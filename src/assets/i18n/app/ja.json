@@ -1,0 +1,138 @@
+{
+  "topBar": {
+    "profile": "私のプロフィール",
+    "logout": "ログアウト",
+    "help": "ヘルプ - ユーザーマニュアル"
+  },
+  "roles": {
+    "tenantAdmin": "テナント管理者",
+    "tenantUser": "テナントユーザー",
+    "clientAdmin": "クライアント管理者",
+    "admin": "UG管理者",
+    "user": "ユーザー",
+    "superAdmin": "スーパー管理者"
+  },
+  "success": {
+    "markUnassignedInvalid": "選択したケースが無効にマークされました"
+  },
+  "error": {
+    "serverError": "おっと！技術的な問題が発生しました。しばらくしてから再試行するか、問題が解決しない場合はシステム管理者に連絡してください。",
+    "userSuccess": "ユーザーが正常に削除されました。ユーザーを再追加できます。",
+    "deleteUserFromGroup": "ユーザーが正常に削除されました",
+    "passwordUpdate": "パスワードが正常に更新されました",
+    "deleteUserGroup": "ユーザーグループが正常に削除されました",
+    "noData": "データは利用できません",
+    "statusSuccess": "ステータスが正常に更新されました"
+  },
+  "navItems": {
+    "home": "ホーム",
+    "dashboard": "ダッシュボード",
+    "systemManagement": "システム管理",
+    "sManagement": {
+      "sites": "サイト",
+      "clients": "クライアント",
+      "superAdmins": "スーパー管理者",
+      "clientAdmins": "クライアント管理者",
+      "roles": "役割",
+      "userGroups": "ユーザーグループ",
+      "users": "ユーザー"
+    },
+    "Report": "レポート",
+    "reporting": "レポーティング",
+    "reports": {
+      "webReport": "ウェブレポート",
+      "webReportDLP": "ウェブレポート DLP",
+      "pageReport": "ページレポート",
+      "pageReportDLP": "ページレポート DLP",
+      "reportLibrary": "レポートライブラリ",
+      "scheduleLibrary": "スケジュールライブラリ",
+      "intelliQ": "インテリキュー",
+      "catalogStudio": "カタログスタジオ"
+    },
+    "Querying": "クエリング",
+    "query": {
+      "qbe": "例によるクエリ",
+      "qbSQL": "SQLによるクエリ",
+      "qLibrary": "クエリライブラリ"
+    },
+    "CaseSeries": "ケースシリーズ",
+    "caseSeries": {
+      "manual": "マニュアルケースシリーズ",
+      "cso": "ケースシリーズ操作",
+      "csLibrary": "ケースシリーズライブラリ"
+    },
+    "quickSight": "クイックサイト",
+    "visualizations": "視覚化",
+    "visualization": "可視化",
+    "visualizationServer": "可視化サーバー",
+    "connection": "接続",
+    "sources": "ソース",
+    "visualGallery": "ビジュアルギャラリー",
+    "dashboardLibrary": "ダッシュボードライブラリ",
+    "pipelineConfig": "パイプライン設定",
+    "batchConfig": "バッチ設定",
+    "taskConfig": "タスク設定",
+    "airflowUI": "エアフローUI",
+    "dataAnalytics": "データ分析",
+    "quicksightSearch": "視覚化クエリ",
+    "myProfile": "私のプロフィール",
+    "help": "ヘルプ - ユーザーマニュアル",
+    "logout": "ログアウト",
+    "auditLogs": "監査ログ",
+    "settings": "アプリ設定",
+    "poweredBy": "搭載",
+    "advancedAnalytics": "高度な分析",
+    "dataVisualization": "データの視覚化",
+    "analytics": "分析",
+    "scheduling": "スケジュール設定",
+    "schedules": "スケジュール",
+    "requests": "リクエスト",
+    "alerts": "待機",
+    "calendar": "カレンダー"
+  },
+  "appOpenInNewTab": "アプリケーションは新しいタブで開かれました。",
+  "notifications": "通知",
+  "noNotification": "通知はありません",
+  "notificationLast30Days": "過去30日間の通知",
+  "footer": {
+    "text1": "UltraAnalytics v2.1 - 著作権 © ",
+    "text2": " Ultragenic Research & Technologies Private Limited | 無断転載を禁じます",
+    "faq": "よくある質問",
+    "termsAndCondition": "利用規約",
+    "contactUs": "お問い合わせ"
+  },
+  "headerSearh": {
+    "report": "検索レポート",
+    "folder": "検索フォルダー",
+    "visualization": "ビジュアライゼーションの作成",
+    "dashboard": "検索ダッシュボード",
+    "visuals": "ビジュアル検索",
+    "caseSeries": "検索ケースシリーズ",
+    "query": "検索クエリ"
+  },
+  "searchBox": {
+    "search": "検索",
+    "globalSearch": "グローバル検索",
+    "suggestions": "提案",
+    "favoriteReports": "お気に入りレポート",
+    "recentlyModifiedReports": "最近変更されました",
+    "mostVisitedReports": "最もアクセスされたレポート",
+    "actionItem": "アクションアイテム",
+    "selectTopic": "トピックを選択してください",
+    "visualize": "視覚化する",
+    "all": "全て",
+    "webReports": "ウェブレポート",
+    "pageReports": "ページレポート",
+    "folders": "フォルダー",
+    "visualizePlaceholder": "プロンプトを入力",
+    "noRecordFound": "レコードが見つかりません",
+    "run": "走る",
+    "schedule": "スケジュール",
+    "edit": "編集",
+    "caseSeries": "ケースシリーズ",
+    "queries": "クエリ",
+    "download": "ダウンロード",
+    "refresh": "リフレッシュする",
+    "tags": "タグ"
+  }
+}

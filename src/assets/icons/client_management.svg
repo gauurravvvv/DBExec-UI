@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24.463" viewBox="0 0 24 24.463">
+  <g id="i_client_management" data-name="i_client management" transform="translate(-25 -94)">
+    <g id="Rectangle_1080" data-name="Rectangle 1080" transform="translate(25 94)" fill="#fff" stroke="#707070" stroke-width="1" opacity="0">
+      <rect width="24" height="24" stroke="none"/>
+      <rect x="0.5" y="0.5" width="23" height="23" fill="none"/>
+    </g>
+    <g id="Ellipse_221" data-name="Ellipse 221" transform="translate(32 96)" fill="#fff" stroke="#161616" stroke-width="1.5">
+      <circle cx="5" cy="5" r="5" stroke="none"/>
+      <circle cx="5" cy="5" r="4.25" fill="none"/>
+    </g>
+    <path id="Path_272" data-name="Path 272" d="M-4327.051,6236.508s-4.951-.736-5.143,3.627-.165,4.668-.165,4.668" transform="translate(4360 -6128.084)" fill="none" stroke="#161616" stroke-width="1.5"/>
+    <path id="Path_273" data-name="Path 273" d="M-4332.361,6236.508s4.451-.736,4.624,3.627.148,4.668.148,4.668" transform="translate(4373.269 -6128.084)" fill="none" stroke="#161616" stroke-width="1.5"/>
+    <path id="Path_274" data-name="Path 274" d="M-4325.31,6236.461h2.8l-1.182,2,1.182,4.021-1.664,2.646-1.64-2.646,1.64-4.39Z" transform="translate(4360.956 -6128.084)" fill="none" stroke="#161616" stroke-width="1.5"/>
+  </g>
+</svg>

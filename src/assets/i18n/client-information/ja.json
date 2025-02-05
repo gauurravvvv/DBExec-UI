@@ -1,0 +1,30 @@
+{
+    "title": "クライアント情報",
+    "tabs": {
+      "basic": "基本情報",
+      "license": "ライセンス情報"
+    },
+    "basic": {
+      "name": "クライアント名",
+      "id": "クライアント ID",
+      "shortName": "クライアントの短い名前",
+      "rootUser": "ルートユーザーの電子メール ID",
+      "decription": "形容",
+      "address": "住所",
+      "fullAddress": "完全なアドレス",
+      "country": "国",
+      "pincode": "ピンコード",
+      "pointOfContact": "主要な窓口",
+      "nameOfContact": "名前",
+      "email": "電子メール ID",
+      "phone": "電話"
+    },
+    "license": {
+      "heading": "ライセンス情報",
+      "startDate": "開始日",
+      "volume": "ケースボリューム",
+      "maxUsers": "許可される最大ユーザー数",
+      "endDate":"有効 期限"
+    }
+  }
+  

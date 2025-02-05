@@ -1,0 +1,861 @@
+{
+  "auditlogList": {
+    "title": "監査ログ",
+    "globalSearchText": "名前、参照、最終更新者で検索",
+    "exportBtn": "輸出",
+    "noDataFound": "データが見つかりません",
+    "select": "選択する",
+    "search": "探す",
+    "gridHeader": {
+      "name": "名前/ID",
+      "reference": "参照",
+      "activity": "アクティビティタイプ",
+      "version": "バージョン",
+      "updatedBy": "最終更新者",
+      "updatedOn": "最終更新日"
+    },
+    "exportDialog": {
+      "title": "のバージョンを選択してください 輸出",
+      "cancel": "キャンセル",
+      "export": "輸出",
+      "version": "バージョン"
+    },
+    "showing": "表示中",
+    "to": "に",
+    "of": "の",
+    "enteries": "エントリ"
+  },
+  "auditlogDetail": {
+    "title": "監査ログの詳細",
+    "globalSearchText": "探す",
+    "exportBtn": "輸出",
+    "compareBtn": "バージョンを比較する",
+    "versionNum": "バージョン",
+    "fieldName": "フィールド名",
+    "oldVal": "古い値",
+    "newVal": "新しい価値",
+    "comment": "コメント",
+    "activityType": "アクティビティタイプ",
+    "updatedBy": "更新者",
+    "updatedOn": "に更新",
+    "state": "州",
+    "intakeId": "インテークID",
+    "username": "ユーザー名",
+    "fullName": "フルネーム",
+    "caseNumber": "ケース番号",
+    "version": "バージョンナンバー"
+  },
+  "stateId": {
+    "$val": "州ID"
+  },
+  "assignedAt": {
+    "$val": "割り当てられた"
+  },
+  "state": {
+    "$val": "州",
+    "id": {
+      "$val": "州ID"
+    },
+    "name": {
+      "$val": "州名"
+    },
+    "configurableStatus": {
+      "$val": "状態構成可能ステータス"
+    },
+    "createdAt": {
+      "$val": "作成された状態"
+    },
+    "createdBy": {
+      "$val": "作成者の状態"
+    },
+    "deletedAt": {
+      "$val": "削除された状態"
+    },
+    "deletedBy": {
+      "$val": "によって削除された状態"
+    },
+    "groupAssignable": {
+      "$val": "割り当て可能な状態グループ"
+    },
+    "techName": {
+      "$val": "州の技術名"
+    },
+    "tenantId": {
+      "$val": "州のテナントID"
+    },
+    "type": {
+      "$val": "状態タイプ"
+    },
+    "updatedAt": {
+      "$val": "状態更新日"
+    },
+    "updatedBy": {
+      "$val": "状態更新者"
+    }
+  },
+  "assignedGroup": {
+    "$val": "割り当てられたグループ",
+    "id": {
+      "$val": "割り当てられたグループID"
+    },
+    "name": {
+      "$val": "割り当てられたグループ名"
+    },
+    "clientId": {
+      "$val": "割り当てられたグループクライアントID"
+    },
+    "tenantId": {
+      "$val": "割り当てられたグループテナントID"
+    }
+  },
+  "jsonData": {
+    "$val": "Jsonデータ",
+    "icsr": {
+      "$val": "ICSR Ja",
+      "caseInfo": {
+        "$val": "ケース情報",
+        "companyNumber": {
+          "$val": "ケース会社番号"
+        },
+        "messageNumber": {
+          "$val": "ケースメッセージ番号"
+        },
+        "duplicateNumb": {
+          "$val": "ケース重複番号"
+        },
+        "caseIdentifier": {
+          "$val": "ケース識別子"
+        },
+        "description": {
+          "$val": "ケースの説明"
+        },
+        "incidenceCountry": {
+          "$val": "症例発生国"
+        },
+        "receiptDate": {
+          "$val": "ケース受領日"
+        },
+        "receiveDate": {
+          "$val": "ケース受領日"
+        },
+        "reportType": {
+          "$val": "症例報告の種類"
+        },
+        "seriousCase": {
+          "$val": "ケースの深刻さ"
+        },
+        "source": {
+          "$val": "ケースソース"
+        },
+        "receiver": {
+          "$val": "ケースレシーバー",
+          "company": {
+            "$val": "ケースレシーバー会社"
+          },
+          "type": {
+            "$val": "ケースレシーバータイプ"
+          },
+          "address": {
+            "$val": "ケースレシーバーアドレス"
+          },
+          "city": {
+            "$val": "ケースレシーバーシティ"
+          },
+          "country": {
+            "$val": "ケースレシーバーの国"
+          },
+          "email": {
+            "$val": "ケースレシーバーの電子メール"
+          },
+          "fax": {
+            "$val": "ケースレシーバーファックス"
+          },
+          "firstName": {
+            "$val": "ケースレシーバーの名"
+          },
+          "lastName": {
+            "$val": "ケースレシーバーの名前"
+          },
+          "phone": {
+            "$val": "ケースレシーバー電話"
+          },
+          "postalCode": {
+            "$val": "ケースレシーバー郵便番号"
+          },
+          "state": {
+            "$val": "ケースレシーバーの状態"
+          },
+          "title": {
+            "$val": "ケースレシーバータイトル"
+          }
+        },
+        "sender": {
+          "$val": "ケース送信者",
+          "company": {
+            "$val": "ケースセンダーカンパニー"
+          },
+          "type": {
+            "$val": "ケース送信者タイプ"
+          },
+          "address": {
+            "$val": "ケース送信者アドレス"
+          },
+          "city": {
+            "$val": "ケースセンダーシティ"
+          },
+          "country": {
+            "$val": "ケース送信者の国"
+          },
+          "email": {
+            "$val": "ケース送信者のメール"
+          },
+          "fax": {
+            "$val": "ケース送信者ファックス"
+          },
+          "firstName": {
+            "$val": "ケース送信者の名"
+          },
+          "lastName": {
+            "$val": "ケース送信者の名前"
+          },
+          "phone": {
+            "$val": "ケース送信者電話"
+          },
+          "postalCode": {
+            "$val": "Case Sender Postal Code"
+          },
+          "state": {
+            "$val": "ケース送信者の郵便番号"
+          },
+          "title": {
+            "$val": "ケース送信者のタイトル"
+          }
+        },
+        "linkType": {
+          "$val": "リンクタイプ"
+        },
+        "linkedNumb": {
+          "$val": "リンク番号"
+        },
+        "duplicateSource": {
+          "$val": "ソースが重複しています"
+        }
+      },
+      "drugs": {
+        "$val": "医薬品情報",
+        "actionTaken": {
+          "$val": "取られた薬物行動"
+        },
+        "dechallengeResult": {
+          "$val": "薬物デチャレンジ結果"
+        },
+        "formulation": {
+          "$val": "製剤"
+        },
+        "indication": {
+          "$val": "適応症"
+        },
+        "productName": {
+          "$val": "医薬品名"
+        },
+        "rechallengeResult": {
+          "$val": "薬物再チャレンジの結果"
+        },
+        "type": {
+          "$val": "薬の種類"
+        },
+        "dosages": {
+          "$val": "薬の投与量",
+          "administrationRoute": {
+            "$val": "薬剤投与投与経路"
+          },
+          "batchLotNo": {
+            "$val": "薬剤投与量バッチロット番号"
+          },
+          "description": {
+            "$val": "薬の投与量の説明"
+          },
+          "doseNo": {
+            "$val": "薬剤投与量数"
+          },
+          "duration": {
+            "$val": "薬剤投与期間"
+          },
+          "durationUnit": {
+            "$val": "薬剤投与期間単位"
+          },
+          "endDate": {
+            "$val": "薬剤投与終了日"
+          },
+          "startDate": {
+            "$val": "薬剤投与開始日"
+          },
+          "dosageFormulation": {
+            "$val": "薬物剤形"
+          },
+          "doseAmount": {
+            "$val": "薬剤投与量"
+          },
+          "doseFrequencyDef": {
+            "$val": "薬剤投与頻度の定義"
+          },
+          "doseFrequencyNumb": {
+            "$val": "薬剤投与頻度数"
+          },
+          "doseFrequencyUnit": {
+            "$val": "薬剤投与頻度単位"
+          },
+          "doseUnit": {
+            "$val": "薬剤投与量単位"
+          }
+        },
+        "genericName": {
+          "$val": "薬の総称"
+        },
+        "meddraVersion": {
+          "$val": "ドラッグメドラバージョン"
+        }
+      },
+      "history": {
+        "$val": "歴史",
+        "codedPT": {
+          "$val": "履歴コード化された優先用語"
+        },
+        "meddraVersion": {
+          "$val": "歴史Meddraバージョン"
+        },
+        "description": {
+          "$val": "履歴の説明"
+        },
+        "notes": {
+          "$val": "履歴ノート"
+        },
+        "startDate": {
+          "$val": "履歴開始日"
+        },
+        "stopDate": {
+          "$val": "履歴停止日"
+        },
+        "type": {
+          "$val": "履歴タイプ"
+        }
+      },
+      "patient": {
+        "$val": "忍耐強い",
+        "initials": {
+          "$val": "患者のイニシャル"
+        },
+        "birthDate": {
+          "$val": "患者の生年月日"
+        },
+        "age": {
+          "$val": "患者の年齢"
+        },
+        "ageUnit": {
+          "$val": "患者年齢単位"
+        },
+        "sex": {
+          "$val": "患者の性別"
+        },
+        "weight": {
+          "$val": "患者の体重"
+        },
+        "weightUnit": {
+          "$val": "患者の体重単位"
+        }
+      },
+      "reactions": {
+        "$val": "反応",
+        "startDate": {
+          "$val": "反応開始日"
+        },
+        "verbatimEvent": {
+          "$val": "反応逐語的イベント"
+        },
+        "meddraVersion": {
+          "$val": "反応メドラバージョン"
+        },
+        "codedEvent": {
+          "$val": "反応コード化イベント"
+        },
+        "outcome": {
+          "$val": "反応結果"
+        },
+        "seriousEvent": {
+          "$val": "反応重篤な事象"
+        },
+        "seriousCriteria": {
+          "$val": "反応の深刻さの基準",
+          "death": {
+            "$val": "反応深刻度基準死"
+          },
+          "hospitalization": {
+            "$val": "反応の深刻さの基準入院"
+          },
+          "disability": {
+            "$val": "反応の深刻さの基準障害"
+          },
+          "lifeThreatning": {
+            "$val": "反応の深刻さの基準生命を脅かす"
+          },
+          "congenitalAnamoly": {
+            "$val": "反応の深刻さの基準先天性異常"
+          },
+          "other": {
+            "$val": "反応の深刻さの基準その他"
+          }
+        }
+      },
+      "labTests": {
+        "$val": "ラボテスト",
+        "date": {
+          "$val": "ラボテスト日"
+        },
+        "notes": {
+          "$val": "ラボテストノート"
+        },
+        "name": {
+          "$val": "ラボテスト名"
+        },
+        "assessment": {
+          "$val": "ラボテスト評価"
+        },
+        "result": {
+          "$val": "ラボテスト結果"
+        },
+        "resultUnit": {
+          "$val": "ラボテスト結果ユニット"
+        },
+        "highRange": {
+          "$val": "ラボテストハイレンジ"
+        },
+        "lowRange": {
+          "$val": "ラボテストローレンジ"
+        }
+      },
+      "reporters": {
+        "$val": "レポーター情報",
+        "firstName": {
+          "$val": "記者名"
+        },
+        "lastName": {
+          "$val": "レポーターの名前"
+        },
+        "hcp": {
+          "$val": "レポーターヘルスケアプロフェッショナル"
+        },
+        "qualification": {
+          "$val": "記者資格"
+        },
+        "address": {
+          "$val": "記者の住所"
+        },
+        "city": {
+          "$val": "レポーターシティ"
+        },
+        "state": {
+          "$val": "レポーターの状態"
+        },
+        "country": {
+          "$val": "レポーター国"
+        },
+        "postalCode": {
+          "$val": "記者の郵便番号"
+        },
+        "phone": {
+          "$val": "記者電話"
+        },
+        "fax": {
+          "$val": "レポーターファックス"
+        },
+        "email": {
+          "$val": "レポーターのメール"
+        },
+        "organization": {
+          "$val": "レポーター組織"
+        }
+      },
+      "other": {
+        "$val": "その他の情報",
+        "fieldName": {
+          "$val": "その他の情報フィールド名"
+        },
+        "fieldValue": {
+          "$val": "その他の情報フィールド値"
+        }
+      },
+      "references": {
+        "$val": "参考文献",
+        "value": {
+          "$val": "基準値"
+        },
+        "type": {
+          "$val": "参照型"
+        },
+        "name": {
+          "$val": "参照名"
+        }
+      }
+    }
+  },
+  "assignedGroupId": {
+    "$val": "割り当てられたグループID"
+  },
+  "assignedUser": {
+    "$val": "割り当てられたユーザー",
+    "id": {
+      "$val": "割り当てられたユーザーID"
+    },
+    "firstName": {
+      "$val": "割り当てられたユーザーの名"
+    },
+    "clientId": {
+      "$val": "割り当てられたユーザークライアントID"
+    },
+    "tenantId": {
+      "$val": "割り当てられたユーザーテナントID"
+    },
+    "middleName": {
+      "$val": "割り当てられたユーザーのミドルネーム"
+    },
+    "lastName": {
+      "$val": "割り当てられたユーザーの名前"
+    },
+    "email": {
+      "$val": "割り当てられたユーザーの電子メール"
+    }
+  },
+  "assignedUserId": {
+    "$val": "割り当てられたユーザーID"
+  },
+  "caseNumber": {
+    "$val": "ケース番号"
+  },
+  "clientId": {
+    "$val": "クライアントID"
+  },
+  "createdAt": {
+    "$val": "作成日"
+  },
+  "createdBy": {
+    "$val": "によって作成された"
+  },
+  "deletedAt": {
+    "$val": "削除日"
+  },
+  "deletedBy": {
+    "$val": "削除者"
+  },
+  "dueAt": {
+    "$val": "期限"
+  },
+  "e2bFileName": {
+    "$val": "E2Bファイル名"
+  },
+  "error": {
+    "$val": "エラー"
+  },
+  "id": {
+    "$val": "ID"
+  },
+  "identifiedFormId": {
+    "$val": "識別されたフォームID"
+  },
+  "intakeAt": {
+    "$val": "インテークオン"
+  },
+  "intakeId": {
+    "$val": "インテークID"
+  },
+  "isArchived": {
+    "$val": "アーカイブされています"
+  },
+  "isReported": {
+    "$val": "報告されます"
+  },
+  "lockedBy": {
+    "$val": "によってロックされています"
+  },
+  "masterId": {
+    "$val": "マスターID"
+  },
+  "pdfFileName": {
+    "$val": "PDFファイル名"
+  },
+  "primaryFormat": {
+    "$val": "プライマリフォーマット"
+  },
+  "receivedAt": {
+    "$val": "受信日"
+  },
+  "sourceFrom": {
+    "$val": "ソースから"
+  },
+  "sourceId": {
+    "$val": "ソースID"
+  },
+  "sourceTo": {
+    "$val": "ソースから"
+  },
+  "sourceUid": {
+    "$val": "ソースUid"
+  },
+  "srcCaseNumber": {
+    "$val": "SRCケース番号"
+  },
+  "status": {
+    "$val": "スターテス"
+  },
+  "studyNum": {
+    "$val": "研究番号"
+  },
+  "subState": {
+    "$val": "サブステート"
+  },
+  "subject": {
+    "$val": "主題"
+  },
+  "tcCaseNumber": {
+    "$val": "TCケース番号"
+  },
+  "tenantId": {
+    "$val": "テナントID"
+  },
+  "updatedAt": {
+    "$val": "更新日"
+  },
+  "updatedBy": {
+    "$val": "更新者"
+  },
+  "countryId": {
+    "$val": "国ID"
+  },
+  "email": {
+    "$val": "Eメール"
+  },
+  "firstName": {
+    "$val": "ファーストネーム"
+  },
+  "isActive": {
+    "$val": "アクティブユーザーですか"
+  },
+  "isRootUser": {
+    "$val": "ルートユーザーです"
+  },
+  "isdCode": {
+    "$val": "ISDコード"
+  },
+  "languageId": {
+    "$val": "言語ID"
+  },
+  "lastName": {
+    "$val": "苗字"
+  },
+  "ldapId": {
+    "$val": "LDAP Id"
+  },
+  "login": {
+    "$val": "ユーザー名"
+  },
+  "middleName": {
+    "$val": "ミドルネーム"
+  },
+  "password": {
+    "$val": "パスワード"
+  },
+  "phone": {
+    "$val": "電話番号"
+  },
+  "role": {
+    "$val": "役割"
+  },
+  "siteId": {
+    "$val": "サイトID"
+  },
+  "stateName": {
+    "$val": "州名"
+  },
+  "timezone": {
+    "$val": "タイムゾーン"
+  },
+  "userGroups": {
+    "$val": "ユーザーグループ",
+    "id": {
+      "$val": "ユーザーグループID"
+    },
+    "clientId": {
+      "$val": "ユーザーグループクライアントID"
+    },
+    "groupId": {
+      "$val": "ユーザーグループグループID"
+    },
+    "createdAt": {
+      "$val": "作成されたユーザーグループ"
+    },
+    "createdBy": {
+      "$val": "作成者ユーザーグループ"
+    },
+    "deletedAt": {
+      "$val": "削除されたユーザーグループ"
+    },
+    "deletedBy": {
+      "$val": "削除者ユーザーグループ"
+    },
+    "tenantId": {
+      "$val": "ユーザーグループテナントID"
+    },
+    "updatedAt": {
+      "$val": "ユーザーグループの更新日"
+    },
+    "updatedBy": {
+      "$val": "ユーザーグループの更新者"
+    },
+    "userId": {
+      "$val": "ユーザーグループユーザーID"
+    }
+  },
+  "userCountries": {
+    "$val": "ユーザーの国",
+    "id": {
+      "$val": "ユーザーの国ID"
+    },
+    "clientId": {
+      "$val": "ユーザー国クライアントID"
+    },
+    "countryId": {
+      "$val": "ユーザー国国ID"
+    },
+    "createdAt": {
+      "$val": "ユーザー作成国"
+    },
+    "createdBy": {
+      "$val": "作成者の国"
+    },
+    "deletedAt": {
+      "$val": "削除されたユーザーの国"
+    },
+    "deletedBy": {
+      "$val": "ユーザーの国削除者"
+    },
+    "tenantId": {
+      "$val": "ユーザー国テナントID"
+    },
+    "updatedAt": {
+      "$val": "ユーザーの国の更新日"
+    },
+    "updatedBy": {
+      "$val": "ユーザーの国更新者"
+    },
+    "userId": {
+      "$val": "ユーザー国ユーザーID"
+    }
+  },
+  "userProducts": {
+    "$val": "ユーザー製品",
+    "id": {
+      "$val": "ウエスト"
+    },
+    "clientId": {
+      "$val": "ユーザー製品クライアント ID"
+    },
+    "productId": {
+      "$val": "ユーザー製品製品ID"
+    },
+    "createdAt": {
+      "$val": "作成されたユーザー製品"
+    },
+    "createdBy": {
+      "$val": "作成者のユーザー製品"
+    },
+    "deletedAt": {
+      "$val": "削除されたユーザー製品"
+    },
+    "deletedBy": {
+      "$val": "ユーザー製品の削除者"
+    },
+    "tenantId": {
+      "$val": "ユーザー製品テナントID"
+    },
+    "updatedAt": {
+      "$val": "ユーザー製品の更新日"
+    },
+    "updatedBy": {
+      "$val": "ユーザー製品の更新者"
+    },
+    "userId": {
+      "$val": "ユーザー製品ユーザーID"
+    }
+  },
+  "userStudies": {
+    "$val": "ユーザー調査",
+    "id": {
+      "$val": "ユーザースタディID"
+    },
+    "clientId": {
+      "$val": "ユーザー調査クライアントID"
+    },
+    "studyId": {
+      "$val": "ユーザー調査調査ID"
+    },
+    "createdAt": {
+      "$val": "作成されたユーザー調査"
+    },
+    "createdBy": {
+      "$val": "作成者によるユーザー調査"
+    },
+    "deletedAt": {
+      "$val": "ユーザー調査が削除されました"
+    },
+    "deletedBy": {
+      "$val": "ユーザー調査の削除者"
+    },
+    "tenantId": {
+      "$val": "ユーザー調査テナントID"
+    },
+    "updatedAt": {
+      "$val": "ユーザー調査の更新日"
+    },
+    "updatedBy": {
+      "$val": "ユーザー調査更新者"
+    },
+    "userId": {
+      "$val": "ユーザー調査ユーザーID"
+    }
+  },
+  "userSources": {
+    "$val": "ユーザーソース",
+    "id": {
+      "$val": "ユーザーソースID"
+    },
+    "clientId": {
+      "$val": "ユーザーソースクライアントID"
+    },
+    "sourceId": {
+      "$val": "ユーザーソースソースID"
+    },
+    "createdAt": {
+      "$val": "作成されたユーザーソース"
+    },
+    "createdBy": {
+      "$val": "作成者ユーザーソース"
+    },
+    "deletedAt": {
+      "$val": "削除されたユーザーソース"
+    },
+    "deletedBy": {
+      "$val": "ユーザーソースの削除者"
+    },
+    "tenantId": {
+      "$val": "ユーザーソーステナントID"
+    },
+    "updatedAt": {
+      "$val": "ユーザーソースの更新日"
+    },
+    "updatedBy": {
+      "$val": "ユーザーソース更新者"
+    },
+    "userId": {
+      "$val": "ユーザーソースユーザーID"
+    }
+  }
+}

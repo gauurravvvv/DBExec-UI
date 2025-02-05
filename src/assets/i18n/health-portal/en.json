@@ -1,0 +1,132 @@
+{
+  "title": "Health Authority Portal",
+  "search": "Search",
+  "select": "Select",
+  "accept": "Accept",
+  "caseDataLabel": "Case Data",
+  "healthPortal": {
+    "config": "Configuration",
+    "execution": "Executions",
+    "caseData": "Case Data",
+    "save": "Save",
+    "haCanada": {
+      "card1": "1. Report Search Criteria",
+      "ird": "Initial Received Date",
+      "lrd": "Latest Received Date",
+      "seriosReport": "Serious Report",
+      "sourceReport": "Source of Report",
+      "card2": "2. Patient Search Criteria",
+      "gender": "Gender",
+      "outcome": "Report Outcome",
+      "ageFrom": "Age from",
+      "ageTo": "Age to",
+      "years": "Year(s)",
+      "card3": "3. Suspect Health Product Search Criteria",
+      "allProducts": "All Health Product",
+      "brand": "By Brand Name",
+      "ingredient": "By Active Ingredient",
+      "card4": "4. Adverse Reaction Term Search Criteria",
+      "allReactions": "All Adverse Reaction Terms",
+      "adverse": "By Adverse Reaction Term",
+      "soc": "By System Organ Class (SOC)",
+      "srchKey": "Search Keyword",
+      "brandKey": "Search Keyword By Brand Name",
+      "ingrKey": "Search Keyword By Active Ingredient",
+      "artKey": "Search Keyword By Adverse Reaction",
+      "socKey": "Search Keyword By System Organ Class",
+      "run": "Run Now",
+      "note": "Note: Cannot select option All for both section 3 and 4",
+      "addProd": "Add Product",
+      "addReac": "Add Adverse Reaction Term",
+      "add": "Add",
+      "remove": "Remove"
+    },
+    "evWeb": {
+      "reports": "Reports",
+      "card1": "Criteria",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "activeSubs": "Active Substance",
+      "activeSubstanceCombination": "Active Substance Combination",
+      "activeSubstanceGroup": "Active Substance Group",
+      "activeSubstanceMlmGroup": "Active Substance MLM Group",
+      "activeSubstanceMlmComb": "Active Substance MLM Combination",
+      "serious": "Serious",
+      "reportingType": "Reporting Type",
+      "currentReport": "Current Report",
+      "organizationType": "Organization Type",
+      "worldCaseId": "World Wide Case Id",
+      "addworldWideCaseId": "World Wide Case Id",
+      "addactiveSubstanceCombination": "Active Substance Combination",
+      "addactiveSubstanceGroup": "Active Substance Group",
+      "addactiveSubstanceMlmGroup": "Active Substance MLM Group",
+      "addactiveSubstanceMlmComb": "Active Subst. MLM Combination",
+      "reporter": "Reporter",
+      "literatureReference": "Literature Reference",
+      "addNew":"Add New"
+    }
+  },
+  "caseData": {
+    "downloadedFrom": "Downloaded From",
+    "caseIdentifier": "Source Case Identifier",
+    "harDate": "Health Authority Receipt Date",
+    "downloadedAt": "Downloaded On",
+    "countryOfIncidence": "Country of Incidence",
+    "suspectProduct": "Suspect Product",
+    "sourceOfReport": "Source of Report",
+    "mahCaseNumber": "MAH Safety Case Number",
+    "status": "Status",
+    "caseNumber": "Safety System Case Number",
+    "error": "Error Message",
+    "noRecords": "No Records Found",
+    "portalJustification": "Justification",
+    "intakeId": "Intake ID",
+    "enterJustification": "Enter Justfication",
+    "execId": "Execution ID",
+    "errorMsg": "Error"
+  },
+  "execution": {
+    "execId": "Execution ID",
+    "srcName": "Source",
+    "status": "Status",
+    "reportCount": "Total Cases",
+    "error": "Error Message",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "execTime": "Total Execution Time (in mins)",
+    "errorMsg": "Error Message"
+  },
+  "validation": {
+    "haCanada": {
+      "keywordsSection3": {
+        "required": "Please enter keyword"
+      },
+      "keywordsSection4": {
+        "required": "Please enter keyword"
+      },
+      "section3results": {
+        "required": "Please enter Product"
+      },
+      "section4results": {
+        "required": "Please enter Adverse Event"
+      }
+    },
+    "evWeb": {
+      "worldWideCaseId": {
+        "required": "Please enter World Wide Case Id"
+      },
+      "startDate": {
+        "required": "Please enter Start and End Date"
+      },
+      "organisation": {
+        "required": "Please enter Organization Type"
+      },
+      "serious": {
+        "required": "Please enter Seriousness Type"
+      },
+      "report": {
+        "required": "Please enter Report Type"
+      }
+    }
+  }
+}

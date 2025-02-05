@@ -1,0 +1,21 @@
+<svg id="Component_343_90" data-name="Component 343 – 90" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g id="Rectangle_1174" data-name="Rectangle 1174" fill="#fff" stroke="#707070" stroke-width="1" opacity="0">
+    <rect width="16" height="16" stroke="none"/>
+    <rect x="0.5" y="0.5" width="15" height="15" fill="none"/>
+  </g>
+  <g id="Group_2301" data-name="Group 2301" transform="translate(-202.805 -644.18)">
+    <path id="Path_335" data-name="Path 335" d="M-5899.713,58.024l5.194,3.066V58.024h1.874a2.221,2.221,0,0,0,2.277-2.221c.013-2.219,0-5.581,0-5.581s.2-2.136-2.834-2.039-8.923,0-8.923,0a2.392,2.392,0,0,0-2.069,2.442c.053,2.153,0,5.679,0,5.679a1.914,1.914,0,0,0,2.069,1.719C-5900.158,58.049-5899.713,58.024-5899.713,58.024Z" transform="translate(6108 598)" fill="none" stroke="#707070" stroke-width="1"/>
+    <g id="Ellipse_250" data-name="Ellipse 250" transform="translate(207 650)" fill="#fff" stroke="#707070" stroke-width="1">
+      <circle cx="1" cy="1" r="1" stroke="none"/>
+      <circle cx="1" cy="1" r="0.5" fill="none"/>
+    </g>
+    <g id="Ellipse_251" data-name="Ellipse 251" transform="translate(210 650)" fill="#fff" stroke="#707070" stroke-width="1">
+      <circle cx="1" cy="1" r="1" stroke="none"/>
+      <circle cx="1" cy="1" r="0.5" fill="none"/>
+    </g>
+    <g id="Ellipse_252" data-name="Ellipse 252" transform="translate(213 650)" fill="#fff" stroke="#707070" stroke-width="1">
+      <circle cx="1" cy="1" r="1" stroke="none"/>
+      <circle cx="1" cy="1" r="0.5" fill="none"/>
+    </g>
+  </g>
+</svg>

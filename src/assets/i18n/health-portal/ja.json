@@ -1,0 +1,131 @@
+{
+  "title": "保健当局ポータル",
+  "search": "探す",
+  "select": "選択する",
+  "accept": "受け入れる",
+  "caseDataLabel": "ケースデータ",
+  "healthPortal": {
+    "config": "構成",
+    "execution": "実行",
+    "caseData": "ケースデータ",
+    "save": "保存",
+    "haCanada": {
+      "card1": "1. レポート検索基準",
+      "ird": "最初の受信日",
+      "lrd": "最新の受信日",
+      "seriosReport": "深刻な報告",
+      "sourceReport": "レポートのソース",
+      "card2": "2.患者の検索基準",
+      "gender": "性別",
+      "outcome": "レポートの結果",
+      "ageFrom": "からの年齢",
+      "ageTo": "に",
+      "years": "年",
+      "card3": "3.疑わしい健康製品の検索基準",
+      "allProducts": "すべての健康製品",
+      "brand": "ブランド名別",
+      "ingredient": "有効成分による",
+      "card4": "4.副作用用語の検索基準",
+      "allReactions": "すべての副作用条件",
+      "adverse": "副作用の用語による",
+      "soc": "システムオルガンクラス（SOC）別",
+      "srchKey": "検索語",
+      "brandKey": "ブランド名でキーワードを検索",
+      "ingrKey": "有効成分でキーワードを検索",
+      "artKey": "副作用でキーワードを検索",
+      "socKey": "システム臓器クラスでキーワードを検索",
+      "run": "今すぐ実行",
+      "note": "注：セクション3と4Jaの両方でオプションAllを選択することはできません",
+      "addProd": "製品を追加",
+      "addReac": "副作用項を追加する",
+      "add": "追加",
+      "remove": "削除"
+    },
+    "evWeb": {
+      "reports": "レポート",
+      "card1": "基準",
+      "startDate": "開始日",
+      "endDate": "終了日",
+      "activeSubs": "有効成分",
+      "activeSubstanceCombination": "有効成分の組み合わせ",
+      "activeSubstanceGroup": "活性物質グループ",
+      "activeSubstanceMlmGroup": "有効成分マルチ商法グループ",
+      "activeSubstanceMlmComb": "有効成分マルチ商法の組み合わせ",
+      "serious": "深刻",
+      "reportingType": "レポートタイプ",
+      "currentReport": "現在のレポート",
+      "organizationType": "組織タイプ",
+      "worldCaseId": "ワールドワイドケースID",
+      "addworldWideCaseId": "ワールドワイドケースID",
+      "addactiveSubstanceCombination": "有効成分の組み合わせ",
+      "addactiveSubstanceGroup": "活性物質グループ ",
+      "addactiveSubstanceMlmGroup": "有効成分マルチ商法グループ",
+      "addactiveSubstanceMlmComb": "有効成分マルチ商法の組み合わせ",
+      "reporter": "レポーター",
+      "literatureReference": "文献リファレンス"
+    }
+  },
+  "caseData": {
+    "downloadedFrom": "からダウンロード",
+    "caseIdentifier": "ソースケース識別子",
+    "harDate": "保健当局の受領日",
+    "downloadedAt": "ダウンロード日",
+    "countryOfIncidence": "発生国",
+    "suspectProduct": "疑わしい製品",
+    "sourceOfReport": "レポートのソース",
+    "mahCaseNumber": "MAH安全ケース番号",
+    "status": "スターテス",
+    "caseNumber": "安全システムケース番号",
+    "error": "エラーメッセージ",
+    "noRecords": "レコードが見つかりません",
+    "portalJustification": "正当化",
+    "intakeId": "インテークID",
+    "enterJustification": "正当化を入力してください",
+    "execId": "実行ID",
+    "errorMsg": "エラー"
+  },
+  "execution": {
+    "execId": "実行ID",
+    "srcName": "ソース",
+    "status": "スターテス",
+    "reportCount": "総件数",
+    "error": "エラーメッセージ",
+    "startTime": "始まる時間",
+    "endTime": "終了時間",
+    "execTime": "合計実行時間（分単位)",
+    "errorMsg": "エラーメッセージ"
+  },
+  "validation": {
+    "haCanada": {
+      "keywordsSection3": {
+        "required": "キーワードを入力してください"
+      },
+      "keywordsSection4": {
+        "required": "キーワードを入力してください"
+      },
+      "section3results": {
+        "required": "製品を入力してください"
+      },
+      "section4results": {
+        "required": "有害事象を入力してください"
+      }
+    },
+    "evWeb": {
+      "worldWideCaseId": {
+        "required": "ワールドワイドケースIDを入力してください"
+      },
+      "startDate": {
+        "required": "開始日と終了日を入力してください"
+      },
+      "organisation": {
+        "required": "組織タイプを入力してください"
+      },
+      "serious": {
+        "required": "深刻度タイプを入力してください"
+      },
+      "report": {
+        "required": "レポートタイプを入力してください"
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "title": "My Profile",
+  "adminProfile": {
+    "username": "Username",
+    "name": "Full name",
+    "email": "Email ID",
+    "password": "Password"
+  },
+  "userProfile": {
+    "username": "Username",
+    "name": "Full Name",
+    "email": "Email ID",
+    "password": "Password",
+    "products": "Product name",
+    "country": "Country",
+    "study": "Study name",
+    "source": "Case source",
+    "restrictions": "Data Restrictions",
+    "privileges": "Privileges",
+    "rights": "Based on admin rights",
+    "passwordPolicy": "Password policy:",
+    "policy": "Password should contain atleast 1 lower case, 1 upper case, 1 numeric and 1 special character. (Allowed special characters: !, @, &, *, (, ), _, - and.)",
+    "restrictions&privilege": "Restrictions and Privileges",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "profileInformation": "Profile Information",
+    "clientsAssociated": "Client(s) Associated",
+    "groupsAssociated": "Group(s) Associated",
+    "active": "Active",
+    "inactive": "Inactive",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "invalidPassword": "Invalid Password",
+    "pickAPassword": "Pick A password",
+    "suggestions": "Suggestions",
+    "oneLowerCase": "At least one lowercase",
+    "oneUpperCase": "At least one uppercase",
+    "oneNumeric": "At least one numeric",
+    "oneSpecial": "At least one special character from @,$,!,%,*,?,$ or #",
+    "minEight": "Minimum 8 characters",
+    "cancel": "Cancel",
+    "update": "Update",
+    "editProfileInfo": "Edit Profile Info",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "confirmation": "Confirmation",
+    "youSure": "Are you sure that you want to do this action? Changes you made might not be saved.",
+    "yes": "Yes",
+    "no": "No",
+    "passCannotSame": "New Password cannot be same as Old Password.",
+    "passNotMatch": "Confirm Password field doesn't match with New Password entered.",
+    "noGroups": "No associated groups found",
+    "oldPass": "Old Password",
+    "charLimitReached": "Maximum character limit reached",
+    "passRequired": "Password is required",
+    "maxChar100": "Maximum character limit is 100",
+    "maxChar30": "Maximum character limit is 30",
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "emailRequired": "Email is required",
+    "invalidFName": "Invalid first name",
+    "invalidLName": "Invalid last name",
+    "invalidEmail": "Invalid Email",
+    "enter": "Enter ",
+    "invalid": "Invalid ",
+    "edit": "Edit"
+  },
+  "privileges": {
+    "section": "Section Level",
+    "navigation": "Navigation Pane",
+    "state": "State",
+    "read": "Read",
+    "write": "Write",
+    "access": "Access",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "validation": {
+    "adminProfile": {
+      "newPassword": {
+        "required": "Please enter password",
+        "pattern": "Password doesn’t satisfy the password policy."
+      },
+      "confirmPassword": {
+        "required": "Please enter password",
+        "pattern": "Password doesn’t satisfy the password policy."
+      }
+    }
+  }
+}

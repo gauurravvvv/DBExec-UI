@@ -1,0 +1,12 @@
+{
+  "title": "アラートと通知",
+  "mark": "既読にする",
+  "select": "選ぶ",
+  "search": "捜索",
+  "noDataFound": "データが見つかりません",
+  "gridHeader": {
+    "title": "タイトル",
+    "desc": "形容",
+    "date": "通知日"
+  }
+}

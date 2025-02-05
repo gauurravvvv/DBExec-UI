@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Path_271" data-name="Path 271" d="M11.047,3.505a37.775,37.775,0,0,0,.265,3.9c.2,1.4.863,2.1,3.313,2.1,4.18,0,3.866,0,3.866,0v9.135H-.537V-.459H11.047Z" fill="#fff"/>
+    </clipPath>
+  </defs>
+  <g id="i_unassigned_cases" data-name="i_unassigned cases" transform="translate(-22 -291)">
+    <g id="i_case_listing" data-name="i_case listing" transform="translate(22 291)">
+      <g id="ico" transform="translate(1.5 3.75)">
+        <g id="_66_folder_archive_file" data-name="66 folder, archive, file">
+          <g id="Mask_Group_10" data-name="Mask Group 10" clip-path="url(#clip-path)">
+            <path id="Path_174" data-name="Path 174" d="M20,18.5V11.75A2.25,2.25,0,0,0,17.75,9.5H11V7.25A2.25,2.25,0,0,0,8.75,5H4.25A2.25,2.25,0,0,0,2,7.25v12A2.25,2.25,0,0,0,4.25,21.5h13.5A2.25,2.25,0,0,0,19.865,20,7.174,7.174,0,0,0,20,18.5Zm-1.5.75a.75.75,0,0,1-.75.75H4.25a.75.75,0,0,1-.75-.75v-12a.75.75,0,0,1,.75-.75h4.5a.75.75,0,0,1,.75.75v3a.75.75,0,0,0,.75.75h7.5a.75.75,0,0,1,.75.75Z" transform="translate(-2 -5)" fill="#161616"/>
+          </g>
+        </g>
+      </g>
+      <g id="Rectangle_632" data-name="Rectangle 632" fill="none" stroke="#707070" stroke-width="1" opacity="0">
+        <rect width="24" height="24" stroke="none"/>
+        <rect x="0.5" y="0.5" width="23" height="23" fill="none"/>
+      </g>
+    </g>
+    <path id="Path_270" data-name="Path 270" d="M-4323.707,6422.067c0-1.91,4.574-2.491,4.574.355s-1.472,2.319-2.408,2.977-.493,1.581-.5,2" transform="translate(4360 -6128)" fill="none" stroke="#161616" stroke-width="1.5"/>
+    <g id="Ellipse_220" data-name="Ellipse 220" transform="translate(37 301)" fill="#fff" stroke="#161616" stroke-width="1">
+      <circle cx="1" cy="1" r="1" stroke="none"/>
+      <circle cx="1" cy="1" r="0.5" fill="none"/>
+    </g>
+  </g>
+</svg>

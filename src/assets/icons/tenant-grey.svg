@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16.385" height="16" viewBox="0 0 16.385 16">
+  <g id="Group_2501" data-name="Group 2501" transform="translate(0.224 0)">
+    <g id="Rectangle_807" data-name="Rectangle 807" transform="translate(-0.224 0)" fill="#6c757d" stroke="#fff" stroke-width="0.5" opacity="0">
+      <rect width="16" height="16" stroke="none"/>
+      <rect x="0.25" y="0.25" width="15.5" height="15.5" fill="none"/>
+    </g>
+    <g id="Group_1352" data-name="Group 1352" transform="translate(0.927 0.66)">
+      <path id="Subtraction_2" data-name="Subtraction 2" d="M14.984,14.366H0v-.359H.892V4.489a.179.179,0,0,1,.178-.18H4.1V.179A.179.179,0,0,1,4.281,0H10.7a.179.179,0,0,1,.178.179v4.13h3.032a.179.179,0,0,1,.178.18v9.517h.892v.359Zm-4.1-9.7v9.338h2.854V4.669ZM4.459.359h0V14.007h6.065V.359ZM1.248,4.669v9.338H4.1V4.669Z" fill="#6c757d" stroke="#6c757d" stroke-width="0.5"/>
+      <rect id="Rectangle_779" data-name="Rectangle 779" width="2.385" height="1.789" transform="translate(6.323 1.808)" fill="#6c757d"/>
+      <rect id="Rectangle_780" data-name="Rectangle 780" width="2.385" height="1.789" transform="translate(6.323 6.404)" fill="#6c757d"/>
+      <rect id="Rectangle_781" data-name="Rectangle 781" width="2.385" height="1.789" transform="translate(6.323 10.964)" fill="#6c757d"/>
+    </g>
+  </g>
+</svg>

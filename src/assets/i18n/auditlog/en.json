@@ -1,0 +1,888 @@
+{
+  "auditlogList": {
+    "title": "Audit log",
+    "globalSearchText": "Search  by name, reference and last updated by",
+    "exportBtn": "Export",
+    "noDataFound": "No Data Found",
+    "select": "Select",
+    "search": "Search",
+    "gridHeader": {
+      "name": "Name/ID",
+      "reference": "Reference",
+      "activity": "Activity type",
+      "version": "Version",
+      "updatedBy": "Last updated by",
+      "updatedOn": "Last Update date"
+    },
+    "exportDialog": {
+      "title": "Choose versions for export",
+      "cancel": "Cancel",
+      "export": "Export",
+      "version": "Version"
+    },
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "enteries": "entries"
+  },
+  "auditlogDetail": {
+    "title": "Audit log detail",
+    "globalSearchText": "Search",
+    "exportBtn": "Export",
+    "compareBtn": "Compare versions",
+    "versionNum": "Version",
+    "fieldName": "Field name",
+    "oldVal": "Old value",
+    "newVal": "New value",
+    "comment": "Comment",
+    "activityType": "Activity type",
+    "updatedBy": "Updated By",
+    "updatedOn": "Updated On",
+    "state": "State",
+    "intakeId": "Intake ID",
+    "username": "Username",
+    "fullName": "Full Name",
+    "caseNumber": "Case number",
+    "version": "Version Number"
+  },
+  "stateId": {
+    "$val": "State ID"
+  },
+  "assignedAt": {
+    "$val": "Assigned On"
+  },
+  "state": {
+    "$val": "State",
+    "id": {
+      "$val": "State ID"
+    },
+    "name": {
+      "$val": "State Name"
+    },
+    "configurableStatus": {
+      "$val": "State Configurable Status"
+    },
+    "createdAt": {
+      "$val": "State Created On"
+    },
+    "createdBy": {
+      "$val": "State Created By"
+    },
+    "deletedAt": {
+      "$val": "State Deleted On"
+    },
+    "deletedBy": {
+      "$val": "State Deleted By"
+    },
+    "groupAssignable": {
+      "$val": "State Group Assignable"
+    },
+    "techName": {
+      "$val": "State Technical Name"
+    },
+    "tenantId": {
+      "$val": "State Tenant Id"
+    },
+    "type": {
+      "$val": "State Type"
+    },
+    "updatedAt": {
+      "$val": "State Updated On"
+    },
+    "updatedBy": {
+      "$val": "State Updated By"
+    }
+  },
+  "assignedGroup": {
+    "$val": "Assigned Group",
+    "id": {
+      "$val": "Assigned Group ID"
+    },
+    "name": {
+      "$val": "Assigned Group Name"
+    },
+    "clientId": {
+      "$val": "Assigned Group Client ID"
+    },
+    "tenantId": {
+      "$val": "Assigned Group Tenant ID"
+    }
+  },
+  "jsonData": {
+    "$val": "Json Data",
+    "icsr": {
+      "$val": "ICSR",
+      "caseInfo": {
+        "$val": "Case Information",
+        "companyNumber": {
+          "$val": "Case Company Number"
+        },
+        "messageNumber": {
+          "$val": "Case Message Number"
+        },
+        "duplicateNumb": {
+          "$val": "Case Duplicate Number"
+        },
+        "caseIdentifier": {
+          "$val": "Case Identifier"
+        },
+        "description": {
+          "$val": "Case Description"
+        },
+        "incidenceCountry": {
+          "$val": "Case Incidence Country"
+        },
+        "receiptDate": {
+          "$val": "Case Receipt Date"
+        },
+        "receiveDate": {
+          "$val": "Case Receive Date"
+        },
+        "reportType": {
+          "$val": "Case Report Type"
+        },
+        "seriousCase": {
+          "$val": "Case Seriousness"
+        },
+        "source": {
+          "$val": "Case Source"
+        },
+        "receiver": {
+          "$val": "Case Receiver",
+          "company": {
+            "$val": "Case Receiver Company"
+          },
+          "type": {
+            "$val": "Case Receiver Type"
+          },
+          "address": {
+            "$val": "Case Receiver Address"
+          },
+          "city": {
+            "$val": "Case Receiver City"
+          },
+          "country": {
+            "$val": "Case Receiver Country"
+          },
+          "email": {
+            "$val": "Case Receiver Email"
+          },
+          "fax": {
+            "$val": "Case Receiver Fax"
+          },
+          "firstName": {
+            "$val": "Case Receiver First Name"
+          },
+          "lastName": {
+            "$val": "Case Receiver Last Name"
+          },
+          "phone": {
+            "$val": "Case Receiver Phone"
+          },
+          "postalCode": {
+            "$val": "Case Receiver Postal Code"
+          },
+          "state": {
+            "$val": "Case Receiver State"
+          },
+          "title": {
+            "$val": "Case Receiver Title"
+          }
+        },
+        "sender": {
+          "$val": "Case Sender",
+          "company": {
+            "$val": "Case Sender Company"
+          },
+          "type": {
+            "$val": "Case Sender Type"
+          },
+          "address": {
+            "$val": "Case Sender Address"
+          },
+          "city": {
+            "$val": "Case Sender City"
+          },
+          "country": {
+            "$val": "Case Sender Country"
+          },
+          "email": {
+            "$val": "Case Sender Email"
+          },
+          "fax": {
+            "$val": "Case Sender Fax"
+          },
+          "firstName": {
+            "$val": "Case Sender First Name"
+          },
+          "lastName": {
+            "$val": "Case Sender Last Name"
+          },
+          "phone": {
+            "$val": "Case Sender Phone"
+          },
+          "postalCode": {
+            "$val": "Case Sender Postal Code"
+          },
+          "state": {
+            "$val": "Case Sender State"
+          },
+          "title": {
+            "$val": "Case Sender Title"
+          }
+        },
+        "linkType": {
+          "$val": "Link Type"
+        },
+        "linkedNumb": {
+          "$val": "Linked Number"
+        },
+        "duplicateSource": {
+          "$val": "Duplicate Source"
+        }
+      },
+      "drugs": {
+        "$val": "Drug Information",
+        "actionTaken": {
+          "$val": "Drug Action Taken"
+        },
+        "dechallengeResult": {
+          "$val": "Drug Dechallenge Result"
+        },
+        "formulation": {
+          "$val": "Drug Formulation"
+        },
+        "indication": {
+          "$val": "Drug Indication"
+        },
+        "productName": {
+          "$val": "Drug Product Name"
+        },
+        "rechallengeResult": {
+          "$val": "Drug Rechallenge Result"
+        },
+        "type": {
+          "$val": "Drug Type"
+        },
+        "dosages": {
+          "$val": "Drug Dosage",
+          "administrationRoute": {
+            "$val": "Drug Dosage Administration Route"
+          },
+          "batchLotNo": {
+            "$val": "Drug Dosage Batch Lot No"
+          },
+          "description": {
+            "$val": "Drug Dosage Description"
+          },
+          "doseNo": {
+            "$val": "Drug Dosage Dose No"
+          },
+          "duration": {
+            "$val": "Drug Dosage Duration"
+          },
+          "durationUnit": {
+            "$val": "Drug Dosage Duration Unit"
+          },
+          "endDate": {
+            "$val": "Drug Dosage End Date"
+          },
+          "startDate": {
+            "$val": "Drug Dosage Start Date"
+          },
+          "doseAmount": {
+            "$val": "Drug Dosage Amount"
+          },
+          "doseFrequencyDef": {
+            "$val": "Drug Dosage Frequency Definition"
+          },
+          "doseFrequencyNumb": {
+            "$val": "Drug Dosage Frequency Number"
+          },
+          "doseFrequencyUnit": {
+            "$val": "Drug Dosage Frequency Unit"
+          },
+          "doseUnit": {
+            "$val": "Drug Dosage Dose Unit"
+          }
+        },
+        "genericName": {
+          "$val": "Drug Generic Name"
+        },
+        "meddraVersion": {
+          "$val": "Drug Meddra Version"
+        }
+      },
+      "history": {
+        "$val": "History",
+        "codedPT": {
+          "$val": "History Coded Preferred Term"
+        },
+        "meddraVersion": {
+          "$val": "History Meddra Version"
+        },
+        "description": {
+          "$val": "History Description"
+        },
+        "notes": {
+          "$val": "History Notes"
+        },
+        "startDate": {
+          "$val": "History Start Date"
+        },
+        "stopDate": {
+          "$val": "History Stop Date"
+        },
+        "type": {
+          "$val": "History Type"
+        }
+      },
+      "patient": {
+        "$val": "Patient",
+        "initials": {
+          "$val": "Patient Initials"
+        },
+        "birthDate": {
+          "$val": "Patient Birth Date"
+        },
+        "age": {
+          "$val": "Patient Age"
+        },
+        "ageGroup": {
+          "$val": "Patient Age Group"
+        },
+        "ageUnit": {
+          "$val": "Patient Age Unit"
+        },
+        "sex": {
+          "$val": "Patient Sex"
+        },
+        "weight": {
+          "$val": "Patient Weight"
+        },
+        "weightUnit": {
+          "$val": "Patient Weight Unit"
+        },
+        "height": {
+          "$val": "Patient Height"
+        },
+        "heightUnit": {
+          "$val": "Patient Height Unit"
+        }
+      },
+      "reactions": {
+        "$val": "Reaction",
+        "startDate": {
+          "$val": "Reaction Start Date"
+        },
+        "verbatimEvent": {
+          "$val": "Reaction Verbatim Event"
+        },
+        "meddraVersion": {
+          "$val": "Reaction Meddra Version"
+        },
+        "codedEvent": {
+          "$val": "Reaction Coded Event"
+        },
+        "outcome": {
+          "$val": "Reaction Outcome"
+        },
+        "seriousEvent": {
+          "$val": "Reaction Serious Event"
+        },
+        "seriousCriteria": {
+          "$val": "Reaction Seriousness Criteria",
+          "death": {
+            "$val": "Reaction Seriousness Criteria Death"
+          },
+          "hospitalization": {
+            "$val": "Reaction Seriousness Criteria Hospitalization"
+          },
+          "disability": {
+            "$val": "Reaction Seriousness Criteria Disability"
+          },
+          "lifeThreatning": {
+            "$val": "Reaction Seriousness Criteria Life Threatning"
+          },
+          "congenitalAnamoly": {
+            "$val": "Reaction Seriousness Criteria Congenital Anamoly"
+          },
+          "other": {
+            "$val": "Reaction Seriousness Criteria Other"
+          }
+        },
+        "duration": {
+          "$val": "Reaction Duration"
+        },
+        "durationUnit": {
+          "$val": "Reaction Duration Unit"
+        },
+        "soc": {
+          "$val": "Reaction SOC"
+        }
+      },
+      "labTests": {
+        "$val": "Lab Test",
+        "date": {
+          "$val": "Lab Test Date"
+        },
+        "notes": {
+          "$val": "Lab Test Notes"
+        },
+        "name": {
+          "$val": "Lab Test Name"
+        },
+        "assessment": {
+          "$val": "Lab Test Assessment"
+        },
+        "result": {
+          "$val": "Lab Test Result"
+        },
+        "resultUnit": {
+          "$val": "Lab Test Result Unit"
+        },
+        "highRange": {
+          "$val": "Lab Test High Range"
+        },
+        "lowRange": {
+          "$val": "Lab Test Low Range"
+        }
+      },
+      "reporters": {
+        "$val": "Reporter Informstion",
+        "firstName": {
+          "$val": "Reporter First Name"
+        },
+        "lastName": {
+          "$val": "Reporter Last Name"
+        },
+        "hcp": {
+          "$val": "Reporter Health Care Professional"
+        },
+        "qualification": {
+          "$val": "Reporter Qualification"
+        },
+        "address": {
+          "$val": "Reporter Address"
+        },
+        "city": {
+          "$val": "Reporter City"
+        },
+        "state": {
+          "$val": "Reporter State"
+        },
+        "country": {
+          "$val": "Reporter Country"
+        },
+        "postalCode": {
+          "$val": "Reporter Postal Code"
+        },
+        "phone": {
+          "$val": "Reporter Phone"
+        },
+        "fax": {
+          "$val": "Reporter Fax"
+        },
+        "email": {
+          "$val": "Reporter Email"
+        },
+        "organization": {
+          "$val": "Reporter Organization"
+        }
+      },
+      "other": {
+        "$val": "Other Information",
+        "fieldName": {
+          "$val": "Other Information Field Name"
+        },
+        "fieldValue": {
+          "$val": "Other Information Field Value"
+        }
+      },
+      "references": {
+        "$val": "References",
+        "value": {
+          "$val": "Reference Value"
+        },
+        "type": {
+          "$val": "Reference Type"
+        },
+        "name": {
+          "$val": "Reference Name"
+        }
+      }
+    }
+  },
+  "assignedGroupId": {
+    "$val": "Assigned Group ID"
+  },
+  "assignedUser": {
+    "$val": "Assigned User",
+    "id": {
+      "$val": "Assigned User ID"
+    },
+    "firstName": {
+      "$val": "Assigned User First Name"
+    },
+    "clientId": {
+      "$val": "Assigned User Client ID"
+    },
+    "tenantId": {
+      "$val": "Assigned User Tenant ID"
+    },
+    "middleName": {
+      "$val": "Assigned User Middle Name"
+    },
+    "lastName": {
+      "$val": "Assigned User Last Name"
+    },
+    "email": {
+      "$val": "Assigned User Email"
+    }
+  },
+  "assignedUserId": {
+    "$val": "Assigned User ID"
+  },
+  "caseNumber": {
+    "$val": "Case Number"
+  },
+  "clientId": {
+    "$val": "Client ID"
+  },
+  "createdAt": {
+    "$val": "Created On"
+  },
+  "createdBy": {
+    "$val": "Created By"
+  },
+  "deletedAt": {
+    "$val": "Deleted On"
+  },
+  "deletedBy": {
+    "$val": "Deleted By"
+  },
+  "dueAt": {
+    "$val": "Due On"
+  },
+  "e2bFileName": {
+    "$val": "E2B File Name"
+  },
+  "error": {
+    "$val": "Error"
+  },
+  "id": {
+    "$val": "ID"
+  },
+  "identifiedFormId": {
+    "$val": "Identified Form ID"
+  },
+  "initialReceiptDate": {
+    "$val": "Initial Receipt Date"
+  },
+  "intakeAt": {
+    "$val": "Intake On"
+  },
+  "intakeId": {
+    "$val": "Intake ID"
+  },
+  "isArchived": {
+    "$val": "Is Archived"
+  },
+  "isReported": {
+    "$val": "Is Reported"
+  },
+  "isValid": {
+    "$val": "Is Valid"
+  },
+  "lockedBy": {
+    "$val": "Locked By"
+  },
+  "masterId": {
+    "$val": "Master ID"
+  },
+  "pdfFileName": {
+    "$val": "PDF File Name"
+  },
+  "primaryFormat": {
+    "$val": "Primary Format"
+  },
+  "portalJustification": {
+    "$val": "Portal Justification"
+  },
+  "portalStatus": {
+    "$val": "Portal Status"
+  },
+  "receivedAt": {
+    "$val": "Received On"
+  },
+  "sourceFrom": {
+    "$val": "Source From"
+  },
+  "sourceId": {
+    "$val": "Source ID"
+  },
+  "sourceTo": {
+    "$val": "Source To"
+  },
+  "sourceUid": {
+    "$val": "Source Uid"
+  },
+  "srcCaseNumber": {
+    "$val": "SRC Case Number"
+  },
+  "status": {
+    "$val": "Status"
+  },
+  "studyNum": {
+    "$val": "Study Number"
+  },
+  "subState": {
+    "$val": "Sub State"
+  },
+  "subject": {
+    "$val": "Subject"
+  },
+  "tcCaseNumber": {
+    "$val": "TC Case Number"
+  },
+  "tenantId": {
+    "$val": "Tenant Id"
+  },
+  "updatedAt": {
+    "$val": "Updated On"
+  },
+  "updatedBy": {
+    "$val": "Updated By"
+  },
+  "countryId": {
+    "$val": "Country Id"
+  },
+  "email": {
+    "$val": "Email"
+  },
+  "firstName": {
+    "$val": "First Name"
+  },
+  "isActive": {
+    "$val": "Is Active User"
+  },
+  "isRootUser": {
+    "$val": "Is Root User"
+  },
+  "isdCode": {
+    "$val": "ISD Code"
+  },
+  "languageId": {
+    "$val": "Language Id"
+  },
+  "lastName": {
+    "$val": "Last Name"
+  },
+  "ldapId": {
+    "$val": "LDAP Id"
+  },
+  "login": {
+    "$val": "User Name"
+  },
+  "middleName": {
+    "$val": "Middle Name"
+  },
+  "password": {
+    "$val": "Password"
+  },
+  "phone": {
+    "$val": "Phone Number"
+  },
+  "role": {
+    "$val": "Role"
+  },
+  "siteId": {
+    "$val": "Site ID"
+  },
+  "stateName": {
+    "$val": "State Name"
+  },
+  "timezone": {
+    "$val": "Timezone"
+  },
+  "userGroups": {
+    "$val": "User Groups",
+    "id": {
+      "$val": "User Group ID"
+    },
+    "clientId": {
+      "$val": "User Group Client ID"
+    },
+    "groupId": {
+      "$val": "User Group Group ID"
+    },
+    "createdAt": {
+      "$val": "User Group Created On"
+    },
+    "createdBy": {
+      "$val": "User Group Created By"
+    },
+    "deletedAt": {
+      "$val": "User Group Deleted On"
+    },
+    "deletedBy": {
+      "$val": "User Group Deleted By"
+    },
+    "tenantId": {
+      "$val": "User Group Tenant ID"
+    },
+    "updatedAt": {
+      "$val": "User Group Updated On"
+    },
+    "updatedBy": {
+      "$val": "User Group Updated By"
+    },
+    "userId": {
+      "$val": "User Group User ID"
+    }
+  },
+  "userCountries": {
+    "$val": "User Countries",
+    "id": {
+      "$val": "User Country ID"
+    },
+    "clientId": {
+      "$val": "User Country Client ID"
+    },
+    "countryId": {
+      "$val": "User Country Country ID"
+    },
+    "createdAt": {
+      "$val": "User Country Created On"
+    },
+    "createdBy": {
+      "$val": "User Country Created By"
+    },
+    "deletedAt": {
+      "$val": "User Country Deleted On"
+    },
+    "deletedBy": {
+      "$val": "User Country Deleted By"
+    },
+    "tenantId": {
+      "$val": "User Country Tenant ID"
+    },
+    "updatedAt": {
+      "$val": "User Country Updated On"
+    },
+    "updatedBy": {
+      "$val": "User Country Updated By"
+    },
+    "userId": {
+      "$val": "User Country User ID"
+    }
+  },
+  "userProducts": {
+    "$val": "User Products",
+    "id": {
+      "$val": "User Product ID"
+    },
+    "clientId": {
+      "$val": "User Product Client ID"
+    },
+    "productId": {
+      "$val": "User Product Product ID"
+    },
+    "createdAt": {
+      "$val": "User Product Created On"
+    },
+    "createdBy": {
+      "$val": "User Product Created By"
+    },
+    "deletedAt": {
+      "$val": "User Product Deleted On"
+    },
+    "deletedBy": {
+      "$val": "User Product Deleted By"
+    },
+    "tenantId": {
+      "$val": "User Product Tenant ID"
+    },
+    "updatedAt": {
+      "$val": "User Product Updated On"
+    },
+    "updatedBy": {
+      "$val": "User Product Updated By"
+    },
+    "userId": {
+      "$val": "User Product User ID"
+    }
+  },
+  "userStudies": {
+    "$val": "User Studies",
+    "id": {
+      "$val": "User Study ID"
+    },
+    "clientId": {
+      "$val": "User Study Client ID"
+    },
+    "studyId": {
+      "$val": "User Study Study ID"
+    },
+    "createdAt": {
+      "$val": "User Study Created On"
+    },
+    "createdBy": {
+      "$val": "User Study Created By"
+    },
+    "deletedAt": {
+      "$val": "User Study Deleted On"
+    },
+    "deletedBy": {
+      "$val": "User Study Deleted By"
+    },
+    "tenantId": {
+      "$val": "User Study Tenant ID"
+    },
+    "updatedAt": {
+      "$val": "User Study Updated On"
+    },
+    "updatedBy": {
+      "$val": "User Study Updated By"
+    },
+    "userId": {
+      "$val": "User Study User ID"
+    }
+  },
+  "userSources": {
+    "$val": "User Sources",
+    "id": {
+      "$val": "User Source ID"
+    },
+    "clientId": {
+      "$val": "User Source Client ID"
+    },
+    "sourceId": {
+      "$val": "User Source Source ID"
+    },
+    "createdAt": {
+      "$val": "User Source Created On"
+    },
+    "createdBy": {
+      "$val": "User Source Created By"
+    },
+    "deletedAt": {
+      "$val": "User Source Deleted On"
+    },
+    "deletedBy": {
+      "$val": "User Source Deleted By"
+    },
+    "tenantId": {
+      "$val": "User Source Tenant ID"
+    },
+    "updatedAt": {
+      "$val": "User Source Updated On"
+    },
+    "updatedBy": {
+      "$val": "User Source Updated By"
+    },
+    "userId": {
+      "$val": "User Source User ID"
+    }
+  }
+}

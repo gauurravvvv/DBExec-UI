@@ -1,0 +1,184 @@
+@font-face {
+  font-family: "Montserrat-Regular";
+  src: url("./assets/fonts/Montserrat/Montserrat-Regular.ttf");
+}
+
+@font-face {
+  font-family: "Montserrat-SemiBold";
+  src: url("./assets/fonts/Montserrat/Montserrat-SemiBold.ttf");
+}
+
+@font-face {
+  font-family: "Montserrat-Medium";
+  src: url("./assets/fonts/Montserrat/Montserrat-Medium.ttf");
+}
+
+@font-face {
+  font-family: "Montserrat-Bold";
+  src: url("./assets/fonts/Montserrat/Montserrat-Bold.ttf");
+}
+
+$font-regular: "Montserrat-Regular";
+$font-medium: "Montserrat-Medium";
+$font-semi-bold: "Montserrat-SemiBold";
+$font-bold: "Montserrat-Bold";
+
+$main-color: #0078d3;
+$hover-color: #1c96f2;
+$pressed-color: #0161aa;
+$highlight-color: #223d77;
+$white-color: #ffffff;
+$black-color: #161616;
+$background-color: #f0f5ff;
+
+$theme-color-1: #d0ebff;
+$theme-color-2: #e0effa;
+$theme-color-3: #f0f7fd;
+
+$theme-grey-1: #6b747c;
+$theme-grey-2: #9aa7b4;
+$theme-grey-3: #ced4da;
+$theme-grey-4: #d8dee3;
+$theme-grey-5: #e9ecef;
+$theme-grey-6: #f0f4f8;
+$theme-grey-7: #6c757d;
+
+$grey-color-1: #b7b7b7;
+$grey-color-2: #e0e0e0;
+$grey-color-3: #f2f2f2;
+$grey-color-4: #fafafa;
+$grey-color-5: #ffffff;
+
+$error-color: #fa4d56;
+$error-color-1: #dd360c;
+$success-color: #42be65;
+$warning-color: #f1c21b;
+
+$panel-hover-color: rgba(0, 0, 0, 0.04);
+$disabled-button: #f0f0f0;
+$table-height: 370px;
+
+:root {
+  --error-color-1: #dd360c;
+}
+
+:root {
+  --main-color: #0078d3;
+}
+
+:root {
+  --grey-color-4: #fafafa;
+}
+
+:root {
+  --grey-color-2: #e0e0e0;
+}
+
+:root {
+  --theme-grey-3: #ced4da;
+}
+
+:root {
+  --theme-grey-2: #9aa7b4;
+}
+
+:root {
+  --theme-grey-6: #838d98;
+}
+
+:root {
+  --black-color: #161616;
+}
+
+:root {
+  --white-color: #ffffff;
+}
+
+:root {
+  --error-bg-color: rgba(221, 54, 12, 0.08);
+}
+
+:root {
+  --theme-color-2: #e0effa;
+}
+
+:root {
+  --theme-grey-1: #6b747c;
+}
+
+:root {
+  --active: #34b37e;
+}
+
+:root {
+  --loader-background: rgba(22, 22, 22, 0.5);
+}
+
+:root {
+  --theme-color-1: #d0ebff;
+}
+
+:root {
+  --theme-grey-4: #d8dee3;
+}
+:root {
+  --grey-color-3: #f2f2f2;
+}
+
+:root {
+  --theme-grey-7: #6c757d;
+}
+
+:root {
+  --panel-hover-color: rgba(0, 0, 0, 0.04);
+}
+
+:root {
+  --theme-color-3: #f0f7fd;
+}
+:root {
+  --checkbox-color: #c3cfdb;
+}
+:root {
+  --disabled-button: #f0f0f0;
+}
+
+:root {
+  --type-volume-1: #85cbe5;
+}
+
+:root {
+  --type-volume-2: #739dde;
+}
+
+:root {
+  --type-volume-3: #f0f0f0;
+}
+
+:root {
+  --format-volume-1: #9b85e5;
+}
+
+:root {
+  --format-volume-2: #e585cb;
+}
+
+:root {
+  --format-volume-3: #f4bb7a;
+}
+
+:root {
+  --user-info: #1c96f2;
+}
+
+:root {
+  --theme-grey-5: #e9ecef;
+}
+
+:root {
+  --table-border-color: rgba(228, 228, 228, 0.5);
+}
+
+:root {
+  --widget-color: #eceff1;
+}

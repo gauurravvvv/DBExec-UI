@@ -1,0 +1,42 @@
+{
+  "unassignedCases": {
+    "title": "Unassigned cases",
+    "assignTenant": "Assign Tenant",
+    "markInvalid": "Mark as Invalid",
+    "globalSearchText": "Search by Intake ID, sender’s name or email",
+    "noDataFound": "No Data Found",
+    "search": "Search",
+    "select": "Select",
+    "gridHeader": {
+      "intakeID": "Intake ID",
+      "source": " Source Name",
+      "pickupSource": "Source Type",
+      "sender": "Sender",
+      "intakeDate": "Intake Date",
+      "state": "Workflow State",
+      "subState": "Sub State"
+    },
+    "invalidDialogTitle": "Do you want to mark selected case(s) as invalid ? ",
+    "comments": "Please note that an invalid case cannot be assigned to a tenant.\nEnter comments.",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "assignToTenant": {
+    "title": "Assign tenant",
+    "assignTenantBtn": "Assign tenant",
+    "globalSearchText": "Search tenant by name, tenant id or country",
+    "noDataFound": "No Data Found",
+    "gridHeader": {
+      "tenantName": "Tenant name",
+      "identifier": "Unique identifier",
+      "country": "Country",
+      "poc": "Primary point of contact"
+    }
+  },
+  "caseDetail": {
+    "note": "NOTE: Details for unassigned cases are available under attachment and 'others' section",
+    "reporter": "Reporter",
+    "email": "Reporter Email",
+    "date": "Reporting Date"
+  }
+}

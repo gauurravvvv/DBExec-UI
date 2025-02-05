@@ -1,0 +1,42 @@
+{
+  "unassignedCases": {
+    "title": "未割り当てケース",
+    "assignTenant": "テナントの割り当て",
+    "markInvalid": "無効としてマークする",
+    "globalSearchText": "インテークID、送信者の名前、または電子メールで検索する",
+    "noDataFound": "データが見つかりません",
+    "search": "捜索",
+    "select": "選ぶ",
+    "gridHeader": {
+      "intakeID": "吸気ID",
+      "source": " ソース名",
+      "pickupSource": "ソースの種類",
+      "sender": "差し出し人",
+      "intakeDate": "摂取日",
+      "state": "ワークフローの状態",
+      "subState": "サブ状態"
+    },
+    "invalidDialogTitle": "選択したケースを無効としてマークしますか? ",
+    "comments": "無効な大文字と小文字をテナントに割り当てることはできません。nコメントを入力してください。.",
+    "confirm": "確認する",
+    "cancel": "キャンセル"
+  },
+  "assignToTenant": {
+    "title": "テナントの割り当て",
+    "assignTenantBtn": "テナントの割り当て",
+    "globalSearchText": "テナントを名前、テナント ID、または国で検索する",
+    "noDataFound": "データが見つかりません",
+    "gridHeader": {
+      "tenantName": "テナント名",
+      "identifier": "一意の識別子",
+      "country": "国",
+      "poc": "主な連絡先"
+    }
+  },
+  "caseDetail": {
+    "note": "メモ: 割り当てられていないサポート案件の詳細は、[添付ファイル] および [その他] セクションを参照してください。",
+    "reporter": "記者",
+    "email": "レポーターのメールアドレス",
+    "date": "報告日"
+  }
+}

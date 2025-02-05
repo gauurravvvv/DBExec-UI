@@ -1,0 +1,90 @@
+{
+  "title": "マイプロフィール",
+  "adminProfile": {
+    "username": "ユーザー名",
+    "name": "フルネーム",
+    "email": "電子メール ID",
+    "password": "パスワード"
+  },
+  "userProfile": {
+    "username": "ユーザー名",
+    "name": "フルネーム",
+    "email": "メールID",
+    "password": "パスワード",
+    "products": "製品名",
+    "country": "国",
+    "study": "研究名",
+    "source": "ケースソース",
+    "restrictions": "データ制限",
+    "privileges": "特権",
+    "rights": "管理者権限に基づく",
+    "passwordPolicy": "パスワードポリシー：",
+    "policy": "パスワードは少なくとも1つの小文字、1つの大文字、1つの数字、および1つの特殊文字を含む必要があります。（許可される特殊文字：!、@、&、*、(、)、_、-、および.）",
+    "restrictions&privilege": "制限と特権",
+    "newPassword": "新しいパスワード",
+    "confirmPassword": "新しいパスワードの確認",
+    "profileInformation": "プロフィール情報",
+    "clientsAssociated": "関連クライアント",
+    "groupsAssociated": "関連グループ",
+    "active": "アクティブ",
+    "inactive": "非アクティブ",
+    "editProfile": "プロフィールを編集",
+    "changePassword": "パスワードを変更",
+    "invalidPassword": "無効なパスワード",
+    "pickAPassword": "パスワードを選択してください",
+    "suggestions": "提案",
+    "oneLowerCase": "少なくとも1つの小文字",
+    "oneUpperCase": "少なくとも1つの大文字",
+    "oneNumeric": "少なくとも1つの数字",
+    "oneSpecial": "@、$、!、%、*、?、$、# の中から少なくとも1つの特殊文字",
+    "minEight": "最低8文字",
+    "cancel": "キャンセル",
+    "update": "更新",
+    "editProfileInfo": "プロフィール情報を編集",
+    "firstName": "名前",
+    "lastName": "苗字",
+    "confirmation": "確認",
+    "youSure": "この操作を実行してもよろしいですか？行った変更が保存されない可能性があります。",
+    "yes": "はい",
+    "noGroups": "関連するグループが見つかりません",
+    "no": "いいえ",
+    "passCannotSame": "新しいパスワードは古いパスワードと同じにできません。",
+    "passNotMatch": "確認用パスワードが新しいパスワードと一致しません。",
+    "oldPass": "古いパスワード",
+    "charLimitReached": "最大文字数に達しました",
+    "passRequired": "パスワードは必須です",
+    "maxChar100": "最大文字数は100です",
+    "maxChar30": "最大文字数は30です",
+    "firstNameRequired": "名前は必須です",
+    "lastNameRequired": "苗字は必須です",
+    "emailRequired": "メールは必須です",
+    "invalidFName": "無効な名前",
+    "invalidLName": "無効な苗字",
+    "invalidEmail": "無効なメール",
+    "enter": "入力 ",
+    "invalid": "無効 ",
+    "edit": "編集"
+  },
+  "privileges": {
+    "section": "セクションレベル",
+    "navigation": "ナビゲーションペイン",
+    "state": "状態",
+    "read": "読む",
+    "write": "書く",
+    "access": "アクセス",
+    "save": "保存",
+    "cancel": "キャンセル"
+  },
+  "validation": {
+    "adminProfile": {
+      "newPassword": {
+        "required": "パスワードを入力してください",
+        "pattern": "パスワードがパスワードポリシーを満たしていない."
+      },
+      "confirmPassword": {
+        "required": "パスワードを入力してください",
+        "pattern": "パスワードがパスワードポリシーを満たしていない."
+      }
+    }
+  }
+}

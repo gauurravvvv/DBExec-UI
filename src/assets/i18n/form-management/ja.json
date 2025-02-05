@@ -1,0 +1,135 @@
+{
+  "title": "フォーム管理",
+  "noDataFound": "何もデータが見つかりませんでした",
+  "select": "選択する",
+  "search": "検索",
+  "state": {
+    "rename": "名前を変更",
+    "delete": "消去",
+    "searchName": "検索",
+    "selectType": "選択する",
+    "newState": "新しい状態を作成します",
+    "stateName": "州名",
+    "stateType": "状態タイプ",
+    "actions": "行動",
+    "deleteStateHeader": "状態を削除",
+    "deleteState": "選択した状態を削除しますか？削除された状態は、すべてのワークフローからも削除されることに注意してください",
+    "deleteButton": "消去",
+    "cancelDeleteButton": "キャンセル",
+    "renameHeader": "状態の名前を変更",
+    "renameButton": "名前を変更",
+    "cancelNewState": "キャンセル",
+    "createNewState": "作成A",
+    "createStateHeader": "新しい状態を作成します",
+    "createStateLabel": "州名",
+    "createStatePlaceholder": "州名を入力してください",
+    "custom": "カスタム",
+    "system": "システム",
+    "configureCaseStatus": "ケースステータスを構成する",
+    "yes": "はい",
+    "no": "いいえ",
+    "save": "保存",
+    "noRecords": "レコードが見つかりません",
+    "screenPref": "画面設定",
+    "dataReview": "データレビュー",
+    "duplicate": "重複チェック",
+    "showing": "表示中",
+    "to": "に",
+    "of": "の",
+    "enteries": "エントリ"
+  },
+  "forms": {
+    "gridHeader": {
+      "formName": "フォーム名",
+      "formID": "フォームID",
+      "workflows": "ワークフロー",
+      "dueDateType": "期日タイプ",
+      "complDuration": "コンプライアンス期間",
+      "source": "ソース",
+      "status": "スターテス",
+      "action": "アクション",
+      "description": "説明"
+    },
+    "formsLabel": "フォーム",
+    "statesLabel": "州",
+    "workflowsLabel": "ワークフロー"
+  },
+  "workflows": {
+    "newWorkflow": "新しいワークフローを作成する",
+    "editWorkflow": "編集",
+    "deleteWorkflow": "消去",
+    "cancel": "キャンセル",
+    "deleteWorkflowHeader": "ワークフローを削除する",
+    "deleteWorkflowMessage": "ワークフローを削除しますか？",
+    "defaultWorkflow": "ディフォルト",
+    "gridHeader": {
+      "fromState": "州から",
+      "action": "アクション",
+      "saveData": "データを保存する",
+      "caseStatus": "ケースステータス",
+      "toState": "述べるために",
+      "assignedGroup": "割り当てられたグループ"
+    },
+    "noRecords": "レコードが見つかりません",
+    "copyWorkflow": "ワークフローのコピー",
+    "newWorkflowPlaceholder":"新しいワークフロー名",
+    "selectWorkflow":"ワークフローを選択",
+    "save":"保存"
+  },
+  "createEditWorkflow": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "renameWorkflow": "ワークフローの名前を変更",
+    "addStep": "ステップを追加",
+    "addAction": "アクションを追加",
+    "note": "ノート",
+    "note1": "1つの状態に最大4つのアクションを追加できます。",
+    "note2": "各ワークフローは、「from state」：登録済みで始まり、「Tostate」：「Closed」で終わる必要があります。",
+    "gridHeader": {
+      "sno": "通し番号",
+      "fromState": "州から",
+      "action": "アクション",
+      "saveData": "データを保存する",
+      "changeStatus": "ステータスを変更する",
+      "toState": "述べるために",
+      "assignedGroup": "割り当てられたグループ"
+    }
+  },
+  "statusOptions": {
+    "duplicate": "複製",
+    "invalid": "無効",
+    "followup": "ファローアップ",
+    "initial": "イニシャル",
+    "nochange": "変化なし"
+  },
+  "validation": {
+    "workflow": {
+      "workflowName": {
+        "required": "有効なワークフロー名を入力してください",
+        "minlength": "2文字以上必要です"
+      },
+      "fromState": {
+        "required": "有効な状態を入力してください",
+        "duplicate": "状態はすでに存在します"
+      },
+      "action": {
+        "required": "有効なアクションを入力してください",
+        "maxlength": "15文字まで使用できます",
+        "duplicate": "アクションはすでに存在します"
+      },
+      "caseStatus": {
+        "required": "有効なステータスを入力してください"
+      },
+      "assignedGroup": {
+        "required": "有効なグループを入力してください"
+      },
+      "createState": {
+        "required": "有効な州名を入力してください",
+        "maxlength": "最大50文字まで使用できます"
+      },
+      "workflowId": {
+        "required": "有効なワークフローを選択してください"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "semi": true,
+  "singleQuote": true,
+  "arrowParens": "avoid",
+  "prettier.enable": true,
+  "prettier.printWidth": 50,
+  "prettier.semi": true,
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false
+}

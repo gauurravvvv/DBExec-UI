@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <g id="Group_2442" data-name="Group 2442" transform="translate(-440 -345)">
+    <g id="Group_2500" data-name="Group 2500">
+      <g id="Component_361_35" data-name="Component 361 – 35" transform="translate(440 345)">
+        <circle id="Ellipse_256" data-name="Ellipse 256" cx="24" cy="24" r="24" fill="#fcfdff"/>
+      </g>
+      <g id="Group_2401" data-name="Group 2401" transform="translate(192 45.199)">
+        <g id="Rectangle_1209" data-name="Rectangle 1209" transform="translate(260 311.801)" fill="none" stroke="#223d77" stroke-width="1.5">
+          <rect width="9" height="13" stroke="none"/>
+          <rect x="0.75" y="0.75" width="7.5" height="11.5" fill="none"/>
+        </g>
+        <g id="Rectangle_1211" data-name="Rectangle 1211" transform="translate(271 311.801)" fill="none" stroke="#223d77" stroke-width="1.5">
+          <rect width="13" height="8" stroke="none"/>
+          <rect x="0.75" y="0.75" width="11.5" height="6.5" fill="none"/>
+        </g>
+        <g id="Rectangle_1212" data-name="Rectangle 1212" transform="translate(271 321.801)" fill="none" stroke="#0078d3" stroke-width="2">
+          <rect width="13" height="15" stroke="none"/>
+          <rect x="1" y="1" width="11" height="13" fill="none"/>
+        </g>
+        <g id="Rectangle_1210" data-name="Rectangle 1210" transform="translate(260 326.801)" fill="none" stroke="#223d77" stroke-width="1.5">
+          <rect width="9" height="10" stroke="none"/>
+          <rect x="0.75" y="0.75" width="7.5" height="8.5" fill="none"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

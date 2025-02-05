@@ -1,0 +1,228 @@
+{
+  "title": "ユーザー管理",
+  "search": "検索",
+  "next": "次",
+  "save": "保存",
+  "cancel": "キャンセル",
+  "users": {
+    "usersLabel": "ユーザー",
+    "userGroupsLabel": "団体",
+    "username": "ユーザー名",
+    "name": "フルネーム",
+    "site": "サイト",
+    "country": "国",
+    "email": "Eメール",
+    "contact": "連絡先",
+    "role": "役割",
+    "userGroups": "ユーザーグループ",
+    "lastLogin": "前回のログイン",
+    "status": "スターテス",
+    "actions": "行動",
+    "search": "検索",
+    "select": "選択する",
+    "active": "アクティブ",
+    "notActive": "非活動中",
+    "edit": "編集",
+    "delete": "消去",
+    "addUser": "ユーザーを追加する",
+    "rootUser": "ルートユーザ",
+    "yes": "はい",
+    "no": "番号",
+    "searchBar": "名前、電子メール、または連絡先で検索します",
+    "showing": "見せて",
+    "to": "に",
+    "of": "の",
+    "enteries": "エントリ"
+  },
+  "groups": {
+    "userGroup": "ユーザー・グループ",
+    "users": "ユーザー",
+    "createdBy": "によって作成された",
+    "createdOn": "作成された",
+    "modifiedBy": "最後に修正された",
+    "modifiedOn": "最後に修正された",
+    "actions": "行動",
+    "search": "検索",
+    "select": "選択する",
+    "addUser": "ユーザーを追加する",
+    "editGroup": "グループを編集する",
+    "delete": "グループを削除します",
+    "createGroup": "グループを作成します",
+    "noRecords": "レコードは見つかりません",
+    "searchBar": "ユーザーグループで検索され、によって作成された、または変更された最後に修正された"
+  },
+  "group-detail": {
+    "usersLabel": "ユーザー",
+    "restrictionsLabel": "制限事項と特権",
+    "addUserToGroup": "グループにユーザーを追加します",
+    "userGroup": "ユーザー・グループ",
+    "editButton":"グループを編集する"
+  },
+  "privileges": {
+    "section": "セクションレベル",
+    "navigation": "ナビゲーションペイン",
+    "state": "州",
+    "read": "読んだ",
+    "write": "書く",
+    "access": "アクセス",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "noRecord": "レコードは見つかりません"
+  },
+  "group-user-detail": {
+    "userName": "ユーザー名",
+    "role": "役割",
+    "country": "国",
+    "lastLogin": "前回のログイン",
+    "addedOn": "追加された",
+    "status": "スターテス",
+    "updatedOn": "最後に更新されました",
+    "actions": "行動",
+    "noRecords": "レコードは見つかりません",
+    "searchBar": "ユーザー名で検索します"
+  },
+  "user-detail": {
+    "user": "ユーザー",
+    "edit": "ユーザーを編集します",
+    "delete": "ユーザーを削除します",
+    "restrictionsLabel": "制限事項と特権",
+    "name": "名前",
+    "username": "ユーザー名",
+    "groups": "グループ",
+    "ldap": "L D A P",
+    "email": "Eメール",
+    "lastLogin": "前回のログイン",
+    "lastUpdated": "最後に更新されました",
+    "lastAdded": "追加された",
+    "status": "スターテス",
+    "active": "アクティブ",
+    "inactive": "非活性",
+    "role": "役割",
+    "editGroups": "グループを編集します",
+    "products": "商品名",
+    "country": "国",
+    "study": "研究者",
+    "source": "ケースソース",
+    "restrictions": "データ制限",
+    "privileges": "特権",
+    "rights": "グループ権利に基づく",
+    "rootUser": "ルートユーザ",
+    "yes": "はい",
+    "no": "番号"
+  },
+  "add-user": {
+    "title": "Add User",
+
+    "details": "詳細",
+    "groups": "団体",
+    "restrictions": "制限事項と特権",
+    "passwordPolicy": "パスワードには、少なくとも1つの小文字、1大文字、1数字、1つの特殊文字が含まれています。（特殊文字：、@、＆、*、（）、_、 - 、および。)",
+    "usernamePolicy": "いいえ _ または .開始または終了時。nいいえ __ または _.または ._ または ..内部。n許可される文字 a-zA-Z0-9._ のみ。"
+  },
+  "edit-user": {
+    "title": "ユーザーを編集します"
+  },
+  "add-details": {
+    "fName": "ファーストネーム",
+    "mName": "ミドルネーム",
+    "lName": "苗字",
+    "timezone": "タイムゾーンを選択してください",
+    "lang": " 言語を選択する",
+    "site": " サイト情報",
+    "phone": "電話番号",
+    "status": "スターテス",
+    "credentials": "資格情報",
+    "location": "位置",
+    "username": "username.",
+    "email": "電子メールID",
+    "password": "パスワード",
+    "state": "状態",
+    "country": "国を選択",
+    "ldap": "LDAP の構成",
+    "selectLdap": "LDAP を選択します。",
+    "authType": "認証の種類",
+    "ldapCheck": "ティッカー",
+    "optional": " (オプション)"
+  },
+  "add-groups": {
+    "all": "すべてのグループ",
+    "assigned": "割り当てられたグループ"
+  },
+  "addUserToGroup": {
+    "search": "ユーザー名で検索します"
+  },
+  "restrictions": {
+    "role": "役割",
+    "admin": "管理者",
+    "user": "ユーザー",
+    "groupPriv": "グループ特権",
+    "dataRes": "データ制限",
+    "section": "セクションレベル",
+    "nav": "ナビゲーションペイン",
+    "state": "州",
+    "products": "製品(オプション)",
+    "countries": "国(オプション)",
+    "studies": "スタディ(オプション)",
+    "sources": "ソース (オプション)",
+    "read": "読んだ ",
+    "write": "書く ",
+    "access": "アクセス"
+  },
+  "validation": {
+    "userDetails": {
+      "firstName": {
+        "required": "名を入力してください"
+      },
+      "timezone": {
+        "required": "タイムゾーンを選択してください"
+      },
+      "language": {
+        "required": "言語を選択してください"
+      },
+      "site": {
+        "required": "サイト情報を選択してください"
+      },
+      "phone": {
+        "required": "電話番号を入力してください"
+      },
+      "login": {
+        "required": "ユーザー名を入力してください",
+        "minlength": "ユーザー名は4文字でなければなりません",
+        "maxlength": "ユーザー名20文字までのユーザー名が許可されています",
+        "pattern": "無効なユーザー名"
+      },
+      "password": {
+        "required": "パスワードを入力してください",
+        "pattern": "無効なパスワード"
+      },
+      "email": {
+        "required": "メールアドレスを入力してください",
+        "email": "無効なメールアドレス"
+      },
+      "stateName": {
+        "required": "状態を入力してください"
+      },
+      "country": {
+        "required": "国を選択してください"
+      },
+      "ldap": {
+        "required": "LDAPを選択してください"
+      },
+      "isdCode": {
+        "required": "ISDコードを入力してください"
+      }
+    },
+    "editGroup": {
+      "name": {
+        "required": "グループ名を入力してください",
+        "pattern": "有効なグループ名を入力してください"
+      }
+    },
+    "createGroup": {
+      "name": {
+        "required": "グループ名を入力してください",
+        "pattern": "有効なグループ名を入力してください"
+      }
+    }
+  }
+}

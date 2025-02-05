@@ -1,0 +1,274 @@
+{
+  "title": "テナント管理",
+  "detail": "テナントの詳細",
+  "save": "保存",
+  "saveNext": "保存して次へ",
+  "cancel": "キャンセル",
+  "list": {
+    "tenantName": "テナント名",
+    "tenantId": "テナントID",
+    "country": "国",
+    "pointOfContact": "主な連絡先",
+    "maxUsersAllowed": "許可される最大ユーザー",
+    "status": "スターテス",
+    "actions": "行動",
+    "addNewTenant": "新しいテナントを追加する",
+    "searchPlaceholder": "名前またはIDでテナントを検索",
+    "active": "アクティブ",
+    "notActive": "非活動中",
+    "createdOn": "で作成",
+    "updatedOn": "最終更新日",
+    "identifier": "一意の識別",
+    "noRecords": "テナントが見つかりません",
+    "edit": "編集",
+    "delete": "消去",
+    "cancel": "キャンセル",
+    "delDialogTitle": "テナントを削除すると、完全に削除されます。続けますか？?",
+    "reason": "削除の理由を入力してください",
+    "showing":"表示中",
+    "to":"に",
+    "of":"の",
+    "enteries":"エントリ"
+  },
+  "info": "テナント情報",
+  "basic": {
+    "assoc": "クライアント関連",
+    "details": "テナントの詳細",
+    "tenantName": "テナント名",
+    "tenantId": "テナントID",
+    "status": "スターテス",
+    "rootUser": "ルートユーザーのメールID",
+    "reset": "パスワードを再設定する",
+    "address": "住所",
+    "fullAddress": "完全な住所",
+    "country": "国",
+    "pincode": "ピンコード",
+    "desc": "説明クライアントについて",
+    "poc": "主要連絡先（POC)",
+    "name": "名前",
+    "email": "電子メールID",
+    "phone": "電話",
+    "configLdap": "構成、設定 LDAP ",
+    "url": "URL ",
+    "auth": "認証 ",
+    "adminName": "管理ドメイン名",
+    "searchBase": "ユーザー検索ベース",
+    "password": "パスワード",
+    "add": "追加 LDAP ",
+    "note": "注：最大5つのLDAPを追加できます"
+  },
+  "source": {
+    "title": "ソース情報",
+    "scheduleTitle": "スケジュール",
+    "add": "ソースを追加",
+    "delete": "ソースを削除",
+    "sourceIdentifier": "ソース識別子",
+    "dataSource": "データソース",
+    "email": "メール",
+    "ftp": "FTP",
+    "portal": "HAポータル",
+    "emailInfo": "メール情報（アップロードできるのはIMAPベースの情報のみ",
+    "ftpInfo": "FTP情報",
+    "portalInfo": "ポータル情報",
+    "otherInfo": "その他の情報",
+    "username": "ユーザー名 ",
+    "password": "パスワード ",
+    "subjectLine": "件名",
+    "senderDomain": "送信者ドメイン",
+    "exchangeServer": "交換 サーバ ",
+    "port": "港",
+    "tls": "TLS Ja",
+    "folderAdd": "FTPフォルダアドレス",
+    "server": "サーバ",
+    "host": "ホスト名",
+    "scheme": "図式",
+    "params": "組織番号",
+    "search": "検索",
+    "checkFtp": "FTPアクセス検証を確認してください",
+    "checkConnection": "接続を確認してください",
+    "note": "注：最大10個のソースを追加できます",
+    "mailbox": "共通メールボックスEメールID",
+    "emailId": "共有メールボックス",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "yes": "はい",
+    "no": "番号",
+    "message": "選択したデータソースの下のすべてのデータが失われます。続けたいですか？",
+    "sendersDomain": "送信者のドメイン",
+    "errorMesage": "ソース情報が見つかりません",
+    "optional": " （オプション）",
+    "saveSource": "ソースを保存"
+  },
+  "target": {
+    "title": "ターゲット情報",
+    "safetyDB": "安全データベース",
+    "name": "安全データベース名",
+    "connectionInfo": "データベース接続情報",
+    "hostName": "ホスト名",
+    "port": "港",
+    "sftpInfo": "SFTP 接続情報",
+    "folderPath": "フォルダパス",
+    "username": "ユーザー名",
+    "password": "パスワード"
+  },
+  "dupeCheck": {
+    "title": "重複チェック",
+    "searchParameters": "検索パラメータ",
+    "note": "注：最大30個のパラメーターを追加できます"
+  },
+  "validation": {
+    "basicInfo": {
+      "tenantName": {
+        "required": "テナント名を入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "id": {
+        "required": "テナントIDを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "address": {
+        "required": "アドレスjaを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "pincode": {
+        "required": "PINコードを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "primaryContact": {
+        "required": "主な連絡先の名前を入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "email": {
+        "required": "メールアドレスを入力してください",
+        "maxlength": "100文字まで使用できます",
+        "email": "有効なメールIDを入力してください",
+        "pattern": "100文字まで使用できます"
+      },
+      "phone": {
+        "required": "電話番号を入力してください",
+        "pattern": "最大11の番号が許可されます"
+      },
+      "description": {
+        "required": "Please enter description",
+        "maxlength": "500文字まで使用できます"
+      },
+      "url": {
+        "required": "LDAPURLを入力してください"
+      },
+      "authentication": {
+        "required": "認証を入力してください"
+      },
+      "principal": {
+        "required": "プリンシパルを入力してください"
+      },
+      "password": {
+        "required": "パスワードを入力してください"
+      },
+      "rootUserEmail": {
+        "required": "rootユーザーのメールIDを入力してください",
+        "email": "有効なメールIDを入力してください",
+        "maxlength": "100文字まで使用できます"
+      }
+    },
+    "targetInfo": {
+      "safetyDbName": {
+        "required": "有効な安全DB名を入力してください"
+      },
+      "dbHostname": {
+        "required": "有効なホスト名を入力してください"
+      },
+      "dbPort": {
+        "required": "有効なポート情報を入力してください"
+      },
+      "sftpFolderPath": {
+        "required": "有効なフォルダパスを入力してください"
+      },
+      "sftpHostname": {
+        "required": "有効なホスト名を入力してください"
+      },
+      "username": {
+        "required": "有効なユーザー名を入力してください"
+      },
+      "password": {
+        "required": "有効なパスワードを入力してください"
+      }
+    },
+    "sourceInfo": {
+      "sourceIdentifier": {
+        "required": "有効なソース名を入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "username": {
+        "required": " 有効なユーザー名を入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "password": {
+        "required": "有効なパスワードを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "subjectLine": {
+        "required": "件名に検索するキーワードを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "sendersDomain": {
+        "required": "有効なドメインを入力してください",
+        "pattern": "有効なドメインを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "exchangeServer": {
+        "required": "有効なサーバーの詳細を入力してください",
+        "maxlength": "300文字まで使用できます"
+      },
+      "hostname": {
+        "required": "有効なホスト名を入力してください",
+        "maxlength": "300文字まで使用できます"
+      },
+      "port": {
+        "required": "ポートの詳細を追加してください",
+        "maxlength": "10文字まで使用できます"
+      },
+      "emailId": {
+        "required": "有効なメールアドレスを入力してください",
+        "email": "有効なメールIDを入力してください"
+      },
+      "folderPath": {
+        "required": "有効なフォルダパスを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "schedule": {
+        "required": "有効なcron式を入力してください",
+        "cron": "有効なcron式を入力してください"
+      },
+      "folder": {
+        "required": "有効なフォルダパスを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "scheme": {
+        "required": "有効なスキームを入力してください",
+        "maxlength": "100文字まで使用できます"
+      },
+      "params": {
+        "required": "有効なパラメータを入力してください",
+        "maxlength": "200文字まで使用できます"
+      },
+      "search": {
+        "required": "有効な検索を入力してください",
+        "maxlength": "500文字まで使用できます"
+      }
+    },
+    "dupeCheck": {
+      "url": {
+        "required": "有効なAPIURLを入力してください"
+      },
+      "userName": {
+        "required": "有効なユーザー名を入力してください"
+      },
+      "password": {
+        "required": "有効なパスワードを入力して下さい"
+      },
+      "timeout": {
+        "required": "有効なタイムアウトを入力してください"
+      }
+    }
+  }
+}

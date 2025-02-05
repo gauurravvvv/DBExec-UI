@@ -1,0 +1,340 @@
+$icon-url: '../icons/';
+.ci {
+  &.ci-download {
+    content: url($icon-url + 'download.svg');
+  }
+
+  &.ci-back-arrow {
+    content: url($icon-url + 'back-arrow.svg');
+  }
+
+  &.ci-fullscreen {
+    content: url($icon-url + 'fullscreen.svg');
+  }
+
+  &.ci-fullscreen-exit {
+    content: url($icon-url + 'fullscreen-exit.svg');
+  }
+
+  &.ci-assign {
+    content: url($icon-url + 'assign.svg');
+  }
+
+  &.ci-admin {
+    content: url($icon-url + 'admin.svg');
+  }
+
+  &.ci-audit_log {
+    content: url($icon-url + 'audit_log.svg');
+  }
+
+  &.ci-case_listing {
+    content: url($icon-url + 'case_listing.svg');
+  }
+
+  &.ci-tenant_management {
+    content: url($icon-url + 'tenant_management.svg');
+  }
+
+  &.ci-client_management {
+    content: url($icon-url + 'client_management.svg');
+  }
+
+  &.ci-unassigned_cases {
+    content: url($icon-url + 'unassigned_cases.svg');
+  }
+
+  &.ci-users {
+    content: url($icon-url + 'users.svg');
+  }
+
+  &.ci-arrow-left-circle {
+    content: url($icon-url + 'arrow-left-circle.svg');
+  }
+
+  &.ci-arrow-right-circle {
+    content: url($icon-url + 'arrow-right-circle.svg');
+  }
+
+  &.ci-arrow-left-expand {
+    content: url($icon-url + 'arrow-left-expand.svg');
+  }
+
+  &.ci-arrow-left-collapse {
+    content: url($icon-url + 'arrow-left-collapse.svg');
+  }
+
+  &.ci-arrow-right-expand {
+    content: url($icon-url + 'arrow-right-expand.svg');
+  }
+
+  &.ci-arrow-right-collapse {
+    content: url($icon-url + 'arrow-right-collapse.svg');
+  }
+
+  &.ci-default-workflow {
+    content: url($icon-url + 'default-workflow.svg');
+  }
+
+  &.ci-edit {
+    content: url($icon-url + 'edit.svg');
+  }
+
+  &.ci-delete {
+    content: url($icon-url + 'delete.svg');
+  }
+
+  &.ci-mail {
+    content: url($icon-url + 'mail.svg');
+  }
+
+  &.ci-phone {
+    content: url($icon-url + 'phone.svg');
+  }
+
+  &.ci-cancel {
+    content: url($icon-url + 'cancel.svg');
+  }
+
+  &.ci-add {
+    content: url($icon-url + 'add.svg');
+  }
+
+  &.ci-close {
+    content: url($icon-url + 'close.svg');
+  }
+
+  &.ci-tick {
+    content: url($icon-url + 'tick.svg');
+  }
+
+  &.ci-alert {
+    content: url($icon-url + 'alert.svg');
+  }
+
+  &.ci-notification {
+    content: url($icon-url + 'notification.svg');
+  }
+
+  &.ci-notification-bell {
+    content: url($icon-url + 'notification_bell.svg');
+  }
+
+  &.ci-client-info {
+    content: url($icon-url + 'client_info.svg');
+  }
+
+  &.ci-refresh {
+    content: url($icon-url + 'refresh.svg');
+  }
+
+  &.ci-comments {
+    content: url($icon-url + 'comments.svg');
+  }
+
+  &.ci-from-to {
+    content: url($icon-url + 'from-to.svg');
+  }
+
+  &.ci-info {
+    content: url($icon-url + 'info.svg');
+  }
+
+  &.ci-info-filled {
+    content: url($icon-url + 'info.svg');
+  }
+
+  &.ci-info-filled:hover,
+  &.ci-info-filled:focus {
+    content: url($icon-url + 'info_filled.svg');
+  }
+
+  &.ci-add-user {
+    content: url($icon-url + 'add_user.svg');
+  }
+
+  &.ci-adverse {
+    content: url($icon-url + 'adverse.svg');
+  }
+
+  &.ci-case-acceptance {
+    content: url($icon-url + 'case-acceptance.svg');
+  }
+
+  &.ci-configurable {
+    content: url($icon-url + 'configurable.svg');
+  }
+
+  &.ci-integerated-score {
+    content: url($icon-url + 'integerated-score.svg');
+  }
+
+  &.ci-live-dashboards {
+    content: url($icon-url + 'live-dashboards.svg');
+  }
+
+  &.ci-seamless-integeration {
+    content: url($icon-url + 'seamless-integeration.svg');
+  }
+
+  &.ci-tracking {
+    content: url($icon-url + 'tracking.svg');
+  }
+
+  &.ci-ha-portal {
+    content: url($icon-url + 'healthPortal.svg');
+  }
+
+  &.ci-client-grey {
+    content: url($icon-url + 'client-grey.svg');
+  }
+
+  &.ci-client-white {
+    content: url($icon-url + 'client-white.svg');
+  }
+
+  &.ci-tenant-grey {
+    content: url($icon-url + 'tenant-grey.svg');
+  }
+
+  &.ci-tenant-white {
+    content: url($icon-url + 'tenant-white.svg');
+  }
+  &.ci-multi-tenant {
+    content: url($icon-url + 'multi-tenant.svg');
+  }
+  &.ci-dashboards {
+    content: url($icon-url + 'dashboards.svg');
+  }
+  &.ci-dashboard {
+    content: url($icon-url + 'dashboard.svg');
+  }
+  &.ci-pixel-perfect-reports {
+    content: url($icon-url + 'pixel-perfect-reports.svg');
+  }
+  &.ci-pre-built-data-models {
+    content: url($icon-url + 'pre-built-data-models.svg');
+  }
+  &.ci-real-time-reporting {
+    content: url($icon-url + 'real-time-reporting.svg');
+  }
+  &.ci-saas-based {
+    content: url($icon-url + 'saas-based.svg');
+  }
+  &.ci-self-service-reporting {
+    content: url($icon-url + 'self-service-reporting.svg');
+  }
+  &.ci-response-time {
+    content: url($icon-url + 'response-time.svg');
+  }
+
+  //new nav icons
+  &.ci-dashboard-nav {
+    content: url($icon-url + 'dashboard-nav.svg');
+  }
+  &.ci-system-management-nav {
+    content: url($icon-url + 'system-management-nav.svg');
+  }
+  &.ci-reporting-nav {
+    content: url($icon-url + 'reporting-nav.svg');
+  }
+  &.ci-audit-nav {
+    content: url($icon-url + 'audit-nav.svg');
+  }
+  &.ci-setting-nav {
+    content: url($icon-url + 'setting-nav.svg');
+  }
+  &.ci-client-nav {
+    content: url($icon-url + 'client-nav.svg');
+  }
+  &.ci-role-nav {
+    content: url($icon-url + 'role-nav.svg');
+  }
+  &.ci-users-nav {
+    content: url($icon-url + 'users-nav.svg');
+  }
+  &.ci-admin-nav {
+    content: url($icon-url + 'admin-nav.svg');
+  }
+  &.ci-site-nav {
+    content: url($icon-url + 'site-nav.svg');
+  }
+  &.ci-clear-brush {
+    content: url($icon-url + 'clear-brush.svg');
+  }
+  &.ci-dash-composer {
+    content: url($icon-url + 'dashboard-composer.svg');
+  }
+  &.ci-visual-gallery {
+    content: url($icon-url + 'visual-gallery.svg');
+  }
+  &.ci-library {
+    content: url($icon-url + 'library.svg');
+  }
+  &.ci-report {
+    content: url($icon-url + 'insightschart-svgrepo-com.svg');
+  }
+  &.ci-page-report {
+    content: url($icon-url + 'page-report.svg');
+  }
+  &.ci-report-library {
+    content: url($icon-url + 'report-library.svg');
+  }
+  &.ci-web-report {
+    content: url($icon-url + 'web-report.svg');
+  }
+  &.ci-super-admin {
+    content: url($icon-url + 'super_admin.svg');
+  }
+  &.ci-qbs {
+    content: url($icon-url + 'qbs.svg');
+  }
+  &.ci-qbe {
+    content: url($icon-url + 'qbe.svg');
+  }
+  &.ci-ql {
+    content: url($icon-url + 'ql.svg');
+  }
+  &.ci-mcs {
+    content: url($icon-url + 'mcs.svg');
+  }
+  &.ci-cso {
+    content: url($icon-url + 'cso.svg');
+  }
+  &.ci-my-report {
+    content: url($icon-url + 'my-report.svg');
+  }
+  &.ci-org-report {
+    content: url($icon-url + 'org-report.svg');
+  }
+  &.ci-status-etl {
+    content: url($icon-url + 'no-etl.svg');
+  }
+  &.ci-status-etl-inprogress {
+    content: url($icon-url + 'inprogress-etl.svg');
+  }
+  &.ci-upcoming-etl {
+    content: url($icon-url + 'next-etl.svg');
+  }
+  &.ci-report-shared {
+    content: url($icon-url + 'shared.svg');
+  }
+  &.ci-quick-schedule {
+    content: url($icon-url + 'quick-schedule-1.svg');
+  }
+  &.ci-my-report-wave {
+    content: url($icon-url + 'my-report-wave.svg');
+  }
+  &.ci-my-report-wave-yellow {
+    content: url($icon-url + 'my-report-wave-yellow.svg');
+  }
+  &.ci-my-report-wave-green {
+    content: url($icon-url + 'my-report-wave-green.svg');
+  }
+  &.ci-data-analytics {
+    content: url($icon-url + 'data-analytics.svg');
+  }
+  &.ci-analytics {
+    content: url($icon-url + 'analytics.png');
+  }
+}

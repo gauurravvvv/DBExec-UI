@@ -1,0 +1,275 @@
+{
+  "title": "Tenant management",
+  "detail": "Tenant detail",
+  "save": "Save",
+  "saveNext": "Save & next",
+  "cancel": "Cancel",
+  "list": {
+    "tenantName": "Tenant name",
+    "tenantId": "Tenant ID",
+    "country": "Country",
+    "pointOfContact": "Primary point of contact",
+    "maxUsersAllowed": "Max users allowed",
+    "status": "Status",
+    "actions": "Actions",
+    "addNewTenant": "Add new tenant",
+    "searchPlaceholder": "Search tenant by name, tenant id or country",
+    "active": "Active",
+    "notActive": "Not active",
+    "createdOn": "Created on",
+    "updatedOn": "Last updated on",
+    "identifier": "Unique identifier",
+    "noRecords": "No tenant found",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "delDialogTitle": "Deleting a tenant will delete it permanently. Do you want to continue ?",
+    "reason": "Enter reason for deletion",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "enteries": "entries"
+  },
+  "info": "Tenant information",
+  "basic": {
+    "assoc": "Client associated",
+    "details": "Tenant details",
+    "tenantName": "Tenant name",
+    "tenantId": "Tenant Identifier",
+    "status": "Status",
+    "rootUser": "Root user's email ID",
+    "reset": "Reset password",
+    "address": "Address",
+    "fullAddress": "Full address",
+    "country": "Country",
+    "pincode": "Pin code",
+    "desc": "Description About Tenant",
+    "poc": "Primary point of contact (POC)",
+    "name": "Name",
+    "email": "Email ID",
+    "phone": "Phone",
+    "configLdap": "Configure LDAP",
+    "url": "URL (ldap://IP:port)",
+    "auth": "Authentication",
+    "adminName": "Admin Domain Name",
+    "searchBase": "User Search Base",
+    "password": "Password",
+    "add": "Add LDAP",
+    "note": "NOTE: Maximum 5 LDAP(s) can be added"
+  },
+  "source": {
+    "title": "Source information",
+    "scheduleTitle": "Schedule",
+    "add": "Add source",
+    "delete": "Delete source",
+    "sourceIdentifier": "Source Identifier",
+    "dataSource": "Data Source",
+    "email": "Email",
+    "ftp": "FTP",
+    "portal": "HA Portal",
+    "emailInfo": "Email Info (only IMAP based info can be uploaded)",
+    "ftpInfo": "FTP Info",
+    "portalInfo": "Portal info",
+    "otherInfo": "Other information",
+    "username": "Username",
+    "password": "Password",
+    "subjectLine": "Subject line",
+    "senderDomain": "Sender's Domain",
+    "exchangeServer": "Exchange Server",
+    "port": "Port",
+    "tls": "TLS",
+    "folderAdd": "FTP folder address",
+    "server": "Server",
+    "host": "Hostname",
+    "scheme": "Scheme",
+    "params": "Organisation Number",
+    "search": "Search",
+    "checkFtp": "Check FTP access validation",
+    "checkConnection": "Check Connection",
+    "note": "NOTE: Maximum 10 sources can be added",
+    "mailbox": "Common mailbox Email ID",
+    "emailId": "Shared Mailbox",
+    "cancel": "Cancel",
+    "save": "Save",
+    "yes": "Yes",
+    "no": "No",
+    "message": "All data under selected data source will be lost. Do you want to continue?",
+    "sendersDomain": "Sender's domain",
+    "errorMesage": "No source information found",
+    "optional": " (Optional)",
+    "saveSource": "Save source",
+    "isActive": "Status"
+  },
+  "target": {
+    "title": "Target information",
+    "safetyDB": "Safety database",
+    "name": "Safety database name",
+    "connectionInfo": "Database connection info",
+    "hostName": "Hostname",
+    "port": "Port",
+    "sftpInfo": "SFTP connection info",
+    "folderPath": "Folder path",
+    "username": "Username",
+    "password": "Password"
+  },
+  "dupeCheck": {
+    "title": "Duplicate check",
+    "searchParameters": "Search parameters",
+    "note": "NOTE: Maximum {{value}} parameters can be added"
+  },
+  "validation": {
+    "basicInfo": {
+      "tenantName": {
+        "required": "Please enter tenant name",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "id": {
+        "required": "Please enter tenant id",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "address": {
+        "required": "Please enter address",
+        "maxlength": "Upto 200 characters are allowed"
+      },
+      "pincode": {
+        "required": "Please enter pincode",
+        "pattern": "Upto 8 numbers are allowed"
+      },
+      "primaryContact": {
+        "required": "Please enter primary contact name",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "email": {
+        "required": "Please enter email",
+        "maxlength": "Upto 100 characters are allowed",
+        "email": "Please enter a valid email ID",
+        "pattern": "Upto 100 characters are allowed"
+      },
+      "phone": {
+        "required": "Please enter phone number",
+        "pattern": "Upto 11 numbers are allowed"
+      },
+      "description": {
+        "required": "Please enter description",
+        "maxlength": "Upto 500 characters are allowed"
+      },
+      "url": {
+        "required": "Please enter ldap url"
+      },
+      "authentication": {
+        "required": "Please enter authentication"
+      },
+      "principal": {
+        "required": "Please enter principal"
+      },
+      "password": {
+        "required": "Please enter password"
+      },
+      "rootUserEmail": {
+        "required": "Please enter root user's email ID",
+        "email": "Please enter a valid email ID",
+        "maxlength": "Upto 100 characters are allowed"
+      }
+    },
+    "targetInfo": {
+      "safetyDbName": {
+        "required": "Please enter valid safety DB name"
+      },
+      "dbHostname": {
+        "required": "Please enter valid Host name"
+      },
+      "dbPort": {
+        "required": "Please enter valid Port information"
+      },
+      "sftpFolderPath": {
+        "required": "Please enter valid folder path"
+      },
+      "sftpHostname": {
+        "required": "Please enter valid hostname"
+      },
+      "username": {
+        "required": "Please enter valid username"
+      },
+      "password": {
+        "required": "Please enter valid password"
+      }
+    },
+    "sourceInfo": {
+      "sourceIdentifier": {
+        "required": "Please enter a valid Source Name",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "username": {
+        "required": "Please enter valid username",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "password": {
+        "required": "Please enter valid password",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "subjectLine": {
+        "required": "Please enter keywords to be searched in subject line",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "sendersDomain": {
+        "required": "Please enter a  valid domain",
+        "pattern": "Please enter a  valid domain",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "exchangeServer": {
+        "required": "Please enter valid server details",
+        "maxlength": "Upto 300 characters are allowed"
+      },
+      "hostname": {
+        "required": "Please enter valid Host name",
+        "maxlength": "Upto 300 characters are allowed"
+      },
+      "port": {
+        "required": "Please add port details",
+        "maxlength": "Upto 10 characters are allowed"
+      },
+      "emailId": {
+        "required": "Please enter valid email",
+        "email": "Please enter a valid email ID"
+      },
+      "folderPath": {
+        "required": "Please enter valid folder path",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "schedule": {
+        "required": "Please enter valid cron expression",
+        "cron": "Please enter valid cron expression"
+      },
+      "folder": {
+        "required": "Please enter valid folder path",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "scheme": {
+        "required": "Please enter valid scheme",
+        "maxlength": "Upto 100 characters are allowed"
+      },
+      "params": {
+        "required": "Please enter organisation number",
+        "maxlength": "Upto 200 characters are allowed"
+      },
+      "search": {
+        "required": "Please enter valid folder path",
+        "maxlength": "Upto 500 characters are allowed"
+      }
+    },
+    "dupeCheck": {
+      "url": {
+        "required": "Please enter a valid API URL"
+      },
+      "userName": {
+        "required": "Please enter a valid username"
+      },
+      "password": {
+        "required": "Please enter a valid password"
+      },
+      "timeout": {
+        "required": "Please enter a valid timeout"
+      }
+    }
+  }
+}

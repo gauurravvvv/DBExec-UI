@@ -1,0 +1,140 @@
+{
+  "topBar": {
+    "profile": "My Profile",
+    "logout": "Logout",
+    "help": "Help - User Manual"
+  },
+  "roles": {
+    "tenantAdmin": "Tenant Admin",
+    "tenantUser": "Tenant User",
+    "clientAdmin": "Client Admin",
+    "admin": "UG Admin",
+    "user": "User",
+    "superAdmin": "Super Admin"
+  },
+  "success": {
+    "markUnassignedInvalid": "Selected case(s) marked Invalid successfully"
+  },
+  "error": {
+    "serverError": "Oops! there was a technical glitch, please try after some time  or contact system admin if issue persists.",
+    "userSuccess": "User deleted successfully. You can add the user again.",
+    "deleteUserFromGroup": "User deleted successfully",
+    "passwordUpdate": "Your password has been updated successfully",
+    "deleteUserGroup": "User group deleted successfully",
+    "noData": "Data Not Available",
+    "statusSuccess": "Status Updated Successfully"
+  },
+  "navItems": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "systemManagement": "System Management",
+    "sManagement": {
+      "sites": "Sites",
+      "clients": "Clients",
+      "superAdmins": "Super Admins",
+      "clientAdmins": "Client Admins",
+      "roles": "Roles",
+      "userGroups": "User Groups",
+      "users": "Users"
+    },
+    "Report": "Reports",
+    "reporting": "Reporting",
+    "reports": {
+      "webReport": "Web Report",
+      "webReportDLP": "Web Report DLP",
+      "pageReport": "Page Report",
+      "pageReportDLP": "Page Report DLP",
+      "reportLibrary": "Report Library",
+      "scheduleLibrary": "Schedule Library",
+      "newReportLibrary": "New Report Library",
+      "intelliQ": "intelliQ",
+      "catalogStudio": "Catalog Studio"
+    },
+    "Querying": "Querying",
+    "query": {
+      "qbe": "Query By Example",
+      "qbSQL": "Query By SQL",
+      "qLibrary": "Query Library"
+    },
+    "CaseSeries": "Case Series",
+    "caseSeries": {
+      "manual": "Manual Case Series",
+      "cso": "Case Series Operation",
+      "csLibrary": "Case Series Library"
+    },
+    "quickSight": "QuickSight",
+    "visualizations": "Visualizations",
+    "visualization": "Visualization",
+    "connection": "Connection",
+    "sources": "Sources",
+    "visualGallery": "Visual Gallery",
+    "dashboardLibrary": "Dashboard Library",
+    "pipelineConfig": "Pipeline Configuration",
+    "batchConfig": "Batch Configuration",
+    "taskConfig": "Task Configuration",
+    "airflowUI": "Airflow UI",
+    "dataAnalytics": "Data Analytics",
+    "quicksightSearch": "Visualization Queries",
+    "myProfile": "My Profile",
+    "help": "Help - User Manual",
+    "logout": "Logout",
+    "auditLogs": "Audit Logs",
+    "settings": "App Settings",
+    "intelliq": "intelliQ",
+    "poweredBy": "Powered By",
+    "visualizationServer": "Visualization Server",
+    "advancedAnalytics": "Advanced Analytics",
+    "dataVisualization": "Data Visualization",
+    "analytics": "Analytics",
+    "scheduling": "Scheduling",
+    "schedules": "Schedules",
+    "requests": "Requests",
+    "alerts": "Alerts",
+    "calendar": "Calendar"
+  },
+  "appOpenInNewTab": "Application has been opened in new tab.",
+  "notifications": "Notifications",
+  "noNotification": "No Notification",
+  "notificationLast30Days": "Notifications of last 30 days",
+  "footer": {
+    "text1": "UltraAnalytics v2.1 - Copyright © ",
+    "text2": " Ultragenic Research & Technologies Private Limited | All Rights Reserved.",
+    "faq": "FAQ",
+    "termsAndCondition": "Terms and Conditions",
+    "contactUs": "Contact Us"
+  },
+  "headerSearh": {
+    "report": "Search Report",
+    "folder": "Search Folder",
+    "visualization": "Create Visualization",
+    "dashboard": "Search Dashboard",
+    "visuals": "Search Visuals",
+    "caseSeries": "Search Case Series",
+    "query": "Search Query"
+  },
+  "searchBox": {
+    "search": "Search",
+    "globalSearch": "Global Search",
+    "suggestions": "Suggestions",
+    "favoriteReports": "Favorite Reports",
+    "recentlyModifiedReports": "Recently Modified Reports",
+    "mostVisitedReports": "Most Visited Reports",
+    "actionItem": "Action Item",
+    "selectTopic": "Select topic",
+    "visualize": "Visualize",
+    "all": "All",
+    "webReports": "Web Reports",
+    "pageReports": "Page Reports",
+    "folders": "Folder",
+    "visualizePlaceholder": "Enter prompt",
+    "noRecordFound": "No Record Found",
+    "run": "Run",
+    "schedule": "Schedule",
+    "edit": "Edit",
+    "caseSeries": "Case Series",
+    "queries": "Queries",
+    "download": "Download",
+    "refresh": "Refresh",
+    "tags": "Tags"
+  }
+}

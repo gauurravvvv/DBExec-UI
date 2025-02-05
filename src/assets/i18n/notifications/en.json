@@ -1,0 +1,12 @@
+{
+  "title": "Alerts & notifications",
+  "mark": "Mark as read",
+  "select": "Select",
+  "search": "Search",
+  "noDataFound": "No Data Found",
+  "gridHeader": {
+    "title": "Title",
+    "desc": "Description",
+    "date": "Notification Date"
+  }
+}

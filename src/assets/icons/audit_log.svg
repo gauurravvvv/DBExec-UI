@@ -1,0 +1,12 @@
+<svg id="Component_324_9" data-name="Component 324 – 9" xmlns="http://www.w3.org/2000/svg" width="24" height="21.952" viewBox="0 0 24 21.952">
+  <g id="Group_1222" data-name="Group 1222" transform="translate(-36 -235.048)">
+    <g id="time" transform="translate(34.004 231.048)">
+      <g id="_21-next" data-name="21-next" transform="translate(1.996 4)">
+        <path id="Path_175" data-name="Path 175" d="M15.71,4A10.283,10.283,0,0,0,5.5,13.135L3.465,11.1a.86.86,0,0,0-1.217,1.217l3.428,3.428a.857.857,0,0,0,1.14.06L11.1,12.381a.857.857,0,1,0-1.063-1.337L7.2,13.306a8.569,8.569,0,1,1,13.2,8.158.854.854,0,0,0,.934,1.431A10.283,10.283,0,0,0,15.71,4Z" transform="translate(-1.996 -4)"/>
+        <path id="Path_176" data-name="Path 176" d="M21.137,14.141H19.184a1.637,1.637,0,0,0-.617-.617V9.857a.857.857,0,1,0-1.714,0v3.668a1.714,1.714,0,1,0,2.331,2.331h1.954a.857.857,0,0,0,0-1.714Z" transform="translate(-3.996 -4.715)"/>
+        <circle id="Ellipse_163" data-name="Ellipse 163" cx="1" cy="1" r="1" transform="translate(13 19.952)"/>
+        <ellipse id="Ellipse_164" data-name="Ellipse 164" cx="0.5" cy="1.5" rx="0.5" ry="1.5" transform="translate(16 17.952)"/>
+      </g>
+    </g>
+  </g>
+</svg>

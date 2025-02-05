@@ -1,0 +1,80 @@
+{
+  "details": "Details",
+  "address": "Address",
+  "clientName": "Client Name",
+  "clientIdentifier": "Client Identifier",
+  "emailId": "Email ID",
+  "description": "Description",
+  "country": "Country",
+  "stateName": "State",
+  "pin": "Pincode",
+  "timezone": "Timezone",
+  "poc": "Primary Point of Contact (POC)",
+  "username": "User Name",
+  "name": "First Name",
+  "lastName":"Last Name",
+  "language": "Language",
+  "password": "Password",
+  "phNumber": "Phone Number",
+  "create": "Create",
+  "passwordPolicy": "Password should contain atleast 1 lower case, 1 upper case, 1 numeric and 1 special character. (Allowed special characters: !, @, &, *, (, ), _, - and.)",
+  "validation": {
+    "clientCreation": {
+      "name": {
+        "required": "Please enter Client Name",
+        "minlength": "Client Name must be 3 characters",
+        "maxlength": "Client Name upto 100 characters are allowed"
+      },
+      "identifier": {
+        "required": "Please enter Client Identifier"
+      },
+      "description": {
+        "required": "Please enter Description",
+        "maxlength": "Description upto 500 characters are allowed"
+      },
+      "primaryContact": {
+        "required": "Please enter First Name"
+      },
+      "lastName": {
+        "required": "Please enter First Name"
+      },
+      "pincode": {
+        "required": "Please enter Pincode",
+        "maxlength": "Pincode upto 10 characters are allowed"
+      },
+      "isdCode": {
+        "required": "Please enter isd Code"
+      },
+      "username": {
+        "required": "Please enter Username",
+        "minlength": "Client Name must be 3 characters",
+        "maxlength": "Client Name upto 100 characters are allowed"
+      },
+      "password": {
+        "required": "Please enter Password",
+        "pattern": "Invalid password"
+      },
+      "email": {
+        "required": "Please enter Email"
+      },
+      "address": {
+        "required": "Please enter Address"
+      },
+      "countryId": {
+        "required": "Please enter Country"
+      },
+      "phone": {
+        "required": "Please enter Phone Number"
+      },
+      "timezone": {
+        "required": "Please enter Timezone"
+      },
+      "state": {
+        "required": "Please enter State"
+      },
+      "languageId": {
+        "required": "Please enter Language"
+      }
+    }
+  }
+}

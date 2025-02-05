@@ -1,0 +1,228 @@
+{
+  "title": "User management",
+  "search": "Search",
+  "next": "Next",
+  "save": "Save",
+  "cancel": "Cancel",
+  "users": {
+    "usersLabel": "Users",
+    "userGroupsLabel": "Groups",
+    "username": "User Name",
+    "name": "Full Name",
+    "site": "Site",
+    "country": "Country",
+    "email": "Email",
+    "contact": "Contact",
+    "role": "Role",
+    "userGroups": "User Groups",
+    "lastLogin": "Last Login",
+    "status": "Status",
+    "actions": "Actions",
+    "search": "Search",
+    "select": "Select",
+    "active": "Active",
+    "notActive": "Not Active",
+    "edit": "Edit",
+    "delete": "Delete",
+    "addUser": "Add User",
+    "rootUser": "Root User",
+    "yes": "Yes",
+    "no": "No",
+    "searchBar": "Search by Name, email or contact",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "enteries": "entries"
+  },
+  "groups": {
+    "userGroup": "User Group",
+    "users": "Users",
+    "createdBy": "Created By",
+    "createdOn": "Created On",
+    "modifiedBy": "Last Modified By",
+    "modifiedOn": "Last Modified On",
+    "actions": "Actions",
+    "search": "Search",
+    "select": "Select",
+    "addUser": "Add User",
+    "editGroup": "Edit Group",
+    "delete": "Delete Group",
+    "createGroup": "Create Group",
+    "noRecords": "No Records Found",
+    "searchBar": "Search by User group, created by or last modified by"
+  },
+  "group-detail": {
+    "usersLabel": "Users",
+    "restrictionsLabel": "Restrictions & Privileges",
+    "addUserToGroup": "Add User To Group",
+    "userGroup": "User Group",
+    "editButton": "Edit Group"
+  },
+  "privileges": {
+    "section": "Section Level",
+    "navigation": "Navigation Pane",
+    "state": "State",
+    "read": "Read",
+    "write": "Write",
+    "access": "Access",
+    "save": "Save",
+    "cancel": "Cancel",
+    "noRecord": "No Records Found"
+  },
+  "group-user-detail": {
+    "userName": "Username",
+    "role": "Role",
+    "country": "Country",
+    "lastLogin": "Last Login",
+    "addedOn": "Added On",
+    "status": "Status",
+    "updatedOn": "Last Updated On",
+    "actions": "Actions",
+    "noRecords": "No Records Found",
+    "searchBar": "Search by Username"
+  },
+  "user-detail": {
+    "user": "User",
+    "edit": "Edit User",
+    "delete": "Delete User",
+    "restrictionsLabel": "Restrictions & Privileges",
+    "name": "Name",
+    "username": "Username",
+    "groups": "Groups",
+    "ldap": "LDAP",
+    "email": "Email",
+    "lastLogin": "Last Login",
+    "lastUpdated": "Last Updated On",
+    "lastAdded": "Added On",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "role": "Role",
+    "editGroups": "Edit Groups",
+    "products": "Product Name",
+    "country": "Country",
+    "study": "Study Name",
+    "source": "Case Source",
+    "restrictions": "Data Restrictions",
+    "privileges": "Privileges",
+    "rights": "Based On Group Rights",
+    "rootUser": "Root User",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "add-user": {
+    "title": "Add User",
+
+    "details": "Details",
+    "groups": "Groups",
+    "restrictions": "Restrictions & Privileges",
+    "passwordPolicy": "Password should contain atleast 1 lower case, 1 upper case, 1 numeric and 1 special character. (Allowed special characters: !, @, &, *, (, ), _, - and.)",
+    "usernamePolicy": "No _ or . at beginning or end.\nNo __ or _. or ._ or .. inside.\nAllowed characters a-zA-Z0-9._ only."
+  },
+  "edit-user": {
+    "title": "Edit User"
+  },
+  "add-details": {
+    "fName": "First Name",
+    "mName": "Middle Name",
+    "lName": "Last Name",
+    "timezone": "Select Timezone",
+    "lang": " Select Language",
+    "site": " Site Information",
+    "phone": "Phone Number",
+    "status": "Status",
+    "credentials": "Credentials",
+    "location": "Location",
+    "username": "Username",
+    "email": "Email Id",
+    "password": "Password",
+    "state": "State",
+    "country": "Select Country",
+    "ldap": "Configure LDAP",
+    "selectLdap": "Select LDAP",
+    "authType": "Authentication type",
+    "ldapCheck": "LDAP",
+    "optional": " (Optional)"
+  },
+  "add-groups": {
+    "all": "All Groups",
+    "assigned": "Assigned Groups"
+  },
+  "addUserToGroup": {
+    "search": "Search by Username"
+  },
+  "restrictions": {
+    "role": "Role",
+    "admin": "Admin",
+    "user": "User",
+    "groupPriv": "Groups Privileges",
+    "dataRes": "Data Restrictions",
+    "section": "Section Level",
+    "nav": "Navigation Pane",
+    "state": "State",
+    "products": "Products (Optional)",
+    "countries": "Countries (Optional)",
+    "studies": "Studies (Optional)",
+    "sources": "Sources (Optional)",
+    "read": "Read ",
+    "write": "Write ",
+    "access": "Access"
+  },
+  "validation": {
+    "userDetails": {
+      "firstName": {
+        "required": "Please enter first name"
+      },
+      "timezone": {
+        "required": "Please select timezone"
+      },
+      "language": {
+        "required": "Please select language"
+      },
+      "site": {
+        "required": "Please select site information"
+      },
+      "phone": {
+        "required": "Please enter phone number"
+      },
+      "login": {
+        "required": "Please enter username",
+        "minlength": "Username must be 4 characters",
+        "maxlength": "Username upto 20 characters are allowed",
+        "pattern": "Invalid username"
+      },
+      "password": {
+        "required": "Please enter password",
+        "pattern": "Invalid password"
+      },
+      "email": {
+        "required": "Please enter email",
+        "email": "Invalid email"
+      },
+      "stateName": {
+        "required": "Please enter state"
+      },
+      "country": {
+        "required": "Please select country"
+      },
+      "ldap": {
+        "required": "Please select LDAP"
+      },
+      "isdCode": {
+        "required": "Please enter isdCode"
+      }
+    },
+    "editGroup": {
+      "name": {
+        "required": "Please enter a group name",
+        "pattern": "Please enter valid group name"
+      }
+    },
+    "createGroup": {
+      "name": {
+        "required": "Please enter a group name",
+        "pattern": "Please enter valid group name"
+      }
+    }
+  }
+}

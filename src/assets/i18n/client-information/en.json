@@ -1,0 +1,34 @@
+{
+  "title": "Client Information",
+  "tabs": {
+    "basic": "Basic Info",
+    "license": "Licensing Info"
+  },
+  "basic": {
+    "name": "Client name",
+    "id": "Client ID",
+    "shortName": "Client's short name",
+    "rootUser": "Root user's email ID",
+    "decription": "Description",
+    "address": "Address",
+    "fullAddress": "Full address",
+    "country": "Country",
+    "pincode": "Pincode",
+    "pointOfContact": "Primary point of contact",
+    "nameOfContact": "Name",
+    "email": "Email ID",
+    "phone": "Phone",
+    "timezone":"Timezone",
+    "state":"State",
+    "identifier":"Client Identifier",
+    "details":"Details",
+    "language":"Language"
+  },
+  "license": {
+    "heading": "Licensing information",
+    "startDate": "Start date",
+    "volume": "Case volume",
+    "maxUsers": "Max users allowed",
+    "endDate":"Expiry date"
+  }
+}

@@ -1,0 +1,13 @@
+<svg id="Component_320_50" data-name="Component 320 – 50" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g id="Rectangle_924" data-name="Rectangle 924" fill="#fff" stroke="#707070" stroke-width="1" opacity="0">
+    <rect width="16" height="16" stroke="none"/>
+    <rect x="0.5" y="0.5" width="15" height="15" fill="none"/>
+  </g>
+  <g id="Group_1493" data-name="Group 1493" transform="translate(-953 -114)">
+    <path id="Path_235" data-name="Path 235" d="M-629.528,7506.952h6.474s3.74-.434,3.74,2.406-3.74,2.649-3.74,2.649" transform="translate(1586 -7390)" fill="none" stroke="#6c757d" stroke-width="1"/>
+    <path id="Path_236" data-name="Path 236" d="M-626.686,7512s-3.96-.527-3.96,2.613,4.556,2.421,4.556,2.421h4.583" transform="translate(1586 -7390)" fill="none" stroke="#6c757d" stroke-width="1"/>
+    <circle id="Ellipse_203" data-name="Ellipse 203" cx="2" cy="2" r="2" transform="translate(954 115)" fill="#6c757d"/>
+    <circle id="Ellipse_204" data-name="Ellipse 204" cx="2" cy="2" r="2" transform="translate(959 120)" fill="#6c757d"/>
+    <circle id="Ellipse_205" data-name="Ellipse 205" cx="2" cy="2" r="2" transform="translate(964 125)" fill="#6c757d"/>
+  </g>
+</svg>

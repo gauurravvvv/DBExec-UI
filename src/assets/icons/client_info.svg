@@ -1,0 +1,27 @@
+<svg id="Component_321_8" data-name="Component 321 – 8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="Rectangle_804" data-name="Rectangle 804" fill="#fff" stroke="#707070" stroke-width="1" opacity="0">
+    <rect width="24" height="24" stroke="none"/>
+    <rect x="0.5" y="0.5" width="23" height="23" fill="none"/>
+  </g>
+  <path id="Path_221" data-name="Path 221" d="M597.287-5476.478h23.185" transform="translate(-597 5499.221)" fill="none" stroke="#161616" stroke-width="1.5"/>
+  <g id="Group_1384" data-name="Group 1384" transform="translate(1.817 2.944)">
+    <path id="Path_220" data-name="Path 220" d="M599.817-5476.478v-16.276l4.9-3.3,4.661,3.3v16.276" transform="translate(-599.817 5496.056)" fill="none" stroke="#161616" stroke-width="1.5"/>
+    <path id="Path_222" data-name="Path 222" d="M611.292-5488.813h7.775v6.743" transform="translate(-601.729 5501.869)" fill="none" stroke="#161616" stroke-width="1.5"/>
+    <g id="Rectangle_802" data-name="Rectangle 802" transform="translate(3.183 7.056)" fill="#fff" stroke="#161616" stroke-width="1.5">
+      <rect width="3" height="3" stroke="none"/>
+      <rect x="0.75" y="0.75" width="1.5" height="1.5" fill="none"/>
+    </g>
+    <g id="Rectangle_803" data-name="Rectangle 803" transform="translate(3.183 13.056)" fill="#fff" stroke="#161616" stroke-width="1.5">
+      <rect width="3" height="3" stroke="none"/>
+      <rect x="0.75" y="0.75" width="1.5" height="1.5" fill="none"/>
+    </g>
+  </g>
+  <g id="Group_1383" data-name="Group 1383" transform="translate(12 1)">
+    <g id="Ellipse_200" data-name="Ellipse 200" fill="#fff" stroke="#161616" stroke-width="1.5">
+      <circle cx="6" cy="6" r="6" stroke="none"/>
+      <circle cx="6" cy="6" r="5.25" fill="none"/>
+    </g>
+    <rect id="Rectangle_805" data-name="Rectangle 805" width="2" height="5" transform="translate(5 6)" fill="#161616"/>
+    <rect id="Rectangle_806" data-name="Rectangle 806" width="2" height="2" transform="translate(5 3)" fill="#161616"/>
+  </g>
+</svg>

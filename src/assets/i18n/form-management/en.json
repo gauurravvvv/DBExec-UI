@@ -1,0 +1,135 @@
+{
+  "title": "Form Management",
+  "noDataFound": "No Data Found",
+  "select": "Select",
+  "search": "Search",
+  "state": {
+    "rename": "Rename",
+    "delete": "Delete",
+    "searchName": "Search",
+    "selectType": "Select",
+    "newState": "Create New State",
+    "stateName": "State Name",
+    "stateType": "State Type",
+    "actions": "Actions",
+    "deleteStateHeader": "Delete State",
+    "deleteState": "Do you want to delete the selected state. Please note that state once deleted will be deleted from all workflows as well",
+    "deleteButton": "Delete",
+    "cancelDeleteButton": "Cancel",
+    "renameHeader": "Rename State",
+    "renameButton": "Rename",
+    "cancelNewState": "Cancel",
+    "createNewState": "Create",
+    "createStateHeader": "Create New State",
+    "createStateLabel": "State Name",
+    "createStatePlaceholder": "Enter state name",
+    "custom": "Custom",
+    "system": "System",
+    "configureCaseStatus": "Configure Case Status",
+    "yes": "Yes",
+    "no": "No",
+    "save": "Save",
+    "noRecords": "No records found",
+    "screenPref": "Screen Preference",
+    "dataReview": "Data Review",
+    "duplicate": "Duplicate Check",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "enteries": "entries"
+  },
+  "forms": {
+    "gridHeader": {
+      "formName": "Form Name",
+      "formID": "Form ID",
+      "workflows": "Workflows",
+      "dueDateType": "Due Date Type",
+      "complDuration": "Compliance Days",
+      "source": "Source",
+      "status": "Status",
+      "action": "Action",
+      "description": "Description"
+    },
+    "formsLabel": "Forms",
+    "statesLabel": "States",
+    "workflowsLabel": "Workflows"
+  },
+  "workflows": {
+    "newWorkflow": "Create New Workflow",
+    "editWorkflow": "Edit",
+    "deleteWorkflow": "Delete",
+    "cancel": "Cancel",
+    "deleteWorkflowHeader": "Delete Workflow",
+    "deleteWorkflowMessage": "Do you want to delete the workflow?",
+    "defaultWorkflow": "Default",
+    "gridHeader": {
+      "fromState": "From State",
+      "action": "Action",
+      "saveData": "Save Data",
+      "caseStatus": "Case Status",
+      "toState": "To State",
+      "assignedGroup": "Assigned Group"
+    },
+    "noRecords": "No records found",
+    "copyWorkflow": "Copy Workflow",
+    "newWorkflowPlaceholder":"New Workflow Name",
+    "selectWorkflow":"Select Workflow",
+    "save":"Save"
+  },
+  "createEditWorkflow": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "renameWorkflow": "Rename Workflow",
+    "addStep": "Add Step",
+    "addAction": "Add Action",
+    "note": "Note",
+    "note1": "Max 4 actions can be added for a state.",
+    "note2": "Each workflow should start with 'from state': Registered and end with 'To state': 'Closed'.",
+    "gridHeader": {
+      "sno": "S.no.",
+      "fromState": "From State",
+      "action": "Action",
+      "saveData": "Save Data",
+      "changeStatus": "Case Status",
+      "toState": "To State",
+      "assignedGroup": "Assigned Group"
+    }
+  },
+  "statusOptions": {
+    "duplicate": "Duplicate",
+    "invalid": "Invalid",
+    "follow-up": "Follow-up",
+    "initial": "Initial",
+    "no-change": "No Change"
+  },
+  "validation": {
+    "workflow": {
+      "workflowName": {
+        "required": "Please enter valid workflow name",
+        "minlength":"Minimum 2 characters are required"
+      },
+      "fromState": {
+        "required": "Please enter valid state",
+        "duplicate": "From state already exists"
+      },
+      "action": {
+        "required": "Please enter valid action",
+        "maxlength": "Upto 50 characters are allowed",
+        "duplicate": "Action already exists"
+      },
+      "caseStatus": {
+        "required": "Please enter valid status"
+      },
+      "assignedGroup": {
+        "required": "Please enter valid group"
+      },
+      "createState": {
+        "required": "Please enter valid state name",
+        "maxlength": "Upto 50 characters are allowed"
+      },
+      "workflowId": {
+        "required": "Please select valid workflow"
+      }
+    }
+  }
+}

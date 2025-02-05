@@ -1,0 +1,76 @@
+{
+  "details": "詳細",
+  "address": "住所",
+  "clientName": "クライアント名",
+  "clientIdentifier": "クライアントが識別します",
+  "emailId": "電子メールID",
+  "description": "説明",
+  "country": "国",
+  "stateName": "州名",
+  "pin": "ピンコード",
+  "timezone": "タイムゾーン",
+  "poc": "主な接触点（POC）",
+  "username": "ユーザー名",
+  "name": "名前",
+  "language": "言語",
+  "password": "パスワード",
+  "phNumber": "電話番号",
+  "create": "作成",
+  "passwordPolicy": "パスワードには、少なくとも1つの小文字、1大文字、1数字、1つの特殊文字が含まれています。（特殊文字：、@、＆、*、（）、_、 - 、および。)",
+  "validation": {
+    "clientCreation": {
+      "name": {
+        "required": "クライアント名を入力してください",
+        "minlength": "クライアント名は3文字である必要があります",
+        "maxlength": "100文字までのクライアント名が許可されます"
+      },
+      "identifier": {
+        "required": "クライアント識別子を入力してください"
+      },
+      "description": {
+        "required": "説明を入力してください",
+        "maxlength": "500文字までの説明が許可されます"
+      },
+      "primaryContact": {
+        "required": "名前を入力してください"
+      },
+      "pincode": {
+        "required": "PINコードを入力してください",
+        "maxlength": "10文字までのピンコードが許可されます"
+      },
+      "isdCode": {
+        "required": "isdコードを入力してください"
+      },
+      "username": {
+        "required": "ユーザー名を入力してください",
+        "minlength": "クライアント名は3文字である必要があります",
+        "maxlength": "100文字までのクライアント名が許可されます"
+      },
+      "password": {
+        "required": "パスワードを入力してください",
+        "pattern": "無効なパスワード"
+      },
+      "email": {
+        "required": "メールアドレスを入力してください"
+      },
+      "address": {
+        "required": "住所を入力してください"
+      },
+      "countryId": {
+        "required": "国を入力してください"
+      },
+      "phone": {
+        "required": "電話番号を入力してください"
+      },
+      "timezone": {
+        "required": "タイムゾーンを入力してください"
+      },
+      "state": {
+         "required": "州を入力してください" 
+        },
+      "languageId": {
+         "required": "言語を入力してください" 
+        }
+    }
+  }
+}
