@@ -1,0 +1,18 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f6fa;
+}
+
+.content-wrapper {
+  display: flex;
+  flex: 1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: calc(100vh - 110px);
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

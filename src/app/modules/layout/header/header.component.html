@@ -1,0 +1,36 @@
+<header class="header">
+  <div class="header-left">
+    <div class="logo">
+      <div class="logo-container">
+        <i class="bi bi-database-fill logo-icon"></i>
+        <span class="logo-text">DB<span class="highlight">Exec</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-center">
+    <div class="org-info">
+      <h2 class="org-name">{{ organisationName }}</h2>
+      <div class="current-time">{{ currentTime | date:'medium' }}</div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="header-actions">
+      <div class="user-profile" dropdown>
+        <div class="profile-info" dropdownToggle>
+          <div class="user-initials">{{ userInitials }}</div>
+          <div class="user-details">
+            <span class="username">{{ userName }}</span>
+            <span class="user-role">{{ userRole }}</span>
+          </div>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+
+        <ul class="dropdown-menu" *dropdownMenu>
+          <li><a (click)="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>

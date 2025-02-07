@@ -1,0 +1,73 @@
+<div class="login-container">
+    <!-- Left Section - Marketing Content -->
+    <div class="marketing-section">
+        <div class="brand mb-5">
+            <i class="pi pi-database mr-2"></i>
+            <span>DBExec</span>
+        </div>
+        <h1 class="headline">Elevate Your Database<br>Management Experience</h1>
+        <p class="subtitle">Powerful . Intuitive . Secure</p>
+        <div class="features-grid">
+            <div class="feature-item" *ngFor="let feature of features">
+                <div class="feature-icon">
+                    <i class="pi pi-{{feature.icon}}"></i>
+                </div>
+                <div class="feature-content">
+                    <h3>{{feature.title}}</h3>
+                    <p>{{feature.description}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="security-badge">
+            <i class="pi pi-shield"></i>
+            Enterprise-Grade Security
+        </div>
+    </div>
+    <!-- Right Section - Login Form -->
+    <div class="login-section">
+        <div class="login-box">
+            <h2>Welcome</h2>
+            <p class="text-500 mb-4">Sign in to continue to DBExec</p>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="p-fluid">
+                <div class="field mb-4">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-building"></i>
+                        <input pInputText id="organization" formControlName="organization" placeholder="Organisation"
+                            class="p-inputtext-lg">
+                    </span>
+                </div>
+
+                <div class="field mb-4">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-user"></i>
+                        <input pInputText id="username" formControlName="username" placeholder="Username"
+                            class="p-inputtext-lg">
+                    </span>
+                </div>
+
+                <div class="field mb-4">
+                    <span class="p-input-icon-left p-input-icon-right">
+                        <i class="pi pi-lock"></i>
+                        <input pInputText type="password" id="password" formControlName="password"
+                            placeholder="Password" class="p-inputtext-lg">
+                        <i class="pi pi-eye" style="cursor: pointer;" (click)="togglePassword($event)"></i>
+                    </span>
+                </div>
+
+                <div class="flex align-items-center justify-content-between mb-4">
+                    <div class="flex align-items-center">
+                        <p-checkbox formControlName="rememberMe" [binary]="true" inputId="rememberMe"></p-checkbox>
+                        <label for="rememberMe" class="ml-2">Remember me</label>
+                    </div>
+                    <a class="forgot-password" (click)="onForgotPassword()">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button pButton type="submit" label="Login" [loading]="loading" [disabled]="!loginForm.valid || loading"
+                    class="p-button-lg"></button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,196 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  height: 64px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1000;
+
+  .header-left {
+    .logo {
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 8px;
+        position: relative;
+
+        .logo-icon {
+          font-size: 2.2rem;
+          color: #3498db;
+          animation: gentle-zoom 3s ease-in-out infinite;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform-origin: center;
+        }
+
+        .logo-text {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: #000000;
+          letter-spacing: -0.5px;
+          font-family: "Poppins", sans-serif;
+          position: relative;
+
+          &::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #3498db;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+          }
+
+          &:hover {
+            &::after {
+              width: 100%;
+            }
+          }
+
+          .highlight {
+            color: #3498db;
+            position: relative;
+          }
+        }
+      }
+    }
+  }
+
+  .header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+
+    .org-info {
+      .org-name {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #000;
+      }
+
+      .current-time {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  .header-right {
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      .user-profile {
+        position: relative;
+
+        .profile-info {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          cursor: pointer;
+          padding: 0.5rem;
+          border-radius: 4px;
+
+          &:hover {
+            background-color: #f5f5f5;
+          }
+
+          .user-initials {
+            width: 48px;
+            height: 48px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+          }
+
+          .user-details {
+            display: flex;
+            flex-direction: column;
+
+            .username {
+              font-weight: 500;
+              color: #000;
+              font-size: 1rem;
+            }
+
+            .user-role {
+              font-size: 0.8rem;
+              color: #666;
+              margin-top: 2px;
+            }
+          }
+
+          i {
+            font-size: 0.8rem;
+            color: #666;
+            margin-left: 4px;
+          }
+        }
+
+        .dropdown-menu {
+          min-width: 200px;
+          padding: 0.5rem 0;
+          margin-top: 0.5rem;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+          li {
+            a {
+              padding: 0.5rem 1rem;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              color: #333;
+              text-decoration: none;
+              cursor: pointer;
+
+              &:hover {
+                background-color: #f5f5f5;
+              }
+
+              i {
+                width: 20px;
+              }
+            }
+          }
+
+          .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 0.5rem 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes gentle-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

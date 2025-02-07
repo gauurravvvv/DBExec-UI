@@ -1,8 +1,5 @@
-import { IEnvironment } from 'src/app/common/interfaces/environment';
-
-export const environment: IEnvironment = {
+export const environment = {
   production: false,
-  defaultReportUrl: '##REPORTSERVER##',
-  defaultBaseUrl: 'http://localhost:3000/api/v2',
-  assetsUrl: 'http://localhost:4200',
+  apiServer: 'http://localhost:3000/api/v1',
+  appURL: 'http://localhost:4200',
 };

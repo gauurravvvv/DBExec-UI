@@ -1,0 +1,269 @@
+.sidebar {
+  width: 260px;
+  height: 100%;
+  background: #1a1a1a;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &.collapsed {
+    width: 70px;
+  }
+
+  .sidebar-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+
+    .toggle-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      right: 20px;
+      top: 15px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  .toggle-btn.outside {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: -15px;
+    top: 20px;
+    z-index: 10;
+
+    &:hover {
+      background: #2c2c2c;
+    }
+  }
+
+  .sidebar-content {
+    height: 100%;
+    overflow-y: auto;
+    padding-top: 20px;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+  }
+
+  &.collapsed {
+    .sidebar-content {
+      height: calc(100% - 60px);
+      padding-top: 0;
+    }
+  }
+
+  .nav-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .nav-item {
+    margin: 4px 0;
+  }
+
+  .nav-link,
+  .submenu-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    color: #ffffff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+      background: #2c2c2c;
+      color: #3498db;
+    }
+
+    .link-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      i {
+        width: 20px;
+        text-align: center;
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+
+      .nav-text {
+        font-size: 14px;
+        white-space: nowrap;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+        padding-left: 4px;
+
+        &.hidden {
+          opacity: 0;
+          width: 0;
+          padding-left: 0;
+        }
+      }
+    }
+
+    .submenu-arrow {
+      font-size: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    &.expanded .submenu-arrow {
+      transform: rotate(-180deg);
+    }
+  }
+
+  .submenu,
+  .nested-submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: rgba(0, 0, 0, 0.2);
+
+    &.expanded {
+      max-height: 1000px;
+    }
+  }
+
+  .submenu-item,
+  .nested-submenu-item {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+
+    &.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    a {
+      padding: 10px 20px 10px 52px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+
+      .link-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        i {
+          width: 20px;
+          text-align: center;
+          font-size: 16px;
+          flex-shrink: 0;
+        }
+
+        .nav-text {
+          padding-left: 4px;
+        }
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      &.active {
+        color: #3498db;
+        background: #2c2c2c;
+      }
+    }
+  }
+
+  .nested-submenu {
+    background: rgba(0, 0, 0, 0.3);
+
+    .nested-submenu-item a {
+      padding-left: 68px;
+
+      .link-content {
+        gap: 16px;
+      }
+    }
+  }
+
+  &.collapsed {
+    .nav-text {
+      display: none;
+    }
+
+    .submenu-arrow {
+      display: none;
+    }
+
+    .nav-link,
+    .submenu-link {
+      justify-content: center;
+
+      .link-content {
+        justify-content: center;
+        gap: 0;
+
+        i {
+          margin: 0;
+        }
+      }
+    }
+
+    .submenu,
+    .nested-submenu {
+      display: none;
+    }
+  }
+}
+
+// Mobile styles
+.sidebar.mobile {
+  position: fixed;
+  z-index: 1000;
+  left: -260px;
+
+  &.collapsed {
+    left: 0;
+  }
+}

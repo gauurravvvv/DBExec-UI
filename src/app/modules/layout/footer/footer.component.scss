@@ -1,0 +1,32 @@
+.footer-container {
+  width: 100%;
+  background-color: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1rem;
+
+  .footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .app-info {
+      color: #666;
+      font-size: 0.875rem;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      @media (max-width: 768px) {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
+
+// Make the footer stick to the bottom
+:host {
+  display: block;
+  position: relative;
+  z-index: 1;
+}

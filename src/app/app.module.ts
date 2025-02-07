@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -14,9 +14,26 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MessageService } from 'primeng/api';
 import { AppPrimeNGModule } from './shared/modules/app-primeng.module';
+import { LoginComponent } from './modules/auth/components/login/login.component';
+import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
+import { HttpRequestInterceptor } from './core/interceptor/HttpRequestInterceptor';
+import { EmptyRootComponent } from './modules/dashboard/empty-root/empty-root.component';
+import { FooterComponent } from './modules/layout/footer/footer.component';
+import { HeaderComponent } from './modules/layout/header/header.component';
+import { HomeComponent } from './modules/layout/home/home.component';
+import { SidebarComponent } from './modules/layout/sidebar/sidebar.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    ForgotPasswordComponent,
+    EmptyRootComponent,
+    HomeComponent,
+    HeaderComponent,
+    SidebarComponent,
+    FooterComponent,
+  ],
   imports: [
     AppRoutingModule,
     HttpClientModule,
@@ -33,7 +50,14 @@ import { AppPrimeNGModule } from './shared/modules/app-primeng.module';
     InputTextareaModule,
     AppPrimeNGModule,
   ],
-  providers: [MessageService],
+
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpRequestInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
