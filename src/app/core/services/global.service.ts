@@ -5,8 +5,10 @@ import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { StorageType } from '../../constants/storageType';
 import { StorageService } from './storage.service';
+import { MessageService } from 'primeng/api';
 
 interface IAPIResponse {
+  code: number;
   message: string;
   data?: any;
   status: boolean;
@@ -25,7 +27,7 @@ export class GlobalService {
   visualizationUrl!: SafeResourceUrl;
   search!: string;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private messageService: MessageService) {}
 
   chipNameProvider(fullName: string | undefined | null) {
     const splitNameArray: string[] | undefined = fullName?.trim()?.split(' ');
@@ -42,6 +44,36 @@ export class GlobalService {
       }
     }
     return chipName.toUpperCase();
+  }
+
+  handleSuccessService(
+    result: IAPIResponse,
+    showToast = true,
+    showErrorToast = true
+  ) {
+    console.log(result);
+    if (result.status) {
+      if (showToast)
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: result.message,
+          life: 3000,
+          styleClass: 'custom-toast',
+          contentStyleClass: 'custom-toast-content',
+          icon: 'pi pi-check-circle',
+        });
+      return true;
+    } else {
+      console.log('sdasdasddsa');
+      if (showErrorToast)
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: result.message,
+        });
+      return false;
+    }
   }
 
   toControl(absCtrl: AbstractControl): UntypedFormControl {
@@ -117,5 +149,20 @@ export class GlobalService {
     });
 
     return capitalizedWords.join('');
+  }
+
+  handleErrorService(error: any): void {
+    // Clear any existing messages
+    this.messageService.clear();
+
+    // Handle different types of errors
+    if (error.status === false) {
+      // Handle application errors (like invalid credentials)
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.message || 'An error occurred',
+      });
+    }
   }
 }

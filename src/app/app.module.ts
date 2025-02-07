@@ -56,6 +56,7 @@ import { SidebarComponent } from './modules/layout/sidebar/sidebar.component';
       useClass: HttpRequestInterceptor,
       multi: true,
     },
+    MessageService,
   ],
   bootstrap: [AppComponent],
 })

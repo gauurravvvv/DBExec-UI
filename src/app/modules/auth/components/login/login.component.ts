@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { LoginService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -8,37 +12,17 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
-  loading = false;
   showPassword = false;
-  features = [
-    {
-      icon: 'eye',
-      title: 'Visual Database Explorer',
-      description:
-        'Navigate through your database structure with an intuitive visual interface',
-    },
-    {
-      icon: 'chart-line',
-      title: 'Performance Insights',
-      description:
-        'Get real-time performance metrics and query optimization suggestions',
-    },
-    {
-      icon: 'key',
-      title: 'Secure Access',
-      description: 'Enterprise-grade security with role-based access control',
-    },
-    {
-      icon: 'table',
-      title: 'Smart Query Builder',
-      description:
-        'Build complex queries with our intelligent visual query builder',
-    },
-  ];
+  features = LOGIN_PAGE_OPTIONS;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    private router: Router,
+    private loginService: LoginService,
+    private globalService: GlobalService
+  ) {
     this.loginForm = this.fb.group({
-      organization: ['', Validators.required],
+      organisation: ['', Validators.required],
       username: ['', Validators.required],
       password: ['', Validators.required],
       rememberMe: [false],
@@ -49,13 +33,13 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.loading = true;
-      // Implement your login logic here
+      this.loginService.login(this.loginForm).then((res: any) => {
+        console.log('Login Response:', res);
+        if (this.globalService.handleSuccessService(res, true)) {
+          this.router.navigate(['/home/dashboard'], { replaceUrl: true });
+        }
+      });
     }
-  }
-
-  onForgotPassword(): void {
-    // Implement forgot password logic
   }
 
   togglePassword(event: Event) {

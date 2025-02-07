@@ -33,7 +33,7 @@
                 <div class="field mb-4">
                     <span class="p-input-icon-left">
                         <i class="pi pi-building"></i>
-                        <input pInputText id="organization" formControlName="organization" placeholder="Organisation"
+                        <input pInputText id="organisation" formControlName="organisation" placeholder="Organisation"
                             class="p-inputtext-lg">
                     </span>
                 </div>
@@ -60,13 +60,12 @@
                         <p-checkbox formControlName="rememberMe" [binary]="true" inputId="rememberMe"></p-checkbox>
                         <label for="rememberMe" class="ml-2">Remember me</label>
                     </div>
-                    <a class="forgot-password" (click)="onForgotPassword()">
+                    <a class="forgot-password" [routerLink]="['/forgot-password']">
                         Forgot password?
                     </a>
                 </div>
 
-                <button pButton type="submit" label="Login" [loading]="loading" [disabled]="!loginForm.valid || loading"
-                    class="p-button-lg"></button>
+                <button pButton type="submit" label="Login" [disabled]="!loginForm.valid" class="p-button-lg"></button>
             </form>
         </div>
     </div>
