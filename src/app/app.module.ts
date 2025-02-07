@@ -28,7 +28,6 @@ import { SidebarComponent } from './modules/layout/sidebar/sidebar.component';
     AppComponent,
     LoginComponent,
     ForgotPasswordComponent,
-    EmptyRootComponent,
     HomeComponent,
     HeaderComponent,
     SidebarComponent,

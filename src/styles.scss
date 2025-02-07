@@ -1,10 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
-
-// Import Variables
-@import "./variables.scss";
-@import "src/assets/scss/_custom-icons.scss";
-@import "primeng/resources/primeng.css";
-@import "primeicons/primeicons.css";
+@import './variables.scss';
+@import 'src/assets/scss/_custom-icons.scss';
+@import 'primeng/resources/primeng.css';
+@import 'primeicons/primeicons.css';
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -314,7 +311,7 @@
 
 .form-state-overlay {
   width: 230px;
-  padding: "0rem";
+  padding: '0rem';
   .p-overlaypanel-content {
     padding: 1rem;
   }
@@ -476,9 +473,6 @@
 }
 
 .p-confirm-dialog {
-  .p-dialog-header {
-    // justify-content: end !important;
-  }
   .p-dialog-footer {
     text-align: left;
     .p-button-icon {
@@ -1082,7 +1076,7 @@
 }
 .group-overlay {
   width: 230px;
-  padding: "0rem";
+  padding: '0rem';
 }
 .p-error {
   color: var(--error-color-1);
@@ -1339,7 +1333,7 @@ aw-wizard-navigation-bar.horizontal ul.steps-indicator li {
   background-color: var(--grey-color-3);
 }
 .p-sidebar-header::before {
-  content: "Comments";
+  content: 'Comments';
   font-weight: 600;
   margin-right: 59%;
   font-size: 18px;

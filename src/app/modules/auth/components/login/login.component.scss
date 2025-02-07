@@ -39,10 +39,11 @@
     font-weight: 600;
     margin-bottom: 1.5rem;
 
-    i {
-      font-size: 2.75rem;
+    i.ci-app-icon {
+      width: 2.75rem;
+      height: 2.75rem;
       margin-right: 1rem;
-      color: #fff;
+      filter: brightness(0) invert(1);
     }
   }
 
@@ -469,8 +470,9 @@
     .brand {
       font-size: 2rem;
 
-      i {
-        font-size: 2.5rem;
+      i.ci-app-icon {
+        width: 2.5rem;
+        height: 2.5rem;
       }
     }
 

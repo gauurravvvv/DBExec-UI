@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
         'Get real-time performance metrics and query optimization suggestions',
     },
     {
-      icon: 'shield-check',
+      icon: 'key',
       title: 'Secure Access',
       description: 'Enterprise-grade security with role-based access control',
     },
