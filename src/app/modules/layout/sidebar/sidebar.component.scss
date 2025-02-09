@@ -2,8 +2,11 @@
   width: 260px;
   height: 100%;
   background: #1a1a1a;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
+  display: flex;
+  flex-direction: column;
 
   &.collapsed {
     width: 70px;
@@ -60,8 +63,10 @@
   }
 
   .sidebar-content {
-    height: 100%;
+    flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    height: calc(100% - 60px);
     padding-top: 20px;
 
     &::-webkit-scrollbar {
@@ -75,6 +80,16 @@
     &::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.2);
       border-radius: 3px;
+    }
+
+    .sidebar-nav {
+      height: 100%;
+
+      .nav-list {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
     }
   }
 

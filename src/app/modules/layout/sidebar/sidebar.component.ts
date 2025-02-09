@@ -1,6 +1,6 @@
-import { Component, OnInit } from "@angular/core";
-import { GlobalService } from "src/app/core/services/global.service";
-import { SIDEBAR_ITEMS_ROUTES } from "./sidebar.constant";
+import { Component, OnInit } from '@angular/core';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
 
 interface MenuItem {
   label: string;
@@ -14,9 +14,9 @@ interface MenuItem {
 }
 
 @Component({
-  selector: "app-sidebar",
-  templateUrl: "./sidebar.component.html",
-  styleUrls: ["./sidebar.component.scss"],
+  selector: 'app-sidebar',
+  templateUrl: './sidebar.component.html',
+  styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements OnInit {
   menuItems: { children: MenuItem[] }[] = [];
@@ -27,7 +27,7 @@ export class SidebarComponent implements OnInit {
     this.menuItems = [
       {
         children: this.processMenuItems(
-          this.globalService.getTokenDetails("permission")
+          this.globalService.getTokenDetails('permission')
         ),
       },
     ];
@@ -35,11 +35,11 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     this.checkScreenSize();
-    window.addEventListener("resize", () => this.checkScreenSize());
+    window.addEventListener('resize', () => this.checkScreenSize());
   }
 
   processMenuItems(items: MenuItem[], level: number = 0): MenuItem[] {
-    return items.map((item) => ({
+    return items.map(item => ({
       ...item,
       level,
       isExpanded: false,
@@ -54,11 +54,35 @@ export class SidebarComponent implements OnInit {
     const route = SIDEBAR_ITEMS_ROUTES.find(
       (ir: any) => ir.value == item.value
     )?.route;
-    return route ? route : "";
+    return route ? route : '';
   }
 
   toggleSidebar() {
     this.isExpanded = !this.isExpanded;
+  }
+
+  toggleSidebarAndCollapseAll() {
+    this.collapseAllItems();
+    this.toggleSidebar();
+  }
+
+  private collapseAllItems() {
+    this.menuItems.forEach(mainItem => {
+      if (mainItem.children) {
+        mainItem.children.forEach(item => {
+          this.collapseItemAndChildren(item);
+        });
+      }
+    });
+  }
+
+  private collapseItemAndChildren(item: any) {
+    item.isExpanded = false;
+    if (item.children) {
+      item.children.forEach((child: any) => {
+        this.collapseItemAndChildren(child);
+      });
+    }
   }
 
   toggleSubmenu(item: MenuItem) {

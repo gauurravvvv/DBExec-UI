@@ -1,12 +1,12 @@
 <aside class="sidebar" [class.collapsed]="!isExpanded" [class.mobile]="isMobile">
   <div class="sidebar-header" *ngIf="!isExpanded">
     <button class="toggle-btn" (click)="toggleSidebar()">
-      <i class="fas" [ngClass]="{'fa-chevron-left': isExpanded, 'fa-chevron-right': !isExpanded}"></i>
+      <i class="pi pi-chevron-left" [ngClass]="{'pi-chevron-left': isExpanded, 'pi-chevron-right': !isExpanded}"></i>
     </button>
   </div>
 
-  <button *ngIf="isExpanded" class="toggle-btn outside" (click)="toggleSidebar()">
-    <i class="fas" [ngClass]="{'fa-chevron-left': isExpanded, 'fa-chevron-right': !isExpanded}"></i>
+  <button *ngIf="isExpanded" class="toggle-btn outside" (click)="toggleSidebarAndCollapseAll()">
+    <i class="pi pi-chevron-left" [ngClass]="{'pi-chevron-left': isExpanded, 'pi-chevron-right': !isExpanded}"></i>
   </button>
 
   <div class="sidebar-content">
@@ -23,7 +23,7 @@
                   <i [class]="item.icon"></i>
                   <span class="nav-text" [class.hidden]="!isExpanded">{{ item.label }}</span>
                 </div>
-                <i class="fas fa-chevron-down submenu-arrow" *ngIf="item.children.length > 0 && isExpanded"></i>
+                <i class="pi pi-chevron-down submenu-arrow" *ngIf="item.children.length > 0 && isExpanded"></i>
               </div>
 
               <!-- Menu item without children -->
@@ -46,7 +46,7 @@
                       <i [class]="child.icon"></i>
                       <span class="nav-text" [class.hidden]="!isExpanded">{{ child.label }}</span>
                     </div>
-                    <i class="fas fa-chevron-down submenu-arrow"
+                    <i class="pi pi-chevron-down submenu-arrow"
                       *ngIf="child.children && child.children.length > 0 && isExpanded"></i>
                   </div>
 

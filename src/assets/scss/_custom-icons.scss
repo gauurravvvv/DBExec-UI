@@ -6,4 +6,67 @@ $icon-url: '../icons/';
   &.ci-shield-check {
     content: url($icon-url + 'shield-check.svg');
   }
+  &.ci-home {
+    content: url($icon-url + 'home.svg');
+  }
+  &.ci-wrench {
+    content: url($icon-url + 'wrench.svg');
+  }
+  &.ci-users {
+    content: url($icon-url + 'users.svg');
+  }
+  &.ci-bolt {
+    content: url($icon-url + 'bolt.svg');
+  }
+  &.ci-building {
+    content: url($icon-url + 'building.svg');
+  }
+  &.ci-database {
+    content: url($icon-url + 'database.svg');
+  }
+  &.ci-file-lines {
+    content: url($icon-url + 'file-lines.svg');
+  }
+  &.ci-globe {
+    content: url($icon-url + 'globe.svg');
+  }
+  &.ci-home {
+    content: url($icon-url + 'home.svg');
+  }
+  &.ci-key {
+    content: url($icon-url + 'key.svg');
+  }
+  &.ci-layer-group {
+    content: url($icon-url + 'layer-group.svg');
+  }
+  &.ci-list {
+    content: url($icon-url + 'list.svg');
+  }
+  &.ci-lock {
+    content: url($icon-url + 'lock.svg');
+  }
+  &.ci-shield-halved {
+    content: url($icon-url + 'shield-halved.svg');
+  }
+  &.ci-sliders {
+    content: url($icon-url + 'sliders.svg');
+  }
+  &.ci-table-cells {
+    content: url($icon-url + 'table-cell.svg');
+  }
+  &.ci-user-cong {
+    content: url($icon-url + 'user-cong.svg');
+  }
+  &.ci-user-gear {
+    content: url($icon-url + 'user-gear.svg');
+  }
+  &.ci-user {
+    content: url($icon-url + 'user.svg');
+  }
+  &.ci-users {
+    content: url($icon-url + 'users.svg');
+  }
+  &.ci-user-tie {
+    content: url($icon-url + 'user-tie.svg');
+  }
 }
