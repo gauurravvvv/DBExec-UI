@@ -1,0 +1,89 @@
+<div class="super-admin-dashboard">
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h2>Overview and Analytics</h2>
+    </div>
+    <div class="organization-selector">
+      <label for="organization">
+        <i class="fas fa-building"></i>
+        Organization:
+      </label>
+      <div class="custom-select">
+        <select id="organization" class="form-control" (change)="onOrganizationChange($event)">
+          <option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</option>
+        </select>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="overview-section">
+      <div class="overview-cards">
+        <div class="overview-card" *ngFor="let overview of overviews; let i = index" [@fadeInUp]>
+          <div class="card-icon" [ngClass]="'bg-' + (i + 1)">
+            <i [class]="getOverviewIcon(overview.title)"></i>
+          </div>
+          <div class="card-content">
+            <h4>{{ overview.title }}</h4>
+            <p class="value">{{ overview.value }}</p>
+            <div class="progress-bar">
+              <div class="progress" [style.width.%]="getProgressValue(overview)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-stats">
+      <div class="active-users-card" [@fadeInUp]>
+        <div class="card-header">
+          <div class="header-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>Active Users Statistics</h3>
+        </div>
+        <div class="stats-content">
+          <div class="current-stats">
+            <div class="stat-value">
+              <h4>{{ activeUsers24hrs }}</h4>
+              <p>Active Today</p>
+            </div>
+            <div class="trend up">
+              <i class="fas fa-arrow-up"></i>
+              <span>12%</span>
+            </div>
+          </div>
+          <div class="stats-progress">
+            <div class="progress-item" *ngFor="let stat of stats">
+              <div class="progress-label">
+                <span>{{ stat.title }}</span>
+                <span class="value">{{ stat.value }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress" [style.width.%]="getProgressPercentage(stat.value)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <div class="action-buttons">
+        <button class="action-btn" (click)="addNewUser()">
+          <i class="fas fa-user-plus"></i>
+          Add User
+        </button>
+        <button class="action-btn" (click)="manageDatabase()">
+          <i class="fas fa-database"></i>
+          Manage Database
+        </button>
+        <button class="action-btn" (click)="viewReports()">
+          <i class="fas fa-chart-bar"></i>
+          View Reports
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -34,9 +34,11 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.loginService.login(this.loginForm).then((res: any) => {
-        console.log('Login Response:', res);
         if (this.globalService.handleSuccessService(res, true)) {
-          this.router.navigate(['/home/dashboard'], { replaceUrl: true });
+          console.log('login success... Routing to dashboard');
+          this.router.navigate(['/home/dashboard'], {
+            replaceUrl: true,
+          });
         }
       });
     }
