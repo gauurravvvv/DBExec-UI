@@ -47,8 +47,8 @@ export class LoginService {
       });
   }
 
-  generateOTP(loginForm: UntypedFormGroup) {
-    const { organisation, username, email } = loginForm.value;
+  generateOTP(forgotPasswordForm: UntypedFormGroup) {
+    const { organisation, username, email } = forgotPasswordForm.value;
     return this.http
       .post(AUTH.GENERATE_OTP, {
         organisation: organisation,

@@ -22,12 +22,14 @@ import { FooterComponent } from './modules/layout/footer/footer.component';
 import { HeaderComponent } from './modules/layout/header/header.component';
 import { HomeComponent } from './modules/layout/home/home.component';
 import { SidebarComponent } from './modules/layout/sidebar/sidebar.component';
+import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     ForgotPasswordComponent,
+    ResetPasswordComponent,
     HomeComponent,
     HeaderComponent,
     SidebarComponent,

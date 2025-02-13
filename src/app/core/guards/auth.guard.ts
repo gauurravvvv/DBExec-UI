@@ -6,29 +6,49 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { LoginService } from 'src/app/modules/auth/services/auth.service';
+import { GlobalService } from '../services/global.service';
+import { ROLES } from 'src/app/constants/user.constant';
+import {
+  DASHBOARD_ROUTES,
+  AUTH_ROUTES,
+} from 'src/app/modules/layout/sidebar/sidebar.constant';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private authService: LoginService, private router: Router) {}
+  constructor(
+    private authService: LoginService,
+    private router: Router,
+    private globalService: GlobalService
+  ) {}
+
+  private getDefaultRouteByRole(): string {
+    const role = this.globalService.getTokenDetails('role');
+    switch (role) {
+      case ROLES.SUPER_ADMIN:
+        return DASHBOARD_ROUTES.SUPER_ADMIN;
+      case ROLES.ORG_ADMIN:
+        return DASHBOARD_ROUTES.ORG_ADMIN;
+      case ROLES.ORG_USER:
+        return DASHBOARD_ROUTES.ORG_USER;
+      default:
+        return AUTH_ROUTES.LOGIN;
+    }
+  }
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    // If trying to access login page
     if (state.url === '/login') {
-      // If already logged in, redirect to home
       if (this.authService.isLoggedIn()) {
-        this.router.navigate(['/home/dashboard']);
+        const dashboardRoute = this.getDefaultRouteByRole();
+        this.router.navigate([dashboardRoute]);
         return false;
       }
-      // Allow access to login page if not logged in
       return true;
     }
-
-    // For all other routes, check authentication
     if (this.authService.isLoggedIn()) {
       return true;
     } else {

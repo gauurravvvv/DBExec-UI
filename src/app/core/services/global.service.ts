@@ -51,7 +51,6 @@ export class GlobalService {
     showToast = true,
     showErrorToast = true
   ) {
-    console.log(result);
     if (result.status) {
       if (showToast)
         this.messageService.add({

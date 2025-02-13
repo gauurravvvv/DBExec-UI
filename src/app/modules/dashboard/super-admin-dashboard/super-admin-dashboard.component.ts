@@ -83,8 +83,6 @@ export class SuperAdminDashboardComponent implements OnInit {
     // Fetch initial data for the first organization
     // this.listOrganisationAPI();
 
-    console.log('super admin dashboard');
-
     this.updateStats(); // Update stats on init
   }
 
@@ -112,7 +110,6 @@ export class SuperAdminDashboardComponent implements OnInit {
       .getSuperAdminDashboard(orgId)
       .subscribe((res: any) => {
         if (res) {
-          console.log(res);
           this.entitiesData.maxAdmins = res.data.maxAdmins;
           this.entitiesData.maxDatabases = res.data.maxDatabases;
           this.entitiesData.maxEnvironment = res.data.maxEnvironment;

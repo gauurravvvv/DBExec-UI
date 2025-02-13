@@ -4,8 +4,14 @@ import { LoginComponent } from './modules/auth/components/login/login.component'
 import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { HomeComponent } from './modules/layout/home/home.component';
+import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 
 const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full',
+  },
   {
     path: 'login',
     component: LoginComponent,
@@ -16,14 +22,19 @@ const routes: Routes = [
     component: ForgotPasswordComponent,
   },
   {
-    path: '**',
-    redirectTo: 'home',
+    path: 'reset-password',
+    component: ResetPasswordComponent,
   },
   {
-    path: 'home',
+    path: 'app',
     component: HomeComponent,
     canActivate: [AuthGuard],
     children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
       {
         path: 'dashboard',
         loadChildren: () =>
@@ -31,7 +42,18 @@ const routes: Routes = [
             m => m.DashboardModule
           ),
       },
+      {
+        path: 'super-admin',
+        loadChildren: () =>
+          import('./modules/superAdmin/superAdmin.module').then(
+            m => m.SuperAdminModule
+          ),
+      },
     ],
+  },
+  {
+    path: '**',
+    redirectTo: 'login',
   },
 ];
 

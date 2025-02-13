@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from '../../services/auth.service';
+import { ROLES } from 'src/app/constants/user.constant';
 
 @Component({
   selector: 'app-login',
@@ -35,8 +36,22 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       this.loginService.login(this.loginForm).then((res: any) => {
         if (this.globalService.handleSuccessService(res, true)) {
-          console.log('login success... Routing to dashboard');
-          this.router.navigate(['/home/dashboard'], {
+          const role = this.globalService.getTokenDetails('role');
+          let dashboardRoute = '/app/dashboard';
+
+          switch (role) {
+            case ROLES.SUPER_ADMIN:
+              dashboardRoute = '/app/dashboard/super-admin';
+              break;
+            case ROLES.ORG_ADMIN:
+              dashboardRoute = '/app/dashboard/org-admin';
+              break;
+            case ROLES.ORG_USER:
+              dashboardRoute = '/app/dashboard/org-user';
+              break;
+          }
+
+          this.router.navigateByUrl(dashboardRoute, {
             replaceUrl: true,
           });
         }

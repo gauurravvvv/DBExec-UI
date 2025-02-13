@@ -14,22 +14,20 @@ export class EmptyRootComponent implements OnInit {
   ngOnInit(): void {
     const role = this.globalService.getTokenDetails('role');
 
-    console.log('role', role);
-
     if (!role) {
       this.router.navigate(['/login']);
+      return;
     }
 
     switch (role) {
       case ROLES.SUPER_ADMIN:
-        console.log('super admin');
-        this.router.navigate(['/home/dashboard/super-admin']);
+        this.router.navigate(['/app/dashboard/super-admin']);
         break;
       case ROLES.ORG_ADMIN:
-        this.router.navigate(['/home/dashboard/org-admin']);
+        this.router.navigate(['/app/dashboard/org-admin']);
         break;
       case ROLES.ORG_USER:
-        this.router.navigate(['/home/dashboard/org-user']);
+        this.router.navigate(['/app/dashboard/org-user']);
         break;
       default:
         this.router.navigate(['/login']);
