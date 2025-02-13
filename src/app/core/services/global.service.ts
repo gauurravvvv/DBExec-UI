@@ -46,33 +46,28 @@ export class GlobalService {
     return chipName.toUpperCase();
   }
 
-  handleSuccessService(
-    result: IAPIResponse,
-    showToast = true,
-    showErrorToast = true
-  ) {
-    if (result.status) {
-      if (showToast)
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: result.message,
-          life: 3000,
-          styleClass: 'custom-toast',
-          contentStyleClass: 'custom-toast-content',
-          icon: 'pi pi-check-circle',
-        });
-      return true;
+  handleAPIResponse(response: any) {
+    if (response.status) {
+      // Success toast
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: response.message,
+        life: 3000,
+        styleClass: 'custom-toast',
+        contentStyleClass: 'custom-toast-content',
+        icon: 'pi pi-check-circle',
+      });
     } else {
-      console.log('sdasdasddsa');
-      if (showErrorToast)
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: result.message,
-        });
-      return false;
+      // Error toast
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: response.message || 'An error occurred',
+        life: 3000,
+      });
     }
+    return response.status;
   }
 
   toControl(absCtrl: AbstractControl): UntypedFormControl {

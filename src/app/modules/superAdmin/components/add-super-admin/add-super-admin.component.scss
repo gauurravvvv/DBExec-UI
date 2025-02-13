@@ -28,13 +28,14 @@
         gap: 0;
 
         button {
-          margin-right: -8px;
+          min-width: 0rem;
         }
 
         h2 {
           margin: 0;
           font-size: 24px;
           font-weight: 600;
+          margin-left: 0.2rem;
         }
       }
 
@@ -103,7 +104,6 @@
           width: 100%;
 
           i {
-            left: 0.75rem;
             color: #6c757d;
           }
 
@@ -148,5 +148,14 @@
         }
       }
     }
+  }
+}
+
+.p-input-icon-left.p-input-icon-right {
+  position: relative;
+
+  i.pi-lock {
+    left: 12px;
+    font-size: 1.1rem;
   }
 }

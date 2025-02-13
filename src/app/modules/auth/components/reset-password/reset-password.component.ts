@@ -56,7 +56,7 @@ export class ResetPasswordComponent implements OnInit {
       this.loginService
         .resetPassword(this.resetPasswordForm, this.userId)
         .then(res => {
-          if (this.globalService.handleSuccessService(res)) {
+          if (this.globalService.handleAPIResponse(res)) {
             // On success, navigate to login page
             this.router.navigate(['/login'], { replaceUrl: true });
           }

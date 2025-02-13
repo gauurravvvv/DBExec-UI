@@ -35,10 +35,9 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.loginService.login(this.loginForm).then((res: any) => {
-        if (this.globalService.handleSuccessService(res, true)) {
+        if (this.globalService.handleAPIResponse(res)) {
           const role = this.globalService.getTokenDetails('role');
           let dashboardRoute = '/app/dashboard';
-
           switch (role) {
             case ROLES.SUPER_ADMIN:
               dashboardRoute = '/app/dashboard/super-admin';
@@ -50,7 +49,6 @@ export class LoginComponent implements OnInit {
               dashboardRoute = '/app/dashboard/org-user';
               break;
           }
-
           this.router.navigateByUrl(dashboardRoute, {
             replaceUrl: true,
           });

@@ -3,16 +3,17 @@
         <!-- Header Section -->
         <div class="page-header">
             <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/home/system/super-admin">
+                <button pButton class="p-button-text" routerLink="/app/super-admin">
                     <i class="pi pi-arrow-left"></i>
                 </button>
                 <h2>Add Super Admin</h2>
             </div>
             <div class="action-buttons">
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
-                    routerLink="/home/system/super-admin"></button>
+                    [disabled]="!isFormDirty" (click)="onCancel()">
+                </button>
                 <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="adminForm.invalid || isSubmitting">
+                    [disabled]="adminForm.invalid">
                     <i class="pi pi-save mr-2"></i>
                 </button>
             </div>
@@ -38,12 +39,17 @@
 
                 <!-- Last Name -->
                 <div class="form-field">
-                    <label for="lastName">Last Name</label>
+                    <label for="lastName">Last Name <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-user"></i>
                         <input id="lastName" type="text" pInputText formControlName="lastName"
-                            placeholder="Enter last name">
+                            placeholder="Enter last name"
+                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched}">
                     </span>
+                    <small class="error-message"
+                        *ngIf="adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched">
+                        Last name is required
+                    </small>
                 </div>
 
                 <!-- Username -->
@@ -81,7 +87,7 @@
 
                 <!-- Phone -->
                 <div class="form-field">
-                    <label for="phone">Phone</label>
+                    <label for="phone">Phone <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-phone"></i>
                         <input id="phone" type="text" pInputText formControlName="phone"
@@ -90,7 +96,9 @@
                     </span>
                     <small class="error-message"
                         *ngIf="adminForm.get('phone')?.invalid && adminForm.get('phone')?.touched">
-                        Please enter a valid 10-digit phone number
+                        <span *ngIf="adminForm.get('phone')?.errors?.['required']">Phone number is required</span>
+                        <span *ngIf="adminForm.get('phone')?.errors?.['pattern']">Please enter a valid 10-digit phone
+                            number</span>
                     </small>
                 </div>
 
@@ -102,6 +110,7 @@
                         <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
                             formControlName="password" placeholder="Enter password"
                             [ngClass]="{'ng-invalid ng-dirty': adminForm.get('password')?.invalid && adminForm.get('password')?.touched}">
+                        <i class="pi pi-eye" style="cursor: pointer;" (click)="togglePassword($event)"></i>
                     </span>
                     <small class="error-message"
                         *ngIf="adminForm.get('password')?.invalid && adminForm.get('password')?.touched">
@@ -109,11 +118,7 @@
                         number and one special character
                     </small>
                 </div>
-
-
             </div>
         </form>
     </div>
 </div>
-
-<p-toast></p-toast>

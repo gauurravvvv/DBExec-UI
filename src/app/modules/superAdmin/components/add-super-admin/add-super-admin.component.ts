@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SuperAdminService } from '../../services/superAdmin.service';
+import { SUPER_ADMIN } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 @Component({
   selector: 'app-add-super-admin',
@@ -11,14 +13,19 @@ import { SuperAdminService } from '../../services/superAdmin.service';
 })
 export class AddSuperAdminComponent implements OnInit {
   adminForm!: FormGroup;
-  isSubmitting = false;
   showPassword = false;
+
+  // Add getter for form dirty state
+  get isFormDirty(): boolean {
+    return this.adminForm.dirty;
+  }
 
   constructor(
     private fb: FormBuilder,
     private superAdminService: SuperAdminService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit(): void {
@@ -28,7 +35,7 @@ export class AddSuperAdminComponent implements OnInit {
   private initForm(): void {
     this.adminForm = this.fb.group({
       firstName: ['', [Validators.required]],
-      lastName: [''],
+      lastName: ['', [Validators.required]],
       username: ['', [Validators.required, Validators.minLength(4)]],
       password: [
         '',
@@ -40,7 +47,7 @@ export class AddSuperAdminComponent implements OnInit {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.pattern('^[0-9]{10}$')]],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
     });
   }
 
@@ -57,28 +64,22 @@ export class AddSuperAdminComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.adminForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
-
+    if (this.adminForm.valid) {
       this.superAdminService.addSuperAdmin(this.adminForm).subscribe({
         next: response => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Super admin added successfully',
-          });
-          this.router.navigate(['/home/system/super-admin']);
+          if (this.globalService.handleAPIResponse(response)) {
+            this.router.navigate([SUPER_ADMIN.LIST]);
+          }
         },
         error: error => {
-          this.isSubmitting = false;
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: error.error.message || 'Failed to add super admin',
+          // Handle error response directly from error object
+          this.globalService.handleAPIResponse({
+            status: false,
+            message:
+              error?.error?.message ||
+              error?.message ||
+              'Failed to add super admin',
           });
-        },
-        complete: () => {
-          this.isSubmitting = false;
         },
       });
     } else {
@@ -88,5 +89,13 @@ export class AddSuperAdminComponent implements OnInit {
         control?.markAsTouched();
       });
     }
+  }
+
+  onCancel(): void {
+    this.adminForm.reset();
+    // Reset specific form controls to empty strings
+    Object.keys(this.adminForm.controls).forEach(key => {
+      this.adminForm.get(key)?.setValue('');
+    });
   }
 }

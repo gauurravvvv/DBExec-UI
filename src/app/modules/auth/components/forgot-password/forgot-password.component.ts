@@ -35,7 +35,7 @@ export class ForgotPasswordComponent implements OnInit {
       this.loginService
         .generateOTP(this.forgotPasswordForm)
         .then((res: any) => {
-          if (this.globalService.handleSuccessService(res, true)) {
+          if (this.globalService.handleAPIResponse(res)) {
             this.router.navigate(['/reset-password'], {
               replaceUrl: true,
               queryParams: {
