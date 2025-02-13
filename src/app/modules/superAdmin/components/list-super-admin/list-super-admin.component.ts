@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 @Component({
   selector: 'app-list-super-admin',
@@ -11,6 +12,7 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 })
 export class ListSuperAdminComponent implements OnInit {
   Math = Math;
+  loggedInUserId: any;
 
   listParams: IParams = {
     limit: 100,
@@ -28,12 +30,17 @@ export class ListSuperAdminComponent implements OnInit {
   searchTerm = '';
   filteredAdmins: any[] = [];
 
+  showDeleteConfirm = false;
+  adminIdToDelete: number | null = null;
+
   constructor(
     private superAdminService: SuperAdminService,
-    private router: Router
+    private router: Router,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit(): void {
+    this.loggedInUserId = this.globalService.getTokenDetails('userId');
     this.listSuperAdminAPI();
     this.applyFilters();
   }
@@ -91,18 +98,30 @@ export class ListSuperAdminComponent implements OnInit {
     this.router.navigate([SUPER_ADMIN.EDIT + '/' + adminId]);
   }
 
-  onDelete(adminId: string) {
-    // this.dialogService.openDeleteConfirmDialog().then((result) => {
-    //   if (result.isConfirmed) {
-    //     this.superAdminService
-    //       .deleteSuperAdmin(adminId)
-    //       .subscribe((res: any) => {
-    //         if (this.globalService.handleServiceResponse(res)) {
-    //           this.listSuperAdminAPI();
-    //         }
-    //       });
-    //   }
-    // });
+  confirmDelete(adminId: number) {
+    this.adminIdToDelete = adminId;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.adminIdToDelete = null;
+  }
+
+  proceedDelete() {
+    if (this.adminIdToDelete) {
+      this.onDelete(this.adminIdToDelete);
+      this.showDeleteConfirm = false;
+      this.adminIdToDelete = null;
+    }
+  }
+
+  onDelete(adminId: number) {
+    this.superAdminService.deleteSuperAdmin(adminId).subscribe((res: any) => {
+      if (res.status) {
+        this.listSuperAdminAPI();
+      }
+    });
   }
 
   onAddNewAdmin(): void {

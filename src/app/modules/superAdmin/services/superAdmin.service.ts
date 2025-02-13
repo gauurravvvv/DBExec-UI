@@ -22,7 +22,7 @@ export class SuperAdminService {
       );
   }
 
-  deleteSuperAdmin(id: string) {
+  deleteSuperAdmin(id: number) {
     return this.http.delete(SUPER_ADMIN.DELETE + `${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

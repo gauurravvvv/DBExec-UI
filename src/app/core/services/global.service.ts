@@ -118,6 +118,8 @@ export class GlobalService {
           return decodeToken?.organisationId;
         case 'permission':
           return decodeToken?.permissions;
+        case 'userId':
+          return decodeToken?.id;
         default:
           return null;
       }
