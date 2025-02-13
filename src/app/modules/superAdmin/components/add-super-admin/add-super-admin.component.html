@@ -1,1 +1,119 @@
-<p>add-super-admin works!</p>
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/home/system/super-admin">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Add Super Admin</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    routerLink="/home/system/super-admin"></button>
+                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    [disabled]="adminForm.invalid || isSubmitting">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <form [formGroup]="adminForm" class="admin-form">
+            <div class="form-grid">
+                <!-- First Name -->
+                <div class="form-field">
+                    <label for="firstName">First Name <span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-user"></i>
+                        <input id="firstName" type="text" pInputText formControlName="firstName"
+                            placeholder="Enter first name"
+                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched">
+                        First name is required
+                    </small>
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-field">
+                    <label for="lastName">Last Name</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-user"></i>
+                        <input id="lastName" type="text" pInputText formControlName="lastName"
+                            placeholder="Enter last name">
+                    </span>
+                </div>
+
+                <!-- Username -->
+                <div class="form-field">
+                    <label for="username">Username <span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-user-edit"></i>
+                        <input id="username" type="text" pInputText formControlName="username"
+                            placeholder="Enter username"
+                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('username')?.invalid && adminForm.get('username')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="adminForm.get('username')?.invalid && adminForm.get('username')?.touched">
+                        <span *ngIf="adminForm.get('username')?.errors?.['required']">Username is required</span>
+                        <span *ngIf="adminForm.get('username')?.errors?.['minlength']">Username must be at least 4
+                            characters</span>
+                    </small>
+                </div>
+
+                <!-- Email -->
+                <div class="form-field">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-envelope"></i>
+                        <input id="email" type="email" pInputText formControlName="email"
+                            placeholder="Enter email address"
+                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('email')?.invalid && adminForm.get('email')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="adminForm.get('email')?.invalid && adminForm.get('email')?.touched">
+                        <span *ngIf="adminForm.get('email')?.errors?.['required']">Email is required</span>
+                        <span *ngIf="adminForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+                    </small>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-field">
+                    <label for="phone">Phone</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-phone"></i>
+                        <input id="phone" type="text" pInputText formControlName="phone"
+                            placeholder="Enter phone number" (input)="onPhoneInput($event)" maxlength="10"
+                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('phone')?.invalid && adminForm.get('phone')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="adminForm.get('phone')?.invalid && adminForm.get('phone')?.touched">
+                        Please enter a valid 10-digit phone number
+                    </small>
+                </div>
+
+                <!-- Password -->
+                <div class="form-field">
+                    <label for="password">Password <span class="required">*</span></label>
+                    <span class="p-input-icon-left p-input-icon-right">
+                        <i class="pi pi-lock"></i>
+                        <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
+                            formControlName="password" placeholder="Enter password"
+                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('password')?.invalid && adminForm.get('password')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="adminForm.get('password')?.invalid && adminForm.get('password')?.touched">
+                        Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one
+                        number and one special character
+                    </small>
+                </div>
+
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<p-toast></p-toast>

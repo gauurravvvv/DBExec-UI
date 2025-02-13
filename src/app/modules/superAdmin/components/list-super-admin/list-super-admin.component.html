@@ -1,1 +1,97 @@
-<p>list-super-admin works!</p>
+<div class="super-admin-wrapper">
+    <div class="super-admin-container">
+        <div class="page-header">
+            <h2>Super Admins</h2>
+            <button pButton class="p-button-outlined" (click)="onAddNewAdmin()">
+                + Add Super Admin
+            </button>
+        </div>
+        <div class="table-section">
+            <!-- Search and Page Size -->
+            <div class="table-controls">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" style="width: 100%;" placeholder="Search..."
+                        (input)="onSearch($event)" [value]="searchTerm">
+                </span>
+            </div>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="filteredAdmins && filteredAdmins.length > 0; else noData">
+                            <tr *ngFor="let admin of filteredAdmins">
+                                <td>
+                                    <a class="admin-name" [routerLink]="['/home/system/super-admin/view', admin.id]">
+                                        {{ admin.firstName + ' ' + admin?.lastName }}
+                                    </a>
+                                </td>
+                                <td>{{ admin.email }}</td>
+                                <td>
+                                    <span class="status-badge" [class.active]="admin.status === 1">
+                                        {{ admin.status === 1 ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>{{ admin.lastLogin ? (admin.lastLogin | date:'medium') : 'Never logged in' }}</td>
+                                <td>{{ admin.createdOn | date:'mediumDate' }}</td>
+                                <td class="actions">
+                                    <button class="action-btn edit" (click)="onEdit(admin.id)" title="Edit">
+                                        <i class="pi pi-pencil"></i>
+                                    </button>
+                                    <button class="action-btn delete" (click)="onDelete(admin.id)" title="Delete">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-template #noData>
+                            <tr style="height: 100%;">
+                                <td colspan="6">
+                                    <div class="no-data">
+                                        <i class="pi pi-inbox"></i>
+                                        <p>No records found</p>
+                                        <span class="sub-text">No super admin data is available at the moment</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </table>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-info">
+                        <ng-container *ngIf="totalItems > 0; else noEntries">
+                            Showing {{ (currentPage - 1) * pageSize + 1 }} to
+                            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
+                        </ng-container>
+                        <ng-template #noEntries>
+                            Showing 0 to 0 of 0 entries
+                        </ng-template>
+                    </div>
+                    <div class="pagination-controls">
+                        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
+                            <i class="pi pi-chevron-left"></i>
+                        </button>
+                        <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
+                            [class.active]="page === currentPage">
+                            {{ page }}
+                        </button>
+                        <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)"
+                            class="page-btn">
+                            <i class="pi pi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

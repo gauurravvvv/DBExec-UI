@@ -11,6 +11,7 @@ import { AddSuperAdminComponent } from './components/add-super-admin/add-super-a
 import { EditSuperAdminComponent } from './components/edit-super-admin/edit-super-admin.component';
 import { ViewSuperAdminComponent } from './components/view-super-admin/view-super-admin.component';
 import { SuperAdminRoutingModule } from './super-admin-routing.module';
+import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { SuperAdminRoutingModule } from './super-admin-routing.module';
     ButtonModule,
     RippleModule,
     SuperAdminRoutingModule,
+    AppPrimeNGModule,
   ],
 })
 export class SuperAdminModule {}
