@@ -538,6 +538,17 @@
     }
   }
 }
+
+.p-toast {
+  z-index: 1000000 !important;
+}
+
+// For specific positions if needed
+.p-toast-top-right,
+.p-toast-top-left,
+.p-toast-top-center {
+  top: 20px !important;
+}
 .p-accordion .p-accordion-header .p-accordion-header-link {
   height: 45px;
 }

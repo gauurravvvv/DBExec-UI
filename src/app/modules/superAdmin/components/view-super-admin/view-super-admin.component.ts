@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { MessageService } from 'primeng/api';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { ConfirmationService } from 'primeng/api';
+import { SUPER_ADMIN } from 'src/app/constants/routes';
 
 interface AdminData {
   id: number;
@@ -24,21 +27,30 @@ interface AdminData {
   selector: 'app-view-super-admin',
   templateUrl: './view-super-admin.component.html',
   styleUrls: ['./view-super-admin.component.scss'],
+  providers: [ConfirmationService],
 })
 export class ViewSuperAdminComponent implements OnInit {
   adminId: string = '';
   adminData: AdminData | null = null;
   adminInitials: string = '';
   avatarBackground: string = '#2196F3'; // Default blue color
+  loggedInUserId: any;
+  adminIdToDelete: string | null = null;
+  showDeleteConfirm = false;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private superAdminService: SuperAdminService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private globalService: GlobalService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
     // Get admin ID from route params
+    this.loggedInUserId = this.globalService.getTokenDetails('userId');
+
     this.route.params.subscribe(params => {
       this.adminId = params['id'];
       if (this.adminId) {
@@ -103,5 +115,33 @@ export class ViewSuperAdminComponent implements OnInit {
       // Use the hash to select a color
       this.avatarBackground = colors[hash % colors.length];
     }
+  }
+
+  confirmDelete(adminId: string) {
+    this.adminIdToDelete = adminId;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.adminIdToDelete = null;
+  }
+
+  proceedDelete() {
+    if (this.adminIdToDelete) {
+      this.onDelete(this.adminIdToDelete);
+      this.showDeleteConfirm = false;
+      this.adminIdToDelete = null;
+    }
+  }
+
+  onDelete(adminId: string) {
+    this.superAdminService
+      .deleteSuperAdmin(Number(adminId))
+      .subscribe((res: any) => {
+        if (res.status) {
+          this.router.navigate([SUPER_ADMIN.LIST]);
+        }
+      });
   }
 }
