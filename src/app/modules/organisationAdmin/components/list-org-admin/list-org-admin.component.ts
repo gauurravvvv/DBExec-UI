@@ -3,6 +3,9 @@ import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { OrganisationAdminService } from '../../services/organisationAdmin.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { ROLES } from 'src/app/constants/user.constant';
 
 @Component({
   selector: 'app-list-org-admin',
@@ -21,10 +24,12 @@ export class ListOrgAdminComponent implements OnInit {
   selectedStatus: number | null = null;
   showDeleteConfirm = false;
   adminToDelete: string | null = null;
-  loggedInUserId: string = '';
   Math = Math;
   organisations: any[] = [];
-  selectedOrg: any = null;
+  selectedOrg: any = {};
+  userRole = this.globalService.getTokenDetails('role');
+  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
   statusFilterItems: MenuItem[] = [
     {
@@ -44,11 +49,19 @@ export class ListOrgAdminComponent implements OnInit {
   constructor(
     private orgAdminService: OrganisationAdminService,
     private organisationService: OrganisationService,
-    private router: Router
+    private router: Router,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
-    this.loadOrganisations();
+    if (this.showOrganisationDropdown) {
+      this.loadOrganisations();
+    } else {
+      this.selectedOrg = {
+        id: this.globalService.getTokenDetails('organisationId'),
+      };
+      this.loadAdmins();
+    }
   }
 
   loadOrganisations() {
@@ -59,7 +72,7 @@ export class ListOrgAdminComponent implements OnInit {
 
     this.organisationService.listOrganisation(params).subscribe({
       next: (response: any) => {
-        this.organisations = response.data;
+        this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadAdmins();
@@ -79,7 +92,6 @@ export class ListOrgAdminComponent implements OnInit {
 
   loadAdmins() {
     if (!this.selectedOrg) return;
-
     const params = {
       orgId: this.selectedOrg.id,
       pageNumber: this.currentPage,
@@ -88,7 +100,7 @@ export class ListOrgAdminComponent implements OnInit {
 
     this.orgAdminService.listOrganisationAdmin(params).subscribe({
       next: (response: any) => {
-        this.admins = response.data;
+        this.admins = response.data.orgAdmins;
         this.filteredAdmins = [...this.admins];
         this.totalItems = response.total;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
@@ -141,11 +153,11 @@ export class ListOrgAdminComponent implements OnInit {
   }
 
   onAddNewAdmin() {
-    this.router.navigate(['/app/org-admin/add']);
+    this.router.navigate([ORGANISATION_ADMIN.ADD]);
   }
 
   onEdit(id: string) {
-    this.router.navigate(['/app/org-admin/edit', id]);
+    this.router.navigate([ORGANISATION_ADMIN.EDIT, id]);
   }
 
   confirmDelete(id: string) {

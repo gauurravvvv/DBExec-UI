@@ -102,7 +102,6 @@ export class GlobalService {
 
     try {
       const decodeToken = JSON.parse(atob(accessToken.split('.')[1]));
-
       switch (value) {
         case 'decodeToken':
           return decodeToken;
