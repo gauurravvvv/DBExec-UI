@@ -21,7 +21,16 @@
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Status</th>
+                            <th>
+                                Status
+                                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
+                                    [style]="{'width': '150px'}" appendTo="body">
+                                </p-menu>
+                                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
+                                    [ngClass]="{'active-filter': selectedStatus !== null}"
+                                    style="margin-left: 5px; cursor: pointer;">
+                                </i>
+                            </th>
                             <th>Last Login</th>
                             <th>Created Date</th>
                             <th>Actions</th>

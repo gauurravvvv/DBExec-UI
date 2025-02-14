@@ -4,6 +4,7 @@ import { SuperAdminService } from '../../services/superAdmin.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-list-super-admin',
@@ -33,6 +34,26 @@ export class ListSuperAdminComponent implements OnInit {
   showDeleteConfirm = false;
   adminIdToDelete: number | null = null;
 
+  selectedStatus: number | null = null;
+
+  statusFilterItems: MenuItem[] = [
+    {
+      label: 'All',
+      icon: 'pi pi-filter-slash',
+      command: () => this.filterByStatus(null),
+    },
+    {
+      label: 'Active',
+      icon: 'pi pi-check-circle',
+      command: () => this.filterByStatus(1),
+    },
+    {
+      label: 'Inactive',
+      icon: 'pi pi-ban',
+      command: () => this.filterByStatus(0),
+    },
+  ];
+
   constructor(
     private superAdminService: SuperAdminService,
     private router: Router,
@@ -42,48 +63,66 @@ export class ListSuperAdminComponent implements OnInit {
   ngOnInit(): void {
     this.loggedInUserId = this.globalService.getTokenDetails('userId');
     this.listSuperAdminAPI();
-    this.applyFilters();
+    this.applyAllFilters();
   }
 
   onSearch(event: Event): void {
     this.searchTerm = (event.target as HTMLInputElement).value;
-    this.currentPage = 1; // Reset to first page when searching
-    this.applyFilters();
+    this.currentPage = 1;
+    this.applyAllFilters();
   }
 
   onPageChange(page: number): void {
     this.currentPage = page;
-    this.applyFilters();
+    this.applyAllFilters();
   }
 
   onPageSizeChange(event: Event): void {
     this.pageSize = Number((event.target as HTMLSelectElement).value);
     this.currentPage = 1; // Reset to first page when changing page size
-    this.applyFilters();
+    this.applyAllFilters();
   }
 
-  private applyFilters(): void {
-    // First apply search filter
-    let filtered = this.superAdmins;
+  private applyAllFilters() {
+    let filtered = [...this.superAdmins];
+
+    // Apply status filter
+    if (this.selectedStatus !== null) {
+      filtered = filtered.filter(admin => admin.status === this.selectedStatus);
+    }
+
+    // Apply search filter
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      filtered = this.superAdmins.filter(
+      filtered = filtered.filter(
         admin =>
-          (admin.firstName + ' ' + admin.lastName)
-            .toLowerCase()
-            .includes(term) || admin.email.toLowerCase().includes(term)
+          admin.firstName.toLowerCase().includes(term) ||
+          admin.lastName.toLowerCase().includes(term)
       );
     }
 
-    // Update total count
+    // Update total count and apply pagination
     this.totalItems = filtered.length;
-
-    // Then apply pagination
     const startIndex = (this.currentPage - 1) * this.pageSize;
     this.filteredAdmins = filtered.slice(
       startIndex,
       startIndex + this.pageSize
     );
+  }
+
+  filterByStatus(status: number | null) {
+    this.selectedStatus = status;
+    this.currentPage = 1; // Reset to first page when filtering
+
+    if (status === null) {
+      // Clear search text when "All" is selected
+      this.searchTerm = '';
+      // Reset to show all admins
+      this.filteredAdmins = [...this.superAdmins];
+      this.totalItems = this.superAdmins.length;
+    } else {
+      this.applyAllFilters();
+    }
   }
 
   get totalPages(): number {

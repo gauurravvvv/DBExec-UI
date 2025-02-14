@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 import { OrganisationService } from '../../services/organisation.service';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-list-organisation',
@@ -32,6 +33,26 @@ export class ListOrganisationComponent implements OnInit {
   showDeleteConfirm = false;
   orgIdToDelete: number | null = null;
 
+  statusFilterItems: MenuItem[] = [
+    {
+      label: 'All',
+      icon: 'pi pi-filter-slash',
+      command: () => this.filterByStatus(null),
+    },
+    {
+      label: 'Active',
+      icon: 'pi pi-check-circle',
+      command: () => this.filterByStatus(1),
+    },
+    {
+      label: 'Inactive',
+      icon: 'pi pi-ban',
+      command: () => this.filterByStatus(0),
+    },
+  ];
+
+  selectedStatus: number | null = null;
+
   constructor(
     private organisationService: OrganisationService,
     private router: Router
@@ -42,15 +63,35 @@ export class ListOrganisationComponent implements OnInit {
     this.applyFilters();
   }
 
+  private applyAllFilters() {
+    let filtered = [...this.organisations];
+
+    // Apply status filter
+    if (this.selectedStatus !== null) {
+      filtered = filtered.filter(org => org.status === this.selectedStatus);
+    }
+
+    // Apply search filter
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(org => org.name.toLowerCase().includes(term));
+    }
+
+    // Update total count and apply pagination
+    this.totalItems = filtered.length;
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.filteredOrgs = filtered.slice(startIndex, startIndex + this.pageSize);
+  }
+
   onSearch(event: Event): void {
     this.searchTerm = (event.target as HTMLInputElement).value;
     this.currentPage = 1; // Reset to first page when searching
-    this.applyFilters();
+    this.applyAllFilters();
   }
 
   onPageChange(page: number): void {
     this.currentPage = page;
-    this.applyFilters();
+    this.applyAllFilters();
   }
 
   onPageSizeChange(event: Event): void {
@@ -129,5 +170,20 @@ export class ListOrganisationComponent implements OnInit {
 
   onAddNewOrganisation() {
     this.router.navigate([ORGANISATION.ADD]);
+  }
+
+  filterByStatus(status: number | null) {
+    this.selectedStatus = status;
+    this.currentPage = 1; // Reset to first page when filtering
+
+    if (status === null) {
+      // Clear search text when "All" is selected
+      this.searchTerm = '';
+      // Reset to show all organisations
+      this.filteredOrgs = [...this.organisations];
+      this.totalItems = this.organisations.length;
+    } else {
+      this.applyAllFilters();
+    }
   }
 }

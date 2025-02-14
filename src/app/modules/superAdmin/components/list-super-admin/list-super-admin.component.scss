@@ -523,3 +523,33 @@
     }
   }
 }
+
+:host ::ng-deep {
+  .p-menu {
+    .p-menuitem {
+      .p-menuitem-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+
+        .p-menuitem-icon {
+          font-size: 0.875rem;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+.pi-filter {
+  font-size: 0.9rem;
+  color: #6c757d;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #000;
+  }
+
+  &.active-filter {
+    color: #2196f3;
+  }
+}
