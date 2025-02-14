@@ -17,7 +17,7 @@
             <li class="nav-item" [class.active]="item.isExpanded">
               <!-- Menu item with children -->
               <div *ngIf="item.children" class="nav-link" [title]="!isExpanded ? item.label : ''"
-                [style.paddingLeft]="getIndentation(item.level)" (click)="toggleSubmenu(item)"
+                [style.paddingLeft]="getIndentation(item.level)" (click)="toggleSubmenuAndExpand(item)"
                 [class.expanded]="item.isExpanded">
                 <div class="link-content">
                   <i [class]="item.icon"></i>

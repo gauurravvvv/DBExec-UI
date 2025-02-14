@@ -91,6 +91,13 @@ export class SidebarComponent implements OnInit {
     }
   }
 
+  toggleSubmenuAndExpand(item: any) {
+    if (!this.isExpanded) {
+      this.isExpanded = true;
+    }
+    this.toggleSubmenu(item);
+  }
+
   getIndentation(level: number = 0): string {
     return `${1.5 + level * 1}rem`;
   }
