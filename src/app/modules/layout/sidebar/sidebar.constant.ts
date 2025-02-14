@@ -9,19 +9,19 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'orgManagement',
-    route: '/app/system/organizations',
+    route: '/app/organisation',
   },
   {
     value: 'orgAdmin',
-    route: '/home/system/org-admin',
+    route: '/home/org-admin',
   },
   {
     value: 'userManagement',
-    route: '/home/system/users',
+    route: '/home/users',
   },
   {
     value: 'userMapper',
-    route: '/home/system/users',
+    route: '/home/users',
   },
   {
     value: 'setupDB',

@@ -1,0 +1,141 @@
+<div class="view-organisation-wrapper">
+    <div class="view-organisation-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/app/organisation">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Organisation Details</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton class="p-button-outlined" type="button" label="Edit"
+                    [routerLink]="['/app/organisation/edit', organisationId]">
+                    <i class="pi pi-pencil mr-2"></i>
+                </button>
+                <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
+                    (click)="confirmDelete(organisationId)">
+                    <i class="pi pi-trash mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="profile-container">
+            <div class="details-grid">
+                <!-- First Row -->
+                <div class="first-row">
+                    <!-- Organisation Identity -->
+                    <div class="identity-section">
+                        <div class="avatar-section">
+                            <div class="avatar-circle" [style.background-color]="avatarBackground">
+                                {{ organisationInitials }}
+                            </div>
+                            <h3 class="organisation-name">{{ organisationData?.name }}</h3>
+                            <div class="status-indicator">
+                                <span class="status-badge" [class.active]="organisationData?.status === 1">
+                                    {{ organisationData?.status === 1 ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <div class="info-section">
+                        <div class="detail-group">
+                            <h4>Basic Information</h4>
+                            <div class="detail-item">
+                                <span class="label">
+                                    <i class="pi pi-building"></i>
+                                    Organisation Name
+                                </span>
+                                <span class="value">{{ organisationData?.name }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">
+                                    <i class="pi pi-id-card"></i>
+                                    Organisation ID
+                                </span>
+                                <span class="value">#{{ organisationData?.id }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">
+                                    <i class="pi pi-calendar"></i>
+                                    Created On
+                                </span>
+                                <span class="value">{{ organisationData?.createdOn | date:'medium' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Row -->
+                <div class="second-row">
+                    <!-- Resource Allocation -->
+                    <div class="detail-group">
+                        <h4>Maximum Resource Limits</h4>
+                        <div class="resource-grid">
+                            <div class="resource-item">
+                                <div class="resource-icon">
+                                    <i class="pi pi-database"></i>
+                                </div>
+                                <div class="resource-details">
+                                    <span class="resource-label">Max Databases</span>
+                                    <span class="resource-value">{{ organisationData?.config?.maxDatabases }}</span>
+                                </div>
+                            </div>
+                            <div class="resource-item">
+                                <div class="resource-icon">
+                                    <i class="pi pi-users"></i>
+                                </div>
+                                <div class="resource-details">
+                                    <span class="resource-label">Max Admins</span>
+                                    <span class="resource-value">{{ organisationData?.config?.maxAdmins }}</span>
+                                </div>
+                            </div>
+                            <div class="resource-item">
+                                <div class="resource-icon">
+                                    <i class="pi pi-user"></i>
+                                </div>
+                                <div class="resource-details">
+                                    <span class="resource-label">Max Users</span>
+                                    <span class="resource-value">{{ organisationData?.config?.maxUsers }}</span>
+                                </div>
+                            </div>
+                            <div class="resource-item">
+                                <div class="resource-icon">
+                                    <i class="pi pi-globe"></i>
+                                </div>
+                                <div class="resource-details">
+                                    <span class="resource-label">Max Environments</span>
+                                    <span class="resource-value">{{ organisationData?.config?.maxEnvironment }}</span>
+                                </div>
+                            </div>
+                            <div class="resource-item">
+                                <div class="resource-icon">
+                                    <i class="pi pi-list"></i>
+                                </div>
+                                <div class="resource-details">
+                                    <span class="resource-label">Max Categories</span>
+                                    <span class="resource-value">{{ organisationData?.config?.maxCategories }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Dialog -->
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+    <div class="popup-content">
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this organisation?</p>
+        <div class="popup-actions">
+            <button class="btn-cancel" (click)="cancelDelete()">No</button>
+            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        </div>
+    </div>
+</div>

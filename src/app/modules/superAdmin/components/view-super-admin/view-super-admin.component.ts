@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { MessageService } from 'primeng/api';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { ConfirmationService } from 'primeng/api';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 
 interface AdminData {
@@ -27,7 +26,6 @@ interface AdminData {
   selector: 'app-view-super-admin',
   templateUrl: './view-super-admin.component.html',
   styleUrls: ['./view-super-admin.component.scss'],
-  providers: [ConfirmationService],
 })
 export class ViewSuperAdminComponent implements OnInit {
   adminId: string = '';
@@ -43,8 +41,7 @@ export class ViewSuperAdminComponent implements OnInit {
     private router: Router,
     private superAdminService: SuperAdminService,
     private messageService: MessageService,
-    private globalService: GlobalService,
-    private confirmationService: ConfirmationService
+    private globalService: GlobalService
   ) {}
 
   ngOnInit(): void {

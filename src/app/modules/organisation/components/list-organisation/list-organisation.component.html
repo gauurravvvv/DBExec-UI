@@ -1,0 +1,114 @@
+<div class="organisation-wrapper">
+    <div class="organisation-container">
+        <div class="page-header">
+            <h2>Organisations</h2>
+            <button pButton class="p-button-outlined" (click)="onAddNewOrganisation()">
+                + Add Organisation
+            </button>
+        </div>
+        <div class="table-section">
+            <!-- Search and Page Size -->
+            <div class="table-controls">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" style="width: 100%;" placeholder="Search..."
+                        (input)="onSearch($event)" [value]="searchTerm">
+                </span>
+            </div>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Max Admins</th>
+                            <th>Max Users</th>
+                            <th>Max Environments</th>
+                            <th>Max Categories</th>
+                            <th>Max Databases</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="filteredOrgs && filteredOrgs.length > 0; else noData">
+                            <tr *ngFor="let org of filteredOrgs">
+                                <td>
+                                    <a class="org-name" [routerLink]="['/app/organisation/view', org.id]">
+                                        {{ org.name }}
+                                    </a>
+                                </td>
+                                <td>{{ org.config.maxAdmins }}</td>
+                                <td>{{ org.config.maxUsers }}</td>
+                                <td>{{ org.config.maxEnvironment }}</td>
+                                <td>{{ org.config.maxCategories }}</td>
+                                <td>{{ org.config.maxDatabases }}</td>
+                                <td>
+                                    <span class="status-badge" [class.active]="org.status === 1">
+                                        {{ org.status === 1 ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>{{ org.createdOn | date:'mediumDate' }}</td>
+                                <td class="actions">
+                                    <button class="action-btn edit" (click)="onEdit(org)" title="Edit">
+                                        <i class="pi pi-pencil"></i>
+                                    </button>
+                                    <button class="action-btn delete" (click)="confirmDelete(org.id)" title="Delete">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-template #noData>
+                            <tr style="height: 100%;">
+                                <td colspan="9">
+                                    <div class="no-data">
+                                        <i class="pi pi-inbox"></i>
+                                        <p>No records found</p>
+                                        <span class="sub-text">No organization data is available at the moment</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </table>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-info">
+                        <ng-container *ngIf="totalItems > 0; else noEntries">
+                            Showing {{ (currentPage - 1) * pageSize + 1 }} to
+                            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
+                        </ng-container>
+                        <ng-template #noEntries>
+                            Showing 0 to 0 of 0 entries
+                        </ng-template>
+                    </div>
+                    <div class="pagination-controls">
+                        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
+                            <i class="pi pi-chevron-left"></i>
+                        </button>
+                        <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
+                            [class.active]="page === currentPage">
+                            {{ page }}
+                        </button>
+                        <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)"
+                            class="page-btn">
+                            <i class="pi pi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+    <div class="popup-content">
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this organization?</p>
+        <div class="popup-actions">
+            <button class="btn-cancel" (click)="cancelDelete()">No</button>
+            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        </div>
+    </div>
+</div>

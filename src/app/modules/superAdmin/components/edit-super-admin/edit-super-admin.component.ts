@@ -25,7 +25,6 @@ export class EditSuperAdminComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private superAdminService: SuperAdminService,
-    private messageService: MessageService,
     private router: Router,
     private route: ActivatedRoute,
     private globalService: GlobalService

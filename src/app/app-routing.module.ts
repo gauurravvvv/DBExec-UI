@@ -49,6 +49,13 @@ const routes: Routes = [
             m => m.SuperAdminModule
           ),
       },
+      {
+        path: 'organisation',
+        loadChildren: () =>
+          import('./modules/organisation/organisation.module').then(
+            m => m.OrganisationModule
+          ),
+      },
     ],
   },
   {

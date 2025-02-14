@@ -1,0 +1,87 @@
+.add-admin-wrapper {
+  height: 100%;
+  background-color: var(--surface-ground);
+
+  .add-admin-container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    height: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 0 20px;
+      border-bottom: 1px solid var(--surface-border);
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: 0;
+
+        button {
+          min-width: 0rem;
+        }
+
+        h2 {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 500;
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+      }
+    }
+
+    .admin-form {
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        max-width: 50%;
+
+        .form-field {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          grid-column: 1 / -1;
+
+          label {
+            font-weight: 500;
+            color: var(--text-color);
+
+            .required {
+              color: var(--red-500);
+            }
+          }
+
+          .p-input-icon-left {
+            width: 100%;
+
+            input {
+              width: 100%;
+              padding-left: 2.5rem;
+            }
+
+            i {
+              color: var(--text-color-secondary);
+            }
+          }
+
+          .error-message {
+            color: var(--red-500);
+            font-size: 0.8rem;
+            margin-top: 4px;
+          }
+        }
+      }
+    }
+  }
+}

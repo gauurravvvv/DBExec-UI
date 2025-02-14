@@ -6,9 +6,10 @@ export const SUPER_ADMIN = {
 };
 
 export const ORGANISATION = {
-  ADD: '/app/organizations/add',
-  LIST: '/app/organizations',
-  EDIT: '/app/organizations/edit',
+  ADD: '/app/organisation/add',
+  LIST: '/app/organisation',
+  EDIT: '/app/organisation/edit',
+  VIEW: '/app/organisation/view',
 };
 
 export const ORGANISATION_ADMIN = {
