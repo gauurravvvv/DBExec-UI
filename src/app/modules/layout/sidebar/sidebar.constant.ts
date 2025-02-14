@@ -13,7 +13,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'orgAdmin',
-    route: '/home/org-admin',
+    route: '/app/org-admin',
   },
   {
     value: 'userManagement',

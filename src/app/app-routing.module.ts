@@ -56,6 +56,13 @@ const routes: Routes = [
             m => m.OrganisationModule
           ),
       },
+      {
+        path: 'org-admin',
+        loadChildren: () =>
+          import('./modules/organisationAdmin/orgAdmin.module').then(
+            m => m.OrgAdminModule
+          ),
+      },
     ],
   },
   {

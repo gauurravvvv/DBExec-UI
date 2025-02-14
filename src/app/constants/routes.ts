@@ -16,6 +16,7 @@ export const ORGANISATION_ADMIN = {
   ADD: '/app/org-admin/add',
   LIST: '/app/org-admin',
   EDIT: '/app/org-admin/edit',
+  VIEW: '/app/org-admin/view',
 };
 
 export const ENVIRONMENT = {
