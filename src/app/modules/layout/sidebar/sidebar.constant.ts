@@ -17,7 +17,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'userManagement',
-    route: '/home/users',
+    route: '/app/users',
   },
   {
     value: 'userMapper',
