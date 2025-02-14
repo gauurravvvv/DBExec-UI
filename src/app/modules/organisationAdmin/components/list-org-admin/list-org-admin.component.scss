@@ -33,7 +33,7 @@
         padding: 0.5rem 1rem;
         border: none;
         border-radius: 6px;
-        background: #3498db;
+        background: #0078d3;
         color: #ffffff;
         font-weight: 500;
         font-size: 0.875rem;
@@ -216,7 +216,7 @@
               flex-shrink: 0;
 
               &.edit {
-                color: #3498db;
+                color: #0078d3;
                 &:hover {
                   background-color: rgba(52, 152, 219, 0.1);
                 }
@@ -351,8 +351,8 @@
       }
 
       &.active {
-        background: #3498db;
-        border-color: #3498db;
+        background: #0078d3;
+        border-color: #0078d3;
         color: #ffffff;
       }
 
@@ -434,7 +434,7 @@
 }
 
 .admin-name {
-  color: #3498db;
+  color: #0078d3;
   font-weight: 600;
   text-decoration: none;
   transition: color 0.2s ease;
@@ -539,7 +539,7 @@
       background-color: white;
       padding: 0 4px;
       left: 0.5rem;
-      color: #3498db;
+      color: #0078d3;
     }
   }
 

@@ -62,7 +62,7 @@ export class ViewOrgAdminComponent implements OnInit {
       '#FFEEAD',
       '#D4A5A5',
       '#9B59B6',
-      '#3498DB',
+      '#0078d3',
     ];
     const randomIndex = Math.floor(Math.random() * colors.length);
     this.avatarBackground = colors[randomIndex];

@@ -22,7 +22,7 @@
 
         .logo-icon {
           font-size: 24px;
-          color: #3498db;
+          color: #0078d3;
           animation: gentle-zoom 3s ease-in-out infinite;
           display: flex;
           align-items: center;
@@ -45,7 +45,7 @@
             left: 50%;
             width: 0;
             height: 2px;
-            background: #3498db;
+            background: #0078d3;
             transition: all 0.3s ease;
             transform: translateX(-50%);
           }
@@ -57,7 +57,7 @@
           }
 
           .highlight {
-            color: #3498db;
+            color: #0078d3;
             position: relative;
           }
         }
@@ -112,7 +112,7 @@
           .user-initials {
             width: 48px;
             height: 48px;
-            background-color: #3498db;
+            background-color: #0078d3;
             color: white;
             border-radius: 4px;
             display: flex;
