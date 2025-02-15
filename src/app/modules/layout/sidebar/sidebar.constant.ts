@@ -45,7 +45,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'secretsEnvironment',
-    route: '/home/secrets/environments',
+    route: '/app/environment',
   },
   {
     value: 'secretsCredentials',

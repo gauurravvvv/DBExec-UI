@@ -68,6 +68,13 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/users/users.module').then(m => m.UsersModule),
       },
+      {
+        path: 'environment',
+        loadChildren: () =>
+          import('./modules/environment/environment.module').then(
+            m => m.EnvironmentModule
+          ),
+      },
     ],
   },
   {

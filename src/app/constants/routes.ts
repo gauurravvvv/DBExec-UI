@@ -20,9 +20,10 @@ export const ORGANISATION_ADMIN = {
 };
 
 export const ENVIRONMENT = {
-  ADD: '/home/secrets/environments/add',
-  LIST: '/home/secrets/environments',
-  EDIT: '/home/secrets/environments/edit',
+  ADD: '/app/environments/add',
+  LIST: '/app/environments',
+  EDIT: '/app/environments/edit',
+  VIEW: '/app/environments/view',
 };
 
 export const CATEGORY = {

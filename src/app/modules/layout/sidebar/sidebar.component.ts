@@ -20,7 +20,7 @@ interface MenuItem {
 })
 export class SidebarComponent implements OnInit {
   menuItems: { children: MenuItem[] }[] = [];
-  isExpanded = true;
+  isExpanded = false;
   isMobile = false;
 
   constructor(private globalService: GlobalService) {
