@@ -1,12 +1,12 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { FormGroup } from "@angular/forms";
-import { map } from "rxjs";
-import { USER } from "src/app/constants/api";
-import { IParams } from "src/app/core/interfaces/global.interface";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { map } from 'rxjs';
+import { USER } from 'src/app/constants/api';
+import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class UserService {
   constructor(private http: HttpClient) {}
@@ -40,7 +40,7 @@ export class UserService {
       username,
       password,
       email,
-      phone,
+      mobile,
       organisation,
     } = userForm.value;
     return this.http
@@ -50,7 +50,7 @@ export class UserService {
         username,
         password,
         email,
-        mobile: phone,
+        mobile,
         organisation,
       })
       .pipe(

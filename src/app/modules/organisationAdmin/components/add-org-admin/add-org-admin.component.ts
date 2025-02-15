@@ -15,7 +15,6 @@ import { ROLES } from 'src/app/constants/user.constant';
 export class AddOrgAdminComponent implements OnInit {
   orgForm!: FormGroup;
   showPassword = false;
-  isFormDirty = false;
   organisations: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
@@ -30,20 +29,41 @@ export class AddOrgAdminComponent implements OnInit {
     this.initForm();
   }
 
+  // Add getter for form dirty state
+  get isFormDirty(): boolean {
+    return this.orgForm.dirty;
+  }
+
   ngOnInit() {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     }
-    this.orgForm.valueChanges.subscribe(() => {
-      this.isFormDirty = true;
-    });
   }
 
   initForm() {
     this.orgForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      username: ['', Validators.required],
+      firstName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+        ],
+      ],
+      lastName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+        ],
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(4),
+          Validators.pattern('^[a-zA-Z0-9_]+$'),
+        ],
+      ],
       email: ['', [Validators.required, Validators.email]],
       password: [
         '',
@@ -103,7 +123,11 @@ export class AddOrgAdminComponent implements OnInit {
   }
 
   onCancel() {
-    this.router.navigate([ORGANISATION_ADMIN.LIST]);
+    this.orgForm.reset();
+    // Reset specific form controls to empty strings
+    Object.keys(this.orgForm.controls).forEach(key => {
+      this.orgForm.get(key)?.setValue('');
+    });
   }
 
   onPhoneInput(event: any) {

@@ -33,7 +33,9 @@
                     </span>
                     <small class="error-message"
                         *ngIf="adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched">
-                        First name is required
+                        <span *ngIf="adminForm.get('firstName')?.errors?.['required']">First name is required</span>
+                        <span *ngIf="adminForm.get('firstName')?.errors?.['pattern']">First name can only contain
+                            letters, spaces and hyphens</span>
                     </small>
                 </div>
 
@@ -48,7 +50,9 @@
                     </span>
                     <small class="error-message"
                         *ngIf="adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched">
-                        Last name is required
+                        <span *ngIf="adminForm.get('lastName')?.errors?.['required']">Last name is required</span>
+                        <span *ngIf="adminForm.get('lastName')?.errors?.['pattern']">Last name can only contain letters,
+                            spaces and hyphens</span>
                     </small>
                 </div>
 
@@ -66,6 +70,8 @@
                         <span *ngIf="adminForm.get('username')?.errors?.['required']">Username is required</span>
                         <span *ngIf="adminForm.get('username')?.errors?.['minlength']">Username must be at least 4
                             characters</span>
+                        <span *ngIf="adminForm.get('username')?.errors?.['pattern']">Username can only contain letters,
+                            numbers and underscores</span>
                     </small>
                 </div>
 
@@ -87,17 +93,17 @@
 
                 <!-- Phone -->
                 <div class="form-field">
-                    <label for="phone">Phone <span class="required">*</span></label>
+                    <label for="mobile">Mobile <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-phone"></i>
-                        <input id="phone" type="text" pInputText formControlName="phone"
-                            placeholder="Enter phone number" (input)="onPhoneInput($event)" maxlength="10"
-                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('phone')?.invalid && adminForm.get('phone')?.touched}">
+                        <input id="mobile" type="text" pInputText formControlName="mobile"
+                            placeholder="Enter mobile number" (input)="onPhoneInput($event)" maxlength="10"
+                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('mobile')?.invalid && adminForm.get('mobile')?.touched}">
                     </span>
                     <small class="error-message"
-                        *ngIf="adminForm.get('phone')?.invalid && adminForm.get('phone')?.touched">
-                        <span *ngIf="adminForm.get('phone')?.errors?.['required']">Phone number is required</span>
-                        <span *ngIf="adminForm.get('phone')?.errors?.['pattern']">Please enter a valid 10-digit phone
+                        *ngIf="adminForm.get('mobile')?.invalid && adminForm.get('mobile')?.touched">
+                        <span *ngIf="adminForm.get('mobile')?.errors?.['required']">Mobile number is required</span>
+                        <span *ngIf="adminForm.get('mobile')?.errors?.['pattern']">Please enter a valid 10-digit mobile
                             number</span>
                     </small>
                 </div>

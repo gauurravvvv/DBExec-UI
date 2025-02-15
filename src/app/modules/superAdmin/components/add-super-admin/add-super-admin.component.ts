@@ -34,9 +34,28 @@ export class AddSuperAdminComponent implements OnInit {
 
   private initForm(): void {
     this.adminForm = this.fb.group({
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
-      username: ['', [Validators.required, Validators.minLength(4)]],
+      firstName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+        ],
+      ],
+      lastName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+        ],
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(4),
+          Validators.pattern('^[a-zA-Z0-9_]+$'),
+        ],
+      ],
       password: [
         '',
         [
@@ -47,7 +66,7 @@ export class AddSuperAdminComponent implements OnInit {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
     });
   }
 

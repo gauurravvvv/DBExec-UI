@@ -44,9 +44,37 @@ export class EditSuperAdminComponent implements OnInit {
   private initForm(): void {
     this.adminForm = this.fb.group({
       id: [''],
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
-      username: ['', [Validators.required, Validators.minLength(4)]],
+      firstName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+        ],
+      ],
+      lastName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+        ],
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(4),
+          Validators.pattern('^[a-zA-Z0-9_]+$'),
+        ],
+      ],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(
+            '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'
+          ),
+        ],
+      ],
       email: ['', [Validators.required, Validators.email]],
       mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       status: [],

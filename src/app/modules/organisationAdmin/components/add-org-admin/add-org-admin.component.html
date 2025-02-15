@@ -33,7 +33,9 @@
                     </span>
                     <small class="error-message"
                         *ngIf="orgForm.get('firstName')?.invalid && orgForm.get('firstName')?.touched">
-                        First name is required
+                        <span *ngIf="orgForm.get('firstName')?.errors?.['required']">First name is required</span>
+                        <span *ngIf="orgForm.get('firstName')?.errors?.['pattern']">First name can only contain
+                            letters, spaces and hyphens</span>
                     </small>
                 </div>
 
@@ -48,7 +50,9 @@
                     </span>
                     <small class="error-message"
                         *ngIf="orgForm.get('lastName')?.invalid && orgForm.get('lastName')?.touched">
-                        Last name is required
+                        <span *ngIf="orgForm.get('lastName')?.errors?.['required']">Last name is required</span>
+                        <span *ngIf="orgForm.get('lastName')?.errors?.['pattern']">Last name can only contain letters,
+                            spaces and hyphens</span>
                     </small>
                 </div>
 
@@ -63,7 +67,11 @@
                     </span>
                     <small class="error-message"
                         *ngIf="orgForm.get('username')?.invalid && orgForm.get('username')?.touched">
-                        Username is required
+                        <span *ngIf="orgForm.get('username')?.errors?.['required']">Username is required</span>
+                        <span *ngIf="orgForm.get('username')?.errors?.['minlength']">Username must be at least 4
+                            characters</span>
+                        <span *ngIf="orgForm.get('username')?.errors?.['pattern']">Username can only contain letters,
+                            numbers and underscores</span>
                     </small>
                 </div>
 
