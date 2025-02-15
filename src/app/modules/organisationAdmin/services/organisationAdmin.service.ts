@@ -92,4 +92,15 @@ export class OrganisationAdminService {
         })
       );
   }
+
+  updateOrgAdminPassword(id: string, password: string) {
+    return this.http
+      .put(ORG_ADMIN.UPDATE_PASSWORD, { id, newPassword: password })
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
 }

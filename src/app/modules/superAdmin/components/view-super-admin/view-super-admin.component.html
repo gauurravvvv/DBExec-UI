@@ -13,6 +13,10 @@
                     [disabled]="adminId == loggedInUserId" [routerLink]="['/app/super-admin/edit', adminId]">
                     <i class="pi pi-pencil mr-2"></i>
                 </button>
+                <button pButton class="p-button-outlined" type="button" label="Change Password"
+                    (click)="openChangePasswordDialog()">
+                    <i class="pi pi-key mr-2"></i>
+                </button>
                 <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
                     [disabled]="adminId == loggedInUserId" (click)="confirmDelete(adminId)">
                     <i class="pi pi-trash mr-2"></i>
@@ -128,3 +132,6 @@
         </div>
     </div>
 </div>
+
+<app-change-password-dialog [visible]="showChangePasswordDialog" (close)="onPasswordDialogClose($event)">
+</app-change-password-dialog>

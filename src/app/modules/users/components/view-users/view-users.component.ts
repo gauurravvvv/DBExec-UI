@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
-import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationAdminService } from 'src/app/modules/organisationAdmin/services/organisationAdmin.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -18,6 +16,7 @@ export class ViewUsersComponent implements OnInit {
   avatarBackground: string = '';
   userInitials: string = '';
   loggedInUserId = this.globalService.getTokenDetails('userId');
+  showChangePasswordDialog = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -84,5 +83,32 @@ export class ViewUsersComponent implements OnInit {
         console.error('Error deleting organisation admin:', error);
       },
     });
+  }
+
+  openChangePasswordDialog() {
+    this.showChangePasswordDialog = true;
+  }
+
+  onPasswordDialogClose(newPassword: string | null) {
+    if (newPassword) {
+      this.userService.updateUserPassword(this.userId, newPassword).subscribe({
+        next: response => {
+          this.globalService.handleAPIResponse({
+            status: true,
+            message: response.message,
+          });
+        },
+        error: error => {
+          this.globalService.handleAPIResponse({
+            status: false,
+            message:
+              error?.error?.message ||
+              error?.message ||
+              'Failed to update password',
+          });
+        },
+      });
+    }
+    this.showChangePasswordDialog = false;
   }
 }

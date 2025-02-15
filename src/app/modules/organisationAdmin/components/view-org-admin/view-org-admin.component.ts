@@ -19,6 +19,9 @@ export class ViewOrgAdminComponent implements OnInit {
   loggedInUserId = this.globalService.getTokenDetails('userId');
   showOrganisationInfo =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+  showChangePassword =
+    this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+  showChangePasswordDialog = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -85,5 +88,34 @@ export class ViewOrgAdminComponent implements OnInit {
         console.error('Error deleting organisation admin:', error);
       },
     });
+  }
+
+  openChangePasswordDialog() {
+    this.showChangePasswordDialog = true;
+  }
+
+  onPasswordDialogClose(newPassword: string | null) {
+    if (newPassword) {
+      this.orgAdminService
+        .updateOrgAdminPassword(this.adminId, newPassword)
+        .subscribe({
+          next: response => {
+            this.globalService.handleAPIResponse({
+              status: true,
+              message: response.message,
+            });
+          },
+          error: error => {
+            this.globalService.handleAPIResponse({
+              status: false,
+              message:
+                error?.error?.message ||
+                error?.message ||
+                'Failed to update password',
+            });
+          },
+        });
+    }
+    this.showChangePasswordDialog = false;
   }
 }

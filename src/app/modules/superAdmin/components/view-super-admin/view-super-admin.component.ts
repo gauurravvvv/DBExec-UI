@@ -35,6 +35,7 @@ export class ViewSuperAdminComponent implements OnInit {
   loggedInUserId: any;
   adminIdToDelete: string | null = null;
   showDeleteConfirm = false;
+  showChangePasswordDialog = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -140,5 +141,34 @@ export class ViewSuperAdminComponent implements OnInit {
           this.router.navigate([SUPER_ADMIN.LIST]);
         }
       });
+  }
+
+  openChangePasswordDialog() {
+    this.showChangePasswordDialog = true;
+  }
+
+  onPasswordDialogClose(newPassword: string | null) {
+    if (newPassword) {
+      this.superAdminService
+        .updateSuperAdminPassword(this.adminId, newPassword)
+        .subscribe({
+          next: response => {
+            this.globalService.handleAPIResponse({
+              status: true,
+              message: response.message,
+            });
+          },
+          error: error => {
+            this.globalService.handleAPIResponse({
+              status: false,
+              message:
+                error?.error?.message ||
+                error?.message ||
+                'Failed to update password',
+            });
+          },
+        });
+    }
+    this.showChangePasswordDialog = false;
   }
 }

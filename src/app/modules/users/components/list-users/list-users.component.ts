@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ORGANISATION_ADMIN, USER } from 'src/app/constants/routes';
+import { MenuItem } from 'primeng/api';
+import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { MenuItem } from 'primeng/api';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from '../../services/user.service';
 

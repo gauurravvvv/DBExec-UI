@@ -90,4 +90,15 @@ export class UserService {
         })
       );
   }
+
+  updateUserPassword(id: string, password: string) {
+    return this.http
+      .put(USER.UPDATE_PASSWORD, { id, newPassword: password })
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
 }
