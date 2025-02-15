@@ -53,7 +53,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'secretsCategory',
-    route: '/home/secrets/categories',
+    route: '/app/category',
   },
   {
     value: 'myProfile',

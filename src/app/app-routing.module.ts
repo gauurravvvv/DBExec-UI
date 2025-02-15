@@ -75,6 +75,13 @@ const routes: Routes = [
             m => m.EnvironmentModule
           ),
       },
+      {
+        path: 'category',
+        loadChildren: () =>
+          import('./modules/categories/category.module').then(
+            m => m.CategoryModule
+          ),
+      },
     ],
   },
   {
