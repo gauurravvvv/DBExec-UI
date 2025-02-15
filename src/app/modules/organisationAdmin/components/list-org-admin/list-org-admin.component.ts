@@ -102,7 +102,7 @@ export class ListOrgAdminComponent implements OnInit {
       next: (response: any) => {
         this.admins = response.data.orgAdmins;
         this.filteredAdmins = [...this.admins];
-        this.totalItems = response.total;
+        this.totalItems = this.admins.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();

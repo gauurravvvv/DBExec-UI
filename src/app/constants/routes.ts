@@ -20,10 +20,10 @@ export const ORGANISATION_ADMIN = {
 };
 
 export const ENVIRONMENT = {
-  ADD: '/app/environments/add',
-  LIST: '/app/environments',
-  EDIT: '/app/environments/edit',
-  VIEW: '/app/environments/view',
+  ADD: '/app/environment/add',
+  LIST: '/app/environment',
+  EDIT: '/app/environment/edit',
+  VIEW: '/app/environment/view',
 };
 
 export const CATEGORY = {

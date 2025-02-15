@@ -102,7 +102,7 @@ export class ListUsersComponent implements OnInit {
       next: (response: any) => {
         this.users = response.data.users;
         this.filteredUsers = [...this.users];
-        this.totalItems = response.total;
+        this.totalItems = this.users.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();

@@ -1,1 +1,70 @@
-<p>edit-environment works!</p>
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/app/environment">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Edit Environment</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    [disabled]="!isFormDirty" (click)="onCancel()">
+                </button>
+                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    [disabled]="envForm.invalid">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <form [formGroup]="envForm" class="admin-form">
+            <div class="form-grid">
+                <!-- Name Field -->
+                <div class="form-field">
+                    <label for="name">Name<span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-globe"></i>
+                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
+                            [ngClass]="{'ng-invalid ng-dirty': envForm.get('name')?.invalid && envForm.get('name')?.touched}">
+                    </span>
+                    <small class="error-message" *ngIf="envForm.get('name')?.invalid && envForm.get('name')?.touched">
+                        <span *ngIf="envForm.get('name')?.errors?.['required']">Name is required</span>
+                        <span *ngIf="envForm.get('name')?.errors?.['pattern']">Name can only contain
+                            letters, spaces and hyphens</span>
+                    </small>
+                </div>
+
+                <!-- Description Field -->
+                <div class="form-field">
+                    <label for="description">Description</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-align-left"></i>
+                        <input id="description" pInputText formControlName="description" rows="3"
+                            placeholder="Enter description">
+                    </span>
+                </div>
+
+                <!-- Organisation Dropdown -->
+                <div class="form-field" *ngIf="showOrganisationDropdown">
+                    <label for="organisation">Organisation<span class="required">*</span></label>
+                    <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled
+                        class="disabled-input">
+                </div>
+
+                <!-- Status -->
+                <div class="form-field">
+                    <label for="status">Status</label>
+                    <div class="d-flex align-items-center pt-2">
+                        <p-inputSwitch class="ml-2" formControlName="status" [trueValue]="1"
+                            [falseValue]="0"></p-inputSwitch>
+                        <span class="ml-2 mb-1">{{ envForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
+                            }}</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

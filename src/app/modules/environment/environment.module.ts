@@ -6,15 +6,14 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { AddEnvironmentComponent } from './components/add-environment/add-environment.component';
 import { EditEnvironmentComponent } from './components/edit-environment/edit-environment.component';
 import { ListEnvironmentComponent } from './components/list-environment/list-environment.component';
-import { ViewEnvironmentComponent } from './components/view-environment/view-environment.component';
 import { EnvironmentRoutingModule } from './environment-routing.module';
+import { MenuModule } from 'primeng/menu';
 
 @NgModule({
   declarations: [
     AddEnvironmentComponent,
     EditEnvironmentComponent,
     ListEnvironmentComponent,
-    ViewEnvironmentComponent,
   ],
   imports: [
     CommonModule,
@@ -22,6 +21,7 @@ import { EnvironmentRoutingModule } from './environment-routing.module';
     AppPrimeNGModule,
     EnvironmentRoutingModule,
     SharedModule,
+    MenuModule,
   ],
 })
 export class EnvironmentModule {}
