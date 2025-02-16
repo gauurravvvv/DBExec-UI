@@ -27,9 +27,10 @@ export const ENVIRONMENT = {
 };
 
 export const CATEGORY = {
-  ADD: '/home/secrets/categories/add',
-  LIST: '/home/secrets/categories',
-  EDIT: '/home/secrets/categories/edit',
+  ADD: '/app/category/add',
+  LIST: '/app/category',
+  EDIT: '/app/category/edit',
+  VIEW: '/app/category/view',
 };
 
 export const USER = {

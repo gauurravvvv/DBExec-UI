@@ -1,1 +1,109 @@
-<p>add-category works!</p>
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/app/category">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Add Category</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    [disabled]="!isFormDirty" (click)="onCancel()">
+                </button>
+                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    [disabled]="categoryForm.invalid">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <form [formGroup]="categoryForm" class="admin-form">
+            <div class="form-grid">
+                <!-- Name Field -->
+                <div class="form-field">
+                    <label for="name">Name<span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-key"></i>
+                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
+                            [ngClass]="{'ng-invalid ng-dirty': categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched">
+                        <span *ngIf="categoryForm.get('name')?.errors?.['required']">Name is required</span>
+                        <span *ngIf="categoryForm.get('name')?.errors?.['pattern']">Name can only contain
+                            letters, spaces and hyphens</span>
+                    </small>
+                </div>
+
+                <!-- Description Field -->
+                <div class="form-field">
+                    <label for="description">Description</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-align-left"></i>
+                        <input id="description" pInputText formControlName="description" rows="3"
+                            placeholder="Enter description">
+                    </span>
+                </div>
+
+                <!-- Organisation Dropdown -->
+                <div class="form-field" *ngIf="showOrganisationDropdown">
+                    <label for="organisation">Organisation<span class="required">*</span></label>
+                    <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
+                        formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                        [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"
+                        [ngClass]="{'ng-invalid ng-dirty': categoryForm.get('organisation')?.invalid && categoryForm.get('organisation')?.touched}">
+                    </p-dropdown>
+                    <small class="error-message"
+                        *ngIf="categoryForm.get('organisation')?.invalid && categoryForm.get('organisation')?.touched">
+                        Organisation is required
+                    </small>
+                </div>
+
+                <!-- Environments Dropdown -->
+                <div class="form-field">
+                    <label for="environments">Environments<span class="required">*</span></label>
+                    <p-multiSelect [options]="environments" formControlName="environments" optionLabel="name"
+                        optionValue="id" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                        [panelStyle]="{'width':'100%'}" placeholder="Select Environments" display="chip"
+                        [ngClass]="{'ng-invalid ng-dirty': categoryForm.get('environments')?.invalid && categoryForm.get('environments')?.touched}">
+                    </p-multiSelect>
+                    <small class="error-message"
+                        *ngIf="categoryForm.get('environments')?.invalid && categoryForm.get('environments')?.touched">
+                        At least one environment is required
+                    </small>
+                </div>
+
+                <!-- Add this after the Environments Dropdown -->
+                <div class="form-field fields-container">
+                    <div class="fields-header">
+                        <label>Field Names<span class="required">*</span></label>
+                        <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
+                            (click)="addField()" [style]="{'color': '#2196f3'}">
+                        </button>
+                    </div>
+
+                    <div class="fields-list" formArrayName="config">
+                        <div *ngFor="let field of config.controls; let i=index" [formGroupName]="i" class="field-row">
+                            <span class="p-input-icon-left field-input">
+                                <i class="pi pi-tag"></i>
+                                <input pInputText formControlName="name" placeholder="Enter field name"
+                                    [ngClass]="{'ng-invalid ng-dirty': field.get('name')?.invalid && field.get('name')?.touched}">
+                            </span>
+                            <button pButton type="button" icon="pi pi-minus"
+                                class="p-button-rounded p-button-text p-button-danger" (click)="removeField(i)"
+                                [disabled]="config.length === 1">
+                            </button>
+                            <small class="error-message"
+                                *ngIf="field.get('name')?.invalid && field.get('name')?.touched">
+                                {{ getFieldErrorMessage(field) }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

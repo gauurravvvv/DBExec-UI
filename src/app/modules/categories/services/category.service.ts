@@ -2,19 +2,19 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
-import { ENVIRONMENT } from 'src/app/constants/api';
+import { CATEGORY, ENVIRONMENT } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class EnvironmentService {
+export class CategoryService {
   constructor(private http: HttpClient) {}
 
-  listEnvironments(params: IParams) {
+  listCategories(params: IParams) {
     return this.http
       .get(
-        ENVIRONMENT.LIST +
+        CATEGORY.LIST +
           `/${params.orgId}` +
           `/${params.pageNumber}/${params.limit}`
       )
@@ -26,13 +26,16 @@ export class EnvironmentService {
       );
   }
 
-  addEnvironment(envForm: FormGroup) {
-    const { name, description, organisation } = envForm.value;
+  addCategory(categoryForm: FormGroup) {
+    const { name, description, organisation, environments, config } =
+      categoryForm.value;
     return this.http
-      .post(ENVIRONMENT.ADD, {
+      .post(CATEGORY.ADD, {
         name,
         description,
         organisation,
+        environments,
+        config,
       })
       .pipe(
         map((response: any) => {
@@ -42,8 +45,8 @@ export class EnvironmentService {
       );
   }
 
-  deleteEnvironment(envId: string) {
-    return this.http.delete(ENVIRONMENT.DELETE + `${envId}`).pipe(
+  deleteCategory(id: string) {
+    return this.http.delete(CATEGORY.DELETE + `${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -51,8 +54,8 @@ export class EnvironmentService {
     );
   }
 
-  viewEnvironment(envId: string) {
-    return this.http.get(ENVIRONMENT.VIEW + `${envId}`).pipe(
+  viewCategory(categoryId: string) {
+    return this.http.get(CATEGORY.VIEW + `${categoryId}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;

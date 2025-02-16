@@ -1,1 +1,93 @@
-<p>view-category works!</p>
+<div class="view-category-wrapper">
+    <div class="view-category-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" (click)="goBack()">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Category Details</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton class="p-button-outlined" (click)="onEdit()">
+                    <i class="pi pi-pencil mr-2"></i>Edit
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content-section" *ngIf="categoryData">
+            <div class="details-grid">
+                <!-- Basic Information -->
+                <div class="info-section">
+                    <h3>
+                        <i class="pi pi-info-circle mr-2"></i>
+                        Basic Information
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Name</label>
+                            <p>{{ categoryData.name }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Description</label>
+                            <p>{{ categoryData.description || 'No description available' }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Status</label>
+                            <span class="status-badge" [class.active]="categoryData.status === 1">
+                                <i class="pi"
+                                    [ngClass]="categoryData.status === 1 ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                                {{ categoryData.status === 1 ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <label>Organization</label>
+                            <p class="with-icon">
+                                <i class="pi pi-building mr-2"></i>
+                                {{ categoryData.organisation?.name }}
+                            </p>
+                        </div>
+                        <div class="info-item">
+                            <label>Created On</label>
+                            <p class="with-icon">
+                                <i class="pi pi-calendar mr-2"></i>
+                                {{ categoryData.createdOn | date:'medium' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fields Configuration -->
+                <div class="info-section">
+                    <h3>
+                        <i class="pi pi-list mr-2"></i>
+                        Field Configuration
+                        <span class="count-badge">{{ categoryData.configurations.length }}</span>
+                    </h3>
+                    <div class="fields-list">
+                        <div class="field-item" *ngFor="let field of categoryData.configurations">
+                            <i class="pi pi-tag"></i>
+                            <span>{{ field.fieldName }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Environment Mappings -->
+                <div class="info-section">
+                    <h3>
+                        <i class="pi pi-globe mr-2"></i>
+                        Environment Mappings
+                        <span class="count-badge">{{ categoryData.categoryMappings.length }}</span>
+                    </h3>
+                    <div class="fields-list">
+                        <div class="field-item" *ngFor="let mapping of categoryData.categoryMappings">
+                            <i class="pi pi-server"></i>
+                            <span>{{ mapping.environment.name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
