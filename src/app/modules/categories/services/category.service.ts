@@ -79,4 +79,24 @@ export class CategoryService {
         })
       );
   }
+
+  editCategory(categoryData: any) {
+    const { id, name, description, environments, status, config } =
+      categoryData;
+    return this.http
+      .put(CATEGORY.EDIT, {
+        id,
+        name,
+        description,
+        environments,
+        status,
+        config,
+      })
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
 }

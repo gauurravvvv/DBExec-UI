@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CATEGORY } from 'src/app/constants/routes';
 import { CategoryService } from '../../services/category.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-view-category',
@@ -11,11 +12,13 @@ import { CategoryService } from '../../services/category.service';
 export class ViewCategoryComponent implements OnInit {
   categoryId: string = '';
   categoryData: any = null;
+  showDeleteConfirm = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -40,5 +43,38 @@ export class ViewCategoryComponent implements OnInit {
 
   goBack() {
     this.router.navigate([CATEGORY.LIST]);
+  }
+
+  confirmDelete(): void {
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
+  }
+
+  proceedDelete(): void {
+    if (this.categoryData) {
+      this.categoryService.deleteCategory(this.categoryData.id).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Category deleted successfully',
+          });
+          this.router.navigate(['/app/category']);
+        },
+        error: error => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to delete category',
+          });
+        },
+        complete: () => {
+          this.showDeleteConfirm = false;
+        },
+      });
+    }
   }
 }
