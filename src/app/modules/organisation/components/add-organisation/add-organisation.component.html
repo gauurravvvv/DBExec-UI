@@ -12,16 +12,39 @@
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
                     [disabled]="!isFormDirty" (click)="onCancel()">
                 </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="orgForm.invalid">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
+                <ng-container *ngIf="currentStep === 0">
+                    <button pButton type="button" label="Next" (click)="nextStep()" class="p-button-outlined"
+                        [disabled]="!isBasicInfoValid()">
+                        <i class="pi pi-arrow-right ml-2"></i>
+                    </button>
+                </ng-container>
+                <ng-container *ngIf="currentStep === 1">
+                    <button pButton type="button" label="Previous" class="p-button-outlined" (click)="previousStep()">
+                        <i class="pi pi-arrow-left mr-2"></i>
+                    </button>
+                    <button pButton type="submit" label="Save" (click)="onSubmit()" [disabled]="orgForm.invalid">
+                        <i class="pi pi-save mr-2"></i>
+                    </button>
+                </ng-container>
             </div>
         </div>
 
-        <!-- Form Section -->
-        <form [formGroup]="orgForm" class="admin-form">
-            <div class="form-grid">
+        <!-- Steps -->
+        <div class="steps-container" [ngClass]="'step-' + (currentStep + 1)">
+            <div class="step" [class.active]="currentStep === 0">
+                <div class="step-dot">1</div>
+                <span class="step-label">Basic Information</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" [class.active]="currentStep === 1">
+                <div class="step-dot">2</div>
+                <span class="step-label">Organisation Configuration</span>
+            </div>
+        </div>
+
+        <form [formGroup]="orgForm" class="admin-form mt-4">
+            <!-- Step 1: Basic Information -->
+            <div *ngIf="currentStep === 0" class="form-grid">
                 <!-- Organisation Name -->
                 <div class="form-field">
                     <label for="name">Organisation Name <span class="required">*</span></label>
@@ -34,6 +57,37 @@
                     <small class="error-message" *ngIf="orgForm.get('name')?.invalid && orgForm.get('name')?.touched">
                         Organisation name is required
                     </small>
+                </div>
+
+                <!-- Organisation Description -->
+                <div class="form-field">
+                    <label for="description">Organisation Description <span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-align-left"></i>
+                        <input id="description" type="text" pInputText formControlName="description"
+                            placeholder="Enter organisation description"
+                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('description')?.invalid && orgForm.get('description')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="orgForm.get('description')?.invalid && orgForm.get('description')?.touched">
+                        Organisation description is required
+                    </small>
+                </div>
+            </div>
+
+            <!-- Step 2: Organisation Configuration -->
+            <div *ngIf="currentStep === 1" class="form-grid">
+                <!-- Database Preference -->
+                <div class="form-field">
+                    <label for="databasePreference">Database Preference</label>
+                    <div class="d-flex align-items-center pt-2 ml-3">
+                        <p-inputSwitch formControlName="use_own_db" [trueValue]="1" [falseValue]="0">
+                        </p-inputSwitch>
+                        <span class="ml-2 mb-1">
+                            {{ orgForm.get('use_own_db')?.value === 1 ? 'Self-Managed Database' : 'Cloud-Managed
+                            Database' }}
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Max Admins -->
@@ -102,8 +156,8 @@
                     </small>
                 </div>
 
-                <!-- Max Databases -->
-                <div class="form-field">
+                <!-- Max Databases - Show only when use_own_db is 0 -->
+                <div class="form-field" *ngIf="orgForm.get('use_own_db')?.value === 0">
                     <label for="maxDatabases">Maximum Databases <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-database"></i>
@@ -118,7 +172,6 @@
                         <span *ngIf="orgForm.get('maxDatabases')?.errors?.['min']">Value must be at least 1</span>
                     </small>
                 </div>
-
             </div>
         </form>
     </div>

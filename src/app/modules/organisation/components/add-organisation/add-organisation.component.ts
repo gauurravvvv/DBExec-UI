@@ -11,8 +11,9 @@ import { GlobalService } from 'src/app/core/services/global.service';
   styleUrls: ['./add-organisation.component.scss'],
 })
 export class AddOrganisationComponent implements OnInit {
-  orgForm: FormGroup;
-  isFormDirty: boolean = false;
+  orgForm!: FormGroup;
+  currentStep = 0;
+  isFormDirty = false;
 
   constructor(
     private fb: FormBuilder,
@@ -20,28 +21,60 @@ export class AddOrganisationComponent implements OnInit {
     private organisationService: OrganisationService,
     private globalService: GlobalService
   ) {
+    this.initForm();
+  }
+
+  ngOnInit(): void {
+    this.orgForm.valueChanges.subscribe(() => {
+      this.isFormDirty = true;
+    });
+  }
+
+  private initForm() {
     this.orgForm = this.fb.group({
       name: ['', [Validators.required]],
+      description: ['', [Validators.required]],
+      use_own_db: [0, Validators.required],
       maxAdmins: ['', [Validators.required, Validators.min(1)]],
       maxUsers: ['', [Validators.required, Validators.min(1)]],
       maxEnvironments: ['', [Validators.required, Validators.min(1)]],
       maxCategories: ['', [Validators.required, Validators.min(1)]],
       maxDatabases: ['', [Validators.required, Validators.min(1)]],
     });
-  }
 
-  ngOnInit(): void {
-    this.watchFormChanges();
-  }
-
-  private watchFormChanges(): void {
-    this.orgForm.valueChanges.subscribe(() => {
-      this.isFormDirty = this.orgForm.dirty;
+    this.orgForm.get('use_own_db')?.valueChanges.subscribe(value => {
+      const maxDatabasesControl = this.orgForm.get('maxDatabases');
+      if (value === 0) {
+        maxDatabasesControl?.setValidators([
+          Validators.required,
+          Validators.min(1),
+        ]);
+      } else {
+        maxDatabasesControl?.clearValidators();
+        maxDatabasesControl?.setValue('');
+      }
+      maxDatabasesControl?.updateValueAndValidity();
     });
   }
 
-  onNumberInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
+  isBasicInfoValid(): boolean {
+    const nameControl = this.orgForm.get('name');
+    const descriptionControl = this.orgForm.get('description');
+    return (nameControl?.valid && descriptionControl?.valid) || false;
+  }
+
+  nextStep() {
+    if (this.isBasicInfoValid()) {
+      this.currentStep = 1;
+    }
+  }
+
+  previousStep() {
+    this.currentStep = 0;
+  }
+
+  onNumberInput(event: any) {
+    const input = event.target;
     input.value = input.value.replace(/[^0-9]/g, '');
 
     // Update form control value

@@ -36,6 +36,19 @@
                     </small>
                 </div>
 
+                <!-- Database Preference -->
+                <div class="form-field">
+                    <label for="databasePreference">Database Preference</label>
+                    <div class="d-flex align-items-center pt-2 ml-3">
+                        <p-inputSwitch formControlName="use_own_db" [trueValue]="1" [falseValue]="0" [disabled]="true">
+                        </p-inputSwitch>
+                        <span class="ml-2 mb-1">
+                            {{ orgForm.get('use_own_db')?.value === 1 ? 'Self-Managed Database' : 'Cloud-Managed
+                            Database' }}
+                        </span>
+                    </div>
+                </div>
+
                 <!-- Max Admins -->
                 <div class="form-field">
                     <label for="maxAdmins">Maximum Admins <span class="required">*</span></label>

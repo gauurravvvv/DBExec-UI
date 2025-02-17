@@ -36,6 +36,7 @@ export class EditOrganisationComponent implements OnInit {
     this.orgForm = this.fb.group({
       id: [''],
       name: ['', [Validators.required]],
+      use_own_db: [{ value: 0, disabled: true }, Validators.required],
       maxAdmins: ['', [Validators.required, Validators.min(1)]],
       maxUsers: ['', [Validators.required, Validators.min(1)]],
       maxEnvironments: ['', [Validators.required, Validators.min(1)]],
@@ -59,6 +60,7 @@ export class EditOrganisationComponent implements OnInit {
         maxUsers: this.orgData?.config?.maxUsers,
         maxEnvironments: this.orgData?.config?.maxEnvironment,
         maxCategories: this.orgData?.config?.maxCategories,
+        use_own_db: this.orgData?.use_own_db,
       };
 
       // Check if any value is different from original
@@ -83,6 +85,7 @@ export class EditOrganisationComponent implements OnInit {
             maxUsers: this.orgData.config.maxUsers,
             maxEnvironments: this.orgData.config.maxEnvironment,
             maxCategories: this.orgData.config.maxCategories,
+            use_own_db: this.orgData.use_own_db,
           });
           this.isFormDirty = false;
         }
@@ -132,6 +135,7 @@ export class EditOrganisationComponent implements OnInit {
       maxUsers: this.orgData.config.maxUsers,
       maxEnvironments: this.orgData.config.maxEnvironment,
       maxCategories: this.orgData.config.maxCategories,
+      use_own_db: this.orgData.use_own_db,
     });
     this.orgForm.markAsPristine();
     this.isCancelClicked = true;

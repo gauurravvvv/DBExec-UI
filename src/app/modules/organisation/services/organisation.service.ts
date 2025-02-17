@@ -25,20 +25,24 @@ export class OrganisationService {
   addOrganisation(orgForm: FormGroup) {
     const {
       name,
+      description,
       maxUsers,
       maxEnvironments,
       maxDatabases,
       maxAdmins,
       maxCategories,
+      use_own_db,
     } = orgForm.value;
     return this.http
       .post(ORGANISATION.ADD, {
         name,
+        description,
         maxUsers,
         maxEnvironments,
         maxDatabases,
         maxAdmins,
         maxCategories,
+        use_own_db,
       })
       .pipe(
         map((response: any) => {
