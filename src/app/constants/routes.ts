@@ -40,9 +40,9 @@ export const USER = {
   VIEW: '/app/users/view',
 };
 
-export const DATABASE_DB = {
-  ADD: '/home/database/setup/add',
-  LIST: '/home/database/setup',
-  EDIT: '/home/database/setup',
-  VIEW: '/home/database/setup',
+export const DATABASE = {
+  ADD: '/app/database/add',
+  LIST: '/app/database',
+  EDIT: '/app/database/edit',
+  VIEW: '/app/database/view',
 };

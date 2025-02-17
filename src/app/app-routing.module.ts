@@ -82,6 +82,13 @@ const routes: Routes = [
             m => m.CategoryModule
           ),
       },
+      {
+        path: 'database',
+        loadChildren: () =>
+          import('./modules/database/database.module').then(
+            m => m.DatabaseModule
+          ),
+      },
     ],
   },
   {

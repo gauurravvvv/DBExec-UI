@@ -25,7 +25,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'setupDB',
-    route: '/home/database/setup',
+    route: '/app/database',
   },
   {
     value: 'dbSchema',
