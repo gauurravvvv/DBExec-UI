@@ -1,0 +1,123 @@
+.add-admin-wrapper {
+  height: 100%;
+  overflow: hidden;
+
+  .add-admin-container {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 1;
+
+      .left-section {
+        display: flex;
+        align-items: center;
+
+        h2 {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 500;
+          color: #343a40;
+        }
+
+        .p-button {
+          min-width: 0rem;
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+      }
+    }
+
+    .admin-form {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        width: 50%;
+
+        .form-field {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          width: 100%;
+
+          label {
+            font-weight: 500;
+            color: #333;
+
+            .required {
+              color: red;
+              margin-left: 4px;
+            }
+          }
+
+          .error-message {
+            color: red;
+            font-size: 0.8rem;
+          }
+
+          .p-input-icon-left {
+            width: 100%;
+
+            input {
+              width: 100%;
+              padding-left: 2.5rem;
+            }
+          }
+
+          .readonly {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+}
+
+.acknowledgment-section {
+  margin: 1.5rem 0;
+
+  .p-field-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-left: 1rem;
+
+    .acknowledgment-text {
+      color: #495057;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+:host ::ng-deep {
+  .p-checkbox {
+    .p-checkbox-box {
+      &.p-highlight {
+        border-color: #2196f3;
+        background: #2196f3;
+      }
+    }
+  }
+}

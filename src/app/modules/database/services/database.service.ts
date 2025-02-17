@@ -35,7 +35,7 @@ export class DatabaseService {
     );
   }
 
-  addDatabase(dbForm: FormGroup) {
+  addDatabase(payload: any) {
     const {
       name,
       description,
@@ -47,7 +47,7 @@ export class DatabaseService {
       password,
       organisation,
       environment,
-    } = dbForm.getRawValue();
+    } = payload;
     return this.http
       .post(DATABASE.ADD, {
         name,
