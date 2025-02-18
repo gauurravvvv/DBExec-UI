@@ -69,4 +69,22 @@ $icon-url: '../icons/';
   &.ci-user-tie {
     content: url($icon-url + 'user-tie.svg');
   }
+  &.ci-columns {
+    content: url($icon-url + 'column.svg');
+  }
+  &.ci-eye-slash {
+    content: url($icon-url + 'table-view.svg');
+  }
+  &.ci-list-ol {
+    content: url($icon-url + 'indexes.svg');
+  }
+  &.ci-sort-numeric {
+    content: url($icon-url + 'sequence.svg');
+  }
+  &.ci-function {
+    content: url($icon-url + 'function.svg');
+  }
+  &.ci-code {
+    content: url($icon-url + 'code.svg');
+  }
 }
