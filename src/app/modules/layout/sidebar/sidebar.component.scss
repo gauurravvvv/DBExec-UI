@@ -1,15 +1,15 @@
 .sidebar {
-  width: 260px;
+  width: 60px;
   height: 100%;
   background: #1a1a1a;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  transition: width 0.3s ease;
   position: relative;
   display: flex;
   flex-direction: column;
 
-  &.collapsed {
-    width: 70px;
+  &:not(.collapsed) {
+    width: 280px;
   }
 
   .sidebar-header {

@@ -72,6 +72,9 @@ $icon-url: '../icons/';
   &.ci-columns {
     content: url($icon-url + 'column.svg');
   }
+  &.ci-eye {
+    content: url($icon-url + 'eye.svg');
+  }
   &.ci-eye-slash {
     content: url($icon-url + 'table-view.svg');
   }
