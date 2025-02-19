@@ -172,6 +172,22 @@
                         <span *ngIf="orgForm.get('maxDatabases')?.errors?.['min']">Value must be at least 1</span>
                     </small>
                 </div>
+
+                <!-- Acknowledgment Checkbox -->
+                <div class="form-field acknowledgment-section">
+                    <div class="p-field-checkbox">
+                        <p-checkbox formControlName="acknowledgment" [binary]="true" inputId="acknowledgment">
+                        </p-checkbox>
+                        <label for="acknowledgment" class="acknowledgment-text">
+                            I acknowledge that DBExec can create a separate schema with name dbexec_master in my
+                            database
+                        </label>
+                    </div>
+                    <small class="error-message"
+                        *ngIf="orgForm.get('acknowledgment')?.invalid && orgForm.get('acknowledgment')?.touched">
+                        Please acknowledge this requirement
+                    </small>
+                </div>
             </div>
         </form>
     </div>

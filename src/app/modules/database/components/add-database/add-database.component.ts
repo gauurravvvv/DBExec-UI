@@ -20,6 +20,7 @@ export class AddDatabaseComponent implements OnInit {
   environments: any[] = [];
   isFormDirty = false;
   showOrganisationDropdown = false;
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -60,22 +61,21 @@ export class AddDatabaseComponent implements OnInit {
       description: ['', Validators.required],
       type: [{ value: 'postgres', disabled: true }],
       host: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
-      port: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      port: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^[0-9]+$'),
+          Validators.min(1),
+          Validators.max(65535),
+        ],
+      ],
       database: [
         '',
         [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')],
       ],
       username: ['', Validators.required],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(8),
-          Validators.pattern(
-            '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$'
-          ),
-        ],
-      ],
+      password: ['', [Validators.required]],
       environment: ['', Validators.required],
       organisation: {
         value: orgId,
@@ -83,6 +83,7 @@ export class AddDatabaseComponent implements OnInit {
         validator: Validators.required,
       },
       acknowledgment: [false, Validators.requiredTrue],
+      schemaAcknowledgment: [false, Validators.requiredTrue],
     });
   }
 
@@ -200,6 +201,10 @@ export class AddDatabaseComponent implements OnInit {
       if (fieldName === 'password' && control.errors['pattern']) {
         return 'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character';
       }
+      if (control.errors['min'] && fieldName === 'port')
+        return 'Port must be at least 1';
+      if (control.errors['max'] && fieldName === 'port')
+        return 'Port cannot exceed 65535';
     }
     return '';
   }
@@ -222,5 +227,21 @@ export class AddDatabaseComponent implements OnInit {
       this.databaseForm.valid &&
       this.databaseForm.get('acknowledgment')?.value === true
     );
+  }
+
+  onPortKeyPress(event: KeyboardEvent): boolean {
+    const pattern = /[0-9]/;
+    const inputChar = String.fromCharCode(event.charCode);
+
+    if (!pattern.test(inputChar)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  togglePassword(event: Event): void {
+    event.preventDefault();
+    this.showPassword = !this.showPassword;
   }
 }

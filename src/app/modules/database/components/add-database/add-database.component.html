@@ -78,7 +78,8 @@
                     <label for="port">Port<span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-hashtag"></i>
-                        <input id="port" pInputText formControlName="port" placeholder="Enter database port"
+                        <input id="port" type="number" pInputText formControlName="port"
+                            placeholder="Enter database port" min="1" max="65535" (keypress)="onPortKeyPress($event)"
                             [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('port')?.invalid && databaseForm.get('port')?.touched}">
                     </span>
                     <small class="error-message"
@@ -118,11 +119,12 @@
                 <!-- Password Field -->
                 <div class="form-field">
                     <label for="password">Password<span class="required">*</span></label>
-                    <span class="p-input-icon-left">
+                    <span class="p-input-icon-left p-input-icon-right">
                         <i class="pi pi-lock"></i>
-                        <input id="password" type="password" pInputText formControlName="password"
-                            placeholder="Enter database password"
+                        <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
+                            formControlName="password" placeholder="Enter database password"
                             [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('password')?.invalid && databaseForm.get('password')?.touched}">
+                        <i class="pi pi-eye" style="cursor: pointer;" (click)="togglePassword($event)"></i>
                     </span>
                     <small class="error-message"
                         *ngIf="databaseForm.get('password')?.invalid && databaseForm.get('password')?.touched">
@@ -160,14 +162,49 @@
                 </div>
             </div>
 
-            <!-- Add this before your form buttons section -->
-            <div class="acknowledgment-section">
-                <div class="p-field-checkbox">
-                    <p-checkbox formControlName="acknowledgment" [binary]="true" inputId="acknowledgment">
-                    </p-checkbox>
-                    <label for="acknowledgment" class="acknowledgment-text">
-                        I acknowledge that the username provided has admin privileges for this database
-                    </label>
+            <!-- Acknowledgments Section -->
+            <div class="acknowledgments-container">
+                <h3 class="acknowledgments-title">Required Acknowledgments</h3>
+
+                <div class="acknowledgment-card">
+                    <div class="p-field-checkbox">
+                        <p-checkbox formControlName="acknowledgment" [binary]="true" inputId="acknowledgment">
+                        </p-checkbox>
+                        <div class="acknowledgment-content">
+                            <label for="acknowledgment" class="acknowledgment-label">
+                                Database Administrator Privileges
+                            </label>
+                            <p class="acknowledgment-text">
+                                I acknowledge that the username provided has admin privileges for this database.
+                            </p>
+                        </div>
+                    </div>
+                    <small class="error-message"
+                        *ngIf="databaseForm.get('acknowledgment')?.invalid && databaseForm.get('acknowledgment')?.touched">
+                        Please acknowledge this requirement
+                    </small>
+                </div>
+
+                <div class="acknowledgment-card">
+                    <div class="p-field-checkbox">
+                        <p-checkbox formControlName="schemaAcknowledgment" [binary]="true"
+                            inputId="schemaAcknowledgment">
+                        </p-checkbox>
+                        <div class="acknowledgment-content">
+                            <label for="schemaAcknowledgment" class="acknowledgment-label">
+                                Schema Creation Authorization
+                            </label>
+                            <p class="acknowledgment-text">
+                                I hereby authorize DBExec to create and maintain a dedicated schema named
+                                'dbexec_master' within
+                                the specified database for system operations.
+                            </p>
+                        </div>
+                    </div>
+                    <small class="error-message"
+                        *ngIf="databaseForm.get('schemaAcknowledgment')?.invalid && databaseForm.get('schemaAcknowledgment')?.touched">
+                        Please acknowledge this requirement
+                    </small>
                 </div>
             </div>
         </form>
