@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ORGANISATION } from 'src/app/constants/routes';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-edit-organisation',
@@ -16,13 +17,15 @@ export class EditOrganisationComponent implements OnInit {
   organisationId!: string;
   orgData: any;
   isCancelClicked: boolean = false;
+  currentStep = 0;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private organisationService: OrganisationService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
+    private messageService: MessageService
   ) {
     this.initForm();
   }
@@ -36,7 +39,7 @@ export class EditOrganisationComponent implements OnInit {
     this.orgForm = this.fb.group({
       id: [''],
       name: ['', [Validators.required]],
-      use_own_db: [{ value: 0, disabled: true }, Validators.required],
+      description: ['', [Validators.required]],
       maxAdmins: ['', [Validators.required, Validators.min(1)]],
       maxUsers: ['', [Validators.required, Validators.min(1)]],
       maxEnvironments: ['', [Validators.required, Validators.min(1)]],
@@ -54,13 +57,13 @@ export class EditOrganisationComponent implements OnInit {
       const originalValue: any = {
         id: this.orgData?.id,
         name: this.orgData?.name,
+        description: this.orgData?.description,
         status: this.orgData?.status,
         maxDatabases: this.orgData?.config?.maxDatabases,
         maxAdmins: this.orgData?.config?.maxAdmins,
         maxUsers: this.orgData?.config?.maxUsers,
         maxEnvironments: this.orgData?.config?.maxEnvironment,
         maxCategories: this.orgData?.config?.maxCategories,
-        use_own_db: this.orgData?.use_own_db,
       };
 
       // Check if any value is different from original
@@ -79,13 +82,13 @@ export class EditOrganisationComponent implements OnInit {
           this.orgForm.patchValue({
             id: this.orgData.id,
             name: this.orgData.name,
+            description: this.orgData.description,
             status: this.orgData.status,
             maxDatabases: this.orgData.config.maxDatabases,
             maxAdmins: this.orgData.config.maxAdmins,
             maxUsers: this.orgData.config.maxUsers,
             maxEnvironments: this.orgData.config.maxEnvironment,
             maxCategories: this.orgData.config.maxCategories,
-            use_own_db: this.orgData.use_own_db,
           });
           this.isFormDirty = false;
         }
@@ -129,15 +132,44 @@ export class EditOrganisationComponent implements OnInit {
     this.orgForm.patchValue({
       id: this.orgData.id,
       name: this.orgData.name,
+      description: this.orgData.description,
       status: this.orgData.status,
       maxDatabases: this.orgData.config.maxDatabases,
       maxAdmins: this.orgData.config.maxAdmins,
       maxUsers: this.orgData.config.maxUsers,
       maxEnvironments: this.orgData.config.maxEnvironment,
       maxCategories: this.orgData.config.maxCategories,
-      use_own_db: this.orgData.use_own_db,
     });
     this.orgForm.markAsPristine();
     this.isCancelClicked = true;
+  }
+
+  nextStep(): void {
+    if (this.currentStep < 1 && this.isBasicInfoValid()) {
+      this.currentStep++;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+    }
+  }
+
+  goToStep(step: number): void {
+    if (step === 1 && !this.isBasicInfoValid()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please complete the basic information first',
+      });
+      return;
+    }
+    this.currentStep = step;
+  }
+
+  isBasicInfoValid(): boolean {
+    const basicControls = ['name'];
+    return basicControls.every(control => this.orgForm.get(control)?.valid);
   }
 }

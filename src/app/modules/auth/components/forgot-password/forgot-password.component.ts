@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from '../../services/auth.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-forgot-password',
@@ -22,8 +23,8 @@ export class ForgotPasswordComponent implements OnInit {
     private globalService: GlobalService
   ) {
     this.forgotPasswordForm = this.fb.group({
-      organisation: ['', Validators.required],
-      username: ['', Validators.required],
+      organisation: ['', [Validators.required, REGEX.orgName]],
+      username: ['', [Validators.required, REGEX.username]],
       email: ['', [Validators.required, Validators.email]],
     });
   }

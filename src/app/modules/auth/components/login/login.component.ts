@@ -5,6 +5,7 @@ import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from '../../services/auth.service';
 import { ROLES } from 'src/app/constants/user.constant';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-login',
@@ -23,9 +24,12 @@ export class LoginComponent implements OnInit {
     private globalService: GlobalService
   ) {
     this.loginForm = this.fb.group({
-      organisation: ['', Validators.required],
-      username: ['', Validators.required],
-      password: ['', Validators.required],
+      organisation: [
+        '',
+        [Validators.required, Validators.pattern(REGEX.orgName)],
+      ],
+      username: ['', [Validators.required, Validators.pattern(REGEX.username)]],
+      password: ['', [Validators.required, Validators.pattern(REGEX.password)]],
       rememberMe: [false],
     });
   }

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-add-organisation',
@@ -32,28 +33,13 @@ export class AddOrganisationComponent implements OnInit {
 
   private initForm() {
     this.orgForm = this.fb.group({
-      name: ['', [Validators.required]],
+      name: ['', [Validators.required, Validators.pattern(REGEX.orgName)]],
       description: ['', [Validators.required]],
-      use_own_db: [0, Validators.required],
       maxAdmins: ['', [Validators.required, Validators.min(1)]],
       maxUsers: ['', [Validators.required, Validators.min(1)]],
       maxEnvironments: ['', [Validators.required, Validators.min(1)]],
       maxCategories: ['', [Validators.required, Validators.min(1)]],
       maxDatabases: ['', [Validators.required, Validators.min(1)]],
-    });
-
-    this.orgForm.get('use_own_db')?.valueChanges.subscribe(value => {
-      const maxDatabasesControl = this.orgForm.get('maxDatabases');
-      if (value === 0) {
-        maxDatabasesControl?.setValidators([
-          Validators.required,
-          Validators.min(1),
-        ]);
-      } else {
-        maxDatabasesControl?.clearValidators();
-        maxDatabasesControl?.setValue('');
-      }
-      maxDatabasesControl?.updateValueAndValidity();
     });
   }
 

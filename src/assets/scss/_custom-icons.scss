@@ -90,4 +90,7 @@ $icon-url: '../icons/';
   &.ci-code {
     content: url($icon-url + 'code.svg');
   }
+  &.ci-site-map {
+    content: url($icon-url + 'site-map.svg');
+  }
 }

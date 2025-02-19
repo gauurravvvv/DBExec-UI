@@ -6,6 +6,7 @@ import { OrganisationAdminService } from '../../services/organisationAdmin.servi
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-add-org-admin',
@@ -44,34 +45,20 @@ export class AddOrgAdminComponent implements OnInit {
     this.orgForm = this.fb.group({
       firstName: [
         '',
-        [
-          Validators.required,
-          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
-        ],
+        [Validators.required, Validators.pattern(REGEX.firstName)],
       ],
-      lastName: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
-        ],
-      ],
+      lastName: ['', [Validators.required, Validators.pattern(REGEX.lastName)]],
       username: [
         '',
         [
           Validators.required,
           Validators.minLength(4),
-          Validators.pattern('^[a-zA-Z0-9_]+$'),
+          Validators.pattern(REGEX.username),
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      password: [
-        '',
-        Validators.pattern(
-          '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'
-        ),
-      ],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      password: ['', [Validators.required, Validators.pattern(REGEX.password)]],
+      mobile: ['', [Validators.required, Validators.pattern(REGEX.mobile)]],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
           ? ''

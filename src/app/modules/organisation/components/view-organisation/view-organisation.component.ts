@@ -3,20 +3,20 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
 import { MessageService } from 'primeng/api';
 
+interface OrganisationConfig {
+  maxDatabases: number;
+  maxAdmins: number;
+  maxUsers: number;
+  maxEnvironment: number;
+  maxCategories: number;
+}
+
 interface OrganisationData {
-  id: number;
+  id: string;
   name: string;
   status: number;
-  createdOn: string;
-  config: {
-    id: number;
-    maxDatabases: number;
-    maxAdmins: number;
-    maxUsers: number;
-    maxEnvironment: number;
-    maxCategories: number;
-    createdOn: string;
-  };
+  createdOn: Date;
+  config: OrganisationConfig;
 }
 
 @Component({

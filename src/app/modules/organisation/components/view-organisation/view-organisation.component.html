@@ -1,4 +1,4 @@
-<div class="view-organisation-wrapper">
+<div class="view-organisation-wrapper" *ngIf="organisationData">
     <div class="view-organisation-container">
         <!-- Header Section -->
         <div class="page-header">
@@ -31,10 +31,10 @@
                             <div class="avatar-circle" [style.background-color]="avatarBackground">
                                 {{ organisationInitials }}
                             </div>
-                            <h3 class="organisation-name">{{ organisationData?.name }}</h3>
+                            <h3 class="organisation-name">{{ organisationData.name }}</h3>
                             <div class="status-indicator">
-                                <span class="status-badge" [class.active]="organisationData?.status === 1">
-                                    {{ organisationData?.status === 1 ? 'Active' : 'Inactive' }}
+                                <span class="status-badge" [class.active]="organisationData.status === 1">
+                                    {{ organisationData.status === 1 ? 'Active' : 'Inactive' }}
                                 </span>
                             </div>
                         </div>
@@ -49,21 +49,21 @@
                                     <i class="pi pi-building"></i>
                                     Organisation Name
                                 </span>
-                                <span class="value">{{ organisationData?.name }}</span>
+                                <span class="value">{{ organisationData.name }}</span>
                             </div>
                             <div class="detail-item">
                                 <span class="label">
                                     <i class="pi pi-id-card"></i>
                                     Organisation ID
                                 </span>
-                                <span class="value">#{{ organisationData?.id }}</span>
+                                <span class="value">#{{ organisationData.id }}</span>
                             </div>
                             <div class="detail-item">
                                 <span class="label">
                                     <i class="pi pi-calendar"></i>
                                     Created On
                                 </span>
-                                <span class="value">{{ organisationData?.createdOn | date:'medium' }}</span>
+                                <span class="value">{{ organisationData.createdOn | date:'medium' }}</span>
                             </div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                                 </div>
                                 <div class="resource-details">
                                     <span class="resource-label">Max Databases</span>
-                                    <span class="resource-value">{{ organisationData?.config?.maxDatabases }}</span>
+                                    <span class="resource-value">{{ organisationData.config.maxDatabases }}</span>
                                 </div>
                             </div>
                             <div class="resource-item">
@@ -90,7 +90,7 @@
                                 </div>
                                 <div class="resource-details">
                                     <span class="resource-label">Max Admins</span>
-                                    <span class="resource-value">{{ organisationData?.config?.maxAdmins }}</span>
+                                    <span class="resource-value">{{ organisationData.config.maxAdmins }}</span>
                                 </div>
                             </div>
                             <div class="resource-item">
@@ -99,7 +99,7 @@
                                 </div>
                                 <div class="resource-details">
                                     <span class="resource-label">Max Users</span>
-                                    <span class="resource-value">{{ organisationData?.config?.maxUsers }}</span>
+                                    <span class="resource-value">{{ organisationData.config.maxUsers }}</span>
                                 </div>
                             </div>
                             <div class="resource-item">
@@ -108,7 +108,7 @@
                                 </div>
                                 <div class="resource-details">
                                     <span class="resource-label">Max Environments</span>
-                                    <span class="resource-value">{{ organisationData?.config?.maxEnvironment }}</span>
+                                    <span class="resource-value">{{ organisationData.config.maxEnvironment }}</span>
                                 </div>
                             </div>
                             <div class="resource-item">
@@ -117,7 +117,7 @@
                                 </div>
                                 <div class="resource-details">
                                     <span class="resource-label">Max Categories</span>
-                                    <span class="resource-value">{{ organisationData?.config?.maxCategories }}</span>
+                                    <span class="resource-value">{{ organisationData.config.maxCategories }}</span>
                                 </div>
                             </div>
                         </div>

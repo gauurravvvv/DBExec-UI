@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RESET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from '../../services/auth.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-reset-password',
@@ -25,9 +26,15 @@ export class ResetPasswordComponent implements OnInit {
   ) {
     this.resetPasswordForm = this.fb.group(
       {
-        otp: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
-        newPassword: ['', [Validators.required, Validators.minLength(8)]],
-        confirmPassword: ['', [Validators.required]],
+        otp: ['', [Validators.required, Validators.pattern(REGEX.otp)]],
+        newPassword: [
+          '',
+          [Validators.required, Validators.pattern(REGEX.password)],
+        ],
+        confirmPassword: [
+          '',
+          [Validators.required, Validators.pattern(REGEX.password)],
+        ],
       },
       {
         validator: this.passwordMatchValidator,

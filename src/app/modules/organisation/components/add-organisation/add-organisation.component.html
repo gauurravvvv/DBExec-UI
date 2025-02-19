@@ -77,19 +77,6 @@
 
             <!-- Step 2: Organisation Configuration -->
             <div *ngIf="currentStep === 1" class="form-grid">
-                <!-- Database Preference -->
-                <div class="form-field">
-                    <label for="databasePreference">Database Preference</label>
-                    <div class="d-flex align-items-center pt-2 ml-3">
-                        <p-inputSwitch formControlName="use_own_db" [trueValue]="1" [falseValue]="0">
-                        </p-inputSwitch>
-                        <span class="ml-2 mb-1">
-                            {{ orgForm.get('use_own_db')?.value === 1 ? 'Self-Managed Database' : 'Cloud-Managed
-                            Database' }}
-                        </span>
-                    </div>
-                </div>
-
                 <!-- Max Admins -->
                 <div class="form-field">
                     <label for="maxAdmins">Maximum Admins <span class="required">*</span></label>
@@ -156,8 +143,8 @@
                     </small>
                 </div>
 
-                <!-- Max Databases - Show only when use_own_db is 0 -->
-                <div class="form-field" *ngIf="orgForm.get('use_own_db')?.value === 0">
+                <!-- Max Databases -->
+                <div class="form-field">
                     <label for="maxDatabases">Maximum Databases <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-database"></i>

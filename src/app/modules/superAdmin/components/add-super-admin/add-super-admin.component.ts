@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-add-super-admin',
@@ -36,37 +37,20 @@ export class AddSuperAdminComponent implements OnInit {
     this.adminForm = this.fb.group({
       firstName: [
         '',
-        [
-          Validators.required,
-          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
-        ],
+        [Validators.required, Validators.pattern(REGEX.firstName)],
       ],
-      lastName: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
-        ],
-      ],
+      lastName: ['', [Validators.required, Validators.pattern(REGEX.lastName)]],
       username: [
         '',
         [
           Validators.required,
           Validators.minLength(4),
-          Validators.pattern('^[a-zA-Z0-9_]+$'),
+          Validators.pattern(REGEX.username),
         ],
       ],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(
-            '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'
-          ),
-        ],
-      ],
+      password: ['', [Validators.required, Validators.pattern(REGEX.password)]],
       email: ['', [Validators.required, Validators.email]],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      mobile: ['', [Validators.required, Validators.pattern(REGEX.mobile)]],
     });
   }
 

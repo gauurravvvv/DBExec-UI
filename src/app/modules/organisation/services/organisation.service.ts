@@ -31,7 +31,6 @@ export class OrganisationService {
       maxDatabases,
       maxAdmins,
       maxCategories,
-      use_own_db,
     } = orgForm.value;
     return this.http
       .post(ORGANISATION.ADD, {
@@ -42,7 +41,6 @@ export class OrganisationService {
         maxDatabases,
         maxAdmins,
         maxCategories,
-        use_own_db,
       })
       .pipe(
         map((response: any) => {
