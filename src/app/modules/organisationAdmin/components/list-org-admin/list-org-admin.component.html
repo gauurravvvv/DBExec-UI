@@ -51,7 +51,8 @@
                         <ng-container *ngIf="filteredAdmins && filteredAdmins.length > 0; else noData">
                             <tr *ngFor="let admin of filteredAdmins">
                                 <td>
-                                    <a class="admin-name" [routerLink]="['/app/org-admin/view', admin.id]">
+                                    <a class="admin-name"
+                                        [routerLink]="['/app/org-admin/view', selectedOrg.id, admin.id]">
                                         {{ admin.firstName + ' ' + admin?.lastName }}
                                     </a>
                                 </td>
@@ -65,11 +66,11 @@
                                 <td>{{ admin.createdOn | date:'mediumDate' }}</td>
                                 <td class="actions">
                                     <button class="action-btn edit" (click)="onEdit(admin.id)" title="Edit"
-                                        [disabled]="admin.id == loggedInUserId">
+                                        [disabled]="!showOrganisationDropdown && admin.id == loggedInUserId">
                                         <i class="pi pi-pencil"></i>
                                     </button>
                                     <button class="action-btn delete" (click)="confirmDelete(admin.id)" title="Delete"
-                                        [disabled]="admin.id == loggedInUserId">
+                                        [disabled]="!showOrganisationDropdown &&admin.id == loggedInUserId">
                                         <i class="pi pi-trash"></i>
                                     </button>
                                 </td>

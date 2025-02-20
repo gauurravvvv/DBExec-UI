@@ -19,6 +19,7 @@ export class EditOrgAdminComponent implements OnInit {
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   selectedOrgName: string = '';
+  selectedOrgId: string = '';
   adminData: any;
 
   constructor(
@@ -33,6 +34,7 @@ export class EditOrgAdminComponent implements OnInit {
 
   ngOnInit() {
     this.adminId = this.route.snapshot.params['id'];
+    this.selectedOrgId = this.route.snapshot.params['orgId'];
     this.loadAdminData();
   }
 
@@ -54,25 +56,27 @@ export class EditOrgAdminComponent implements OnInit {
   }
 
   loadAdminData() {
-    this.orgAdminService.viewOrganisationAdmin(this.adminId).subscribe({
-      next: (response: any) => {
-        this.adminData = response.data;
-        this.orgForm.patchValue({
-          id: this.adminData.id,
-          firstName: this.adminData.firstName,
-          lastName: this.adminData.lastName,
-          username: this.adminData.username,
-          email: this.adminData.email,
-          mobile: this.adminData.mobile,
-          organisation: this.adminData.organisationId,
-          status: this.adminData.status,
-        });
-        this.selectedOrgName = this.adminData.organisationName;
-      },
-      error: error => {
-        console.error('Error loading admin data:', error);
-      },
-    });
+    this.orgAdminService
+      .viewOrganisationAdmin(this.selectedOrgId, this.adminId)
+      .subscribe({
+        next: (response: any) => {
+          this.adminData = response.data;
+          this.orgForm.patchValue({
+            id: this.adminData.id,
+            firstName: this.adminData.firstName,
+            lastName: this.adminData.lastName,
+            username: this.adminData.username,
+            email: this.adminData.email,
+            mobile: this.adminData.mobile,
+            organisation: this.adminData.organisationId,
+            status: this.adminData.status,
+          });
+          this.selectedOrgName = this.adminData.organisationName;
+        },
+        error: error => {
+          console.error('Error loading admin data:', error);
+        },
+      });
   }
 
   onPhoneInput(event: any) {

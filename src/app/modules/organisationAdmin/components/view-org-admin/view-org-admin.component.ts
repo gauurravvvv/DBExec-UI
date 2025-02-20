@@ -22,6 +22,7 @@ export class ViewOrgAdminComponent implements OnInit {
   showChangePassword =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   showChangePasswordDialog = false;
+  selectedOrgId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -32,20 +33,23 @@ export class ViewOrgAdminComponent implements OnInit {
 
   ngOnInit() {
     this.adminId = this.route.snapshot.params['id'];
+    this.selectedOrgId = this.route.snapshot.params['orgId'];
     this.loadAdminData();
   }
 
   loadAdminData() {
-    this.orgAdminService.viewOrganisationAdmin(this.adminId).subscribe({
-      next: (response: any) => {
-        this.adminData = response.data;
-        this.setAdminInitials();
-        this.generateAvatarBackground();
-      },
-      error: error => {
-        console.error('Error loading admin data:', error);
-      },
-    });
+    this.orgAdminService
+      .viewOrganisationAdmin(this.selectedOrgId, this.adminId)
+      .subscribe({
+        next: (response: any) => {
+          this.adminData = response.data;
+          this.setAdminInitials();
+          this.generateAvatarBackground();
+        },
+        error: error => {
+          console.error('Error loading admin data:', error);
+        },
+      });
   }
 
   setAdminInitials() {
@@ -80,14 +84,16 @@ export class ViewOrgAdminComponent implements OnInit {
   }
 
   proceedDelete() {
-    this.orgAdminService.deleteAdminOrganisation(this.adminId).subscribe({
-      next: () => {
-        this.router.navigate([ORGANISATION_ADMIN.LIST]);
-      },
-      error: error => {
-        console.error('Error deleting organisation admin:', error);
-      },
-    });
+    this.orgAdminService
+      .deleteAdminOrganisation(this.selectedOrgId, this.adminId)
+      .subscribe({
+        next: () => {
+          this.router.navigate([ORGANISATION_ADMIN.LIST]);
+        },
+        error: error => {
+          console.error('Error deleting organisation admin:', error);
+        },
+      });
   }
 
   openChangePasswordDialog() {

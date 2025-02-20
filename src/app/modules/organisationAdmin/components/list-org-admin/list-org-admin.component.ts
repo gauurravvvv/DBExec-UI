@@ -157,7 +157,12 @@ export class ListOrgAdminComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([ORGANISATION_ADMIN.EDIT, id]);
+    this.router.navigate([ORGANISATION_ADMIN.EDIT, this.selectedOrg.id, id], {
+      queryParams: {
+        orgId: this.selectedOrg.id,
+        adminId: id,
+      },
+    });
   }
 
   confirmDelete(id: string) {
@@ -173,7 +178,7 @@ export class ListOrgAdminComponent implements OnInit {
   proceedDelete() {
     if (this.adminToDelete) {
       this.orgAdminService
-        .deleteAdminOrganisation(this.adminToDelete)
+        .deleteAdminOrganisation(this.selectedOrg.id, this.adminToDelete)
         .subscribe({
           next: () => {
             this.loadAdmins();

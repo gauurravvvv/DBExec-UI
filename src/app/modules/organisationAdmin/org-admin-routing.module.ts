@@ -14,8 +14,8 @@ const routes: Routes = [
     path: 'add',
     component: AddOrgAdminComponent,
   },
-  { path: 'view/:id', component: ViewOrgAdminComponent },
-  { path: 'edit/:id', component: EditOrgAdminComponent },
+  { path: 'view/:orgId/:id', component: ViewOrgAdminComponent },
+  { path: 'edit/:orgId/:id', component: EditOrgAdminComponent },
 ];
 
 @NgModule({

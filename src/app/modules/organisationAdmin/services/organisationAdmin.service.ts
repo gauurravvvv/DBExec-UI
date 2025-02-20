@@ -54,8 +54,8 @@ export class OrganisationAdminService {
       );
   }
 
-  deleteAdminOrganisation(orgId: string) {
-    return this.http.delete(ORG_ADMIN.DELETE + `${orgId}`).pipe(
+  deleteAdminOrganisation(orgId: string, id: string) {
+    return this.http.delete(ORG_ADMIN.DELETE + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -63,8 +63,8 @@ export class OrganisationAdminService {
     );
   }
 
-  viewOrganisationAdmin(id: string) {
-    return this.http.get(ORG_ADMIN.VIEW + `${id}`).pipe(
+  viewOrganisationAdmin(orgId: string, id: string) {
+    return this.http.get(ORG_ADMIN.VIEW + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -73,8 +73,16 @@ export class OrganisationAdminService {
   }
 
   updateOrgAdmin(orgAdminForm: FormGroup) {
-    const { id, firstName, lastName, username, email, mobile, status } =
-      orgAdminForm.getRawValue();
+    const {
+      id,
+      firstName,
+      lastName,
+      username,
+      email,
+      mobile,
+      status,
+      organisation,
+    } = orgAdminForm.getRawValue();
     return this.http
       .put(ORG_ADMIN.UPDATE, {
         id,
@@ -83,6 +91,7 @@ export class OrganisationAdminService {
         username,
         email,
         mobile,
+        organisation,
         status: status ? 1 : 0,
       })
       .pipe(
