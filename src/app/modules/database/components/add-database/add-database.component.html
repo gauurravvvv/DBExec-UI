@@ -137,9 +137,8 @@
                     <label for="organisation">Organisation<span class="required">*</span></label>
                     <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
                         formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                        [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"
-                        [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('organisation')?.invalid && databaseForm.get('organisation')?.touched}"
-                        (onChange)="onOrganisationChange($event)">
+                        [panelStyle]="{'width':'100%'}" placeholder="Select Organisation" appendTo="body"
+                        [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('organisation')?.invalid && databaseForm.get('organisation')?.touched}">
                     </p-dropdown>
                     <small class="error-message"
                         *ngIf="databaseForm.get('organisation')?.invalid && databaseForm.get('organisation')?.touched">
@@ -147,23 +146,18 @@
                     </small>
                 </div>
 
-                <!-- Environment Dropdown -->
+                <!-- Master DB Toggle -->
                 <div class="form-field">
-                    <label for="environment">Environment<span class="required">*</span></label>
-                    <p-dropdown [options]="environments" optionLabel="name" optionValue="id"
-                        formControlName="environment" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                        [panelStyle]="{'width':'100%'}" placeholder="Select Environment"
-                        [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('environment')?.invalid && databaseForm.get('environment')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="databaseForm.get('environment')?.invalid && databaseForm.get('environment')?.touched">
-                        Environment is required
-                    </small>
+                    <label for="isMasterDB">Master Database</label>
+                    <div class="flex align-items-center gap-2 ml-3">
+                        <p-inputSwitch formControlName="isMasterDB"></p-inputSwitch>
+                        <span class="ml-2">{{ databaseForm.get('isMasterDB')?.value ? 'Yes' : 'No' }}</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Acknowledgments Section -->
-            <div class="acknowledgments-container">
+            <div class="acknowledgments-container" *ngIf="databaseForm.get('isMasterDB')?.value">
                 <h3 class="acknowledgments-title">Required Acknowledgments</h3>
 
                 <div class="acknowledgment-card">
@@ -195,9 +189,8 @@
                                 Schema Creation Authorization
                             </label>
                             <p class="acknowledgment-text">
-                                I hereby authorize DBExec to create and maintain a dedicated schema named
-                                'dbexec_master' within
-                                the specified database for system operations.
+                                I hereby authorize DBExec to create and maintain a 'dbexec_master' schema with all
+                                necessary database objects required for system operations.
                             </p>
                         </div>
                     </div>

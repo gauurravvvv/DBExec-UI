@@ -46,7 +46,7 @@ export class DatabaseService {
       username,
       password,
       organisation,
-      environment,
+      isMasterDB,
     } = payload;
     return this.http
       .post(DATABASE.ADD, {
@@ -59,7 +59,7 @@ export class DatabaseService {
         username,
         password,
         organisation,
-        environment,
+        isMasterDB,
       })
       .pipe(
         map((response: any) => {
@@ -90,6 +90,53 @@ export class DatabaseService {
         email,
         mobile,
         status: status ? 1 : 0,
+      })
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
+
+  viewDatabase(id: string) {
+    return this.http.get(DATABASE.VIEW + `${id}`).pipe(
+      map((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      })
+    );
+  }
+
+  updateDatabase(payload: any) {
+    const {
+      id,
+      name,
+      description,
+      type,
+      host,
+      port,
+      database,
+      username,
+      password,
+      organisation,
+      isMasterDB,
+      status,
+    } = payload;
+    return this.http
+      .put(DATABASE.UPDATE, {
+        id,
+        name,
+        description,
+        type,
+        host,
+        port,
+        database,
+        username,
+        password,
+        organisation,
+        isMasterDB,
+        status,
       })
       .pipe(
         map((response: any) => {

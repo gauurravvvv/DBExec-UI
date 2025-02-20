@@ -30,6 +30,7 @@ export class ListDatabaseComponent implements OnInit {
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
+  selectedDatabase: any = null;
 
   statusFilterItems: MenuItem[] = [
     {
@@ -152,31 +153,31 @@ export class ListDatabaseComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([DATABASE.EDIT, id]);
+    this.router.navigate([DATABASE.EDIT + '/' + id]);
   }
 
-  confirmDelete(id: string) {
-    this.dbToDelete = id;
+  confirmDelete(database: any): void {
+    this.selectedDatabase = database;
     this.showDeleteConfirm = true;
   }
 
-  cancelDelete() {
+  cancelDelete(): void {
+    this.selectedDatabase = null;
     this.showDeleteConfirm = false;
-    this.dbToDelete = null;
   }
 
-  proceedDelete() {
-    if (this.dbToDelete) {
-      this.databaseService.deleteDatabase(this.dbToDelete).subscribe({
+  proceedDelete(): void {
+    if (this.selectedDatabase) {
+      this.databaseService.deleteDatabase(this.selectedDatabase.id).subscribe({
         next: () => {
           this.loaddbs();
           this.showDeleteConfirm = false;
-          this.dbToDelete = null;
+          this.selectedDatabase = null;
         },
         error: error => {
-          console.error('Error deleting env:', error);
+          console.error('Error deleting database:', error);
           this.showDeleteConfirm = false;
-          this.dbToDelete = null;
+          this.selectedDatabase = null;
         },
       });
     }

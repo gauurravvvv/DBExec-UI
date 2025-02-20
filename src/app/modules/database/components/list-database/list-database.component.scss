@@ -485,7 +485,7 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
+    width: 600px;
     max-width: 90%;
 
     h3 {
@@ -768,17 +768,44 @@
       }
 
       &.edit {
-        color: #2196f3;
+        color: #0078d3;
+        &:hover {
+          background: rgba(0, 120, 211, 0.1);
+        }
       }
 
       &.delete {
         color: #f44336;
+        &:hover {
+          background: rgba(244, 67, 54, 0.1);
+        }
       }
+    }
+  }
 
-      &:hover {
-        background: #f5f5f5;
-        border-radius: 4px;
-      }
+  &.master-db {
+    border: 2px solid rgba(0, 120, 211, 0.4);
+    background: linear-gradient(to right bottom, #fff, #e3f2fd);
+  }
+
+  .status-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .master-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #0078d3;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+
+    i {
+      font-size: 0.8rem;
     }
   }
 }
@@ -808,5 +835,103 @@
   .sub-text {
     color: #999;
     font-size: 14px;
+  }
+}
+
+.master-db-warning {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+
+  i {
+    color: #856404;
+    font-size: 1rem;
+    margin-top: 0.2rem;
+  }
+
+  p {
+    margin: 0;
+    color: #856404;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+.warning-container {
+  margin: 1.5rem 0;
+
+  .warning-message {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    border-radius: 4px;
+
+    .warning-header {
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      i {
+        font-size: 1.2rem;
+        color: #856404;
+
+        &.pi-exclamation-triangle {
+          animation: pulse 1s ease-in-out infinite;
+        }
+      }
+
+      .warning-title {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+    }
+
+    .warning-content {
+      border-top: 1px solid #ffeeba;
+      background-color: #fffbf0;
+      padding: 1rem;
+
+      .warning-text {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.5;
+
+        p {
+          margin: 0;
+          margin-bottom: 0.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          i {
+            font-size: 0.4rem;
+            display: flex;
+            align-items: center;
+          }
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
   }
 }

@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { DATABASE } from 'src/app/constants/routes';
 import { DatabaseService } from '../../services/database.service';
-import { EnvironmentService } from 'src/app/modules/environment/services/environment.service';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -17,7 +16,6 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 export class AddDatabaseComponent implements OnInit {
   databaseForm!: FormGroup;
   organisations: any[] = [];
-  environments: any[] = [];
   isFormDirty = false;
   showOrganisationDropdown = false;
   showPassword: boolean = false;
@@ -26,7 +24,6 @@ export class AddDatabaseComponent implements OnInit {
     private fb: FormBuilder,
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
-    private environmentService: EnvironmentService,
     private globalService: GlobalService,
     private messageService: MessageService,
     private router: Router
@@ -39,12 +36,7 @@ export class AddDatabaseComponent implements OnInit {
     this.initForm();
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
-    } else {
-      this.loadEnvironments(
-        this.globalService.getTokenDetails('organisationId')
-      );
     }
-
     this.databaseForm.valueChanges.subscribe(() => {
       this.isFormDirty = true;
     });
@@ -76,14 +68,33 @@ export class AddDatabaseComponent implements OnInit {
       ],
       username: ['', Validators.required],
       password: ['', [Validators.required]],
-      environment: ['', Validators.required],
       organisation: {
         value: orgId,
         disabled: !this.showOrganisationDropdown,
         validator: Validators.required,
       },
-      acknowledgment: [false, Validators.requiredTrue],
-      schemaAcknowledgment: [false, Validators.requiredTrue],
+      acknowledgment: [false],
+      schemaAcknowledgment: [false],
+      isMasterDB: [false],
+    });
+
+    // Subscribe to isMasterDB changes to update validators
+    this.databaseForm.get('isMasterDB')?.valueChanges.subscribe(isMaster => {
+      const acknowledgmentControl = this.databaseForm.get('acknowledgment');
+      const schemaAcknowledgmentControl = this.databaseForm.get(
+        'schemaAcknowledgment'
+      );
+
+      if (isMaster) {
+        acknowledgmentControl?.setValidators(Validators.requiredTrue);
+        schemaAcknowledgmentControl?.setValidators(Validators.requiredTrue);
+      } else {
+        acknowledgmentControl?.clearValidators();
+        schemaAcknowledgmentControl?.clearValidators();
+      }
+
+      acknowledgmentControl?.updateValueAndValidity();
+      schemaAcknowledgmentControl?.updateValueAndValidity();
     });
   }
 
@@ -108,29 +119,6 @@ export class AddDatabaseComponent implements OnInit {
     }
   }
 
-  loadEnvironments(orgId: string): void {
-    if (orgId) {
-      const params = {
-        orgId,
-        pageNumber: 1,
-        limit: 100,
-      };
-
-      this.environmentService.listEnvironments(params).subscribe({
-        next: response => {
-          this.environments = response.data.envs;
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load environments',
-          });
-        },
-      });
-    }
-  }
-
   onSubmit(): void {
     if (this.databaseForm.valid) {
       const formValue = this.databaseForm.getRawValue();
@@ -147,7 +135,7 @@ export class AddDatabaseComponent implements OnInit {
         organisation: this.showOrganisationDropdown
           ? formValue.organisation
           : formValue.organisation.value,
-        environment: formValue.environment,
+        isMasterDB: formValue.isMasterDB,
       };
 
       this.databaseService.addDatabase(payload).subscribe({
@@ -207,19 +195,6 @@ export class AddDatabaseComponent implements OnInit {
         return 'Port cannot exceed 65535';
     }
     return '';
-  }
-
-  onOrganisationChange(event: any): void {
-    const orgId = event.value;
-    if (orgId) {
-      this.databaseForm.patchValue({
-        environment: '',
-      });
-
-      this.loadEnvironments(orgId);
-    } else {
-      this.environments = [];
-    }
   }
 
   canSubmit(): boolean {
