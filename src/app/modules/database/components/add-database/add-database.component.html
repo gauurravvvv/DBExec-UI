@@ -10,7 +10,7 @@
             </div>
             <div class="action-buttons">
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
-                    [disabled]="!isFormDirty" (click)="onCancel()">
+                    [disabled]="!isFormDirty || databaseForm.invalid" (click)="onCancel()">
                 </button>
                 <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
                     [disabled]="databaseForm.invalid">
@@ -28,7 +28,8 @@
                     <span class="p-input-icon-left">
                         <i class="pi pi-database"></i>
                         <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched}">
+                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched}"
+                            class="p-inputtext">
                     </span>
                     <small class="error-message"
                         *ngIf="databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched">
@@ -42,7 +43,8 @@
                     <span class="p-input-icon-left">
                         <i class="pi pi-align-left"></i>
                         <input id="description" pInputText formControlName="description" placeholder="Enter description"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched}">
+                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched}"
+                            class="p-inputtext">
                     </span>
                     <small class="error-message"
                         *ngIf="databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched">
@@ -65,7 +67,8 @@
                     <span class="p-input-icon-left">
                         <i class="pi pi-desktop"></i>
                         <input id="host" pInputText formControlName="host" placeholder="Enter database host"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('host')?.invalid && databaseForm.get('host')?.touched}">
+                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('host')?.invalid && databaseForm.get('host')?.touched}"
+                            class="p-inputtext">
                     </span>
                     <small class="error-message"
                         *ngIf="databaseForm.get('host')?.invalid && databaseForm.get('host')?.touched">
@@ -80,7 +83,8 @@
                         <i class="pi pi-hashtag"></i>
                         <input id="port" type="number" pInputText formControlName="port"
                             placeholder="Enter database port" min="1" max="65535" (keypress)="onPortKeyPress($event)"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('port')?.invalid && databaseForm.get('port')?.touched}">
+                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('port')?.invalid && databaseForm.get('port')?.touched}"
+                            class="p-inputtext">
                     </span>
                     <small class="error-message"
                         *ngIf="databaseForm.get('port')?.invalid && databaseForm.get('port')?.touched">
@@ -94,7 +98,8 @@
                     <span class="p-input-icon-left">
                         <i class="pi pi-database"></i>
                         <input id="database" pInputText formControlName="database" placeholder="Enter database name"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('database')?.invalid && databaseForm.get('database')?.touched}">
+                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('database')?.invalid && databaseForm.get('database')?.touched}"
+                            class="p-inputtext">
                     </span>
                     <small class="error-message"
                         *ngIf="databaseForm.get('database')?.invalid && databaseForm.get('database')?.touched">
@@ -108,7 +113,8 @@
                     <span class="p-input-icon-left">
                         <i class="pi pi-user"></i>
                         <input id="username" pInputText formControlName="username" placeholder="Enter database username"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('username')?.invalid && databaseForm.get('username')?.touched}">
+                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('username')?.invalid && databaseForm.get('username')?.touched}"
+                            class="p-inputtext">
                     </span>
                     <small class="error-message"
                         *ngIf="databaseForm.get('username')?.invalid && databaseForm.get('username')?.touched">
@@ -123,7 +129,8 @@
                         <i class="pi pi-lock"></i>
                         <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
                             formControlName="password" placeholder="Enter database password"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('password')?.invalid && databaseForm.get('password')?.touched}">
+                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('password')?.invalid && databaseForm.get('password')?.touched}"
+                            class="p-inputtext">
                         <i class="pi pi-eye" style="cursor: pointer;" (click)="togglePassword($event)"></i>
                     </span>
                     <small class="error-message"
@@ -138,7 +145,8 @@
                     <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
                         formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
                         [panelStyle]="{'width':'100%'}" placeholder="Select Organisation" appendTo="body"
-                        [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('organisation')?.invalid && databaseForm.get('organisation')?.touched}">
+                        [ngClass]="{'ng-invalid': databaseForm.get('organisation')?.invalid && databaseForm.get('organisation')?.touched}"
+                        styleClass="p-dropdown-theme">
                     </p-dropdown>
                     <small class="error-message"
                         *ngIf="databaseForm.get('organisation')?.invalid && databaseForm.get('organisation')?.touched">
@@ -149,7 +157,7 @@
                 <!-- Master DB Toggle -->
                 <div class="form-field">
                     <label for="isMasterDB">Master Database</label>
-                    <div class="flex align-items-center gap-2 ml-3">
+                    <div class="d-flex align-items-center pt-2">
                         <p-inputSwitch formControlName="isMasterDB"></p-inputSwitch>
                         <span class="ml-2">{{ databaseForm.get('isMasterDB')?.value ? 'Yes' : 'No' }}</span>
                     </div>

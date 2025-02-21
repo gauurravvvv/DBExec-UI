@@ -16,8 +16,7 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 export class AddDatabaseComponent implements OnInit {
   databaseForm!: FormGroup;
   organisations: any[] = [];
-  isFormDirty = false;
-  showOrganisationDropdown = false;
+  private _showOrganisationDropdown = false;
   showPassword: boolean = false;
 
   constructor(
@@ -37,9 +36,6 @@ export class AddDatabaseComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     }
-    this.databaseForm.valueChanges.subscribe(() => {
-      this.isFormDirty = true;
-    });
   }
 
   initForm(): void {
@@ -68,15 +64,22 @@ export class AddDatabaseComponent implements OnInit {
       ],
       username: ['', Validators.required],
       password: ['', [Validators.required]],
-      organisation: {
-        value: orgId,
-        disabled: !this.showOrganisationDropdown,
-        validator: Validators.required,
-      },
+      organisation: [
+        {
+          value: orgId || null,
+          disabled: !this.showOrganisationDropdown,
+        },
+      ],
       acknowledgment: [false],
       schemaAcknowledgment: [false],
       isMasterDB: [false],
     });
+
+    // Handle validators separately
+    const orgControl = this.databaseForm.get('organisation');
+    if (this.showOrganisationDropdown) {
+      orgControl?.setValidators([Validators.required]);
+    }
 
     // Subscribe to isMasterDB changes to update validators
     this.databaseForm.get('isMasterDB')?.valueChanges.subscribe(isMaster => {
@@ -96,6 +99,11 @@ export class AddDatabaseComponent implements OnInit {
       acknowledgmentControl?.updateValueAndValidity();
       schemaAcknowledgmentControl?.updateValueAndValidity();
     });
+  }
+
+  // Add getter for form dirty state
+  get isFormDirty(): boolean {
+    return this.databaseForm.dirty;
   }
 
   loadOrganisations(): void {
@@ -161,7 +169,7 @@ export class AddDatabaseComponent implements OnInit {
   onCancel(): void {
     if (this.isFormDirty) {
       this.databaseForm.reset();
-      this.isFormDirty = false;
+      this.databaseForm.markAsPristine();
     } else {
       this.router.navigate([DATABASE.LIST]);
     }
@@ -218,5 +226,25 @@ export class AddDatabaseComponent implements OnInit {
   togglePassword(event: Event): void {
     event.preventDefault();
     this.showPassword = !this.showPassword;
+  }
+
+  set showOrganisationDropdown(value: boolean) {
+    this._showOrganisationDropdown = value;
+    if (this.databaseForm) {
+      const orgControl = this.databaseForm.get('organisation');
+
+      if (value) {
+        orgControl?.enable();
+        orgControl?.setValidators([Validators.required]);
+      } else {
+        orgControl?.disable();
+        orgControl?.clearValidators();
+        orgControl?.setValue(null);
+      }
+    }
+  }
+
+  get showOrganisationDropdown(): boolean {
+    return this._showOrganisationDropdown;
   }
 }

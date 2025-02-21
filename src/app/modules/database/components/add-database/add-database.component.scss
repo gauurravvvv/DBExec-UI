@@ -3,7 +3,7 @@
   overflow: hidden;
 
   .add-admin-container {
-    background: #fff;
+    background: var(--card-background);
     border-radius: 8px;
     padding: 20px;
     height: 100%;
@@ -17,7 +17,7 @@
       margin-bottom: 24px;
       position: sticky;
       top: 0;
-      background: #fff;
+      background: var(--card-background);
       z-index: 1;
 
       .left-section {
@@ -28,7 +28,7 @@
           margin: 0;
           font-size: 1.5rem;
           font-weight: 500;
-          color: #343a40;
+          color: var(--text-color);
         }
 
         .p-button {
@@ -39,6 +39,16 @@
       .action-buttons {
         display: flex;
         gap: 12px;
+
+        .p-button {
+          min-width: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          font-weight: 500;
+        }
       }
     }
 
@@ -46,6 +56,29 @@
       flex: 1;
       overflow-y: auto;
       padding-right: 4px;
+
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+
+        &:hover {
+          background: var(--secondary-color);
+        }
+      }
+
+      // For Firefox
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
 
       .form-grid {
         display: grid;
@@ -62,16 +95,16 @@
 
           label {
             font-weight: 500;
-            color: #333;
+            color: var(--text-color);
 
             .required {
-              color: red;
+              color: var(--error-color);
               margin-left: 4px;
             }
           }
 
           .error-message {
-            color: red;
+            color: var(--error-color);
             font-size: 0.8rem;
           }
 
@@ -81,12 +114,38 @@
             input {
               width: 100%;
               padding-left: 2.5rem;
+              background: var(--card-background);
+              color: var(--text-color);
+              border-color: var(--border-color);
+
+              &::placeholder {
+                color: var(--text-color);
+                opacity: 0.4;
+              }
+
+              &.readonly {
+                background-color: var(--hover-background);
+                cursor: not-allowed;
+              }
+            }
+
+            i {
+              color: var(--text-color);
+              opacity: 0.4;
             }
           }
 
-          .readonly {
-            background-color: #f8f9fa;
-            cursor: not-allowed;
+          .d-flex {
+            display: flex;
+            align-items: center;
+            padding-top: 0.5rem;
+
+            span {
+              margin-left: 0.75rem;
+              color: var(--text-color);
+              opacity: 0.7;
+              font-size: 0.875rem;
+            }
           }
         }
       }
@@ -100,7 +159,8 @@
 
   .acknowledgments-title {
     font-size: 0.875rem;
-    color: #64748b;
+    color: var(--text-color);
+    opacity: 0.7;
     margin-bottom: 1rem;
     font-weight: 500;
     display: flex;
@@ -108,17 +168,20 @@
   }
 
   .acknowledgment-card {
-    padding: 0.75rem 0.75rem;
-    border-bottom: 1px solid #edf2f7;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    background: var(--hover-background);
 
     &:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
     }
 
     .p-field-checkbox {
       display: flex;
       align-items: flex-start;
-      gap: 0.75rem;
+      gap: 1rem;
 
       .acknowledgment-content {
         flex: 1;
@@ -126,24 +189,25 @@
         .acknowledgment-label {
           display: block;
           font-weight: 500;
-          color: #2c3e50;
-          margin-bottom: 0.25rem;
+          color: var(--text-color);
+          margin-bottom: 0.5rem;
           font-size: 0.875rem;
         }
 
         .acknowledgment-text {
-          color: #64748b;
+          color: var(--text-color);
+          opacity: 0.7;
           font-size: 0.8125rem;
-          line-height: 1.5;
+          line-height: 1.6;
           margin: 0;
         }
       }
     }
 
     .error-message {
-      color: #dc3545;
+      color: var(--error-color);
       font-size: 0.75rem;
-      margin-top: 0.375rem;
+      margin-top: 0.5rem;
       margin-left: 2.25rem;
       display: block;
     }
@@ -153,23 +217,225 @@
 :host ::ng-deep {
   .p-checkbox {
     .p-checkbox-box {
-      border-radius: 3px;
-      border-width: 1px;
-      width: 16px;
-      height: 16px;
+      background: var(--card-background);
+      border-color: var(--border-color);
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
 
       &.p-highlight {
-        border-color: #0078d3;
-        background: #0078d3;
+        border-color: var(--primary-color);
+        background: var(--primary-color);
+
+        .p-checkbox-icon {
+          color: white;
+        }
       }
 
       &:not(.p-disabled):hover {
-        border-color: #0078d3;
+        border-color: var(--primary-color);
       }
 
       .p-checkbox-icon {
-        font-size: 10px;
+        font-size: 12px;
       }
+    }
+  }
+
+  .p-inputswitch {
+    width: 3rem !important;
+    height: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+
+    .p-inputswitch-slider {
+      background: var(--border-color) !important;
+      border-radius: 30px !important;
+
+      &:before {
+        background: var(--card-background) !important;
+        width: 1rem !important;
+        height: 1rem !important;
+        left: 0.25rem !important;
+        margin-top: -0.5rem !important;
+        border-radius: 50% !important;
+        transition: all 0.2s ease !important;
+      }
+    }
+
+    &.p-inputswitch-checked {
+      .p-inputswitch-slider {
+        background: var(--success-color) !important;
+
+        &:before {
+          transform: translateX(1.5rem) !important;
+        }
+      }
+    }
+
+    &:not(.p-disabled) {
+      &:hover {
+        .p-inputswitch-slider {
+          background: var(--secondary-color) !important;
+        }
+      }
+
+      &.p-inputswitch-checked:hover {
+        .p-inputswitch-slider {
+          background: var(--success-color) !important;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+
+  .p-dropdown {
+    background: var(--card-background);
+    border-color: var(--border-color);
+
+    &.ng-invalid.ng-touched {
+      border-color: var(--error-color);
+    }
+
+    &:not(.ng-invalid) {
+      border-color: var(--border-color);
+    }
+
+    &.p-focus {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+    }
+
+    .p-dropdown-label {
+      color: var(--text-color);
+
+      &.p-placeholder {
+        color: var(--text-color);
+        opacity: 0.4;
+      }
+
+      &.p-highlight {
+        background: transparent !important;
+        color: var(--text-color) !important;
+      }
+    }
+
+    .p-dropdown-trigger {
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+  }
+
+  .p-inputtext:enabled:focus {
+    box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+    border-color: var(--primary-color) !important;
+  }
+
+  .p-dropdown-panel {
+    .p-dropdown-header {
+      .p-dropdown-filter-container {
+        .p-dropdown-filter.p-inputtext {
+          &:enabled:focus {
+            box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+            border-color: var(--primary-color) !important;
+          }
+
+          &:enabled:hover {
+            border-color: var(--primary-color) !important;
+          }
+        }
+      }
+    }
+  }
+
+  .p-inputtext:enabled:hover,
+  .p-dropdown-panel .p-dropdown-filter:enabled:hover {
+    border-color: var(--primary-color) !important;
+  }
+
+  .p-dropdown-items-wrapper {
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--secondary-color);
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .p-dropdown-panel {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+
+    .p-dropdown-header {
+      background: var(--hover-background) !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      padding: 0.5rem !important;
+
+      .p-dropdown-filter {
+        background: var(--card-background) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-color) !important;
+
+        &::placeholder {
+          color: var(--text-color) !important;
+          opacity: 0.4;
+        }
+      }
+
+      .p-dropdown-filter-icon {
+        color: var(--text-color) !important;
+        opacity: 0.7;
+      }
+    }
+
+    .p-dropdown-items {
+      padding: 0.5rem 0;
+      background: var(--card-background) !important;
+
+      .p-dropdown-item {
+        color: var(--text-color) !important;
+        padding: 0.75rem 1rem;
+
+        &:hover {
+          background: var(--hover-background) !important;
+          color: var(--text-color) !important;
+        }
+
+        &.p-highlight {
+          background: var(--hover-background) !important;
+          color: var(--primary-color) !important;
+        }
+      }
+
+      .p-dropdown-empty-message {
+        color: var(--text-color-secondary) !important;
+        padding: 0.75rem 1rem;
+      }
+    }
+  }
+
+  .p-inputtext {
+    &:enabled:focus {
+      box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+      border-color: var(--primary-color) !important;
+    }
+
+    &:enabled:hover {
+      border-color: var(--primary-color) !important;
     }
   }
 }
@@ -189,5 +455,49 @@
 .p-input-icon-right {
   i:last-child {
     right: 0.75rem;
+  }
+}
+
+// Override PrimeNG button styles
+:host ::ng-deep {
+  .p-button {
+    &.p-button-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-color) !important;
+      padding: 0.5rem !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        color: var(--text-color) !important;
+      }
+    }
+
+    &.p-button-outlined {
+      background: transparent !important;
+      border: 1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--primary-rgb), 0.04) !important;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      &.p-button-danger {
+        border-color: var(--error-color) !important;
+        color: var(--error-color) !important;
+
+        &:hover:not(:disabled) {
+          background: rgba(var(--error-rgb), 0.04) !important;
+        }
+      }
+    }
   }
 }
