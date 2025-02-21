@@ -919,6 +919,20 @@
             margin-bottom: 0;
           }
         }
+
+        p.warning-checkbox {
+          margin-top: 1.5rem;
+          color: #d32f2f;
+          font-weight: 500;
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+
+          label {
+            line-height: 1.4;
+            margin-top: 2px;
+          }
+        }
       }
     }
   }
@@ -933,5 +947,23 @@
   }
   100% {
     transform: scale(1);
+  }
+}
+
+.checkbox-container {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #ffe4e4;
+  border: 1px solid #ffb8b8;
+  border-radius: 4px;
+
+  .checkbox-label {
+    color: #d32f2f;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-top: 2px;
   }
 }

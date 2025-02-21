@@ -108,7 +108,11 @@ export class ListOrgAdminComponent implements OnInit {
         this.applyFilters();
       },
       error: error => {
-        console.error('Error loading organisation admins:', error);
+        this.admins = [];
+        this.filteredAdmins = [];
+        this.totalItems = 0;
+        this.totalPages = 0;
+        this.pages = [];
       },
     });
   }

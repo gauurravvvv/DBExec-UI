@@ -51,7 +51,7 @@
                         <ng-container *ngIf="filteredUsers && filteredUsers.length > 0; else noData">
                             <tr *ngFor="let user of filteredUsers">
                                 <td>
-                                    <a class="admin-name" [routerLink]="['/app/users/view', user.id]">
+                                    <a class="admin-name" [routerLink]="['/app/users/view', selectedOrg.id, user.id]">
                                         {{ user.firstName + ' ' + user?.lastName }}
                                     </a>
                                 </td>

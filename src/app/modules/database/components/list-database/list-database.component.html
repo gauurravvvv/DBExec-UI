@@ -130,13 +130,18 @@
                         <p><i class="pi pi-circle-fill"></i>Deleting this database will permanently remove all system
                             configurations and cannot be undone.</p>
                         <p><i class="pi pi-circle-fill"></i>You will need to create a new master database to restore
-                            system
-                            functionality and continue operations.</p>
+                            system functionality and continue operations.</p>
                         <p><i class="pi pi-circle-fill"></i>Please ensure you have taken a complete backup of all
-                            configurations
-                            and data before proceeding.</p>
+                            configurations and data before proceeding.</p>
                         <p><i class="pi pi-circle-fill"></i>This action requires immediate system reconfiguration after
                             deletion.</p>
+                        <p class="warning-checkbox">
+                            <p-checkbox [(ngModel)]="deleteConfiguration" [binary]="true" inputId="deleteConfig">
+                            </p-checkbox>
+                            <label for="deleteConfig">
+                                Do you want to delete the database data too that are required for system operations?
+                            </label>
+                        </p>
                     </div>
                 </div>
             </div>

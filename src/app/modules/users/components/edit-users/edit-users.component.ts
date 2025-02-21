@@ -20,7 +20,7 @@ export class EditUsersComponent implements OnInit {
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   selectedOrgName: string = '';
   userData: any;
-
+  orgId: string = '';
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -33,6 +33,7 @@ export class EditUsersComponent implements OnInit {
 
   ngOnInit() {
     this.userId = this.route.snapshot.params['id'];
+    this.orgId = this.route.snapshot.params['orgId'];
     this.loadAdminData();
   }
 
@@ -73,18 +74,13 @@ export class EditUsersComponent implements OnInit {
         ),
       ],
       mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
-          ? ''
-          : this.globalService.getTokenDetails('organisationId'),
-        Validators.required,
-      ],
+      organisation: ['', Validators.required],
       status: [],
     });
   }
 
   loadAdminData() {
-    this.userService.viewOrgUser(this.userId).subscribe({
+    this.userService.viewOrgUser(this.orgId, this.userId).subscribe({
       next: (response: any) => {
         this.userData = response.data;
         this.userForm.patchValue({

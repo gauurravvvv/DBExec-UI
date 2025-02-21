@@ -108,6 +108,11 @@ export class ListUsersComponent implements OnInit {
         this.applyFilters();
       },
       error: error => {
+        this.users = [];
+        this.filteredUsers = [];
+        this.totalItems = 0;
+        this.totalPages = 0;
+        this.pages = [];
         console.error('Error loading users:', error);
       },
     });
@@ -157,7 +162,12 @@ export class ListUsersComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([USER.EDIT, id]);
+    this.router.navigate([USER.EDIT, this.selectedOrg.id, id], {
+      queryParams: {
+        orgId: this.selectedOrg.id,
+        adminId: id,
+      },
+    });
   }
 
   confirmDelete(id: string) {
@@ -172,18 +182,20 @@ export class ListUsersComponent implements OnInit {
 
   proceedDelete() {
     if (this.userToDelete) {
-      this.userService.deleteUser(this.userToDelete).subscribe({
-        next: () => {
-          this.loadUsers();
-          this.showDeleteConfirm = false;
-          this.userToDelete = null;
-        },
-        error: error => {
-          console.error('Error deleting organisation user:', error);
-          this.showDeleteConfirm = false;
-          this.userToDelete = null;
-        },
-      });
+      this.userService
+        .deleteUser(this.userToDelete, this.selectedOrg.id)
+        .subscribe({
+          next: () => {
+            this.loadUsers();
+            this.showDeleteConfirm = false;
+            this.userToDelete = null;
+          },
+          error: error => {
+            console.error('Error deleting organisation user:', error);
+            this.showDeleteConfirm = false;
+            this.userToDelete = null;
+          },
+        });
     }
   }
 }

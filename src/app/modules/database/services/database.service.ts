@@ -26,13 +26,17 @@ export class DatabaseService {
       );
   }
 
-  deleteDatabase(id: string) {
-    return this.http.delete(DATABASE.DELETE + `${id}`).pipe(
-      map((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
+  deleteDatabase(id: string, deleteConfiguration: boolean) {
+    return this.http
+      .post(DATABASE.DELETE + `${id}`, {
+        deleteConfiguration,
       })
-    );
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
   }
 
   addDatabase(payload: any) {

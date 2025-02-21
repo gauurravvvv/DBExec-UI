@@ -31,6 +31,7 @@ export class ListDatabaseComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatabase: any = null;
+  deleteConfiguration: boolean = false;
 
   statusFilterItems: MenuItem[] = [
     {
@@ -109,6 +110,11 @@ export class ListDatabaseComponent implements OnInit {
         this.applyFilters();
       },
       error: error => {
+        this.dbs = [];
+        this.filteredDBs = [];
+        this.totalItems = 0;
+        this.totalPages = 0;
+        this.pages = [];
         console.error('Error loading dbs:', error);
       },
     });
@@ -168,18 +174,20 @@ export class ListDatabaseComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.selectedDatabase) {
-      this.databaseService.deleteDatabase(this.selectedDatabase.id).subscribe({
-        next: () => {
-          this.loaddbs();
-          this.showDeleteConfirm = false;
-          this.selectedDatabase = null;
-        },
-        error: error => {
-          console.error('Error deleting database:', error);
-          this.showDeleteConfirm = false;
-          this.selectedDatabase = null;
-        },
-      });
+      this.databaseService
+        .deleteDatabase(this.selectedDatabase.id, this.deleteConfiguration)
+        .subscribe({
+          next: () => {
+            this.loaddbs();
+            this.showDeleteConfirm = false;
+            this.selectedDatabase = null;
+          },
+          error: error => {
+            console.error('Error deleting database:', error);
+            this.showDeleteConfirm = false;
+            this.selectedDatabase = null;
+          },
+        });
     }
   }
 }

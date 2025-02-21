@@ -17,6 +17,7 @@ export class ViewUsersComponent implements OnInit {
   userInitials: string = '';
   loggedInUserId = this.globalService.getTokenDetails('userId');
   showChangePasswordDialog = false;
+  orgId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -27,11 +28,12 @@ export class ViewUsersComponent implements OnInit {
 
   ngOnInit() {
     this.userId = this.route.snapshot.params['id'];
+    this.orgId = this.route.snapshot.params['orgId'];
     this.loadAdminData();
   }
 
   loadAdminData() {
-    this.userService.viewOrgUser(this.userId).subscribe({
+    this.userService.viewOrgUser(this.orgId, this.userId).subscribe({
       next: (response: any) => {
         this.userData = response.data;
         this.setAdminInitials();
@@ -75,7 +77,7 @@ export class ViewUsersComponent implements OnInit {
   }
 
   proceedDelete() {
-    this.userService.deleteUser(this.userId).subscribe({
+    this.userService.deleteUser(this.userId, this.orgId).subscribe({
       next: () => {
         this.router.navigate([ORGANISATION_ADMIN.LIST]);
       },

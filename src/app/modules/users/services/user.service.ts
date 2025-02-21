@@ -24,8 +24,8 @@ export class UserService {
       );
   }
 
-  deleteUser(id: string) {
-    return this.http.delete(USER.DELETE + `${id}`).pipe(
+  deleteUser(id: string, orgId: string) {
+    return this.http.delete(USER.DELETE + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -61,8 +61,8 @@ export class UserService {
       );
   }
 
-  viewOrgUser(id: string) {
-    return this.http.get(USER.VIEW + `${id}`).pipe(
+  viewOrgUser(orgId: string, id: string) {
+    return this.http.get(USER.VIEW + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -71,8 +71,16 @@ export class UserService {
   }
 
   updateUser(userForm: FormGroup) {
-    const { id, firstName, lastName, username, email, mobile, status } =
-      userForm.getRawValue();
+    const {
+      id,
+      firstName,
+      lastName,
+      username,
+      email,
+      mobile,
+      status,
+      organisation,
+    } = userForm.getRawValue();
     return this.http
       .put(USER.UPDATE, {
         id,
@@ -81,6 +89,7 @@ export class UserService {
         username,
         email,
         mobile,
+        organisation,
         status: status ? 1 : 0,
       })
       .pipe(
