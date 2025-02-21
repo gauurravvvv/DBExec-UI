@@ -2,12 +2,13 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow-color);
 
   .add-admin-container {
-    background: white;
-    border-radius: 8px;
+    background: var(--card-background);
     padding: 24px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     max-width: 100%;
     margin: 0;
     flex: 1;
@@ -29,6 +30,17 @@
 
         button {
           min-width: 0rem;
+          background: transparent !important;
+          border: none !important;
+          color: var(--text-color) !important;
+
+          &:hover {
+            background: var(--hover-background) !important;
+          }
+
+          i {
+            color: var(--text-color) !important;
+          }
         }
 
         h2 {
@@ -36,6 +48,7 @@
           font-size: 24px;
           font-weight: 600;
           margin-left: 0.2rem;
+          color: var(--text-color);
         }
       }
 
@@ -93,29 +106,54 @@
 
         label {
           font-weight: 500;
-          color: #333;
+          color: var(--text-color);
 
           .required {
-            color: red;
+            color: var(--error-color);
           }
         }
 
         .p-input-icon-left {
           width: 100%;
 
-          i {
-            color: #6c757d;
-          }
-
           input {
             width: 100%;
             padding-left: 2.5rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+
+            &::placeholder {
+              color: var(--text-color);
+              opacity: 0.5;
+            }
+
+            &:focus {
+              border-color: var(--primary-color);
+              box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+            }
+
+            &.ng-invalid.ng-dirty {
+              border-color: var(--error-color);
+            }
+          }
+
+          i {
+            color: var(--text-color);
+            opacity: 0.7;
           }
         }
 
         .error-message {
-          color: #f44336;
+          color: var(--error-color);
           font-size: 12px;
+        }
+
+        // Status switch styling
+        .d-flex {
+          span {
+            color: var(--text-color);
+          }
         }
       }
     }
@@ -149,22 +187,122 @@
 
 :host ::ng-deep {
   .p-inputswitch {
+    width: 3rem !important;
+    height: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+
+    .p-inputswitch-slider {
+      background: var(--border-color) !important;
+      border-radius: 30px !important;
+
+      &:before {
+        background: var(--card-background) !important;
+        width: 1rem !important;
+        height: 1rem !important;
+        left: 0.25rem !important;
+        margin-top: -0.5rem !important;
+        border-radius: 50% !important;
+        transition: all 0.2s ease !important;
+      }
+    }
+
     &.p-inputswitch-checked {
       .p-inputswitch-slider {
-        background: #2196f3;
+        background: var(--success-color) !important;
+
+        &:before {
+          transform: translateX(1.5rem) !important;
+        }
       }
     }
 
-    &:not(.p-disabled):hover {
-      .p-inputswitch-slider {
-        background: #90caf9;
+    &:not(.p-disabled) {
+      &:hover {
+        .p-inputswitch-slider {
+          background: var(--secondary-color) !important;
+        }
+      }
+
+      &.p-inputswitch-checked:hover {
+        .p-inputswitch-slider {
+          background: var(--success-color) !important;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+
+  .p-button {
+    &.p-button-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-color) !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        color: var(--text-color) !important;
       }
     }
 
-    &.p-disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    &.p-button-outlined {
+      background: transparent !important;
+      border: 1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--primary-rgb), 0.04) !important;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      i {
+        color: var(--primary-color) !important;
+      }
     }
+
+    &:not(.p-button-outlined):not(.p-button-text) {
+      background: var(--primary-color) !important;
+      border: 1px solid var(--primary-color) !important;
+      color: white !important;
+      padding: 0.5rem 1rem !important;
+
+      &:hover:not(:disabled) {
+        opacity: 0.9;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      i {
+        color: white !important;
+      }
+    }
+
+    &.p-button-danger {
+      border-color: var(--error-color) !important;
+      color: var(--error-color) !important;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--error-rgb), 0.04) !important;
+      }
+
+      i {
+        color: var(--error-color) !important;
+      }
+    }
+  }
+
+  .p-steps {
+    display: none;
   }
 }
 
@@ -172,73 +310,74 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 2rem 0;
-  position: relative;
-  width: 50%;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 1rem 0;
+  padding: 0 20%;
 
   .step {
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
+    flex: 0 0 auto;
     cursor: pointer;
-    transition: all 0.3s ease;
 
-    &:hover {
+    &.active {
       .step-dot {
-        background-color: #0078d3;
+        background: var(--primary-color);
         color: white;
+      }
+      .step-label {
+        color: var(--primary-color);
+        font-weight: 600;
       }
     }
 
     .step-dot {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background-color: #f8f9fa;
-      border: 2px solid #0078d3;
+      background: var(--border-color);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
+      color: var(--text-color);
+      font-weight: 600;
+      margin-bottom: 8px;
       transition: all 0.3s ease;
     }
 
     .step-label {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #6c757d;
-    }
-
-    &.active {
-      .step-dot {
-        background-color: #0078d3;
-        color: white;
-      }
-
-      .step-label {
-        color: #0078d3;
-        font-weight: bold;
-      }
+      font-size: 14px;
+      color: var(--text-color);
+      transition: all 0.3s ease;
     }
   }
 
   .step-line {
     flex: 1;
     height: 2px;
-    background-color: #e9ecef;
-    margin: 0 1rem;
+    background: var(--border-color);
+    margin: 0 24px;
+    margin-bottom: 32px;
     position: relative;
-    top: -15px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: var(--primary-color);
+      transition: width 0.3s ease;
+      width: 0;
+    }
   }
 
-  &.step-1 .step-line {
-    background: linear-gradient(to right, #0078d3 0%, #e9ecef 0%);
+  &.step-1 .step-line::before {
+    width: 0;
   }
 
-  &.step-2 .step-line {
-    background: linear-gradient(to right, #0078d3 100%, #e9ecef 0%);
+  &.step-2 .step-line::before {
+    width: 100%;
   }
 }

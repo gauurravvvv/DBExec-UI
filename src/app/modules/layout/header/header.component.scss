@@ -1,11 +1,12 @@
 .header {
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.5rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1.5rem;
-  height: 64px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 60px;
+  box-shadow: 0 2px 4px var(--shadow-color);
   position: relative;
   z-index: 1000;
 
@@ -14,26 +15,23 @@
       .logo-container {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 0.5rem;
         cursor: pointer;
         padding: 8px 12px;
         border-radius: 8px;
         position: relative;
 
         .logo-icon {
-          font-size: 24px;
-          color: #0078d3;
-          animation: gentle-zoom 3s ease-in-out infinite;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transform-origin: center;
+          width: 32px;
+          height: 32px;
+          filter: var(--icon-filter);
+          animation: gentle-pulse 2s ease-in-out infinite;
         }
 
         .logo-text {
-          font-size: 1.8rem;
-          font-weight: 700;
-          color: #000000;
+          color: var(--text-color);
+          font-size: 1.5rem;
+          font-weight: 600;
           letter-spacing: -0.5px;
           font-family: 'Poppins', sans-serif;
           position: relative;
@@ -57,7 +55,7 @@
           }
 
           .highlight {
-            color: #0078d3;
+            color: var(--primary-color);
             position: relative;
           }
         }
@@ -73,16 +71,15 @@
 
     .org-info {
       .org-name {
+        color: var(--text-color);
         margin: 0;
         font-size: 1.2rem;
-        font-weight: 600;
-        color: #000;
+        font-weight: 500;
       }
 
       .current-time {
+        color: var(--secondary-color);
         font-size: 0.9rem;
-        color: #666;
-        margin-top: 0.25rem;
       }
     }
   }
@@ -91,8 +88,12 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1rem;
       cursor: pointer;
+
+      .p-button {
+        min-width: 0rem;
+      }
 
       .user-profile {
         position: relative;
@@ -103,24 +104,23 @@
           align-items: center;
           gap: 0.75rem;
           padding: 0.5rem;
-          border-radius: 4px;
+          border-radius: 8px;
+          transition: background-color 0.2s;
 
           &:hover {
-            background-color: #f5f5f5;
+            background: var(--hover-background);
           }
 
           .user-initials {
-            width: 48px;
-            height: 48px;
-            background-color: #0078d3;
+            width: 36px;
+            height: 36px;
+            background: var(--primary-color);
             color: white;
-            border-radius: 4px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-transform: uppercase;
+            font-weight: 500;
           }
 
           .user-details {
@@ -128,22 +128,19 @@
             flex-direction: column;
 
             .username {
+              color: var(--text-color);
               font-weight: 500;
-              color: #000;
-              font-size: 1rem;
             }
 
             .user-role {
-              font-size: 0.8rem;
-              color: #666;
-              margin-top: 2px;
+              color: var(--secondary-color);
+              font-size: 0.85rem;
             }
           }
 
           i {
-            font-size: 0.8rem;
-            color: #666;
-            margin-left: 4px;
+            color: var(--text-color);
+            font-size: 0.85rem;
           }
         }
 
@@ -151,13 +148,13 @@
           position: absolute;
           top: 100%;
           right: 0;
-          min-width: 200px;
-          background: white;
-          border-radius: 4px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           margin-top: 0.5rem;
-          padding: 0.5rem 0;
-          z-index: 1000;
+          background: var(--card-background);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          box-shadow: 0 4px 6px var(--shadow-color);
+          min-width: 200px;
+          padding: 0.5rem;
           list-style: none;
 
           .menu-item {
@@ -166,18 +163,17 @@
               align-items: center;
               gap: 0.75rem;
               padding: 0.75rem 1rem;
-              color: #333;
+              color: var(--text-color);
               text-decoration: none;
+              border-radius: 6px;
               transition: background-color 0.2s;
-              cursor: pointer;
-
-              &:hover {
-                background-color: #f5f5f5;
-              }
 
               i {
-                font-size: 1rem;
-                width: 20px;
+                color: var(--secondary-color);
+              }
+
+              &:hover {
+                background: var(--hover-background);
               }
             }
 
@@ -210,14 +206,69 @@
   }
 }
 
-@keyframes gentle-zoom {
+@keyframes gentle-pulse {
   0% {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.25);
+    transform: scale(1.1);
   }
   100% {
     transform: scale(1);
+  }
+}
+
+// Add to your theme variables
+:root {
+  --icon-filter: none;
+}
+
+.dark-theme {
+  --icon-filter: brightness(0) invert(1);
+}
+
+.theme-toggle {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 8px !important;
+  margin: 0 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  perspective: 100px;
+
+  .pi {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    position: relative;
+    transition: color 0.3s ease;
+    transform-style: preserve-3d;
+    backface-visibility: visible;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  // Animation only when animate class is present
+  .animate {
+    animation: rotateY 0.7s ease-in-out;
+  }
+}
+
+@keyframes rotateY {
+  0% {
+    transform: rotate3d(0, 1, 0, 0deg);
+  }
+  30% {
+    transform: rotate3d(0, 1, 0, 90deg) scale(1.2);
+  }
+  70% {
+    transform: rotate3d(0, 1, 0, 270deg) scale(0.8);
+  }
+  100% {
+    transform: rotate3d(0, 1, 0, 360deg);
   }
 }

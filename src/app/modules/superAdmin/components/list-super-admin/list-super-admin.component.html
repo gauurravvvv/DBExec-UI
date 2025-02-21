@@ -3,7 +3,8 @@
         <div class="page-header">
             <h2>Super Admins</h2>
             <button pButton class="p-button-outlined" (click)="onAddNewAdmin()">
-                + Add Super Admin
+                <i class="pi pi-plus"></i>
+                <span>Add Super Admin</span>
             </button>
         </div>
         <div class="table-section">
@@ -23,8 +24,12 @@
                             <th>Email</th>
                             <th>
                                 Status
-                                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
-                                    [style]="{'width': '150px'}" appendTo="body">
+                                <p-menu #statusMenu [popup]="true" [model]="[
+                                    { label: 'All', icon: 'pi pi-filter', styleClass: 'status-all' },
+                                    { label: 'Active', icon: 'pi pi-check-circle', styleClass: 'status-active' },
+                                    { label: 'Inactive', icon: 'pi pi-ban', styleClass: 'status-inactive' }
+                                ]" [style]="{'width': '150px', 'background': 'var(--card-background)'}"
+                                    appendTo="body">
                                 </p-menu>
                                 <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
                                     [ngClass]="{'active-filter': selectedStatus !== null}"

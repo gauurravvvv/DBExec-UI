@@ -22,7 +22,7 @@
                     <button pButton type="button" label="Previous" class="p-button-outlined" (click)="previousStep()">
                         <i class="pi pi-arrow-left mr-2"></i>
                     </button>
-                    <button pButton type="submit" label="Save" (click)="onSubmit()"
+                    <button pButton type="submit" class="p-button-outlined" label="Save" (click)="onSubmit()"
                         [disabled]="orgForm.invalid || !isFormDirty">
                         <i class="pi pi-save mr-2"></i>
                     </button>
@@ -170,22 +170,6 @@
                         <span *ngIf="orgForm.get('maxDatabases')?.errors?.['required']">Maximum databases is
                             required</span>
                         <span *ngIf="orgForm.get('maxDatabases')?.errors?.['min']">Value must be at least 1</span>
-                    </small>
-                </div>
-
-                <!-- Acknowledgment Checkbox -->
-                <div class="form-field acknowledgment-section">
-                    <div class="p-field-checkbox">
-                        <p-checkbox formControlName="acknowledgment" [binary]="true" inputId="acknowledgment">
-                        </p-checkbox>
-                        <label for="acknowledgment" class="acknowledgment-text">
-                            I acknowledge that DBExec can create a separate schema with name dbexec_master in my
-                            database
-                        </label>
-                    </div>
-                    <small class="error-message"
-                        *ngIf="orgForm.get('acknowledgment')?.invalid && orgForm.get('acknowledgment')?.touched">
-                        Please acknowledge this requirement
                     </small>
                 </div>
             </div>

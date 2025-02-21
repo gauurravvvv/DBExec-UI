@@ -3,6 +3,7 @@
 @import 'primeng/resources/primeng.css';
 @import 'primeicons/primeicons.css';
 @import './styles/components/toast';
+@import './app/styles/theme-variables';
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -1986,4 +1987,41 @@ aw-wizard-navigation-bar.horizontal ul.steps-indicator li {
   .p-chip-text {
     font-size: 0.75rem;
   }
+}
+
+// Add theme transition
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+// Update PrimeNG components for dark theme
+.dark-theme {
+  .p-component {
+    background: var(--card-background);
+    color: var(--text-color);
+  }
+
+  .p-button {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .p-inputtext {
+    background: var(--card-background);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+
+  .p-dropdown {
+    background: var(--card-background);
+    border-color: var(--border-color);
+
+    .p-dropdown-label {
+      color: var(--text-color);
+    }
+  }
+
+  // Add more PrimeNG component overrides as needed
 }

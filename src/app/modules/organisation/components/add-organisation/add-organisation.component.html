@@ -10,7 +10,7 @@
             </div>
             <div class="action-buttons">
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
-                    [disabled]="!isFormDirty" (click)="onCancel()">
+                    [disabled]="!isFormDirty || orgForm.pristine" (click)="onCancel()">
                 </button>
                 <ng-container *ngIf="currentStep === 0">
                     <button pButton type="button" label="Next" (click)="nextStep()" class="p-button-outlined"
@@ -22,7 +22,8 @@
                     <button pButton type="button" label="Previous" class="p-button-outlined" (click)="previousStep()">
                         <i class="pi pi-arrow-left mr-2"></i>
                     </button>
-                    <button pButton type="submit" label="Save" (click)="onSubmit()" [disabled]="orgForm.invalid">
+                    <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                        [disabled]="orgForm.invalid">
                         <i class="pi pi-save mr-2"></i>
                     </button>
                 </ng-container>

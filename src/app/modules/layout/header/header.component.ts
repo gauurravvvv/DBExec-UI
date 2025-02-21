@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { interval, Subscription } from 'rxjs';
+import { Renderer2 } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -16,8 +17,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userRole: string = '';
   private timeSubscription?: Subscription;
   showProfileMenu: boolean = false;
+  isDarkMode = true;
+  isAnimating = false;
 
-  constructor(private router: Router, private globalService: GlobalService) {}
+  constructor(
+    private router: Router,
+    private globalService: GlobalService,
+    private renderer: Renderer2
+  ) {
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    this.isDarkMode = savedTheme === 'dark';
+    this.applyTheme();
+  }
 
   ngOnInit() {
     // Get organization name
@@ -63,5 +75,26 @@ export class HeaderComponent implements OnInit, OnDestroy {
   viewProfile() {
     // Implement profile view logic
     this.showProfileMenu = false;
+  }
+
+  toggleTheme() {
+    const icon = document.querySelector('.theme-toggle .pi');
+    if (icon) {
+      icon.classList.add('animate');
+      setTimeout(() => {
+        icon.classList.remove('animate');
+      }, 700); // Match animation duration
+    }
+    this.isDarkMode = !this.isDarkMode;
+    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
+    this.applyTheme();
+  }
+
+  private applyTheme() {
+    if (this.isDarkMode) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
   }
 }

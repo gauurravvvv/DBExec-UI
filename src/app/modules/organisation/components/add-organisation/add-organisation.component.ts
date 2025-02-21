@@ -101,6 +101,9 @@ export class AddOrganisationComponent implements OnInit {
 
   onCancel(): void {
     this.orgForm.reset();
+    this.currentStep = 0;
+    this.isFormDirty = false;
+    this.orgForm.markAsPristine();
     // Reset specific form controls to empty strings
     Object.keys(this.orgForm.controls).forEach(key => {
       this.orgForm.get(key)?.setValue('');

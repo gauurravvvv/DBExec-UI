@@ -1,12 +1,13 @@
-<aside class="sidebar" [class.collapsed]="!isExpanded" [class.mobile]="isMobile">
+<aside class="sidebar" [class.collapsed]="!isExpanded" [class.mobile]="isMobile" role="navigation"
+  aria-label="Main Navigation">
   <div class="sidebar-header" *ngIf="!isExpanded">
     <button class="toggle-btn" (click)="toggleSidebar()">
-      <i class="pi pi-chevron-left" [ngClass]="{'pi-chevron-left': isExpanded, 'pi-chevron-right': !isExpanded}"></i>
+      <i class="pi" [ngClass]="{'pi-chevron-right': !isExpanded, 'pi-chevron-left': isExpanded}"></i>
     </button>
   </div>
 
   <button *ngIf="isExpanded" class="toggle-btn outside" (click)="toggleSidebarAndCollapseAll()">
-    <i class="pi pi-chevron-left" [ngClass]="{'pi-chevron-left': isExpanded, 'pi-chevron-right': !isExpanded}"></i>
+    <i class="pi" [ngClass]="{'pi-chevron-right': !isExpanded, 'pi-chevron-left': isExpanded}"></i>
   </button>
 
   <div class="sidebar-content">
@@ -39,9 +40,7 @@
               <ul class="submenu" [class.expanded]="item.isExpanded" *ngIf="item.children">
                 <li *ngFor="let child of item.children" class="submenu-item" [class.visible]="item.isExpanded">
                   <!-- Nested submenu item -->
-                  <div *ngIf="child.children" class="submenu-link" [title]="!isExpanded ? child.label : ''"
-                    [style.paddingLeft]="getIndentation(child.level)" (click)="toggleSubmenu(child)"
-                    [class.expanded]="child.isExpanded">
+                  <div *ngIf="child.children" class="submenu-link">
                     <div class="link-content">
                       <i [class]="child.icon"></i>
                       <span class="nav-text" [class.hidden]="!isExpanded">{{ child.label }}</span>
@@ -51,8 +50,7 @@
                   </div>
 
                   <!-- Regular submenu item -->
-                  <a *ngIf="!child.children" [routerLink]="child.route" routerLinkActive="active"
-                    [title]="!isExpanded ? child.label : ''" [style.paddingLeft]="getIndentation(child.level)">
+                  <a *ngIf="!child.children" [routerLink]="child.route" routerLinkActive="active">
                     <div class="link-content">
                       <i [class]="child.icon"></i>
                       <span class="nav-text" [class.hidden]="!isExpanded">{{ child.label }}</span>

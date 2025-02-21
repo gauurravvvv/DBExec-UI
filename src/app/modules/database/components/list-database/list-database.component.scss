@@ -967,3 +967,46 @@
     margin-top: 2px;
   }
 }
+
+.add-admin-wrapper {
+  height: 100%;
+
+  .add-admin-container {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+
+    .page-header {
+      h2 {
+        color: var(--text-color);
+      }
+    }
+
+    .admin-form {
+      .form-field {
+        label {
+          color: var(--text-color);
+        }
+
+        input,
+        textarea {
+          background: var(--card-background);
+          color: var(--text-color);
+          border-color: var(--border-color);
+
+          &:hover {
+            border-color: var(--primary-color);
+          }
+        }
+
+        .error-message {
+          color: var(--error-color);
+        }
+      }
+    }
+  }
+}

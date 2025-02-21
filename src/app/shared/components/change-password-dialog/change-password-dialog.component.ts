@@ -73,6 +73,7 @@ export class ChangePasswordDialogComponent implements OnInit {
   }
 
   onCancel() {
+    this.passwordForm.reset();
     this.close.emit(null);
   }
 }

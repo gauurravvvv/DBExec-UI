@@ -17,6 +17,9 @@
 
   <div class="header-right">
     <div class="header-actions">
+      <button pButton class="p-button-text theme-toggle" (click)="toggleTheme()">
+        <i class="pi" [ngClass]="isDarkMode ? 'pi-sun' : 'pi-moon'"></i>
+      </button>
       <div class="user-profile" (click)="toggleProfileMenu($event)">
         <div class="profile-info">
           <div class="user-initials">{{ userInitials }}</div>

@@ -1,19 +1,19 @@
 .view-organisation-wrapper {
   .view-organisation-container {
-    background: white;
+    background: var(--card-background);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--shadow-color);
     height: calc(100vh - 145px);
     display: flex;
     flex-direction: column;
 
     .page-header {
       padding: 20px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: white;
+      background: var(--card-background);
       border-radius: 8px 8px 0 0;
       position: sticky;
       top: 0;
@@ -26,6 +26,7 @@
 
         h2 {
           margin: 0;
+          color: var(--text-color);
         }
 
         button {
@@ -50,16 +51,16 @@
       }
 
       &::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: var(--card-background);
         border-radius: 4px;
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
+        background: var(--border-color);
         border-radius: 4px;
 
         &:hover {
-          background: #a8a8a8;
+          background: var(--secondary-color);
         }
       }
 
@@ -116,19 +117,20 @@
       margin: 10px 0 5px;
       font-size: 1.5rem;
       text-align: center;
+      color: var(--text-color);
     }
   }
 
   .detail-group {
-    background: #f8f9fa;
+    background: var(--card-background);
     padding: 20px;
     border-radius: 8px;
 
     h4 {
-      color: #333;
+      color: var(--text-color);
       margin-bottom: 20px;
       padding-bottom: 10px;
-      border-bottom: 2px solid #e0e0e0;
+      border-bottom: 2px solid var(--border-color);
     }
 
     .detail-item {
@@ -142,18 +144,19 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #666;
+        color: var(--secondary-color);
         margin-bottom: 5px;
 
         i {
           font-size: 1rem;
+          color: var(--text-color);
         }
       }
 
       .value {
         display: block;
         font-size: 1.1rem;
-        color: #333;
+        color: var(--text-color);
         padding: 4px 0;
       }
     }
@@ -165,18 +168,18 @@
       margin-top: 10px;
 
       .resource-item {
-        background: white;
+        background: var(--card-background);
         padding: 20px;
         border-radius: 8px;
         display: flex;
         align-items: center;
         gap: 15px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 4px var(--shadow-color);
 
         .resource-icon {
           width: 45px;
           height: 45px;
-          background: #e9ecef;
+          background: var(--hover-background);
           border-radius: 8px;
           display: flex;
           align-items: center;
@@ -184,7 +187,7 @@
 
           i {
             font-size: 1.5rem;
-            color: #495057;
+            color: var(--text-color);
           }
         }
 
@@ -193,14 +196,14 @@
           flex-direction: column;
 
           .resource-label {
-            color: #6c757d;
+            color: var(--secondary-color);
             font-size: 0.875rem;
           }
 
           .resource-value {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #495057;
+            color: var(--text-color);
           }
         }
       }
@@ -213,11 +216,11 @@
     border-radius: 4px;
     font-size: 0.9rem;
     font-weight: 500;
-    background-color: #ff4444;
+    background-color: var(--error-color);
     color: white;
 
     &.active {
-      background-color: #4caf50;
+      background-color: var(--success-color);
     }
   }
 }
@@ -249,20 +252,22 @@
   z-index: 1000;
 
   .popup-content {
-    background: white;
+    background: var(--card-background);
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px var(--shadow-color);
     width: 400px;
     max-width: 90%;
 
     h3 {
       margin-top: 0;
       margin-bottom: 15px;
+      color: var(--text-color);
     }
 
     p {
       margin-bottom: 20px;
+      color: var(--text-color);
     }
 
     .popup-actions {
@@ -277,13 +282,55 @@
         cursor: pointer;
 
         &.btn-cancel {
-          background-color: #6c757d;
+          background-color: var(--secondary-color);
           color: white;
         }
 
         &.btn-confirm {
-          background-color: #dc3545;
+          background-color: var(--error-color);
           color: white;
+        }
+      }
+    }
+  }
+}
+
+:host ::ng-deep {
+  .p-button {
+    &.p-button-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-color) !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        color: var(--text-color) !important;
+      }
+    }
+
+    &.p-button-outlined {
+      background: transparent !important;
+      border: 1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--primary-rgb), 0.04) !important;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      &.p-button-danger {
+        border-color: var(--error-color) !important;
+        color: var(--error-color) !important;
+
+        &:hover:not(:disabled) {
+          background: rgba(var(--error-rgb), 0.04) !important;
         }
       }
     }

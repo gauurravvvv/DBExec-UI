@@ -1,96 +1,177 @@
 $icon-url: '../icons/';
+
+// Base icon styles
 .ci {
-  &.ci-app-icon {
-    content: url($icon-url + 'dbexec_icon.svg');
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  transition: filter 0.3s ease;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+}
+
+// Light mode icons (default)
+:root {
+  .ci {
+    filter: brightness(0); // Makes icons black in light mode
+    opacity: 0.8; // Slightly softer black
+
+    &.ci-app-icon {
+      width: 2rem;
+      height: 2rem;
+      margin-right: 1rem;
+      content: url($icon-url + 'dbexec_icon.svg');
+    }
+    &.ci-shield-check {
+      content: url($icon-url + 'shield-check.svg');
+    }
+    &.ci-home {
+      content: url($icon-url + 'home.svg');
+    }
+    &.ci-wrench {
+      content: url($icon-url + 'wrench.svg');
+    }
+    &.ci-users {
+      content: url($icon-url + 'users.svg');
+    }
+    &.ci-bolt {
+      content: url($icon-url + 'bolt.svg');
+    }
+    &.ci-building {
+      content: url($icon-url + 'building.svg');
+    }
+    &.ci-database {
+      content: url($icon-url + 'database.svg');
+    }
+    &.ci-file-lines {
+      content: url($icon-url + 'file-lines.svg');
+    }
+    &.ci-globe {
+      content: url($icon-url + 'globe.svg');
+    }
+    &.ci-key {
+      content: url($icon-url + 'key.svg');
+    }
+    &.ci-layer-group {
+      content: url($icon-url + 'layer-group.svg');
+    }
+    &.ci-list {
+      content: url($icon-url + 'list.svg');
+    }
+    &.ci-lock {
+      content: url($icon-url + 'lock.svg');
+    }
+    &.ci-shield-halved {
+      content: url($icon-url + 'shield-halved.svg');
+    }
+    &.ci-sliders {
+      content: url($icon-url + 'sliders.svg');
+    }
+    &.ci-table-cells {
+      content: url($icon-url + 'table-cell.svg');
+    }
+    &.ci-user-cong {
+      content: url($icon-url + 'user-cong.svg');
+    }
+    &.ci-user-gear {
+      content: url($icon-url + 'user-gear.svg');
+    }
+    &.ci-user {
+      content: url($icon-url + 'user.svg');
+    }
+    &.ci-user-tie {
+      content: url($icon-url + 'user-tie.svg');
+    }
+    &.ci-columns {
+      content: url($icon-url + 'column.svg');
+    }
+    &.ci-eye {
+      content: url($icon-url + 'eye.svg');
+    }
+    &.ci-eye-slash {
+      content: url($icon-url + 'table-view.svg');
+    }
+    &.ci-list-ol {
+      content: url($icon-url + 'indexes.svg');
+    }
+    &.ci-sort-numeric {
+      content: url($icon-url + 'sequence.svg');
+    }
+    &.ci-function {
+      content: url($icon-url + 'function.svg');
+    }
+    &.ci-code {
+      content: url($icon-url + 'code.svg');
+    }
+    &.ci-site-map {
+      content: url($icon-url + 'site-map.svg');
+    }
   }
-  &.ci-shield-check {
-    content: url($icon-url + 'shield-check.svg');
+}
+
+// Dark mode icons
+.dark-theme {
+  .ci {
+    filter: brightness(0) invert(1); // Makes icons white in dark mode
+    opacity: 0.9; // Slightly softer white
   }
-  &.ci-home {
-    content: url($icon-url + 'home.svg');
+}
+
+// Exception for app icon in header if needed
+.header {
+  .logo-container {
+    .ci-app-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      margin-right: 1rem;
+      filter: none; // Original color for logo
+      opacity: 1;
+    }
   }
-  &.ci-wrench {
-    content: url($icon-url + 'wrench.svg');
+
+  &.dark-theme {
+    .logo-container {
+      .ci-app-icon {
+        filter: brightness(0) invert(1);
+      }
+    }
   }
-  &.ci-users {
-    content: url($icon-url + 'users.svg');
+}
+
+// Sidebar specific adjustments
+.sidebar {
+  .nav-link {
+    .link-content {
+      i.ci {
+        width: 1.4em;
+        height: 1.4em;
+        margin-right: 1rem;
+
+        // Active state in light mode
+        .active & {
+          filter: brightness(0) invert(0.4) sepia(1) saturate(5)
+            hue-rotate(175deg); // Makes icon primary color
+          opacity: 1;
+        }
+      }
+    }
   }
-  &.ci-bolt {
-    content: url($icon-url + 'bolt.svg');
-  }
-  &.ci-building {
-    content: url($icon-url + 'building.svg');
-  }
-  &.ci-database {
-    content: url($icon-url + 'database.svg');
-  }
-  &.ci-file-lines {
-    content: url($icon-url + 'file-lines.svg');
-  }
-  &.ci-globe {
-    content: url($icon-url + 'globe.svg');
-  }
-  &.ci-home {
-    content: url($icon-url + 'home.svg');
-  }
-  &.ci-key {
-    content: url($icon-url + 'key.svg');
-  }
-  &.ci-layer-group {
-    content: url($icon-url + 'layer-group.svg');
-  }
-  &.ci-list {
-    content: url($icon-url + 'list.svg');
-  }
-  &.ci-lock {
-    content: url($icon-url + 'lock.svg');
-  }
-  &.ci-shield-halved {
-    content: url($icon-url + 'shield-halved.svg');
-  }
-  &.ci-sliders {
-    content: url($icon-url + 'sliders.svg');
-  }
-  &.ci-table-cells {
-    content: url($icon-url + 'table-cell.svg');
-  }
-  &.ci-user-cong {
-    content: url($icon-url + 'user-cong.svg');
-  }
-  &.ci-user-gear {
-    content: url($icon-url + 'user-gear.svg');
-  }
-  &.ci-user {
-    content: url($icon-url + 'user.svg');
-  }
-  &.ci-users {
-    content: url($icon-url + 'users.svg');
-  }
-  &.ci-user-tie {
-    content: url($icon-url + 'user-tie.svg');
-  }
-  &.ci-columns {
-    content: url($icon-url + 'column.svg');
-  }
-  &.ci-eye {
-    content: url($icon-url + 'eye.svg');
-  }
-  &.ci-eye-slash {
-    content: url($icon-url + 'table-view.svg');
-  }
-  &.ci-list-ol {
-    content: url($icon-url + 'indexes.svg');
-  }
-  &.ci-sort-numeric {
-    content: url($icon-url + 'sequence.svg');
-  }
-  &.ci-function {
-    content: url($icon-url + 'function.svg');
-  }
-  &.ci-code {
-    content: url($icon-url + 'code.svg');
-  }
-  &.ci-site-map {
-    content: url($icon-url + 'site-map.svg');
+}
+
+// Dark theme sidebar adjustments
+.dark-theme {
+  .sidebar {
+    .nav-link {
+      .link-content {
+        i.ci {
+          // Active state in dark mode
+          .active & {
+            filter: brightness(0) invert(0.8) sepia(0.5) saturate(5)
+              hue-rotate(175deg); // Makes icon primary color
+            opacity: 1;
+          }
+        }
+      }
+    }
   }
 }
