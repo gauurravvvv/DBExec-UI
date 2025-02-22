@@ -16,6 +16,7 @@ export class EditEnvironmentComponent implements OnInit {
   isCancelClicked = false;
   organisations: any[] = [];
   envId: string = '';
+  orgId: string = '';
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   selectedOrgName: string = '';
@@ -33,6 +34,8 @@ export class EditEnvironmentComponent implements OnInit {
 
   ngOnInit() {
     this.envId = this.route.snapshot.params['id'];
+    this.orgId = this.route.snapshot.params['orgId'];
+
     this.loadEnvironmentData();
   }
 
@@ -66,17 +69,19 @@ export class EditEnvironmentComponent implements OnInit {
   }
 
   loadEnvironmentData() {
-    this.environmentService.viewEnvironment(this.envId).subscribe({
+    this.environmentService.viewEnvironment(this.orgId, this.envId).subscribe({
       next: (response: any) => {
         this.envData = response.data;
+
         this.envForm.patchValue({
           id: this.envData.id,
           name: this.envData.name,
           description: this.envData.description,
-          organisation: this.envData.organisation.id,
+          organisation: this.envData.organisationId,
           status: this.envData.status,
         });
-        this.selectedOrgName = this.envData.organisation.name;
+
+        this.selectedOrgName = this.envData.organisationName;
       },
       error: error => {
         console.error('Error loading environment data:', error);
@@ -85,6 +90,7 @@ export class EditEnvironmentComponent implements OnInit {
   }
 
   onSubmit() {
+    console.log(this.envForm.getRawValue());
     if (this.envForm.valid) {
       this.environmentService.editEnvironment(this.envForm).subscribe({
         next: () => {
@@ -112,8 +118,8 @@ export class EditEnvironmentComponent implements OnInit {
       organisation: this.envData.organisationId,
       status: this.envData.status,
     });
-    this.selectedOrgName = this.envData.organisation.name;
-    this.isCancelClicked = true;
+    this.selectedOrgName = this.envData.organisationName;
     this.envForm.markAsPristine();
+    this.isCancelClicked = true;
   }
 }

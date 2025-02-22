@@ -2,8 +2,9 @@
   height: 100%;
 
   .add-admin-container {
-    background: #fff;
+    background: var(--card-background);
     border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -16,7 +17,7 @@
       margin-bottom: 24px;
       position: sticky;
       top: 0;
-      background: #fff;
+      background: var(--card-background);
       z-index: 1;
 
       .left-section {
@@ -31,18 +32,13 @@
           margin: 0;
           font-size: 24px;
           font-weight: 600;
+          color: var(--text-color);
         }
       }
 
       .action-buttons {
         display: flex;
         gap: 12px;
-
-        button {
-          i {
-            margin-right: 8px;
-          }
-        }
       }
     }
 
@@ -58,16 +54,16 @@
       }
 
       &::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: var(--card-background);
         border-radius: 3px;
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
+        background: var(--border-color);
         border-radius: 3px;
 
         &:hover {
-          background: #a8a8a8;
+          background: var(--secondary-color);
         }
       }
 
@@ -95,10 +91,10 @@
 
           label {
             font-weight: 500;
-            color: #333;
+            color: var(--text-color);
 
             .required {
-              color: #f44336;
+              color: var(--error-color);
               margin-left: 4px;
             }
           }
@@ -108,19 +104,30 @@
             width: 100%;
 
             i {
-              color: #666;
+              color: var(--text-color);
+              opacity: 0.7;
             }
 
             input {
               width: 100%;
               padding-left: 35px;
-            }
+              background: var(--card-background);
+              border: 1px solid var(--border-color);
+              color: var(--text-color);
 
-            textarea {
-              width: 100%;
-              padding-left: 35px;
-              min-height: 80px;
-              resize: vertical;
+              &::placeholder {
+                color: var(--text-color);
+                opacity: 0.5;
+              }
+
+              &:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 1px var(--primary-color-transparent);
+              }
+
+              &.ng-invalid.ng-dirty {
+                border-color: var(--error-color);
+              }
             }
           }
 
@@ -128,13 +135,131 @@
             i:last-child {
               cursor: pointer;
               right: 10px;
+              color: var(--text-color);
+              opacity: 0.7;
+
+              &:hover {
+                opacity: 1;
+              }
             }
           }
 
           .error-message {
-            color: #f44336;
+            color: var(--error-color);
             font-size: 12px;
           }
+
+          input.readonly {
+            background: var(--hover-background) !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+
+            &:focus {
+              box-shadow: none;
+              border-color: var(--border-color);
+            }
+          }
+
+          .status-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-top: 0.25rem;
+
+            .status-text {
+              color: var(--text-color);
+              font-size: 0.875rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Override PrimeNG button styles
+:host ::ng-deep {
+  .p-button {
+    &.p-button-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-color) !important;
+      padding: 0.5rem !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        color: var(--text-color) !important;
+      }
+    }
+
+    &.p-button-outlined {
+      background: transparent !important;
+      border: 1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--primary-rgb), 0.04) !important;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      &.p-button-danger {
+        border-color: var(--error-color) !important;
+        color: var(--error-color) !important;
+
+        &:hover:not(:disabled) {
+          background: rgba(var(--error-rgb), 0.04) !important;
+        }
+      }
+    }
+  }
+
+  // InputSwitch styling
+  .p-inputswitch {
+    width: 3rem !important;
+    height: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+
+    .p-inputswitch-slider {
+      background: var(--border-color) !important;
+      border-radius: 30px !important;
+
+      &:before {
+        background: var(--card-background) !important;
+        width: 1rem !important;
+        height: 1rem !important;
+        left: 0.25rem !important;
+        margin-top: -0.5rem !important;
+        border-radius: 50% !important;
+        transition: all 0.2s ease !important;
+      }
+    }
+
+    &.p-inputswitch-checked {
+      .p-inputswitch-slider {
+        background: var(--success-color) !important;
+      }
+    }
+
+    &:not(.p-disabled) {
+      &:hover {
+        .p-inputswitch-slider {
+          background: var(--secondary-color) !important;
+        }
+      }
+
+      &.p-inputswitch-checked:hover {
+        .p-inputswitch-slider {
+          background: var(--success-color) !important;
+          opacity: 0.9;
         }
       }
     }

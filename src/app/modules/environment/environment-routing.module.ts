@@ -13,7 +13,7 @@ const routes: Routes = [
     path: 'add',
     component: AddEnvironmentComponent,
   },
-  { path: 'edit/:id', component: EditEnvironmentComponent },
+  { path: 'edit/:orgId/:id', component: EditEnvironmentComponent },
 ];
 
 @NgModule({

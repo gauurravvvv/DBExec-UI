@@ -24,7 +24,7 @@
             <div class="form-grid">
                 <!-- Name Field -->
                 <div class="form-field">
-                    <label for="name">Name<span class="required">*</span></label>
+                    <label for="name">Name <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-globe"></i>
                         <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
@@ -49,7 +49,7 @@
 
                 <!-- Organisation Dropdown -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation<span class="required">*</span></label>
+                    <label for="organisation">Organisation <span class="required">*</span></label>
                     <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
                         formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
                         [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"

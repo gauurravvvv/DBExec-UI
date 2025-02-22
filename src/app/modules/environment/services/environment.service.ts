@@ -51,8 +51,8 @@ export class EnvironmentService {
     );
   }
 
-  viewEnvironment(envId: string) {
-    return this.http.get(ENVIRONMENT.VIEW + `${envId}`).pipe(
+  viewEnvironment(orgId: string, envId: string) {
+    return this.http.get(ENVIRONMENT.VIEW + `${orgId}/${envId}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -61,13 +61,15 @@ export class EnvironmentService {
   }
 
   editEnvironment(envForm: FormGroup) {
-    const { id, name, description, status } = envForm.getRawValue();
+    const { id, name, description, status, organisation } =
+      envForm.getRawValue();
     return this.http
       .put(ENVIRONMENT.EDIT, {
         id,
         name,
         description,
         status: status ? 1 : 0,
+        organisation,
       })
       .pipe(
         map((response: any) => {
