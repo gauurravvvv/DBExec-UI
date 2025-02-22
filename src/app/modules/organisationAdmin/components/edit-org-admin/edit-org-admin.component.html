@@ -107,10 +107,9 @@
                 <!-- Status -->
                 <div class="form-field">
                     <label for="status">Status</label>
-                    <div class="d-flex align-items-center pt-2">
-                        <p-inputSwitch class="ml-2" formControlName="status" [trueValue]="1"
-                            [falseValue]="0"></p-inputSwitch>
-                        <span class="ml-2 mb-1">{{ orgForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
+                    <div class="status-wrapper">
+                        <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
+                        <span class="status-text">{{ orgForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
                             }}</span>
                     </div>
                 </div>

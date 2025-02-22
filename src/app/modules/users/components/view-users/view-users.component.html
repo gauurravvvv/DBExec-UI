@@ -10,7 +10,7 @@
             </div>
             <div class="action-buttons">
                 <button pButton class="p-button-outlined" type="button" label="Edit"
-                    [disabled]="userId == loggedInUserId" [routerLink]="['/app/users/edit', userId]">
+                    [disabled]="userId == loggedInUserId" [routerLink]="['/app/users/edit', orgId, userId]">
                     <i class="pi pi-pencil mr-2"></i>
                 </button>
                 <button pButton class="p-button-outlined" type="button" label="Change Password"

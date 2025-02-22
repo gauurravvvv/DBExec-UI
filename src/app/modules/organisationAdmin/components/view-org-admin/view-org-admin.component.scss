@@ -1,19 +1,23 @@
 .view-admin-wrapper {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
   .view-admin-container {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    height: calc(100vh - 145px);
+    height: 100%;
     display: flex;
     flex-direction: column;
 
     .page-header {
       padding: 20px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: white;
+      background: var(--card-background);
       border-radius: 8px 8px 0 0;
       position: sticky;
       top: 0;
@@ -26,10 +30,22 @@
 
         h2 {
           margin: 0;
+          color: var(--text-color);
         }
 
         button {
           min-width: 0rem;
+          background: transparent !important;
+          border: none !important;
+          color: var(--text-color) !important;
+
+          &:hover {
+            background: var(--hover-background) !important;
+          }
+
+          i {
+            color: var(--text-color) !important;
+          }
         }
       }
 
@@ -44,22 +60,23 @@
       padding: 30px;
       overflow-y: auto;
       flex: 1;
+      height: calc(100% - 80px); // Subtract header height
 
       &::-webkit-scrollbar {
         width: 8px;
       }
 
       &::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: var(--card-background);
         border-radius: 4px;
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
+        background: var(--border-color);
         border-radius: 4px;
 
         &:hover {
-          background: #a8a8a8;
+          background: var(--secondary-color);
         }
       }
 
@@ -67,12 +84,108 @@
         display: flex;
         flex-direction: column;
         gap: 40px;
+        height: 100%;
 
         .first-row,
         .second-row {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 30px;
+        }
+      }
+
+      .avatar-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+
+        .avatar-circle {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 2.5rem;
+          color: white;
+          margin-bottom: 16px;
+        }
+
+        .admin-name {
+          margin: 10px 0 5px;
+          font-size: 1.5rem;
+          text-align: center;
+          color: var(--text-color);
+        }
+
+        .admin-username {
+          color: var(--secondary-color);
+          margin: 0;
+          text-align: center;
+        }
+      }
+
+      .detail-group {
+        background: var(--card-background);
+        padding: 20px;
+        border-radius: 8px;
+        height: fit-content;
+
+        h4 {
+          color: var(--text-color);
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 2px solid var(--border-color);
+        }
+
+        .detail-item {
+          margin-bottom: 20px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+
+            i {
+              font-size: 1rem;
+              color: var(--text-color);
+            }
+          }
+
+          .value {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--text-color);
+            padding: 4px 0;
+
+            .status-badge {
+              display: inline-block;
+              padding: 0.3rem 0.6rem;
+              border-radius: 4px;
+              font-size: 0.9rem;
+              font-weight: 500;
+              background-color: #ff4444;
+              color: white;
+
+              &.active {
+                background: rgba(var(--success-rgb), 0.15);
+                color: var(--success-color);
+              }
+
+              &:not(.active) {
+                background: rgba(var(--error-rgb), 0.15);
+                color: var(--error-color);
+              }
+            }
+          }
         }
       }
     }
@@ -192,7 +305,7 @@
   z-index: 1000;
 
   .popup-content {
-    background: white;
+    background: var(--card-background);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -202,10 +315,12 @@
     h3 {
       margin-top: 0;
       margin-bottom: 15px;
+      color: var(--text-color);
     }
 
     p {
       margin-bottom: 20px;
+      color: var(--text-color);
     }
 
     .popup-actions {
@@ -220,13 +335,56 @@
         cursor: pointer;
 
         &.btn-cancel {
-          background-color: #6c757d;
+          background-color: var(--secondary-color);
           color: white;
         }
 
         &.btn-confirm {
-          background-color: #dc3545;
+          background-color: var(--error-color);
           color: white;
+        }
+      }
+    }
+  }
+}
+
+// Override PrimeNG button styles
+:host ::ng-deep {
+  .p-button {
+    &.p-button-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-color) !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        color: var(--text-color) !important;
+      }
+    }
+
+    &.p-button-outlined {
+      background: transparent !important;
+      border: 1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--primary-rgb), 0.04) !important;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      &.p-button-danger {
+        border-color: var(--error-color) !important;
+        color: var(--error-color) !important;
+
+        &:hover:not(:disabled) {
+          background: rgba(var(--error-rgb), 0.04) !important;
         }
       }
     }

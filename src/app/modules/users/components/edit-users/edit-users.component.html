@@ -3,7 +3,7 @@
         <!-- Header Section -->
         <div class="page-header">
             <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/org-admin">
+                <button pButton class="p-button-text" routerLink="/app/users">
                     <i class="pi pi-arrow-left"></i>
                 </button>
                 <h2>Edit User</h2>
@@ -12,8 +12,8 @@
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
                     [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
                 </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="userForm.invalid || !isFormDirty">
+                <button pButton type="submit" label="Save" class="p-button-outlined"
+                    [disabled]="userForm.invalid || !isFormDirty" (click)="onSubmit()">
                     <i class="pi pi-save mr-2"></i>
                 </button>
             </div>
@@ -24,7 +24,7 @@
             <div class="form-grid">
                 <!-- First Name -->
                 <div class="form-field">
-                    <label for="firstName">First Name<span class="required">*</span></label>
+                    <label for="firstName">First Name <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-user"></i>
                         <input id="firstName" type="text" pInputText formControlName="firstName"
@@ -39,7 +39,7 @@
 
                 <!-- Last Name -->
                 <div class="form-field">
-                    <label for="lastName">Last Name<span class="required">*</span></label>
+                    <label for="lastName">Last Name <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-user"></i>
                         <input id="lastName" type="text" pInputText formControlName="lastName"
@@ -54,7 +54,7 @@
 
                 <!-- Username -->
                 <div class="form-field">
-                    <label for="username">Username<span class="required">*</span></label>
+                    <label for="username">Username <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-user-edit"></i>
                         <input id="username" type="text" pInputText formControlName="username"
@@ -64,7 +64,7 @@
 
                 <!-- Email -->
                 <div class="form-field">
-                    <label for="email">Email<span class="required">*</span></label>
+                    <label for="email">Email <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-envelope"></i>
                         <input id="email" type="email" pInputText formControlName="email"
@@ -80,7 +80,7 @@
 
                 <!-- Mobile -->
                 <div class="form-field">
-                    <label for="mobile">Mobile<span class="required">*</span></label>
+                    <label for="mobile">Mobile <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-phone"></i>
                         <input id="mobile" type="text" pInputText formControlName="mobile"
@@ -108,10 +108,9 @@
                 <!-- Status -->
                 <div class="form-field">
                     <label for="status">Status</label>
-                    <div class="d-flex align-items-center pt-2">
-                        <p-inputSwitch class="ml-2" formControlName="status" [trueValue]="1"
-                            [falseValue]="0"></p-inputSwitch>
-                        <span class="ml-2 mb-1">{{ userForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
+                    <div class="status-wrapper">
+                        <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
+                        <span class="status-text">{{ userForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
                             }}</span>
                     </div>
                 </div>

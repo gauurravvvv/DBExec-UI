@@ -24,7 +24,7 @@
             <div class="form-grid">
                 <!-- Name Field -->
                 <div class="form-field">
-                    <label for="name">Name<span class="required">*</span></label>
+                    <label for="name">Name<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-database"></i>
                         <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
@@ -39,7 +39,7 @@
 
                 <!-- Description Field -->
                 <div class="form-field">
-                    <label for="description">Description<span class="required">*</span></label>
+                    <label for="description">Description<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-align-left"></i>
                         <input id="description" pInputText formControlName="description" placeholder="Enter description"
@@ -63,7 +63,7 @@
 
                 <!-- Host Field -->
                 <div class="form-field">
-                    <label for="host">Host<span class="required">*</span></label>
+                    <label for="host">Host<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-desktop"></i>
                         <input id="host" pInputText formControlName="host" placeholder="Enter database host"
@@ -78,7 +78,7 @@
 
                 <!-- Port Field -->
                 <div class="form-field">
-                    <label for="port">Port<span class="required">*</span></label>
+                    <label for="port">Port<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-hashtag"></i>
                         <input id="port" type="number" pInputText formControlName="port"
@@ -94,7 +94,7 @@
 
                 <!-- Database Name Field -->
                 <div class="form-field">
-                    <label for="database">Database Name<span class="required">*</span></label>
+                    <label for="database">Database Name<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-database"></i>
                         <input id="database" pInputText formControlName="database" placeholder="Enter database name"
@@ -109,7 +109,7 @@
 
                 <!-- Username Field -->
                 <div class="form-field">
-                    <label for="username">Username<span class="required">*</span></label>
+                    <label for="username">Username<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-user"></i>
                         <input id="username" pInputText formControlName="username" placeholder="Enter database username"
@@ -124,7 +124,7 @@
 
                 <!-- Password Field -->
                 <div class="form-field">
-                    <label for="password">Password<span class="required">*</span></label>
+                    <label for="password">Password<span class="required"> *</span></label>
                     <span class="p-input-icon-left p-input-icon-right">
                         <i class="pi pi-lock"></i>
                         <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
@@ -141,7 +141,7 @@
 
                 <!-- Organisation Dropdown -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation<span class="required">*</span></label>
+                    <label for="organisation">Organisation<span class="required"> *</span></label>
                     <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
                         formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
                         [panelStyle]="{'width':'100%'}" placeholder="Select Organisation" appendTo="body"

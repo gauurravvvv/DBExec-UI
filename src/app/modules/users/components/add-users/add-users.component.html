@@ -24,7 +24,7 @@
             <div class="form-grid">
                 <!-- First Name -->
                 <div class="form-field">
-                    <label for="firstName">First Name<span class="required">*</span></label>
+                    <label for="firstName">First Name<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-user"></i>
                         <input id="firstName" type="text" pInputText formControlName="firstName"
@@ -41,7 +41,7 @@
 
                 <!-- Last Name -->
                 <div class="form-field">
-                    <label for="lastName">Last Name<span class="required">*</span></label>
+                    <label for="lastName">Last Name<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-user"></i>
                         <input id="lastName" type="text" pInputText formControlName="lastName"
@@ -58,7 +58,7 @@
 
                 <!-- Username -->
                 <div class="form-field">
-                    <label for="username">Username<span class="required">*</span></label>
+                    <label for="username">Username<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-user-edit"></i>
                         <input id="username" type="text" pInputText formControlName="username"
@@ -77,7 +77,7 @@
 
                 <!-- Email -->
                 <div class="form-field">
-                    <label for="email">Email<span class="required">*</span></label>
+                    <label for="email">Email<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-envelope"></i>
                         <input id="email" type="email" pInputText formControlName="email"
@@ -93,7 +93,7 @@
 
                 <!-- Mobile -->
                 <div class="form-field">
-                    <label for="mobile">Mobile<span class="required">*</span></label>
+                    <label for="mobile">Mobile<span class="required"> *</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-phone"></i>
                         <input id="mobile" type="text" pInputText formControlName="mobile"
@@ -110,7 +110,7 @@
 
                 <!-- Password -->
                 <div class="form-field">
-                    <label for="password">Password<span class="required">*</span></label>
+                    <label for="password">Password<span class="required"> *</span></label>
                     <span class="p-input-icon-left p-input-icon-right">
                         <i class="pi pi-lock"></i>
                         <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
@@ -127,7 +127,7 @@
 
                 <!-- Organisation Dropdown -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation<span class="required">*</span></label>
+                    <label for="organisation">Organisation<span class="required"> *</span></label>
                     <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
                         formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
                         [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"

@@ -47,14 +47,20 @@ select,
 textarea,
 .p-inputtext,
 .p-inputswitch,
-.p-button {
+.p-icon,
+.p-dropdown-trigger,
+.p-dropdown-trigger-icon,
+.p-dropdown,
+.p-dropdown-panel,
+.p-dropdown-items .p-dropdown-item {
   transition: all 0.3s ease !important;
   background: var(--input-background) !important;
 }
 
 // Override any PrimeNG transitions
 :host ::ng-deep {
-  .p-component {
+  .p-component,
+  .p-component * {
     transition: all 0.3s ease !important;
   }
 }
