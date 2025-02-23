@@ -17,6 +17,7 @@ export class EditCategoryComponent implements OnInit {
   isFormDirty = false;
   showOrganisationDropdown = true;
   categoryId!: string;
+  orgId!: string;
   selectedOrgName: string = '';
   originalFormValue: any;
 
@@ -33,6 +34,8 @@ export class EditCategoryComponent implements OnInit {
     this.initForm();
 
     this.categoryId = this.route.snapshot.params['id'];
+    this.orgId = this.route.snapshot.params['orgId'];
+
     if (this.categoryId) {
       this.loadCategoryData();
     }
@@ -48,100 +51,90 @@ export class EditCategoryComponent implements OnInit {
       status: [1],
       config: this.fb.array([]),
     });
+
+    this.categoryForm.valueChanges.subscribe(() => {
+      this.checkFormDirty();
+    });
   }
 
   get config(): FormArray {
     return this.categoryForm.get('config') as FormArray;
   }
 
-  createFieldGroup(): FormGroup {
+  createFieldGroup(sequence: number = this.getNextSequence()): FormGroup {
     return this.fb.group({
       id: [null],
       name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s]+$')]],
-      categoryId: [null],
+      sequence: [sequence],
     });
   }
 
+  getNextSequence(): number {
+    return this.config.length + 1;
+  }
+
   loadCategoryData(): void {
-    this.categoryService
-      .viewCategory(this.categoryId)
-      .pipe()
-      .subscribe({
-        next: response => {
-          const categoryData = response.data;
+    this.categoryService.viewCategory(this.orgId, this.categoryId).subscribe({
+      next: response => {
+        const categoryData = response.data;
 
-          // First patch the organisation ID and set name
-          this.categoryForm.patchValue({
-            organisation: categoryData.organisationId,
+        this.categoryForm.patchValue({
+          organisation: categoryData.organisationId,
+        });
+        this.selectedOrgName = categoryData.organisationName || '';
+
+        this.loadEnvironments({
+          orgId: categoryData.organisationId,
+          pageNumber: 1,
+          limit: 100,
+        });
+
+        while (this.config.length) {
+          this.config.removeAt(0);
+        }
+
+        if (
+          categoryData.configurations &&
+          categoryData.configurations.length > 0
+        ) {
+          categoryData.configurations.forEach((config: any, index: number) => {
+            this.config.push(
+              this.fb.group({
+                id: [config.id],
+                name: [
+                  config.fieldName,
+                  [Validators.required, Validators.pattern('^[a-zA-Z\\s]+$')],
+                ],
+                sequence: [index + 1],
+              })
+            );
           });
-          this.selectedOrgName = categoryData.organisation?.name || '';
+        }
 
-          // Load environments with orgId from response
-          const params = {
-            orgId: categoryData.organisationId,
-            pageNumber: 1,
-            limit: 100,
-          };
-          this.loadEnvironments(params);
+        const environmentIds = categoryData.categoryMappings.map(
+          (mapping: any) => mapping.environmentId
+        );
 
-          // Clear existing config fields
-          while (this.config.length) {
-            this.config.removeAt(0);
-          }
+        this.categoryForm.patchValue({
+          id: categoryData.id,
+          name: categoryData.name,
+          description: categoryData.description,
+          environments: environmentIds,
+          status: categoryData.status,
+        });
 
-          // Add configuration fields
-          if (
-            categoryData.configurations &&
-            categoryData.configurations.length > 0
-          ) {
-            categoryData.configurations.forEach((config: any) => {
-              this.config.push(
-                this.fb.group({
-                  id: [config.id],
-                  name: [
-                    config.fieldName,
-                    [Validators.required, Validators.pattern('^[a-zA-Z\\s]+$')],
-                  ],
-                  categoryId: [config.categoryId],
-                })
-              );
-            });
-          }
-
-          // Get environment IDs from mappings
-          const environmentIds = categoryData.categoryMappings.map(
-            (mapping: any) => mapping.environmentId
-          );
-
-          // Finally patch all remaining form values
-          this.categoryForm.patchValue({
-            id: categoryData.id,
-            name: categoryData.name,
-            description: categoryData.description,
-            environments: environmentIds,
-            status: categoryData.status,
-          });
-
-          // Store original form value after all patches
-          this.originalFormValue = this.categoryForm.value;
-
-          // Reset form dirty state
-          this.isFormDirty = false;
-          this.categoryForm.markAsPristine();
-
-          // Watch for form changes
-          this.categoryForm.valueChanges.subscribe(() => {
-            this.checkFormDirty();
-          });
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load category data',
-          });
-        },
-      });
+        this.originalFormValue = this.categoryForm.value;
+        this.isFormDirty = false;
+        this.categoryForm.markAsPristine();
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load category data',
+        });
+      },
+    });
   }
 
   loadEnvironments(params: any): void {
@@ -149,7 +142,7 @@ export class EditCategoryComponent implements OnInit {
       next: response => {
         this.environments = response.data.envs;
       },
-      error: error => {
+      error: () => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -161,10 +154,22 @@ export class EditCategoryComponent implements OnInit {
 
   addField(): void {
     this.config.push(this.createFieldGroup());
+    this.resequenceFields();
+    this.categoryForm.markAsDirty();
   }
 
   removeField(index: number): void {
-    this.config.removeAt(index);
+    if (this.config.length > 1) {
+      this.config.removeAt(index);
+      this.resequenceFields();
+      this.categoryForm.markAsDirty();
+    }
+  }
+
+  private resequenceFields() {
+    this.config.controls.forEach((control, index) => {
+      control.patchValue({ sequence: index + 1 }, { emitEvent: false });
+    });
   }
 
   getFieldErrorMessage(field: any): string {
@@ -181,11 +186,10 @@ export class EditCategoryComponent implements OnInit {
     if (this.categoryForm.valid) {
       const formValue = this.categoryForm.value;
 
-      // Transform config array to match API expectations
       const configData = formValue.config.map((item: any) => ({
         id: item.id,
         fieldName: item.name,
-        categoryId: item.categoryId,
+        sequence: item.sequence,
       }));
 
       const submitData = {
@@ -193,37 +197,32 @@ export class EditCategoryComponent implements OnInit {
         config: configData,
       };
 
-      this.categoryService
-        .editCategory(submitData)
-        .pipe()
-        .subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Category updated successfully',
-            });
-            this.router.navigate([CATEGORY.LIST]);
-          },
-          error: error => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to update category',
-            });
-          },
-        });
+      this.categoryService.editCategory(submitData).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Category updated successfully',
+          });
+          this.router.navigate([CATEGORY.LIST]);
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to update category',
+          });
+        },
+      });
     }
   }
 
   onCancel(): void {
     if (this.isFormDirty) {
-      // Clear existing config fields
       while (this.config.length) {
         this.config.removeAt(0);
       }
 
-      // Recreate config form groups
       this.originalFormValue.config.forEach((config: any) => {
         this.config.push(
           this.fb.group({
@@ -232,15 +231,12 @@ export class EditCategoryComponent implements OnInit {
               config.name,
               [Validators.required, Validators.pattern('^[a-zA-Z\\s]+$')],
             ],
-            categoryId: [config.categoryId],
+            sequence: [config.sequence],
           })
         );
       });
 
-      // Restore all form values
       this.categoryForm.patchValue(this.originalFormValue);
-
-      // Reset form state
       this.isFormDirty = false;
       this.categoryForm.markAsPristine();
     } else {
@@ -248,10 +244,8 @@ export class EditCategoryComponent implements OnInit {
     }
   }
 
-  // Add new method to check if form is dirty
   checkFormDirty(): void {
     if (!this.originalFormValue) return;
-
     const currentValue = this.categoryForm.value;
     this.isFormDirty =
       JSON.stringify(this.originalFormValue) !== JSON.stringify(currentValue);

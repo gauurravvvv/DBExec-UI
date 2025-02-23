@@ -51,7 +51,8 @@
                         <ng-container *ngIf="filteredCategories && filteredCategories.length > 0; else noData">
                             <tr *ngFor="let category of filteredCategories">
                                 <td>
-                                    <a class="admin-name" [routerLink]="['/app/category/view', category.id]">
+                                    <a class="admin-name"
+                                        [routerLink]="['/app/category/view',selectedOrg.id , category.id]">
                                         {{ category.name }}
                                     </a>
                                 </td>

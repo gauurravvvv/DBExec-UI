@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CATEGORY, ENVIRONMENT } from 'src/app/constants/routes';
+import { CATEGORY } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { EnvironmentService } from 'src/app/modules/environment/services/environment.service';
@@ -32,20 +32,18 @@ export class AddCategoryComponent implements OnInit {
     this.initForm();
   }
 
-  // Add getter for form dirty state
   get isFormDirty(): boolean {
     return this.categoryForm.dirty;
   }
 
-  get config() {
-    return this.categoryForm.get('config') as FormArray;
+  get config(): FormArray {
+    return this.categoryForm?.get('config') as FormArray;
   }
 
   ngOnInit() {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      // Load environments for non-super admin users
       this.loadEnvironments();
     }
   }
@@ -70,11 +68,9 @@ export class AddCategoryComponent implements OnInit {
       config: this.fb.array([this.createField()]), // Initialize with one field
     });
 
-    // Subscribe to organisation changes
     this.categoryForm.get('organisation')?.valueChanges.subscribe(value => {
       if (value) {
         this.loadEnvironments();
-        // Reset environments when organisation changes
         this.categoryForm.patchValue(
           { environments: [] },
           { emitEvent: false }
@@ -86,6 +82,8 @@ export class AddCategoryComponent implements OnInit {
   }
 
   createField(): FormGroup {
+    const nextSequence = this.getNextSequence();
+
     return this.fb.group({
       name: [
         '',
@@ -96,18 +94,34 @@ export class AddCategoryComponent implements OnInit {
           Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
         ],
       ],
+      sequence: [nextSequence],
     });
+  }
+
+  private getNextSequence(): number {
+    if (!this.categoryForm) return 1;
+    const configArray = this.categoryForm.get('config') as FormArray;
+    return configArray ? configArray.length + 1 : 1;
   }
 
   addField() {
     this.config.push(this.createField());
+    this.categoryForm.markAsDirty();
   }
 
   removeField(index: number) {
     if (this.config.length > 1) {
-      // Keep at least one field
       this.config.removeAt(index);
+      this.resequenceFields();
+      this.categoryForm.markAsDirty();
     }
+  }
+
+  private resequenceFields() {
+    const controls = this.config.controls;
+    controls.forEach((control, index) => {
+      control.patchValue({ sequence: index + 1 }, { emitEvent: false });
+    });
   }
 
   loadOrganisations() {
@@ -175,20 +189,28 @@ export class AddCategoryComponent implements OnInit {
 
   onCancel() {
     this.categoryForm.reset();
-    // Reset specific form controls to empty strings
     Object.keys(this.categoryForm.controls).forEach(key => {
-      this.categoryForm.get(key)?.setValue('');
+      if (key === 'environments') {
+        this.categoryForm.get(key)?.setValue([]);
+      } else if (key === 'config') {
+        const configArray = this.categoryForm.get('config') as FormArray;
+        while (configArray.length) {
+          configArray.removeAt(0);
+        }
+        configArray.push(this.createField());
+      } else {
+        this.categoryForm.get(key)?.setValue('');
+      }
     });
   }
 
   onPhoneInput(event: any) {
     const input = event.target as HTMLInputElement;
     const value = input.value;
-    input.value = value.replace(/\D/g, ''); // Remove non-digit characters
+    input.value = value.replace(/\D/g, '');
     this.categoryForm.patchValue({ mobile: input.value });
   }
 
-  // Add a helper method to get error message
   getFieldErrorMessage(field: any): string {
     if (field.get('name')?.errors) {
       const errors = field.get('name')?.errors;

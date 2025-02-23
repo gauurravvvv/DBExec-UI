@@ -174,18 +174,20 @@ export class ListEnvironmentComponent implements OnInit {
 
   proceedDelete() {
     if (this.envToDelete) {
-      this.environmentService.deleteEnvironment(this.envToDelete).subscribe({
-        next: () => {
-          this.loadEnvs();
-          this.showDeleteConfirm = false;
-          this.envToDelete = null;
-        },
-        error: error => {
-          console.error('Error deleting env:', error);
-          this.showDeleteConfirm = false;
-          this.envToDelete = null;
-        },
-      });
+      this.environmentService
+        .deleteEnvironment(this.selectedOrg.id, this.envToDelete)
+        .subscribe({
+          next: () => {
+            this.loadEnvs();
+            this.showDeleteConfirm = false;
+            this.envToDelete = null;
+          },
+          error: error => {
+            console.error('Error deleting env:', error);
+            this.showDeleteConfirm = false;
+            this.envToDelete = null;
+          },
+        });
     }
   }
 }

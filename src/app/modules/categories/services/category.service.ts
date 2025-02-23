@@ -45,8 +45,8 @@ export class CategoryService {
       );
   }
 
-  deleteCategory(id: string) {
-    return this.http.delete(CATEGORY.DELETE + `${id}`).pipe(
+  deleteCategory(orgId: string, id: string) {
+    return this.http.delete(CATEGORY.DELETE + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -54,8 +54,8 @@ export class CategoryService {
     );
   }
 
-  viewCategory(categoryId: string) {
-    return this.http.get(CATEGORY.VIEW + `${categoryId}`).pipe(
+  viewCategory(orgId: string, categoryId: string) {
+    return this.http.get(CATEGORY.VIEW + `${orgId}/${categoryId}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -81,8 +81,15 @@ export class CategoryService {
   }
 
   editCategory(categoryData: any) {
-    const { id, name, description, environments, status, config } =
-      categoryData;
+    const {
+      id,
+      name,
+      description,
+      environments,
+      status,
+      config,
+      organisation,
+    } = categoryData;
     return this.http
       .put(CATEGORY.EDIT, {
         id,
@@ -91,6 +98,7 @@ export class CategoryService {
         environments,
         status,
         config,
+        organisation,
       })
       .pipe(
         map((response: any) => {

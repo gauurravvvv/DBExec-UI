@@ -108,6 +108,11 @@ export class ListCategoryComponent implements OnInit {
         this.applyFilters();
       },
       error: error => {
+        this.categories = [];
+        this.filteredCategories = [];
+        this.totalItems = 0;
+        this.totalPages = 0;
+        this.pages = [];
         console.error('Error loading categories:', error);
       },
     });
@@ -158,7 +163,12 @@ export class ListCategoryComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([CATEGORY.EDIT, id]);
+    this.router.navigate([CATEGORY.EDIT, this.selectedOrg.id, id], {
+      queryParams: {
+        orgId: this.selectedOrg.id,
+        adminId: id,
+      },
+    });
   }
 
   confirmDelete(id: string) {
@@ -173,18 +183,20 @@ export class ListCategoryComponent implements OnInit {
 
   proceedDelete() {
     if (this.categoryToDelete) {
-      this.categoryService.deleteCategory(this.categoryToDelete).subscribe({
-        next: () => {
-          this.loadCategories();
-          this.showDeleteConfirm = false;
-          this.categoryToDelete = null;
-        },
-        error: error => {
-          console.error('Error deleting category:', error);
-          this.showDeleteConfirm = false;
-          this.categoryToDelete = null;
-        },
-      });
+      this.categoryService
+        .deleteCategory(this.selectedOrg.id, this.categoryToDelete)
+        .subscribe({
+          next: () => {
+            this.loadCategories();
+            this.showDeleteConfirm = false;
+            this.categoryToDelete = null;
+          },
+          error: error => {
+            console.error('Error deleting category:', error);
+            this.showDeleteConfirm = false;
+            this.categoryToDelete = null;
+          },
+        });
     }
   }
 }

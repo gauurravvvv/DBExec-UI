@@ -11,6 +11,7 @@ import { MessageService } from 'primeng/api';
 })
 export class ViewCategoryComponent implements OnInit {
   categoryId: string = '';
+  orgId: string = '';
   categoryData: any = null;
   showDeleteConfirm = false;
 
@@ -23,11 +24,12 @@ export class ViewCategoryComponent implements OnInit {
 
   ngOnInit() {
     this.categoryId = this.route.snapshot.params['id'];
+    this.orgId = this.route.snapshot.params['orgId'];
     this.loadCategoryDetails();
   }
 
   loadCategoryDetails() {
-    this.categoryService.viewCategory(this.categoryId).subscribe({
+    this.categoryService.viewCategory(this.orgId, this.categoryId).subscribe({
       next: (response: any) => {
         this.categoryData = response.data;
       },
@@ -38,7 +40,12 @@ export class ViewCategoryComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([CATEGORY.EDIT, this.categoryId]);
+    this.router.navigate([CATEGORY.EDIT, this.orgId, this.categoryId], {
+      queryParams: {
+        orgId: this.orgId,
+        adminId: this.categoryId,
+      },
+    });
   }
 
   goBack() {
@@ -55,26 +62,28 @@ export class ViewCategoryComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.categoryData) {
-      this.categoryService.deleteCategory(this.categoryData.id).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Category deleted successfully',
-          });
-          this.router.navigate(['/app/category']);
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to delete category',
-          });
-        },
-        complete: () => {
-          this.showDeleteConfirm = false;
-        },
-      });
+      this.categoryService
+        .deleteCategory(this.orgId, this.categoryData.id)
+        .subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Category deleted successfully',
+            });
+            this.router.navigate(['/app/category']);
+          },
+          error: error => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete category',
+            });
+          },
+          complete: () => {
+            this.showDeleteConfirm = false;
+          },
+        });
     }
   }
 }

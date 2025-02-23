@@ -42,8 +42,8 @@ export class EnvironmentService {
       );
   }
 
-  deleteEnvironment(envId: string) {
-    return this.http.delete(ENVIRONMENT.DELETE + `${envId}`).pipe(
+  deleteEnvironment(orgId: string, envId: string) {
+    return this.http.delete(ENVIRONMENT.DELETE + `${orgId}/${envId}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
