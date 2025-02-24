@@ -20,6 +20,10 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/users',
   },
   {
+    value: 'userGroupManagement',
+    route: '/app/group',
+  },
+  {
     value: 'userMapper',
     route: '/home/users',
   },

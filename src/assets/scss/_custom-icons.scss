@@ -106,6 +106,9 @@ $icon-url: '../icons/';
     &.ci-site-map {
       content: url($icon-url + 'site-map.svg');
     }
+    &.ci-user-group {
+      content: url($icon-url + 'user-group.svg');
+    }
   }
 }
 
