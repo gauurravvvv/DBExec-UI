@@ -20,6 +20,7 @@ export class ChangePasswordDialogComponent implements OnInit {
   passwordForm!: FormGroup;
   showNewPassword = false;
   showConfirmPassword = false;
+  users: any[] = [];
 
   constructor(private fb: FormBuilder) {}
 
@@ -66,9 +67,19 @@ export class ChangePasswordDialogComponent implements OnInit {
     }
   }
 
+  canSubmit(): boolean {
+    return (
+      !this.passwordForm.invalid &&
+      !this.passwordForm.hasError('mismatch') &&
+      this.users.length > 1
+    );
+  }
+
   onSubmit() {
-    if (this.passwordForm.valid) {
-      this.close.emit(this.passwordForm.get('newPassword')?.value);
+    if (this.canSubmit()) {
+      if (this.passwordForm.valid) {
+        this.close.emit(this.passwordForm.get('newPassword')?.value);
+      }
     }
   }
 

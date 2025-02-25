@@ -31,6 +31,7 @@ export class OrganisationService {
       maxDatabases,
       maxAdmins,
       maxCategories,
+      maxGroups,
     } = orgForm.value;
     return this.http
       .post(ORGANISATION.ADD, {
@@ -41,6 +42,7 @@ export class OrganisationService {
         maxDatabases,
         maxAdmins,
         maxCategories,
+        maxGroups,
       })
       .pipe(
         map((response: any) => {
@@ -59,6 +61,7 @@ export class OrganisationService {
       maxDatabases,
       maxAdmins,
       maxCategories,
+      maxGroups,
       status,
     } = orgForm.getRawValue();
     return this.http
@@ -70,6 +73,7 @@ export class OrganisationService {
         maxDatabases,
         maxAdmins,
         maxCategories,
+        maxGroups,
         status: status ? 1 : 0,
       })
       .pipe(

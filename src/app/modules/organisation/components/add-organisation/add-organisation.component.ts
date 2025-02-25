@@ -40,6 +40,7 @@ export class AddOrganisationComponent implements OnInit {
       maxEnvironments: ['', [Validators.required, Validators.min(1)]],
       maxCategories: ['', [Validators.required, Validators.min(1)]],
       maxDatabases: ['', [Validators.required, Validators.min(1)]],
+      maxGroups: ['', [Validators.required, Validators.min(1)]],
     });
   }
 

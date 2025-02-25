@@ -45,6 +45,7 @@ export class EditOrganisationComponent implements OnInit {
       maxEnvironments: ['', [Validators.required, Validators.min(1)]],
       maxCategories: ['', [Validators.required, Validators.min(1)]],
       maxDatabases: ['', [Validators.required, Validators.min(1)]],
+      maxGroups: ['', [Validators.required, Validators.min(1)]],
       status: [],
     });
 
@@ -64,6 +65,7 @@ export class EditOrganisationComponent implements OnInit {
         maxUsers: this.orgData?.config?.maxUsers,
         maxEnvironments: this.orgData?.config?.maxEnvironment,
         maxCategories: this.orgData?.config?.maxCategories,
+        maxGroups: this.orgData?.config?.maxGroups,
       };
 
       // Check if any value is different from original
@@ -89,6 +91,7 @@ export class EditOrganisationComponent implements OnInit {
             maxUsers: this.orgData.config.maxUsers,
             maxEnvironments: this.orgData.config.maxEnvironment,
             maxCategories: this.orgData.config.maxCategories,
+            maxGroups: this.orgData.config.maxGroups,
           });
           this.isFormDirty = false;
         }

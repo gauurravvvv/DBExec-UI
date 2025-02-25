@@ -1,0 +1,92 @@
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/app/group">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Edit Group</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    [disabled]="!isFormDirty" (click)="onCancel()">
+                </button>
+                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    [disabled]="groupForm.invalid || !isFormDirty || groupForm.get('users')?.value?.length <= 1">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <form [formGroup]="groupForm" class="admin-form" *ngIf="groupForm">
+            <div class="form-grid">
+                <!-- Hidden ID Field -->
+                <input type="hidden" formControlName="id">
+
+                <!-- Name Field -->
+                <div class="form-field">
+                    <label for="name">Name<span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-key"></i>
+                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
+                            [ngClass]="{'ng-invalid ng-dirty': groupForm.get('name')?.invalid && groupForm.get('name')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="groupForm.get('name')?.invalid && groupForm.get('name')?.touched">
+                        <span *ngIf="groupForm.get('name')?.errors?.['required']">Name is required</span>
+                        <span *ngIf="groupForm.get('name')?.errors?.['pattern']">Name can only contain
+                            letters, spaces and hyphens</span>
+                    </small>
+                </div>
+
+                <!-- Description Field -->
+                <div class="form-field">
+                    <label for="description">Description</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-align-left"></i>
+                        <input id="description" pInputText formControlName="description" rows="3"
+                            placeholder="Enter description">
+                    </span>
+                </div>
+
+                <!-- Replace the Organisation Input -->
+                <div class="form-field">
+                    <label for="organisation">Organisation</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-building"></i>
+                        <input id="organisation" type="text" pInputText [value]="selectedOrgName"
+                            placeholder="Organisation" readonly [ngClass]="{'readonly': true}">
+                    </span>
+                    <input type="hidden" formControlName="organisation">
+                </div>
+
+                <!-- Users Dropdown -->
+                <div class="form-field">
+                    <label for="users">Users<span class="required">*</span></label>
+                    <p-multiSelect [options]="users" formControlName="users" optionLabel="username" optionValue="id"
+                        [filter]="true" filterBy="username" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                        placeholder="Select Users" display="chip"
+                        [ngClass]="{'ng-invalid ng-dirty': groupForm.get('users')?.invalid && groupForm.get('users')?.touched}">
+                    </p-multiSelect>
+                    <small class="error-message"
+                        *ngIf="groupForm.get('users')?.invalid && groupForm.get('users')?.touched">
+                        <span *ngIf="groupForm.get('users')?.errors?.['minUsers']">At least two users are
+                            required</span>
+                    </small>
+                </div>
+
+                <!-- Status -->
+                <div class="form-field">
+                    <label for="status">Status</label>
+                    <div class="status-wrapper">
+                        <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
+                        <span class="status-text">{{ groupForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
+                            }}</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

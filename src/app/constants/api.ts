@@ -66,3 +66,11 @@ export const CATEGORY = {
   VIEW: '/category/get/',
   EDIT: '/category/update',
 };
+
+export const GROUP = {
+  LIST: '/group/list',
+  DELETE: '/group/delete/',
+  ADD: '/group/add',
+  VIEW: '/group/get/',
+  EDIT: '/group/update',
+};

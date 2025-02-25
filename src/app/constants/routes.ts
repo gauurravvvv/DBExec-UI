@@ -33,6 +33,13 @@ export const CATEGORY = {
   VIEW: '/app/category/view',
 };
 
+export const GROUP = {
+  ADD: '/app/group/add',
+  LIST: '/app/group',
+  EDIT: '/app/group/edit',
+  VIEW: '/app/group/view',
+};
+
 export const USER = {
   ADD: '/app/users/add',
   LIST: '/app/users',

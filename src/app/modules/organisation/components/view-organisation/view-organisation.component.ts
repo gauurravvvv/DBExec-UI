@@ -9,6 +9,7 @@ interface OrganisationConfig {
   maxUsers: number;
   maxEnvironment: number;
   maxCategories: number;
+  maxGroups: number;
 }
 
 interface OrganisationData {

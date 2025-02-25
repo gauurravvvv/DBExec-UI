@@ -69,24 +69,23 @@
       overflow-y: auto;
       padding-right: 12px;
       height: calc(100vh - 150px);
-      min-height: 500px;
 
       &::-webkit-scrollbar {
         width: 8px;
       }
 
       &::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: var(--card-background);
         border-radius: 4px;
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #888;
+        background: var(--border-color);
         border-radius: 4px;
-      }
 
-      &::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        &:hover {
+          background: var(--secondary-color);
+        }
       }
 
       .form-grid {

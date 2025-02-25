@@ -98,7 +98,7 @@
                 <div class="form-field">
                     <label for="maxUsers">Maximum Users <span class="required">*</span></label>
                     <span class="p-input-icon-left">
-                        <i class="pi pi-users"></i>
+                        <i class="pi pi-user"></i>
                         <input id="maxUsers" type="text" pInputText formControlName="maxUsers"
                             placeholder="Enter maximum users" (input)="onNumberInput($event)" maxlength="5"
                             [ngClass]="{'ng-invalid ng-dirty': orgForm.get('maxUsers')?.invalid && orgForm.get('maxUsers')?.touched}">
@@ -107,6 +107,22 @@
                         *ngIf="orgForm.get('maxUsers')?.invalid && orgForm.get('maxUsers')?.touched">
                         <span *ngIf="orgForm.get('maxUsers')?.errors?.['required']">Maximum users is required</span>
                         <span *ngIf="orgForm.get('maxUsers')?.errors?.['min']">Value must be at least 1</span>
+                    </small>
+                </div>
+
+                <!-- Max User Groups -->
+                <div class="form-field">
+                    <label for="maxUsers">Maximum Groups <span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-users"></i>
+                        <input id="maxGroups" type="text" pInputText formControlName="maxGroups"
+                            placeholder="Enter maximum groups" (input)="onNumberInput($event)" maxlength="5"
+                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('maxGroups')?.invalid && orgForm.get('maxGroups')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="orgForm.get('maxGroups')?.invalid && orgForm.get('maxGroups')?.touched">
+                        <span *ngIf="orgForm.get('maxGroups')?.errors?.['required']">Maximum groups is required</span>
+                        <span *ngIf="orgForm.get('maxGroups')?.errors?.['min']">Value must be at least 1</span>
                     </small>
                 </div>
 
