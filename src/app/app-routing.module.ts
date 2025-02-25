@@ -94,6 +94,13 @@ const routes: Routes = [
             m => m.DatabaseModule
           ),
       },
+      {
+        path: 'credentials',
+        loadChildren: () =>
+          import('./modules/credentials/credentials.module').then(
+            m => m.CredentialsModule
+          ),
+      },
     ],
   },
   {

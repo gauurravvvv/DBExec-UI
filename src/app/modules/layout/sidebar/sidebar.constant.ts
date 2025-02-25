@@ -53,7 +53,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'secretsCredentials',
-    route: '/home/system/secretsCreds',
+    route: '/app/credentials',
   },
   {
     value: 'secretsCategory',
