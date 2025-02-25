@@ -163,12 +163,7 @@ export class ListCategoryComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([CATEGORY.EDIT, this.selectedOrg.id, id], {
-      queryParams: {
-        orgId: this.selectedOrg.id,
-        adminId: id,
-      },
-    });
+    this.router.navigate([CATEGORY.EDIT, this.selectedOrg.id, id]);
   }
 
   confirmDelete(id: string) {

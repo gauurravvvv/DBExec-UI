@@ -154,12 +154,7 @@ export class ListEnvironmentComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([ENVIRONMENT.EDIT, this.selectedOrg.id, id], {
-      queryParams: {
-        orgId: this.selectedOrg.id,
-        adminId: id,
-      },
-    });
+    this.router.navigate([ENVIRONMENT.EDIT, this.selectedOrg.id, id]);
   }
 
   confirmDelete(id: string) {

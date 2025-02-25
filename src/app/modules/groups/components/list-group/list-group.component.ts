@@ -160,12 +160,7 @@ export class ListGroupComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([GROUP.EDIT, this.selectedOrg.id, id], {
-      queryParams: {
-        orgId: this.selectedOrg.id,
-        adminId: id,
-      },
-    });
+    this.router.navigate([GROUP.EDIT, this.selectedOrg.id, id]);
   }
 
   confirmDelete(id: string) {
