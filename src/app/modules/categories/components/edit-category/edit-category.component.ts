@@ -5,6 +5,8 @@ import { MessageService } from 'primeng/api';
 import { EnvironmentService } from 'src/app/modules/environment/services/environment.service';
 import { CategoryService } from '../../services/category.service';
 import { CATEGORY } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { ROLES } from 'src/app/constants/user.constant';
 
 @Component({
   selector: 'app-edit-category',
@@ -15,7 +17,8 @@ export class EditCategoryComponent implements OnInit {
   categoryForm!: FormGroup;
   environments: any[] = [];
   isFormDirty = false;
-  showOrganisationDropdown = true;
+  showOrganisationDropdown =
+    this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   categoryId!: string;
   orgId!: string;
   selectedOrgName: string = '';
@@ -27,6 +30,7 @@ export class EditCategoryComponent implements OnInit {
     private environmentService: EnvironmentService,
     private messageService: MessageService,
     private router: Router,
+    private globalService: GlobalService,
     private route: ActivatedRoute
   ) {}
 

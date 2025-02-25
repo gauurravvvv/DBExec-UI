@@ -15,6 +15,15 @@
   --shadow-color: rgba(0, 0, 0, 0.1);
   --icon-filter: none;
   --input-background: #ffffff;
+
+  // Toast variables
+  --toast-background: #ffffff;
+  --toast-text-color: #333333;
+  --toast-border: 1px solid #e0e0e0;
+  --toast-success-background: #4caf50;
+  --toast-error-background: #f44336;
+  --toast-warning-background: #ff9800;
+  --toast-info-background: #2196f3;
 }
 
 .dark-theme {
@@ -33,6 +42,15 @@
   --shadow-color: rgba(0, 0, 0, 0.3);
   --icon-filter: brightness(0) invert(1);
   --input-background: #1e1e1e;
+
+  // Toast variables
+  --toast-background: #1e1e1e;
+  --toast-text-color: #ffffff;
+  --toast-border: 1px solid #333333;
+  --toast-success-background: #81c784;
+  --toast-error-background: #ef5350;
+  --toast-warning-background: #ffb74d;
+  --toast-info-background: #64b5f6;
 }
 
 // Add transition for all themed elements
@@ -62,5 +80,62 @@ textarea,
   .p-component,
   .p-component * {
     transition: all 0.3s ease !important;
+  }
+}
+
+// Toast styling
+:root {
+  .p-toast {
+    .p-toast-message {
+      background: var(--toast-background);
+      border: var(--toast-border);
+      border-radius: 6px;
+      box-shadow: 0 2px 4px var(--shadow-color);
+
+      .p-toast-message-content {
+        color: var(--toast-text-color);
+      }
+
+      &.p-toast-message-success {
+        background: var(--toast-success-background);
+        border-color: var(--toast-success-background);
+        .p-toast-message-content {
+          color: #ffffff;
+        }
+      }
+
+      &.p-toast-message-error {
+        background: var(--toast-error-background);
+        border-color: var(--toast-error-background);
+        .p-toast-message-content {
+          color: #ffffff;
+        }
+      }
+
+      &.p-toast-message-warn {
+        background: var(--toast-warning-background);
+        border-color: var(--toast-warning-background);
+        .p-toast-message-content {
+          color: #ffffff;
+        }
+      }
+
+      &.p-toast-message-info {
+        background: var(--toast-info-background);
+        border-color: var(--toast-info-background);
+        .p-toast-message-content {
+          color: #ffffff;
+        }
+      }
+
+      .p-toast-icon-close {
+        color: inherit;
+        opacity: 0.7;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
   }
 }

@@ -54,7 +54,12 @@ export class AddGroupComponent implements OnInit {
     this.userGroupForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s-]+$')]],
       description: [''],
-      organisation: ['', Validators.required],
+      organisation: [
+        this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
+          ? ''
+          : this.globalService.getTokenDetails('organisationId'),
+        Validators.required,
+      ],
       users: ['', [Validators.required, this.minUsersValidator(2)]],
     });
 
