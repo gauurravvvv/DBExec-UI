@@ -25,61 +25,72 @@
                         <label for="org-dropdown">Organisation</label>
                     </span>
                 </div>
-                <div class="status-filter">
-                    <span>Status</span>
-                    <p-menu #statusMenu [popup]="true" [model]="statusFilterItems" [style]="{'width': '150px'}"
-                        appendTo="body">
-                    </p-menu>
-                    <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
-                        [ngClass]="{'active-filter': selectedStatus !== null}"
-                        style="margin-left: 5px; cursor: pointer;">
-                    </i>
-                </div>
             </div>
             <div class="table-container">
-                <!-- Card Layout -->
-                <div class="env-cards-container">
-                    <ng-container *ngIf="filteredDBs && filteredDBs.length > 0; else noData">
-                        <div class="env-card" *ngFor="let db of filteredDBs" [class.master-db]="db.isMasterDB">
-                            <div class="card-header">
-                                <div class="env-icon">
-                                    <i class="pi pi-database"></i>
-                                </div>
-                                <div class="status-container">
-                                    <div class="env-status" [class.active]="db.status === 1">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th>
+                                Status
+                                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
+                                    [style]="{'width': '150px'}" appendTo="body">
+                                </p-menu>
+                                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
+                                    [ngClass]="{'active-filter': selectedStatus !== null}"
+                                    style="margin-left: 5px; cursor: pointer;">
+                                </i>
+                            </th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="filteredDBs && filteredDBs.length > 0; else noData">
+                            <tr *ngFor="let db of filteredDBs">
+                                <td>
+                                    <div class="db-name">
+                                        <i class="pi pi-database"></i>
+                                        {{ db.name }}
+                                        <span class="master-badge" *ngIf="db.isMasterDB">
+                                            <i class="pi pi-star-fill"></i>
+                                            Master
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>{{ db.description || 'No description' }}</td>
+                                <td>{{ db.config.dbType || 'Standard' }}</td>
+                                <td>
+                                    <span class="status-badge" [class.active]="db.status === 1">
                                         {{ db.status === 1 ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>{{ db.createdOn | date:'mediumDate' }}</td>
+                                <td class="actions">
+                                    <button class="action-btn edit" (click)="onEdit(db.id)" title="Edit">
+                                        <i class="pi pi-pencil"></i>
+                                    </button>
+                                    <button class="action-btn delete" (click)="confirmDelete(db)" title="Delete">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-template #noData>
+                            <tr style="height: 100%;">
+                                <td colspan="6">
+                                    <div class="no-data">
+                                        <i class="pi pi-inbox"></i>
+                                        <p>No records found</p>
+                                        <span class="sub-text">No database data is available at the moment</span>
                                     </div>
-                                    <div class="master-badge" *ngIf="db.isMasterDB">
-                                        <i class="pi pi-star-fill"></i>
-                                        Master DB
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-content">
-                                <h3>{{ db.name }}</h3>
-                                <p class="description">{{ db.description }}</p>
-                                <p class="created-date">Created: {{ db.createdOn | date:'mediumDate' }}</p>
-                            </div>
-                            <div class="card-actions">
-                                <button class="action-btn edit" (click)="onEdit(db.id)">
-                                    <i class="pi pi-pencil"></i> Edit
-                                </button>
-                                <button class="action-btn delete" (click)="confirmDelete(db)">
-                                    <i class="pi pi-trash"></i> Delete
-                                </button>
-                            </div>
-                        </div>
-                    </ng-container>
-
-                    <ng-template #noData>
-                        <div class="no-data">
-                            <i class="pi pi-inbox"></i>
-                            <p>No records found</p>
-                            <span class="sub-text">No database data is available at the moment</span>
-                        </div>
-                    </ng-template>
-                </div>
-
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </table>
                 <!-- Pagination -->
                 <div class="pagination">
                     <div class="pagination-info">
@@ -113,35 +124,40 @@
 <!-- Delete Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
-        <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this database?</p>
+        <div class="content-wrapper">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this database?</p>
 
-        <!-- Special warning for master database -->
-        <div class="warning-container" *ngIf="selectedDatabase?.isMasterDB">
-            <div class="warning-message">
-                <div class="warning-header">
-                    <i class="pi pi-exclamation-triangle"></i>
-                    <span class="warning-title">Critical Warning: Master Database</span>
-                </div>
-                <div class="warning-content">
-                    <div class="warning-text">
-                        <p><i class="pi pi-circle-fill"></i>You are attempting to delete a master database that controls
-                            core system operations.</p>
-                        <p><i class="pi pi-circle-fill"></i>Deleting this database will permanently remove all system
-                            configurations and cannot be undone.</p>
-                        <p><i class="pi pi-circle-fill"></i>You will need to create a new master database to restore
-                            system functionality and continue operations.</p>
-                        <p><i class="pi pi-circle-fill"></i>Please ensure you have taken a complete backup of all
-                            configurations and data before proceeding.</p>
-                        <p><i class="pi pi-circle-fill"></i>This action requires immediate system reconfiguration after
-                            deletion.</p>
-                        <p class="warning-checkbox">
-                            <p-checkbox [(ngModel)]="deleteConfiguration" [binary]="true" inputId="deleteConfig">
-                            </p-checkbox>
-                            <label for="deleteConfig">
-                                Do you want to delete the database data too that are required for system operations?
-                            </label>
-                        </p>
+            <!-- Special warning for master database -->
+            <div class="warning-container" *ngIf="selectedDatabase?.isMasterDB">
+                <div class="warning-message">
+                    <div class="warning-header">
+                        <i class="pi pi-exclamation-triangle"></i>
+                        <span class="warning-title">Critical Warning: Master Database</span>
+                    </div>
+                    <div class="warning-content">
+                        <div class="warning-text">
+                            <p><i class="pi pi-circle-fill"></i>You are attempting to delete a master database that
+                                controls
+                                core system operations.</p>
+                            <p><i class="pi pi-circle-fill"></i>Deleting this database will permanently remove all
+                                system
+                                configurations and cannot be undone.</p>
+                            <p><i class="pi pi-circle-fill"></i>You will need to create a new master database to restore
+                                system functionality and continue operations.</p>
+                            <p><i class="pi pi-circle-fill"></i>Please ensure you have taken a complete backup of all
+                                configurations and data before proceeding.</p>
+                            <p><i class="pi pi-circle-fill"></i>This action requires immediate system reconfiguration
+                                after
+                                deletion.</p>
+                            <p class="warning-checkbox">
+                                <p-checkbox [(ngModel)]="deleteConfiguration" [binary]="true" inputId="deleteConfig">
+                                </p-checkbox>
+                                <label for="deleteConfig">
+                                    Do you want to delete the database data too that are required for system operations?
+                                </label>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

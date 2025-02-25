@@ -168,26 +168,22 @@ export class ListDatabaseComponent implements OnInit {
   }
 
   cancelDelete(): void {
-    this.selectedDatabase = null;
     this.showDeleteConfirm = false;
+    this.selectedDatabase = null;
+    this.deleteConfiguration = false;
   }
 
-  proceedDelete(): void {
-    if (this.selectedDatabase) {
-      this.databaseService
-        .deleteDatabase(this.selectedDatabase.id, this.deleteConfiguration)
-        .subscribe({
-          next: () => {
-            this.loaddbs();
-            this.showDeleteConfirm = false;
-            this.selectedDatabase = null;
-          },
-          error: error => {
-            console.error('Error deleting database:', error);
-            this.showDeleteConfirm = false;
-            this.selectedDatabase = null;
-          },
-        });
+  async proceedDelete(): Promise<void> {
+    try {
+      if (this.selectedDatabase) {
+        await this.databaseService
+          .deleteDatabase(this.selectedDatabase.id, this.deleteConfiguration)
+          .toPromise();
+      }
+    } finally {
+      this.showDeleteConfirm = false;
+      this.selectedDatabase = null;
+      this.deleteConfiguration = false;
     }
   }
 }
