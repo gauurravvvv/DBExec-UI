@@ -74,3 +74,11 @@ export const GROUP = {
   VIEW: '/group/get/',
   EDIT: '/group/update',
 };
+
+export const CREDENTIAL = {
+  LIST: '/credential/list',
+  DELETE: '/credential/delete/',
+  ADD: '/credential/add',
+  VIEW: '/credential/get/',
+  EDIT: '/credential/update',
+};
