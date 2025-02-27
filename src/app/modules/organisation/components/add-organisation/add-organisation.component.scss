@@ -276,6 +276,148 @@
       }
     }
   }
+
+  .p-dropdown {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+
+    &:not(.p-disabled):hover {
+      border-color: var(--primary-color) !important;
+    }
+
+    &.p-focus {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+    }
+
+    .p-dropdown-label {
+      color: var(--text-color) !important;
+
+      &.p-placeholder {
+        color: var(--text-color) !important;
+        opacity: 0.7;
+      }
+    }
+
+    .p-dropdown-trigger {
+      color: var(--text-color) !important;
+      opacity: 0.7;
+
+      &:hover {
+        color: var(--primary-color) !important;
+        opacity: 1;
+      }
+    }
+  }
+
+  .p-dropdown-panel {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+    margin-top: 2px;
+
+    .p-dropdown-header {
+      background: var(--hover-background) !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      padding: 0.5rem !important;
+
+      .p-dropdown-filter {
+        background: var(--card-background) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-color) !important;
+
+        &::placeholder {
+          color: var(--text-color) !important;
+          opacity: 0.7;
+        }
+
+        &:hover {
+          border-color: var(--primary-color) !important;
+        }
+
+        &:focus {
+          border-color: var(--primary-color) !important;
+          box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+        }
+      }
+
+      .p-dropdown-filter-icon {
+        color: var(--text-color) !important;
+        opacity: 0.7;
+      }
+    }
+
+    .p-dropdown-items {
+      padding: 0.5rem 0;
+      background: var(--card-background) !important;
+
+      .p-dropdown-item {
+        color: var(--text-color) !important;
+        padding: 0.75rem 1rem;
+
+        &:hover {
+          background: var(--hover-background) !important;
+          color: var(--text-color) !important;
+        }
+
+        &.p-highlight {
+          background: var(--hover-background) !important;
+          color: var(--primary-color) !important;
+        }
+      }
+
+      .p-dropdown-empty-message {
+        color: var(--text-color-secondary) !important;
+        padding: 0.75rem 1rem;
+      }
+    }
+
+    .p-dropdown-items-wrapper {
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--card-background);
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+
+        &:hover {
+          background: var(--secondary-color);
+        }
+      }
+    }
+  }
+
+  .p-checkbox {
+    .p-checkbox-box {
+      background: var(--card-background);
+      border-color: var(--border-color);
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+
+      &.p-highlight {
+        border-color: var(--primary-color);
+        background: var(--primary-color);
+
+        .p-checkbox-icon {
+          color: var(--text-color);
+        }
+      }
+
+      &:not(.p-disabled):hover {
+        border-color: var(--primary-color);
+      }
+
+      .p-checkbox-icon {
+        font-size: 12px;
+      }
+    }
+  }
 }
 
 .steps-container {
@@ -370,5 +512,67 @@
 :host ::ng-deep {
   .p-steps {
     display: none;
+  }
+}
+
+// Replace the confirmation-field styles with these
+.acknowledgments-container {
+  margin: 2rem 0;
+  width: 50%;
+
+  .acknowledgments-title {
+    font-size: 0.875rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
+
+  .acknowledgment-card {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    background: var(--hover-background);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .p-field-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .acknowledgment-content {
+        flex: 1;
+
+        .acknowledgment-label {
+          display: block;
+          font-weight: 500;
+          color: var(--text-color);
+          margin-bottom: 0.5rem;
+          font-size: 0.875rem;
+        }
+
+        .acknowledgment-text {
+          color: var(--text-color);
+          opacity: 0.7;
+          font-size: 0.8125rem;
+          line-height: 1.6;
+          margin: 0;
+        }
+      }
+    }
+
+    .error-message {
+      color: var(--error-color);
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+      margin-left: 2.25rem;
+      display: block;
+    }
   }
 }

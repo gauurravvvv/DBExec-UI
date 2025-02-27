@@ -1083,29 +1083,36 @@
 }
 
 .db-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
 
-  i.pi-database {
-    color: var(--primary-color);
-    font-size: 1rem;
+  &:hover {
+    color: var(--primary-color-dark);
+    text-decoration: underline;
+  }
+
+  i {
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-right: 0.5rem;
   }
 
   .master-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 6px;
-    border-radius: 4px;
+    margin-left: 0.5rem;
     font-size: 0.75rem;
-    font-weight: 500;
-    background: var(--primary-color);
-    color: white;
+    font-weight: normal;
+    padding: 0.25rem 0.5rem;
+    background: var(--hover-background);
+    border-radius: 4px;
+    color: var(--text-color);
+    opacity: 0.7;
 
-    i.pi-star-fill {
+    i {
       font-size: 0.75rem;
-      color: #ffd700; // Gold color for star
+      color: var(--warning-color);
+      margin-right: 0.25rem;
     }
   }
 }

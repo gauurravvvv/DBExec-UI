@@ -15,6 +15,8 @@ export class AddOrganisationComponent implements OnInit {
   orgForm!: FormGroup;
   currentStep = 0;
   isFormDirty = false;
+  showPepperKey = false;
+  confirmationChecked = false;
 
   constructor(
     private fb: FormBuilder,
@@ -41,6 +43,16 @@ export class AddOrganisationComponent implements OnInit {
       maxCategories: ['', [Validators.required, Validators.min(1)]],
       maxDatabases: ['', [Validators.required, Validators.min(1)]],
       maxGroups: ['', [Validators.required, Validators.min(1)]],
+      encryptionMethod: ['', [Validators.required]],
+      pepperKey: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(
+            /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{32,}$/
+          ),
+        ],
+      ],
     });
   }
 
@@ -109,5 +121,29 @@ export class AddOrganisationComponent implements OnInit {
     Object.keys(this.orgForm.controls).forEach(key => {
       this.orgForm.get(key)?.setValue('');
     });
+  }
+
+  encryptionMethods = [
+    { value: 'aes-256-gcm', label: 'aes-256-gcm' },
+    { value: 'aes-192-gcm', label: 'aes-192-gcm' },
+    { value: 'aes-128-gcm', label: 'aes-128-gcm' },
+    { value: 'aes-256-cbc', label: 'aes-256-cbc' },
+    { value: 'aes-192-cbc', label: 'aes-192-cbc' },
+    { value: 'aes-128-cbc', label: 'aes-128-cbc' },
+  ];
+
+  togglePepperKeyVisibility(event: Event) {
+    event.preventDefault();
+    this.showPepperKey = !this.showPepperKey;
+    const pepperKeyInput = document.getElementById(
+      'pepperKey'
+    ) as HTMLInputElement;
+    if (pepperKeyInput) {
+      pepperKeyInput.type = this.showPepperKey ? 'text' : 'password';
+    }
+  }
+
+  isFormValid(): boolean {
+    return this.orgForm.valid && this.confirmationChecked;
   }
 }

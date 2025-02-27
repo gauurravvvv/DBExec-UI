@@ -45,13 +45,17 @@ export class CredentialService {
       );
   }
 
-  deleteCategory(orgId: string, id: string) {
-    return this.http.delete(CREDENTIAL.DELETE + `${orgId}/${id}`).pipe(
-      map((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
+  deleteCredential(ids: string[]) {
+    return this.http
+      .delete(CREDENTIAL.DELETE, {
+        body: { credentialIds: ids },
       })
-    );
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
   }
 
   viewCategory(orgId: string, categoryId: string) {

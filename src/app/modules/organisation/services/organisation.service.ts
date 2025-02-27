@@ -32,6 +32,8 @@ export class OrganisationService {
       maxAdmins,
       maxCategories,
       maxGroups,
+      encryptionAlgorithm,
+      pepperKey,
     } = orgForm.value;
     return this.http
       .post(ORGANISATION.ADD, {
@@ -43,6 +45,8 @@ export class OrganisationService {
         maxAdmins,
         maxCategories,
         maxGroups,
+        encryptionAlgorithm,
+        pepperKey,
       })
       .pipe(
         map((response: any) => {

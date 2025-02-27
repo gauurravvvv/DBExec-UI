@@ -51,14 +51,14 @@
                         <ng-container *ngIf="filteredDBs && filteredDBs.length > 0; else noData">
                             <tr *ngFor="let db of filteredDBs">
                                 <td>
-                                    <div class="db-name">
+                                    <a class="db-name" [routerLink]="['/app/database/view', db.id]">
                                         <i class="pi pi-database"></i>
                                         {{ db.name }}
                                         <span class="master-badge" *ngIf="db.isMasterDB">
                                             <i class="pi pi-star-fill"></i>
                                             Master
                                         </span>
-                                    </div>
+                                    </a>
                                 </td>
                                 <td>{{ db.description || 'No description' }}</td>
                                 <td>{{ db.config.dbType || 'Standard' }}</td>

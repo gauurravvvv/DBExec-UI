@@ -23,7 +23,7 @@
                         <i class="pi pi-arrow-left mr-2"></i>
                     </button>
                     <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                        [disabled]="orgForm.invalid">
+                        [disabled]="!isFormValid()">
                         <i class="pi pi-save mr-2"></i>
                     </button>
                 </ng-container>
@@ -112,7 +112,7 @@
 
                 <!-- Max User Groups -->
                 <div class="form-field">
-                    <label for="maxUsers">Maximum Groups <span class="required">*</span></label>
+                    <label for="maxGroups">Maximum Groups <span class="required">*</span></label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-users"></i>
                         <input id="maxGroups" type="text" pInputText formControlName="maxGroups"
@@ -175,6 +175,67 @@
                             required</span>
                         <span *ngIf="orgForm.get('maxDatabases')?.errors?.['min']">Value must be at least 1</span>
                     </small>
+                </div>
+
+                <!-- Encryption Method -->
+                <div class="form-field">
+                    <label for="encryptionMethod">Encryption Method<span class="required"> *</span></label>
+                    <p-dropdown [options]="encryptionMethods" optionLabel="label" optionValue="value"
+                        formControlName="encryptionMethod" [filter]="true" filterBy="label" [style]="{'width':'100%'}"
+                        [panelStyle]="{'width':'100%'}" placeholder="Select Encryption Method"
+                        [ngClass]="{'ng-invalid ng-dirty': orgForm.get('encryptionMethod')?.invalid && orgForm.get('encryptionMethod')?.touched}">
+                    </p-dropdown>
+                    <small class="error-message"
+                        *ngIf="orgForm.get('encryptionMethod')?.invalid && orgForm.get('encryptionMethod')?.touched">
+                        Encryption method is required
+                    </small>
+                </div>
+
+                <!-- Pepper Key -->
+                <div class="form-field">
+                    <label for="pepperKey">Pepper Key<span class="required"> *</span></label>
+                    <span class="p-input-icon-left p-input-icon-right">
+                        <i class="pi pi-lock"></i>
+                        <input id="pepperKey" type="password" pInputText formControlName="pepperKey"
+                            placeholder="Enter pepper key (minimum 32 characters)"
+                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('pepperKey')?.invalid && orgForm.get('pepperKey')?.touched}">
+                        <i class="pi pi-eye" style="cursor: pointer;" (click)="togglePepperKeyVisibility($event)"></i>
+                    </span>
+                    <small class="error-message"
+                        *ngIf="orgForm.get('pepperKey')?.invalid && orgForm.get('pepperKey')?.touched">
+                        <span *ngIf="orgForm.get('pepperKey')?.errors?.['required']">Pepper key is required</span>
+                        <span *ngIf="orgForm.get('pepperKey')?.errors?.['pattern']">
+                            Pepper key must be at least 32 characters long and can contain letters, numbers, and special
+                            characters
+                        </span>
+                    </small>
+                </div>
+
+                <!-- Add this after the Pepper Key field but before closing the form-grid div -->
+                <div class="acknowledgments-container">
+                    <div class="acknowledgments-title">
+                        Security Configuration Acknowledgment
+                    </div>
+                    <div class="acknowledgment-card">
+                        <div class="p-field-checkbox">
+                            <p-checkbox [binary]="true" [(ngModel)]="confirmationChecked"
+                                [ngModelOptions]="{standalone: true}" inputId="confirmation">
+                            </p-checkbox>
+                            <div class="acknowledgment-content">
+                                <label for="confirmation" class="acknowledgment-label">
+                                    Encryption Configuration
+                                </label>
+                                <p class="acknowledgment-text">
+                                    I understand that the encryption method and pepper key are critical security
+                                    settings that cannot be modified after organization creation. These settings will be
+                                    used for all sensitive data encryption within the organization.
+                                </p>
+                            </div>
+                        </div>
+                        <small class="error-message" *ngIf="!confirmationChecked && orgForm.valid">
+                            Please acknowledge the encryption configuration settings
+                        </small>
+                    </div>
                 </div>
             </div>
         </form>

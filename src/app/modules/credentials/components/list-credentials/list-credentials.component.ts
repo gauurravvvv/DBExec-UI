@@ -5,6 +5,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { CredentialService } from '../../services/credential.service';
+import { CREDENTIAL } from 'src/app/constants/routes';
 
 @Component({
   selector: 'app-list-credentials',
@@ -46,7 +47,7 @@ export class ListCredentialsComponent implements OnInit {
   ];
 
   showDeleteConfirm: boolean = false;
-  credentialToDelete: number | null = null;
+  credentialToDelete: string[] = [];
 
   constructor(
     private router: Router,
@@ -97,11 +98,19 @@ export class ListCredentialsComponent implements OnInit {
     this.credentialService.listCredentials(params).subscribe({
       next: (response: any) => {
         this.credentials = response.data.credentials;
+        this.filteredCredentials = [...this.credentials];
+        this.totalItems = this.credentials.length;
+        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+        this.generatePageNumbers();
       },
       error: error => {
         console.error('Error loading credentials:', error);
       },
     });
+  }
+
+  generatePageNumbers() {
+    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
   onOrgChange(event: any) {
@@ -121,28 +130,51 @@ export class ListCredentialsComponent implements OnInit {
 
   applyFilters() {
     // Implement filtering logic
+    let filtered = [...this.credentials];
+
+    if (this.searchTerm) {
+      const search = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        user =>
+          user.firstName.toLowerCase().includes(search) ||
+          user.lastName.toLowerCase().includes(search) ||
+          user.email.toLowerCase().includes(search)
+      );
+    }
+
+    if (this.selectedStatus !== null) {
+      filtered = filtered.filter(user => user.status === this.selectedStatus);
+    }
+
+    this.filteredCredentials = filtered;
   }
 
   onAddNewCredential() {
     // Implement navigation to add new credential
+    this.router.navigate([CREDENTIAL.ADD]);
   }
 
   onEdit(id: number) {
     // Implement edit functionality
+    this.router.navigate([CREDENTIAL.EDIT, this.selectedOrg.id, id]);
   }
 
-  confirmDelete(id: number) {
-    this.credentialToDelete = id;
-    this.showDeleteConfirm = true;
-  }
+  confirmDelete(id: number) {}
 
-  cancelDelete() {
-    this.showDeleteConfirm = false;
-    this.credentialToDelete = null;
-  }
+  cancelDelete() {}
 
   proceedDelete() {
     // Implement delete functionality
+    this.credentialService.deleteCredential(this.credentialToDelete).subscribe({
+      next: () => {
+        this.loadCredentials();
+        this.showDeleteConfirm = false;
+      },
+      error: error => {
+        console.error('Error deleting credentials', error);
+        this.showDeleteConfirm = false;
+      },
+    });
   }
 
   onPageChange(page: number) {

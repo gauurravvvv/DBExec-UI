@@ -53,3 +53,10 @@ export const DATABASE = {
   EDIT: '/app/database/edit',
   VIEW: '/app/database/view',
 };
+
+export const CREDENTIAL = {
+  ADD: '/app/credentials/add',
+  LIST: '/app/credentials',
+  EDIT: '/app/credentials/edit',
+  VIEW: '/app/credentials/view',
+};
