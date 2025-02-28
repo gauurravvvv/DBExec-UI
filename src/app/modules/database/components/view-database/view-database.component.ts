@@ -204,30 +204,13 @@ export class ViewDatabaseComponent implements OnInit {
     this.schemaChartOptions = {
       plugins: {
         legend: {
-          position: 'bottom',
-          align: 'center',
-          labels: {
-            color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--text-color'
-            ),
-            font: { size: 12 },
-            usePointStyle: true,
-            padding: 15,
-          },
+          display: false,
         },
         tooltip: {
-          backgroundColor: getComputedStyle(
-            document.documentElement
-          ).getPropertyValue('--card-background'),
-          titleColor: getComputedStyle(
-            document.documentElement
-          ).getPropertyValue('--text-color'),
-          bodyColor: getComputedStyle(
-            document.documentElement
-          ).getPropertyValue('--text-color'),
-          borderColor: getComputedStyle(
-            document.documentElement
-          ).getPropertyValue('--border-color'),
+          backgroundColor: 'var(--card-background)',
+          titleColor: 'var(--text-color)',
+          bodyColor: 'var(--text-color)',
+          borderColor: 'var(--border-color)',
           borderWidth: 1,
         },
       },
