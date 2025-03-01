@@ -7,6 +7,7 @@ import { DatabaseService } from '../../services/database.service';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-add-database',
@@ -18,6 +19,7 @@ export class AddDatabaseComponent implements OnInit {
   organisations: any[] = [];
   private _showOrganisationDropdown = false;
   showPassword: boolean = false;
+  showAdminPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -27,6 +29,11 @@ export class AddDatabaseComponent implements OnInit {
     private messageService: MessageService,
     private router: Router
   ) {}
+
+  // Add getter for form dirty state
+  get isFormDirty(): boolean {
+    return this.databaseForm.dirty;
+  }
 
   ngOnInit(): void {
     this.showOrganisationDropdown =
@@ -65,45 +72,66 @@ export class AddDatabaseComponent implements OnInit {
       username: ['', Validators.required],
       password: ['', [Validators.required]],
       organisation: [
-        {
-          value: orgId || null,
-          disabled: !this.showOrganisationDropdown,
-        },
+        this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
+          ? ''
+          : this.globalService.getTokenDetails('organisationId'),
+        Validators.required,
       ],
       acknowledgment: [false],
       schemaAcknowledgment: [false],
       isMasterDB: [false],
+      adminPassword: [''],
+      adminEmail: [''],
+      adminPhone: [''],
     });
 
-    // Handle validators separately
     const orgControl = this.databaseForm.get('organisation');
     if (this.showOrganisationDropdown) {
       orgControl?.setValidators([Validators.required]);
     }
 
-    // Subscribe to isMasterDB changes to update validators
     this.databaseForm.get('isMasterDB')?.valueChanges.subscribe(isMaster => {
       const acknowledgmentControl = this.databaseForm.get('acknowledgment');
       const schemaAcknowledgmentControl = this.databaseForm.get(
         'schemaAcknowledgment'
       );
+      const adminPasswordControl = this.databaseForm.get('adminPassword');
+      const adminEmailControl = this.databaseForm.get('adminEmail');
+      const adminPhoneControl = this.databaseForm.get('adminPhone');
 
       if (isMaster) {
         acknowledgmentControl?.setValidators(Validators.requiredTrue);
         schemaAcknowledgmentControl?.setValidators(Validators.requiredTrue);
+        adminPasswordControl?.setValidators([
+          Validators.required,
+          Validators.pattern(REGEX.password),
+        ]);
+        adminEmailControl?.setValidators([
+          Validators.required,
+          Validators.email,
+        ]);
+        adminPhoneControl?.setValidators([
+          Validators.required,
+          Validators.pattern(REGEX.mobile),
+        ]);
       } else {
         acknowledgmentControl?.clearValidators();
         schemaAcknowledgmentControl?.clearValidators();
+        adminPasswordControl?.clearValidators();
+        adminEmailControl?.clearValidators();
+        adminPhoneControl?.clearValidators();
+
+        adminPasswordControl?.setValue('');
+        adminEmailControl?.setValue('');
+        adminPhoneControl?.setValue('');
       }
 
       acknowledgmentControl?.updateValueAndValidity();
       schemaAcknowledgmentControl?.updateValueAndValidity();
+      adminPasswordControl?.updateValueAndValidity();
+      adminEmailControl?.updateValueAndValidity();
+      adminPhoneControl?.updateValueAndValidity();
     });
-  }
-
-  // Add getter for form dirty state
-  get isFormDirty(): boolean {
-    return this.databaseForm.dirty;
   }
 
   loadOrganisations(): void {
@@ -131,7 +159,7 @@ export class AddDatabaseComponent implements OnInit {
     if (this.databaseForm.valid) {
       const formValue = this.databaseForm.getRawValue();
 
-      const payload = {
+      const payload: any = {
         name: formValue.name,
         description: formValue.description,
         type: formValue.type,
@@ -142,9 +170,18 @@ export class AddDatabaseComponent implements OnInit {
         password: formValue.password,
         organisation: this.showOrganisationDropdown
           ? formValue.organisation
-          : formValue.organisation.value,
+          : formValue.organisation,
         isMasterDB: formValue.isMasterDB,
       };
+
+      // Add admin credentials only if masterDB is true
+      if (formValue.isMasterDB) {
+        payload.adminCredentials = {
+          email: formValue.adminEmail,
+          phone: formValue.adminPhone,
+          password: formValue.adminPassword,
+        };
+      }
 
       this.databaseService.addDatabase(payload).subscribe({
         next: () => {
@@ -169,9 +206,21 @@ export class AddDatabaseComponent implements OnInit {
   onCancel(): void {
     if (this.isFormDirty) {
       this.databaseForm.reset();
+      this.databaseForm.get('isMasterDB')?.setValue(false);
+      this.databaseForm.get('acknowledgment')?.setValue(false);
+      this.databaseForm.get('schemaAcknowledgment')?.setValue(false);
+      this.databaseForm.get('adminPassword')?.setValue('');
+      this.databaseForm.get('adminEmail')?.setValue('');
+      this.databaseForm.get('adminPhone')?.setValue('');
+      this.databaseForm.get('adminPassword')?.clearValidators();
+      this.databaseForm.get('adminEmail')?.clearValidators();
+      this.databaseForm.get('adminPhone')?.clearValidators();
+      this.databaseForm.get('adminPassword')?.updateValueAndValidity();
+      this.databaseForm.get('adminEmail')?.updateValueAndValidity();
+      this.databaseForm.get('adminPhone')?.updateValueAndValidity();
+      this.databaseForm.get('type')?.setValue('postgres');
+      this.databaseForm.get('type')?.disable();
       this.databaseForm.markAsPristine();
-    } else {
-      this.router.navigate([DATABASE.LIST]);
     }
   }
 
@@ -223,9 +272,19 @@ export class AddDatabaseComponent implements OnInit {
     return true;
   }
 
-  togglePassword(event: Event): void {
+  togglePassword(event: Event, field: 'password' | 'adminPassword'): void {
     event.preventDefault();
-    this.showPassword = !this.showPassword;
+    if (field === 'password') {
+      this.showPassword = !this.showPassword;
+    } else {
+      this.showAdminPassword = !this.showAdminPassword;
+    }
+  }
+
+  onPhoneInput(event: any): void {
+    const input = event.target;
+    input.value = input.value.replace(/[^0-9]/g, '');
+    this.databaseForm.get('adminPhone')?.setValue(input.value);
   }
 
   set showOrganisationDropdown(value: boolean) {

@@ -43,7 +43,7 @@ export class AddOrganisationComponent implements OnInit {
       maxCategories: ['', [Validators.required, Validators.min(1)]],
       maxDatabases: ['', [Validators.required, Validators.min(1)]],
       maxGroups: ['', [Validators.required, Validators.min(1)]],
-      encryptionMethod: ['', [Validators.required]],
+      encryptionAlgorithm: ['', [Validators.required]],
       pepperKey: [
         '',
         [
@@ -123,7 +123,7 @@ export class AddOrganisationComponent implements OnInit {
     });
   }
 
-  encryptionMethods = [
+  encryptionAlgorithms = [
     { value: 'aes-256-gcm', label: 'aes-256-gcm' },
     { value: 'aes-192-gcm', label: 'aes-192-gcm' },
     { value: 'aes-128-gcm', label: 'aes-128-gcm' },

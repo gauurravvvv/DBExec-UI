@@ -51,26 +51,38 @@ export class DatabaseService {
       password,
       organisation,
       isMasterDB,
+      adminCredentials,
     } = payload;
-    return this.http
-      .post(DATABASE.ADD, {
-        name,
-        description,
-        type,
-        host,
-        port,
-        database,
-        username,
-        password,
-        organisation,
-        isMasterDB,
+
+    const requestBody: any = {
+      name,
+      description,
+      type,
+      host,
+      port,
+      database,
+      username,
+      password,
+      organisation,
+      isMasterDB,
+    };
+
+    if (adminCredentials) {
+      requestBody.adminCredentials = {
+        email: adminCredentials.email,
+        phone: adminCredentials.phone,
+        password: adminCredentials.password,
+      };
+    }
+
+    console.log(requestBody);
+
+    return this.http.post(DATABASE.ADD, requestBody).pipe(
+      map((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+    );
   }
 
   viewSuperAdmin(id: string) {

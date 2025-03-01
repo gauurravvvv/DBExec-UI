@@ -83,6 +83,7 @@
           flex-direction: column;
           gap: 8px;
           width: 100%;
+          margin-bottom: 0;
 
           label {
             font-weight: 500;
@@ -100,23 +101,40 @@
           }
 
           .p-input-icon-left {
+            position: relative;
             width: 100%;
 
             i {
               color: var(--text-color);
-              opacity: 0.4;
+              opacity: 0.7;
             }
 
             input {
               width: 100%;
-              padding-left: 2.5rem;
+              padding-left: 35px;
               background: var(--card-background);
+              border: 1px solid var(--border-color);
               color: var(--text-color);
-              border-color: var(--border-color);
 
               &::placeholder {
                 color: var(--text-color);
-                opacity: 0.4;
+                opacity: 0.5;
+              }
+
+              &:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 1px var(--primary-color-transparent);
+              }
+
+              &.readonly {
+                background: var(--hover-background) !important;
+                cursor: not-allowed;
+                opacity: 0.7;
+
+                &:focus {
+                  box-shadow: none;
+                  border-color: var(--border-color);
+                }
               }
             }
           }

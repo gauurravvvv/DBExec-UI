@@ -1245,14 +1245,23 @@
                         display: flex;
                         gap: 1rem;
                         font-size: 0.8rem;
+                        margin-left: auto;
+                        min-width: 360px;
+                        justify-content: flex-end;
 
-                        .size {
-                          color: var(--primary-color);
-                        }
+                        span {
+                          &.size {
+                            width: 100px;
+                            color: var(--primary-color);
+                            text-align: right;
+                          }
 
-                        .rows {
-                          color: var(--text-color);
-                          opacity: 0.8;
+                          &.rows {
+                            width: 120px;
+                            color: var(--text-color);
+                            opacity: 0.8;
+                            text-align: right;
+                          }
                         }
                       }
                     }

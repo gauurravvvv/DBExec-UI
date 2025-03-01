@@ -44,7 +44,7 @@
                 </div>
                 <div class="stat-card animated">
                     <div class="stat-icon">
-                        <i class="pi pi-list"></i>
+                        <i class="pi pi-file"></i>
                     </div>
                     <div class="stat-info">
                         <span class="stat-value">{{ dbData.statistics.totalSchemas }}</span>
@@ -53,7 +53,7 @@
                 </div>
                 <div class="stat-card animated">
                     <div class="stat-icon">
-                        <i class="pi pi-sitemap"></i>
+                        <i class="pi pi-search"></i>
                     </div>
                     <div class="stat-info">
                         <span class="stat-value">{{ dbData.statistics.totalIndexes }}</span>
@@ -138,7 +138,7 @@
                     <!-- Schema Analysis -->
                     <div class="info-card">
                         <div class="card-header">
-                            <h3><i class="pi pi-folder"></i>Schema Analysis</h3>
+                            <h3><i class="pi pi-file"></i>Schema Analysis</h3>
                             <div class="search-box">
                                 <span class="p-input-icon-left">
                                     <i class="pi pi-search"></i>
@@ -153,8 +153,7 @@
                                     (click)="toggleSchemaExpand(schema)"
                                     [class.expanded]="expandedSchemas.includes(schema.name)">
                                     <div class="schema-header">
-                                        <i class="pi"
-                                            [ngClass]="expandedSchemas.includes(schema.name) ? 'pi-folder-open' : 'pi-folder'"></i>
+                                        <i class="pi pi-file"></i>
                                         <span class="schema-name">{{ schema.name }}</span>
                                         <span class="schema-size">{{ schema.totalSizeMB.toFixed(2) }} MB</span>
                                         <i class="expand-icon pi"
@@ -188,6 +187,7 @@
                                                 </div>
                                                 <div class="table-info">
                                                     <span class="size">{{ table.sizeMB.total.toFixed(2) }} MB</span>
+                                                    <span class="rows">{{ table.totalColumns }} columns</span>
                                                     <span class="rows">{{ table.rowCount }} rows</span>
                                                 </div>
                                             </div>

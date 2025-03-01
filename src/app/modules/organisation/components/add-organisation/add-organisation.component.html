@@ -179,14 +179,15 @@
 
                 <!-- Encryption Method -->
                 <div class="form-field">
-                    <label for="encryptionMethod">Encryption Method<span class="required"> *</span></label>
-                    <p-dropdown [options]="encryptionMethods" optionLabel="label" optionValue="value"
-                        formControlName="encryptionMethod" [filter]="true" filterBy="label" [style]="{'width':'100%'}"
-                        [panelStyle]="{'width':'100%'}" placeholder="Select Encryption Method"
-                        [ngClass]="{'ng-invalid ng-dirty': orgForm.get('encryptionMethod')?.invalid && orgForm.get('encryptionMethod')?.touched}">
+                    <label for="encryptionAlgorithm">Encryption Method<span class="required"> *</span></label>
+                    <p-dropdown [options]="encryptionAlgorithms" optionLabel="label" optionValue="value"
+                        formControlName="encryptionAlgorithm" [filter]="true" filterBy="label"
+                        [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                        placeholder="Select Encryption Method"
+                        [ngClass]="{'ng-invalid ng-dirty': orgForm.get('encryptionAlgorithm')?.invalid && orgForm.get('encryptionAlgorithm')?.touched}">
                     </p-dropdown>
                     <small class="error-message"
-                        *ngIf="orgForm.get('encryptionMethod')?.invalid && orgForm.get('encryptionMethod')?.touched">
+                        *ngIf="orgForm.get('encryptionAlgorithm')?.invalid && orgForm.get('encryptionAlgorithm')?.touched">
                         Encryption method is required
                     </small>
                 </div>
