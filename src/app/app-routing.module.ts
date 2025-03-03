@@ -95,7 +95,7 @@ const routes: Routes = [
           ),
       },
       {
-        path: 'credentials',
+        path: 'secrets',
         loadChildren: () =>
           import('./modules/credentials/credentials.module').then(
             m => m.CredentialsModule

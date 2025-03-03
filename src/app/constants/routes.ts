@@ -55,8 +55,8 @@ export const DATABASE = {
 };
 
 export const CREDENTIAL = {
-  ADD: '/app/credentials/add',
-  LIST: '/app/credentials',
-  EDIT: '/app/credentials/edit',
-  VIEW: '/app/credentials/view',
+  ADD: '/app/secrets/add',
+  LIST: '/app/secrets',
+  EDIT: '/app/secrets/edit',
+  VIEW: '/app/secrets/view',
 };

@@ -26,16 +26,13 @@ export class CredentialService {
       );
   }
 
-  addCredential(credentialForm: FormGroup) {
-    const { name, description, organisation, environments, config } =
-      credentialForm.value;
+  addCredential(credentialForm: any) {
+    const { organisation, categoryId, credentials } = credentialForm;
     return this.http
       .post(CREDENTIAL.ADD, {
-        name,
-        description,
         organisation,
-        environments,
-        config,
+        categoryId,
+        credentials,
       })
       .pipe(
         map((response: any) => {
