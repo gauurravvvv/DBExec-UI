@@ -108,4 +108,10 @@ export class CredentialService {
         })
       );
   }
+
+  downloadCredentials(orgId: string, categoryId: string) {
+    return this.http.get(CREDENTIAL.DOWNLOAD + `${orgId}/${categoryId}`, {
+      responseType: 'blob',
+    });
+  }
 }

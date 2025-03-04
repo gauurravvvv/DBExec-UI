@@ -81,4 +81,5 @@ export const CREDENTIAL = {
   ADD: '/credential/add',
   VIEW: '/credential/get/',
   EDIT: '/credential/update',
+  DOWNLOAD: '/credential/download/',
 };

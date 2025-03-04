@@ -6,6 +6,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { CredentialService } from '../../services/credential.service';
 import { CREDENTIAL } from 'src/app/constants/routes';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-list-credentials',
@@ -151,11 +152,6 @@ export class ListCredentialsComponent implements OnInit {
     this.router.navigate([CREDENTIAL.ADD]);
   }
 
-  onEdit(id: number) {
-    // Implement edit functionality
-    this.router.navigate([CREDENTIAL.EDIT, this.selectedOrg.id, id]);
-  }
-
   confirmDelete(id: number) {}
 
   cancelDelete() {}
@@ -179,16 +175,19 @@ export class ListCredentialsComponent implements OnInit {
     this.applyFilters();
   }
 
-  onDownload(categoryId: number) {
-    // Implement download functionality
-    // this.credentialService.downloadCredentials(categoryId).subscribe({
-    //   next: response => {
-    //     // Handle successful download
-    //     console.log('Download successful', response);
-    //   },
-    //   error: error => {
-    //     console.error('Error downloading credentials:', error);
-    //   },
-    // });
+  onDownload(categoryId: string) {
+    if (!this.selectedOrg) return;
+
+    this.credentialService
+      .downloadCredentials(this.selectedOrg.id, categoryId)
+      .subscribe({
+        next: (response: Blob) => {
+          const filename = `Credentials_${this.selectedOrg.name}.xlsx`;
+          saveAs(response, filename);
+        },
+        error: error => {
+          console.error('Error downloading credentials:', error);
+        },
+      });
   }
 }
