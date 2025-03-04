@@ -134,11 +134,8 @@ export class ListCredentialsComponent implements OnInit {
 
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        user =>
-          user.firstName.toLowerCase().includes(search) ||
-          user.lastName.toLowerCase().includes(search) ||
-          user.email.toLowerCase().includes(search)
+      filtered = filtered.filter(credential =>
+        credential.categoryName.toLowerCase().includes(search)
       );
     }
 
@@ -180,5 +177,18 @@ export class ListCredentialsComponent implements OnInit {
   onPageChange(page: number) {
     this.currentPage = page;
     this.applyFilters();
+  }
+
+  onDownload(categoryId: number) {
+    // Implement download functionality
+    // this.credentialService.downloadCredentials(categoryId).subscribe({
+    //   next: response => {
+    //     // Handle successful download
+    //     console.log('Download successful', response);
+    //   },
+    //   error: error => {
+    //     console.error('Error downloading credentials:', error);
+    //   },
+    // });
   }
 }
