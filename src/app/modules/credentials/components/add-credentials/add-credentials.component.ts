@@ -230,7 +230,7 @@ export class AddCredentialsComponent implements OnInit {
   getFieldErrorMessage(field: any): string {
     if (field.get('value')?.errors) {
       if (field.get('value')?.errors?.['required']) {
-        return 'Value is required';
+        return `${field.get('fieldName')?.value} is required`;
       }
     }
     return '';

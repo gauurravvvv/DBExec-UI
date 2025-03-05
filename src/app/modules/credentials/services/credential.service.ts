@@ -66,7 +66,7 @@ export class CredentialService {
       );
   }
 
-  viewCategory(orgId: string, categoryId: string) {
+  getCredential(orgId: string, categoryId: string) {
     return this.http.get(CREDENTIAL.VIEW + `${orgId}/${categoryId}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

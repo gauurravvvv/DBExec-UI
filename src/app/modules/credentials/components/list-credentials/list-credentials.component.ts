@@ -160,7 +160,9 @@ export class ListCredentialsComponent implements OnInit {
     }
   }
 
-  cancelDelete() {}
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+  }
 
   proceedDelete() {
     // Implement delete functionality

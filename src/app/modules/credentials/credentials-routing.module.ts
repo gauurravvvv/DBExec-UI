@@ -15,7 +15,7 @@ const routes: Routes = [
     component: AddCredentialsComponent,
   },
   { path: 'edit/:orgId/:id', component: EditCredentialsComponent },
-  { path: 'view/:orgId/:id', component: ViewCredentialsComponent },
+  { path: 'view/:orgId/:categoryId', component: ViewCredentialsComponent },
 ];
 
 @NgModule({
