@@ -12,8 +12,8 @@
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
                     [disabled]="!isFormDirty" (click)="onCancel()">
                 </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="categoryForm.invalid || !isFormDirty">
+                <button pButton type="submit" label="Save" class="p-button-outlined"
+                    [disabled]="categoryForm.invalid || !isFormDirty" (click)="onSubmit()">
                     <i class="pi pi-save mr-2"></i>
                 </button>
             </div>
@@ -46,12 +46,12 @@
                     <label for="description">Description</label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-align-left"></i>
-                        <input id="description" pInputText formControlName="description" rows="3"
+                        <input id="description" pInputText formControlName="description"
                             placeholder="Enter description">
                     </span>
                 </div>
 
-                <!-- Replace the Organisation Input -->
+                <!-- Organisation Input -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
                     <label for="organisation">Organisation</label>
                     <span class="p-input-icon-left">
@@ -76,31 +76,13 @@
                     </small>
                 </div>
 
-                <!-- Field Names Section -->
-                <div class="form-field fields-container">
-                    <div class="fields-header">
-                        <label>Field Names<span class="required">*</span></label>
-                        <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
-                            (click)="addField()" [style]="{'color': '#2196f3'}">
-                        </button>
-                    </div>
-
-                    <div class="fields-list" formArrayName="config">
-                        <div *ngFor="let field of config.controls; let i=index" [formGroupName]="i" class="field-row">
-                            <span class="p-input-icon-left field-input">
-                                <i class="pi pi-tag"></i>
-                                <input pInputText formControlName="name" placeholder="Enter field name"
-                                    [ngClass]="{'ng-invalid ng-dirty': field.get('name')?.invalid && field.get('name')?.touched}">
-                            </span>
-                            <button pButton type="button" icon="pi pi-minus"
-                                class="p-button-rounded p-button-text p-button-danger" (click)="removeField(i)"
-                                [disabled]="config.length === 1">
-                            </button>
-                            <small class="error-message"
-                                *ngIf="field.get('name')?.invalid && field.get('name')?.touched">
-                                {{ getFieldErrorMessage(field) }}
-                            </small>
-                        </div>
+                <!-- Status -->
+                <div class="form-field">
+                    <label for="status">Status</label>
+                    <div class="status-wrapper">
+                        <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
+                        <span class="status-text">{{ categoryForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
+                            }}</span>
                     </div>
                 </div>
             </div>

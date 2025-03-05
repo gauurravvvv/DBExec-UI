@@ -53,28 +53,11 @@ export class EditCategoryComponent implements OnInit {
       organisation: [''],
       environments: [[], Validators.required],
       status: [1],
-      config: this.fb.array([]),
     });
 
     this.categoryForm.valueChanges.subscribe(() => {
       this.checkFormDirty();
     });
-  }
-
-  get config(): FormArray {
-    return this.categoryForm.get('config') as FormArray;
-  }
-
-  createFieldGroup(sequence: number = this.getNextSequence()): FormGroup {
-    return this.fb.group({
-      id: [null],
-      name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s]+$')]],
-      sequence: [sequence],
-    });
-  }
-
-  getNextSequence(): number {
-    return this.config.length + 1;
   }
 
   loadCategoryData(): void {
@@ -92,28 +75,6 @@ export class EditCategoryComponent implements OnInit {
           pageNumber: 1,
           limit: 100,
         });
-
-        while (this.config.length) {
-          this.config.removeAt(0);
-        }
-
-        if (
-          categoryData.configurations &&
-          categoryData.configurations.length > 0
-        ) {
-          categoryData.configurations.forEach((config: any, index: number) => {
-            this.config.push(
-              this.fb.group({
-                id: [config.id],
-                name: [
-                  config.fieldName,
-                  [Validators.required, Validators.pattern('^[a-zA-Z\\s]+$')],
-                ],
-                sequence: [index + 1],
-              })
-            );
-          });
-        }
 
         const environmentIds = categoryData.categoryMappings.map(
           (mapping: any) => mapping.environmentId
@@ -156,26 +117,6 @@ export class EditCategoryComponent implements OnInit {
     });
   }
 
-  addField(): void {
-    this.config.push(this.createFieldGroup());
-    this.resequenceFields();
-    this.categoryForm.markAsDirty();
-  }
-
-  removeField(index: number): void {
-    if (this.config.length > 1) {
-      this.config.removeAt(index);
-      this.resequenceFields();
-      this.categoryForm.markAsDirty();
-    }
-  }
-
-  private resequenceFields() {
-    this.config.controls.forEach((control, index) => {
-      control.patchValue({ sequence: index + 1 }, { emitEvent: false });
-    });
-  }
-
   getFieldErrorMessage(field: any): string {
     if (field.get('name')?.errors?.['required']) {
       return 'Field name is required';
@@ -190,15 +131,8 @@ export class EditCategoryComponent implements OnInit {
     if (this.categoryForm.valid) {
       const formValue = this.categoryForm.value;
 
-      const configData = formValue.config.map((item: any) => ({
-        id: item.id,
-        fieldName: item.name,
-        sequence: item.sequence,
-      }));
-
       const submitData = {
         ...formValue,
-        config: configData,
       };
 
       this.categoryService.editCategory(submitData).subscribe({
@@ -223,23 +157,6 @@ export class EditCategoryComponent implements OnInit {
 
   onCancel(): void {
     if (this.isFormDirty) {
-      while (this.config.length) {
-        this.config.removeAt(0);
-      }
-
-      this.originalFormValue.config.forEach((config: any) => {
-        this.config.push(
-          this.fb.group({
-            id: [config.id],
-            name: [
-              config.name,
-              [Validators.required, Validators.pattern('^[a-zA-Z\\s]+$')],
-            ],
-            sequence: [config.sequence],
-          })
-        );
-      });
-
       this.categoryForm.patchValue(this.originalFormValue);
       this.isFormDirty = false;
       this.categoryForm.markAsPristine();

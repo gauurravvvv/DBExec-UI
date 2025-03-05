@@ -178,6 +178,18 @@
             color: var(--error-color);
             font-size: 12px;
           }
+
+          .status-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-top: 0.25rem;
+
+            .status-text {
+              color: var(--text-color);
+              font-size: 0.875rem;
+            }
+          }
         }
       }
     }
@@ -267,6 +279,50 @@
 
 // Override PrimeNG button styles
 :host ::ng-deep {
+  // InputSwitch styling
+  .p-inputswitch {
+    width: 3rem !important;
+    height: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+
+    .p-inputswitch-slider {
+      background: var(--border-color) !important;
+      border-radius: 30px !important;
+
+      &:before {
+        background: var(--card-background) !important;
+        width: 1rem !important;
+        height: 1rem !important;
+        left: 0.25rem !important;
+        margin-top: -0.5rem !important;
+        border-radius: 50% !important;
+        transition: all 0.2s ease !important;
+      }
+    }
+
+    &.p-inputswitch-checked {
+      .p-inputswitch-slider {
+        background: var(--success-color) !important;
+      }
+    }
+
+    &:not(.p-disabled) {
+      &:hover {
+        .p-inputswitch-slider {
+          background: var(--secondary-color) !important;
+        }
+      }
+
+      &.p-inputswitch-checked:hover {
+        .p-inputswitch-slider {
+          background: var(--success-color) !important;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
   .p-button {
     &.p-button-text {
       background: transparent !important;
