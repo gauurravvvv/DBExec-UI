@@ -21,6 +21,7 @@ export class ListCredentialsComponent implements OnInit {
 
   filteredCredentials: any[] = [];
   credentials: any[] = [];
+  selectedCredCategoryId!: string;
 
   // Pagination
   currentPage: number = 1;
@@ -152,22 +153,29 @@ export class ListCredentialsComponent implements OnInit {
     this.router.navigate([CREDENTIAL.ADD]);
   }
 
-  confirmDelete(id: number) {}
+  confirmDelete(id: string) {
+    if (id) {
+      this.selectedCredCategoryId = id;
+      this.showDeleteConfirm = true;
+    }
+  }
 
   cancelDelete() {}
 
   proceedDelete() {
     // Implement delete functionality
-    this.credentialService.deleteCredential(this.credentialToDelete).subscribe({
-      next: () => {
-        this.loadCredentials();
-        this.showDeleteConfirm = false;
-      },
-      error: error => {
-        console.error('Error deleting credentials', error);
-        this.showDeleteConfirm = false;
-      },
-    });
+    this.credentialService
+      .deleteAllCredential(this.selectedOrg.id, this.selectedCredCategoryId)
+      .subscribe({
+        next: () => {
+          this.showDeleteConfirm = false;
+          this.loadCredentials();
+        },
+        error: error => {
+          console.error('Error deleting credentials', error);
+          this.showDeleteConfirm = false;
+        },
+      });
   }
 
   onPageChange(page: number) {

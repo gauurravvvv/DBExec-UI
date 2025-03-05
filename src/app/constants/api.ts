@@ -78,6 +78,7 @@ export const GROUP = {
 export const CREDENTIAL = {
   LIST: '/credential/list',
   DELETE: '/credential/delete/',
+  DELETE_ALL: '/credential/deleteAll/',
   ADD: '/credential/add',
   VIEW: '/credential/get/',
   EDIT: '/credential/update',

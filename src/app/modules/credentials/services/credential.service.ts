@@ -55,6 +55,17 @@ export class CredentialService {
       );
   }
 
+  deleteAllCredential(orgId: string, categoryId: string) {
+    return this.http
+      .delete(CREDENTIAL.DELETE_ALL + `${orgId}/${categoryId}`)
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
+
   viewCategory(orgId: string, categoryId: string) {
     return this.http.get(CREDENTIAL.VIEW + `${orgId}/${categoryId}`).pipe(
       map((response: any) => {
