@@ -16,6 +16,7 @@ interface CredentialValue {
 interface CredentialSet {
   credentialId: number;
   values: CredentialValue[];
+  visibility: number;
 }
 
 interface CredentialDetails {
@@ -46,6 +47,16 @@ export class ViewCredentialsComponent implements OnInit {
   selectedCategoryId: string = '';
   showEditDialog: boolean = false;
   selectedCredential: any = null;
+  showCopyIcon: string = '';
+  showAllValues: boolean = false;
+
+  // Pagination properties
+  currentPage: number = 1;
+  pageSize: number = 10;
+  totalItems: number = 0;
+  totalPages: number = 0;
+  pages: number[] = [];
+  Math = Math; // For using Math in template
 
   constructor(
     private route: ActivatedRoute,
@@ -69,6 +80,8 @@ export class ViewCredentialsComponent implements OnInit {
       next: response => {
         if (response.status && response.data) {
           this.credentialDetails = response.data;
+          this.totalItems = this.credentialDetails?.values?.length || 0;
+          this.updatePagination();
         }
       },
       error: error => {
@@ -79,6 +92,23 @@ export class ViewCredentialsComponent implements OnInit {
         });
       },
     });
+  }
+
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  get paginatedCredentials(): any[] {
+    if (!this.credentialDetails?.values) return [];
+
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    return this.credentialDetails.values.slice(start, end);
   }
 
   getFieldNames(): string[] {
@@ -219,5 +249,38 @@ export class ViewCredentialsComponent implements OnInit {
     if (updatedData) {
       this.loadCredentialDetails(this.selectedOrgId, this.selectedCategoryId);
     }
+  }
+
+  copyField(fieldName: string, value: string): void {
+    const textToCopy = `${fieldName}: ${value}`;
+    this.clipboard.copy(textToCopy);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Copied',
+      detail: `${fieldName} copied to clipboard`,
+    });
+  }
+
+  changeVisibility(credentialId: number): void {
+    this.credentialsService
+      .changeVisibility(this.selectedOrgId, credentialId.toString())
+      .subscribe({
+        next: () => {
+          this.loadCredentialDetails(
+            this.selectedOrgId,
+            this.selectedCategoryId
+          );
+        },
+        error: error => {
+          console.error('Error changing visibility:', error);
+        },
+      });
+  }
+
+  toggleAllValues() {
+    this.showAllValues = !this.showAllValues;
+    // Fill all values in showValues array with the new state
+    this.showValues = this.paginatedCredentials.map(() => this.showAllValues);
   }
 }

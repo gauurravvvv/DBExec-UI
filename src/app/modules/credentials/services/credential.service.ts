@@ -123,4 +123,15 @@ export class CredentialService {
       responseType: 'blob',
     });
   }
+
+  changeVisibility(orgId: string, credentialId: string) {
+    return this.http
+      .get(CREDENTIAL.CHANGE_VISIBILITY + `${orgId}/${credentialId}`)
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
 }

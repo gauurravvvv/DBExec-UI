@@ -83,4 +83,5 @@ export const CREDENTIAL = {
   VIEW: '/credential/get/',
   EDIT: '/credential/update',
   DOWNLOAD: '/credential/download/',
+  CHANGE_VISIBILITY: '/credential/changeVisibility/',
 };
