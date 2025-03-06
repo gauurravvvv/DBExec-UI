@@ -42,11 +42,9 @@ export class CredentialService {
       );
   }
 
-  deleteCredential(ids: string[]) {
+  deleteCredential(orgId: string, credentialId: string) {
     return this.http
-      .delete(CREDENTIAL.DELETE, {
-        body: { credentialIds: ids },
-      })
+      .delete(CREDENTIAL.DELETE + `${orgId}/${credentialId}`)
       .pipe(
         map((response: any) => {
           const result = JSON.parse(JSON.stringify(response));

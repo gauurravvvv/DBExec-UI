@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ListCredentialsComponent } from './components/list-credentials/list-credentials.component';
 import { AddCredentialsComponent } from './components/add-credentials/add-credentials.component';
-import { EditCredentialsComponent } from './components/edit-credentials/edit-credentials.component';
 import { ViewCredentialsComponent } from './components/view-credentials/view-credentials.component';
 
 const routes: Routes = [
@@ -14,7 +13,6 @@ const routes: Routes = [
     path: 'add',
     component: AddCredentialsComponent,
   },
-  { path: 'edit/:orgId/:id', component: EditCredentialsComponent },
   { path: 'view/:orgId/:categoryId', component: ViewCredentialsComponent },
 ];
 

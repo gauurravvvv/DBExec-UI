@@ -3,24 +3,30 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { CredentialService } from '../../services/credential.service';
+import { CREDENTIAL } from 'src/app/constants/routes';
+import { saveAs } from 'file-saver';
+
+interface CredentialValue {
+  fieldName: string;
+  value: string;
+  configId: number;
+  sequence: number;
+}
+
+interface CredentialSet {
+  credentialId: number;
+  values: CredentialValue[];
+}
 
 interface CredentialDetails {
   id: number;
   organisationId: string;
   organisationName: string;
   category: {
-    id: number;
     name: string;
     description: string;
   };
-  values: Array<
-    Array<{
-      fieldName: string;
-      value: string;
-      configId: number;
-      sequence: number;
-    }>
-  >;
+  values: CredentialSet[];
   status: number;
   createdOn: string;
 }
@@ -33,8 +39,13 @@ interface CredentialDetails {
 export class ViewCredentialsComponent implements OnInit {
   credentialDetails: CredentialDetails | null = null;
   showDeleteConfirm: boolean = false;
-  selectedSetIndex: number | null = null;
-  showValues: { [key: number]: boolean } = {}; // Track show/hide state for each row
+  showAllDeleteConfirm: boolean = false;
+  selectedCredentialId: number | null = null;
+  showValues: { [key: number]: boolean } = {};
+  selectedOrgId: string = '';
+  selectedCategoryId: string = '';
+  showEditDialog: boolean = false;
+  selectedCredential: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -45,11 +56,11 @@ export class ViewCredentialsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const orgId = this.route.snapshot.params['orgId'];
-    const categoryId = this.route.snapshot.params['categoryId'];
+    this.selectedOrgId = this.route.snapshot.params['orgId'];
+    this.selectedCategoryId = this.route.snapshot.params['categoryId'];
 
-    if (orgId && categoryId) {
-      this.loadCredentialDetails(orgId, categoryId);
+    if (this.selectedOrgId && this.selectedCategoryId) {
+      this.loadCredentialDetails(this.selectedOrgId, this.selectedCategoryId);
     }
   }
 
@@ -75,7 +86,9 @@ export class ViewCredentialsComponent implements OnInit {
       this.credentialDetails?.values &&
       this.credentialDetails.values.length > 0
     ) {
-      return this.credentialDetails.values[0].map(field => field.fieldName);
+      return this.credentialDetails.values[0].values.map(
+        field => field.fieldName
+      );
     }
     return [];
   }
@@ -89,111 +102,95 @@ export class ViewCredentialsComponent implements OnInit {
     });
   }
 
-  onEdit(): void {
-    if (this.credentialDetails) {
-      this.router.navigate([
-        '/app/credentials/edit',
-        this.credentialDetails.id,
-      ]);
-    }
+  onDownload(): void {
+    if (!this.selectedOrgId) return;
+
+    this.credentialsService
+      .downloadCredentials(this.selectedOrgId, this.selectedCategoryId)
+      .subscribe({
+        next: (response: Blob) => {
+          const filename = `Credentials_${this.credentialDetails?.organisationName}.xlsx`;
+          saveAs(response, filename);
+        },
+        error: error => {
+          console.error('Error downloading credentials:', error);
+        },
+      });
   }
 
   onDelete(): void {
-    this.showDeleteConfirm = true;
+    console.log('asdsad');
+    this.showAllDeleteConfirm = true;
   }
 
-  onEditSet(index: number): void {
-    if (this.credentialDetails) {
-      this.router.navigate(
-        ['/app/credentials/edit', this.credentialDetails.id],
-        {
-          queryParams: { setIndex: index },
-        }
-      );
-    }
+  cancelAllDelete(): void {
+    this.showAllDeleteConfirm = false;
   }
 
-  onDeleteSet(index: number): void {
-    this.selectedSetIndex = index;
+  confirmAllDelete() {
+    this.credentialsService
+      .deleteAllCredential(this.selectedOrgId, this.selectedCategoryId)
+      .subscribe({
+        next: () => {
+          this.showAllDeleteConfirm = false;
+          this.router.navigate([CREDENTIAL.LIST]);
+        },
+        error: error => {
+          console.error('Error deleting credentials', error);
+          this.showAllDeleteConfirm = false;
+        },
+      });
+  }
+
+  onEditSet(set: any) {
+    this.selectedCredential = {
+      ...set,
+      organisationName: this.credentialDetails?.organisationName,
+      category: this.credentialDetails?.category,
+    };
+    this.showEditDialog = true;
+  }
+
+  onDeleteSet(credentialId: number): void {
+    this.selectedCredentialId = credentialId;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
-    this.selectedSetIndex = null;
+    this.selectedCredentialId = null;
   }
 
   confirmDelete(): void {
     if (this.credentialDetails) {
-      if (this.selectedSetIndex !== null) {
-        // Delete specific set
-        this.deleteCredentialSet(this.selectedSetIndex);
-      } else {
-        // Delete entire credential
-        this.deleteCredential();
+      if (this.selectedCredentialId !== null) {
+        this.credentialsService
+          .deleteCredential(
+            this.credentialDetails.organisationId,
+            this.selectedCredentialId.toString()
+          )
+          .subscribe({
+            next: () => {
+              this.showDeleteConfirm = false;
+              this.selectedCredentialId = null;
+              this.loadCredentialDetails(
+                this.selectedOrgId,
+                this.selectedCategoryId
+              );
+            },
+            error: error => {
+              console.error('Error deleting organisation user:', error);
+              this.showDeleteConfirm = false;
+              this.selectedCredentialId = null;
+            },
+          });
       }
     }
   }
 
-  private deleteCredentialSet(index: number): void {
-    if (this.credentialDetails) {
-      //   this.credentialsService
-      //     .deleteCredentialSet(this.credentialDetails.id, index)
-      //     .subscribe({
-      //       next: () => {
-      //         this.messageService.add({
-      //           severity: 'success',
-      //           summary: 'Success',
-      //           detail: 'Credential set deleted successfully',
-      //         });
-      //         this.loadCredentialDetails(this.credentialDetails!.id);
-      //       },
-      //       error: error => {
-      //         this.messageService.add({
-      //           severity: 'error',
-      //           summary: 'Error',
-      //           detail: 'Failed to delete credential set',
-      //         });
-      //       },
-      //       complete: () => {
-      //         this.showDeleteConfirm = false;
-      //         this.selectedSetIndex = null;
-      //       },
-      //     });
-    }
-  }
-
-  private deleteCredential(): void {
-    if (this.credentialDetails) {
-      // this.credentialsService
-      //   .deleteCredential(this.credentialDetails.id)
-      //   .subscribe({
-      //     next: () => {
-      //       this.messageService.add({
-      //         severity: 'success',
-      //         summary: 'Success',
-      //         detail: 'Credentials deleted successfully',
-      //       });
-      //       this.router.navigate(['/app/credentials']);
-      //     },
-      //     error: error => {
-      //       this.messageService.add({
-      //         severity: 'error',
-      //         summary: 'Error',
-      //         detail: 'Failed to delete credentials',
-      //       });
-      //     },
-      //     complete: () => {
-      //       this.showDeleteConfirm = false;
-      //     },
-      //   });
-    }
-  }
-
-  copyRow(set: any[]): void {
+  copyRow(set: CredentialSet): void {
     try {
-      // Create a formatted string with field names and values
-      const textToCopy = set
+      const textToCopy = set.values
         .map(field => `${field.fieldName}: ${field.value}`)
         .join('\n');
 
@@ -213,8 +210,14 @@ export class ViewCredentialsComponent implements OnInit {
     }
   }
 
-  // Add new method to toggle visibility
   toggleValues(index: number): void {
     this.showValues[index] = !this.showValues[index];
+  }
+
+  onEditDialogClose(updatedData?: any) {
+    this.showEditDialog = false;
+    if (updatedData) {
+      this.loadCredentialDetails(this.selectedOrgId, this.selectedCategoryId);
+    }
   }
 }
