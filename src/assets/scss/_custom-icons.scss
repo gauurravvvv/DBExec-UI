@@ -109,6 +109,15 @@ $icon-url: '../icons/';
     &.ci-user-group {
       content: url($icon-url + 'user-group.svg');
     }
+    &.ci-dataset {
+      content: url($icon-url + 'dataset.svg');
+    }
+    &.ci-studio {
+      content: url($icon-url + 'studio.svg');
+    }
+    &.ci-dataset-binder {
+      content: url($icon-url + 'dataset-binder.svg');
+    }
   }
 }
 
