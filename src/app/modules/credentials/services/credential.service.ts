@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
-import { CREDENTIAL, ENVIRONMENT } from 'src/app/constants/api';
+import { SECRET } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
@@ -14,7 +13,7 @@ export class CredentialService {
   listCredentials(params: IParams) {
     return this.http
       .get(
-        CREDENTIAL.LIST +
+        SECRET.LIST +
           `/${params.orgId}` +
           `/${params.pageNumber}/${params.limit}`
       )
@@ -29,7 +28,7 @@ export class CredentialService {
   addCredential(credentialForm: any) {
     const { organisation, categoryId, credentials } = credentialForm;
     return this.http
-      .post(CREDENTIAL.ADD, {
+      .post(SECRET.ADD, {
         organisation,
         categoryId,
         credentials,
@@ -43,29 +42,7 @@ export class CredentialService {
   }
 
   deleteCredential(orgId: string, credentialId: string) {
-    return this.http
-      .delete(CREDENTIAL.DELETE + `${orgId}/${credentialId}`)
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
-  }
-
-  deleteAllCredential(orgId: string, categoryId: string) {
-    return this.http
-      .delete(CREDENTIAL.DELETE_ALL + `${orgId}/${categoryId}`)
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
-  }
-
-  getCredential(orgId: string, categoryId: string) {
-    return this.http.get(CREDENTIAL.VIEW + `${orgId}/${categoryId}`).pipe(
+    return this.http.delete(SECRET.DELETE + `${orgId}/${credentialId}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -73,42 +50,31 @@ export class CredentialService {
     );
   }
 
-  editEnvironment(envForm: FormGroup) {
-    const { id, name, description, status } = envForm.getRawValue();
-    return this.http
-      .put(ENVIRONMENT.EDIT, {
-        id,
-        name,
-        description,
-        status: status ? 1 : 0,
+  deleteAllCredential(orgId: string, categoryId: string) {
+    return this.http.delete(SECRET.DELETE_ALL + `${orgId}/${categoryId}`).pipe(
+      map((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+    );
   }
 
-  editCategory(categoryData: any) {
-    const {
-      id,
-      name,
-      description,
-      environments,
-      status,
-      config,
-      organisation,
-    } = categoryData;
+  getCredential(orgId: string, categoryId: string) {
+    return this.http.get(SECRET.VIEW + `${orgId}/${categoryId}`).pipe(
+      map((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      })
+    );
+  }
+
+  editCredential(credentialData: any) {
+    const { credentialId, values, organisationId } = credentialData;
     return this.http
-      .put(CREDENTIAL.EDIT, {
-        id,
-        name,
-        description,
-        environments,
-        status,
-        config,
-        organisation,
+      .put(SECRET.EDIT, {
+        credentialId,
+        values,
+        organisationId,
       })
       .pipe(
         map((response: any) => {
@@ -119,14 +85,14 @@ export class CredentialService {
   }
 
   downloadCredentials(orgId: string, categoryId: string) {
-    return this.http.get(CREDENTIAL.DOWNLOAD + `${orgId}/${categoryId}`, {
+    return this.http.get(SECRET.DOWNLOAD + `${orgId}/${categoryId}`, {
       responseType: 'blob',
     });
   }
 
   changeVisibility(orgId: string, credentialId: string) {
     return this.http
-      .get(CREDENTIAL.CHANGE_VISIBILITY + `${orgId}/${credentialId}`)
+      .get(SECRET.CHANGE_VISIBILITY + `${orgId}/${credentialId}`)
       .pipe(
         map((response: any) => {
           const result = JSON.parse(JSON.stringify(response));

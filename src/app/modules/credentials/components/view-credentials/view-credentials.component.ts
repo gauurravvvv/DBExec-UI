@@ -173,11 +173,14 @@ export class ViewCredentialsComponent implements OnInit {
   }
 
   onEditSet(set: any) {
+    console.log(set);
     this.selectedCredential = {
       ...set,
       organisationName: this.credentialDetails?.organisationName,
+      organisationId: this.credentialDetails?.organisationId,
       category: this.credentialDetails?.category,
     };
+    console.log(this.selectedCredential);
     this.showEditDialog = true;
   }
 
@@ -246,8 +249,19 @@ export class ViewCredentialsComponent implements OnInit {
 
   onEditDialogClose(updatedData?: any) {
     this.showEditDialog = false;
+    //call update secrets api
     if (updatedData) {
-      this.loadCredentialDetails(this.selectedOrgId, this.selectedCategoryId);
+      this.credentialsService.editCredential(updatedData).subscribe({
+        next: () => {
+          this.loadCredentialDetails(
+            this.selectedOrgId,
+            this.selectedCategoryId
+          );
+        },
+        error: error => {
+          console.error('Error updating credentials:', error);
+        },
+      });
     }
   }
 

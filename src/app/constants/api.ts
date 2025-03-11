@@ -75,13 +75,13 @@ export const GROUP = {
   EDIT: '/group/update',
 };
 
-export const CREDENTIAL = {
-  LIST: '/credential/list',
-  DELETE: '/credential/delete/',
-  DELETE_ALL: '/credential/deleteAll/',
-  ADD: '/credential/add',
-  VIEW: '/credential/get/',
-  EDIT: '/credential/update',
-  DOWNLOAD: '/credential/download/',
-  CHANGE_VISIBILITY: '/credential/changeVisibility/',
+export const SECRET = {
+  LIST: '/secret/list',
+  DELETE: '/secret/delete/',
+  DELETE_ALL: '/secret/deleteAll/',
+  ADD: '/secret/add',
+  VIEW: '/secret/get/',
+  EDIT: '/secret/update',
+  DOWNLOAD: '/secret/download/',
+  CHANGE_VISIBILITY: '/secret/changeVisibility/',
 };

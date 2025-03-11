@@ -58,8 +58,13 @@ export class EditCredentialsComponent implements OnInit, OnDestroy {
   }
 
   private initializeForm() {
+    // Reset form state
+    this.isFormDirty = false;
+    this.initialValues = {};
+
     const formGroup: any = {};
     if (this.credentialSet?.values) {
+      // Reset password visibility array
       this.showPassword = new Array(this.credentialSet.values.length).fill(
         false
       );
@@ -69,8 +74,11 @@ export class EditCredentialsComponent implements OnInit, OnDestroy {
         this.initialValues[field.fieldName] = field.value;
       });
     }
+
+    // Create new form group
     this.editForm = this.fb.group(formGroup);
 
+    // Subscribe to value changes
     this.editForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.checkFormDirty();
     });
@@ -95,19 +103,33 @@ export class EditCredentialsComponent implements OnInit, OnDestroy {
         values: Object.keys(this.editForm.value).map(key => ({
           fieldName: key,
           value: this.editForm.value[key],
+          sequence: this.credentialSet.values.find(
+            (value: any) => value.fieldName === key
+          )?.sequence,
         })),
       };
+
+      // Update initial values to match new values
+      Object.keys(this.editForm.value).forEach(key => {
+        this.initialValues[key] = this.editForm.value[key];
+      });
+
+      this.isFormDirty = false;
+      this.loading = false;
       this.close.emit(updatedValues);
     }
   }
 
   onClose() {
-    // Reset form to initial values
-    Object.keys(this.initialValues).forEach(key => {
-      const control = this.editForm.get(key);
-      control?.setValue(this.initialValues[key]);
-      control?.markAsUntouched(); // Reset validation state
-    });
+    // Reset form and initial values to original credential set values
+    if (this.credentialSet?.values) {
+      this.credentialSet.values.forEach((field: any) => {
+        const control = this.editForm.get(field.fieldName);
+        control?.setValue(field.value);
+        control?.markAsUntouched(); // Reset validation state
+        this.initialValues[field.fieldName] = field.value; // Update initial values
+      });
+    }
     this.isFormDirty = false;
     this.close.emit();
   }
