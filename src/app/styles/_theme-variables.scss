@@ -70,7 +70,12 @@ textarea,
 .p-dropdown-trigger-icon,
 .p-dropdown,
 .p-dropdown-panel,
-.p-dropdown-items .p-dropdown-item {
+.p-dropdown-items .p-dropdown-item,
+.p-multiselect,
+.p-multiselect-trigger,
+.p-multiselect-trigger-icon,
+.p-multiselect-panel,
+.p-multiselect-items .p-multiselect-item {
   transition: all 0.3s ease !important;
   background: var(--input-background) !important;
 }
