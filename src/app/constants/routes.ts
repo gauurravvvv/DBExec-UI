@@ -60,3 +60,10 @@ export const CREDENTIAL = {
   EDIT: '/app/secrets/edit',
   VIEW: '/app/secrets/view',
 };
+
+export const DATASET = {
+  ADD: '/app/dataset/add',
+  LIST: '/app/dataset',
+  EDIT: '/app/dataset/edit',
+  VIEW: '/app/dataset/view',
+};

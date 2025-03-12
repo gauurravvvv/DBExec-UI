@@ -1,0 +1,84 @@
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/app/secrets">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Add Dataset</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    [disabled]="!isFormDirty" (click)="onCancel()">
+                </button>
+                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    [disabled]="datasetForm.invalid">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <form [formGroup]="datasetForm" class="admin-form">
+            <div class="form-grid">
+                <!-- Organisation Dropdown -->
+                <div class="form-field" *ngIf="showOrganisationDropdown">
+                    <label for="organisation">Organisation<span class="required"> *</span></label>
+                    <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
+                        formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                        [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"
+                        (onChange)="onOrganisationChange($event)"
+                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('organisation')?.invalid && datasetForm.get('organisation')?.touched}">
+                    </p-dropdown>
+                    <small class="error-message"
+                        *ngIf="datasetForm.get('organisation')?.invalid && datasetForm.get('organisation')?.touched">
+                        Organisation is required
+                    </small>
+                </div>
+
+                <!-- Database Dropdown -->
+                <div class="form-field">
+                    <label for="database">Database<span class="required"> *</span></label>
+                    <p-dropdown [options]="databases" optionLabel="name" optionValue="id" formControlName="database"
+                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                        placeholder="Select Database" (onChange)="onDatabaseChange($event)"
+                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('database')?.invalid && datasetForm.get('database')?.touched}">
+                    </p-dropdown>
+                    <small class="error-message"
+                        *ngIf="datasetForm.get('database')?.invalid && datasetForm.get('database')?.touched">
+                        Database is required
+                    </small>
+                </div>
+
+                <!-- Schema Dropdown -->
+                <div class="form-field">
+                    <label for="schema">Schema<span class="required"> *</span></label>
+                    <p-dropdown [options]="schemas" optionLabel="name" optionValue="name" formControlName="schema"
+                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                        placeholder="Select Schema" (onChange)="onSchemaChange($event)"
+                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('schema')?.invalid && datasetForm.get('schema')?.touched}">
+                    </p-dropdown>
+                    <small class="error-message"
+                        *ngIf="datasetForm.get('schema')?.invalid && datasetForm.get('schema')?.touched">
+                        Schema is required
+                    </small>
+                </div>
+
+                <!-- Table Dropdown -->
+                <div class="form-field">
+                    <label for="table">Table<span class="required"> *</span></label>
+                    <p-dropdown [options]="tables" optionLabel="name" optionValue="id" formControlName="table"
+                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                        placeholder="Select Table" (onChange)="onTableChange($event)"
+                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('table')?.invalid && datasetForm.get('table')?.touched}">
+                    </p-dropdown>
+                    <small class="error-message"
+                        *ngIf="datasetForm.get('table')?.invalid && datasetForm.get('table')?.touched">
+                        Table is required
+                    </small>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

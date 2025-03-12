@@ -161,4 +161,15 @@ export class DatabaseService {
         })
       );
   }
+
+  listDatabaseSchemas(params: any) {
+    return this.http
+      .get(DATABASE.LIST_SCHEMAS + `${params.orgId}` + `/${params.databaseId}`)
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
 }

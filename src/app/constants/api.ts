@@ -49,6 +49,7 @@ export const DATABASE = {
   ADD: '/database/add',
   VIEW: '/database/get/',
   UPDATE: '/database/update',
+  LIST_SCHEMAS: '/database/schema/list/',
 };
 
 export const ENVIRONMENT = {

@@ -101,6 +101,11 @@ const routes: Routes = [
             m => m.CredentialsModule
           ),
       },
+      {
+        path: 'dataset',
+        loadChildren: () =>
+          import('./modules/dataset/dataset.module').then(m => m.DatasetModule),
+      },
     ],
   },
   {

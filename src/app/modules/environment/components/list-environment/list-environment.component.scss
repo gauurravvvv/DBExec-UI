@@ -605,8 +605,9 @@
       }
 
       .p-dropdown-empty-message {
-        color: var(--text-color-secondary) !important;
+        color: var(--text-color) !important;
         padding: 0.75rem 1rem;
+        opacity: 0.4;
       }
     }
   }
