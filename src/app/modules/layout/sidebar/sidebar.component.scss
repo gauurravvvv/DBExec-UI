@@ -91,6 +91,7 @@
             text-decoration: none;
             cursor: pointer;
             transition: background-color 0.2s;
+            position: relative;
 
             &:hover {
               background: var(--hover-background);
@@ -127,7 +128,7 @@
 
             .submenu-arrow {
               font-size: 0.8rem;
-              transition: transform 0.2s;
+              transition: transform 0.2s ease-in-out;
 
               &.expanded {
                 transform: rotate(-180deg);
@@ -141,25 +142,41 @@
                 transform: scale(1.2);
               }
             }
+
+            &:hover {
+              .sidebar-tooltip {
+                opacity: 1;
+                visibility: visible;
+              }
+            }
           }
 
           .nav-link:hover & {
             transform: scale(1.2);
           }
 
-          .submenu {
+          .submenu,
+          .nested-submenu {
             list-style: none;
             padding: 0;
             margin: 0;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transition: all 0.2s ease-in-out;
+            opacity: 0;
+            transform: translateY(-10px);
 
             &.expanded {
               max-height: 1000px;
+              opacity: 1;
+              transform: translateY(0);
             }
 
-            .submenu-item {
+            .submenu-item,
+            .nested-submenu-item {
+              transform-origin: top;
+              transition: transform 0.2s ease-in-out;
+
               a,
               .submenu-link {
                 display: flex;
@@ -205,56 +222,86 @@
                   }
                 }
               }
-            }
 
-            .nested-submenu {
-              list-style: none;
-              padding: 0;
-              margin: 0;
-              max-height: 0;
-              overflow: hidden;
-              transition: max-height 0.3s ease;
-
-              &.expanded {
-                max-height: 1000px;
+              &.visible {
+                transform: scaleY(1);
               }
 
-              .nested-submenu-item {
-                a {
-                  padding-left: calc(1.25rem + 24px + 1rem + 24px + 1rem);
-
-                  &:hover {
-                    background: var(--hover-background);
-                  }
-
-                  &.active {
-                    background: var(--hover-background);
-                    color: var(--primary-color);
-
-                    i {
-                      color: var(--primary-color);
-                    }
-                  }
-
-                  .link-content {
-                    i {
-                      transition: transform 0.2s ease;
-                    }
-                  }
-
-                  &:hover {
-                    background: var(--hover-background);
-
-                    .link-content i {
-                      transform: scale(1.2);
-                    }
-                  }
-                }
+              &:not(.visible) {
+                transform: scaleY(0);
               }
             }
           }
         }
       }
     }
+  }
+}
+
+.sidebar-tooltip {
+  position: fixed;
+  left: 70px;
+  background: var(--card-background);
+  color: var(--text-color);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-color);
+  z-index: 1000;
+  pointer-events: none;
+  transform: translateY(-50%);
+  margin-top: 20px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent var(--border-color) transparent transparent;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent var(--card-background) transparent transparent;
+  }
+}
+
+.nav-link,
+.submenu-item a,
+.nested-submenu-item a {
+  position: relative;
+
+  &:hover {
+    .sidebar-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+.sidebar:not(.collapsed) {
+  .sidebar-tooltip {
+    display: none;
+  }
+}
+
+// For nested submenu items
+.nested-submenu-item {
+  a {
+    padding-left: calc(1.25rem + 24px + 1rem + 24px + 1rem) !important;
   }
 }

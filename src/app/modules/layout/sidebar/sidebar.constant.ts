@@ -32,6 +32,18 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/database',
   },
   {
+    value: 'dbExecStudio',
+    route: '/app/studio',
+  },
+  {
+    value: 'datasetManager',
+    route: '/app/dataset',
+  },
+  {
+    value: 'datasetBinder',
+    route: '/app/datasetBinder',
+  },
+  {
     value: 'dbSchema',
     route: '/home/system/configureDB',
   },

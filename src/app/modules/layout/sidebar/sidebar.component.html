@@ -17,23 +17,24 @@
           <ng-container *ngFor="let item of mainItem.children">
             <li class="nav-item" [class.active]="item.isExpanded">
               <!-- Menu item with children -->
-              <div *ngIf="item.children" class="nav-link" [title]="!isExpanded ? item.label : ''"
-                [style.paddingLeft]="getIndentation(item.level)" (click)="toggleSubmenuAndExpand(item)"
-                [class.expanded]="item.isExpanded">
+              <div *ngIf="item.children" class="nav-link" [style.paddingLeft]="getIndentation(item.level)"
+                (click)="toggleSubmenuAndExpand(item)" [class.expanded]="item.isExpanded">
                 <div class="link-content">
                   <i [class]="item.icon"></i>
                   <span class="nav-text" [class.hidden]="!isExpanded">{{ item.label }}</span>
                 </div>
                 <i class="pi pi-chevron-down submenu-arrow" *ngIf="item.children.length > 0 && isExpanded"></i>
+                <div class="sidebar-tooltip" *ngIf="!isExpanded">{{ item.label }}</div>
               </div>
 
               <!-- Menu item without children -->
               <a *ngIf="!item.children" [routerLink]="item.route" routerLinkActive="active" class="nav-link"
-                [title]="!isExpanded ? item.label : ''" [style.paddingLeft]="getIndentation(item.level)">
+                [style.paddingLeft]="getIndentation(item.level)">
                 <div class="link-content">
                   <i [class]="item.icon"></i>
                   <span class="nav-text" [class.hidden]="!isExpanded">{{ item.label }}</span>
                 </div>
+                <div class="sidebar-tooltip" *ngIf="!isExpanded">{{ item.label }}</div>
               </a>
 
               <!-- Submenu -->
@@ -62,7 +63,6 @@
                     <li *ngFor="let nestedChild of child.children" class="nested-submenu-item"
                       [class.visible]="child.isExpanded">
                       <a [routerLink]="nestedChild.route" routerLinkActive="active"
-                        [title]="!isExpanded ? nestedChild.label : ''"
                         [style.paddingLeft]="getIndentation(nestedChild.level)">
                         <div class="link-content">
                           <i [class]="nestedChild.icon"></i>
