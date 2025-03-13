@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -6,11 +6,13 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatasetService } from '../../services/dataset.service';
+import { DATASET } from 'src/app/constants/routes';
 
 @Component({
   selector: 'app-add-dataset',
@@ -30,7 +32,7 @@ export class AddDatasetComponent implements OnInit {
   selectedOrg: any = null;
   selectedDatabase: any = null;
   selectedSchema: any = null;
-  private originalColumns: any[] = [];
+  originalColumns: any[] = [];
   allColumns: { schema: string; table: string; column: any }[] = [];
   totalAvailableColumns: number = 0;
   duplicateRows: { [key: string]: Array<[number, number]> } = {};
@@ -43,6 +45,7 @@ export class AddDatasetComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private router: Router,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private databaseService: DatabaseService,
@@ -215,6 +218,7 @@ export class AddDatasetComponent implements OnInit {
       this.datasetService.addDataset(payload).subscribe({
         next: (response: any) => {
           console.log('Dataset added successfully:', response);
+          this.router.navigate([DATASET.LIST]);
         },
         error: error => {
           console.error('Error adding dataset:', error);
