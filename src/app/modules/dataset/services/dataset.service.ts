@@ -2,13 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
-import { DATABASE, SUPER_ADMIN } from 'src/app/constants/api';
+import { DATABASE, DATASET, SUPER_ADMIN } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class DatabaseService {
+export class DatasetService {
   constructor(private http: HttpClient) {}
 
   listDatabase(params: IParams) {
@@ -39,48 +39,24 @@ export class DatabaseService {
       );
   }
 
-  addDatabase(payload: any) {
-    const {
-      name,
-      description,
-      type,
-      host,
-      port,
-      database,
-      username,
-      password,
-      organisation,
-      isMasterDB,
-      adminCredentials,
-    } = payload;
+  addDataset(payload: any) {
+    const { name, description, organisation, database, columnMappings } =
+      payload;
 
-    const requestBody: any = {
-      name,
-      description,
-      type,
-      host,
-      port,
-      database,
-      username,
-      password,
-      organisation,
-      isMasterDB,
-    };
-
-    if (adminCredentials) {
-      requestBody.adminCredentials = {
-        email: adminCredentials.email,
-        phone: adminCredentials.phone,
-        password: adminCredentials.password,
-      };
-    }
-
-    return this.http.post(DATABASE.ADD, requestBody).pipe(
-      map((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
+    return this.http
+      .post(DATASET.ADD, {
+        name,
+        description,
+        organisation,
+        database,
+        columnMappings,
       })
-    );
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
   }
 
   viewSuperAdmin(id: string) {

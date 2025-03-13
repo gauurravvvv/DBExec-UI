@@ -88,3 +88,7 @@ export const SECRET = {
   DOWNLOAD: '/secret/download/',
   CHANGE_VISIBILITY: '/secret/changeVisibility/',
 };
+
+export const DATASET = {
+  ADD: '/dataset/add',
+};

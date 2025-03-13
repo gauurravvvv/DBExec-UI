@@ -10,6 +10,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { DatasetService } from '../../services/dataset.service';
 
 @Component({
   selector: 'app-add-dataset',
@@ -44,7 +45,8 @@ export class AddDatasetComponent implements OnInit {
     private fb: FormBuilder,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private datasetService: DatasetService
   ) {
     this.initForm();
   }
@@ -210,6 +212,14 @@ export class AddDatasetComponent implements OnInit {
 
       console.log('Submitting dataset:', payload);
       // Call your API service here
+      this.datasetService.addDataset(payload).subscribe({
+        next: (response: any) => {
+          console.log('Dataset added successfully:', response);
+        },
+        error: error => {
+          console.error('Error adding dataset:', error);
+        },
+      });
     }
   }
 
