@@ -172,4 +172,37 @@ export class DatabaseService {
         })
       );
   }
+
+  listSchemaTables(params: any) {
+    return this.http
+      .get(
+        DATABASE.LIST_SCHEMA_TABLES +
+          `${params.orgId}` +
+          `/${params.databaseId}` +
+          `/${params.schemaName}`
+      )
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
+
+  listTableColumns(params: any) {
+    return this.http
+      .get(
+        DATABASE.LIST_TABLE_COLUMNS +
+          `${params.orgId}` +
+          `/${params.databaseId}` +
+          `/${params.schemaName}` +
+          `/${params.tableName}`
+      )
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
 }

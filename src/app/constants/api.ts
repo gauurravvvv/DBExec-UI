@@ -50,6 +50,8 @@ export const DATABASE = {
   VIEW: '/database/get/',
   UPDATE: '/database/update',
   LIST_SCHEMAS: '/database/schema/list/',
+  LIST_SCHEMA_TABLES: '/database/table/list/',
+  LIST_TABLE_COLUMNS: '/database/table/columns/list/',
 };
 
 export const ENVIRONMENT = {

@@ -8,6 +8,12 @@
                 </button>
                 <h2>Add Dataset</h2>
             </div>
+            <div class="warning-section" *ngIf="hasDuplicates">
+                <div class="duplicate-warning">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>Duplicate column selection found. Please remove duplicates to continue.</span>
+                </div>
+            </div>
             <div class="action-buttons">
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
                     [disabled]="!isFormDirty" (click)="onCancel()">
@@ -20,9 +26,34 @@
         </div>
 
         <!-- Form Section -->
-        <form [formGroup]="datasetForm" class="admin-form">
+        <form [formGroup]="datasetForm" class="admin-form" #formContainer>
             <div class="form-grid">
-                <!-- Organisation Dropdown -->
+                <!-- Name and Description fields -->
+                <div class="form-field">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-box"></i>
+                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
+                            [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched">
+                        <span *ngIf="datasetForm.get('name')?.errors?.['required']">Name is required</span>
+                        <span *ngIf="datasetForm.get('name')?.errors?.['pattern']">Name can only contain
+                            letters, spaces and hyphens</span>
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <label for="description">Description</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-align-left"></i>
+                        <input id="description" pInputText formControlName="description" rows="3"
+                            placeholder="Enter description">
+                    </span>
+                </div>
+
+                <!-- Organisation and Database dropdowns -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
                     <label for="organisation">Organisation<span class="required"> *</span></label>
                     <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
@@ -37,7 +68,6 @@
                     </small>
                 </div>
 
-                <!-- Database Dropdown -->
                 <div class="form-field">
                     <label for="database">Database<span class="required"> *</span></label>
                     <p-dropdown [options]="databases" optionLabel="name" optionValue="id" formControlName="database"
@@ -51,32 +81,78 @@
                     </small>
                 </div>
 
-                <!-- Schema Dropdown -->
-                <div class="form-field">
-                    <label for="schema">Schema<span class="required"> *</span></label>
-                    <p-dropdown [options]="schemas" optionLabel="name" optionValue="name" formControlName="schema"
-                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        placeholder="Select Schema" (onChange)="onSchemaChange($event)"
-                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('schema')?.invalid && datasetForm.get('schema')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="datasetForm.get('schema')?.invalid && datasetForm.get('schema')?.touched">
-                        Schema is required
-                    </small>
-                </div>
+                <!-- Column Mappings -->
+                <div class="form-field fields-container" *ngIf="schemas.length > 0">
+                    <div class="fields-header">
+                        <label>Column Mappings<span class="required">*</span></label>
+                        <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
+                            (click)="addSchemaGroup()" [style]="{'color': '#2196f3'}">
+                        </button>
+                    </div>
 
-                <!-- Table Dropdown -->
-                <div class="form-field">
-                    <label for="table">Table<span class="required"> *</span></label>
-                    <p-dropdown [options]="tables" optionLabel="name" optionValue="id" formControlName="table"
-                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        placeholder="Select Table" (onChange)="onTableChange($event)"
-                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('table')?.invalid && datasetForm.get('table')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="datasetForm.get('table')?.invalid && datasetForm.get('table')?.touched">
-                        Table is required
-                    </small>
+                    <div class="fields-list">
+                        <div *ngFor="let schemaGroup of schemaGroups.controls; let groupIndex=index"
+                            [formGroup]="$any(schemaGroup)" class="schema-group">
+                            <!-- Schema Header -->
+                            <div class="schema-header">
+                                <p-dropdown [options]="getAvailableSchemas(groupIndex)" optionLabel="name"
+                                    optionValue="name" formControlName="schema" [filter]="true" filterBy="name"
+                                    [style]="{'width':'300px'}" placeholder="Select Schema">
+                                </p-dropdown>
+                                <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
+                                    (click)="addMappingToSchema(groupIndex)"
+                                    [disabled]="!schemaGroup.get('schema')?.value" [style]="{'color': '#2196f3'}">
+                                </button>
+                                <button pButton type="button" icon="pi pi-trash"
+                                    class="p-button-rounded p-button-text p-button-danger"
+                                    (click)="removeSchemaGroup(groupIndex)" [disabled]="schemaGroups.length === 1">
+                                </button>
+                            </div>
+
+                            <!-- Mappings for this schema -->
+                            <div class="mappings-list" formArrayName="mappings">
+                                <div *ngFor="let mapping of getSchemaGroupMappings(groupIndex).controls; let mappingIndex=index"
+                                    [formGroupName]="mappingIndex" class="mapping-row"
+                                    [ngClass]="{'duplicate': isDuplicateRow(groupIndex, mappingIndex)}">
+                                    <span class="index-number">{{mappingIndex + 1}}</span>
+                                    <div class="mapping-inputs">
+                                        <!-- Table Dropdown -->
+                                        <div class="dropdown-container">
+                                            <p-dropdown [options]="getAvailableTables(schemaGroup.get('schema')?.value)"
+                                                optionLabel="name" optionValue="name" formControlName="table"
+                                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                                placeholder="Select Table">
+                                            </p-dropdown>
+                                        </div>
+
+                                        <!-- Column Dropdown -->
+                                        <div class="dropdown-container">
+                                            <p-dropdown
+                                                [options]="getAvailableColumns(schemaGroup.get('schema')?.value, mapping.get('table')?.value)"
+                                                optionLabel="name" optionValue="name" formControlName="column"
+                                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                                placeholder="Select Column">
+                                            </p-dropdown>
+                                        </div>
+
+                                        <!-- Value Input -->
+                                        <div class="input-container">
+                                            <span class="p-input-icon-left">
+                                                <i class="pi pi-pencil"></i>
+                                                <input pInputText formControlName="value" placeholder="Enter value">
+                                            </span>
+                                        </div>
+
+                                        <button pButton type="button" icon="pi pi-minus"
+                                            class="p-button-rounded p-button-text p-button-danger"
+                                            (click)="removeMappingFromSchema(groupIndex, mappingIndex)"
+                                            [disabled]="getSchemaGroupMappings(groupIndex).length === 1">
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>

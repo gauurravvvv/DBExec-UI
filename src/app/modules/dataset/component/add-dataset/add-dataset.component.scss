@@ -53,12 +53,28 @@
           }
         }
       }
+
+      .warning-section {
+        margin-right: 20px;
+
+        .duplicate-warning {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--warning-color);
+
+          i {
+            font-size: 1.2rem;
+          }
+        }
+      }
     }
 
     .admin-form {
       flex: 1;
       overflow-y: auto;
       padding-right: 10px;
+      max-height: calc(100vh - 200px);
       display: flex;
       justify-content: left;
 
@@ -203,6 +219,20 @@
               &:disabled {
                 opacity: 0.6;
                 cursor: not-allowed;
+              }
+            }
+
+            button {
+              &.p-button-rounded.p-button-text {
+                &:disabled {
+                  opacity: 0.4;
+                  cursor: not-allowed;
+                  color: var(--text-color-secondary) !important;
+
+                  .pi {
+                    color: var(--text-color-secondary) !important;
+                  }
+                }
               }
             }
           }
@@ -751,6 +781,284 @@
 
     &:hover {
       opacity: 0.7;
+    }
+  }
+}
+
+// Update the keyframes with yellow color
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); // Yellow warning color
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); // Fade out
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+  }
+}
+
+.mapping-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  padding: 1rem;
+  background: var(--surface-ground);
+  border-radius: 8px;
+
+  .index-number {
+    min-width: 24px;
+    height: 24px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+
+  .mapping-inputs {
+    flex: 1;
+    display: flex;
+    gap: 2rem;
+    position: relative;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+
+    .dropdown-container,
+    .input-container {
+      flex: 1;
+      position: relative;
+      min-width: 250px;
+    }
+
+    p-dropdown {
+      width: 100%;
+    }
+
+    .p-input-icon-left {
+      width: 100%;
+
+      input {
+        width: 100%;
+      }
+    }
+
+    .error-message {
+      color: var(--error-color);
+      font-size: 0.75rem;
+      position: absolute;
+      bottom: -1.25rem;
+      left: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 2.5rem;
+
+    .mapping-inputs {
+      gap: 1.5rem;
+
+      .dropdown-container,
+      .input-container {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  button {
+    &.p-button-rounded.p-button-text.p-button-danger {
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        color: var(--text-color-secondary) !important;
+
+        .pi {
+          color: var(--text-color-secondary) !important;
+        }
+      }
+    }
+  }
+
+  &.duplicate {
+    background: var(--surface-ground);
+    border: none;
+
+    .index-number {
+      background: #ffc107; // Warning yellow color
+      animation: pulseGlow 1.5s infinite;
+      color: #000; // Change text color to black for better contrast with yellow
+    }
+  }
+}
+
+:host ::ng-deep {
+  .mapping-inputs {
+    .p-dropdown,
+    .p-inputtext {
+      width: 100%;
+
+      &.ng-invalid.ng-touched {
+        border-color: var(--error-color);
+      }
+    }
+  }
+}
+
+.schema-group {
+  margin-bottom: 2rem;
+  background: var(--surface-card);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: opacity 0.3s ease;
+
+  .schema-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--surface-border);
+
+    p-dropdown {
+      flex: 0 0 300px;
+
+      &.p-disabled {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+    }
+
+    button {
+      flex-shrink: 0;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+
+        .pi {
+          opacity: 0.6;
+        }
+      }
+    }
+  }
+
+  .mappings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .mapping-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--surface-ground);
+      border-radius: 8px;
+      margin: 0;
+
+      .index-number {
+        min-width: 24px;
+        height: 24px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+      }
+
+      .mapping-inputs {
+        flex: 1;
+        display: flex;
+        gap: 1rem;
+        position: relative;
+        flex-wrap: wrap;
+
+        .dropdown-container,
+        .input-container {
+          flex: 1 1 200px;
+          min-width: 200px;
+          position: relative;
+        }
+
+        @media (max-width: 1200px) {
+          .dropdown-container,
+          .input-container {
+            flex: 1 1 calc(50% - 0.5rem);
+          }
+        }
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+          gap: 1rem;
+
+          .dropdown-container,
+          .input-container {
+            flex: 1 1 100%;
+            width: 100%;
+            min-width: unset;
+          }
+        }
+      }
+
+      &.duplicate {
+        .index-number {
+          background: #ffc107;
+          animation: pulseGlow 1.5s infinite;
+          color: #000;
+        }
+      }
+
+      &.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+
+        .mapping-inputs {
+          .dropdown-container,
+          .input-container {
+            opacity: 0.6;
+
+            input,
+            p-dropdown {
+              pointer-events: none;
+            }
+          }
+        }
+
+        button {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// Update the button styles globally
+:host ::ng-deep {
+  .p-button {
+    &:disabled {
+      opacity: 0.6 !important;
+      cursor: not-allowed !important;
+
+      .pi {
+        opacity: 0.6;
+      }
     }
   }
 }
