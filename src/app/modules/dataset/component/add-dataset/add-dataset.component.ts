@@ -411,6 +411,21 @@ export class AddDatasetComponent implements OnInit {
     }
   }
 
+  clearAllMappings() {
+    // Clear all schema groups
+    this.schemaGroups.clear();
+
+    // Reset duplicates
+    this.duplicateRows = {};
+
+    // Add back one empty schema group
+    this.addSchemaGroup();
+
+    // Update form state
+    this.datasetForm.markAsDirty();
+    this.updateFormDirtyState();
+  }
+
   private loadColumnsForMapping(schemaName: string, tableName: string) {
     // Find the schema in static data
     const schemaData = this.staticSchemaData.find(

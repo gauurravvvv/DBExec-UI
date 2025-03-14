@@ -804,3 +804,27 @@
     }
   }
 }
+
+.database-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-200);
+  border-radius: 16px;
+  padding: 0.25rem 0.75rem;
+
+  .chip-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--surface-900);
+
+    .pi-database {
+      color: var(--primary-color);
+      font-size: 0.875rem;
+    }
+  }
+
+  &:hover {
+    background: var(--surface-300);
+  }
+}

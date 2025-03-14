@@ -195,6 +195,26 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 1rem;
+
+            .button-group {
+              display: flex;
+              align-items: center;
+
+              .clear-btn {
+                margin-right: -0.5rem;
+                color: var(--error-color) !important;
+
+                &:hover {
+                  background: rgba(var(--red-500), 0.04);
+                }
+              }
+
+              .add-btn {
+                z-index: 1;
+                color: var(--primary-color) !important;
+              }
+            }
 
             label {
               font-weight: 500;
@@ -203,36 +223,6 @@
               .required {
                 color: var(--error-color);
                 margin-left: 4px;
-              }
-            }
-
-            .add-btn {
-              width: 40px;
-              height: 40px;
-              padding: 0;
-
-              &:hover:not(:disabled) {
-                background: var(--primary-color-transparent) !important;
-                color: var(--primary-color) !important;
-              }
-
-              &:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-              }
-            }
-
-            button {
-              &.p-button-rounded.p-button-text {
-                &:disabled {
-                  opacity: 0.4;
-                  cursor: not-allowed;
-                  color: var(--text-color-secondary) !important;
-
-                  .pi {
-                    color: var(--text-color-secondary) !important;
-                  }
-                }
               }
             }
           }

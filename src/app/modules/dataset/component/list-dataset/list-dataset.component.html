@@ -31,7 +31,9 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Email</th>
+                            <th>Description</th>
+                            <th>Database Name</th>
+                            <th>Mappings Count</th>
                             <th>
                                 Status
                                 <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
@@ -42,34 +44,44 @@
                                     style="margin-left: 5px; cursor: pointer;">
                                 </i>
                             </th>
-                            <th>Last Login</th>
-                            <th>Created Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="filteredUsers && filteredUsers.length > 0; else noData">
-                            <tr *ngFor="let user of filteredUsers">
+                        <ng-container *ngIf="filteredDatasets && filteredDatasets.length > 0; else noData">
+                            <tr *ngFor="let dataset of filteredDatasets">
                                 <td>
-                                    <a class="admin-name" [routerLink]="['/app/users/view', selectedOrg.id, user.id]">
-                                        {{ user.firstName + ' ' + user?.lastName }}
+                                    <a class="admin-name"
+                                        [routerLink]="['/app/dataset/view', selectedOrg.id, dataset.id]">
+                                        {{ dataset.name }}
                                     </a>
                                 </td>
-                                <td>{{ user.email }}</td>
+                                <td>{{ dataset.description }}</td>
                                 <td>
-                                    <span class="status-badge" [class.active]="user.status === 1">
-                                        {{ user.status === 1 ? 'Active' : 'Inactive' }}
+                                    <span class="database-chip">
+                                        <span class="chip-content">
+                                            <i class="pi pi-database"></i>
+                                            {{ dataset.databaseName }}
+                                        </span>
                                     </span>
                                 </td>
-                                <td>{{ user.lastLogin ? (user.lastLogin | date:'medium') : 'Never logged in' }}</td>
-                                <td>{{ user.createdOn | date:'mediumDate' }}</td>
+                                <td>
+                                    <span class="field-count">
+                                        <i class="pi pi-list"></i>
+                                        {{ dataset.columnMappings?.length || 0 }} Mappings
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge" [class.active]="dataset.status === 1">
+                                        {{ dataset.status === 1 ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
                                 <td class="actions">
-                                    <button class="action-btn edit" (click)="onEdit(user.id)" title="Edit"
-                                        [disabled]="user.id == loggedInUserId">
+                                    <button class="action-btn edit" (click)="onEdit(dataset.id)" title="Edit">
                                         <i class="pi pi-pencil"></i>
                                     </button>
-                                    <button class="action-btn delete" (click)="confirmDelete(user.id)" title="Delete"
-                                        [disabled]="user.id == loggedInUserId">
+                                    <button class="action-btn delete" (click)="confirmDelete(dataset.id)"
+                                        title="Delete">
                                         <i class="pi pi-trash"></i>
                                     </button>
                                 </td>
@@ -81,7 +93,7 @@
                                     <div class="no-data">
                                         <i class="pi pi-inbox"></i>
                                         <p>No records found</p>
-                                        <span class="sub-text">No user data is available at the moment</span>
+                                        <span class="sub-text">No datasets available at the moment</span>
                                     </div>
                                 </td>
                             </tr>
@@ -121,7 +133,7 @@
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
         <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this user?</p>
+        <p>Are you sure you want to delete this dataset?</p>
         <div class="popup-actions">
             <button class="btn-cancel" (click)="cancelDelete()">No</button>
             <button class="btn-confirm" (click)="proceedDelete()">Yes</button>

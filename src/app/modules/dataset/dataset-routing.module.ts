@@ -14,8 +14,8 @@ const routes: Routes = [
     path: 'add',
     component: AddDatasetComponent,
   },
-  { path: 'edit/:id', component: EditDatasetComponent },
-  { path: 'view/:id', component: ViewDatasetComponent },
+  { path: 'edit/:orgId/:id', component: EditDatasetComponent },
+  { path: 'view/:orgId/:id', component: ViewDatasetComponent },
 ];
 
 @NgModule({

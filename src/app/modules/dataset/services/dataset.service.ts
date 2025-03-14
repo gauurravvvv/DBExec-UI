@@ -11,10 +11,10 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class DatasetService {
   constructor(private http: HttpClient) {}
 
-  listDatabase(params: IParams) {
+  listDatasets(params: IParams) {
     return this.http
       .get(
-        DATABASE.LIST +
+        DATASET.LIST +
           `/${params.orgId}` +
           `/${params.pageNumber}/${params.limit}`
       )
@@ -26,17 +26,13 @@ export class DatasetService {
       );
   }
 
-  deleteDatabase(id: string, deleteConfiguration: boolean) {
-    return this.http
-      .post(DATABASE.DELETE + `${id}`, {
-        deleteConfiguration,
+  deleteDataset(orgId: string, datasetId: string) {
+    return this.http.delete(DATASET.DELETE + `${orgId}` + `/${datasetId}`).pipe(
+      map((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+    );
   }
 
   addDataset(payload: any) {

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { DATASET, USER } from 'src/app/constants/routes';
+import { DATABASE, DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { UserService } from 'src/app/modules/users/services/user.service';
+import { DatasetService } from '../../services/dataset.service';
 
 @Component({
   selector: 'app-list-dataset',
@@ -13,8 +13,8 @@ import { UserService } from 'src/app/modules/users/services/user.service';
   styleUrls: ['./list-dataset.component.scss'],
 })
 export class ListDatasetComponent implements OnInit {
-  users: any[] = [];
-  filteredUsers: any[] = [];
+  datasets: any[] = [];
+  filteredDatasets: any[] = [];
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
@@ -23,7 +23,7 @@ export class ListDatasetComponent implements OnInit {
   searchTerm: string = '';
   selectedStatus: number | null = null;
   showDeleteConfirm = false;
-  userToDelete: string | null = null;
+  datasetToDelete: string | null = null;
   Math = Math;
   organisations: any[] = [];
   selectedOrg: any = {};
@@ -47,10 +47,10 @@ export class ListDatasetComponent implements OnInit {
   ];
 
   constructor(
-    private userService: UserService,
     private organisationService: OrganisationService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
+    private datasetService: DatasetService
   ) {}
 
   ngOnInit() {
@@ -60,7 +60,7 @@ export class ListDatasetComponent implements OnInit {
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadUsers();
+      this.loadDatasets();
     }
   }
 
@@ -75,7 +75,7 @@ export class ListDatasetComponent implements OnInit {
         this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
-          this.loadUsers();
+          this.loadDatasets();
         }
       },
       error: error => {
@@ -87,10 +87,10 @@ export class ListDatasetComponent implements OnInit {
   onOrgChange(event: any) {
     this.selectedOrg = event.value;
     this.currentPage = 1;
-    this.loadUsers();
+    this.loadDatasets();
   }
 
-  loadUsers() {
+  loadDatasets() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg.id,
@@ -98,22 +98,22 @@ export class ListDatasetComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.userService.listUser(params).subscribe({
+    this.datasetService.listDatasets(params).subscribe({
       next: (response: any) => {
-        this.users = response.data.users;
-        this.filteredUsers = [...this.users];
-        this.totalItems = this.users.length;
+        this.datasets = response.data;
+        this.filteredDatasets = [...this.datasets];
+        this.totalItems = this.datasets.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
       },
       error: error => {
-        this.users = [];
-        this.filteredUsers = [];
+        this.datasets = [];
+        this.filteredDatasets = [];
         this.totalItems = 0;
         this.totalPages = 0;
         this.pages = [];
-        console.error('Error loading users:', error);
+        console.error('Error loading datasets:', error);
       },
     });
   }
@@ -124,7 +124,7 @@ export class ListDatasetComponent implements OnInit {
 
   onPageChange(page: number) {
     this.currentPage = page;
-    this.loadUsers();
+    this.loadDatasets();
   }
 
   onSearch(event: any) {
@@ -138,23 +138,22 @@ export class ListDatasetComponent implements OnInit {
   }
 
   applyFilters() {
-    let filtered = [...this.users];
+    let filtered = [...this.datasets];
 
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        user =>
-          user.firstName.toLowerCase().includes(search) ||
-          user.lastName.toLowerCase().includes(search) ||
-          user.email.toLowerCase().includes(search)
+      filtered = filtered.filter(dataset =>
+        dataset.name.toLowerCase().includes(search)
       );
     }
 
     if (this.selectedStatus !== null) {
-      filtered = filtered.filter(user => user.status === this.selectedStatus);
+      filtered = filtered.filter(
+        dataset => dataset.status === this.selectedStatus
+      );
     }
 
-    this.filteredUsers = filtered;
+    this.filteredDatasets = filtered;
   }
 
   onAddNewAdmin() {
@@ -162,33 +161,33 @@ export class ListDatasetComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([USER.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([DATABASE.EDIT, this.selectedOrg.id, id]);
   }
 
   confirmDelete(id: string) {
-    this.userToDelete = id;
+    this.datasetToDelete = id;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
-    this.userToDelete = null;
+    this.datasetToDelete = null;
   }
 
   proceedDelete() {
-    if (this.userToDelete) {
-      this.userService
-        .deleteUser(this.userToDelete, this.selectedOrg.id)
+    if (this.datasetToDelete) {
+      this.datasetService
+        .deleteDataset(this.selectedOrg.id, this.datasetToDelete)
         .subscribe({
           next: () => {
-            this.loadUsers();
+            this.loadDatasets();
             this.showDeleteConfirm = false;
-            this.userToDelete = null;
+            this.datasetToDelete = null;
           },
           error: error => {
-            console.error('Error deleting organisation user:', error);
+            console.error('Error deleting dataset:', error);
             this.showDeleteConfirm = false;
-            this.userToDelete = null;
+            this.datasetToDelete = null;
           },
         });
     }

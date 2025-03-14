@@ -85,9 +85,16 @@
                 <div class="form-field fields-container" *ngIf="schemas.length > 0">
                     <div class="fields-header">
                         <label>Column Mappings<span class="required">*</span></label>
-                        <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
-                            (click)="addSchemaGroup()" [style]="{'color': '#2196f3'}">
-                        </button>
+                        <div class="button-group">
+                            <button pButton type="button" icon="pi pi-times"
+                                class="p-button-rounded p-button-text p-button-danger clear-btn mr-1"
+                                (click)="clearAllMappings()">
+                            </button>
+                            <button pButton type="button" icon="pi pi-plus"
+                                class="p-button-rounded p-button-text add-btn" (click)="addSchemaGroup()"
+                                [style]="{'color': '#2196f3'}">
+                            </button>
+                        </div>
                     </div>
 
                     <div class="fields-list">
@@ -113,7 +120,8 @@
                             <div class="mappings-list" formArrayName="mappings">
                                 <div *ngFor="let mapping of getSchemaGroupMappings(groupIndex).controls; let mappingIndex=index"
                                     [formGroupName]="mappingIndex" class="mapping-row"
-                                    [ngClass]="{'duplicate': isDuplicateRow(groupIndex, mappingIndex)}">
+                                    [ngClass]="{'duplicate': isDuplicateRow(groupIndex, mappingIndex)}"
+                                    [id]="'mapping-' + groupIndex + '-' + mappingIndex">
                                     <span class="index-number">{{mappingIndex + 1}}</span>
                                     <div class="mapping-inputs">
                                         <!-- Table Dropdown -->

@@ -91,4 +91,6 @@ export const SECRET = {
 
 export const DATASET = {
   ADD: '/dataset/add',
+  LIST: '/dataset/list',
+  DELETE: '/dataset/delete/',
 };
