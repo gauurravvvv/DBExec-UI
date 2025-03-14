@@ -85,8 +85,8 @@ export class DatasetService {
       );
   }
 
-  viewDatabase(id: string) {
-    return this.http.get(DATABASE.VIEW + `${id}`).pipe(
+  viewDataset(orgId: string, id: string) {
+    return this.http.get(DATASET.VIEW + `${orgId}` + `/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;

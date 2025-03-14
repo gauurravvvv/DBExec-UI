@@ -1,6 +1,6 @@
 export const SIDEBAR_ITEMS_ROUTES = [
   {
-    value: 'dashboard',
+    value: 'dashbaord',
     route: '/app/dashboard',
   },
   {

@@ -1,1 +1,190 @@
-<p>view-dataset works!</p>
+<div class="view-dataset-wrapper">
+    <div class="view-dataset-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" (click)="goBack()">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Dataset Details</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton class="p-button-outlined" type="button" (click)="onEdit()">
+                    <i class="pi pi-pencil mr-2"></i>Edit
+                </button>
+                <button pButton class="p-button-outlined p-button-danger" type="button" (click)="confirmDelete()">
+                    <i class="pi pi-trash mr-2"></i>Delete
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content-section" *ngIf="datasetData">
+            <!-- Quick Stats Row -->
+            <div class="quick-stats">
+                <div class="stat-card animated">
+                    <div class="stat-icon">
+                        <i class="pi pi-database"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value">{{ datasetData.databaseName }}</span>
+                        <span class="stat-label">Database</span>
+                    </div>
+                </div>
+                <div class="stat-card animated">
+                    <div class="stat-icon">
+                        <i class="pi pi-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value">{{ getTotalMappings() }}</span>
+                        <span class="stat-label">Total Mappings</span>
+                    </div>
+                </div>
+                <div class="stat-card animated">
+                    <div class="stat-icon">
+                        <i class="pi pi-file"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value">{{ getSchemaCount() }}</span>
+                        <span class="stat-label">Schemas</span>
+                    </div>
+                </div>
+                <div class="stat-card animated">
+                    <div class="stat-icon">
+                        <i class="pi pi-table"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value">{{ getTotalTables() }}</span>
+                        <span class="stat-label">Total Tables</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="main-content">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- Configuration Card -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h3><i class="pi pi-cog"></i>Configuration</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="config-grid">
+                                <div class="config-item">
+                                    <label>Dataset Name</label>
+                                    <p>{{ datasetData.name }}</p>
+                                </div>
+                                <div class="config-item">
+                                    <label>Status</label>
+                                    <p>
+                                        <span class="status-badge" [class.active]="datasetData.status === 1">
+                                            {{ datasetData.status === 1 ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="config-item">
+                                    <label>Description</label>
+                                    <p>{{ datasetData.description }}</p>
+                                </div>
+                                <div class="config-item">
+                                    <label>Organization</label>
+                                    <p>{{ datasetData.organisationName }}</p>
+                                </div>
+                                <div class="config-item">
+                                    <label>Database</label>
+                                    <p class="with-badge">
+                                        <span class="database-chip">
+                                            <span class="chip-content">
+                                                <i class="pi pi-database"></i>
+                                                {{ datasetData.databaseName }}
+                                            </span>
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="config-item">
+                                    <label>Created On</label>
+                                    <p>{{ datasetData.createdOn | date:'medium' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-column">
+                    <!-- Mappings Analysis -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h3><i class="pi pi-list"></i>Mappings</h3>
+                            <div class="search-box">
+                                <span class="p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" placeholder="Search by schema name..."
+                                        (input)="onSchemaSearch($event)" />
+                                </span>
+                                <span class="p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" placeholder="Search in tables and columns..."
+                                        (input)="onMappingSearch($event)" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="schema-list">
+                                <ng-container *ngIf="filteredMappings.length > 0; else noData">
+                                    <div class="schema-item" *ngFor="let mapping of filteredMappings"
+                                        [class.expanded]="expandedSchemas.includes(mapping.schema)">
+                                        <div class="schema-header" (click)="toggleSchemaExpand(mapping.schema)">
+                                            <i class="pi pi-file"></i>
+                                            <span class="schema-name">{{ mapping.schema }}</span>
+                                            <span class="schema-size">{{ mapping.tables.length }} Tables</span>
+                                            <i class="expand-icon pi"
+                                                [ngClass]="expandedSchemas.includes(mapping.schema) ? 'pi-chevron-up' : 'pi-chevron-down'">
+                                            </i>
+                                        </div>
+                                        <div class="schema-details" *ngIf="expandedSchemas.includes(mapping.schema)">
+                                            <div class="tables-list">
+                                                <div class="table-item" *ngFor="let table of mapping.tables">
+                                                    <div class="table-name">
+                                                        <i class="pi pi-table"></i> {{ table.table }}
+                                                    </div>
+                                                    <div class="columns-list">
+                                                        <div class="column-item" *ngFor="let col of table.columns">
+                                                            <span class="column-name">{{ col.column }}</span>
+                                                            <i class="pi pi-arrow-right"></i>
+                                                            <span class="column-value">{{ col.value }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-template #noData>
+                                    <div class="no-data">
+                                        <i class="pi pi-info-circle"></i>
+                                        <span>No mapping data found</span>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Dialog -->
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+    <div class="popup-content">
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this dataset?</p>
+        <div class="popup-actions">
+            <button class="btn-cancel" (click)="cancelDelete()">No</button>
+            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        </div>
+    </div>
+</div>
