@@ -94,4 +94,5 @@ export const DATASET = {
   LIST: '/dataset/list',
   DELETE: '/dataset/delete/',
   VIEW: '/dataset/get/',
+  UPDATE: '/dataset/update',
 };

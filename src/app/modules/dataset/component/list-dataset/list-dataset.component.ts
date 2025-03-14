@@ -161,7 +161,7 @@ export class ListDatasetComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([DATABASE.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([DATASET.EDIT, this.selectedOrg.id, id]);
   }
 
   confirmDelete(id: string) {

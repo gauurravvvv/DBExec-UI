@@ -175,4 +175,42 @@ export class DatasetService {
         })
       );
   }
+
+  getDataset(orgId: string, datasetId: string) {
+    return this.http.get(DATASET.VIEW + `${orgId}/${datasetId}`).pipe(
+      map((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      })
+    );
+  }
+
+  updateDataset(payload: any) {
+    const {
+      id,
+      name,
+      description,
+      organisation,
+      database,
+      columnMappings,
+      status,
+    } = payload;
+
+    return this.http
+      .put(DATASET.UPDATE, {
+        id,
+        name,
+        description,
+        organisation,
+        database,
+        columnMappings,
+        status: status ? 1 : 0,
+      })
+      .pipe(
+        map((response: any) => {
+          const result = JSON.parse(JSON.stringify(response));
+          return result;
+        })
+      );
+  }
 }
