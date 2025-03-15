@@ -8,7 +8,7 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 @Injectable({
   providedIn: 'root',
 })
-export class TabService {
+export class PromptService {
   constructor(private http: HttpClient) {}
 
   listSuperAdmin(params: IParams) {

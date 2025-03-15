@@ -111,6 +111,16 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/tab/tab.module').then(m => m.TabModule),
       },
+      {
+        path: 'section',
+        loadChildren: () =>
+          import('./modules/section/section.module').then(m => m.SectionModule),
+      },
+      {
+        path: 'prompt',
+        loadChildren: () =>
+          import('./modules/prompt/prompt.module').then(m => m.PromptModule),
+      },
     ],
   },
   {

@@ -48,6 +48,14 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/tab',
   },
   {
+    value: 'queryBuilderSection',
+    route: '/app/section',
+  },
+  {
+    value: 'queryBuilderPrompt',
+    route: '/app/prompt',
+  },
+  {
     value: 'dbSchema',
     route: '/home/system/configureDB',
   },
