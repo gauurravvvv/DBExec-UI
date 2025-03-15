@@ -6,6 +6,10 @@
   transition: width 0.3s ease;
   position: relative;
   box-shadow: 2px 0 4px var(--shadow-color);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 
   &.collapsed {
     width: 70px;
@@ -92,6 +96,10 @@
             cursor: pointer;
             transition: background-color 0.2s;
             position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
 
             &:hover {
               background: var(--hover-background);
@@ -110,6 +118,10 @@
               display: flex;
               align-items: center;
               gap: 1rem;
+              user-select: none;
+              -webkit-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
 
               i {
                 min-width: 24px;
@@ -129,6 +141,10 @@
             .submenu-arrow {
               font-size: 0.8rem;
               transition: transform 0.2s ease-in-out;
+              user-select: none;
+              -webkit-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
 
               &.expanded {
                 transform: rotate(-180deg);
@@ -160,75 +176,32 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.2s ease-in-out;
+            display: none;
             opacity: 0;
-            transform: translateY(-10px);
+            transition: opacity 0.3s ease-in-out;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
 
             &.expanded {
-              max-height: 1000px;
+              display: block;
               opacity: 1;
-              transform: translateY(0);
             }
 
             .submenu-item,
             .nested-submenu-item {
-              transform-origin: top;
-              transition: transform 0.2s ease-in-out;
-
-              a,
-              .submenu-link {
-                display: flex;
-                align-items: center;
-                padding: 0.75rem 1rem;
-                padding-left: calc(1.25rem + 24px + 1rem);
-                color: var(--text-color);
-                text-decoration: none;
-                transition: background-color 0.2s;
-                cursor: pointer;
-
-                &:hover {
-                  background: var(--hover-background);
-                }
-
-                &.active {
-                  background: var(--hover-background);
-                  color: var(--primary-color);
-
-                  i {
-                    color: var(--primary-color);
-                  }
-                }
-
-                .link-content {
-                  display: flex;
-                  align-items: center;
-                  gap: 1rem;
-
-                  i {
-                    min-width: 24px;
-                    display: flex;
-                    justify-content: center;
-                    transition: transform 0.2s ease;
-                  }
-                }
-
-                &:hover {
-                  background: var(--hover-background);
-
-                  .link-content i {
-                    transform: scale(1.2);
-                  }
-                }
-              }
+              display: none;
+              opacity: 0;
+              transition: opacity 0.3s ease-in-out;
+              user-select: none;
+              -webkit-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
 
               &.visible {
-                transform: scaleY(1);
-              }
-
-              &:not(.visible) {
-                transform: scaleY(0);
+                display: block;
+                opacity: 1;
               }
             }
           }
@@ -256,6 +229,10 @@
   pointer-events: none;
   transform: translateY(-50%);
   margin-top: 20px;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 
   &::before {
     content: '';
@@ -278,12 +255,22 @@
     border-style: solid;
     border-color: transparent var(--card-background) transparent transparent;
   }
+
+  .tooltip-arrow {
+    margin-left: 5px;
+    font-size: 14px;
+    font-weight: bold;
+  }
 }
 
 .nav-link,
 .submenu-item a,
 .nested-submenu-item a {
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 
   &:hover {
     .sidebar-tooltip {
@@ -302,6 +289,199 @@
 // For nested submenu items
 .nested-submenu-item {
   a {
-    padding-left: calc(1.25rem + 24px + 1rem + 24px + 1rem) !important;
+    padding-left: calc(0.25rem + 24px + 1rem + 24px + 1rem) !important;
+  }
+
+  &[class*='queryBuilder'] {
+    > .submenu-link {
+      .submenu-arrow {
+        margin-left: auto;
+        transform: rotate(0);
+        transition: transform 0.2s ease-in-out;
+      }
+
+      &.expanded .submenu-arrow {
+        transform: rotate(-180deg);
+      }
+    }
+  }
+}
+
+// Base styles for all menu items
+.nav-link,
+.submenu-link,
+a {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: var(--text-color);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+
+  &:hover {
+    background: var(--hover-background);
+  }
+
+  &.expandable {
+    cursor: pointer;
+  }
+
+  .link-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+    i {
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+  }
+
+  .submenu-arrow {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+    &.expanded {
+      transform: rotate(-180deg);
+    }
+  }
+}
+
+// Indentation levels
+.submenu {
+  .submenu-item {
+    > .submenu-link,
+    > a {
+      padding-left: 32px;
+    }
+
+    .nested-submenu {
+      .nested-submenu-item {
+        > .submenu-link,
+        > a {
+          padding-left: 48px;
+        }
+
+        .nested-submenu {
+          .nested-submenu-item {
+            > a {
+              padding-left: 64px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Active state
+.active {
+  > .submenu-link,
+  > a {
+    background: var(--hover-background);
+    color: var(--primary-color);
+
+    i {
+      color: var(--primary-color);
+    }
+  }
+}
+
+// Tooltip for collapsed state
+.sidebar-tooltip {
+  position: fixed;
+  left: 70px;
+  background: var(--card-background);
+  color: var(--text-color);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-color);
+  z-index: 1000;
+  pointer-events: none;
+  transform: translateY(-50%);
+  margin-top: 20px;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.sidebar:not(.collapsed) {
+  .sidebar-tooltip {
+    display: none;
+  }
+}
+
+// Hover effects
+.nav-link:hover,
+.submenu-link:hover,
+a:hover {
+  .link-content i {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar-tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// Update the submenu link styles
+.submenu-link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+
+  &:hover {
+    background: var(--hover-background);
+  }
+
+  &.expanded {
+    .submenu-arrow {
+      transform: rotate(-180deg);
+    }
+  }
+}
+
+// Ensure tooltips are visible in collapsed state
+.sidebar.collapsed {
+  .nav-link,
+  .submenu-link {
+    &:hover {
+      .sidebar-tooltip {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
   }
 }

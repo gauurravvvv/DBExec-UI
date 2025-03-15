@@ -118,6 +118,18 @@ $icon-url: '../icons/';
     &.ci-dataset-binder {
       content: url($icon-url + 'dataset-binder.svg');
     }
+    &.ci-query-builder {
+      content: url($icon-url + 'query-builder.svg');
+    }
+    &.ci-ribbon {
+      content: url($icon-url + 'ribbon.svg');
+    }
+    &.ci-caret-down {
+      content: url($icon-url + 'caret-down.svg');
+    }
+    &.ci-section {
+      content: url($icon-url + 'section.svg');
+    }
   }
 }
 
