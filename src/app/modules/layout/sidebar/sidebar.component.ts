@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
+import { Router } from '@angular/router';
 
 interface MenuItem {
   label: string;
@@ -22,9 +23,11 @@ export class SidebarComponent implements OnInit {
   isMobile = false;
   menuItems: MenuItem[] = [];
 
-  constructor(private globalService: GlobalService) {
+  constructor(private globalService: GlobalService, public router: Router) {
     const permissions = this.globalService.getTokenDetails('permission');
     this.menuItems = this.processMenuItems(permissions);
+    // Set initial expanded state based on current route
+    this.expandMenuForCurrentRoute();
   }
 
   ngOnInit() {
@@ -54,14 +57,44 @@ export class SidebarComponent implements OnInit {
     return route || '';
   }
 
+  // Simplified method to expand menu based on current URL
+  private expandMenuForCurrentRoute() {
+    const currentUrl = this.router.url;
+
+    // Helper function to expand parent items
+    const expandParents = (items: MenuItem[]): boolean => {
+      for (const item of items) {
+        // Check if current route matches this item's route
+        if (item.route && currentUrl.includes(item.route)) {
+          item.isExpanded = true;
+          return true;
+        }
+
+        // Check children if they exist
+        if (item.subPermissions && expandParents(item.subPermissions)) {
+          item.isExpanded = true;
+          return true;
+        }
+      }
+      return false;
+    };
+
+    expandParents(this.menuItems);
+  }
+
   toggleSidebar() {
     this.isExpanded = !this.isExpanded;
+    if (this.isExpanded) {
+      this.expandMenuForCurrentRoute();
+    }
   }
 
   toggleSidebarAndCollapseAll() {
     this.isExpanded = !this.isExpanded;
     if (!this.isExpanded) {
       this.collapseAllMenus();
+    } else {
+      this.expandMenuForCurrentRoute();
     }
   }
 
@@ -82,65 +115,19 @@ export class SidebarComponent implements OnInit {
   }
 
   toggleSubmenuAndExpand(item: MenuItem) {
-    // If sidebar is collapsed, expand it first
     if (!this.isExpanded) {
       this.isExpanded = true;
-      // Small delay to allow sidebar expansion animation
       setTimeout(() => {
-        this.expandItemAndCollapseSiblings(item);
+        item.isExpanded = !item.isExpanded;
       }, 100);
     } else {
-      this.expandItemAndCollapseSiblings(item);
+      item.isExpanded = !item.isExpanded;
     }
   }
 
-  // New helper method to handle expansion logic
-  private expandItemAndCollapseSiblings(item: MenuItem) {
-    // First collapse all sibling items at the same level
-    const parent = this.findParentItem(item, this.menuItems);
-    if (parent) {
-      parent.subPermissions?.forEach(sibling => {
-        if (sibling !== item) {
-          sibling.isExpanded = false;
-          this.collapseChildren(sibling);
-        }
-      });
-    } else {
-      // If no parent found, this is a top-level item
-      // Collapse all other top-level items
-      this.menuItems.forEach(menuItem => {
-        if (menuItem !== item) {
-          menuItem.isExpanded = false;
-          this.collapseChildren(menuItem);
-        }
-      });
-    }
-
-    item.isExpanded = !item.isExpanded;
-  }
-
-  private findParentItem(item: MenuItem, items: MenuItem[]): MenuItem | null {
-    for (const menuItem of items) {
-      if (menuItem.subPermissions?.includes(item)) {
-        return menuItem;
-      }
-      if (menuItem.subPermissions) {
-        const parent = this.findParentItem(item, menuItem.subPermissions);
-        if (parent) {
-          return parent;
-        }
-      }
-    }
-    return null;
-  }
-
-  private collapseChildren(item: MenuItem) {
-    if (item.subPermissions) {
-      item.subPermissions.forEach(child => {
-        child.isExpanded = false;
-        this.collapseChildren(child);
-      });
-    }
+  isRouteActive(route: string | undefined): boolean {
+    if (!route) return false;
+    return this.router.url.includes(route);
   }
 
   getIndentation(level: number): string {

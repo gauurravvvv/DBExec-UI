@@ -44,6 +44,10 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/datasetBinder',
   },
   {
+    value: 'queryBuilderTab',
+    route: '/app/tab',
+  },
+  {
     value: 'dbSchema',
     route: '/home/system/configureDB',
   },

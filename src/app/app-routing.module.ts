@@ -106,6 +106,11 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/dataset/dataset.module').then(m => m.DatasetModule),
       },
+      {
+        path: 'tab',
+        loadChildren: () =>
+          import('./modules/tab/tab.module').then(m => m.TabModule),
+      },
     ],
   },
   {
