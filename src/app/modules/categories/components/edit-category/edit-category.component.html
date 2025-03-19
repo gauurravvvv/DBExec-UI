@@ -85,6 +85,35 @@
                             }}</span>
                     </div>
                 </div>
+
+                <!-- Add this after the Status field -->
+                <div class="form-field fields-container">
+                    <div class="fields-header">
+                        <label>Field Names<span class="required">*</span></label>
+                        <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
+                            (click)="addField(); scrollToNewField()" [style]="{'color': '#2196f3'}">
+                        </button>
+                    </div>
+
+                    <div class="fields-list" formArrayName="config">
+                        <div *ngFor="let field of config.controls; let i=index" [formGroupName]="i" class="field-row"
+                            [class.highlight-animation]="i === lastAddedFieldIndex && isNewlyAdded" [id]="'field-' + i">
+                            <span class="p-input-icon-left field-input">
+                                <i class="pi pi-tag"></i>
+                                <input pInputText formControlName="name" placeholder="Enter field name"
+                                    [ngClass]="{'ng-invalid ng-dirty': field.get('name')?.invalid && field.get('name')?.touched}">
+                            </span>
+                            <button pButton type="button" icon="pi pi-minus"
+                                class="p-button-rounded p-button-text p-button-danger" (click)="removeField(i)"
+                                [disabled]="config.length === 1">
+                            </button>
+                            <small class="error-message"
+                                *ngIf="field.get('name')?.invalid && field.get('name')?.touched">
+                                {{ getFieldErrorMessage(field) }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>

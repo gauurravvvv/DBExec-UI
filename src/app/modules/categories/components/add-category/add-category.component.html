@@ -81,12 +81,13 @@
                     <div class="fields-header">
                         <label>Field Names<span class="required">*</span></label>
                         <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
-                            (click)="addField()" [style]="{'color': '#2196f3'}">
+                            (click)="addField(); scrollToNewField()" [style]="{'color': '#2196f3'}">
                         </button>
                     </div>
 
                     <div class="fields-list" formArrayName="config">
-                        <div *ngFor="let field of config.controls; let i=index" [formGroupName]="i" class="field-row">
+                        <div *ngFor="let field of config.controls; let i=index" [formGroupName]="i" class="field-row"
+                            [class.highlight-animation]="i === lastAddedFieldIndex && isNewlyAdded" [id]="'field-' + i">
                             <span class="p-input-icon-left field-input">
                                 <i class="pi pi-tag"></i>
                                 <input pInputText formControlName="name" placeholder="Enter field name"

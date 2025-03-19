@@ -99,7 +99,8 @@
 
                     <div class="fields-list">
                         <div *ngFor="let schemaGroup of schemaGroups.controls; let groupIndex=index"
-                            [formGroup]="$any(schemaGroup)" class="schema-group">
+                            [formGroup]="$any(schemaGroup)" class="schema-group"
+                            [class.highlight-animation]="groupIndex === lastAddedSchemaIndex && isNewlyAdded">
                             <!-- Schema Header -->
                             <div class="schema-header">
                                 <p-dropdown [options]="getAvailableSchemas(groupIndex)" optionLabel="name"
@@ -107,7 +108,7 @@
                                     [style]="{'width':'300px'}" placeholder="Select Schema">
                                 </p-dropdown>
                                 <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
-                                    (click)="addMappingToSchema(groupIndex)"
+                                    (click)="addMappingToSchema(groupIndex); scrollToNewMapping(groupIndex)"
                                     [disabled]="!schemaGroup.get('schema')?.value" [style]="{'color': '#2196f3'}">
                                 </button>
                                 <button pButton type="button" icon="pi pi-trash"
@@ -119,9 +120,12 @@
                             <!-- Mappings for this schema -->
                             <div class="mappings-list" formArrayName="mappings">
                                 <div *ngFor="let mapping of getSchemaGroupMappings(groupIndex).controls; let mappingIndex=index"
-                                    [formGroupName]="mappingIndex" class="mapping-row"
-                                    [ngClass]="{'duplicate': isDuplicateRow(groupIndex, mappingIndex)}"
-                                    [id]="'mapping-' + groupIndex + '-' + mappingIndex">
+                                    [formGroupName]="mappingIndex" class="mapping-row" [ngClass]="{
+                                        'duplicate': isDuplicateRow(groupIndex, mappingIndex),
+                                        'highlight-animation': groupIndex === lastAddedMappingGroupIndex && 
+                                                            mappingIndex === lastAddedMappingIndex && 
+                                                            isNewlyAddedMapping
+                                    }" [id]="'mapping-' + groupIndex + '-' + mappingIndex">
                                     <span class="index-number">{{mappingIndex + 1}}</span>
                                     <div class="mapping-inputs">
                                         <!-- Table Dropdown -->

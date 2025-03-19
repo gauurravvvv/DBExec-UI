@@ -218,38 +218,35 @@
   .fields-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
 
     .field-row {
       display: flex;
       align-items: start;
       gap: 12px;
       position: relative;
-      margin-bottom: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--surface-card);
+
+      &.highlight-animation {
+        padding: 12px;
+        border-radius: 6px;
+      }
 
       .field-input {
         flex: 1;
+        position: relative;
 
         input {
           width: 100%;
-          background: var(--card-background);
-          color: var(--text-color);
-          border-color: var(--border-color);
-
-          &::placeholder {
-            color: var(--text-color);
-            opacity: 0.4;
-          }
         }
       }
 
       .error-message {
         position: absolute;
-        bottom: -22px;
+        bottom: -20px;
         left: 0;
-        color: var(--error-color);
-        font-size: 12px;
-        white-space: nowrap;
       }
     }
   }
@@ -631,4 +628,24 @@
       }
     }
   }
+}
+
+@keyframes highlightBackground {
+  0% {
+    background-color: rgba(33, 150, 243, 0.15);
+  }
+  50% {
+    background-color: rgba(33, 150, 243, 0.2);
+  }
+  100% {
+    background-color: var(--surface-card);
+  }
+}
+
+.highlight-animation {
+  animation: highlightBackground 0.5s ease-out;
+}
+
+.field-row {
+  background: var(--surface-card);
 }

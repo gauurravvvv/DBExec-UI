@@ -23,6 +23,8 @@ export class EditCategoryComponent implements OnInit {
   orgId!: string;
   selectedOrgName: string = '';
   originalFormValue: any;
+  isNewlyAdded: boolean = false;
+  lastAddedFieldIndex: number = -1;
 
   constructor(
     private fb: FormBuilder,
@@ -53,6 +55,7 @@ export class EditCategoryComponent implements OnInit {
       organisation: [''],
       environments: [[], Validators.required],
       status: [1],
+      config: this.fb.array([this.createField()]),
     });
 
     this.categoryForm.valueChanges.subscribe(() => {
@@ -65,29 +68,64 @@ export class EditCategoryComponent implements OnInit {
       next: response => {
         const categoryData = response.data;
 
+        // First patch the basic form data
         this.categoryForm.patchValue({
+          id: categoryData.id,
+          name: categoryData.name,
+          description: categoryData.description,
           organisation: categoryData.organisationId,
+          environments: categoryData.categoryMappings.map(
+            (mapping: any) => mapping.environmentId
+          ),
+          status: categoryData.status,
         });
+
         this.selectedOrgName = categoryData.organisationName || '';
 
+        // Load environments
         this.loadEnvironments({
           orgId: categoryData.organisationId,
           pageNumber: 1,
           limit: 100,
         });
 
-        const environmentIds = categoryData.categoryMappings.map(
-          (mapping: any) => mapping.environmentId
-        );
+        // Handle config FormArray
+        const configArray = this.categoryForm.get('config') as FormArray;
 
-        this.categoryForm.patchValue({
-          id: categoryData.id,
-          name: categoryData.name,
-          description: categoryData.description,
-          environments: environmentIds,
-          status: categoryData.status,
-        });
+        // Clear existing fields
+        while (configArray.length !== 0) {
+          configArray.removeAt(0);
+        }
 
+        // Add fields from configurations array
+        if (
+          categoryData.configurations &&
+          Array.isArray(categoryData.configurations)
+        ) {
+          // Sort by sequence if needed
+          const sortedConfigs = [...categoryData.configurations].sort(
+            (a, b) => a.sequence - b.sequence
+          );
+
+          sortedConfigs.forEach((config: any) => {
+            configArray.push(
+              this.fb.group({
+                name: [
+                  config.fieldName, // Use fieldName instead of name
+                  [
+                    Validators.required,
+                    Validators.pattern('^[a-zA-Z][a-zA-Z0-9_]*$'),
+                  ],
+                ],
+              })
+            );
+          });
+        } else {
+          // Add one empty field if no configurations exist
+          configArray.push(this.createField());
+        }
+
+        // Store original form value and reset dirty state
         this.originalFormValue = this.categoryForm.value;
         this.isFormDirty = false;
         this.categoryForm.markAsPristine();
@@ -170,5 +208,65 @@ export class EditCategoryComponent implements OnInit {
     const currentValue = this.categoryForm.value;
     this.isFormDirty =
       JSON.stringify(this.originalFormValue) !== JSON.stringify(currentValue);
+  }
+
+  addField() {
+    const field = this.fb.group({
+      name: [
+        '',
+        [Validators.required, Validators.pattern('^[a-zA-Z][a-zA-Z0-9_]*$')],
+      ],
+    });
+
+    this.config.push(field);
+    this.lastAddedFieldIndex = this.config.length - 1;
+
+    this.scrollToNewField();
+    setTimeout(() => {
+      this.isNewlyAdded = true;
+      setTimeout(() => {
+        this.isNewlyAdded = false;
+        this.lastAddedFieldIndex = -1;
+      }, 500);
+    }, 300);
+  }
+
+  scrollToNewField(): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('.admin-form');
+      const newField = document.getElementById(
+        `field-${this.config.length - 1}`
+      );
+
+      if (formElement && newField) {
+        const formRect = formElement.getBoundingClientRect();
+        const newFieldRect = newField.getBoundingClientRect();
+
+        formElement.scrollTo({
+          top: formElement.scrollTop + (newFieldRect.top - formRect.top) - 100,
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
+  }
+
+  get config(): FormArray {
+    return this.categoryForm?.get('config') as FormArray;
+  }
+
+  createField(): FormGroup {
+    return this.fb.group({
+      name: [
+        '',
+        [Validators.required, Validators.pattern('^[a-zA-Z][a-zA-Z0-9_]*$')],
+      ],
+    });
+  }
+
+  removeField(index: number) {
+    if (this.config.length > 1) {
+      this.config.removeAt(index);
+      this.categoryForm.markAsDirty();
+    }
   }
 }

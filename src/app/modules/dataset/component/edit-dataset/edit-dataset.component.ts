@@ -33,6 +33,11 @@ export class EditDatasetComponent implements OnInit {
   duplicateRows: { [key: string]: Array<[number, number]> } = {};
   selectedOrgName: string = '';
   selectedDatabaseName: string = '';
+  isNewlyAdded: boolean = false;
+  isNewlyAddedMapping: boolean = false;
+  lastAddedSchemaIndex: number = -1;
+  lastAddedMappingGroupIndex: number = -1;
+  lastAddedMappingIndex: number = -1;
 
   @ViewChild('formContainer') formContainer!: ElementRef;
 
@@ -503,7 +508,18 @@ export class EditDatasetComponent implements OnInit {
     });
 
     this.schemaGroups.push(schemaGroup);
-    this.addMappingToSchema(this.schemaGroups.length - 1);
+    this.lastAddedSchemaIndex = this.schemaGroups.length - 1;
+    this.addMappingToSchema(this.lastAddedSchemaIndex);
+
+    // First scroll, then highlight
+    this.scrollToBottom();
+    setTimeout(() => {
+      this.isNewlyAdded = true;
+      setTimeout(() => {
+        this.isNewlyAdded = false;
+        this.lastAddedSchemaIndex = -1;
+      }, 500);
+    }, 300); // Wait for scroll to complete
   }
 
   removeSchemaGroup(groupIndex: number) {
@@ -532,7 +548,22 @@ export class EditDatasetComponent implements OnInit {
       this.checkDuplicateMappings();
     });
 
-    this.getSchemaGroupMappings(groupIndex).push(mapping);
+    const mappingsArray = this.getSchemaGroupMappings(groupIndex);
+    mappingsArray.push(mapping);
+
+    this.lastAddedMappingGroupIndex = groupIndex;
+    this.lastAddedMappingIndex = mappingsArray.length - 1;
+
+    // First scroll, then highlight
+    this.scrollToNewMapping(groupIndex);
+    setTimeout(() => {
+      this.isNewlyAddedMapping = true;
+      setTimeout(() => {
+        this.isNewlyAddedMapping = false;
+        this.lastAddedMappingGroupIndex = -1;
+        this.lastAddedMappingIndex = -1;
+      }, 500);
+    }, 300); // Wait for scroll to complete
   }
 
   removeMappingFromSchema(groupIndex: number, mappingIndex: number) {
@@ -570,5 +601,38 @@ export class EditDatasetComponent implements OnInit {
   getAvailableColumns(schemaName: string, tableName: string): any[] {
     const key = `${schemaName}.${tableName}`;
     return this.columns[key] || [];
+  }
+
+  scrollToBottom(): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('.admin-form');
+      if (formElement) {
+        formElement.scrollTo({
+          top: formElement.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
+  }
+
+  scrollToNewMapping(groupIndex: number): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('.admin-form');
+      const mappingsLength = this.getSchemaGroupMappings(groupIndex).length;
+      const newMapping = document.getElementById(
+        `mapping-${groupIndex}-${mappingsLength - 1}`
+      );
+
+      if (formElement && newMapping) {
+        const formRect = formElement.getBoundingClientRect();
+        const newMappingRect = newMapping.getBoundingClientRect();
+
+        formElement.scrollTo({
+          top:
+            formElement.scrollTop + (newMappingRect.top - formRect.top) - 100, // 100px offset for better visibility
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
   }
 }

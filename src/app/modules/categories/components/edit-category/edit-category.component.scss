@@ -247,7 +247,6 @@
       align-items: start;
       gap: 12px;
       position: relative;
-      margin-bottom: 12px;
 
       .field-input {
         flex: 1;
@@ -695,6 +694,58 @@
           background: var(--secondary-color);
         }
       }
+    }
+  }
+}
+
+@keyframes highlightBackground {
+  0% {
+    background-color: rgba(33, 150, 243, 0.15);
+  }
+  50% {
+    background-color: rgba(33, 150, 243, 0.2);
+  }
+  100% {
+    background-color: var(--surface-card);
+  }
+}
+
+.highlight-animation {
+  animation: highlightBackground 0.5s ease-out;
+}
+
+.fields-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .field-row {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    position: relative;
+    padding: 12px;
+    border-radius: 6px;
+    background: var(--surface-card);
+
+    &.highlight-animation {
+      padding: 12px;
+      border-radius: 6px;
+    }
+
+    .field-input {
+      flex: 1;
+      position: relative;
+
+      input {
+        width: 100%;
+      }
+    }
+
+    .error-message {
+      position: absolute;
+      bottom: -20px;
+      left: 0;
     }
   }
 }

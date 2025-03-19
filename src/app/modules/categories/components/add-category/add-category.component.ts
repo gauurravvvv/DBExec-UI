@@ -20,6 +20,8 @@ export class AddCategoryComponent implements OnInit {
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   environments: any[] = [];
+  isNewlyAdded: boolean = false;
+  lastAddedFieldIndex: number = -1;
 
   constructor(
     private fb: FormBuilder,
@@ -105,8 +107,25 @@ export class AddCategoryComponent implements OnInit {
   }
 
   addField() {
-    this.config.push(this.createField());
-    this.categoryForm.markAsDirty();
+    const field = this.fb.group({
+      name: [
+        '',
+        [Validators.required, Validators.pattern('^[a-zA-Z][a-zA-Z0-9_]*$')],
+      ],
+    });
+
+    this.config.push(field);
+    this.lastAddedFieldIndex = this.config.length - 1;
+
+    // First scroll, then highlight
+    this.scrollToNewField();
+    setTimeout(() => {
+      this.isNewlyAdded = true;
+      setTimeout(() => {
+        this.isNewlyAdded = false;
+        this.lastAddedFieldIndex = -1;
+      }, 500);
+    }, 300);
   }
 
   removeField(index: number) {
@@ -229,5 +248,24 @@ export class AddCategoryComponent implements OnInit {
       }
     }
     return '';
+  }
+
+  scrollToNewField(): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('.admin-form');
+      const newField = document.getElementById(
+        `field-${this.config.length - 1}`
+      );
+
+      if (formElement && newField) {
+        const formRect = formElement.getBoundingClientRect();
+        const newFieldRect = newField.getBoundingClientRect();
+
+        formElement.scrollTo({
+          top: formElement.scrollTop + (newFieldRect.top - formRect.top) - 100,
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
   }
 }

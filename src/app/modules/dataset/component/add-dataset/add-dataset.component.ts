@@ -43,6 +43,13 @@ export class AddDatasetComponent implements OnInit {
   // Update the static data property to be an array
   private staticSchemaData: any[] = [];
 
+  // Add these properties
+  isNewlyAdded: boolean = false;
+  isNewlyAddedMapping: boolean = false;
+  lastAddedSchemaIndex: number = -1;
+  lastAddedMappingGroupIndex: number = -1;
+  lastAddedMappingIndex: number = -1;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -249,7 +256,6 @@ export class AddDatasetComponent implements OnInit {
       mappings: this.fb.array([]),
     });
 
-    // Subscribe to schema changes
     schemaGroup.get('schema')?.valueChanges.subscribe(schemaName => {
       if (schemaName) {
         this.loadTablesForSchema(schemaName);
@@ -258,7 +264,18 @@ export class AddDatasetComponent implements OnInit {
     });
 
     this.schemaGroups.push(schemaGroup);
-    this.addMappingToSchema(this.schemaGroups.length - 1);
+    this.lastAddedSchemaIndex = this.schemaGroups.length - 1;
+    this.addMappingToSchema(this.lastAddedSchemaIndex);
+
+    // First scroll, then highlight
+    this.scrollToBottom();
+    setTimeout(() => {
+      this.isNewlyAdded = true;
+      setTimeout(() => {
+        this.isNewlyAdded = false;
+        this.lastAddedSchemaIndex = -1;
+      }, 500);
+    }, 300);
   }
 
   removeSchemaGroup(groupIndex: number) {
@@ -293,7 +310,6 @@ export class AddDatasetComponent implements OnInit {
       value: ['', Validators.required],
     });
 
-    // Subscribe to table and column changes
     mapping.get('table')?.valueChanges.subscribe(tableName => {
       const schemaName = this.schemaGroups.at(groupIndex).get('schema')?.value;
       if (schemaName && tableName) {
@@ -306,7 +322,22 @@ export class AddDatasetComponent implements OnInit {
       this.checkDuplicateMappings();
     });
 
-    this.getSchemaGroupMappings(groupIndex).push(mapping);
+    const mappingsArray = this.getSchemaGroupMappings(groupIndex);
+    mappingsArray.push(mapping);
+
+    this.lastAddedMappingGroupIndex = groupIndex;
+    this.lastAddedMappingIndex = mappingsArray.length - 1;
+
+    // First scroll, then highlight
+    this.scrollToNewMapping(groupIndex);
+    setTimeout(() => {
+      this.isNewlyAddedMapping = true;
+      setTimeout(() => {
+        this.isNewlyAddedMapping = false;
+        this.lastAddedMappingGroupIndex = -1;
+        this.lastAddedMappingIndex = -1;
+      }, 500);
+    }, 300);
   }
 
   removeMappingFromSchema(groupIndex: number, mappingIndex: number) {
@@ -485,5 +516,38 @@ export class AddDatasetComponent implements OnInit {
     return this.schemas.filter(
       schema => !selectedSchemas.includes(schema.name)
     );
+  }
+
+  scrollToBottom(): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('.admin-form');
+      if (formElement) {
+        formElement.scrollTo({
+          top: formElement.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
+  }
+
+  scrollToNewMapping(groupIndex: number): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('.admin-form');
+      const mappingsLength = this.getSchemaGroupMappings(groupIndex).length;
+      const newMapping = document.getElementById(
+        `mapping-${groupIndex}-${mappingsLength - 1}`
+      );
+
+      if (formElement && newMapping) {
+        const formRect = formElement.getBoundingClientRect();
+        const newMappingRect = newMapping.getBoundingClientRect();
+
+        formElement.scrollTo({
+          top:
+            formElement.scrollTop + (newMappingRect.top - formRect.top) - 100, // 100px offset for better visibility
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
   }
 }
