@@ -11,7 +11,7 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class DatabaseService {
   constructor(private http: HttpClient) {}
 
-  listDatabase(params: IParams) {
+  listDatabase(params: any) {
     return this.http
       .get(
         DATABASE.LIST +

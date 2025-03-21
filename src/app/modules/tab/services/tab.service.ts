@@ -2,8 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
-import { SUPER_ADMIN } from 'src/app/constants/api';
-import { IParams } from 'src/app/core/interfaces/global.interface';
+import { SUPER_ADMIN, TAB } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -11,9 +10,12 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class TabService {
   constructor(private http: HttpClient) {}
 
-  listSuperAdmin(params: IParams) {
+  listTab(params: any) {
     return this.http
-      .get(SUPER_ADMIN.LIST + `/${params.pageNumber}/${params.limit}`)
+      .get(
+        TAB.LIST +
+          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
+      )
       .pipe(
         map((response: any) => {
           const result = JSON.parse(JSON.stringify(response));
@@ -31,17 +33,14 @@ export class TabService {
     );
   }
 
-  addSuperAdmin(superAdminForm: FormGroup) {
-    const { firstName, lastName, username, password, email, mobile } =
-      superAdminForm.value;
+  addTab(tabForm: FormGroup) {
+    const { name, description, organisation, database } = tabForm.value;
     return this.http
-      .post(SUPER_ADMIN.ADD, {
-        firstName,
-        lastName,
-        username,
-        password,
-        email,
-        mobile,
+      .post(TAB.ADD, {
+        name,
+        description,
+        organisation,
+        database,
       })
       .pipe(
         map((response: any) => {

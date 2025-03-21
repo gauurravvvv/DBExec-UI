@@ -1,1 +1,139 @@
-<p>list-tab works!</p>
+<div class="super-admin-wrapper">
+    <div class="super-admin-container">
+        <div class="page-header">
+            <h2>Tabs</h2>
+            <button pButton class="p-button-outlined" (click)="onAddNewTab()">
+                + Add Tab
+            </button>
+        </div>
+        <div class="table-section">
+            <!-- Search and Page Size -->
+            <div class="table-controls">
+                <div class="left-controls">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" style="width: 100%;" placeholder="Search..."
+                            (input)="onSearch($event)" [value]="searchTerm">
+                    </span>
+                </div>
+                <div class="right-controls" *ngIf="showOrganisationDropdown">
+                    <span class="p-float-label">
+                        <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
+                            [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                            (onChange)="onOrgChange($event)" inputId="org-dropdown">
+                        </p-dropdown>
+                        <label for="org-dropdown">Organisation</label>
+                    </span>
+                </div>
+                <div class="right-controls">
+                    <span class="p-float-label">
+                        <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
+                            [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                            (onChange)="onDBChange($event)" inputId="org-dropdown">
+                        </p-dropdown>
+                        <label for="org-dropdown">Database</label>
+                    </span>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>
+                                Status
+                                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
+                                    [style]="{'width': '150px'}" appendTo="body">
+                                </p-menu>
+                                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
+                                    [ngClass]="{'active-filter': selectedStatus !== null}"
+                                    style="margin-left: 5px; cursor: pointer;">
+                                </i>
+                            </th>
+                            <th>Last Login</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="filteredUsers && filteredUsers.length > 0; else noData">
+                            <tr *ngFor="let user of filteredUsers">
+                                <td>
+                                    <a class="admin-name" [routerLink]="['/app/users/view', selectedOrg.id, user.id]">
+                                        {{ user.firstName + ' ' + user?.lastName }}
+                                    </a>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="status-badge" [class.active]="user.status === 1">
+                                        {{ user.status === 1 ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>{{ user.lastLogin ? (user.lastLogin | date:'medium') : 'Never logged in' }}</td>
+                                <td>{{ user.createdOn | date:'mediumDate' }}</td>
+                                <td class="actions">
+                                    <button class="action-btn edit" (click)="onEdit(user.id)" title="Edit"
+                                        [disabled]="user.id == loggedInUserId">
+                                        <i class="pi pi-pencil"></i>
+                                    </button>
+                                    <button class="action-btn delete" (click)="confirmDelete(user.id)" title="Delete"
+                                        [disabled]="user.id == loggedInUserId">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-template #noData>
+                            <tr style="height: 100%;">
+                                <td colspan="6">
+                                    <div class="no-data">
+                                        <i class="pi pi-inbox"></i>
+                                        <p>No records found</p>
+                                        <span class="sub-text">No user data is available at the moment</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </table>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-info">
+                        <ng-container *ngIf="totalItems > 0; else noEntries">
+                            Showing {{ (currentPage - 1) * pageSize + 1 }} to
+                            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
+                        </ng-container>
+                        <ng-template #noEntries>
+                            Showing 0 to 0 of 0 entries
+                        </ng-template>
+                    </div>
+                    <div class="pagination-controls">
+                        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
+                            <i class="pi pi-chevron-left"></i>
+                        </button>
+                        <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
+                            [class.active]="page === currentPage">
+                            {{ page }}
+                        </button>
+                        <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)"
+                            class="page-btn">
+                            <i class="pi pi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+    <div class="popup-content">
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this user?</p>
+        <div class="popup-actions">
+            <button class="btn-cancel" (click)="cancelDelete()">No</button>
+            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        </div>
+    </div>
+</div>

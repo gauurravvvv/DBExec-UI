@@ -96,3 +96,10 @@ export const DATASET = {
   VIEW: '/dataset/get/',
   UPDATE: '/dataset/update',
 };
+export const TAB = {
+  ADD: '/tab/add',
+  LIST: '/tab/list',
+  DELETE: '/tab/delete/',
+  VIEW: '/tab/get/',
+  UPDATE: '/tab/update',
+};

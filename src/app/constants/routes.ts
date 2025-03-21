@@ -67,3 +67,10 @@ export const DATASET = {
   EDIT: '/app/dataset/edit',
   VIEW: '/app/dataset/view',
 };
+
+export const TAB = {
+  ADD: '/app/tab/add',
+  LIST: '/app/tab',
+  EDIT: '/app/tab/edit',
+  VIEW: '/app/tab/view',
+};
