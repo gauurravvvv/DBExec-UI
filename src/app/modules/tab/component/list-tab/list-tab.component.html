@@ -9,30 +9,37 @@
         <div class="table-section">
             <!-- Search and Page Size -->
             <div class="table-controls">
-                <div class="left-controls">
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-search"></i>
-                        <input pInputText type="text" style="width: 100%;" placeholder="Search..."
-                            (input)="onSearch($event)" [value]="searchTerm">
-                    </span>
-                </div>
-                <div class="right-controls" *ngIf="showOrganisationDropdown">
-                    <span class="p-float-label">
-                        <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
-                            [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                            (onChange)="onOrgChange($event)" inputId="org-dropdown">
-                        </p-dropdown>
-                        <label for="org-dropdown">Organisation</label>
-                    </span>
-                </div>
-                <div class="right-controls">
-                    <span class="p-float-label">
-                        <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
-                            [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                            (onChange)="onDBChange($event)" inputId="org-dropdown">
-                        </p-dropdown>
-                        <label for="org-dropdown">Database</label>
-                    </span>
+                <div class="controls-wrapper">
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" placeholder="Search..." (input)="onSearch($event)"
+                                [value]="searchTerm">
+                        </span>
+                    </div>
+
+                    <!-- Organisation Dropdown -->
+                    <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+                        <span class="p-float-label">
+                            <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
+                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)" inputId="org-dropdown">
+                            </p-dropdown>
+                            <label for="org-dropdown">Organisation</label>
+                        </span>
+                    </div>
+
+                    <!-- Database Dropdown -->
+                    <div class="dropdown-field">
+                        <span class="p-float-label">
+                            <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
+                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                [panelStyle]="{'width':'100%'}" (onChange)="onDBChange($event)" inputId="db-dropdown">
+                            </p-dropdown>
+                            <label for="db-dropdown">Database</label>
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="table-container">

@@ -9,31 +9,37 @@
         <div class="table-section">
             <!-- Search and Organization Controls -->
             <div class="table-controls">
-                <div class="left-controls">
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-search"></i>
-                        <input pInputText type="text" style="width: 100%;" placeholder="Search..."
-                            (input)="onSearch($event)" [value]="searchTerm">
-                    </span>
-                </div>
-                <div class="right-controls" *ngIf="showOrganisationDropdown">
-                    <span class="p-float-label">
-                        <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
-                            [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                            (onChange)="onOrgChange($event)" inputId="org-dropdown">
-                        </p-dropdown>
-                        <label for="org-dropdown">Organisation</label>
-                    </span>
-                </div>
-                <div class="status-filter">
-                    <span>Status</span>
-                    <p-menu #statusMenu [popup]="true" [model]="statusFilterItems" [style]="{'width': '150px'}"
-                        appendTo="body">
-                    </p-menu>
-                    <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
-                        [ngClass]="{'active-filter': selectedStatus !== null}"
-                        style="margin-left: 5px; cursor: pointer;">
-                    </i>
+                <div class="controls-wrapper">
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" placeholder="Search..." (input)="onSearch($event)"
+                                [value]="searchTerm">
+                        </span>
+                    </div>
+
+                    <!-- Organisation Dropdown -->
+                    <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+                        <span class="p-float-label">
+                            <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
+                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)" inputId="org-dropdown">
+                            </p-dropdown>
+                            <label for="org-dropdown">Organisation</label>
+                        </span>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="status-filter">
+                        <p-menu #statusMenu [popup]="true" [model]="statusFilterItems" [style]="{'width':'150px'}"
+                            appendTo="body">
+                        </p-menu>
+                        <button class="filter-button" (click)="statusMenu.toggle($event)"
+                            [ngClass]="{'active-filter': selectedStatus !== null}">
+                            <i class="pi pi-filter"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="table-container">
