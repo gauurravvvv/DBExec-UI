@@ -20,6 +20,10 @@
       <button pButton class="p-button-text theme-toggle" (click)="toggleTheme()">
         <i class="pi" [ngClass]="isDarkMode ? 'pi-sun' : 'pi-moon'"></i>
       </button>
+      <button pButton class="p-button-text notification-btn" (click)="toggleNotificationMenu($event)">
+        <i class="pi pi-bell"></i>
+        <span class="notification-badge" *ngIf="unreadNotifications > 0">{{ unreadNotifications }}</span>
+      </button>
       <div class="user-profile" (click)="toggleProfileMenu($event)">
         <div class="profile-info">
           <div class="user-initials">{{ userInitials }}</div>
@@ -48,3 +52,36 @@
     </div>
   </div>
 </header>
+
+<div class="notification-menu" [class.show]="showNotificationMenu" #notificationMenu>
+  <div class="notification-header">
+    <h3>Notifications</h3>
+    <button pButton class="p-button-text" *ngIf="hasNotifications" (click)="markAllAsRead()">
+      Mark all as read
+    </button>
+  </div>
+  <div class="notification-list" *ngIf="hasNotifications; else noNotifications">
+    <div class="notification-item" *ngFor="let notification of notifications" [class.unread]="!notification.read"
+      (click)="markAsRead(notification, $event)">
+      <div class="notification-icon">
+        <i class="pi" [ngClass]="notification.icon"></i>
+      </div>
+      <div class="notification-content">
+        <p class="message">{{ notification.message }}</p>
+        <span class="time">{{ notification.time | date:'shortTime' }}</span>
+      </div>
+      <button class="close-btn" (click)="removeNotification(notification.id)">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </div>
+  <div class="notification-footer">
+    Showing notifications for the last 30 days
+  </div>
+  <ng-template #noNotifications>
+    <div class="no-notifications">
+      <i class="pi pi-bell-slash"></i>
+      <p>No notifications</p>
+    </div>
+  </ng-template>
+</div>

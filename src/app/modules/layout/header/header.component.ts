@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+  ElementRef,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { interval, Subscription } from 'rxjs';
@@ -19,6 +26,56 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showProfileMenu: boolean = false;
   isDarkMode = true;
   isAnimating = false;
+  @ViewChild('notificationMenu') notificationMenu!: ElementRef;
+
+  showNotificationMenu = false;
+  unreadNotifications = 2; // Example count
+  notifications = [
+    {
+      id: 1,
+      message: 'New environment "Production" has been created',
+      time: new Date(),
+      read: false,
+      icon: 'pi-globe',
+    },
+    {
+      id: 2,
+      message: 'Database "Main DB" is now connected',
+      time: new Date(Date.now() - 3600000), // 1 hour ago
+      read: true,
+      icon: 'pi-database',
+    },
+    {
+      id: 3,
+      message:
+        'User "John Doe" has been added to the Development team with admin privileges',
+      time: new Date(Date.now() - 7200000), // 2 hours ago
+      read: false,
+      icon: 'pi-user-plus',
+    },
+    {
+      id: 4,
+      message: 'Backup completed successfully for "Analytics DB"',
+      time: new Date(Date.now() - 86400000), // 1 day ago
+      read: true,
+      icon: 'pi-check-circle',
+    },
+    {
+      id: 5,
+      message: 'Security update: 2 new access policies have been implemented',
+      time: new Date(Date.now() - 172800000), // 2 days ago
+      read: true,
+      icon: 'pi-shield',
+    },
+    {
+      id: 6,
+      message:
+        'System maintenance scheduled for tomorrow at 02:00 AM UTCSystem maintenance scheduled for tomorrow at 02:00 AM UTCSystem maintenance scheduled for tomorrow at 02:00 AM UTC',
+      time: new Date(Date.now() - 259200000), // 3 days ago
+      read: false,
+      icon: 'pi-clock',
+    },
+  ];
 
   constructor(
     private router: Router,
@@ -46,6 +103,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.timeSubscription = interval(1000).subscribe(() => {
       this.currentTime = new Date();
     });
+
+    this.updateUnreadCount();
   }
 
   ngOnDestroy() {
@@ -95,6 +154,56 @@ export class HeaderComponent implements OnInit, OnDestroy {
       document.body.classList.add('dark-theme');
     } else {
       document.body.classList.remove('dark-theme');
+    }
+  }
+
+  get hasNotifications(): boolean {
+    return this.notifications.length > 0;
+  }
+
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: Event) {
+    const notificationBtn = event.target as HTMLElement;
+    if (
+      !notificationBtn.closest('.notification-btn') &&
+      !notificationBtn.closest('.notification-menu')
+    ) {
+      this.showNotificationMenu = false;
+    }
+  }
+
+  toggleNotificationMenu(event: Event) {
+    event.stopPropagation();
+    this.showNotificationMenu = !this.showNotificationMenu;
+  }
+
+  markAllAsRead() {
+    // Update read status for all notifications
+    this.notifications.forEach(notification => {
+      notification.read = true;
+    });
+
+    // Update the unread count
+    this.unreadNotifications = 0;
+  }
+
+  removeNotification(id: number) {
+    //call delete notification API
+    // this.notifications = this.notifications.filter(n => n.id !== id);
+  }
+
+  private updateUnreadCount() {
+    this.unreadNotifications = this.notifications.filter(n => !n.read).length;
+  }
+
+  markAsRead(notification: any, event: Event) {
+    // Prevent click event from bubbling up to parent elements
+    event.stopPropagation();
+
+    // Only process if notification is unread
+    if (!notification.read) {
+      notification.read = true;
+      this.updateUnreadCount();
     }
   }
 }
