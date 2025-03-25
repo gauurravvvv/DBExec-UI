@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
-import { SUPER_ADMIN } from 'src/app/constants/api';
+import { SECTION, SUPER_ADMIN } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
@@ -31,17 +31,16 @@ export class SectionService {
     );
   }
 
-  addSuperAdmin(superAdminForm: FormGroup) {
-    const { firstName, lastName, username, password, email, mobile } =
-      superAdminForm.value;
+  addSection(sectionForm: FormGroup) {
+    const { name, description, organisation, database, tab } =
+      sectionForm.value;
     return this.http
-      .post(SUPER_ADMIN.ADD, {
-        firstName,
-        lastName,
-        username,
-        password,
-        email,
-        mobile,
+      .post(SECTION.ADD, {
+        name,
+        description,
+        organisation,
+        database,
+        tab,
       })
       .pipe(
         map((response: any) => {

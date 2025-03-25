@@ -74,3 +74,10 @@ export const TAB = {
   EDIT: '/app/tab/edit',
   VIEW: '/app/tab/view',
 };
+
+export const SECTION = {
+  ADD: '/app/section/add',
+  LIST: '/app/section',
+  EDIT: '/app/section/edit',
+  VIEW: '/app/section/view',
+};
