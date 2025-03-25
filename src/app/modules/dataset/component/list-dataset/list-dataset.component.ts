@@ -6,6 +6,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatasetService } from '../../services/dataset.service';
+import { DatabaseService } from 'src/app/modules/database/services/database.service';
 
 @Component({
   selector: 'app-list-dataset',
@@ -26,10 +27,12 @@ export class ListDatasetComponent implements OnInit {
   datasetToDelete: string | null = null;
   Math = Math;
   organisations: any[] = [];
+  databases: any[] = [];
   selectedOrg: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
+  selectedDatabase: any = {};
 
   statusFilterItems: MenuItem[] = [
     {
@@ -50,7 +53,8 @@ export class ListDatasetComponent implements OnInit {
     private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
-    private datasetService: DatasetService
+    private datasetService: DatasetService,
+    private databaseService: DatabaseService
   ) {}
 
   ngOnInit() {
@@ -60,7 +64,7 @@ export class ListDatasetComponent implements OnInit {
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadDatasets();
+      this.loadDatabases();
     }
   }
 
@@ -75,7 +79,7 @@ export class ListDatasetComponent implements OnInit {
         this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
-          this.loadDatasets();
+          this.loadDatabases();
         }
       },
       error: error => {
@@ -87,13 +91,42 @@ export class ListDatasetComponent implements OnInit {
   onOrgChange(event: any) {
     this.selectedOrg = event.value;
     this.currentPage = 1;
+    this.loadDatabases();
+  }
+
+  onDBChange(event: any) {
+    this.selectedDatabase = event.value;
+    this.currentPage = 1;
     this.loadDatasets();
+  }
+
+  loadDatabases() {
+    if (!this.selectedOrg) return;
+    const params = {
+      orgId: this.selectedOrg.id,
+      pageNumber: 1,
+      limit: 100,
+    };
+
+    this.databaseService.listDatabase(params).subscribe({
+      next: (response: any) => {
+        this.databases = response.data;
+        if (this.databases.length > 0) {
+          this.selectedDatabase = this.databases[0];
+          this.loadDatasets();
+        }
+      },
+      error: error => {
+        console.error('Error loading databases:', error);
+      },
+    });
   }
 
   loadDatasets() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg.id,
+      databaseId: this.selectedDatabase.id,
       pageNumber: this.currentPage,
       limit: this.pageSize,
     };

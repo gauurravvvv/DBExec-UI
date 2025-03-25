@@ -9,7 +9,7 @@
         <div class="table-section">
             <!-- Search and Page Size -->
             <div class="table-controls">
-                <div class="controls-wrapper">
+                <div class="filter-container">
                     <!-- Search Box -->
                     <div class="search-box">
                         <span class="p-input-icon-left">
@@ -19,15 +19,30 @@
                         </span>
                     </div>
 
-                    <!-- Organisation Dropdown -->
-                    <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                        <span class="p-float-label">
-                            <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
-                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)" inputId="org-dropdown">
-                            </p-dropdown>
-                            <label for="org-dropdown">Organisation</label>
-                        </span>
+                    <div class="dropdowns-wrapper">
+                        <!-- Organisation Dropdown -->
+                        <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+                            <span class="p-float-label">
+                                <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
+                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                    [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)"
+                                    inputId="org-dropdown">
+                                </p-dropdown>
+                                <label for="org-dropdown">Organisation</label>
+                            </span>
+                        </div>
+
+                        <!-- Database Dropdown -->
+                        <div class="dropdown-field">
+                            <span class="p-float-label">
+                                <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
+                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                    [panelStyle]="{'width':'100%'}" (onChange)="onDBChange($event)"
+                                    inputId="db-dropdown">
+                                </p-dropdown>
+                                <label for="db-dropdown">Database</label>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -11,11 +11,12 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class DatasetService {
   constructor(private http: HttpClient) {}
 
-  listDatasets(params: IParams) {
+  listDatasets(params: any) {
     return this.http
       .get(
         DATASET.LIST +
           `/${params.orgId}` +
+          `/${params.databaseId}` +
           `/${params.pageNumber}/${params.limit}`
       )
       .pipe(

@@ -65,7 +65,7 @@ export class ListTabComponent implements OnInit {
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadTabs();
+      this.loadDatabases();
     }
   }
 
