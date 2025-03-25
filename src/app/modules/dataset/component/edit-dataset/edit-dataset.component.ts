@@ -5,7 +5,6 @@ import { MessageService } from 'primeng/api';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatasetService } from '../../services/dataset.service';
 import { DATASET } from 'src/app/constants/routes';
 
@@ -45,7 +44,6 @@ export class EditDatasetComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private organisationService: OrganisationService,
     private globalService: GlobalService,
     private databaseService: DatabaseService,
     private datasetService: DatasetService,
@@ -91,12 +89,6 @@ export class EditDatasetComponent implements OnInit {
         this.selectedDatabase = { id: datasetData.databaseId };
         this.selectedOrgName = datasetData.organisationName || '';
         this.selectedDatabaseName = datasetData.databaseName || '';
-
-        if (this.showOrganisationDropdown) {
-          this.loadOrganisations();
-        }
-
-        this.loadDatabases();
 
         this.loadDatabaseSchemas(() => {
           this.datasetForm.patchValue({
@@ -190,47 +182,6 @@ export class EditDatasetComponent implements OnInit {
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to load dataset data',
-        });
-      },
-    });
-  }
-
-  loadOrganisations(): void {
-    const params = {
-      pageNumber: 1,
-      limit: 100,
-    };
-
-    this.organisationService.listOrganisation(params).subscribe({
-      next: response => {
-        this.organisations = response.data.orgs;
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load organisations',
-        });
-      },
-    });
-  }
-
-  loadDatabases(): void {
-    const params = {
-      orgId: this.selectedOrg.id,
-      pageNumber: 1,
-      limit: 100,
-    };
-
-    this.databaseService.listDatabase(params).subscribe({
-      next: response => {
-        this.databases = response.data;
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load databases',
         });
       },
     });

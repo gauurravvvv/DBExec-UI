@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { TAB, USER } from 'src/app/constants/routes';
+import { TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { UserService } from 'src/app/modules/users/services/user.service';
 import { TabService } from '../../services/tab.service';
 
 @Component({
@@ -16,7 +15,7 @@ import { TabService } from '../../services/tab.service';
 })
 export class ListTabComponent implements OnInit {
   users: any[] = [];
-  filteredUsers: any[] = [];
+  filteredTabs: any[] = [];
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
@@ -25,7 +24,7 @@ export class ListTabComponent implements OnInit {
   searchTerm: string = '';
   selectedStatus: number | null = null;
   showDeleteConfirm = false;
-  userToDelete: string | null = null;
+  tabToDelete: string | null = null;
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
@@ -52,7 +51,6 @@ export class ListTabComponent implements OnInit {
   ];
 
   constructor(
-    private userService: UserService,
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
     private tabService: TabService,
@@ -67,7 +65,7 @@ export class ListTabComponent implements OnInit {
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadUsers();
+      this.loadTabs();
     }
   }
 
@@ -99,35 +97,7 @@ export class ListTabComponent implements OnInit {
   onDBChange(event: any) {
     this.selectedDatabase = event.value;
     this.currentPage = 1;
-    this.loadUsers();
-  }
-
-  loadUsers() {
-    if (!this.selectedOrg) return;
-    const params = {
-      orgId: this.selectedOrg.id,
-      pageNumber: this.currentPage,
-      limit: this.pageSize,
-    };
-
-    this.userService.listUser(params).subscribe({
-      next: (response: any) => {
-        this.users = response.data.users;
-        this.filteredUsers = [...this.users];
-        this.totalItems = this.users.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
-      },
-      error: error => {
-        this.users = [];
-        this.filteredUsers = [];
-        this.totalItems = 0;
-        this.totalPages = 0;
-        this.pages = [];
-        console.error('Error loading users:', error);
-      },
-    });
+    this.loadTabs();
   }
 
   loadDatabases() {
@@ -164,8 +134,7 @@ export class ListTabComponent implements OnInit {
     this.tabService.listTab(params).subscribe({
       next: (response: any) => {
         this.tabs = response.data;
-        this.filteredUsers = [...this.tabs];
-        console.log(this.filteredUsers);
+        this.filteredTabs = [...this.tabs];
         this.totalItems = this.tabs.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
@@ -183,7 +152,7 @@ export class ListTabComponent implements OnInit {
 
   onPageChange(page: number) {
     this.currentPage = page;
-    this.loadUsers();
+    this.loadTabs();
   }
 
   onSearch(event: any) {
@@ -197,15 +166,11 @@ export class ListTabComponent implements OnInit {
   }
 
   applyFilters() {
-    let filtered = [...this.users];
-
+    let filtered = [...this.tabs];
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        user =>
-          user.firstName.toLowerCase().includes(search) ||
-          user.lastName.toLowerCase().includes(search) ||
-          user.email.toLowerCase().includes(search)
+      filtered = filtered.filter(user =>
+        user.name.toLowerCase().includes(search)
       );
     }
 
@@ -213,7 +178,7 @@ export class ListTabComponent implements OnInit {
       filtered = filtered.filter(user => user.status === this.selectedStatus);
     }
 
-    this.filteredUsers = filtered;
+    this.filteredTabs = filtered;
   }
 
   onAddNewTab() {
@@ -221,35 +186,40 @@ export class ListTabComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([USER.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([TAB.EDIT, this.selectedOrg.id, id]);
   }
 
   confirmDelete(id: string) {
-    this.userToDelete = id;
+    this.tabToDelete = id;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
-    this.userToDelete = null;
+    this.tabToDelete = null;
   }
 
   proceedDelete() {
-    if (this.userToDelete) {
-      this.userService
-        .deleteUser(this.userToDelete, this.selectedOrg.id)
+    if (this.tabToDelete) {
+      this.tabService
+        .deleteTab(this.selectedOrg.id, this.tabToDelete)
         .subscribe({
           next: () => {
-            this.loadUsers();
+            this.loadTabs();
             this.showDeleteConfirm = false;
-            this.userToDelete = null;
+            this.tabToDelete = null;
           },
           error: error => {
-            console.error('Error deleting organisation user:', error);
+            console.error('Error deleting tab:', error);
             this.showDeleteConfirm = false;
-            this.userToDelete = null;
+            this.tabToDelete = null;
           },
         });
     }
+  }
+
+  onEditTab(tab: any) {
+    // Handle edit action
+    this.router.navigate([TAB.EDIT, this.selectedOrg.id, tab.id]);
   }
 }

@@ -24,8 +24,8 @@ export class TabService {
       );
   }
 
-  deleteSuperAdmin(id: number) {
-    return this.http.delete(SUPER_ADMIN.DELETE + `${id}`).pipe(
+  deleteTab(orgId: string, id: string) {
+    return this.http.delete(TAB.DELETE + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -50,8 +50,8 @@ export class TabService {
       );
   }
 
-  viewSuperAdmin(id: string) {
-    return this.http.get(SUPER_ADMIN.VIEW + `${id}`).pipe(
+  viewTab(orgId: string, id: string) {
+    return this.http.get(TAB.VIEW + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -59,17 +59,16 @@ export class TabService {
     );
   }
 
-  updateSuperAdmin(superAdminForm: FormGroup) {
-    const { id, firstName, lastName, username, email, mobile, status } =
-      superAdminForm.getRawValue();
+  updateTab(tabForm: FormGroup) {
+    const { id, name, description, organisation, database, status } =
+      tabForm.getRawValue();
     return this.http
-      .put(SUPER_ADMIN.UPDATE, {
+      .put(TAB.UPDATE, {
         id,
-        firstName,
-        lastName,
-        username,
-        email,
-        mobile,
+        name,
+        description,
+        organisation,
+        database,
         status: status ? 1 : 0,
       })
       .pipe(

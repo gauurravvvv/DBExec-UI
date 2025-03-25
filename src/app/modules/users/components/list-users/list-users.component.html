@@ -69,12 +69,10 @@
                                 <td>{{ user.lastLogin ? (user.lastLogin | date:'medium') : 'Never logged in' }}</td>
                                 <td>{{ user.createdOn | date:'mediumDate' }}</td>
                                 <td class="actions">
-                                    <button class="action-btn edit" (click)="onEdit(user.id)" title="Edit"
-                                        [disabled]="user.id == loggedInUserId">
+                                    <button class="action-btn edit" (click)="onEdit(user.id)" title="Edit">
                                         <i class="pi pi-pencil"></i>
                                     </button>
-                                    <button class="action-btn delete" (click)="confirmDelete(user.id)" title="Delete"
-                                        [disabled]="user.id == loggedInUserId">
+                                    <button class="action-btn delete" (click)="confirmDelete(user.id)" title="Delete">
                                         <i class="pi pi-trash"></i>
                                     </button>
                                 </td>

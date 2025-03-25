@@ -9,7 +9,7 @@
         <div class="table-section">
             <!-- Search and Page Size -->
             <div class="table-controls">
-                <div class="controls-wrapper">
+                <div class="filter-container">
                     <!-- Search Box -->
                     <div class="search-box">
                         <span class="p-input-icon-left">
@@ -19,26 +19,30 @@
                         </span>
                     </div>
 
-                    <!-- Organisation Dropdown -->
-                    <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                        <span class="p-float-label">
-                            <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
-                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)" inputId="org-dropdown">
-                            </p-dropdown>
-                            <label for="org-dropdown">Organisation</label>
-                        </span>
-                    </div>
+                    <div class="dropdowns-wrapper">
+                        <!-- Organisation Dropdown -->
+                        <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+                            <span class="p-float-label">
+                                <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
+                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                    [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)"
+                                    inputId="org-dropdown">
+                                </p-dropdown>
+                                <label for="org-dropdown">Organisation</label>
+                            </span>
+                        </div>
 
-                    <!-- Database Dropdown -->
-                    <div class="dropdown-field">
-                        <span class="p-float-label">
-                            <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
-                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                [panelStyle]="{'width':'100%'}" (onChange)="onDBChange($event)" inputId="db-dropdown">
-                            </p-dropdown>
-                            <label for="db-dropdown">Database</label>
-                        </span>
+                        <!-- Database Dropdown -->
+                        <div class="dropdown-field">
+                            <span class="p-float-label">
+                                <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
+                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                    [panelStyle]="{'width':'100%'}" (onChange)="onDBChange($event)"
+                                    inputId="db-dropdown">
+                                </p-dropdown>
+                                <label for="db-dropdown">Database</label>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -47,7 +51,8 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Email</th>
+                            <th>Description</th>
+                            <th>Sections</th>
                             <th>
                                 Status
                                 <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
@@ -58,34 +63,36 @@
                                     style="margin-left: 5px; cursor: pointer;">
                                 </i>
                             </th>
-                            <th>Last Login</th>
                             <th>Created Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="filteredUsers && filteredUsers.length > 0; else noData">
-                            <tr *ngFor="let user of filteredUsers">
+                        <ng-container *ngIf="filteredTabs && filteredTabs.length > 0; else noData">
+                            <tr *ngFor="let tab of filteredTabs">
                                 <td>
-                                    <a class="admin-name" [routerLink]="['/app/users/view', selectedOrg.id, user.id]">
-                                        {{ user.firstName + ' ' + user?.lastName }}
+                                    <a class="admin-name" [routerLink]="['/app/tab/view', selectedOrg.id, tab.id]">
+                                        {{ tab.name }}
                                     </a>
                                 </td>
-                                <td>{{ user.email }}</td>
+                                <td>{{ tab.description }}</td>
                                 <td>
-                                    <span class="status-badge" [class.active]="user.status === 1">
-                                        {{ user.status === 1 ? 'Active' : 'Inactive' }}
+                                    <span class="field-count">
+                                        <i class="pi pi-list"></i>
+                                        {{ tab.sections.length }} sections
                                     </span>
                                 </td>
-                                <td>{{ user.lastLogin ? (user.lastLogin | date:'medium') : 'Never logged in' }}</td>
-                                <td>{{ user.createdOn | date:'mediumDate' }}</td>
+                                <td>
+                                    <span class="status-badge" [class.active]="tab.status === 1">
+                                        {{ tab.status === 1 ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>{{ tab.createdOn | date:'mediumDate' }}</td>
                                 <td class="actions">
-                                    <button class="action-btn edit" (click)="onEdit(user.id)" title="Edit"
-                                        [disabled]="user.id == loggedInUserId">
+                                    <button class="action-btn edit" (click)="onEdit(tab.id)" title="Edit">
                                         <i class="pi pi-pencil"></i>
                                     </button>
-                                    <button class="action-btn delete" (click)="confirmDelete(user.id)" title="Delete"
-                                        [disabled]="user.id == loggedInUserId">
+                                    <button class="action-btn delete" (click)="confirmDelete(tab.id)" title="Delete">
                                         <i class="pi pi-trash"></i>
                                     </button>
                                 </td>
@@ -95,9 +102,9 @@
                             <tr style="height: 100%;">
                                 <td colspan="6">
                                     <div class="no-data">
-                                        <i class="pi pi-inbox"></i>
-                                        <p>No records found</p>
-                                        <span class="sub-text">No user data is available at the moment</span>
+                                        <i class="pi pi-plus-circle"></i>
+                                        <p>No tabs found</p>
+                                        <span class="sub-text">Click on + to create a new Tab</span>
                                     </div>
                                 </td>
                             </tr>
@@ -137,7 +144,7 @@
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
         <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this user?</p>
+        <p>Are you sure you want to delete this tab?</p>
         <div class="popup-actions">
             <button class="btn-cancel" (click)="cancelDelete()">No</button>
             <button class="btn-confirm" (click)="proceedDelete()">Yes</button>

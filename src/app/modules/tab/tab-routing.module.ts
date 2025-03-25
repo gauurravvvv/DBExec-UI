@@ -14,8 +14,8 @@ const routes: Routes = [
     path: 'add',
     component: AddTabComponent,
   },
-  { path: 'view/:id', component: ViewTabComponent },
-  { path: 'edit/:id', component: EditTabComponent },
+  { path: 'view/:orgId/:id', component: ViewTabComponent },
+  { path: 'edit/:orgId/:id', component: EditTabComponent },
 ];
 
 @NgModule({
