@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
-import { SUPER_ADMIN, TAB } from 'src/app/constants/api';
+import { TAB } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -71,17 +71,6 @@ export class TabService {
         database,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
-  }
-
-  updateSuperAdminPassword(id: string, password: string) {
-    return this.http
-      .put(SUPER_ADMIN.UPDATE_PASSWORD, { id, newPassword: password })
       .pipe(
         map((response: any) => {
           const result = JSON.parse(JSON.stringify(response));
