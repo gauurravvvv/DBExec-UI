@@ -337,51 +337,84 @@
   width: 100%;
   margin-bottom: 1rem;
 
-  // Full width layout (3 columns)
-  @media screen and (min-width: 1024px) {
-    grid-template-columns: 1fr 1fr 1fr;
+  // Full width layout (all elements in one row)
+  @media screen and (min-width: 1200px) {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     align-items: flex-start;
+    gap: 1rem;
 
-    .dropdowns-wrapper {
+    .search-and-first-dropdown {
+      display: contents;
+
+      .search-box {
+        width: 100%;
+      }
+
+      .dropdown-field {
+        width: 100%;
+      }
+    }
+
+    .remaining-dropdowns {
+      display: contents;
+
+      .dropdown-field {
+        width: 100%;
+      }
+    }
+  }
+
+  // Medium width layout (2x2 grid)
+  @media screen and (min-width: 768px) and (max-width: 1199px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+    gap: 1rem;
+
+    .search-and-first-dropdown {
+      display: contents;
+
+      .search-box {
+        width: 100%;
+      }
+
+      .dropdown-field {
+        width: 100%;
+      }
+    }
+
+    .remaining-dropdowns {
+      display: contents;
+
+      .dropdown-field {
+        width: 100%;
+      }
+    }
+  }
+
+  // Small width layout (stacked)
+  @media screen and (max-width: 767px) {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+
+    .search-and-first-dropdown {
       display: contents;
     }
-  }
 
-  // Medium width layout (2 rows, 2 columns in second row)
-  @media screen and (min-width: 768px) and (max-width: 1023px) {
-    grid-template-rows: auto auto;
-
-    .search-box {
-      grid-column: 1 / -1;
+    .remaining-dropdowns {
+      display: contents;
     }
 
-    .dropdowns-wrapper {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+    .search-box,
+    .dropdown-field {
+      width: 100%;
     }
   }
 
-  // Small width layout (3 rows)
-  @media screen and (max-width: 767px) {
-    grid-template-rows: auto auto auto;
-
-    .search-box {
-      grid-column: 1 / -1;
-    }
-
-    .dropdowns-wrapper {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-rows: auto auto;
-      gap: 1rem;
-    }
-  }
-
+  // Common styles for search box
   .search-box {
-    width: 100%;
-
     .p-input-icon-left {
       width: 100%;
 
@@ -408,23 +441,18 @@
         &:focus {
           border-color: var(--primary-color);
           box-shadow: 0 0 0 1px var(--primary-color-transparent);
-
-          &::placeholder {
-            color: #6c757d;
-            opacity: 1;
-          }
-
-          & + i {
-            color: var(--primary-color);
-            opacity: 1;
-          }
         }
       }
     }
   }
 
+  // Common styles for dropdowns
   .dropdown-field {
     width: 100%;
+
+    .p-dropdown {
+      width: 100%;
+    }
   }
 }
 

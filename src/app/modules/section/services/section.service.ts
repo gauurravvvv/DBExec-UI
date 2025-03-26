@@ -11,9 +11,12 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class SectionService {
   constructor(private http: HttpClient) {}
 
-  listSuperAdmin(params: IParams) {
+  listSection(params: any) {
     return this.http
-      .get(SUPER_ADMIN.LIST + `/${params.pageNumber}/${params.limit}`)
+      .get(
+        SECTION.LIST +
+          `/${params.orgId}/${params.tabId}/${params.pageNumber}/${params.limit}`
+      )
       .pipe(
         map((response: any) => {
           const result = JSON.parse(JSON.stringify(response));
@@ -22,8 +25,8 @@ export class SectionService {
       );
   }
 
-  deleteSuperAdmin(id: number) {
-    return this.http.delete(SUPER_ADMIN.DELETE + `${id}`).pipe(
+  deleteSection(orgId: string, id: string) {
+    return this.http.delete(SECTION.DELETE + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -50,8 +53,8 @@ export class SectionService {
       );
   }
 
-  viewSuperAdmin(id: string) {
-    return this.http.get(SUPER_ADMIN.VIEW + `${id}`).pipe(
+  viewSection(orgId: string, id: string) {
+    return this.http.get(SECTION.VIEW + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;

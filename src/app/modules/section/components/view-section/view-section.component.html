@@ -1,1 +1,104 @@
-<p>view-section works!</p>
+<div class="view-category-wrapper">
+    <div class="view-category-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" (click)="goBack()">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Section Details</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton class="p-button-outlined mr-2" (click)="onEdit()">
+                    <i class="pi pi-pencil mr-2"></i>Edit
+                </button>
+                <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
+                    (click)="confirmDelete()">
+                    <i class="pi pi-trash mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Section -->
+        <div class="content-section" *ngIf="tabData">
+            <div class="details-grid">
+                <!-- Basic Information -->
+                <div class="info-section">
+                    <h3>
+                        <i class="pi pi-info-circle mr-2"></i>
+                        Basic Information
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Name</label>
+                            <p>{{ tabData.name }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Description</label>
+                            <p>{{ tabData.description || 'No description available' }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Status</label>
+                            <span class="status-badge" [class.active]="tabData.status === 1">
+                                <i class="pi"
+                                    [ngClass]="tabData.status === 1 ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                                {{ tabData.status === 1 ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <label>Organization</label>
+                            <p class="with-icon">
+                                <i class="pi pi-building mr-2"></i>
+                                {{ tabData.organisationName }}
+                            </p>
+                        </div>
+                        <div class="info-item">
+                            <label>Tab</label>
+                            <p class="with-icon">
+                                <i class="pi pi-box mr-2"></i>
+                                {{ tabData.tab.name }}
+                            </p>
+                        </div>
+                        <div class="info-item">
+                            <label>Created On</label>
+                            <p class="with-icon">
+                                <i class="pi pi-calendar mr-2"></i>
+                                {{ tabData.createdOn | date:'medium' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sections -->
+                <div class="info-section">
+                    <h3>
+                        <i class="pi pi-list mr-2"></i>
+                        Prompts
+                        <span class="count-badge">{{ tabData.prompts.length }}</span>
+                    </h3>
+                    <div class="fields-list">
+                        <div class="field-item" *ngFor="let prompt of tabData.prompts">
+                            <i class="pi pi-tag"></i>
+                            <span>{{ prompt.name }}</span>
+                        </div>
+                        <div *ngIf="tabData.prompts.length === 0" class="no-data">
+                            No prompts found
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update the confirmation popup to match list-category exactly -->
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+    <div class="popup-content">
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this section?</p>
+        <div class="popup-actions">
+            <button class="btn-cancel" (click)="cancelDelete()">No</button>
+            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        </div>
+    </div>
+</div>

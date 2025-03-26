@@ -7,6 +7,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
+import { SectionService } from '../../services/section.service';
 
 @Component({
   selector: 'app-list-section',
@@ -15,7 +16,7 @@ import { TabService } from 'src/app/modules/tab/services/tab.service';
 })
 export class ListSectionComponent implements OnInit {
   users: any[] = [];
-  filteredTabs: any[] = [];
+  filteredSections: any[] = [];
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
@@ -24,13 +25,15 @@ export class ListSectionComponent implements OnInit {
   searchTerm: string = '';
   selectedStatus: number | null = null;
   showDeleteConfirm = false;
-  tabToDelete: string | null = null;
+  sectionToDelete: string | null = null;
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
   tabs: any[] = [];
+  sections: any[] = [];
   selectedOrg: any = {};
   selectedDatabase: any = {};
+  selectedTab: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
@@ -52,6 +55,7 @@ export class ListSectionComponent implements OnInit {
 
   constructor(
     private databaseService: DatabaseService,
+    private sectionService: SectionService,
     private organisationService: OrganisationService,
     private tabService: TabService,
     private router: Router,
@@ -100,6 +104,12 @@ export class ListSectionComponent implements OnInit {
     this.loadTabs();
   }
 
+  onTabChange(event: any) {
+    this.selectedTab = event.value;
+    this.currentPage = 1;
+    this.loadSections();
+  }
+
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
@@ -122,6 +132,30 @@ export class ListSectionComponent implements OnInit {
     });
   }
 
+  loadSections() {
+    if (!this.selectedOrg) return;
+    const params = {
+      orgId: this.selectedOrg.id,
+      tabId: this.selectedTab.id,
+      pageNumber: 1,
+      limit: 100,
+    };
+
+    this.sectionService.listSection(params).subscribe({
+      next: (response: any) => {
+        this.sections = response.data;
+        this.filteredSections = [...this.sections];
+        this.totalItems = this.sections.length;
+        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+        this.generatePageNumbers();
+        this.applyFilters();
+      },
+      error: error => {
+        console.error('Error loading databases:', error);
+      },
+    });
+  }
+
   loadTabs() {
     if (!this.selectedDatabase) return;
     const params = {
@@ -134,11 +168,10 @@ export class ListSectionComponent implements OnInit {
     this.tabService.listTab(params).subscribe({
       next: (response: any) => {
         this.tabs = response.data;
-        this.filteredTabs = [...this.tabs];
-        this.totalItems = this.tabs.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
+        if (this.tabs.length > 0) {
+          this.selectedTab = this.tabs[0];
+          this.loadSections();
+        }
       },
       error: error => {
         console.error('Error loading tabs:', error);
@@ -166,19 +199,21 @@ export class ListSectionComponent implements OnInit {
   }
 
   applyFilters() {
-    let filtered = [...this.tabs];
+    let filtered = [...this.sections];
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(user =>
-        user.name.toLowerCase().includes(search)
+      filtered = filtered.filter(section =>
+        section.name.toLowerCase().includes(search)
       );
     }
 
     if (this.selectedStatus !== null) {
-      filtered = filtered.filter(user => user.status === this.selectedStatus);
+      filtered = filtered.filter(
+        section => section.status === this.selectedStatus
+      );
     }
 
-    this.filteredTabs = filtered;
+    this.filteredSections = filtered;
   }
 
   onAddNewSection() {
@@ -190,29 +225,29 @@ export class ListSectionComponent implements OnInit {
   }
 
   confirmDelete(id: string) {
-    this.tabToDelete = id;
+    this.sectionToDelete = id;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
-    this.tabToDelete = null;
+    this.sectionToDelete = null;
   }
 
   proceedDelete() {
-    if (this.tabToDelete) {
-      this.tabService
-        .deleteTab(this.selectedOrg.id, this.tabToDelete)
+    if (this.sectionToDelete) {
+      this.sectionService
+        .deleteSection(this.selectedOrg.id, this.sectionToDelete)
         .subscribe({
           next: () => {
-            this.loadTabs();
+            this.loadSections();
             this.showDeleteConfirm = false;
-            this.tabToDelete = null;
+            this.sectionToDelete = null;
           },
           error: error => {
             console.error('Error deleting tab:', error);
             this.showDeleteConfirm = false;
-            this.tabToDelete = null;
+            this.sectionToDelete = null;
           },
         });
     }
