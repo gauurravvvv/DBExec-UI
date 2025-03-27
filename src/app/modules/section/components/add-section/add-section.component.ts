@@ -28,6 +28,7 @@ export class AddSectionComponent implements OnInit {
   hasDuplicates: boolean = false;
   duplicateRows: { [key: string]: Array<[number, number]> } = {};
   isNewlyAdded: boolean = false;
+  isNewlyAddedSection: boolean = false;
   lastAddedSectionIndex: number = -1;
   lastAddedGroupIndex: number = -1;
 
@@ -52,6 +53,10 @@ export class AddSectionComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     }
+
+    this.sectionForm.valueChanges.subscribe(() => {
+      this.checkForDuplicates();
+    });
   }
 
   initForm() {
@@ -94,27 +99,17 @@ export class AddSectionComponent implements OnInit {
 
   addTabGroup() {
     this.tabGroups.push(this.createTabGroup());
+    this.lastAddedGroupIndex = this.tabGroups.length - 1;
 
-    // Reset any previous highlights
-    this.lastAddedGroupIndex = -1;
-    this.isNewlyAdded = false;
-
-    // Set new highlights
+    // First scroll, then highlight
+    this.scrollToBottom();
     setTimeout(() => {
-      this.lastAddedGroupIndex = this.tabGroups.length - 1;
       this.isNewlyAdded = true;
-
-      const element = document.querySelector('.schema-group:last-child');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
-      // Reset highlight after animation
       setTimeout(() => {
-        this.lastAddedGroupIndex = -1;
         this.isNewlyAdded = false;
+        this.lastAddedGroupIndex = -1;
       }, 500);
-    });
+    }, 300);
   }
 
   removeTabGroup(index: number) {
@@ -133,35 +128,31 @@ export class AddSectionComponent implements OnInit {
     const sections = this.getTabSections(groupIndex);
     sections.push(this.createSection());
 
-    // First reset any existing highlights
-    this.lastAddedSectionIndex = -1;
-    this.lastAddedGroupIndex = -1;
-    this.isNewlyAdded = false;
-
-    // Force a reflow
-    void document.body.offsetHeight;
-
-    // Then set new highlights
     this.lastAddedSectionIndex = sections.length - 1;
     this.lastAddedGroupIndex = groupIndex;
-    this.isNewlyAdded = true;
 
-    // Scroll to new element
+    // First scroll, then highlight
+    this.scrollToBottom();
     setTimeout(() => {
-      const element = document.querySelector(
-        `.schema-group:nth-child(${groupIndex + 1}) .mapping-row:last-child`
-      );
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      this.isNewlyAddedSection = true;
+      setTimeout(() => {
+        this.isNewlyAddedSection = false;
+        this.lastAddedSectionIndex = -1;
+        this.lastAddedGroupIndex = -1;
+      }, 500);
+    }, 300);
+  }
+
+  scrollToBottom(): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('.admin-form');
+      if (formElement) {
+        formElement.scrollTo({
+          top: formElement.scrollHeight,
+          behavior: 'smooth',
+        });
       }
-    });
-
-    // Reset highlight after animation
-    setTimeout(() => {
-      this.lastAddedSectionIndex = -1;
-      this.lastAddedGroupIndex = -1;
-      this.isNewlyAdded = false;
-    }, 500);
+    }, 100);
   }
 
   removeSectionFromTab(groupIndex: number, sectionIndex: number) {
@@ -180,52 +171,44 @@ export class AddSectionComponent implements OnInit {
     return this.tabs.filter(tab => !selectedTabs.includes(tab.id));
   }
 
-  isDuplicateRow(groupIndex: number, sectionIndex: number): boolean {
-    const currentSection = this.getTabSections(groupIndex).at(sectionIndex);
-    const currentName = currentSection.get('name')?.value?.trim().toLowerCase();
-
-    if (!currentName) return false;
-
-    let duplicateFound = false;
-    this.tabGroups.controls.forEach((group, gIndex) => {
-      const sections = this.getTabSections(gIndex);
-      sections.controls.forEach((section, sIndex) => {
-        if (gIndex === groupIndex && sIndex === sectionIndex) return;
-
-        const name = section.get('name')?.value?.trim().toLowerCase();
-        if (name === currentName) {
-          duplicateFound = true;
-        }
-      });
-    });
-
-    return duplicateFound;
-  }
-
   checkForDuplicates() {
     this.hasDuplicates = false;
-    const nameMap = new Map<string, Array<[number, number]>>();
+    this.duplicateRows = {};
 
+    // Check each tab group separately
     this.tabGroups.controls.forEach((group, groupIndex) => {
+      const nameMap = new Map<string, Array<number>>();
       const sections = this.getTabSections(groupIndex);
+
+      // Check sections within this tab group
       sections.controls.forEach((section, sectionIndex) => {
         const name = section.get('name')?.value?.trim().toLowerCase();
         if (name) {
           if (!nameMap.has(name)) {
-            nameMap.set(name, [[groupIndex, sectionIndex]]);
+            nameMap.set(name, [sectionIndex]);
           } else {
-            nameMap.get(name)?.push([groupIndex, sectionIndex]);
+            nameMap.get(name)?.push(sectionIndex);
           }
         }
       });
-    });
 
-    nameMap.forEach((positions, name) => {
-      if (positions.length > 1) {
-        this.hasDuplicates = true;
-        this.duplicateRows[name] = positions;
-      }
+      // Check for duplicates within this tab group
+      nameMap.forEach((sectionIndices, name) => {
+        if (sectionIndices.length > 1) {
+          this.hasDuplicates = true;
+          this.duplicateRows[`${groupIndex}-${name}`] = sectionIndices.map(
+            index => [groupIndex, index]
+          );
+        }
+      });
     });
+  }
+
+  isDuplicateRow(groupIndex: number, sectionIndex: number): boolean {
+    // Check only within the same tab group
+    return Object.values(this.duplicateRows).some(positions =>
+      positions.some(([g, s]) => g === groupIndex && s === sectionIndex)
+    );
   }
 
   loadOrganisations() {

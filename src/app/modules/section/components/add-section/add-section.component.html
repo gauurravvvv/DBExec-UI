@@ -19,7 +19,7 @@
                     [disabled]="!isFormDirty" (click)="onCancel()">
                 </button>
                 <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="sectionForm.invalid">
+                    [disabled]="sectionForm.invalid || hasDuplicates">
                     <i class="pi pi-save mr-2"></i>
                 </button>
             </div>
@@ -104,11 +104,12 @@
                             <!-- Tab Header -->
                             <div class="schema-header">
                                 <p-dropdown [options]="getAvailableTabs(groupIndex)" optionLabel="name" optionValue="id"
-                                    formControlName="tab" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                    formControlName="tab" [filter]="true" filterBy="name" [style]="{'width':'300px'}"
                                     placeholder="Select Tab">
                                 </p-dropdown>
                                 <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
-                                    (click)="addSectionToTab(groupIndex)" [disabled]="!tabGroup.get('tab')?.value">
+                                    (click)="addSectionToTab(groupIndex)" [disabled]="!tabGroup.get('tab')?.value"
+                                    [style]="{'color': '#2196f3'}">
                                 </button>
                                 <button pButton type="button" icon="pi pi-trash"
                                     class="p-button-rounded p-button-text p-button-danger"
@@ -119,8 +120,12 @@
                             <!-- Sections for this tab -->
                             <div class="mappings-list" formArrayName="sections">
                                 <div *ngFor="let section of getTabSections(groupIndex).controls; let sectionIndex=index"
-                                    [formGroupName]="sectionIndex" class="mapping-row"
-                                    [class.highlight-animation]="sectionIndex === lastAddedSectionIndex && groupIndex === lastAddedGroupIndex && isNewlyAdded">
+                                    [formGroupName]="sectionIndex" class="mapping-row" [ngClass]="{
+                                        'highlight-animation': sectionIndex === lastAddedSectionIndex && 
+                                                             groupIndex === lastAddedGroupIndex && 
+                                                             isNewlyAddedSection,
+                                        'duplicate': isDuplicateRow(groupIndex, sectionIndex)
+                                    }">
                                     <span class="index-number">{{sectionIndex + 1}}</span>
 
                                     <div class="mapping-inputs">
