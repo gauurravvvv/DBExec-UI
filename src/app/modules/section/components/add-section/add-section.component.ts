@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SECTION, TAB } from 'src/app/constants/routes';
@@ -25,6 +25,11 @@ export class AddSectionComponent implements OnInit {
   selectedDatabase: any = null;
   databases: any[] = [];
   tabs: any[] = [];
+  hasDuplicates: boolean = false;
+  duplicateRows: { [key: string]: Array<[number, number]> } = {};
+  isNewlyAdded: boolean = false;
+  lastAddedSectionIndex: number = -1;
+  lastAddedGroupIndex: number = -1;
 
   constructor(
     private fb: FormBuilder,
@@ -51,11 +56,6 @@ export class AddSectionComponent implements OnInit {
 
   initForm() {
     this.sectionForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: [
-        '',
-        [Validators.required, Validators.pattern(REGEX.lastName)],
-      ],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
           ? ''
@@ -63,7 +63,168 @@ export class AddSectionComponent implements OnInit {
         Validators.required,
       ],
       database: ['', Validators.required],
+      tabGroups: this.fb.array([this.createTabGroup()]),
+    });
+  }
+
+  get tabGroups(): FormArray {
+    return this.sectionForm.get('tabGroups') as FormArray;
+  }
+
+  createTabGroup(): FormGroup {
+    return this.fb.group({
       tab: ['', Validators.required],
+      sections: this.fb.array([this.createSection()]),
+    });
+  }
+
+  createSection(): FormGroup {
+    return this.fb.group({
+      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
+      description: [
+        '',
+        [Validators.required, Validators.pattern(REGEX.lastName)],
+      ],
+    });
+  }
+
+  getTabSections(groupIndex: number): FormArray {
+    return this.tabGroups.at(groupIndex).get('sections') as FormArray;
+  }
+
+  addTabGroup() {
+    this.tabGroups.push(this.createTabGroup());
+
+    // Reset any previous highlights
+    this.lastAddedGroupIndex = -1;
+    this.isNewlyAdded = false;
+
+    // Set new highlights
+    setTimeout(() => {
+      this.lastAddedGroupIndex = this.tabGroups.length - 1;
+      this.isNewlyAdded = true;
+
+      const element = document.querySelector('.schema-group:last-child');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // Reset highlight after animation
+      setTimeout(() => {
+        this.lastAddedGroupIndex = -1;
+        this.isNewlyAdded = false;
+      }, 500);
+    });
+  }
+
+  removeTabGroup(index: number) {
+    this.tabGroups.removeAt(index);
+    this.checkForDuplicates();
+  }
+
+  clearAllTabs() {
+    while (this.tabGroups.length !== 0) {
+      this.tabGroups.removeAt(0);
+    }
+    this.addTabGroup();
+  }
+
+  addSectionToTab(groupIndex: number) {
+    const sections = this.getTabSections(groupIndex);
+    sections.push(this.createSection());
+
+    // First reset any existing highlights
+    this.lastAddedSectionIndex = -1;
+    this.lastAddedGroupIndex = -1;
+    this.isNewlyAdded = false;
+
+    // Force a reflow
+    void document.body.offsetHeight;
+
+    // Then set new highlights
+    this.lastAddedSectionIndex = sections.length - 1;
+    this.lastAddedGroupIndex = groupIndex;
+    this.isNewlyAdded = true;
+
+    // Scroll to new element
+    setTimeout(() => {
+      const element = document.querySelector(
+        `.schema-group:nth-child(${groupIndex + 1}) .mapping-row:last-child`
+      );
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+
+    // Reset highlight after animation
+    setTimeout(() => {
+      this.lastAddedSectionIndex = -1;
+      this.lastAddedGroupIndex = -1;
+      this.isNewlyAdded = false;
+    }, 500);
+  }
+
+  removeSectionFromTab(groupIndex: number, sectionIndex: number) {
+    const sections = this.getTabSections(groupIndex);
+    sections.removeAt(sectionIndex);
+    this.checkForDuplicates();
+  }
+
+  getAvailableTabs(currentIndex: number): any[] {
+    const selectedTabs = this.tabGroups.controls
+      .map((group, index) =>
+        index !== currentIndex ? group.get('tab')?.value : null
+      )
+      .filter(tab => tab !== null);
+
+    return this.tabs.filter(tab => !selectedTabs.includes(tab.id));
+  }
+
+  isDuplicateRow(groupIndex: number, sectionIndex: number): boolean {
+    const currentSection = this.getTabSections(groupIndex).at(sectionIndex);
+    const currentName = currentSection.get('name')?.value?.trim().toLowerCase();
+
+    if (!currentName) return false;
+
+    let duplicateFound = false;
+    this.tabGroups.controls.forEach((group, gIndex) => {
+      const sections = this.getTabSections(gIndex);
+      sections.controls.forEach((section, sIndex) => {
+        if (gIndex === groupIndex && sIndex === sectionIndex) return;
+
+        const name = section.get('name')?.value?.trim().toLowerCase();
+        if (name === currentName) {
+          duplicateFound = true;
+        }
+      });
+    });
+
+    return duplicateFound;
+  }
+
+  checkForDuplicates() {
+    this.hasDuplicates = false;
+    const nameMap = new Map<string, Array<[number, number]>>();
+
+    this.tabGroups.controls.forEach((group, groupIndex) => {
+      const sections = this.getTabSections(groupIndex);
+      sections.controls.forEach((section, sectionIndex) => {
+        const name = section.get('name')?.value?.trim().toLowerCase();
+        if (name) {
+          if (!nameMap.has(name)) {
+            nameMap.set(name, [[groupIndex, sectionIndex]]);
+          } else {
+            nameMap.get(name)?.push([groupIndex, sectionIndex]);
+          }
+        }
+      });
+    });
+
+    nameMap.forEach((positions, name) => {
+      if (positions.length > 1) {
+        this.hasDuplicates = true;
+        this.duplicateRows[name] = positions;
+      }
     });
   }
 
@@ -84,6 +245,10 @@ export class AddSectionComponent implements OnInit {
   }
 
   onSubmit() {
+    this.checkForDuplicates();
+    if (this.hasDuplicates) {
+      return;
+    }
     if (this.sectionForm.valid) {
       this.sectionService.addSection(this.sectionForm).subscribe({
         next: () => {
@@ -138,10 +303,17 @@ export class AddSectionComponent implements OnInit {
   }
 
   onDatabaseChange(event: any) {
-    this.selectedDatabase = {
-      id: event.value,
-    };
-    this.loadTabs();
+    if (event.value) {
+      this.selectedDatabase = {
+        id: event.value,
+      };
+      this.loadTabs();
+      // Reset tab groups when database changes
+      while (this.tabGroups.length !== 0) {
+        this.tabGroups.removeAt(0);
+      }
+      this.addTabGroup();
+    }
   }
 
   loadTabs() {

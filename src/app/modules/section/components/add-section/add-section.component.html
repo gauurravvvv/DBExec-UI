@@ -8,6 +8,12 @@
                 </button>
                 <h2>Add Section</h2>
             </div>
+            <div class="warning-section" *ngIf="hasDuplicates">
+                <div class="duplicate-warning">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>Duplicate section names found. Please remove duplicates to continue.</span>
+                </div>
+            </div>
             <div class="action-buttons">
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
                     [disabled]="!isFormDirty" (click)="onCancel()">
@@ -20,7 +26,7 @@
         </div>
 
         <!-- Form Section -->
-        <form [formGroup]="sectionForm" class="admin-form" #formContainer>
+        <form [formGroup]="sectionForm" class="admin-form">
             <div class="form-grid">
                 <!-- Name and Description fields -->
                 <div class="form-field">
@@ -75,19 +81,77 @@
                     </small>
                 </div>
 
-                <!-- TAB dropdown -->
+                <!-- Tab Groups - Only show when database is selected -->
+                <div class="form-field fields-container" *ngIf="sectionForm.get('database')?.value">
+                    <div class="fields-header">
+                        <label>Tab Groups<span class="required">*</span></label>
+                        <div class="button-group">
+                            <button pButton type="button" icon="pi pi-times"
+                                class="p-button-rounded p-button-text p-button-danger clear-btn mr-1"
+                                (click)="clearAllTabs()">
+                            </button>
+                            <button pButton type="button" icon="pi pi-plus"
+                                class="p-button-rounded p-button-text add-btn" (click)="addTabGroup()">
+                            </button>
+                        </div>
+                    </div>
 
-                <div class="form-field">
-                    <label for="tab">Tab<span class="required"> *</span></label>
-                    <p-dropdown [options]="tabs" optionLabel="name" optionValue="id" formControlName="tab"
-                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        placeholder="Select Tab"
-                        [ngClass]="{'ng-invalid ng-dirty': sectionForm.get('tab')?.invalid && sectionForm.get('tab')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="sectionForm.get('tab')?.invalid && sectionForm.get('tab')?.touched">
-                        Tab is required
-                    </small>
+                    <div class="fields-list">
+                        <div *ngFor="let tabGroup of tabGroups.controls; let groupIndex=index"
+                            [formGroup]="$any(tabGroup)" class="schema-group"
+                            [class.highlight-animation]="groupIndex === lastAddedGroupIndex && isNewlyAdded">
+
+                            <!-- Tab Header -->
+                            <div class="schema-header">
+                                <p-dropdown [options]="getAvailableTabs(groupIndex)" optionLabel="name" optionValue="id"
+                                    formControlName="tab" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                    placeholder="Select Tab">
+                                </p-dropdown>
+                                <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
+                                    (click)="addSectionToTab(groupIndex)" [disabled]="!tabGroup.get('tab')?.value">
+                                </button>
+                                <button pButton type="button" icon="pi pi-trash"
+                                    class="p-button-rounded p-button-text p-button-danger"
+                                    (click)="removeTabGroup(groupIndex)" [disabled]="tabGroups.length === 1">
+                                </button>
+                            </div>
+
+                            <!-- Sections for this tab -->
+                            <div class="mappings-list" formArrayName="sections">
+                                <div *ngFor="let section of getTabSections(groupIndex).controls; let sectionIndex=index"
+                                    [formGroupName]="sectionIndex" class="mapping-row"
+                                    [class.highlight-animation]="sectionIndex === lastAddedSectionIndex && groupIndex === lastAddedGroupIndex && isNewlyAdded">
+                                    <span class="index-number">{{sectionIndex + 1}}</span>
+
+                                    <div class="mapping-inputs">
+                                        <!-- Name field -->
+                                        <div class="form-field">
+                                            <span class="p-input-icon-left">
+                                                <i class="pi pi-box"></i>
+                                                <input type="text" pInputText formControlName="name"
+                                                    placeholder="Enter section name">
+                                            </span>
+                                        </div>
+
+                                        <!-- Description field -->
+                                        <div class="form-field">
+                                            <span class="p-input-icon-left">
+                                                <i class="pi pi-align-left"></i>
+                                                <input pInputText formControlName="description"
+                                                    placeholder="Enter description">
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <button pButton type="button" icon="pi pi-trash"
+                                        class="p-button-rounded p-button-text p-button-danger"
+                                        (click)="removeSectionFromTab(groupIndex, sectionIndex)"
+                                        [disabled]="getTabSections(groupIndex).length === 1">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
