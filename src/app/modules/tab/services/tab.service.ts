@@ -34,13 +34,12 @@ export class TabService {
   }
 
   addTab(tabForm: FormGroup) {
-    const { name, description, organisation, database } = tabForm.value;
+    const { organisation, database, tabs } = tabForm.value;
     return this.http
       .post(TAB.ADD, {
-        name,
-        description,
         organisation,
         database,
+        tabs,
       })
       .pipe(
         map((response: any) => {

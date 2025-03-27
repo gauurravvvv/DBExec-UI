@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { TAB } from 'src/app/constants/routes';
@@ -8,6 +8,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from '../../services/tab.service';
+
 @Component({
   selector: 'app-add-tab',
   templateUrl: './add-tab.component.html',
@@ -22,6 +23,10 @@ export class AddTabComponent implements OnInit {
   selectedOrg: any = null;
   selectedDatabase: any = null;
   databases: any[] = [];
+  isNewlyAdded: boolean = false;
+  lastAddedTabIndex: number = -1;
+  hasDuplicates: boolean = false;
+  duplicateRows: { [key: string]: Array<[number, number]> } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -43,15 +48,15 @@ export class AddTabComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     }
+
+    // Subscribe to form changes to check for duplicates
+    this.tabGroups.valueChanges.subscribe(() => {
+      this.checkForDuplicates();
+    });
   }
 
   initForm() {
     this.tabForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: [
-        '',
-        [Validators.required, Validators.pattern(REGEX.lastName)],
-      ],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
           ? ''
@@ -59,7 +64,52 @@ export class AddTabComponent implements OnInit {
         Validators.required,
       ],
       database: ['', Validators.required],
+      tabs: this.fb.array([this.createTabGroup()]), // Initialize with one tab group
     });
+  }
+
+  createTabGroup(): FormGroup {
+    return this.fb.group({
+      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
+      description: ['', [Validators.pattern(REGEX.lastName)]],
+    });
+  }
+
+  get tabGroups(): FormArray {
+    return this.tabForm.get('tabs') as FormArray;
+  }
+
+  addTabGroup() {
+    this.tabGroups.push(this.createTabGroup());
+    this.lastAddedTabIndex = this.tabGroups.length - 1;
+
+    // First scroll, then highlight
+    this.scrollToBottom();
+    setTimeout(() => {
+      this.isNewlyAdded = true;
+      setTimeout(() => {
+        this.isNewlyAdded = false;
+        this.lastAddedTabIndex = -1;
+      }, 500);
+    }, 300);
+  }
+
+  removeTabGroup(index: number) {
+    if (this.tabGroups.length > 1) {
+      this.tabGroups.removeAt(index);
+    }
+  }
+
+  scrollToBottom(): void {
+    setTimeout(() => {
+      const formElement = document.querySelector('.admin-form');
+      if (formElement) {
+        formElement.scrollTo({
+          top: formElement.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
   }
 
   loadOrganisations() {
@@ -79,8 +129,11 @@ export class AddTabComponent implements OnInit {
   }
 
   onSubmit() {
+    this.checkForDuplicates();
+    if (this.hasDuplicates) {
+      return; // Prevent submission if duplicates exist
+    }
     if (this.tabForm.valid) {
-      console.log(this.tabForm.value);
       this.tabService.addTab(this.tabForm).subscribe({
         next: () => {
           this.router.navigate([TAB.LIST]);
@@ -131,5 +184,40 @@ export class AddTabComponent implements OnInit {
         console.error('Error loading databases:', error);
       },
     });
+  }
+
+  // Add new method to check for duplicates
+  checkForDuplicates() {
+    this.hasDuplicates = false;
+    this.duplicateRows = {};
+
+    const tabGroups = this.tabGroups.controls;
+    const nameMap = new Map<string, number[]>();
+
+    // Build map of names and their indices
+    tabGroups.forEach((group, index) => {
+      const name = group.get('name')?.value?.trim().toLowerCase();
+      if (name) {
+        if (!nameMap.has(name)) {
+          nameMap.set(name, [index]);
+        } else {
+          nameMap.get(name)?.push(index);
+        }
+      }
+    });
+
+    // Check for duplicates
+    nameMap.forEach((indices, name) => {
+      if (indices.length > 1) {
+        this.hasDuplicates = true;
+        this.duplicateRows[name] = indices.map(i => [i, 0]); // Using 0 as column index
+      }
+    });
+  }
+
+  isDuplicateRow(rowIndex: number): boolean {
+    return Object.values(this.duplicateRows).some(duplicates =>
+      duplicates.some(([index]) => index === rowIndex)
+    );
   }
 }

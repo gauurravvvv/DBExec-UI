@@ -8,45 +8,27 @@
                 </button>
                 <h2>Add Tab</h2>
             </div>
+            <div class="warning-section" *ngIf="hasDuplicates">
+                <div class="duplicate-warning">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>Duplicate tab names found. Please remove duplicates to continue.</span>
+                </div>
+            </div>
             <div class="action-buttons">
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
                     [disabled]="!isFormDirty" (click)="onCancel()">
                 </button>
                 <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="tabForm.invalid">
+                    [disabled]="tabForm.invalid || hasDuplicates">
                     <i class="pi pi-save mr-2"></i>
                 </button>
             </div>
         </div>
 
         <!-- Form Section -->
-        <form [formGroup]="tabForm" class="admin-form" #formContainer>
+        <form [formGroup]="tabForm" class="admin-form">
+            <!-- Organisation and Database dropdowns -->
             <div class="form-grid">
-                <!-- Name and Description fields -->
-                <div class="form-field">
-                    <label for="name">Tab Name <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-box"></i>
-                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter tab name"
-                            [ngClass]="{'ng-invalid ng-dirty': tabForm.get('name')?.invalid && tabForm.get('name')?.touched}">
-                    </span>
-                    <small class="error-message" *ngIf="tabForm.get('name')?.invalid && tabForm.get('name')?.touched">
-                        <span *ngIf="tabForm.get('name')?.errors?.['required']">Tab Name is required</span>
-                        <span *ngIf="tabForm.get('name')?.errors?.['pattern']">Tab Name can only contain
-                            letters, spaces and hyphens</span>
-                    </small>
-                </div>
-
-                <div class="form-field">
-                    <label for="description">Description</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-align-left"></i>
-                        <input id="description" pInputText formControlName="description" rows="3"
-                            placeholder="Enter description">
-                    </span>
-                </div>
-
-                <!-- Organisation and Database dropdowns -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
                     <label for="organisation">Organisation<span class="required"> *</span></label>
                     <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
@@ -72,6 +54,60 @@
                         *ngIf="tabForm.get('database')?.invalid && tabForm.get('database')?.touched">
                         Database is required
                     </small>
+                </div>
+
+                <!-- Tab Groups -->
+                <div class="form-field fields-container">
+                    <div class="fields-header">
+                        <label>Tabs<span class="required">*</span></label>
+                        <div class="button-group">
+                            <button pButton type="button" icon="pi pi-plus"
+                                class="p-button-rounded p-button-text add-btn" (click)="addTabGroup()">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="fields-list" formArrayName="tabs">
+                        <div *ngFor="let tabGroup of tabGroups.controls; let i=index" [formGroupName]="i"
+                            class="mapping-row" [class.highlight-animation]="i === lastAddedTabIndex && isNewlyAdded"
+                            [class.duplicate]="isDuplicateRow(i)">
+                            <span class="index-number">{{i + 1}}</span>
+
+                            <div class="mapping-inputs">
+                                <!-- Name field -->
+                                <div class="form-field">
+                                    <label for="name">Name <span class="required"> *</span></label>
+                                    <span class="p-input-icon-left">
+                                        <i class="pi pi-box"></i>
+                                        <input type="text" pInputText formControlName="name"
+                                            placeholder="Enter tab name"
+                                            [ngClass]="{'ng-invalid ng-dirty': tabGroup.get('name')?.invalid && tabGroup.get('name')?.touched}">
+                                    </span>
+                                    <small class="error-message"
+                                        *ngIf="tabGroup.get('name')?.invalid && tabGroup.get('name')?.touched">
+                                        <span *ngIf="tabGroup.get('name')?.errors?.['required']">Tab Name is
+                                            required</span>
+                                        <span *ngIf="tabGroup.get('name')?.errors?.['pattern']">Tab Name can only
+                                            contain letters, spaces and hyphens</span>
+                                    </small>
+                                </div>
+
+                                <!-- Description field -->
+                                <div class="form-field">
+                                    <label for="description">Description</label>
+                                    <span class="p-input-icon-left">
+                                        <i class="pi pi-align-left"></i>
+                                        <input pInputText formControlName="description" placeholder="Enter description">
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button pButton type="button" icon="pi pi-trash"
+                                class="p-button-rounded p-button-text p-button-danger delete-button"
+                                (click)="removeTabGroup(i)" [disabled]="tabGroups.length === 1">
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
