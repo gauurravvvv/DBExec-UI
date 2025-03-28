@@ -981,6 +981,7 @@
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--surface-border);
+  position: relative;
 
   p-dropdown {
     flex: 0 0 300px;
@@ -1002,6 +1003,14 @@
         opacity: 0.6;
       }
     }
+  }
+
+  .error-message {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    color: var(--error-color);
+    font-size: 0.75rem;
   }
 }
 
@@ -1031,5 +1040,26 @@
       font-size: 0.875rem;
       flex-shrink: 0;
     }
+  }
+}
+
+.mapping-inputs {
+  .form-field {
+    position: relative;
+    margin-bottom: 1rem;
+
+    .error-message {
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      color: var(--error-color);
+      font-size: 0.75rem;
+    }
+  }
+}
+
+:host ::ng-deep {
+  .ng-invalid.ng-dirty {
+    border-color: var(--error-color);
   }
 }

@@ -80,15 +80,19 @@
                             <div class="schema-header">
                                 <p-dropdown [options]="getAvailableTabs(groupIndex)" optionLabel="name" optionValue="id"
                                     formControlName="tab" [filter]="true" filterBy="name" [style]="{'width':'300px'}"
-                                    placeholder="Select Tab">
+                                    placeholder="Select Tab" (onChange)="onTabChange($event, groupIndex)"
+                                    [ngClass]="{'ng-invalid ng-dirty': tabGroup.get('tab')?.invalid && tabGroup.get('tab')?.touched}">
                                 </p-dropdown>
+                                <small class="error-message"
+                                    *ngIf="tabGroup.get('tab')?.invalid && tabGroup.get('tab')?.touched">
+                                    Tab is required
+                                </small>
                                 <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
-                                    (click)="addSectionToTab(groupIndex)" [disabled]="!tabGroup.get('tab')?.value"
-                                    [style]="{'color': '#2196f3'}">
+                                    (click)="addSectionToTab(groupIndex)" [style]="{'color': '#2196f3'}">
                                 </button>
                                 <button pButton type="button" icon="pi pi-trash"
                                     class="p-button-rounded p-button-text p-button-danger"
-                                    (click)="removeTabGroup(groupIndex)" [disabled]="tabGroups.length === 1">
+                                    (click)="removeTabGroup(groupIndex)">
                                 </button>
                             </div>
 
@@ -109,8 +113,13 @@
                                             <span class="p-input-icon-left">
                                                 <i class="pi pi-box"></i>
                                                 <input type="text" pInputText formControlName="name"
-                                                    placeholder="Enter section name">
+                                                    placeholder="Enter section name"
+                                                    [ngClass]="{'ng-invalid ng-dirty': section.get('name')?.invalid && section.get('name')?.touched}">
                                             </span>
+                                            <small class="error-message"
+                                                *ngIf="section.get('name')?.invalid && section.get('name')?.touched">
+                                                Name is required
+                                            </small>
                                         </div>
 
                                         <!-- Description field -->
@@ -125,8 +134,7 @@
 
                                     <button pButton type="button" icon="pi pi-trash"
                                         class="p-button-rounded p-button-text p-button-danger"
-                                        (click)="removeSectionFromTab(groupIndex, sectionIndex)"
-                                        [disabled]="getTabSections(groupIndex).length === 1">
+                                        (click)="removeSectionFromTab(groupIndex, sectionIndex)">
                                     </button>
                                 </div>
                             </div>

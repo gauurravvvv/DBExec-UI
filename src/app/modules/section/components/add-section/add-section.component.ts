@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
-import { SECTION, TAB } from 'src/app/constants/routes';
+import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
@@ -51,6 +51,11 @@ export class AddSectionComponent implements OnInit {
   ngOnInit() {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
+    } else {
+      this.selectedOrg = {
+        id: this.globalService.getTokenDetails('organisationId'),
+      };
+      this.loadDatabases();
     }
 
     this.sectionForm.valueChanges.subscribe(() => {
@@ -61,14 +66,22 @@ export class AddSectionComponent implements OnInit {
   initForm() {
     this.sectionForm = this.fb.group({
       organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
-          ? ''
-          : this.globalService.getTokenDetails('organisationId'),
+        {
+          value:
+            this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
+              ? ''
+              : this.globalService.getTokenDetails('organisationId'),
+          disabled: false,
+        },
         Validators.required,
       ],
-      database: ['', Validators.required],
-      tabGroups: this.fb.array([this.createTabGroup()]),
+      database: [{ value: '', disabled: true }, Validators.required],
+      tabGroups: this.fb.array([]),
     });
+
+    if (!this.showOrganisationDropdown) {
+      this.sectionForm.get('database')?.enable();
+    }
   }
 
   get tabGroups(): FormArray {
@@ -85,10 +98,7 @@ export class AddSectionComponent implements OnInit {
   createSection(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: [
-        '',
-        [Validators.required, Validators.pattern(REGEX.lastName)],
-      ],
+      description: [''],
     });
   }
 
@@ -283,6 +293,12 @@ export class AddSectionComponent implements OnInit {
       id: event.value,
     };
     this.selectedDatabase = null;
+
+    const databaseControl = this.sectionForm.get('database');
+    databaseControl?.enable();
+    databaseControl?.setValue('');
+
+    this.clearAllTabs();
     this.loadDatabases();
   }
 
@@ -333,5 +349,15 @@ export class AddSectionComponent implements OnInit {
         console.error('Error loading tabs:', error);
       },
     });
+  }
+
+  onTabChange(event: any, groupIndex: number) {
+    if (event.value) {
+      const sections = this.getTabSections(groupIndex);
+      while (sections.length !== 0) {
+        sections.removeAt(0);
+      }
+      sections.push(this.createSection());
+    }
   }
 }

@@ -57,7 +57,7 @@
                 </div>
 
                 <!-- Tab Groups -->
-                <div class="form-field fields-container">
+                <div class="form-field fields-container" *ngIf="tabForm.get('database')?.value">
                     <div class="fields-header">
                         <label>Tabs<span class="required">*</span></label>
                         <div class="button-group">
@@ -104,7 +104,7 @@
 
                             <button pButton type="button" icon="pi pi-trash"
                                 class="p-button-rounded p-button-text p-button-danger delete-button"
-                                (click)="removeTabGroup(i)" [disabled]="tabGroups.length === 1">
+                                (click)="removeTabGroup(i)">
                             </button>
                         </div>
                     </div>

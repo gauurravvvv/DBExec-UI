@@ -81,3 +81,10 @@ export const SECTION = {
   EDIT: '/app/section/edit',
   VIEW: '/app/section/view',
 };
+
+export const PROMPT = {
+  ADD: '/app/prompt/add',
+  LIST: '/app/prompt',
+  EDIT: '/app/prompt/edit',
+  VIEW: '/app/prompt/view',
+};

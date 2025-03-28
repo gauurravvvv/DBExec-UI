@@ -47,6 +47,11 @@ export class AddTabComponent implements OnInit {
   ngOnInit() {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
+    } else {
+      this.selectedOrg = {
+        id: this.globalService.getTokenDetails('organisationId'),
+      };
+      this.loadDatabases();
     }
 
     // Subscribe to form changes to check for duplicates
@@ -58,14 +63,22 @@ export class AddTabComponent implements OnInit {
   initForm() {
     this.tabForm = this.fb.group({
       organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
-          ? ''
-          : this.globalService.getTokenDetails('organisationId'),
+        {
+          value:
+            this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
+              ? ''
+              : this.globalService.getTokenDetails('organisationId'),
+          disabled: false,
+        },
         Validators.required,
       ],
-      database: ['', Validators.required],
-      tabs: this.fb.array([this.createTabGroup()]), // Initialize with one tab group
+      database: [{ value: '', disabled: true }, Validators.required],
+      tabs: this.fb.array([]),
     });
+
+    if (!this.showOrganisationDropdown) {
+      this.tabForm.get('database')?.enable();
+    }
   }
 
   createTabGroup(): FormGroup {
@@ -97,6 +110,8 @@ export class AddTabComponent implements OnInit {
   removeTabGroup(index: number) {
     if (this.tabGroups.length > 1) {
       this.tabGroups.removeAt(index);
+    } else {
+      this.clearAllTabs();
     }
   }
 
@@ -164,7 +179,37 @@ export class AddTabComponent implements OnInit {
       id: event.value,
     };
     this.selectedDatabase = null;
+
+    const databaseControl = this.tabForm.get('database');
+    databaseControl?.enable();
+    databaseControl?.setValue('');
+
+    this.clearAllTabs();
     this.loadDatabases();
+  }
+
+  onDatabaseChange(event: any) {
+    if (event.value) {
+      this.selectedDatabase = {
+        id: event.value,
+      };
+
+      // Clear existing tabs and add a default one
+      if (this.tabGroups.length === 0) {
+        this.tabGroups.push(this.createTabGroup());
+        this.lastAddedTabIndex = this.tabGroups.length - 1;
+
+        // First scroll, then highlight (same pattern as addTabGroup)
+        this.scrollToBottom();
+        setTimeout(() => {
+          this.isNewlyAdded = true;
+          setTimeout(() => {
+            this.isNewlyAdded = false;
+            this.lastAddedTabIndex = -1;
+          }, 500);
+        }, 300);
+      }
+    }
   }
 
   private loadDatabases() {
@@ -219,5 +264,12 @@ export class AddTabComponent implements OnInit {
     return Object.values(this.duplicateRows).some(duplicates =>
       duplicates.some(([index]) => index === rowIndex)
     );
+  }
+
+  clearAllTabs() {
+    while (this.tabGroups.length !== 0) {
+      this.tabGroups.removeAt(0);
+    }
+    this.addTabGroup();
   }
 }
