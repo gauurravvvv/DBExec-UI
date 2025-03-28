@@ -136,9 +136,54 @@ export class SidebarComponent implements OnInit {
   }
 
   private checkScreenSize() {
+    const wasMobile = this.isMobile;
     this.isMobile = window.innerWidth <= 768;
-    if (this.isMobile) {
+
+    // If transitioning to mobile/small screen
+    if (!wasMobile && this.isMobile) {
+      // First collapse all menu items
+      this.menuItems.forEach(item => {
+        if (item.isExpanded) {
+          item.isExpanded = false;
+          // Also collapse any sub-items
+          if (item.subPermissions) {
+            item.subPermissions.forEach(subItem => {
+              if (subItem.isExpanded) {
+                subItem.isExpanded = false;
+                // Handle nested items if any
+                if (subItem.subPermissions) {
+                  subItem.subPermissions.forEach(nestedItem => {
+                    nestedItem.isExpanded = false;
+                  });
+                }
+              }
+            });
+          }
+        }
+      });
+
+      // Then collapse the sidebar
       this.isExpanded = false;
     }
+  }
+
+  collapseAllAndToggle() {
+    // First collapse all expanded items
+    this.menuItems.forEach(item => {
+      if (item.isExpanded) {
+        item.isExpanded = false;
+        // Also collapse any sub-items
+        if (item.subPermissions) {
+          item.subPermissions.forEach(subItem => {
+            if (subItem.isExpanded) {
+              subItem.isExpanded = false;
+            }
+          });
+        }
+      }
+    });
+
+    // Then toggle the sidebar
+    this.toggleSidebar();
   }
 }

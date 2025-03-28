@@ -6,7 +6,7 @@
     </button>
   </div>
 
-  <button *ngIf="isExpanded" class="toggle-btn outside" (click)="toggleSidebarAndCollapseAll()">
+  <button *ngIf="isExpanded" class="toggle-btn outside" (click)="collapseAllAndToggle()">
     <i class="pi" [ngClass]="{'pi-chevron-right': !isExpanded, 'pi-chevron-left': isExpanded}"></i>
   </button>
 

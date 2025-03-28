@@ -9,6 +9,13 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 
+interface TreeNode {
+  key: string;
+  label: string;
+  data: any;
+  children?: TreeNode[];
+}
+
 @Component({
   selector: 'app-list-prompt',
   templateUrl: './list-prompt.component.html',
@@ -37,6 +44,9 @@ export class ListPromptComponent implements OnInit {
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
+
+  tabTreeNodes: TreeNode[] = [];
+  selectedNode: TreeNode | null = null;
 
   statusFilterItems: MenuItem[] = [
     {
@@ -105,7 +115,19 @@ export class ListPromptComponent implements OnInit {
   }
 
   onTabChange(event: any) {
-    this.selectedTab = event.value;
+    const selectedNode = event.node;
+    if (selectedNode.children) {
+      this.selectedTab = selectedNode.data;
+    } else {
+      const parentTab = this.tabs.find(tab =>
+        tab.sections?.some(
+          (section: any) => section.id === selectedNode.data.id
+        )
+      );
+      if (parentTab) {
+        this.selectedTab = parentTab;
+      }
+    }
     this.currentPage = 1;
     this.loadSections();
   }
@@ -170,6 +192,8 @@ export class ListPromptComponent implements OnInit {
         this.tabs = response.data;
         if (this.tabs.length > 0) {
           this.selectedTab = this.tabs[0];
+          this.tabTreeNodes = this.transformToTreeNodes(this.tabs);
+          this.selectedNode = this.tabTreeNodes[0];
           this.loadSections();
         }
       },
@@ -256,5 +280,18 @@ export class ListPromptComponent implements OnInit {
   onEditTab(tab: any) {
     // Handle edit action
     this.router.navigate([SECTION.EDIT, this.selectedOrg.id, tab.id]);
+  }
+
+  transformToTreeNodes(tabs: any[]): TreeNode[] {
+    return tabs.map(tab => ({
+      key: `tab-${tab.id}`,
+      label: tab.name,
+      data: tab,
+      children: tab.sections?.map((section: any) => ({
+        key: `section-${section.id}`,
+        label: section.name,
+        data: section,
+      })),
+    }));
   }
 }

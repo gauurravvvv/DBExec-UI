@@ -50,12 +50,12 @@
                         <!-- Tab Dropdown -->
                         <div class="dropdown-field">
                             <span class="p-float-label">
-                                <p-dropdown [options]="tabs" [(ngModel)]="selectedTab" optionLabel="name"
-                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                    [panelStyle]="{'width':'100%'}" (onChange)="onTabChange($event)"
-                                    inputId="db-dropdown">
-                                </p-dropdown>
-                                <label for="db-dropdown">Tab</label>
+                                <p-treeSelect [(ngModel)]="selectedNode" [options]="tabTreeNodes" selectionMode="single"
+                                    [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                                    (onNodeSelect)="onTabChange($event)" placeholder="Select Tab"
+                                    inputId="tab-treeselect">
+                                </p-treeSelect>
+                                <label for="tab-treeselect">Tab</label>
                             </span>
                         </div>
                     </div>
