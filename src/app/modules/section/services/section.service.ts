@@ -33,16 +33,13 @@ export class SectionService {
     );
   }
 
-  addSection(sectionForm: FormGroup) {
-    const { name, description, organisation, database, tab } =
-      sectionForm.value;
+  addSection(formData: any) {
+    const { organisation, database, sections } = formData;
     return this.http
       .post(SECTION.ADD, {
-        name,
-        description,
         organisation,
         database,
-        tab,
+        sections,
       })
       .pipe(
         map((response: any) => {

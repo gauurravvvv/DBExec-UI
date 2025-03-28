@@ -44,7 +44,6 @@ export class AddSectionComponent implements OnInit {
     this.initForm();
   }
 
-  // Add getter for form dirty state
   get isFormDirty(): boolean {
     return this.sectionForm.dirty;
   }
@@ -101,7 +100,6 @@ export class AddSectionComponent implements OnInit {
     this.tabGroups.push(this.createTabGroup());
     this.lastAddedGroupIndex = this.tabGroups.length - 1;
 
-    // First scroll, then highlight
     this.scrollToBottom();
     setTimeout(() => {
       this.isNewlyAdded = true;
@@ -131,7 +129,6 @@ export class AddSectionComponent implements OnInit {
     this.lastAddedSectionIndex = sections.length - 1;
     this.lastAddedGroupIndex = groupIndex;
 
-    // First scroll, then highlight
     this.scrollToBottom();
     setTimeout(() => {
       this.isNewlyAddedSection = true;
@@ -175,12 +172,10 @@ export class AddSectionComponent implements OnInit {
     this.hasDuplicates = false;
     this.duplicateRows = {};
 
-    // Check each tab group separately
     this.tabGroups.controls.forEach((group, groupIndex) => {
       const nameMap = new Map<string, Array<number>>();
       const sections = this.getTabSections(groupIndex);
 
-      // Check sections within this tab group
       sections.controls.forEach((section, sectionIndex) => {
         const name = section.get('name')?.value?.trim().toLowerCase();
         if (name) {
@@ -192,7 +187,6 @@ export class AddSectionComponent implements OnInit {
         }
       });
 
-      // Check for duplicates within this tab group
       nameMap.forEach((sectionIndices, name) => {
         if (sectionIndices.length > 1) {
           this.hasDuplicates = true;
@@ -205,7 +199,6 @@ export class AddSectionComponent implements OnInit {
   }
 
   isDuplicateRow(groupIndex: number, sectionIndex: number): boolean {
-    // Check only within the same tab group
     return Object.values(this.duplicateRows).some(positions =>
       positions.some(([g, s]) => g === groupIndex && s === sectionIndex)
     );
@@ -232,8 +225,17 @@ export class AddSectionComponent implements OnInit {
     if (this.hasDuplicates) {
       return;
     }
+
     if (this.sectionForm.valid) {
-      this.sectionService.addSection(this.sectionForm).subscribe({
+      const formValue = this.sectionForm.value;
+
+      const transformedData = {
+        organisation: formValue.organisation,
+        database: formValue.database,
+        sections: this.transformSections(formValue.tabGroups),
+      };
+
+      this.sectionService.addSection(transformedData).subscribe({
         next: () => {
           this.router.navigate([SECTION.LIST]);
         },
@@ -249,6 +251,24 @@ export class AddSectionComponent implements OnInit {
         }
       });
     }
+  }
+
+  private transformSections(tabGroups: any[]): any[] {
+    const sections: any[] = [];
+
+    tabGroups.forEach(group => {
+      if (group.tab) {
+        group.sections.forEach((section: any) => {
+          sections.push({
+            name: section.name,
+            description: section.description,
+            tabId: group.tab,
+          });
+        });
+      }
+    });
+
+    return sections;
   }
 
   onCancel() {
@@ -291,7 +311,6 @@ export class AddSectionComponent implements OnInit {
         id: event.value,
       };
       this.loadTabs();
-      // Reset tab groups when database changes
       while (this.tabGroups.length !== 0) {
         this.tabGroups.removeAt(0);
       }

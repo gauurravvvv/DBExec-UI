@@ -28,31 +28,6 @@
         <!-- Form Section -->
         <form [formGroup]="sectionForm" class="admin-form">
             <div class="form-grid">
-                <!-- Name and Description fields -->
-                <div class="form-field">
-                    <label for="name">Section Name <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-box"></i>
-                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter section name"
-                            [ngClass]="{'ng-invalid ng-dirty': sectionForm.get('name')?.invalid && sectionForm.get('name')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="sectionForm.get('name')?.invalid && sectionForm.get('name')?.touched">
-                        <span *ngIf="sectionForm.get('name')?.errors?.['required']">Section Name is required</span>
-                        <span *ngIf="sectionForm.get('name')?.errors?.['pattern']">Section Name can only contain
-                            letters, spaces and hyphens</span>
-                    </small>
-                </div>
-
-                <div class="form-field">
-                    <label for="description">Description</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-align-left"></i>
-                        <input id="description" pInputText formControlName="description" rows="3"
-                            placeholder="Enter description">
-                    </span>
-                </div>
-
                 <!-- Organisation and Database dropdowns -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
                     <label for="organisation">Organisation<span class="required"> *</span></label>
