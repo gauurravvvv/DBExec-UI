@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
-import { SECTION, TAB } from 'src/app/constants/routes';
+import { PROMPT, SECTION, TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
@@ -249,14 +249,14 @@ export class AddPromptComponent implements OnInit {
       };
 
       console.log(transformedData);
-      // this.promptService.addPrompt(transformedData).subscribe({
-      //   next: () => {
-      //     this.router.navigate(['/prompts/list']);
-      //   },
-      //   error: (error: any) => {
-      //     console.error('Error adding prompt:', error);
-      //   },
-      // });
+      this.promptService.addPrompt(transformedData).subscribe({
+        next: () => {
+          this.router.navigate([PROMPT.LIST]);
+        },
+        error: (error: any) => {
+          console.error('Error adding prompt:', error);
+        },
+      });
     } else {
       Object.keys(this.sectionForm.controls).forEach(key => {
         const control = this.sectionForm.get(key);

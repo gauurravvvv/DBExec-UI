@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
-import { SUPER_ADMIN } from 'src/app/constants/api';
+import { PROMPT, SUPER_ADMIN } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
@@ -31,17 +31,14 @@ export class PromptService {
     );
   }
 
-  addSuperAdmin(superAdminForm: FormGroup) {
-    const { firstName, lastName, username, password, email, mobile } =
-      superAdminForm.value;
+  addPrompt(promptForm: any) {
+    const { organisation, database, tab, prompts } = promptForm;
     return this.http
-      .post(SUPER_ADMIN.ADD, {
-        firstName,
-        lastName,
-        username,
-        password,
-        email,
-        mobile,
+      .post(PROMPT.ADD, {
+        organisation,
+        database,
+        tab,
+        prompts,
       })
       .pipe(
         map((response: any) => {

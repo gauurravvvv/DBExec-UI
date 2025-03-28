@@ -112,3 +112,11 @@ export const SECTION = {
   VIEW: '/section/get/',
   UPDATE: '/section/update',
 };
+
+export const PROMPT = {
+  ADD: '/prompt/add',
+  LIST: '/prompt/list',
+  DELETE: '/prompt/delete/',
+  VIEW: '/prompt/get/',
+  UPDATE: '/prompt/update',
+};
