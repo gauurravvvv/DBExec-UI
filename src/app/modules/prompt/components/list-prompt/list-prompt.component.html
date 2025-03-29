@@ -50,12 +50,20 @@
                         <!-- Tab Dropdown -->
                         <div class="dropdown-field">
                             <span class="p-float-label">
-                                <p-treeSelect [(ngModel)]="selectedNode" [options]="tabTreeNodes" selectionMode="single"
-                                    [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                                    (onNodeSelect)="onTabChange($event)" placeholder="Select Tab"
-                                    inputId="tab-treeselect">
-                                </p-treeSelect>
-                                <label for="tab-treeselect">Tab</label>
+                                <div class="custom-tree-select p-input-wrapper"
+                                    [class.p-inputwrapper-filled]="selectedNode?.label" [class.expanded]="treeExpanded"
+                                    (click)="onTreeClick()">
+                                    <span class="selected-value">{{ (selectedNode && !selectedNode.children) ?
+                                        selectedNode.label : 'Select Section' }}</span>
+                                    <i class="pi pi-chevron-down" [class.expanded]="treeExpanded"></i>
+                                </div>
+                                <div class="tree-container" *ngIf="treeExpanded">
+                                    <p-tree [value]="tabTreeNodes" selectionMode="single" [(selection)]="selectedNode"
+                                        (onNodeSelect)="onTabChange($event)" [style]="{'width':'100%'}"
+                                        class="tree-dropdown">
+                                    </p-tree>
+                                </div>
+                                <label>Tab & Section</label>
                             </span>
                         </div>
                     </div>

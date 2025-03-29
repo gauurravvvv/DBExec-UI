@@ -8,12 +8,14 @@ import { DatabaseService } from 'src/app/modules/database/services/database.serv
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
+import { HostListener } from '@angular/core';
 
 interface TreeNode {
   key: string;
   label: string;
   data: any;
   children?: TreeNode[];
+  expanded?: boolean;
 }
 
 @Component({
@@ -47,6 +49,8 @@ export class ListPromptComponent implements OnInit {
 
   tabTreeNodes: TreeNode[] = [];
   selectedNode: TreeNode | null = null;
+
+  treeExpanded: boolean = false;
 
   statusFilterItems: MenuItem[] = [
     {
@@ -116,18 +120,31 @@ export class ListPromptComponent implements OnInit {
 
   onTabChange(event: any) {
     const selectedNode = event.node;
+
+    // If it's a parent node (has children)
     if (selectedNode.children) {
-      this.selectedTab = selectedNode.data;
-    } else {
-      const parentTab = this.tabs.find(tab =>
-        tab.sections?.some(
-          (section: any) => section.id === selectedNode.data.id
-        )
-      );
-      if (parentTab) {
-        this.selectedTab = parentTab;
-      }
+      // Toggle expanded state
+      selectedNode.expanded = !selectedNode.expanded;
+      // Don't update selection for parent nodes
+      return;
     }
+
+    // For child nodes, find the parent tab and update selection
+    const parentTab = this.tabs.find(tab =>
+      tab.sections?.some((section: any) => section.id === selectedNode.data.id)
+    );
+    if (parentTab) {
+      this.selectedTab = parentTab;
+    }
+
+    // Close tree and collapse all parent nodes when child is selected
+    this.treeExpanded = false;
+    this.tabTreeNodes.forEach(node => {
+      if (node.children) {
+        node.expanded = false;
+      }
+    });
+
     this.currentPage = 1;
     this.loadSections();
   }
@@ -287,11 +304,41 @@ export class ListPromptComponent implements OnInit {
       key: `tab-${tab.id}`,
       label: tab.name,
       data: tab,
+      expanded: false,
       children: tab.sections?.map((section: any) => ({
         key: `section-${section.id}`,
         label: section.name,
         data: section,
       })),
     }));
+  }
+
+  onTreeClick() {
+    this.treeExpanded = !this.treeExpanded;
+
+    // If closing the tree, collapse all parent nodes
+    if (!this.treeExpanded) {
+      this.tabTreeNodes.forEach(node => {
+        if (node.children) {
+          node.expanded = false;
+        }
+      });
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const dropdownElement = (event.target as HTMLElement).closest(
+      '.dropdown-field'
+    );
+    if (!dropdownElement) {
+      this.treeExpanded = false;
+      // Collapse all parent nodes when clicking outside
+      this.tabTreeNodes.forEach(node => {
+        if (node.children) {
+          node.expanded = false;
+        }
+      });
+    }
   }
 }
