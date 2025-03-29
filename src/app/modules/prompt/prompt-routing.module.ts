@@ -14,8 +14,8 @@ const routes: Routes = [
     path: 'add',
     component: AddPromptComponent,
   },
-  { path: 'view/:id', component: ViewPromptComponent },
-  { path: 'edit/:id', component: EditPromptComponent },
+  { path: 'view/:orgId/:id', component: ViewPromptComponent },
+  { path: 'edit/:orgId/:id', component: EditPromptComponent },
 ];
 
 @NgModule({

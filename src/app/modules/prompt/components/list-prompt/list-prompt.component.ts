@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { PROMPT, SECTION } from 'src/app/constants/routes';
+import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
@@ -281,7 +281,7 @@ export class ListPromptComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([SECTION.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([PROMPT.EDIT, this.selectedOrg.id, id]);
   }
 
   confirmDelete(id: string) {
