@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { PROMPT, SECTION } from 'src/app/constants/routes';
@@ -8,7 +8,7 @@ import { DatabaseService } from 'src/app/modules/database/services/database.serv
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
-import { HostListener } from '@angular/core';
+import { PromptService } from '../../services/prompt.service';
 
 interface TreeNode {
   key: string;
@@ -25,7 +25,7 @@ interface TreeNode {
 })
 export class ListPromptComponent implements OnInit {
   users: any[] = [];
-  filteredSections: any[] = [];
+  filteredPrompts: any[] = [];
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
@@ -34,15 +34,17 @@ export class ListPromptComponent implements OnInit {
   searchTerm: string = '';
   selectedStatus: number | null = null;
   showDeleteConfirm = false;
-  sectionToDelete: string | null = null;
+  promptToDelete: string | null = null;
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
+  prompts: any[] = [];
   tabs: any[] = [];
   sections: any[] = [];
   selectedOrg: any = {};
   selectedDatabase: any = {};
   selectedTab: any = {};
+  selectedSection: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
@@ -73,7 +75,8 @@ export class ListPromptComponent implements OnInit {
     private organisationService: OrganisationService,
     private tabService: TabService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
+    private promptService: PromptService
   ) {}
 
   ngOnInit() {
@@ -121,15 +124,11 @@ export class ListPromptComponent implements OnInit {
   onTabChange(event: any) {
     const selectedNode = event.node;
 
-    // If it's a parent node (has children)
     if (selectedNode.children) {
-      // Toggle expanded state
       selectedNode.expanded = !selectedNode.expanded;
-      // Don't update selection for parent nodes
       return;
     }
 
-    // For child nodes, find the parent tab and update selection
     const parentTab = this.tabs.find(tab =>
       tab.sections?.some((section: any) => section.id === selectedNode.data.id)
     );
@@ -137,7 +136,6 @@ export class ListPromptComponent implements OnInit {
       this.selectedTab = parentTab;
     }
 
-    // Close tree and collapse all parent nodes when child is selected
     this.treeExpanded = false;
     this.tabTreeNodes.forEach(node => {
       if (node.children) {
@@ -145,8 +143,30 @@ export class ListPromptComponent implements OnInit {
       }
     });
 
-    this.currentPage = 1;
-    this.loadSections();
+    this.selectedSection = event.node.data;
+    this.loadPrompts();
+  }
+
+  loadPrompts() {
+    if (!this.selectedSection) return;
+    const params = {
+      orgId: this.selectedOrg.id,
+      sectionId: this.selectedSection.id,
+    };
+
+    this.promptService.listPrompt(params).subscribe({
+      next: (response: any) => {
+        this.prompts = response.data;
+        this.filteredPrompts = [...this.prompts];
+        this.totalItems = this.prompts.length;
+        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+        this.generatePageNumbers();
+        this.applyFilters();
+      },
+      error: error => {
+        console.error('Error loading databases:', error);
+      },
+    });
   }
 
   loadDatabases() {
@@ -183,11 +203,10 @@ export class ListPromptComponent implements OnInit {
     this.sectionService.listSection(params).subscribe({
       next: (response: any) => {
         this.sections = response.data;
-        this.filteredSections = [...this.sections];
-        this.totalItems = this.sections.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
+        if (this.sections.length > 0) {
+          this.selectedSection = this.sections[0];
+          this.loadPrompts();
+        }
       },
       error: error => {
         console.error('Error loading databases:', error);
@@ -240,21 +259,21 @@ export class ListPromptComponent implements OnInit {
   }
 
   applyFilters() {
-    let filtered = [...this.sections];
+    let filtered = [...this.prompts];
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(section =>
-        section.name.toLowerCase().includes(search)
+      filtered = filtered.filter(prompt =>
+        prompt.name.toLowerCase().includes(search)
       );
     }
 
     if (this.selectedStatus !== null) {
       filtered = filtered.filter(
-        section => section.status === this.selectedStatus
+        prompt => prompt.status === this.selectedStatus
       );
     }
 
-    this.filteredSections = filtered;
+    this.filteredPrompts = filtered;
   }
 
   onAddNewPrompt() {
@@ -266,37 +285,36 @@ export class ListPromptComponent implements OnInit {
   }
 
   confirmDelete(id: string) {
-    this.sectionToDelete = id;
+    this.promptToDelete = id;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
-    this.sectionToDelete = null;
+    this.promptToDelete = null;
   }
 
   proceedDelete() {
-    if (this.sectionToDelete) {
-      this.sectionService
-        .deleteSection(this.selectedOrg.id, this.sectionToDelete)
+    if (this.promptToDelete) {
+      this.promptService
+        .deletePrompt(this.selectedOrg.id, this.promptToDelete)
         .subscribe({
           next: () => {
-            this.loadSections();
+            this.loadPrompts();
             this.showDeleteConfirm = false;
-            this.sectionToDelete = null;
+            this.promptToDelete = null;
           },
           error: error => {
-            console.error('Error deleting tab:', error);
+            console.error('Error deleting prompt:', error);
             this.showDeleteConfirm = false;
-            this.sectionToDelete = null;
+            this.promptToDelete = null;
           },
         });
     }
   }
 
   onEditTab(tab: any) {
-    // Handle edit action
-    this.router.navigate([SECTION.EDIT, this.selectedOrg.id, tab.id]);
+    this.router.navigate([PROMPT.EDIT, this.selectedOrg.id, tab.id]);
   }
 
   transformToTreeNodes(tabs: any[]): TreeNode[] {
@@ -316,7 +334,6 @@ export class ListPromptComponent implements OnInit {
   onTreeClick() {
     this.treeExpanded = !this.treeExpanded;
 
-    // If closing the tree, collapse all parent nodes
     if (!this.treeExpanded) {
       this.tabTreeNodes.forEach(node => {
         if (node.children) {
@@ -333,7 +350,7 @@ export class ListPromptComponent implements OnInit {
     );
     if (!dropdownElement) {
       this.treeExpanded = false;
-      // Collapse all parent nodes when clicking outside
+
       this.tabTreeNodes.forEach(node => {
         if (node.children) {
           node.expanded = false;

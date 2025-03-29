@@ -75,7 +75,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            <th>Prompts</th>
+                            <th>Type</th>
                             <th>
                                 Status
                                 <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
@@ -91,33 +91,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="filteredSections && filteredSections.length > 0; else noData">
-                            <tr *ngFor="let section of filteredSections">
+                        <ng-container *ngIf="filteredPrompts && filteredPrompts.length > 0; else noData">
+                            <tr *ngFor="let prompt of filteredPrompts">
                                 <td>
                                     <a class="admin-name"
-                                        [routerLink]="['/app/section/view', selectedOrg.id, section.id]">
-                                        {{ section.name }}
+                                        [routerLink]="['/app/prompt/view', selectedOrg.id, prompt.id]">
+                                        {{ prompt.name }}
                                     </a>
                                 </td>
-                                <td>{{ section.description }}</td>
+                                <td>{{ prompt.description }}</td>
+                                <td>{{ prompt.type }}</td>
                                 <td>
-                                    <span class="field-count">
-                                        <i class="pi pi-list"></i>
-                                        {{ section.prompts.length }} prompts
+                                    <span class="status-badge" [class.active]="prompt.status === 1">
+                                        {{ prompt.status === 1 ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
-                                <td>
-                                    <span class="status-badge" [class.active]="section.status === 1">
-                                        {{ section.status === 1 ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </td>
-                                <td>{{ section.createdOn | date:'mediumDate' }}</td>
+                                <td>{{ prompt.createdOn | date:'mediumDate' }}</td>
                                 <td class="actions">
-                                    <button class="action-btn edit" (click)="onEdit(section.id)" title="Edit">
+                                    <button class="action-btn edit" (click)="onEdit(prompt.id)" title="Edit">
                                         <i class="pi pi-pencil"></i>
                                     </button>
-                                    <button class="action-btn delete" (click)="confirmDelete(section.id)"
-                                        title="Delete">
+                                    <button class="action-btn delete" (click)="confirmDelete(prompt.id)" title="Delete">
                                         <i class="pi pi-trash"></i>
                                     </button>
                                 </td>
@@ -128,8 +122,8 @@
                                 <td colspan="6">
                                     <div class="no-data">
                                         <i class="pi pi-plus-circle"></i>
-                                        <p>No sections found</p>
-                                        <span class="sub-text">Click on + to create a new section</span>
+                                        <p>No prompts found</p>
+                                        <span class="sub-text">Click on + to create a new prompt</span>
                                     </div>
                                 </td>
                             </tr>
@@ -169,7 +163,7 @@
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
         <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this section?</p>
+        <p>Are you sure you want to delete this prompt?</p>
         <div class="popup-actions">
             <button class="btn-cancel" (click)="cancelDelete()">No</button>
             <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
