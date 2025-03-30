@@ -30,17 +30,23 @@ export class EditTabComponent implements OnInit {
     private globalService: GlobalService,
     private messageService: MessageService,
     private tabService: TabService
-  ) {}
+  ) {
+    this.initForm();
+  }
 
   ngOnInit(): void {
-    this.initForm();
-
     this.tabId = this.route.snapshot.params['id'];
     this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.tabId) {
       this.loadTabData();
     }
+
+    this.tabForm.valueChanges.subscribe(() => {
+      if (this.isCancelClicked) {
+        this.isCancelClicked = false;
+      }
+    });
   }
 
   get isFormDirty(): boolean {
@@ -122,7 +128,6 @@ export class EditTabComponent implements OnInit {
       this.selectedOrgName = this.tabData.organisationName;
       this.isCancelClicked = true;
       this.tabForm.markAsPristine();
-      this.isCancelClicked = true;
     } else {
       this.router.navigate([TAB.LIST]);
     }

@@ -48,8 +48,8 @@ export class PromptService {
       );
   }
 
-  viewSuperAdmin(id: string) {
-    return this.http.get(SUPER_ADMIN.VIEW + `${id}`).pipe(
+  viewPrompt(orgId: string, id: string) {
+    return this.http.get(PROMPT.VIEW + `${orgId}/${id}`).pipe(
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
@@ -57,17 +57,30 @@ export class PromptService {
     );
   }
 
-  updateSuperAdmin(superAdminForm: FormGroup) {
-    const { id, firstName, lastName, username, email, mobile, status } =
-      superAdminForm.getRawValue();
+  updatePrompt(promptForm: FormGroup) {
+    const {
+      id,
+      organisation,
+      database,
+      tab,
+      section,
+      name,
+      type,
+      mandatory,
+      description,
+      status,
+    } = promptForm.value;
     return this.http
-      .put(SUPER_ADMIN.UPDATE, {
+      .put(PROMPT.UPDATE, {
         id,
-        firstName,
-        lastName,
-        username,
-        email,
-        mobile,
+        organisation,
+        database,
+        tab,
+        section,
+        name,
+        type,
+        mandatory,
+        description,
         status: status ? 1 : 0,
       })
       .pipe(

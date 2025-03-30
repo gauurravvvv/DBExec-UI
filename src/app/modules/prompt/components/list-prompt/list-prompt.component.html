@@ -58,7 +58,8 @@
                                     <i class="pi pi-chevron-down" [class.expanded]="treeExpanded"></i>
                                 </div>
                                 <div class="tree-container" *ngIf="treeExpanded">
-                                    <p-tree [value]="tabTreeNodes" selectionMode="single" [(selection)]="selectedNode"
+                                    <p-tree [value]="tabTreeNodes" [filter]="true" filterPlaceholder="Search"
+                                        filterMode="strict" selectionMode="single" [(selection)]="selectedNode"
                                         (onNodeSelect)="onTabChange($event)" [style]="{'width':'100%'}"
                                         class="tree-dropdown">
                                     </p-tree>

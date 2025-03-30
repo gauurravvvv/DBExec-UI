@@ -16,6 +16,9 @@ interface TreeNode {
   data: any;
   children?: TreeNode[];
   expanded?: boolean;
+  selectable?: boolean;
+  leaf?: boolean;
+  type?: 'tab' | 'section';
 }
 
 @Component({
@@ -124,27 +127,16 @@ export class ListPromptComponent implements OnInit {
   onTabChange(event: any) {
     const selectedNode = event.node;
 
-    if (selectedNode.children) {
+    if (selectedNode.type === 'tab') {
       selectedNode.expanded = !selectedNode.expanded;
-      return;
+      this.selectedTab = selectedNode.data;
+    } else if (selectedNode.type === 'section') {
+      this.selectedSection = selectedNode.data;
+      this.selectedTab = this.tabs.find(
+        tab => tab.id === selectedNode.data.tabId
+      );
+      this.loadPrompts();
     }
-
-    const parentTab = this.tabs.find(tab =>
-      tab.sections?.some((section: any) => section.id === selectedNode.data.id)
-    );
-    if (parentTab) {
-      this.selectedTab = parentTab;
-    }
-
-    this.treeExpanded = false;
-    this.tabTreeNodes.forEach(node => {
-      if (node.children) {
-        node.expanded = false;
-      }
-    });
-
-    this.selectedSection = event.node.data;
-    this.loadPrompts();
   }
 
   loadPrompts() {
@@ -191,29 +183,6 @@ export class ListPromptComponent implements OnInit {
     });
   }
 
-  loadSections() {
-    if (!this.selectedOrg) return;
-    const params = {
-      orgId: this.selectedOrg.id,
-      tabId: this.selectedTab.id,
-      pageNumber: 1,
-      limit: 100,
-    };
-
-    this.sectionService.listSection(params).subscribe({
-      next: (response: any) => {
-        this.sections = response.data;
-        if (this.sections.length > 0) {
-          this.selectedSection = this.sections[0];
-          this.loadPrompts();
-        }
-      },
-      error: error => {
-        console.error('Error loading databases:', error);
-      },
-    });
-  }
-
   loadTabs() {
     if (!this.selectedDatabase) return;
     const params = {
@@ -230,7 +199,6 @@ export class ListPromptComponent implements OnInit {
           this.selectedTab = this.tabs[0];
           this.tabTreeNodes = this.transformToTreeNodes(this.tabs);
           this.selectedNode = this.tabTreeNodes[0];
-          this.loadSections();
         }
       },
       error: error => {
@@ -323,11 +291,19 @@ export class ListPromptComponent implements OnInit {
       label: tab.name,
       data: tab,
       expanded: false,
-      children: tab.sections?.map((section: any) => ({
-        key: `section-${section.id}`,
-        label: section.name,
-        data: section,
-      })),
+      type: 'tab',
+      selectable: true,
+      leaf: false,
+      children: tab.sections?.length
+        ? tab.sections.map((section: any) => ({
+            key: `section-${section.id}`,
+            label: section.name,
+            data: section,
+            type: 'section',
+            selectable: true,
+            leaf: true,
+          }))
+        : [],
     }));
   }
 

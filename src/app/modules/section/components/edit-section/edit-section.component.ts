@@ -33,17 +33,23 @@ export class EditSectionComponent implements OnInit {
     private messageService: MessageService,
     private tabService: TabService,
     private sectionService: SectionService
-  ) {}
+  ) {
+    this.initForm();
+  }
 
   ngOnInit(): void {
-    this.initForm();
-
     this.sectionId = this.route.snapshot.params['id'];
     this.orgId = this.route.snapshot.params['orgId'];
 
     if (this.sectionId) {
       this.loadSectionData();
     }
+
+    this.sectionForm.valueChanges.subscribe(() => {
+      if (this.isCancelClicked) {
+        this.isCancelClicked = false;
+      }
+    });
   }
 
   get isFormDirty(): boolean {
@@ -133,7 +139,6 @@ export class EditSectionComponent implements OnInit {
 
   onCancel(): void {
     if (this.isFormDirty) {
-      // Restore basic form values
       this.sectionForm.patchValue({
         id: this.sectionData.id,
         name: this.sectionData.name,
@@ -146,7 +151,6 @@ export class EditSectionComponent implements OnInit {
       this.selectedOrgName = this.sectionData.organisationName;
       this.isCancelClicked = true;
       this.sectionForm.markAsPristine();
-      this.isCancelClicked = true;
     }
   }
 }
