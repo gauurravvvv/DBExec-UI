@@ -419,6 +419,7 @@
   .p-multiselect {
     background: var(--card-background);
     border-color: var(--border-color);
+    height: 40px;
 
     &.ng-invalid.ng-touched {
       border-color: var(--error-color);

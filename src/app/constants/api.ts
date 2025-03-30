@@ -119,4 +119,6 @@ export const PROMPT = {
   DELETE: '/prompt/delete/',
   VIEW: '/prompt/get/',
   UPDATE: '/prompt/update',
+  CONFIG: '/prompt/config',
+  GET_CONFIG: '/prompt/getConfig/',
 };

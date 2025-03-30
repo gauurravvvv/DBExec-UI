@@ -1,1 +1,183 @@
-<p>config-prompt works!</p>
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/app/prompt">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Configure Prompt</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
+                </button>
+                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    [disabled]="promptForm.invalid || !isFormDirty">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+        <form [formGroup]="promptForm" class="admin-form" #formContainer>
+            <div class="form-container">
+                <div class="form-grid left-column">
+                    <div class="form-row">
+                        <div class="form-field half-width">
+                            <label for="name">Name</label>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-tag"></i>
+                                <input id="name" type="text" pInputText [value]="promptForm.get('name')?.value"
+                                    disabled>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-field" *ngIf="showOrganisationDropdown">
+                            <label for="organisation">Organisation</label>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-building"></i>
+                                <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled>
+                            </span>
+                        </div>
+                        <div class="form-field">
+                            <label for="database">Database</label>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-database"></i>
+                                <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="tab">Tab</label>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-box"></i>
+                                <input id="tab" type="text" pInputText [value]="selectedTabName" disabled>
+                            </span>
+                        </div>
+                        <div class="form-field">
+                            <label for="section">Section</label>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-box"></i>
+                                <input id="section" type="text" pInputText [value]="selectedSectionName" disabled>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <h3>
+                            <i class="pi pi-database mr-2"></i>
+                            Query Configurations
+                        </h3>
+                    </div>
+                    <div class="form-row schema-table-row">
+                        <div class="form-field schema-field">
+                            <label for="schema">Schema<span class="required">*</span></label>
+                            <p-dropdown id="schema" [options]="schemas" formControlName="schema" [filter]="true"
+                                filterBy="name" placeholder="Select Schema" [style]="{'width':'100%'}"
+                                optionLabel="name"
+                                [ngClass]="{'ng-invalid ng-dirty': promptForm.get('schema')?.invalid && promptForm.get('schema')?.touched}">
+                            </p-dropdown>
+                            <small class="error-message"
+                                *ngIf="promptForm.get('schema')?.invalid && promptForm.get('schema')?.touched">
+                                Schema is required
+                            </small>
+                        </div>
+                        <div class="form-field">
+                            <label for="promptTable">Table(s)<span class="required">*</span></label>
+                            <p-multiSelect [options]="getAvailableTables(promptForm.get('schema')?.value)"
+                                formControlName="tables" optionLabel="name" optionValue="value" [filter]="true"
+                                filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                                placeholder="Select Tables" display="chip"
+                                [ngClass]="{'ng-invalid ng-dirty': promptForm.get('tables')?.invalid && promptForm.get('tables')?.touched}">
+                            </p-multiSelect>
+                            <small class="error-message"
+                                *ngIf="promptForm.get('tables')?.invalid && promptForm.get('tables')?.touched">
+                                At least one table is required
+                            </small>
+                        </div>
+                    </div>
+                    <div class="form-row" *ngIf="promptForm.get('tables')?.value?.length > 1">
+                        <div class="form-field full-width">
+                            <label for="promptJoin">
+                                Prompt Join Condition<span class="required">*</span>
+                            </label>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-link"></i>
+                                <input id="promptJoin" type="text" pInputText formControlName="promptJoin"
+                                    placeholder="Enter join conditions"
+                                    [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptJoin')?.invalid && promptForm.get('promptJoin')?.touched}">
+                            </span>
+                            <small class="error-message"
+                                *ngIf="promptForm.get('promptJoin')?.invalid && promptForm.get('promptJoin')?.touched">
+                                Join condition is required
+                            </small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field full-width">
+                            <label for="promptWhere">
+                                Prompt Where Condition<span class="required">*</span>
+                            </label>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-filter"></i>
+                                <input id="promptWhere" type="text" pInputText formControlName="promptWhere"
+                                    placeholder="Enter where condition"
+                                    [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched}">
+                            </span>
+                            <small class="error-message"
+                                *ngIf="promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched">
+                                Where condition is required
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="section-header" *ngIf="showAddPromptValues">
+                        <h3>
+                            <i class="pi pi-list mr-2"></i>
+                            Prompt Configuration
+                        </h3>
+                    </div>
+                    <div class="form-row" *ngIf="showAddPromptValues">
+                        <div class="form-field">
+                            <div class="label-with-clear">
+                                <label for="promptValues">
+                                    Prompt Values<span class="required">*</span>
+                                    <i class="pi pi-info-circle info-icon" pTooltip="Press Enter or Comma to add values"
+                                        tooltipPosition="right"></i>
+                                </label>
+                                <button type="button" pButton
+                                    class="p-button-text p-button-rounded p-button-plain clear-all-button"
+                                    icon="pi pi-trash" (click)="clearPromptValues()"
+                                    [disabled]="!promptForm.get('promptValues')?.value?.length">
+                                </button>
+                            </div>
+                            <p-chips id="promptValues" formControlName="promptValues" [addOnBlur]="true"
+                                [addOnTab]="true" [allowDuplicate]="false" [separator]="separator"
+                                placeholder="Enter values and press Enter or Comma"
+                                (onChipDoubleClick)="onChipDoubleClick($event)"
+                                [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptValues')?.invalid && promptForm.get('promptValues')?.touched}">
+                                <ng-template let-item pTemplate="item">
+                                    <span
+                                        [class.editing]="editingChipIndex === promptForm.get('promptValues')?.value?.indexOf(item)"
+                                        (dblclick)="onChipDoubleClick({value: item})">
+                                        <span
+                                            *ngIf="editingChipIndex !== promptForm.get('promptValues')?.value?.indexOf(item)">
+                                            {{item}}
+                                        </span>
+                                        <input
+                                            *ngIf="editingChipIndex === promptForm.get('promptValues')?.value?.indexOf(item)"
+                                            #chipInput type="text" [value]="item" (keydown.enter)="updateChip($event)"
+                                            (keydown.escape)="cancelEdit()" (blur)="updateChip($event)">
+                                    </span>
+                                </ng-template>
+                            </p-chips>
+                            <small class="error-message"
+                                *ngIf="promptForm.get('promptValues')?.invalid && promptForm.get('promptValues')?.touched">
+                                Prompt values are required
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

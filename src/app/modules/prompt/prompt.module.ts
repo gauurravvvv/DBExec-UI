@@ -13,6 +13,7 @@ import { ListPromptComponent } from './components/list-prompt/list-prompt.compon
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
 import { PromptRoutingModule } from './prompt-routing.module';
 import { ConfigPromptComponent } from './components/config-prompt/config-prompt.component';
+import { TooltipModule } from 'primeng/tooltip';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { ConfigPromptComponent } from './components/config-prompt/config-prompt.
     RippleModule,
     AppPrimeNGModule,
     PromptRoutingModule,
+    TooltipModule,
   ],
 })
 export class PromptModule {}
