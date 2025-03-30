@@ -12,7 +12,6 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { PromptService } from '../../services/prompt.service';
 import { PROMPT } from 'src/app/constants/routes';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
-import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-config-prompt',
@@ -168,6 +167,7 @@ export class ConfigPromptComponent implements OnInit {
       next: response => {
         this.sectionData = response.data;
 
+        // Set basic prompt data
         this.promptForm.patchValue({
           id: this.sectionData.id,
           name: this.sectionData.name,
@@ -177,17 +177,19 @@ export class ConfigPromptComponent implements OnInit {
           section: this.sectionData.section.id,
         });
 
+        // Set display names
         this.selectedOrgName = this.sectionData.organisationName || '';
         this.selectedDatabaseName = this.sectionData.databaseName || '';
         this.selectedTabName = this.sectionData.section.tab.name || '';
         this.selectedSectionName = this.sectionData.section.name || '';
         this.selectedPromptType = this.sectionData.type || '';
+
+        // Set prompt type validations
         this.showAddPromptValues =
           this.selectedPromptType === 'dropdown' ||
           this.selectedPromptType === 'multiselect' ||
           this.selectedPromptType === 'checkbox';
 
-        // Update promptValues validation when type changes
         if (this.showAddPromptValues) {
           this.promptForm
             .get('promptValues')
@@ -197,9 +199,7 @@ export class ConfigPromptComponent implements OnInit {
         }
         this.promptForm.get('promptValues')?.updateValueAndValidity();
 
-        this.promptForm.markAsPristine();
-
-        this.loadConfigData();
+        // First load schema data
         this.loadSchemaData();
       },
       error: () => {
@@ -207,39 +207,6 @@ export class ConfigPromptComponent implements OnInit {
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to load tab data',
-        });
-      },
-    });
-  }
-
-  loadConfigData() {
-    this.promptService.getConfig(this.orgId, this.promptId).subscribe({
-      next: (response: any) => {
-        const config = response.data.configuration[0];
-        const values = response.data.values;
-
-        this.configData = config;
-
-        // Extract column name from where condition
-        if (config.prompt_where) {
-          const match = config.prompt_where.match(/\.([^.=\s]+)\s*[=\s]in/);
-          if (match) {
-            this.columnNameControl.setValue(match[1], { emitEvent: false });
-          }
-        }
-
-        this.promptForm.patchValue({
-          promptJoin: config.prompt_join,
-          promptWhere: config.prompt_where,
-          promptValues: values.map((v: any) => v.value),
-        });
-      },
-      error: (error: any) => {
-        console.error('Error loading config data:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load configuration data',
         });
       },
     });
@@ -258,32 +225,8 @@ export class ConfigPromptComponent implements OnInit {
           name: schema.schema_name,
         }));
 
-        // Set schema and table after schemas are loaded
-        if (this.configData) {
-          // First set the schema
-          const schemaControl = this.promptForm.get('schema');
-          schemaControl?.patchValue({ name: this.configData.prompt_schema });
-
-          // Parse and set table after schema is set
-          const tableMatch =
-            this.configData.prompt_table.match(/(.+?)\((.+?)\)/);
-          if (tableMatch) {
-            const tableName = tableMatch[1];
-            const alias = tableMatch[2];
-
-            // Wait for tables to be loaded
-            setTimeout(() => {
-              this.promptForm.patchValue({
-                tables: [
-                  {
-                    tableName: tableName,
-                    alias: alias,
-                  },
-                ],
-              });
-            });
-          }
-        }
+        // After schema data is loaded, load config data
+        this.loadConfigData();
       },
       error: error => {
         console.error('Error loading schemas:', error);
@@ -291,6 +234,54 @@ export class ConfigPromptComponent implements OnInit {
           severity: 'error',
           summary: 'Error',
           detail: 'Failed to load schema data',
+        });
+      },
+    });
+  }
+
+  loadConfigData() {
+    this.promptService.getConfig(this.orgId, this.promptId).subscribe({
+      next: (response: any) => {
+        const config = response.data.configuration[0];
+        const values = response.data.values;
+        this.configData = config;
+
+        // First set the schema
+        const schemaControl = this.promptForm.get('schema');
+        schemaControl?.patchValue({ name: config.prompt_schema });
+
+        // Parse and set table
+        const tableMatch = config.prompt_table.match(/(.+?)\((.+?)\)/);
+        if (tableMatch) {
+          const tableName = tableMatch[1];
+          const alias = tableMatch[2];
+
+          // Set tables after schema is set
+          setTimeout(() => {
+            this.promptForm.patchValue({
+              tables: [
+                {
+                  tableName: tableName,
+                  alias: alias,
+                },
+              ],
+            });
+
+            // Finally set the remaining config
+            this.promptForm.patchValue({
+              promptJoin: config.prompt_join,
+              promptWhere: config.prompt_where,
+              promptValues: values.map((v: any) => v.value),
+            });
+          });
+        }
+      },
+      error: (error: any) => {
+        console.error('Error loading config data:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load configuration data',
         });
       },
     });
