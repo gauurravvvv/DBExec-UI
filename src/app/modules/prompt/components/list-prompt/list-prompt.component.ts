@@ -334,4 +334,8 @@ export class ListPromptComponent implements OnInit {
       });
     }
   }
+
+  onConfig(id: string) {
+    this.router.navigate([PROMPT.CONFIG, this.selectedOrg.id, id]);
+  }
 }

@@ -96,33 +96,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Right Column -->
-                <div class="form-grid right-column">
-                    <!-- Type Dropdown -->
-                    <div class="form-field">
-                        <label for="type">Type<span class="required"> *</span></label>
-                        <p-dropdown [options]="promptTypes" optionLabel="label" optionValue="value"
-                            formControlName="type" [filter]="true" filterBy="label" [style]="{'width':'100%'}"
-                            [panelStyle]="{'width':'100%'}" placeholder="Select Type"
-                            [ngClass]="{'ng-invalid ng-dirty': promptForm.get('type')?.invalid && promptForm.get('type')?.touched}">
-                        </p-dropdown>
-                        <small class="error-message"
-                            *ngIf="promptForm.get('type')?.invalid && promptForm.get('type')?.touched">
-                            Type is required
-                        </small>
-                    </div>
-
-                    <!-- Is Required Toggle -->
-                    <div class="form-field">
-                        <label for="mandatory">Is Required</label>
-                        <div class="status-wrapper">
-                            <p-inputSwitch formControlName="mandatory" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
-                            <span class="status-text">{{ promptForm.get('mandatory')?.value === 1 ? 'Yes' : 'No'
-                                }}</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </form>
     </div>

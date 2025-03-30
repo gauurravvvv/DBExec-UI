@@ -4,6 +4,7 @@ import { ListPromptComponent } from './components/list-prompt/list-prompt.compon
 import { AddPromptComponent } from './components/add-prompt/add-prompt.component';
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
 import { EditPromptComponent } from './components/edit-prompt/edit-prompt.component';
+import { ConfigPromptComponent } from './components/config-prompt/config-prompt.component';
 
 const routes: Routes = [
   {
@@ -16,6 +17,7 @@ const routes: Routes = [
   },
   { path: 'view/:orgId/:id', component: ViewPromptComponent },
   { path: 'edit/:orgId/:id', component: EditPromptComponent },
+  { path: 'config/:orgId/:id', component: ConfigPromptComponent },
 ];
 
 @NgModule({

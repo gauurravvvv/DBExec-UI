@@ -87,4 +87,5 @@ export const PROMPT = {
   LIST: '/app/prompt',
   EDIT: '/app/prompt/edit',
   VIEW: '/app/prompt/view',
+  CONFIG: '/app/prompt/config',
 };

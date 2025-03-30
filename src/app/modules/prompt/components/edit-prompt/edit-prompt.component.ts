@@ -6,7 +6,6 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { PromptService } from '../../services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
-import { PROMPT_TYPES } from '../../constants/prompt.constant';
 import { PROMPT } from 'src/app/constants/routes';
 
 @Component({
@@ -26,7 +25,6 @@ export class EditPromptComponent implements OnInit {
   sectionData: any;
   sections: any[] = [];
   isCancelClicked = false;
-  promptTypes = PROMPT_TYPES;
 
   constructor(
     private fb: FormBuilder,
@@ -68,9 +66,7 @@ export class EditPromptComponent implements OnInit {
       database: [''],
       tab: [''],
       section: ['', Validators.required],
-      type: ['', Validators.required],
       status: [false],
-      mandatory: [0],
     });
   }
 
@@ -87,9 +83,7 @@ export class EditPromptComponent implements OnInit {
           database: this.sectionData.databaseId,
           tab: this.sectionData.section.tab.id,
           section: this.sectionData.section.id,
-          type: this.sectionData.type,
           status: this.sectionData.status,
-          mandatory: this.sectionData.mandatory || 0,
         });
 
         this.selectedOrgName = this.sectionData.organisationName || '';
@@ -155,11 +149,9 @@ export class EditPromptComponent implements OnInit {
         name: this.sectionData.name,
         description: this.sectionData.description,
         organisation: this.sectionData.organisationId,
-        type: this.sectionData.type,
         section: this.sectionData.section.id,
         database: this.sectionData.databaseId,
         status: this.sectionData.status,
-        mandatory: this.sectionData.mandatory || 0,
       });
 
       this.selectedOrgName = this.sectionData.organisationName;

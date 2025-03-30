@@ -12,6 +12,7 @@ import { EditPromptComponent } from './components/edit-prompt/edit-prompt.compon
 import { ListPromptComponent } from './components/list-prompt/list-prompt.component';
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
 import { PromptRoutingModule } from './prompt-routing.module';
+import { ConfigPromptComponent } from './components/config-prompt/config-prompt.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { PromptRoutingModule } from './prompt-routing.module';
     EditPromptComponent,
     ListPromptComponent,
     ViewPromptComponent,
+    ConfigPromptComponent,
   ],
   imports: [
     CommonModule,

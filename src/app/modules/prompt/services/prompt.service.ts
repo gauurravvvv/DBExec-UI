@@ -65,8 +65,6 @@ export class PromptService {
       tab,
       section,
       name,
-      type,
-      mandatory,
       description,
       status,
     } = promptForm.value;
@@ -78,8 +76,6 @@ export class PromptService {
         tab,
         section,
         name,
-        type,
-        mandatory,
         description,
         status: status ? 1 : 0,
       })
