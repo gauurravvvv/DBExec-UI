@@ -185,6 +185,38 @@
                 font-size: 0.875rem;
               }
             }
+
+            .column-suggestions {
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 0;
+              background: var(--card-background);
+              border: 1px solid var(--border-color);
+              border-radius: 4px;
+              margin-top: 4px;
+              max-height: 200px;
+              overflow-y: auto;
+              z-index: 1000;
+              box-shadow: 0 2px 4px var(--shadow-color);
+
+              .suggestion-item {
+                padding: 8px 12px;
+                cursor: pointer;
+                color: var(--text-color);
+
+                &:hover,
+                &.selected {
+                  background: var(--hover-background);
+                }
+
+                .column-type {
+                  opacity: 0.6;
+                  font-size: 0.9em;
+                  margin-left: 8px;
+                }
+              }
+            }
           }
         }
       }
@@ -883,6 +915,43 @@
 
     .p-button-icon {
       font-size: 1rem;
+    }
+  }
+}
+
+.where-condition-wrapper {
+  .where-template {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0.5rem;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+
+    span {
+      color: var(--text-color);
+      opacity: 0.8;
+    }
+
+    .column-input {
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin: 0 4px;
+      color: var(--text-color);
+      min-width: 100px;
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
+
+      &::placeholder {
+        color: var(--text-color);
+        opacity: 0.5;
+      }
     }
   }
 }

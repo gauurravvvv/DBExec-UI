@@ -120,8 +120,16 @@
                             <span class="p-input-icon-left">
                                 <i class="pi pi-filter"></i>
                                 <input id="promptWhere" type="text" pInputText formControlName="promptWhere"
-                                    placeholder="Enter where condition"
+                                    (input)="onWhereConditionInput($event)" (keydown)="onWhereKeydown($event)"
+                                    [placeholder]="getWhereTemplate()"
                                     [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched}">
+                                <div class="column-suggestions" *ngIf="showSuggestions && filteredColumns.length > 0">
+                                    <div class="suggestion-item" *ngFor="let column of filteredColumns; let i = index"
+                                        [class.selected]="i === selectedSuggestionIndex"
+                                        (click)="selectSuggestion(column)">
+                                        {{column.name}} <span class="column-type">({{column.type}})</span>
+                                    </div>
+                                </div>
                             </span>
                             <small class="error-message"
                                 *ngIf="promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched">

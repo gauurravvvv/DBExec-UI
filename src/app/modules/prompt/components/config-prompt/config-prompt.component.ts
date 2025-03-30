@@ -1,5 +1,10 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -36,6 +41,11 @@ export class ConfigPromptComponent implements OnInit {
   editingChipIndex: number = -1;
   @ViewChild('chipInput') chipInput!: ElementRef;
   configData: any = null;
+  columnNameControl = new FormControl('');
+  showSuggestions = false;
+  filteredColumns: any[] = [];
+  selectedSuggestionIndex = -1;
+  tableColumns: { [key: string]: any[] } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -47,6 +57,7 @@ export class ConfigPromptComponent implements OnInit {
     private databaseService: DatabaseService
   ) {
     this.initForm();
+    this.setupColumnNameSync();
   }
 
   ngOnInit(): void {
@@ -101,6 +112,17 @@ export class ConfigPromptComponent implements OnInit {
     });
 
     this.promptForm.get('tables')?.valueChanges.subscribe(tables => {
+      // Clear where condition when tables change
+      this.promptForm.get('promptWhere')?.setValue('');
+
+      // Reset suggestions
+      this.showSuggestions = false;
+      this.filteredColumns = [];
+
+      // Update table columns mapping for selected tables
+      this.updateTableColumns(tables);
+
+      // Update join validation
       const promptJoinControl = this.promptForm.get('promptJoin');
       if (tables?.length > 1) {
         promptJoinControl?.setValidators([Validators.required]);
@@ -117,6 +139,28 @@ export class ConfigPromptComponent implements OnInit {
       this.promptForm.get('promptValues')?.clearValidators();
     }
     this.promptForm.get('promptValues')?.updateValueAndValidity();
+  }
+
+  private setupColumnNameSync() {
+    // Sync column name with where condition
+    this.columnNameControl.valueChanges.subscribe(columnName => {
+      if (columnName) {
+        const tableAlias = this.getSelectedTableAlias();
+        const value =
+          this.selectedPromptType === 'dropdown'
+            ? `${tableAlias}.${columnName} = '{value}'`
+            : `${tableAlias}.${columnName} in ('{value}')`;
+        this.promptForm.patchValue(
+          { promptWhere: value },
+          { emitEvent: false }
+        );
+      }
+    });
+  }
+
+  getSelectedTableAlias(): string {
+    const selectedTables = this.promptForm.get('tables')?.value || [];
+    return selectedTables[0]?.alias || 't1';
   }
 
   loadPromptData(): void {
@@ -174,10 +218,16 @@ export class ConfigPromptComponent implements OnInit {
         const config = response.data.configuration[0];
         const values = response.data.values;
 
-        // Store config data to use after schema loads
         this.configData = config;
 
-        // Patch prompt values immediately
+        // Extract column name from where condition
+        if (config.prompt_where) {
+          const match = config.prompt_where.match(/\.([^.=\s]+)\s*[=\s]in/);
+          if (match) {
+            this.columnNameControl.setValue(match[1], { emitEvent: false });
+          }
+        }
+
         this.promptForm.patchValue({
           promptJoin: config.prompt_join,
           promptWhere: config.prompt_where,
@@ -313,15 +363,23 @@ export class ConfigPromptComponent implements OnInit {
       schema => schema.schema_name === schemaName
     );
 
+    // Clear previous table columns
+    this.tableColumns = {};
+
     if (schemaData) {
-      const tables = schemaData.tables.map((table: any, index: number) => ({
-        name: `${table.table_name}(t${index + 1})`,
-        value: {
-          tableName: table.table_name,
-          alias: `t${index + 1}`,
-        },
-        columns: table.columns,
-      }));
+      const tables = schemaData.tables.map((table: any, index: number) => {
+        // Store columns for each table alias
+        this.tableColumns[`t${index + 1}`] = table.columns;
+
+        return {
+          name: `${table.table_name}(t${index + 1})`,
+          value: {
+            tableName: table.table_name,
+            alias: `t${index + 1}`,
+          },
+          columns: table.columns,
+        };
+      });
 
       this.tables[schemaName] = tables;
     } else {
@@ -373,5 +431,142 @@ export class ConfigPromptComponent implements OnInit {
 
   cancelEdit(): void {
     this.editingChipIndex = -1;
+  }
+
+  getWhereTemplate(): string {
+    const selectedTables = this.promptForm.get('tables')?.value || [];
+
+    // Show default placeholder if no tables selected
+    if (!selectedTables.length) {
+      return 'Enter Where condition';
+    }
+
+    // Show custom placeholder based on table selection
+    let template = '';
+    if (selectedTables.length === 1) {
+      template = `${selectedTables[0].alias}.column_name`;
+    } else {
+      template = 'alias.column_name';
+    }
+
+    const operator =
+      this.selectedPromptType === 'dropdown'
+        ? ` = '{value}'`
+        : ` in ('{value}')`;
+
+    return `Example: ${template}${operator}`;
+  }
+
+  onWhereConditionInput(event: any) {
+    const value = event.target.value;
+    const lastDotIndex = value.lastIndexOf('.');
+    const selectedTables = this.promptForm.get('tables')?.value || [];
+
+    if (lastDotIndex !== -1) {
+      const beforeDot = value.substring(0, lastDotIndex).trim();
+      const afterDot = value.substring(lastDotIndex + 1).toLowerCase();
+
+      // For single table, force the current table's alias
+      if (selectedTables.length === 1) {
+        const currentAlias = selectedTables[0].alias;
+        if (beforeDot !== currentAlias) {
+          event.target.value = `${currentAlias}.${afterDot}`;
+          return;
+        }
+      }
+
+      // For multiple tables, check if the alias is from selected tables
+      if (selectedTables.length > 1) {
+        const validAliases = selectedTables.map((t: any) => t.alias);
+        if (!validAliases.includes(beforeDot)) {
+          // If invalid alias, prevent input
+          event.preventDefault();
+          return;
+        }
+      }
+
+      // Show column suggestions for valid alias
+      if (this.tableColumns[beforeDot]) {
+        this.filteredColumns = this.tableColumns[beforeDot].filter(column =>
+          column.name.toLowerCase().includes(afterDot)
+        );
+        this.showSuggestions = true;
+        this.selectedSuggestionIndex = -1;
+      }
+    } else {
+      this.showSuggestions = false;
+    }
+  }
+
+  onWhereKeydown(event: KeyboardEvent) {
+    if (!this.showSuggestions) return;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.selectedSuggestionIndex = Math.min(
+          this.selectedSuggestionIndex + 1,
+          this.filteredColumns.length - 1
+        );
+        break;
+
+      case 'ArrowUp':
+        event.preventDefault();
+        this.selectedSuggestionIndex = Math.max(
+          this.selectedSuggestionIndex - 1,
+          0
+        );
+        break;
+
+      case 'Enter':
+        event.preventDefault();
+        if (this.selectedSuggestionIndex >= 0) {
+          this.selectSuggestion(
+            this.filteredColumns[this.selectedSuggestionIndex]
+          );
+        }
+        break;
+
+      case 'Escape':
+        this.showSuggestions = false;
+        break;
+    }
+  }
+
+  selectSuggestion(column: any) {
+    const value = this.promptForm.get('promptWhere')?.value || '';
+    const lastDotIndex = value.lastIndexOf('.');
+    const beforeDot = value.substring(0, lastDotIndex);
+    const operator =
+      this.selectedPromptType === 'dropdown'
+        ? ` = '{value}'`
+        : ` in ('{value}')`;
+    const newValue = `${beforeDot}.${column.name}${operator}`;
+
+    this.promptForm.patchValue({ promptWhere: newValue });
+    this.showSuggestions = false;
+  }
+
+  private updateTableColumns(selectedTables: any[]) {
+    // Clear previous table columns
+    this.tableColumns = {};
+
+    // Get current schema
+    const currentSchema = this.promptForm.get('schema')?.value?.name;
+    const schemaData = this.staticSchemaData.find(
+      schema => schema.schema_name === currentSchema
+    );
+
+    if (schemaData) {
+      selectedTables.forEach((selectedTable: any) => {
+        const table = schemaData.tables.find(
+          (t: any) => t.table_name === selectedTable.tableName
+        );
+        if (table) {
+          // Store columns for the selected table's alias
+          this.tableColumns[selectedTable.alias] = table.columns;
+        }
+      });
+    }
   }
 }
