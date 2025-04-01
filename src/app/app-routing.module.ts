@@ -121,6 +121,11 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/prompt/prompt.module').then(m => m.PromptModule),
       },
+      {
+        path: 'screen',
+        loadChildren: () =>
+          import('./modules/screen/screen.module').then(m => m.ScreenModule),
+      },
     ],
   },
   {

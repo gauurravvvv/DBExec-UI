@@ -56,6 +56,10 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/prompt',
   },
   {
+    value: 'queryBuilderScreen',
+    route: '/app/screen',
+  },
+  {
     value: 'dbSchema',
     route: '/home/system/configureDB',
   },

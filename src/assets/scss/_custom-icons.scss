@@ -130,6 +130,9 @@ $icon-url: '../icons/';
     &.ci-section {
       content: url($icon-url + 'section.svg');
     }
+    &.ci-screen {
+      content: url($icon-url + 'screen.svg');
+    }
   }
 }
 
