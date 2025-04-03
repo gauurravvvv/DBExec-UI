@@ -4,6 +4,7 @@ import { AddScreenComponent } from './components/add-screen/add-screen.component
 import { EditScreenComponent } from './components/edit-screen/edit-screen.component';
 import { ListScreenComponent } from './components/list-screen/list-screen.component';
 import { ViewScreenComponent } from './components/view-screen/view-screen.component';
+import { ConfigureScreenComponent } from './components/configure-screen/configure-screen.component';
 
 const routes: Routes = [
   {
@@ -16,6 +17,7 @@ const routes: Routes = [
   },
   { path: 'view/:orgId/:id', component: ViewScreenComponent },
   { path: 'edit/:orgId/:id', component: EditScreenComponent },
+  { path: 'config/:orgId/:id', component: ConfigureScreenComponent },
 ];
 
 @NgModule({

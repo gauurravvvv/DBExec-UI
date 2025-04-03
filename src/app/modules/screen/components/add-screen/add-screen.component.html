@@ -1,1 +1,81 @@
-<p>add-screen works!</p>
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/app/screen">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Add Screen</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    [disabled]="!isFormDirty" (click)="onCancel()">
+                </button>
+                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    [disabled]="screenForm.invalid">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <form [formGroup]="screenForm" class="admin-form">
+            <!-- Organisation and Database dropdowns -->
+            <div class="form-grid">
+                <div class="form-field" *ngIf="showOrganisationDropdown">
+                    <label for="organisation">Organisation<span class="required"> *</span></label>
+                    <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
+                        formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                        [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"
+                        (onChange)="onOrganisationChange($event)"
+                        [ngClass]="{'ng-invalid ng-dirty': screenForm.get('organisation')?.invalid && screenForm.get('organisation')?.touched}">
+                    </p-dropdown>
+                    <small class="error-message"
+                        *ngIf="screenForm.get('organisation')?.invalid && screenForm.get('organisation')?.touched">
+                        Organisation is required
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <label for="database">Database<span class="required"> *</span></label>
+                    <p-dropdown [options]="databases" optionLabel="name" optionValue="id" formControlName="database"
+                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
+                        placeholder="Select Database"
+                        [ngClass]="{'ng-invalid ng-dirty': screenForm.get('database')?.invalid && screenForm.get('database')?.touched}">
+                    </p-dropdown>
+                    <small class="error-message"
+                        *ngIf="screenForm.get('database')?.invalid && screenForm.get('database')?.touched">
+                        Database is required
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <label for="name">Name<span class="required"> *</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-box"></i>
+                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
+                            [ngClass]="{'ng-invalid ng-dirty': screenForm.get('name')?.invalid && screenForm.get('name')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="screenForm.get('name')?.invalid && screenForm.get('name')?.touched">
+                        <span *ngIf="screenForm.get('name')?.errors?.['required']">Name is required</span>
+                        <span *ngIf="screenForm.get('name')?.errors?.['pattern']">Name can only contain letters, spaces
+                            and
+                            hyphens</span>
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <label for="description">Description</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-align-left"></i>
+                        <input id="description" type="text" pInputText formControlName="description"
+                            placeholder="Enter description"
+                            [ngClass]="{'ng-invalid ng-dirty': screenForm.get('description')?.invalid && screenForm.get('description')?.touched}">
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

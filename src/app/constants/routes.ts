@@ -89,3 +89,11 @@ export const PROMPT = {
   VIEW: '/app/prompt/view',
   CONFIG: '/app/prompt/config',
 };
+
+export const SCREEN = {
+  ADD: '/app/screen/add',
+  LIST: '/app/screen',
+  EDIT: '/app/screen/edit',
+  VIEW: '/app/screen/view',
+  CONFIG: '/app/screen/config',
+};

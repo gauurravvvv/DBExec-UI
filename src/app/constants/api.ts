@@ -122,3 +122,11 @@ export const PROMPT = {
   CONFIG: '/prompt/config',
   GET_CONFIG: '/prompt/getConfig/',
 };
+
+export const SCREEN = {
+  ADD: '/screen/add',
+  LIST: '/screen/list',
+  DELETE: '/screen/delete/',
+  VIEW: '/screen/get/',
+  UPDATE: '/screen/update',
+};
