@@ -202,6 +202,11 @@
         border-right: 1px solid var(--border-color);
         height: 100%;
         overflow-y: auto;
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--hover-background);
+        }
 
         &::-webkit-scrollbar {
           width: 6px;
@@ -222,7 +227,36 @@
         }
 
         &.collapsed {
-          width: 10%;
+          width: 5%;
+
+          .sidebar-content {
+            position: relative;
+            padding: 0;
+            height: 100%;
+
+            h3,
+            .nav-list,
+            .dummy-text {
+              display: none;
+            }
+
+            .rotated-title {
+              position: absolute;
+              left: 50%;
+              top: 50%;
+              transform: translate(-50%, -50%);
+              color: var(--text-color);
+              font-weight: 600;
+              font-size: 14px;
+              letter-spacing: 0;
+              text-transform: uppercase;
+              text-align: center;
+              writing-mode: vertical-lr;
+              text-orientation: upright;
+              white-space: pre;
+              line-height: 1.2;
+            }
+          }
         }
 
         .sidebar-content {
@@ -323,7 +357,7 @@
         }
 
         &.expanded {
-          width: 90%;
+          width: 95%;
         }
 
         h2 {

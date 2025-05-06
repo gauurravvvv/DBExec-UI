@@ -8,6 +8,12 @@ import { Component } from '@angular/core';
 export class ConfigureScreenComponent {
   isSidebarCollapsed = false;
 
+  expandSidebar() {
+    if (this.isSidebarCollapsed) {
+      this.isSidebarCollapsed = false;
+    }
+  }
+
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }

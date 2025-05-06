@@ -2,7 +2,7 @@
   <div class="add-admin-container">
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/prompt">
+        <button pButton class="p-button-text" routerLink="/app/screen">
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Configure Screen</h2>
@@ -22,6 +22,9 @@
     <div class="screen-wrapper">
       <div class="sidebar" [class.collapsed]="isSidebarCollapsed">
         <div class="sidebar-content">
+          <div class="rotated-title" *ngIf="isSidebarCollapsed">
+            C O D E L I S T
+          </div>
           <h3>Sidebar Navigation</h3>
           <ul class="nav-list">
             <li>Dashboard</li>
@@ -44,8 +47,8 @@
         <button class="toggle-btn" (click)="toggleSidebar()">
           <i
             class="pi"
-            [class.pi-chevron-right]="!isSidebarCollapsed"
-            [class.pi-chevron-left]="isSidebarCollapsed"
+            [class.pi-chevron-left]="!isSidebarCollapsed"
+            [class.pi-chevron-right]="isSidebarCollapsed"
           ></i>
         </button>
       </div>
