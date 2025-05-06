@@ -50,20 +50,21 @@ export class ScreenService {
       );
   }
 
-  viewTab(orgId: string, id: string) {
-    return this.http.get(TAB.VIEW + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+  viewScreen(orgId: string, id: string) {
+    return this.http
+      .get(SCREEN.VIEW + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
-  updateTab(tabForm: FormGroup) {
+  updateScreen(screenForm: FormGroup) {
     const { id, name, description, organisation, database, status } =
-      tabForm.getRawValue();
+      screenForm.getRawValue();
     return this.http
-      .put(TAB.UPDATE, {
+      .put(SCREEN.UPDATE, {
         id,
         name,
         description,
@@ -71,11 +72,10 @@ export class ScreenService {
         database,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }

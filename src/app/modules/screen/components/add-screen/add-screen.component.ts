@@ -7,7 +7,6 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { ScreenService } from '../../services/screen.service';
 
 @Component({
@@ -27,7 +26,6 @@ export class AddScreenComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private tabService: TabService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private databaseService: DatabaseService,

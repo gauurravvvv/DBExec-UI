@@ -160,4 +160,33 @@ export class GlobalService {
       });
     }
   }
+
+  handleSuccessService(
+    result: IAPIResponse,
+    showToast = true,
+    showErrorToast = true
+  ) {
+    if (result.code == 200) {
+      if (showToast)
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: result.message,
+          life: 3000,
+          styleClass: 'custom-toast',
+          contentStyleClass: 'custom-toast-content',
+          icon: 'pi pi-check-circle',
+        });
+      return true;
+    } else {
+      if (showErrorToast)
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: result.message,
+          life: 3000,
+        });
+      return false;
+    }
+  }
 }
