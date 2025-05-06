@@ -1,1 +1,91 @@
-<p>configure-screen works!</p>
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" routerLink="/app/prompt">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Configure Screen</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-danger"
+        ></button>
+        <button pButton class="p-button-outlined" type="submit" label="Save">
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+    <div class="screen-wrapper">
+      <div class="sidebar" [class.collapsed]="isSidebarCollapsed">
+        <div class="sidebar-content">
+          <h3>Sidebar Navigation</h3>
+          <ul class="nav-list">
+            <li>Dashboard</li>
+            <li>Analytics</li>
+            <li>Reports</li>
+            <li>Settings</li>
+            <li>Users</li>
+          </ul>
+          <div class="dummy-text">
+            <p>
+              This is some sidebar content to test the layout and scrolling
+              behavior.
+            </p>
+            <p>You can add more items here to see how they wrap and flow.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="separator">
+        <button class="toggle-btn" (click)="toggleSidebar()">
+          <i
+            class="pi"
+            [class.pi-chevron-right]="!isSidebarCollapsed"
+            [class.pi-chevron-left]="isSidebarCollapsed"
+          ></i>
+        </button>
+      </div>
+
+      <div class="main-content" [class.expanded]="isSidebarCollapsed">
+        <h2>Main Content Area</h2>
+        <div class="content-section">
+          <h3>Section 1</h3>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          </p>
+          <p>
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+            nisi ut aliquip ex ea commodo consequat.
+          </p>
+        </div>
+        <div class="content-section">
+          <h3>Section 2</h3>
+          <p>
+            Duis aute irure dolor in reprehenderit in voluptate velit esse
+            cillum dolore eu fugiat nulla pariatur.
+          </p>
+          <p>
+            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+            officia deserunt mollit anim id est laborum.
+          </p>
+        </div>
+        <div class="content-section">
+          <h3>Section 3</h3>
+          <p>
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+            accusantium doloremque laudantium.
+          </p>
+          <p>
+            Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
+            fugit, sed quia consequuntur magni dolores.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

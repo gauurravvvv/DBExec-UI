@@ -12,6 +12,8 @@ import { AddScreenComponent } from './components/add-screen/add-screen.component
 import { EditScreenComponent } from './components/edit-screen/edit-screen.component';
 import { ListScreenComponent } from './components/list-screen/list-screen.component';
 import { ViewScreenComponent } from './components/view-screen/view-screen.component';
+import { ConfigureScreenComponent } from './components/configure-screen/configure-screen.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -19,6 +21,7 @@ import { ViewScreenComponent } from './components/view-screen/view-screen.compon
     EditScreenComponent,
     ListScreenComponent,
     ViewScreenComponent,
+    ConfigureScreenComponent,
   ],
   imports: [
     CommonModule,
@@ -30,6 +33,8 @@ import { ViewScreenComponent } from './components/view-screen/view-screen.compon
     RippleModule,
     AppPrimeNGModule,
     ScreenRoutingModule,
+    RouterModule,
   ],
+  exports: [ConfigureScreenComponent],
 })
 export class ScreenModule {}
