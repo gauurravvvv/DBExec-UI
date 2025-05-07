@@ -65,13 +65,10 @@ export class AddEnvironmentComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
+      }
     });
   }
 
@@ -82,19 +79,9 @@ export class AddEnvironmentComponent implements OnInit {
 
   onSubmit() {
     if (this.envForm.valid) {
-      this.environmentService.addEnvironment(this.envForm).subscribe({
-        next: () => {
+      this.environmentService.addEnvironment(this.envForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ENVIRONMENT.LIST]);
-        },
-        error: error => {
-          console.error('Error adding environment:', error);
-        },
-      });
-    } else {
-      Object.keys(this.envForm.controls).forEach(key => {
-        const control = this.envForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

@@ -79,17 +79,14 @@ export class ListSectionComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadDatabases();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -118,17 +115,14 @@ export class ListSectionComponent implements OnInit {
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
-        this.databases = response.data;
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.databases = [...response.data];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0];
           this.loadTabs();
         }
-      },
-      error: error => {
-        console.error('Error loading databases:', error);
-      },
+      }
     });
   }
 
@@ -141,18 +135,15 @@ export class ListSectionComponent implements OnInit {
       limit: 100,
     };
 
-    this.sectionService.listSection(params).subscribe({
-      next: (response: any) => {
-        this.sections = response.data;
+    this.sectionService.listSection(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.sections = [...response.data];
         this.filteredSections = [...this.sections];
         this.totalItems = this.sections.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        console.error('Error loading databases:', error);
-      },
+      }
     });
   }
 
@@ -165,17 +156,14 @@ export class ListSectionComponent implements OnInit {
       limit: 100,
     };
 
-    this.tabService.listTab(params).subscribe({
-      next: (response: any) => {
-        this.tabs = response.data;
+    this.tabService.listTab(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.tabs = [...response.data];
         if (this.tabs.length > 0) {
           this.selectedTab = this.tabs[0];
           this.loadSections();
         }
-      },
-      error: error => {
-        console.error('Error loading tabs:', error);
-      },
+      }
     });
   }
 
@@ -238,17 +226,12 @@ export class ListSectionComponent implements OnInit {
     if (this.sectionToDelete) {
       this.sectionService
         .deleteSection(this.selectedOrg.id, this.sectionToDelete)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadSections();
             this.showDeleteConfirm = false;
             this.sectionToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting tab:', error);
-            this.showDeleteConfirm = false;
-            this.sectionToDelete = null;
-          },
+          }
         });
     }
   }

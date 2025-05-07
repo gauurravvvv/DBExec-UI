@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SECTION } from 'src/app/constants/routes';
-import { MessageService } from 'primeng/api';
 import { SectionService } from '../../services/section.service';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 @Component({
   selector: 'app-view-section',
@@ -18,8 +18,8 @@ export class ViewSectionComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private messageService: MessageService,
-    private sectionService: SectionService
+    private sectionService: SectionService,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
@@ -29,14 +29,13 @@ export class ViewSectionComponent implements OnInit {
   }
 
   loadSectionDetails() {
-    this.sectionService.viewSection(this.orgId, this.sectionId).subscribe({
-      next: (response: any) => {
-        this.tabData = response.data;
-      },
-      error: error => {
-        console.error('Error loading category details:', error);
-      },
-    });
+    this.sectionService
+      .viewSection(this.orgId, this.sectionId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.tabData = response.data;
+        }
+      });
   }
 
   onEdit() {
@@ -57,26 +56,13 @@ export class ViewSectionComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.tabData) {
-      this.sectionService.deleteSection(this.orgId, this.tabData.id).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Section deleted successfully',
-          });
-          this.router.navigate(['/app/section']);
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to delete section',
-          });
-        },
-        complete: () => {
-          this.showDeleteConfirm = false;
-        },
-      });
+      this.sectionService
+        .deleteSection(this.orgId, this.tabData.id)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate(['/app/section']);
+          }
+        });
     }
   }
 }

@@ -1,19 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormArray,
   AbstractControl,
+  FormBuilder,
+  FormGroup,
   ValidationErrors,
+  Validators,
 } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { CATEGORY, GROUP } from 'src/app/constants/routes';
-import { CategoryService } from 'src/app/modules/categories/services/category.service';
-import { EnvironmentService } from 'src/app/modules/environment/services/environment.service';
-import { GroupService } from '../../services/group.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { GROUP } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
+import { GroupService } from '../../services/group.service';
 
 @Component({
   selector: 'app-edit-group',
@@ -32,13 +29,11 @@ export class EditGroupComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private categoryService: CategoryService,
-    private environmentService: EnvironmentService,
-    private messageService: MessageService,
     private router: Router,
     private route: ActivatedRoute,
     private groupService: GroupService,
-    private userService: UserService
+    private userService: UserService,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit(): void {
@@ -78,8 +73,8 @@ export class EditGroupComponent implements OnInit {
   }
 
   loadGroupData(): void {
-    this.groupService.viewGroup(this.orgId, this.categoryId).subscribe({
-      next: response => {
+    this.groupService.viewGroup(this.orgId, this.categoryId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         const groupData = response.data;
 
         this.groupForm.patchValue({
@@ -108,29 +103,15 @@ export class EditGroupComponent implements OnInit {
         this.originalFormValue = this.groupForm.value;
         this.isFormDirty = false;
         this.groupForm.markAsPristine();
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load category data',
-        });
-      },
+      }
     });
   }
 
   loadUsers(params: any): void {
-    this.userService.listUser(params).subscribe({
-      next: response => {
-        this.users = response.data.users;
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load users',
-        });
-      },
+    this.userService.listUser(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.users = [...response.data.users];
+      }
     });
   }
 
@@ -152,22 +133,10 @@ export class EditGroupComponent implements OnInit {
   onSubmit(): void {
     if (this.canSubmit()) {
       console.log(this.groupForm.value);
-      this.groupService.editGroup(this.groupForm).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Group updated successfully',
-          });
+      this.groupService.editGroup(this.groupForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([GROUP.LIST]);
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to update group',
-          });
-        },
+        }
       });
     }
   }

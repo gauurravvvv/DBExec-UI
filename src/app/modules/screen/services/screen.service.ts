@@ -16,21 +16,21 @@ export class ScreenService {
         SCREEN.LIST +
           `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteScreen(orgId: string, id: string) {
-    return this.http.delete(SCREEN.DELETE + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(SCREEN.DELETE + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   addScreen(screenForm: FormGroup) {
@@ -42,12 +42,11 @@ export class ScreenService {
         name,
         description,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   viewScreen(orgId: string, id: string) {

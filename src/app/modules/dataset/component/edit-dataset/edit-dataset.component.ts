@@ -2,11 +2,11 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { DatasetService } from '../../services/dataset.service';
-import { DATASET } from 'src/app/constants/routes';
 
 @Component({
   selector: 'app-edit-dataset',
@@ -82,109 +82,102 @@ export class EditDatasetComponent implements OnInit {
   }
 
   loadDatasetData(): void {
-    this.datasetService.getDataset(this.orgId, this.datasetId).subscribe({
-      next: response => {
-        const datasetData = response.data;
-        this.selectedOrg = { id: datasetData.organisationId };
-        this.selectedDatabase = { id: datasetData.databaseId };
-        this.selectedOrgName = datasetData.organisationName || '';
-        this.selectedDatabaseName = datasetData.databaseName || '';
+    this.datasetService
+      .getDataset(this.orgId, this.datasetId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const datasetData = response.data;
+          this.selectedOrg = { id: datasetData.organisationId };
+          this.selectedDatabase = { id: datasetData.databaseId };
+          this.selectedOrgName = datasetData.organisationName || '';
+          this.selectedDatabaseName = datasetData.databaseName || '';
 
-        this.loadDatabaseSchemas(() => {
-          this.datasetForm.patchValue({
-            id: datasetData.id,
-            name: datasetData.name,
-            description: datasetData.description,
-            organisation: datasetData.organisationId,
-            database: datasetData.databaseId,
-            status: datasetData.status,
-          });
+          this.loadDatabaseSchemas(() => {
+            this.datasetForm.patchValue({
+              id: datasetData.id,
+              name: datasetData.name,
+              description: datasetData.description,
+              organisation: datasetData.organisationId,
+              database: datasetData.databaseId,
+              status: datasetData.status,
+            });
 
-          while (this.schemaGroups.length) {
-            this.schemaGroups.removeAt(0);
-          }
+            while (this.schemaGroups.length) {
+              this.schemaGroups.removeAt(0);
+            }
 
-          // Process the mapping data
-          if (Array.isArray(datasetData.datasetMapping)) {
-            datasetData.datasetMapping.forEach((schemaMapping: any) => {
-              const schemaGroup = this.fb.group({
-                schema: [schemaMapping.schema, Validators.required],
-                mappings: this.fb.array([]),
-              });
-
-              this.loadTablesForSchema(schemaMapping.schema);
-
-              // Process tables and their columns
-              if (Array.isArray(schemaMapping.tables)) {
-                schemaMapping.tables.forEach((tableData: any) => {
-                  const tableName = tableData.table;
-                  this.loadColumnsForMapping(schemaMapping.schema, tableName);
-
-                  if (Array.isArray(tableData.columns)) {
-                    tableData.columns.forEach((columnData: any) => {
-                      const mappingsArray = schemaGroup.get(
-                        'mappings'
-                      ) as FormArray;
-                      mappingsArray.push(
-                        this.fb.group({
-                          table: [tableName, Validators.required],
-                          column: [columnData.column, Validators.required],
-                          value: [columnData.value, Validators.required],
-                        })
-                      );
-                    });
-                  }
+            // Process the mapping data
+            if (Array.isArray(datasetData.datasetMapping)) {
+              datasetData.datasetMapping.forEach((schemaMapping: any) => {
+                const schemaGroup = this.fb.group({
+                  schema: [schemaMapping.schema, Validators.required],
+                  mappings: this.fb.array([]),
                 });
-              }
 
-              this.schemaGroups.push(schemaGroup);
-            });
-          }
+                this.loadTablesForSchema(schemaMapping.schema);
 
-          if (this.schemaGroups.length === 0) {
-            this.addSchemaGroup();
-          }
+                // Process tables and their columns
+                if (Array.isArray(schemaMapping.tables)) {
+                  schemaMapping.tables.forEach((tableData: any) => {
+                    const tableName = tableData.table;
+                    this.loadColumnsForMapping(schemaMapping.schema, tableName);
 
-          // Set up subscriptions for all schema groups
-          this.schemaGroups.controls.forEach((group, index) => {
-            group.get('schema')?.valueChanges.subscribe(schemaName => {
-              if (schemaName) {
-                this.loadTablesForSchema(schemaName);
-              }
-              this.checkDuplicateMappings();
-            });
+                    if (Array.isArray(tableData.columns)) {
+                      tableData.columns.forEach((columnData: any) => {
+                        const mappingsArray = schemaGroup.get(
+                          'mappings'
+                        ) as FormArray;
+                        mappingsArray.push(
+                          this.fb.group({
+                            table: [tableName, Validators.required],
+                            column: [columnData.column, Validators.required],
+                            value: [columnData.value, Validators.required],
+                          })
+                        );
+                      });
+                    }
+                  });
+                }
 
-            const mappings = this.getSchemaGroupMappings(index);
-            mappings.controls.forEach(mapping => {
-              mapping.get('table')?.valueChanges.subscribe(tableName => {
-                const schemaName = group.get('schema')?.value;
-                if (schemaName && tableName) {
-                  this.loadColumnsForMapping(schemaName, tableName);
+                this.schemaGroups.push(schemaGroup);
+              });
+            }
+
+            if (this.schemaGroups.length === 0) {
+              this.addSchemaGroup();
+            }
+
+            // Set up subscriptions for all schema groups
+            this.schemaGroups.controls.forEach((group, index) => {
+              group.get('schema')?.valueChanges.subscribe(schemaName => {
+                if (schemaName) {
+                  this.loadTablesForSchema(schemaName);
                 }
                 this.checkDuplicateMappings();
               });
 
-              mapping.get('column')?.valueChanges.subscribe(() => {
-                this.checkDuplicateMappings();
+              const mappings = this.getSchemaGroupMappings(index);
+              mappings.controls.forEach(mapping => {
+                mapping.get('table')?.valueChanges.subscribe(tableName => {
+                  const schemaName = group.get('schema')?.value;
+                  if (schemaName && tableName) {
+                    this.loadColumnsForMapping(schemaName, tableName);
+                  }
+                  this.checkDuplicateMappings();
+                });
+
+                mapping.get('column')?.valueChanges.subscribe(() => {
+                  this.checkDuplicateMappings();
+                });
               });
             });
+
+            this.originalFormValue = this.datasetForm.value;
+            this.isFormDirty = false;
+            this.datasetForm.markAsPristine();
           });
-
-          this.originalFormValue = this.datasetForm.value;
-          this.isFormDirty = false;
-          this.datasetForm.markAsPristine();
-
-          console.log('Schema Groups:', this.schemaGroups.value);
-        });
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load dataset data',
-        });
-      },
-    });
+        }
+      });
   }
 
   loadDatabaseSchemas(callback?: () => void): void {
@@ -193,21 +186,14 @@ export class EditDatasetComponent implements OnInit {
       databaseId: this.selectedDatabase.id,
     };
 
-    this.databaseService.listDatabaseSchemas(params).subscribe({
-      next: response => {
+    this.databaseService.listDatabaseSchemas(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.staticSchemaData = response.data;
         this.schemas = this.staticSchemaData.map(schema => ({
           name: schema.schema_name,
         }));
         if (callback) callback();
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load schemas',
-        });
-      },
+      }
     });
   }
 
@@ -284,22 +270,10 @@ export class EditDatasetComponent implements OnInit {
         columnMappings: datasetMapping,
       };
 
-      this.datasetService.updateDataset(payload).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Dataset updated successfully',
-          });
+      this.datasetService.updateDataset(payload).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([DATASET.LIST]);
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to update dataset',
-          });
-        },
+        }
       });
     }
   }

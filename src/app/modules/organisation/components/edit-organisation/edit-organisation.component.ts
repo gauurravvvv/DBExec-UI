@@ -78,8 +78,8 @@ export class EditOrganisationComponent implements OnInit {
   private loadOrganisationData() {
     this.organisationService
       .viewOrganisation(this.organisationId)
-      .subscribe(response => {
-        if (this.globalService.handleAPIResponse(response)) {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
           this.orgData = response.data;
           this.orgForm.patchValue({
             id: this.orgData.id,
@@ -105,22 +105,10 @@ export class EditOrganisationComponent implements OnInit {
 
   onSubmit() {
     if (this.orgForm.valid) {
-      this.organisationService.editOrganisation(this.orgForm).subscribe({
-        next: response => {
-          if (this.globalService.handleAPIResponse(response)) {
-            this.router.navigate([ORGANISATION.LIST]);
-          }
-        },
-        error: error => {
-          // Handle error response directly from error object
-          this.globalService.handleAPIResponse({
-            status: false,
-            message:
-              error?.error?.message ||
-              error?.message ||
-              'Failed to add super admin',
-          });
-        },
+      this.organisationService.editOrganisation(this.orgForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.router.navigate([ORGANISATION.LIST]);
+        }
       });
     } else {
       // Mark all fields as touched to trigger validation messages

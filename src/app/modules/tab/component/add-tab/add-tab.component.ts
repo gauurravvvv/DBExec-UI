@@ -133,13 +133,10 @@ export class AddTabComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
+      }
     });
   }
 
@@ -149,19 +146,9 @@ export class AddTabComponent implements OnInit {
       return; // Prevent submission if duplicates exist
     }
     if (this.tabForm.valid) {
-      this.tabService.addTab(this.tabForm).subscribe({
-        next: () => {
+      this.tabService.addTab(this.tabForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([TAB.LIST]);
-        },
-        error: error => {
-          console.error('Error adding tab:', error);
-        },
-      });
-    } else {
-      Object.keys(this.tabForm.controls).forEach(key => {
-        const control = this.tabForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }
@@ -220,14 +207,10 @@ export class AddTabComponent implements OnInit {
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
-        this.databases = response.data;
-      },
-      error: error => {
-        this.databases = [];
-        console.error('Error loading databases:', error);
-      },
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.databases = [...response.data];
+      }
     });
   }
 

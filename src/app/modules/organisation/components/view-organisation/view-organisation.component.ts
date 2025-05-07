@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
-import { MessageService } from 'primeng/api';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { ORGANISATION } from 'src/app/constants/routes';
 
 interface OrganisationConfig {
   maxDatabases: number;
@@ -28,7 +29,7 @@ interface OrganisationData {
 export class ViewOrganisationComponent implements OnInit {
   organisationId!: number;
   organisationData!: OrganisationData;
-  avatarBackground: string = '#2196F3'; // Default color
+  avatarBackground: string = '#2196F3';
   organisationInitials: string = '';
   showDeleteConfirm: boolean = false;
 
@@ -36,7 +37,7 @@ export class ViewOrganisationComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private organisationService: OrganisationService,
-    private messageService: MessageService
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
@@ -49,19 +50,11 @@ export class ViewOrganisationComponent implements OnInit {
   loadOrganisationData() {
     this.organisationService
       .viewOrganisation(this.organisationId.toString())
-      .subscribe({
-        next: response => {
-          console.log(response);
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
           this.organisationData = response.data;
           this.setOrganisationInitials();
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load organisation details',
-          });
-        },
+        }
       });
   }
 
@@ -87,25 +80,10 @@ export class ViewOrganisationComponent implements OnInit {
   proceedDelete() {
     this.organisationService
       .deleteOrganisation(this.organisationId.toString())
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Organisation deleted successfully',
-          });
-          this.router.navigate(['/app/organisation']);
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to delete organisation',
-          });
-        },
-        complete: () => {
-          this.showDeleteConfirm = false;
-        },
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.router.navigate([ORGANISATION.LIST]);
+        }
       });
   }
 }

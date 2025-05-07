@@ -69,35 +69,30 @@ export class EditSectionComponent implements OnInit {
   }
 
   loadSectionData(): void {
-    this.sectionService.viewSection(this.orgId, this.sectionId).subscribe({
-      next: response => {
-        this.sectionData = response.data;
+    this.sectionService
+      .viewSection(this.orgId, this.sectionId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.sectionData = response.data;
 
-        this.sectionForm.patchValue({
-          id: this.sectionData.id,
-          name: this.sectionData.name,
-          description: this.sectionData.description,
-          organisation: this.sectionData.organisationId,
-          database: this.sectionData.databaseId,
-          tab: this.sectionData.tabId,
-          status: this.sectionData.status,
-        });
+          this.sectionForm.patchValue({
+            id: this.sectionData.id,
+            name: this.sectionData.name,
+            description: this.sectionData.description,
+            organisation: this.sectionData.organisationId,
+            database: this.sectionData.databaseId,
+            tab: this.sectionData.tabId,
+            status: this.sectionData.status,
+          });
 
-        this.selectedOrgName = this.sectionData.organisationName || '';
-        this.selectedDatabaseName = this.sectionData.databaseName || '';
+          this.selectedOrgName = this.sectionData.organisationName || '';
+          this.selectedDatabaseName = this.sectionData.databaseName || '';
 
-        this.loadTabData();
+          this.loadTabData();
 
-        this.sectionForm.markAsPristine();
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load tab data',
-        });
-      },
-    });
+          this.sectionForm.markAsPristine();
+        }
+      });
   }
 
   loadTabData() {
@@ -107,31 +102,18 @@ export class EditSectionComponent implements OnInit {
       pageNumber: 1,
       limit: 100,
     };
-    this.tabService.listTab(param).subscribe({
-      next: (response: any) => {
-        this.tabs = response.data;
-      },
-      error: error => {
-        console.error('Error loading tabs:', error);
-      },
+    this.tabService.listTab(param).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.tabs = [...response.data];
+      }
     });
   }
 
   onSubmit(): void {
     if (this.sectionForm.valid) {
-      this.sectionService.updateSection(this.sectionForm).subscribe({
-        next: () => {
+      this.sectionService.updateSection(this.sectionForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([SECTION.LIST]);
-        },
-        error: error => {
-          console.error('Error updating section:', error);
-        },
-      });
-    } else {
-      Object.keys(this.sectionForm.controls).forEach(key => {
-        const control = this.sectionForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

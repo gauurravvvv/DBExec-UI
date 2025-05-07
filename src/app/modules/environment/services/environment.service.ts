@@ -18,12 +18,11 @@ export class EnvironmentService {
           `/${params.orgId}` +
           `/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   addEnvironment(envForm: FormGroup) {
@@ -34,30 +33,31 @@ export class EnvironmentService {
         description,
         organisation,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteEnvironment(orgId: string, envId: string) {
-    return this.http.delete(ENVIRONMENT.DELETE + `${orgId}/${envId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(ENVIRONMENT.DELETE + `${orgId}/${envId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   viewEnvironment(orgId: string, envId: string) {
-    return this.http.get(ENVIRONMENT.VIEW + `${orgId}/${envId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(ENVIRONMENT.VIEW + `${orgId}/${envId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   editEnvironment(envForm: FormGroup) {
@@ -71,11 +71,10 @@ export class EnvironmentService {
         status: status ? 1 : 0,
         organisation,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }

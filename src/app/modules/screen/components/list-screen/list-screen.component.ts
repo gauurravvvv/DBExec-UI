@@ -29,7 +29,7 @@ export class ListScreenComponent implements OnInit {
   organisations: any[] = [];
   databases: any[] = [];
   screens: any[] = [];
-  selectedOrg: any = {};
+  selectedScreen: any = {};
   selectedDatabase: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -62,7 +62,7 @@ export class ListScreenComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
+      this.selectedScreen = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
       this.loadDatabases();
@@ -75,22 +75,19 @@ export class ListScreenComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedScreen = this.organisations[0];
           this.loadDatabases();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
   onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+    this.selectedScreen = event.value;
     this.loadDatabases();
   }
 
@@ -101,48 +98,42 @@ export class ListScreenComponent implements OnInit {
   }
 
   loadDatabases() {
-    if (!this.selectedOrg) return;
+    if (!this.selectedScreen) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedScreen.id,
       pageNumber: 1,
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
-        this.databases = response.data;
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.databases = [...response.data];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0];
           this.loadScreens();
         }
-      },
-      error: error => {
-        console.error('Error loading databases:', error);
-      },
+      }
     });
   }
 
   loadScreens() {
     if (!this.selectedDatabase) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedScreen.id,
       databaseId: this.selectedDatabase.id,
       pageNumber: 1,
       limit: 100,
     };
 
-    this.screenService.listScreen(params).subscribe({
-      next: (response: any) => {
-        this.screens = response.data;
+    this.screenService.listScreen(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.screens = [...response.data];
         this.filteredScreens = [...this.screens];
         this.totalItems = this.screens.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        console.error('Error loading screens:', error);
-      },
+      }
     });
   }
 
@@ -188,7 +179,7 @@ export class ListScreenComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([SCREEN.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([SCREEN.EDIT, this.selectedScreen.id, id]);
   }
 
   confirmDelete(id: string) {
@@ -204,28 +195,23 @@ export class ListScreenComponent implements OnInit {
   proceedDelete() {
     if (this.screenToDelete) {
       this.screenService
-        .deleteScreen(this.selectedOrg.id, this.screenToDelete)
-        .subscribe({
-          next: () => {
+        .deleteScreen(this.selectedScreen.id, this.screenToDelete)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadScreens();
             this.showDeleteConfirm = false;
             this.screenToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting tab:', error);
-            this.showDeleteConfirm = false;
-            this.screenToDelete = null;
-          },
+          }
         });
     }
   }
 
   onEditScreen(screen: any) {
     // Handle edit action
-    this.router.navigate([SCREEN.EDIT, this.selectedOrg.id, screen.id]);
+    this.router.navigate([SCREEN.EDIT, this.selectedScreen.id, screen.id]);
   }
 
   onConfig(id: string) {
-    this.router.navigate([SCREEN.CONFIG, this.selectedOrg.id, id]);
+    this.router.navigate([SCREEN.CONFIG, this.selectedScreen.id, id]);
   }
 }

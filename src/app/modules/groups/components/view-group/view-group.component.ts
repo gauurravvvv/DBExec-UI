@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { CATEGORY, GROUP } from 'src/app/constants/routes';
-import { CategoryService } from 'src/app/modules/categories/services/category.service';
+import { GROUP } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from '../../services/group.service';
 
 @Component({
@@ -11,7 +10,7 @@ import { GroupService } from '../../services/group.service';
   styleUrls: ['./view-group.component.scss'],
 })
 export class ViewGroupComponent implements OnInit {
-  categoryId: string = '';
+  groupId: string = '';
   orgId: string = '';
   groupData: any = null;
   showDeleteConfirm = false;
@@ -19,33 +18,29 @@ export class ViewGroupComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private categoryService: CategoryService,
-    private messageService: MessageService,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
-    this.categoryId = this.route.snapshot.params['id'];
+    this.groupId = this.route.snapshot.params['id'];
     this.orgId = this.route.snapshot.params['orgId'];
-    this.loadCategoryDetails();
+    this.loadGroupDetails();
   }
 
-  loadCategoryDetails() {
-    this.groupService.viewGroup(this.orgId, this.categoryId).subscribe({
-      next: (response: any) => {
+  loadGroupDetails() {
+    this.groupService.viewGroup(this.orgId, this.groupId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.groupData = response.data;
-      },
-      error: error => {
-        console.error('Error loading group details:', error);
-      },
+      }
     });
   }
 
   onEdit() {
-    this.router.navigate([GROUP.EDIT, this.orgId, this.categoryId], {
+    this.router.navigate([GROUP.EDIT, this.orgId, this.groupId], {
       queryParams: {
         orgId: this.orgId,
-        adminId: this.categoryId,
+        adminId: this.groupId,
       },
     });
   }
@@ -64,26 +59,13 @@ export class ViewGroupComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.groupData) {
-      this.groupService.deleteGroup(this.orgId, this.groupData.id).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Group deleted successfully',
-          });
-          this.router.navigate(['/app/group']);
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to delete category',
-          });
-        },
-        complete: () => {
-          this.showDeleteConfirm = false;
-        },
-      });
+      this.groupService
+        .deleteGroup(this.orgId, this.groupData.id)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate([GROUP.LIST]);
+          }
+        });
     }
   }
 }

@@ -220,13 +220,10 @@ export class AddSectionComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
+      }
     });
   }
 
@@ -245,19 +242,9 @@ export class AddSectionComponent implements OnInit {
         sections: this.transformSections(formValue.tabGroups),
       };
 
-      this.sectionService.addSection(transformedData).subscribe({
-        next: () => {
+      this.sectionService.addSection(transformedData).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([SECTION.LIST]);
-        },
-        error: error => {
-          console.error('Error adding section:', error);
-        },
-      });
-    } else {
-      Object.keys(this.sectionForm.controls).forEach(key => {
-        const control = this.sectionForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }
@@ -310,14 +297,10 @@ export class AddSectionComponent implements OnInit {
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
-        this.databases = response.data;
-      },
-      error: error => {
-        this.databases = [];
-        console.error('Error loading databases:', error);
-      },
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.databases = [...response.data];
+      }
     });
   }
 
@@ -341,13 +324,10 @@ export class AddSectionComponent implements OnInit {
       pageNumber: 1,
       limit: 100,
     };
-    this.tabService.listTab(param).subscribe({
-      next: (response: any) => {
-        this.tabs = response.data;
-      },
-      error: error => {
-        console.error('Error loading tabs:', error);
-      },
+    this.tabService.listTab(param).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.tabs = [...response.data];
+      }
     });
   }
 

@@ -75,17 +75,14 @@ export class ListCredentialsComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadCredentials();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -97,17 +94,14 @@ export class ListCredentialsComponent implements OnInit {
       limit: this.pageSize,
     };
     // Implement credentials loading logic
-    this.credentialService.listCredentials(params).subscribe({
-      next: (response: any) => {
+    this.credentialService.listCredentials(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.credentials = response.data.credentials;
         this.filteredCredentials = [...this.credentials];
         this.totalItems = this.credentials.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
-      },
-      error: error => {
-        console.error('Error loading credentials:', error);
-      },
+      }
     });
   }
 
@@ -168,15 +162,11 @@ export class ListCredentialsComponent implements OnInit {
     // Implement delete functionality
     this.credentialService
       .deleteAllCredential(this.selectedOrg.id, this.selectedCredCategoryId)
-      .subscribe({
-        next: () => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.showDeleteConfirm = false;
           this.loadCredentials();
-        },
-        error: error => {
-          console.error('Error deleting credentials', error);
-          this.showDeleteConfirm = false;
-        },
+        }
       });
   }
 
@@ -190,14 +180,11 @@ export class ListCredentialsComponent implements OnInit {
 
     this.credentialService
       .downloadCredentials(this.selectedOrg.id, categoryId)
-      .subscribe({
-        next: (response: Blob) => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           const filename = `Credentials_${this.selectedOrg.name}.xlsx`;
           saveAs(response, filename);
-        },
-        error: error => {
-          console.error('Error downloading credentials:', error);
-        },
+        }
       });
   }
 }

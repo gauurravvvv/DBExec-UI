@@ -5,6 +5,7 @@ import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from '../../services/auth.service';
 import { REGEX } from 'src/app/constants/regex.constant';
+import { AUTH } from 'src/app/constants/routes';
 
 @Component({
   selector: 'app-forgot-password',
@@ -36,8 +37,8 @@ export class ForgotPasswordComponent implements OnInit {
       this.loginService
         .generateOTP(this.forgotPasswordForm)
         .then((res: any) => {
-          if (this.globalService.handleAPIResponse(res)) {
-            this.router.navigate(['/reset-password'], {
+          if (this.globalService.handleSuccessService(res)) {
+            this.router.navigate([AUTH.RESET_PASSWORD], {
               replaceUrl: true,
               queryParams: {
                 id: res.data.userId,

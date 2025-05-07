@@ -7,12 +7,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatasetService } from '../../services/dataset.service';
-import { DATASET } from 'src/app/constants/routes';
 
 @Component({
   selector: 'app-add-dataset',
@@ -127,13 +127,10 @@ export class AddDatasetComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
+      }
     });
   }
 
@@ -145,14 +142,10 @@ export class AddDatasetComponent implements OnInit {
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
-        this.databases = response.data;
-      },
-      error: error => {
-        this.databases = [];
-        console.error('Error loading databases:', error);
-      },
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.databases = [...response.data];
+      }
     });
   }
 
@@ -186,8 +179,8 @@ export class AddDatasetComponent implements OnInit {
       databaseId: this.selectedDatabase.id,
     };
 
-    this.databaseService.listDatabaseSchemas(params).subscribe({
-      next: (response: any) => {
+    this.databaseService.listDatabaseSchemas(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.staticSchemaData = response.data;
         // Load schemas from static data
         this.schemas = this.staticSchemaData.map(schema => ({
@@ -195,10 +188,7 @@ export class AddDatasetComponent implements OnInit {
         }));
         // Add first empty mapping row
         this.addSchemaGroup();
-      },
-      error: error => {
-        console.error('Error loading schemas:', error);
-      },
+      }
     });
   }
 
@@ -220,16 +210,11 @@ export class AddDatasetComponent implements OnInit {
         columnMappings: mappings,
       };
 
-      console.log('Submitting dataset:', payload);
       // Call your API service here
-      this.datasetService.addDataset(payload).subscribe({
-        next: (response: any) => {
-          console.log('Dataset added successfully:', response);
+      this.datasetService.addDataset(payload).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([DATASET.LIST]);
-        },
-        error: error => {
-          console.error('Error adding dataset:', error);
-        },
+        }
       });
     }
   }

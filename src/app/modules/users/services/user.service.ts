@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
 import { USER } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
@@ -16,21 +15,21 @@ export class UserService {
       .get(
         USER.LIST + `/${params.orgId}` + `/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteUser(id: string, orgId: string) {
-    return this.http.delete(USER.DELETE + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(USER.DELETE + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   addUser(userForm: FormGroup) {
@@ -53,21 +52,21 @@ export class UserService {
         mobile,
         organisation,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   viewOrgUser(orgId: string, id: string) {
-    return this.http.get(USER.VIEW + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(USER.VIEW + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   updateUser(userForm: FormGroup) {
@@ -92,22 +91,20 @@ export class UserService {
         organisation,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   updateUserPassword(id: string, password: string) {
     return this.http
       .put(USER.UPDATE_PASSWORD, { id, newPassword: password })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }

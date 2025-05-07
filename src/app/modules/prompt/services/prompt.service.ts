@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
-import { PROMPT, SUPER_ADMIN } from 'src/app/constants/api';
+import { PROMPT } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -13,21 +12,21 @@ export class PromptService {
   listPrompt(params: any) {
     return this.http
       .get(PROMPT.LIST + `/${params.orgId}/${params.sectionId}`)
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deletePrompt(orgId: string, id: string) {
-    return this.http.delete(PROMPT.DELETE + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(PROMPT.DELETE + `${orgId}/${id}`)
+      .toPromise()
+      .then(response => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   addPrompt(promptForm: any) {
@@ -39,21 +38,21 @@ export class PromptService {
         tab,
         prompts,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   viewPrompt(orgId: string, id: string) {
-    return this.http.get(PROMPT.VIEW + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(PROMPT.VIEW + `${orgId}/${id}`)
+      .toPromise()
+      .then(response => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   updatePrompt(promptForm: FormGroup) {
@@ -78,12 +77,11 @@ export class PromptService {
         description,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   configPrompt(promptConfigData: any) {
@@ -106,20 +104,20 @@ export class PromptService {
         promptWhere,
         promptValues,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   getConfig(orgId: string, id: string) {
-    return this.http.get(PROMPT.GET_CONFIG + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(PROMPT.GET_CONFIG + `${orgId}/${id}`)
+      .toPromise()
+      .then(response => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 }

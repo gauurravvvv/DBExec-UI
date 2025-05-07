@@ -134,8 +134,8 @@ export class EditDatabaseComponent implements OnInit {
   }
 
   loadDatabaseData(): void {
-    this.databaseService.viewDatabase(this.databaseId).subscribe({
-      next: response => {
+    this.databaseService.viewDatabase(this.databaseId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.isMasterDatabase = response.data.isMasterDB;
         this.organisationId = response.data.organisationId;
 
@@ -161,14 +161,7 @@ export class EditDatabaseComponent implements OnInit {
         this.initialFormValues = { ...formData };
         this.databaseForm.patchValue(formData);
         this.isFormDirty = false;
-      },
-      error: error => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load database details',
-        });
-      },
+      }
     });
   }
 
@@ -190,22 +183,10 @@ export class EditDatabaseComponent implements OnInit {
         status: this.isMasterDatabase ? 1 : formValue.status ? 1 : 0,
       };
 
-      this.databaseService.updateDatabase(payload).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Database updated successfully',
-          });
+      this.databaseService.updateDatabase(payload).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([DATABASE.LIST]);
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to update database',
-          });
-        },
+        }
       });
     }
   }

@@ -69,42 +69,31 @@ export class EditEnvironmentComponent implements OnInit {
   }
 
   loadEnvironmentData() {
-    this.environmentService.viewEnvironment(this.orgId, this.envId).subscribe({
-      next: (response: any) => {
-        this.envData = response.data;
+    this.environmentService
+      .viewEnvironment(this.orgId, this.envId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.envData = response.data;
 
-        this.envForm.patchValue({
-          id: this.envData.id,
-          name: this.envData.name,
-          description: this.envData.description,
-          organisation: this.envData.organisationId,
-          status: this.envData.status,
-        });
+          this.envForm.patchValue({
+            id: this.envData.id,
+            name: this.envData.name,
+            description: this.envData.description,
+            organisation: this.envData.organisationId,
+            status: this.envData.status,
+          });
 
-        this.selectedOrgName = this.envData.organisationName;
-      },
-      error: error => {
-        console.error('Error loading environment data:', error);
-      },
-    });
+          this.selectedOrgName = this.envData.organisationName;
+        }
+      });
   }
 
   onSubmit() {
     console.log(this.envForm.getRawValue());
     if (this.envForm.valid) {
-      this.environmentService.editEnvironment(this.envForm).subscribe({
-        next: () => {
+      this.environmentService.editEnvironment(this.envForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ENVIRONMENT.LIST]);
-        },
-        error: error => {
-          console.error('Error updating environment:', error);
-        },
-      });
-    } else {
-      Object.keys(this.envForm.controls).forEach(key => {
-        const control = this.envForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

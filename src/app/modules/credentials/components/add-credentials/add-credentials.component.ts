@@ -108,17 +108,14 @@ export class AddCredentialsComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadCategories();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -130,14 +127,10 @@ export class AddCredentialsComponent implements OnInit {
       limit: 100,
     };
 
-    this.categoryService.listCategories(params).subscribe({
-      next: (response: any) => {
+    this.categoryService.listCategories(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.categories = response.data.categories;
-      },
-      error: error => {
-        this.categories = [];
-        console.error('Error loading categories:', error);
-      },
+      }
     });
   }
 
@@ -170,14 +163,11 @@ export class AddCredentialsComponent implements OnInit {
   loadCategoryDetails(categoryId: any) {
     this.categoryService
       .viewCategory(this.selectedOrg.id, categoryId)
-      .subscribe({
-        next: (response: any) => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
           this.categoryData = response.data;
           this.initializeCredentialFields();
-        },
-        error: error => {
-          console.error('Error loading category details:', error);
-        },
+        }
       });
   }
 
@@ -252,15 +242,10 @@ export class AddCredentialsComponent implements OnInit {
         })),
       };
 
-      console.log('Transformed data:', transformedData);
-
-      this.credentialService.addCredential(transformedData).subscribe({
-        next: () => {
+      this.credentialService.addCredential(transformedData).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([CREDENTIAL.LIST]);
-        },
-        error: error => {
-          console.error('Error adding credentials:', error);
-        },
+        }
       });
     } else {
       this.markAllFieldsAsTouched();

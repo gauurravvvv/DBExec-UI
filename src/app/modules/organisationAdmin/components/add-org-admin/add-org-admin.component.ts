@@ -74,13 +74,10 @@ export class AddOrgAdminComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
+      }
     });
   }
 
@@ -91,19 +88,9 @@ export class AddOrgAdminComponent implements OnInit {
 
   onSubmit() {
     if (this.orgForm.valid) {
-      this.orgAdminService.addOrganisationAdmin(this.orgForm).subscribe({
-        next: () => {
+      this.orgAdminService.addOrganisationAdmin(this.orgForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ORGANISATION_ADMIN.LIST]);
-        },
-        error: error => {
-          console.error('Error adding organisation admin:', error);
-        },
-      });
-    } else {
-      Object.keys(this.orgForm.controls).forEach(key => {
-        const control = this.orgForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

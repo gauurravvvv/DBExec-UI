@@ -5,6 +5,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { CredentialService } from '../../services/credential.service';
 import { CREDENTIAL } from 'src/app/constants/routes';
 import { saveAs } from 'file-saver';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 interface CredentialValue {
   fieldName: string;
@@ -63,7 +64,8 @@ export class ViewCredentialsComponent implements OnInit {
     private router: Router,
     private credentialsService: CredentialService,
     private messageService: MessageService,
-    private clipboard: Clipboard
+    private clipboard: Clipboard,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit(): void {
@@ -76,21 +78,12 @@ export class ViewCredentialsComponent implements OnInit {
   }
 
   loadCredentialDetails(orgId: string, categoryId: string): void {
-    this.credentialsService.getCredential(orgId, categoryId).subscribe({
-      next: response => {
-        if (response.status && response.data) {
-          this.credentialDetails = response.data;
-          this.totalItems = this.credentialDetails?.values?.length || 0;
-          this.updatePagination();
-        }
-      },
-      error: error => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load credential details',
-        });
-      },
+    this.credentialsService.getCredential(orgId, categoryId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.credentialDetails = response.data;
+        this.totalItems = this.credentialDetails?.values?.length || 0;
+        this.updatePagination();
+      }
     });
   }
 
@@ -137,14 +130,11 @@ export class ViewCredentialsComponent implements OnInit {
 
     this.credentialsService
       .downloadCredentials(this.selectedOrgId, this.selectedCategoryId)
-      .subscribe({
-        next: (response: Blob) => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           const filename = `Credentials_${this.credentialDetails?.organisationName}.xlsx`;
           saveAs(response, filename);
-        },
-        error: error => {
-          console.error('Error downloading credentials:', error);
-        },
+        }
       });
   }
 
@@ -160,15 +150,11 @@ export class ViewCredentialsComponent implements OnInit {
   confirmAllDelete() {
     this.credentialsService
       .deleteAllCredential(this.selectedOrgId, this.selectedCategoryId)
-      .subscribe({
-        next: () => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.showAllDeleteConfirm = false;
           this.router.navigate([CREDENTIAL.LIST]);
-        },
-        error: error => {
-          console.error('Error deleting credentials', error);
-          this.showAllDeleteConfirm = false;
-        },
+        }
       });
   }
 
@@ -202,20 +188,15 @@ export class ViewCredentialsComponent implements OnInit {
             this.credentialDetails.organisationId,
             this.selectedCredentialId.toString()
           )
-          .subscribe({
-            next: () => {
+          .then(response => {
+            if (this.globalService.handleSuccessService(response)) {
               this.showDeleteConfirm = false;
               this.selectedCredentialId = null;
               this.loadCredentialDetails(
                 this.selectedOrgId,
                 this.selectedCategoryId
               );
-            },
-            error: error => {
-              console.error('Error deleting organisation user:', error);
-              this.showDeleteConfirm = false;
-              this.selectedCredentialId = null;
-            },
+            }
           });
       }
     }
@@ -251,16 +232,13 @@ export class ViewCredentialsComponent implements OnInit {
     this.showEditDialog = false;
     //call update secrets api
     if (updatedData) {
-      this.credentialsService.editCredential(updatedData).subscribe({
-        next: () => {
+      this.credentialsService.editCredential(updatedData).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.loadCredentialDetails(
             this.selectedOrgId,
             this.selectedCategoryId
           );
-        },
-        error: error => {
-          console.error('Error updating credentials:', error);
-        },
+        }
       });
     }
   }
@@ -279,16 +257,13 @@ export class ViewCredentialsComponent implements OnInit {
   changeVisibility(credentialId: number): void {
     this.credentialsService
       .changeVisibility(this.selectedOrgId, credentialId.toString())
-      .subscribe({
-        next: () => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.loadCredentialDetails(
             this.selectedOrgId,
             this.selectedCategoryId
           );
-        },
-        error: error => {
-          console.error('Error changing visibility:', error);
-        },
+        }
       });
   }
 

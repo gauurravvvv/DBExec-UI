@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CATEGORY } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
 import { CategoryService } from '../../services/category.service';
-import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-view-category',
@@ -19,7 +19,7 @@ export class ViewCategoryComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private categoryService: CategoryService,
-    private messageService: MessageService
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
@@ -29,23 +29,17 @@ export class ViewCategoryComponent implements OnInit {
   }
 
   loadCategoryDetails() {
-    this.categoryService.viewCategory(this.orgId, this.categoryId).subscribe({
-      next: (response: any) => {
-        this.categoryData = response.data;
-      },
-      error: error => {
-        console.error('Error loading category details:', error);
-      },
-    });
+    this.categoryService
+      .viewCategory(this.orgId, this.categoryId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.categoryData = response.data;
+        }
+      });
   }
 
   onEdit() {
-    this.router.navigate([CATEGORY.EDIT, this.orgId, this.categoryId], {
-      queryParams: {
-        orgId: this.orgId,
-        adminId: this.categoryId,
-      },
-    });
+    this.router.navigate([CATEGORY.EDIT, this.orgId, this.categoryId]);
   }
 
   goBack() {
@@ -64,25 +58,10 @@ export class ViewCategoryComponent implements OnInit {
     if (this.categoryData) {
       this.categoryService
         .deleteCategory(this.orgId, this.categoryData.id)
-        .subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Category deleted successfully',
-            });
-            this.router.navigate(['/app/category']);
-          },
-          error: error => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete category',
-            });
-          },
-          complete: () => {
-            this.showDeleteConfirm = false;
-          },
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate([CATEGORY.LIST]);
+          }
         });
     }
   }

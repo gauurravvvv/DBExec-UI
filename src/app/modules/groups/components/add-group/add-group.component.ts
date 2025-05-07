@@ -79,13 +79,10 @@ export class AddGroupComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -99,32 +96,18 @@ export class AddGroupComponent implements OnInit {
       limit: 100,
     };
 
-    this.userService.listUser(params).subscribe({
-      next: (response: any) => {
+    this.userService.listUser(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.users = response.data.users;
-      },
-      error: error => {
-        console.error('Error loading users:', error);
-        this.users = [];
-      },
+      }
     });
   }
 
   onSubmit() {
     if (this.canSubmit()) {
-      this.groupService.addGroup(this.userGroupForm).subscribe({
-        next: () => {
+      this.groupService.addGroup(this.userGroupForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([GROUP.LIST]);
-        },
-        error: error => {
-          console.error('Error adding environment:', error);
-        },
-      });
-    } else {
-      Object.keys(this.userGroupForm.controls).forEach(key => {
-        const control = this.userGroupForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

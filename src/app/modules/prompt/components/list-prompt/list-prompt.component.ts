@@ -99,17 +99,14 @@ export class ListPromptComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadDatabases();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -146,18 +143,15 @@ export class ListPromptComponent implements OnInit {
       sectionId: this.selectedSection.id,
     };
 
-    this.promptService.listPrompt(params).subscribe({
-      next: (response: any) => {
+    this.promptService.listPrompt(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.prompts = response.data;
         this.filteredPrompts = [...this.prompts];
         this.totalItems = this.prompts.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        console.error('Error loading databases:', error);
-      },
+      }
     });
   }
 
@@ -169,17 +163,14 @@ export class ListPromptComponent implements OnInit {
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.databases = response.data;
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0];
           this.loadTabs();
         }
-      },
-      error: error => {
-        console.error('Error loading databases:', error);
-      },
+      }
     });
   }
 
@@ -192,18 +183,15 @@ export class ListPromptComponent implements OnInit {
       limit: 100,
     };
 
-    this.tabService.listTab(params).subscribe({
-      next: (response: any) => {
+    this.tabService.listTab(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.tabs = response.data;
         if (this.tabs.length > 0) {
           this.selectedTab = this.tabs[0];
           this.tabTreeNodes = this.transformToTreeNodes(this.tabs);
           this.selectedNode = this.tabTreeNodes[0];
         }
-      },
-      error: error => {
-        console.error('Error loading tabs:', error);
-      },
+      }
     });
   }
 
@@ -266,17 +254,12 @@ export class ListPromptComponent implements OnInit {
     if (this.promptToDelete) {
       this.promptService
         .deletePrompt(this.selectedOrg.id, this.promptToDelete)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadPrompts();
             this.showDeleteConfirm = false;
             this.promptToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting prompt:', error);
-            this.showDeleteConfirm = false;
-            this.promptToDelete = null;
-          },
+          }
         });
     }
   }

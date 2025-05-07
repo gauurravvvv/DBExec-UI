@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DatasetService } from '../../services/dataset.service';
 import { DATASET } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasetService } from '../../services/dataset.service';
 
 @Component({
   selector: 'app-view-dataset',
@@ -19,7 +20,8 @@ export class ViewDatasetComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private datasetService: DatasetService
+    private datasetService: DatasetService,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
@@ -30,15 +32,12 @@ export class ViewDatasetComponent implements OnInit {
     const orgId = this.route.snapshot.params['orgId'];
     const datasetId = this.route.snapshot.params['id'];
 
-    this.datasetService.viewDataset(orgId, datasetId).subscribe({
-      next: (response: any) => {
+    this.datasetService.viewDataset(orgId, datasetId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.datasetData = response.data;
         this.originalMappings = this.datasetData.datasetMapping;
         this.filteredMappings = [...this.originalMappings];
-      },
-      error: error => {
-        console.error('Error loading dataset:', error);
-      },
+      }
     });
   }
 
@@ -165,13 +164,10 @@ export class ViewDatasetComponent implements OnInit {
   proceedDelete() {
     this.datasetService
       .deleteDataset(this.datasetData.organisationId, this.datasetData.id)
-      .subscribe({
-        next: () => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([DATASET.LIST]);
-        },
-        error: error => {
-          console.error('Error deleting dataset:', error);
-        },
+        }
       });
   }
 }

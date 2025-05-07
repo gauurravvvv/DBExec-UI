@@ -71,17 +71,14 @@ export class ListGroupComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadGroups();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -99,23 +96,15 @@ export class ListGroupComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.groupService.listGroupps(params).subscribe({
-      next: (response: any) => {
+    this.groupService.listGroupps(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.groups = response.data.groups;
         this.filteredGroups = [...this.groups];
         this.totalItems = response.data.total || this.groups.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        this.groups = [];
-        this.filteredGroups = [];
-        this.totalItems = 0;
-        this.totalPages = 0;
-        this.pages = [];
-        console.error('Error loading groups:', error);
-      },
+      }
     });
   }
 
@@ -177,17 +166,12 @@ export class ListGroupComponent implements OnInit {
     if (this.groupToDelete) {
       this.groupService
         .deleteGroup(this.selectedOrg.id, this.groupToDelete)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadGroups();
             this.showDeleteConfirm = false;
             this.groupToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting group:', error);
-            this.showDeleteConfirm = false;
-            this.groupToDelete = null;
-          },
+          }
         });
     }
   }

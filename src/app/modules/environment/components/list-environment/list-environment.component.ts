@@ -70,17 +70,14 @@ export class ListEnvironmentComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadEnvs();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -98,18 +95,15 @@ export class ListEnvironmentComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.environmentService.listEnvironments(params).subscribe({
-      next: (response: any) => {
-        this.envs = response.data.envs;
+    this.environmentService.listEnvironments(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.envs = [...response.data.envs];
         this.filteredEnvs = [...this.envs];
         this.totalItems = this.envs.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        console.error('Error loading envs:', error);
-      },
+      }
     });
   }
 
@@ -171,17 +165,12 @@ export class ListEnvironmentComponent implements OnInit {
     if (this.envToDelete) {
       this.environmentService
         .deleteEnvironment(this.selectedOrg.id, this.envToDelete)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadEnvs();
             this.showDeleteConfirm = false;
             this.envToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting env:', error);
-            this.showDeleteConfirm = false;
-            this.envToDelete = null;
-          },
+          }
         });
     }
   }

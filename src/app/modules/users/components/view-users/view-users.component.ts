@@ -33,15 +33,12 @@ export class ViewUsersComponent implements OnInit {
   }
 
   loadAdminData() {
-    this.userService.viewOrgUser(this.orgId, this.userId).subscribe({
-      next: (response: any) => {
+    this.userService.viewOrgUser(this.orgId, this.userId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.userData = response.data;
         this.setAdminInitials();
         this.generateAvatarBackground();
-      },
-      error: error => {
-        console.error('Error loading admin data:', error);
-      },
+      }
     });
   }
 
@@ -77,13 +74,10 @@ export class ViewUsersComponent implements OnInit {
   }
 
   proceedDelete() {
-    this.userService.deleteUser(this.userId, this.orgId).subscribe({
-      next: () => {
+    this.userService.deleteUser(this.userId, this.orgId).then(response => {
+      if (this.globalService.handleSuccessService(response)) {
         this.router.navigate([ORGANISATION_ADMIN.LIST]);
-      },
-      error: error => {
-        console.error('Error deleting organisation admin:', error);
-      },
+      }
     });
   }
 
@@ -93,24 +87,13 @@ export class ViewUsersComponent implements OnInit {
 
   onPasswordDialogClose(newPassword: string | null) {
     if (newPassword) {
-      this.userService.updateUserPassword(this.userId, newPassword).subscribe({
-        next: response => {
-          this.globalService.handleAPIResponse({
-            status: true,
-            message: response.message,
-          });
-        },
-        error: error => {
-          this.globalService.handleAPIResponse({
-            status: false,
-            message:
-              error?.error?.message ||
-              error?.message ||
-              'Failed to update password',
-          });
-        },
-      });
+      this.userService
+        .updateUserPassword(this.userId, newPassword)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showChangePasswordDialog = false;
+          }
+        });
     }
-    this.showChangePasswordDialog = false;
   }
 }

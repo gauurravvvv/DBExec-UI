@@ -63,36 +63,15 @@ export class ViewDatabaseComponent implements OnInit {
 
   // Changed from private to public
   loadDatabaseData(): void {
-    this.databaseService.viewDatabase(this.dbId).subscribe({
-      next: (response: any) => {
-        if (this.globalService.handleAPIResponse(response)) {
-          this.dbData = response.data;
-          this.prepareChartData();
-          this.updateChartOptions(); // Update options after data is loaded
-          this.filteredSchemas = this.dbData.statistics.schemaStats;
-          this.prepareTopStorageTables();
-        }
-      },
-      error: error => {
-        this.globalService.handleAPIResponse({
-          status: false,
-          message:
-            error?.error?.message ||
-            error?.message ||
-            'Failed to load database',
-        });
-      },
+    this.databaseService.viewDatabase(this.dbId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.dbData = response.data;
+        this.prepareChartData();
+        this.updateChartOptions(); // Update options after data is loaded
+        this.filteredSchemas = this.dbData.statistics.schemaStats;
+        this.prepareTopStorageTables();
+      }
     });
-  }
-
-  // Add missing methods
-  syncDatabase(): void {
-    // Implementation for syncing database
-    // this.globalService.showToast(
-    //   'info',
-    //   'Syncing database...',
-    //   'This feature is coming soon'
-    // );
   }
 
   onSchemaSearch(event: any): void {
@@ -342,21 +321,10 @@ export class ViewDatabaseComponent implements OnInit {
     if (this.dbData) {
       this.databaseService
         .deleteDatabase(this.dbData.id, this.deleteConfiguration)
-        .subscribe({
-          next: response => {
-            if (this.globalService.handleAPIResponse(response)) {
-              this.router.navigate([DATABASE.LIST]);
-            }
-          },
-          error: error => {
-            this.globalService.handleAPIResponse({
-              status: false,
-              message:
-                error?.error?.message ||
-                error?.message ||
-                'Failed to delete database',
-            });
-          },
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate([DATABASE.LIST]);
+          }
         });
     }
   }

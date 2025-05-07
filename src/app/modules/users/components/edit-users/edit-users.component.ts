@@ -80,8 +80,8 @@ export class EditUsersComponent implements OnInit {
   }
 
   loadAdminData() {
-    this.userService.viewOrgUser(this.orgId, this.userId).subscribe({
-      next: (response: any) => {
+    this.userService.viewOrgUser(this.orgId, this.userId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.userData = response.data;
         this.userForm.patchValue({
           id: this.userData.id,
@@ -94,10 +94,7 @@ export class EditUsersComponent implements OnInit {
           status: this.userData.status,
         });
         this.selectedOrgName = this.userData.organisationName;
-      },
-      error: error => {
-        console.error('Error loading admin data:', error);
-      },
+      }
     });
   }
 
@@ -110,19 +107,9 @@ export class EditUsersComponent implements OnInit {
 
   onSubmit() {
     if (this.userForm.valid) {
-      this.userService.updateUser(this.userForm).subscribe({
-        next: () => {
+      this.userService.updateUser(this.userForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([USER.LIST]);
-        },
-        error: error => {
-          console.error('Error updating user:', error);
-        },
-      });
-    } else {
-      Object.keys(this.userForm.controls).forEach(key => {
-        const control = this.userForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

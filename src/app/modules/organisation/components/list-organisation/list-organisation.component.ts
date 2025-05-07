@@ -4,6 +4,7 @@ import { ORGANISATION } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 import { OrganisationService } from '../../services/organisation.service';
 import { MenuItem } from 'primeng/api';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 @Component({
   selector: 'app-list-organisation',
@@ -55,7 +56,8 @@ export class ListOrganisationComponent implements OnInit {
 
   constructor(
     private organisationService: OrganisationService,
-    private router: Router
+    private router: Router,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit(): void {
@@ -129,10 +131,12 @@ export class ListOrganisationComponent implements OnInit {
   listOrganisationAPI() {
     this.organisationService
       .listOrganisation(this.listParams)
-      .subscribe((res: any) => {
-        this.organisations = [...res.data.orgs];
-        this.filteredOrgs = [...this.organisations];
-        this.totalItems = this.organisations.length;
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res, false)) {
+          this.organisations = [...res.data.orgs];
+          this.filteredOrgs = [...this.organisations];
+          this.totalItems = this.organisations.length;
+        }
       });
   }
 
@@ -157,8 +161,8 @@ export class ListOrganisationComponent implements OnInit {
   onDelete(orgId: number) {
     this.organisationService
       .deleteOrganisation(orgId.toString())
-      .subscribe((res: any) => {
-        if (res.status) {
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
           this.listOrganisationAPI();
         }
       });

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PROMPT } from 'src/app/constants/routes';
-import { MessageService } from 'primeng/api';
 import { PromptService } from '../../services/prompt.service';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 @Component({
   selector: 'app-view-prompt',
@@ -18,8 +18,8 @@ export class ViewPromptComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private messageService: MessageService,
-    private promptService: PromptService
+    private promptService: PromptService,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
@@ -29,13 +29,10 @@ export class ViewPromptComponent implements OnInit {
   }
 
   loadPromptData() {
-    this.promptService.viewPrompt(this.orgId, this.promptId).subscribe({
-      next: (response: any) => {
+    this.promptService.viewPrompt(this.orgId, this.promptId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.promptData = response.data;
-      },
-      error: error => {
-        console.error('Error loading category details:', error);
-      },
+      }
     });
   }
 
@@ -57,26 +54,13 @@ export class ViewPromptComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.promptData) {
-      this.promptService.deletePrompt(this.orgId, this.promptId).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Prompt deleted successfully',
-          });
-          this.router.navigate(['/app/prompt']);
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to delete prompt',
-          });
-        },
-        complete: () => {
-          this.showDeleteConfirm = false;
-        },
-      });
+      this.promptService
+        .deletePrompt(this.orgId, this.promptId)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate([PROMPT.LIST]);
+          }
+        });
     }
   }
 }

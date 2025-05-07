@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
 import { TAB } from 'src/app/constants/api';
 
 @Injectable({
@@ -16,21 +15,21 @@ export class TabService {
         TAB.LIST +
           `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteTab(orgId: string, id: string) {
-    return this.http.delete(TAB.DELETE + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(TAB.DELETE + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   addTab(tabForm: FormGroup) {
@@ -41,21 +40,21 @@ export class TabService {
         database,
         tabs,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   viewTab(orgId: string, id: string) {
-    return this.http.get(TAB.VIEW + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(TAB.VIEW + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   updateTab(tabForm: FormGroup) {
@@ -70,11 +69,10 @@ export class TabService {
         database,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }

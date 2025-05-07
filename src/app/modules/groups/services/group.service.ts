@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
-import { GROUP, ENVIRONMENT } from 'src/app/constants/api';
+import { GROUP } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
@@ -18,12 +17,11 @@ export class GroupService {
           `/${params.orgId}` +
           `/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   addGroup(categoryForm: FormGroup) {
@@ -37,30 +35,31 @@ export class GroupService {
         environments,
         users,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteGroup(orgId: string, id: string) {
-    return this.http.delete(GROUP.DELETE + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(GROUP.DELETE + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   viewGroup(orgId: string, categoryId: string) {
-    return this.http.get(GROUP.VIEW + `${orgId}/${categoryId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(GROUP.VIEW + `${orgId}/${categoryId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   editGroup(groupForm: FormGroup) {
@@ -75,11 +74,10 @@ export class GroupService {
         users,
         organisation,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }

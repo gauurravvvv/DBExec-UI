@@ -58,8 +58,8 @@ export class EditOrgAdminComponent implements OnInit {
   loadAdminData() {
     this.orgAdminService
       .viewOrganisationAdmin(this.selectedOrgId, this.adminId)
-      .subscribe({
-        next: (response: any) => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
           this.adminData = response.data;
           this.orgForm.patchValue({
             id: this.adminData.id,
@@ -72,10 +72,7 @@ export class EditOrgAdminComponent implements OnInit {
             status: this.adminData.status,
           });
           this.selectedOrgName = this.adminData.organisationName;
-        },
-        error: error => {
-          console.error('Error loading admin data:', error);
-        },
+        }
       });
   }
 
@@ -88,19 +85,9 @@ export class EditOrgAdminComponent implements OnInit {
 
   onSubmit() {
     if (this.orgForm.valid) {
-      this.orgAdminService.updateOrgAdmin(this.orgForm).subscribe({
-        next: () => {
+      this.orgAdminService.updateOrgAdmin(this.orgForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ORGANISATION_ADMIN.LIST]);
-        },
-        error: error => {
-          console.error('Error updating organisation admin:', error);
-        },
-      });
-    } else {
-      Object.keys(this.orgForm.controls).forEach(key => {
-        const control = this.orgForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

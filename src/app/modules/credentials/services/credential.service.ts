@@ -17,12 +17,11 @@ export class CredentialService {
           `/${params.orgId}` +
           `/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   addCredential(credentialForm: any) {
@@ -33,39 +32,41 @@ export class CredentialService {
         categoryId,
         credentials,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteCredential(orgId: string, credentialId: string) {
-    return this.http.delete(SECRET.DELETE + `${orgId}/${credentialId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(SECRET.DELETE + `${orgId}/${credentialId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   deleteAllCredential(orgId: string, categoryId: string) {
-    return this.http.delete(SECRET.DELETE_ALL + `${orgId}/${categoryId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(SECRET.DELETE_ALL + `${orgId}/${categoryId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   getCredential(orgId: string, categoryId: string) {
-    return this.http.get(SECRET.VIEW + `${orgId}/${categoryId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(SECRET.VIEW + `${orgId}/${categoryId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   editCredential(credentialData: any) {
@@ -76,28 +77,32 @@ export class CredentialService {
         values,
         organisationId,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   downloadCredentials(orgId: string, categoryId: string) {
-    return this.http.get(SECRET.DOWNLOAD + `${orgId}/${categoryId}`, {
-      responseType: 'blob',
-    });
+    return this.http
+      .get(SECRET.DOWNLOAD + `${orgId}/${categoryId}`, {
+        responseType: 'blob',
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   changeVisibility(orgId: string, credentialId: string) {
     return this.http
       .get(SECRET.CHANGE_VISIBILITY + `${orgId}/${credentialId}`)
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }

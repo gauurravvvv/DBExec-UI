@@ -1,3 +1,9 @@
+export const AUTH = {
+  LOGIN: '/login',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
+};
+
 export const SUPER_ADMIN = {
   ADD: '/app/super-admin/add',
   LIST: '/app/super-admin',

@@ -5,6 +5,7 @@ import { RESET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from '../../services/auth.service';
 import { REGEX } from 'src/app/constants/regex.constant';
+import { AUTH } from 'src/app/constants/routes';
 
 @Component({
   selector: 'app-reset-password',
@@ -47,7 +48,7 @@ export class ResetPasswordComponent implements OnInit {
       this.userId = +params['id'];
       if (!this.userId) {
         // Redirect back to forgot-password if ID is missing
-        this.router.navigate(['/forgot-password']);
+        this.router.navigate([AUTH.LOGIN]);
       }
     });
   }
@@ -63,9 +64,9 @@ export class ResetPasswordComponent implements OnInit {
       this.loginService
         .resetPassword(this.resetPasswordForm, this.userId)
         .then(res => {
-          if (this.globalService.handleAPIResponse(res)) {
+          if (this.globalService.handleSuccessService(res)) {
             // On success, navigate to login page
-            this.router.navigate(['/login'], { replaceUrl: true });
+            this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
           }
         });
     }

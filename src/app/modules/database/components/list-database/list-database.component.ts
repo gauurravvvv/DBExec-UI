@@ -72,17 +72,14 @@ export class ListDatabaseComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loaddbs();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -100,23 +97,15 @@ export class ListDatabaseComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.dbs = response.data;
         this.filteredDBs = [...this.dbs];
         this.totalItems = this.dbs.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        this.dbs = [];
-        this.filteredDBs = [];
-        this.totalItems = 0;
-        this.totalPages = 0;
-        this.pages = [];
-        console.error('Error loading dbs:', error);
-      },
+      }
     });
   }
 
@@ -177,17 +166,12 @@ export class ListDatabaseComponent implements OnInit {
     if (this.selectedDatabase) {
       this.databaseService
         .deleteDatabase(this.selectedDatabase.id, this.deleteConfiguration)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loaddbs();
             this.showDeleteConfirm = false;
             this.selectedDatabase = null;
-          },
-          error: error => {
-            console.error('Error deleting database', error);
-            this.showDeleteConfirm = false;
-            this.selectedDatabase = null;
-          },
+          }
         });
     }
   }

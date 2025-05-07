@@ -74,13 +74,10 @@ export class AddUsersComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -91,19 +88,9 @@ export class AddUsersComponent implements OnInit {
 
   onSubmit() {
     if (this.userForm.valid) {
-      this.userService.addUser(this.userForm).subscribe({
-        next: () => {
+      this.userService.addUser(this.userForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([USER.LIST]);
-        },
-        error: error => {
-          console.error('Error adding user:', error);
-        },
-      });
-    } else {
-      Object.keys(this.userForm.controls).forEach(key => {
-        const control = this.userForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

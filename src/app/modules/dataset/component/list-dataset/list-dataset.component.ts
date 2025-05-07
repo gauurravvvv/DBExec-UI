@@ -74,17 +74,14 @@ export class ListDatasetComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadDatabases();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -108,17 +105,14 @@ export class ListDatasetComponent implements OnInit {
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
-        this.databases = response.data;
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.databases = [...response.data];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0];
           this.loadDatasets();
         }
-      },
-      error: error => {
-        console.error('Error loading databases:', error);
-      },
+      }
     });
   }
 
@@ -131,23 +125,15 @@ export class ListDatasetComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.datasetService.listDatasets(params).subscribe({
-      next: (response: any) => {
-        this.datasets = response.data;
+    this.datasetService.listDatasets(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.datasets = [...response.data];
         this.filteredDatasets = [...this.datasets];
         this.totalItems = this.datasets.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        this.datasets = [];
-        this.filteredDatasets = [];
-        this.totalItems = 0;
-        this.totalPages = 0;
-        this.pages = [];
-        console.error('Error loading datasets:', error);
-      },
+      }
     });
   }
 
@@ -211,17 +197,12 @@ export class ListDatasetComponent implements OnInit {
     if (this.datasetToDelete) {
       this.datasetService
         .deleteDataset(this.selectedOrg.id, this.datasetToDelete)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadDatasets();
             this.showDeleteConfirm = false;
             this.datasetToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting dataset:', error);
-            this.showDeleteConfirm = false;
-            this.datasetToDelete = null;
-          },
+          }
         });
     }
   }

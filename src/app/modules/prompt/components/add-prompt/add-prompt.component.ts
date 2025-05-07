@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
-import { PROMPT, SECTION, TAB } from 'src/app/constants/routes';
+import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { PromptService } from 'src/app/modules/prompt/services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
-import { PromptService } from 'src/app/modules/prompt/services/prompt.service';
 import { PROMPT_TYPES } from '../../constants/prompt.constant';
 
 @Component({
@@ -222,13 +222,10 @@ export class AddPromptComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -248,20 +245,9 @@ export class AddPromptComponent implements OnInit {
         prompts: this.transformPrompts(),
       };
 
-      console.log(transformedData);
-      this.promptService.addPrompt(transformedData).subscribe({
-        next: () => {
+      this.promptService.addPrompt(transformedData).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([PROMPT.LIST]);
-        },
-        error: (error: any) => {
-          console.error('Error adding prompt:', error);
-        },
-      });
-    } else {
-      Object.keys(this.sectionForm.controls).forEach(key => {
-        const control = this.sectionForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }
@@ -319,14 +305,10 @@ export class AddPromptComponent implements OnInit {
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).subscribe({
-      next: (response: any) => {
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.databases = response.data;
-      },
-      error: error => {
-        this.databases = [];
-        console.error('Error loading databases:', error);
-      },
+      }
     });
   }
 
@@ -362,13 +344,10 @@ export class AddPromptComponent implements OnInit {
       pageNumber: 1,
       limit: 100,
     };
-    this.tabService.listTab(param).subscribe({
-      next: (response: any) => {
+    this.tabService.listTab(param).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.tabs = response.data;
-      },
-      error: error => {
-        console.error('Error loading tabs:', error);
-      },
+      }
     });
   }
 
@@ -380,16 +359,13 @@ export class AddPromptComponent implements OnInit {
       pageNumber: 1,
       limit: 100,
     };
-    this.sectionService.listSection(params).subscribe({
-      next: (response: any) => {
+    this.sectionService.listSection(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.sections = response.data;
         if (this.sectionGroups.length === 0) {
           this.addSectionGroup();
         }
-      },
-      error: error => {
-        console.error('Error loading sections:', error);
-      },
+      }
     });
   }
 

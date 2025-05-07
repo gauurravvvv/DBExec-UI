@@ -1,9 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
 import { DATABASE, DATASET, SUPER_ADMIN } from 'src/app/constants/api';
-import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -19,21 +17,21 @@ export class DatasetService {
           `/${params.databaseId}` +
           `/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteDataset(orgId: string, datasetId: string) {
-    return this.http.delete(DATASET.DELETE + `${orgId}` + `/${datasetId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(DATASET.DELETE + `${orgId}` + `/${datasetId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   addDataset(payload: any) {
@@ -48,21 +46,21 @@ export class DatasetService {
         database,
         columnMappings,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   viewSuperAdmin(id: string) {
-    return this.http.get(SUPER_ADMIN.VIEW + `${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(SUPER_ADMIN.VIEW + `${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   updateSuperAdmin(superAdminForm: FormGroup) {
@@ -78,21 +76,21 @@ export class DatasetService {
         mobile,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   viewDataset(orgId: string, id: string) {
-    return this.http.get(DATASET.VIEW + `${orgId}` + `/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(DATASET.VIEW + `${orgId}` + `/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   updateDatabase(payload: any) {
@@ -125,23 +123,21 @@ export class DatasetService {
         isMasterDB,
         status,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   listDatabaseSchemas(params: any) {
     return this.http
       .get(DATABASE.LIST_SCHEMAS + `${params.orgId}` + `/${params.databaseId}`)
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   listSchemaTables(params: any) {
@@ -152,12 +148,11 @@ export class DatasetService {
           `/${params.databaseId}` +
           `/${params.schemaName}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   listTableColumns(params: any) {
@@ -169,21 +164,21 @@ export class DatasetService {
           `/${params.schemaName}` +
           `/${params.tableName}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   getDataset(orgId: string, datasetId: string) {
-    return this.http.get(DATASET.VIEW + `${orgId}/${datasetId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(DATASET.VIEW + `${orgId}/${datasetId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   updateDataset(payload: any) {
@@ -207,11 +202,10 @@ export class DatasetService {
         columnMappings,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }

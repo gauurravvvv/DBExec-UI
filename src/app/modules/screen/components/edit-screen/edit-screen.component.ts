@@ -6,7 +6,6 @@ import { SCREEN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ScreenService } from '../../services/screen.service';
-import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-edit-screen',
@@ -29,8 +28,7 @@ export class EditScreenComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private screenService: ScreenService,
-    private route: ActivatedRoute,
-    private messageService: MessageService
+    private route: ActivatedRoute
   ) {
     this.initForm();
   }
@@ -72,7 +70,7 @@ export class EditScreenComponent implements OnInit {
 
   loadScreenDetails(): void {
     this.screenService.viewScreen(this.orgId, this.screenId).then(response => {
-      if (this.globalService.handleSuccessService(response, false, true)) {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.screenData = response.data;
         this.screenForm.patchValue({
           id: this.screenData.id,

@@ -71,8 +71,8 @@ export class EditPromptComponent implements OnInit {
   }
 
   loadPromptData(): void {
-    this.promptService.viewPrompt(this.orgId, this.promptId).subscribe({
-      next: response => {
+    this.promptService.viewPrompt(this.orgId, this.promptId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.sectionData = response.data;
 
         this.promptForm.patchValue({
@@ -92,14 +92,7 @@ export class EditPromptComponent implements OnInit {
         this.loadSectionData();
 
         this.promptForm.markAsPristine();
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load tab data',
-        });
-      },
+      }
     });
   }
 
@@ -110,32 +103,18 @@ export class EditPromptComponent implements OnInit {
       pageNumber: 1,
       limit: 100,
     };
-    this.sectionService.listSection(param).subscribe({
-      next: (response: any) => {
+    this.sectionService.listSection(param).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.sections = response.data;
-      },
-      error: error => {
-        console.error('Error loading sections:', error);
-      },
+      }
     });
   }
 
   onSubmit(): void {
     if (this.promptForm.valid) {
-      this.promptService.updatePrompt(this.promptForm).subscribe({
-        next: () => {
+      this.promptService.updatePrompt(this.promptForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([PROMPT.LIST]);
-        },
-        error: error => {
-          console.error('Error updating section:', error);
-        },
-      });
-      console.log(this.promptForm.value);
-    } else {
-      Object.keys(this.promptForm.controls).forEach(key => {
-        const control = this.promptForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

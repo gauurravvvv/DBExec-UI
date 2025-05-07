@@ -40,15 +40,12 @@ export class ViewOrgAdminComponent implements OnInit {
   loadAdminData() {
     this.orgAdminService
       .viewOrganisationAdmin(this.selectedOrgId, this.adminId)
-      .subscribe({
-        next: (response: any) => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
           this.adminData = response.data;
           this.setAdminInitials();
           this.generateAvatarBackground();
-        },
-        error: error => {
-          console.error('Error loading admin data:', error);
-        },
+        }
       });
   }
 
@@ -86,13 +83,10 @@ export class ViewOrgAdminComponent implements OnInit {
   proceedDelete() {
     this.orgAdminService
       .deleteAdminOrganisation(this.selectedOrgId, this.adminId)
-      .subscribe({
-        next: () => {
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ORGANISATION_ADMIN.LIST]);
-        },
-        error: error => {
-          console.error('Error deleting organisation admin:', error);
-        },
+        }
       });
   }
 
@@ -104,24 +98,11 @@ export class ViewOrgAdminComponent implements OnInit {
     if (newPassword) {
       this.orgAdminService
         .updateOrgAdminPassword(this.adminId, newPassword)
-        .subscribe({
-          next: response => {
-            this.globalService.handleAPIResponse({
-              status: true,
-              message: response.message,
-            });
-          },
-          error: error => {
-            this.globalService.handleAPIResponse({
-              status: false,
-              message:
-                error?.error?.message ||
-                error?.message ||
-                'Failed to update password',
-            });
-          },
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showChangePasswordDialog = false;
+          }
         });
     }
-    this.showChangePasswordDialog = false;
   }
 }

@@ -85,28 +85,9 @@ export class AddOrganisationComponent implements OnInit {
 
   onSubmit(): void {
     if (this.orgForm.valid) {
-      this.organisationService.addOrganisation(this.orgForm).subscribe({
-        next: response => {
-          if (this.globalService.handleAPIResponse(response)) {
-            this.router.navigate([ORGANISATION.LIST]);
-          }
-        },
-        error: error => {
-          // Handle error response directly from error object
-          this.globalService.handleAPIResponse({
-            status: false,
-            message:
-              error?.error?.message ||
-              error?.message ||
-              'Failed to add super admin',
-          });
-        },
-      });
-    } else {
-      Object.keys(this.orgForm.controls).forEach(key => {
-        const control = this.orgForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
+      this.organisationService.addOrganisation(this.orgForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.router.navigate([ORGANISATION.LIST]);
         }
       });
     }

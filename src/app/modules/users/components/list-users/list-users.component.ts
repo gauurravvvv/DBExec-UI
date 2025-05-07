@@ -70,17 +70,14 @@ export class ListUsersComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadUsers();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -98,23 +95,15 @@ export class ListUsersComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.userService.listUser(params).subscribe({
-      next: (response: any) => {
+    this.userService.listUser(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.users = response.data.users;
         this.filteredUsers = [...this.users];
         this.totalItems = this.users.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        this.users = [];
-        this.filteredUsers = [];
-        this.totalItems = 0;
-        this.totalPages = 0;
-        this.pages = [];
-        console.error('Error loading users:', error);
-      },
+      }
     });
   }
 
@@ -179,17 +168,12 @@ export class ListUsersComponent implements OnInit {
     if (this.userToDelete) {
       this.userService
         .deleteUser(this.userToDelete, this.selectedOrg.id)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadUsers();
             this.showDeleteConfirm = false;
             this.userToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting organisation user:', error);
-            this.showDeleteConfirm = false;
-            this.userToDelete = null;
-          },
+          }
         });
     }
   }

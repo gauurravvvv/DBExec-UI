@@ -149,13 +149,10 @@ export class AddCategoryComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response)) {
+        this.organisations = [...response.data.orgs];
+      }
     });
   }
 
@@ -169,14 +166,10 @@ export class AddCategoryComponent implements OnInit {
       limit: 100,
     };
 
-    this.environmentService.listEnvironments(params).subscribe({
-      next: (response: any) => {
-        this.environments = response.data.envs;
-      },
-      error: error => {
-        console.error('Error loading environments:', error);
-        this.environments = [];
-      },
+    this.environmentService.listEnvironments(params).then(response => {
+      if (this.globalService.handleSuccessService(response)) {
+        this.environments = [...response.data.envs];
+      }
     });
   }
 
@@ -188,19 +181,9 @@ export class AddCategoryComponent implements OnInit {
   onSubmit() {
     console.log(this.categoryForm.value);
     if (this.categoryForm.valid) {
-      this.categoryService.addCategory(this.categoryForm).subscribe({
-        next: () => {
+      this.categoryService.addCategory(this.categoryForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([CATEGORY.LIST]);
-        },
-        error: error => {
-          console.error('Error adding environment:', error);
-        },
-      });
-    } else {
-      Object.keys(this.categoryForm.controls).forEach(key => {
-        const control = this.categoryForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

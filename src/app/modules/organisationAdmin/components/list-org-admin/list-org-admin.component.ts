@@ -70,17 +70,14 @@ export class ListOrgAdminComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadAdmins();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -98,22 +95,15 @@ export class ListOrgAdminComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.orgAdminService.listOrganisationAdmin(params).subscribe({
-      next: (response: any) => {
+    this.orgAdminService.listOrganisationAdmin(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.admins = response.data.orgAdmins;
         this.filteredAdmins = [...this.admins];
         this.totalItems = this.admins.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        this.admins = [];
-        this.filteredAdmins = [];
-        this.totalItems = 0;
-        this.totalPages = 0;
-        this.pages = [];
-      },
+      }
     });
   }
 
@@ -178,17 +168,12 @@ export class ListOrgAdminComponent implements OnInit {
     if (this.adminToDelete) {
       this.orgAdminService
         .deleteAdminOrganisation(this.selectedOrg.id, this.adminToDelete)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadAdmins();
             this.showDeleteConfirm = false;
             this.adminToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting organisation admin:', error);
-            this.showDeleteConfirm = false;
-            this.adminToDelete = null;
-          },
+          }
         });
     }
   }

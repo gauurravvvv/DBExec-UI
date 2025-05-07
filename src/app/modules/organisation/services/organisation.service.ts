@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
 import { ORGANISATION } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
@@ -14,12 +13,11 @@ export class OrganisationService {
   listOrganisation(params: IParams) {
     return this.http
       .get(ORGANISATION.LIST + `/${params.pageNumber}/${params.limit}`)
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   addOrganisation(orgForm: FormGroup) {
@@ -48,12 +46,11 @@ export class OrganisationService {
         encryptionAlgorithm,
         pepperKey,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   editOrganisation(orgForm: FormGroup) {
@@ -80,29 +77,30 @@ export class OrganisationService {
         maxGroups,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteOrganisation(orgId: string) {
-    return this.http.delete(ORGANISATION.DELETE + `${orgId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(ORGANISATION.DELETE + `${orgId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   viewOrganisation(id: string) {
-    return this.http.get(ORGANISATION.VIEW + `${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(ORGANISATION.VIEW + `${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 }

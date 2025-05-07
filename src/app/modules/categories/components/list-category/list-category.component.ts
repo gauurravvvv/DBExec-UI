@@ -70,17 +70,14 @@ export class ListCategoryComponent implements OnInit {
       limit: 100,
     };
 
-    this.organisationService.listOrganisation(params).subscribe({
-      next: (response: any) => {
-        this.organisations = response.data.orgs;
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
           this.loadCategories();
         }
-      },
-      error: error => {
-        console.error('Error loading organisations:', error);
-      },
+      }
     });
   }
 
@@ -98,23 +95,15 @@ export class ListCategoryComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.categoryService.listCategories(params).subscribe({
-      next: (response: any) => {
+    this.categoryService.listCategories(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.categories = response.data.categories;
         this.filteredCategories = [...this.categories];
         this.totalItems = response.data.total || this.categories.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.generatePageNumbers();
         this.applyFilters();
-      },
-      error: error => {
-        this.categories = [];
-        this.filteredCategories = [];
-        this.totalItems = 0;
-        this.totalPages = 0;
-        this.pages = [];
-        console.error('Error loading categories:', error);
-      },
+      }
     });
   }
 
@@ -180,17 +169,12 @@ export class ListCategoryComponent implements OnInit {
     if (this.categoryToDelete) {
       this.categoryService
         .deleteCategory(this.selectedOrg.id, this.categoryToDelete)
-        .subscribe({
-          next: () => {
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
             this.loadCategories();
             this.showDeleteConfirm = false;
             this.categoryToDelete = null;
-          },
-          error: error => {
-            console.error('Error deleting category:', error);
-            this.showDeleteConfirm = false;
-            this.categoryToDelete = null;
-          },
+          }
         });
     }
   }

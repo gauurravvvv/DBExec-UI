@@ -16,21 +16,21 @@ export class SectionService {
         SECTION.LIST +
           `/${params.orgId}/${params.tabId}/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteSection(orgId: string, id: string) {
-    return this.http.delete(SECTION.DELETE + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(SECTION.DELETE + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   addSection(formData: any) {
@@ -41,21 +41,21 @@ export class SectionService {
         database,
         sections,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   viewSection(orgId: string, id: string) {
-    return this.http.get(SECTION.VIEW + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(SECTION.VIEW + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   updateSection(sectionForm: FormGroup) {
@@ -71,11 +71,10 @@ export class SectionService {
         tab,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }

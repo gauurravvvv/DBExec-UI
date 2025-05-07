@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
 import { TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -28,7 +27,6 @@ export class EditTabComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private globalService: GlobalService,
-    private messageService: MessageService,
     private tabService: TabService
   ) {
     this.initForm();
@@ -65,8 +63,8 @@ export class EditTabComponent implements OnInit {
   }
 
   loadTabData(): void {
-    this.tabService.viewTab(this.orgId, this.tabId).subscribe({
-      next: response => {
+    this.tabService.viewTab(this.orgId, this.tabId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.tabData = response.data;
 
         this.tabForm.patchValue({
@@ -82,32 +80,15 @@ export class EditTabComponent implements OnInit {
         this.selectedDatabaseName = this.tabData.databaseName || '';
 
         this.tabForm.markAsPristine();
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load tab data',
-        });
-      },
+      }
     });
   }
 
   onSubmit(): void {
     if (this.tabForm.valid) {
-      this.tabService.updateTab(this.tabForm).subscribe({
-        next: () => {
+      this.tabService.updateTab(this.tabForm).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([TAB.LIST]);
-        },
-        error: error => {
-          console.error('Error updating user:', error);
-        },
-      });
-    } else {
-      Object.keys(this.tabForm.controls).forEach(key => {
-        const control = this.tabForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

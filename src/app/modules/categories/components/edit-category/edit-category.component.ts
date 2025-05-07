@@ -64,94 +64,82 @@ export class EditCategoryComponent implements OnInit {
   }
 
   loadCategoryData(): void {
-    this.categoryService.viewCategory(this.orgId, this.categoryId).subscribe({
-      next: response => {
-        const categoryData = response.data;
+    this.categoryService
+      .viewCategory(this.orgId, this.categoryId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const categoryData = response.data;
 
-        // First patch the basic form data
-        this.categoryForm.patchValue({
-          id: categoryData.id,
-          name: categoryData.name,
-          description: categoryData.description,
-          organisation: categoryData.organisationId,
-          environments: categoryData.categoryMappings.map(
-            (mapping: any) => mapping.environmentId
-          ),
-          status: categoryData.status,
-        });
-
-        this.selectedOrgName = categoryData.organisationName || '';
-
-        // Load environments
-        this.loadEnvironments({
-          orgId: categoryData.organisationId,
-          pageNumber: 1,
-          limit: 100,
-        });
-
-        // Handle config FormArray
-        const configArray = this.categoryForm.get('config') as FormArray;
-
-        // Clear existing fields
-        while (configArray.length !== 0) {
-          configArray.removeAt(0);
-        }
-
-        // Add fields from configurations array
-        if (
-          categoryData.configurations &&
-          Array.isArray(categoryData.configurations)
-        ) {
-          // Sort by sequence if needed
-          const sortedConfigs = [...categoryData.configurations].sort(
-            (a, b) => a.sequence - b.sequence
-          );
-
-          sortedConfigs.forEach((config: any) => {
-            configArray.push(
-              this.fb.group({
-                name: [
-                  config.fieldName, // Use fieldName instead of name
-                  [
-                    Validators.required,
-                    Validators.pattern('^[a-zA-Z][a-zA-Z0-9_]*$'),
-                  ],
-                ],
-              })
-            );
+          // First patch the basic form data
+          this.categoryForm.patchValue({
+            id: categoryData.id,
+            name: categoryData.name,
+            description: categoryData.description,
+            organisation: categoryData.organisationId,
+            environments: categoryData.categoryMappings.map(
+              (mapping: any) => mapping.environmentId
+            ),
+            status: categoryData.status,
           });
-        } else {
-          // Add one empty field if no configurations exist
-          configArray.push(this.createField());
-        }
 
-        // Store original form value and reset dirty state
-        this.originalFormValue = this.categoryForm.value;
-        this.isFormDirty = false;
-        this.categoryForm.markAsPristine();
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load category data',
-        });
-      },
-    });
+          this.selectedOrgName = categoryData.organisationName || '';
+
+          // Load environments
+          this.loadEnvironments({
+            orgId: categoryData.organisationId,
+            pageNumber: 1,
+            limit: 100,
+          });
+
+          // Handle config FormArray
+          const configArray = this.categoryForm.get('config') as FormArray;
+
+          // Clear existing fields
+          while (configArray.length !== 0) {
+            configArray.removeAt(0);
+          }
+
+          // Add fields from configurations array
+          if (
+            categoryData.configurations &&
+            Array.isArray(categoryData.configurations)
+          ) {
+            // Sort by sequence if needed
+            const sortedConfigs = [...categoryData.configurations].sort(
+              (a, b) => a.sequence - b.sequence
+            );
+
+            sortedConfigs.forEach((config: any) => {
+              configArray.push(
+                this.fb.group({
+                  name: [
+                    config.fieldName, // Use fieldName instead of name
+                    [
+                      Validators.required,
+                      Validators.pattern('^[a-zA-Z][a-zA-Z0-9_]*$'),
+                    ],
+                  ],
+                })
+              );
+            });
+          } else {
+            // Add one empty field if no configurations exist
+            configArray.push(this.createField());
+          }
+
+          // Store original form value and reset dirty state
+          this.originalFormValue = this.categoryForm.value;
+          this.isFormDirty = false;
+          this.categoryForm.markAsPristine();
+        }
+      });
   }
 
   loadEnvironments(params: any): void {
-    this.environmentService.listEnvironments(params).subscribe({
-      next: response => {
-        this.environments = response.data.envs;
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load environments',
-        });
-      },
+    this.environmentService.listEnvironments(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.environments = [...response.data.envs];
+      }
     });
   }
 
@@ -173,22 +161,10 @@ export class EditCategoryComponent implements OnInit {
         ...formValue,
       };
 
-      this.categoryService.editCategory(submitData).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Category updated successfully',
-          });
+      this.categoryService.editCategory(submitData).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([CATEGORY.LIST]);
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to update category',
-          });
-        },
+        }
       });
     }
   }

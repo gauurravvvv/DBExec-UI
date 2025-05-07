@@ -1,17 +1,16 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   Validators,
-  FormControl,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { PromptService } from '../../services/prompt.service';
-import { PROMPT } from 'src/app/constants/routes';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { PromptService } from '../../services/prompt.service';
 
 @Component({
   selector: 'app-config-prompt',
@@ -51,7 +50,6 @@ export class ConfigPromptComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private globalService: GlobalService,
-    private messageService: MessageService,
     private promptService: PromptService,
     private databaseService: DatabaseService
   ) {
@@ -163,8 +161,8 @@ export class ConfigPromptComponent implements OnInit {
   }
 
   loadPromptData(): void {
-    this.promptService.viewPrompt(this.orgId, this.promptId).subscribe({
-      next: response => {
+    this.promptService.viewPrompt(this.orgId, this.promptId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.sectionData = response.data;
 
         // Set basic prompt data
@@ -201,14 +199,7 @@ export class ConfigPromptComponent implements OnInit {
 
         // First load schema data
         this.loadSchemaData();
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load tab data',
-        });
-      },
+      }
     });
   }
 
@@ -218,8 +209,8 @@ export class ConfigPromptComponent implements OnInit {
       databaseId: this.sectionData.databaseId,
     };
 
-    this.databaseService.listDatabaseSchemas(params).subscribe({
-      next: (response: any) => {
+    this.databaseService.listDatabaseSchemas(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.staticSchemaData = response.data;
         this.schemas = this.staticSchemaData.map(schema => ({
           name: schema.schema_name,
@@ -227,21 +218,13 @@ export class ConfigPromptComponent implements OnInit {
 
         // After schema data is loaded, load config data
         this.loadConfigData();
-      },
-      error: error => {
-        console.error('Error loading schemas:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load schema data',
-        });
-      },
+      }
     });
   }
 
   loadConfigData() {
-    this.promptService.getConfig(this.orgId, this.promptId).subscribe({
-      next: (response: any) => {
+    this.promptService.getConfig(this.orgId, this.promptId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         const config = response.data.configuration[0];
         const values = response.data.values;
         this.configData = config;
@@ -275,15 +258,7 @@ export class ConfigPromptComponent implements OnInit {
             });
           });
         }
-      },
-      error: (error: any) => {
-        console.error('Error loading config data:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load configuration data',
-        });
-      },
+      }
     });
   }
 
@@ -301,19 +276,9 @@ export class ConfigPromptComponent implements OnInit {
         schema: formValues.schema.name,
       };
 
-      this.promptService.configPrompt(submitData).subscribe({
-        next: () => {
+      this.promptService.configPrompt(submitData).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([PROMPT.LIST]);
-        },
-        error: (error: any) => {
-          console.error('Error configuring prompt:', error);
-        },
-      });
-    } else {
-      Object.keys(this.promptForm.controls).forEach(key => {
-        const control = this.promptForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
         }
       });
     }

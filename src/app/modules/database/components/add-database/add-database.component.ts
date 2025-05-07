@@ -26,7 +26,6 @@ export class AddDatabaseComponent implements OnInit {
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private messageService: MessageService,
     private router: Router
   ) {}
 
@@ -140,17 +139,10 @@ export class AddDatabaseComponent implements OnInit {
         pageNumber: 1,
         limit: 100,
       };
-      this.organisationService.listOrganisation(params).subscribe({
-        next: response => {
-          this.organisations = response.data.orgs;
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load organisations',
-          });
-        },
+      this.organisationService.listOrganisation(params).then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = [...response.data.orgs];
+        }
       });
     }
   }
@@ -183,22 +175,10 @@ export class AddDatabaseComponent implements OnInit {
         };
       }
 
-      this.databaseService.addDatabase(payload).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Database added successfully',
-          });
+      this.databaseService.addDatabase(payload).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([DATABASE.LIST]);
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to add database',
-          });
-        },
+        }
       });
     }
   }

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TAB } from 'src/app/constants/routes';
-import { MessageService } from 'primeng/api';
 import { TabService } from '../../services/tab.service';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 @Component({
   selector: 'app-view-tab',
@@ -18,8 +18,8 @@ export class ViewTabComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private messageService: MessageService,
-    private tabService: TabService
+    private tabService: TabService,
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
@@ -29,13 +29,10 @@ export class ViewTabComponent implements OnInit {
   }
 
   loadTabDetails() {
-    this.tabService.viewTab(this.orgId, this.tabId).subscribe({
-      next: (response: any) => {
+    this.tabService.viewTab(this.orgId, this.tabId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
         this.tabData = response.data;
-      },
-      error: error => {
-        console.error('Error loading category details:', error);
-      },
+      }
     });
   }
 
@@ -62,25 +59,10 @@ export class ViewTabComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.tabData) {
-      this.tabService.deleteTab(this.orgId, this.tabData.id).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Tab deleted successfully',
-          });
-          this.router.navigate(['/app/tab']);
-        },
-        error: error => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to delete tab',
-          });
-        },
-        complete: () => {
-          this.showDeleteConfirm = false;
-        },
+      this.tabService.deleteTab(this.orgId, this.tabData.id).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.router.navigate([TAB.LIST]);
+        }
       });
     }
   }

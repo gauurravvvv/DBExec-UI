@@ -18,12 +18,11 @@ export class CategoryService {
           `/${params.orgId}` +
           `/${params.pageNumber}/${params.limit}`
       )
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   addCategory(categoryForm: FormGroup) {
@@ -37,30 +36,31 @@ export class CategoryService {
         environments,
         config,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   deleteCategory(orgId: string, id: string) {
-    return this.http.delete(CATEGORY.DELETE + `${orgId}/${id}`).pipe(
-      map((response: any) => {
+    return this.http
+      .delete(CATEGORY.DELETE + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   viewCategory(orgId: string, categoryId: string) {
-    return this.http.get(CATEGORY.VIEW + `${orgId}/${categoryId}`).pipe(
-      map((response: any) => {
+    return this.http
+      .get(CATEGORY.VIEW + `${orgId}/${categoryId}`)
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
-    );
+      });
   }
 
   editEnvironment(envForm: FormGroup) {
@@ -72,12 +72,11 @@ export class CategoryService {
         description,
         status: status ? 1 : 0,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 
   editCategory(categoryData: any) {
@@ -100,11 +99,10 @@ export class CategoryService {
         config,
         organisation,
       })
-      .pipe(
-        map((response: any) => {
-          const result = JSON.parse(JSON.stringify(response));
-          return result;
-        })
-      );
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
   }
 }
