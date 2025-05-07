@@ -172,10 +172,9 @@ export class GlobalService {
           severity: 'success',
           summary: 'Success',
           detail: result.message,
+          key: 'topRight',
           life: 3000,
           styleClass: 'custom-toast',
-          contentStyleClass: 'custom-toast-content',
-          icon: 'pi pi-check-circle',
         });
       return true;
     } else {
@@ -184,7 +183,9 @@ export class GlobalService {
           severity: 'error',
           summary: 'Error',
           detail: result.message,
+          key: 'topRight',
           life: 3000,
+          styleClass: 'custom-toast',
         });
       return false;
     }

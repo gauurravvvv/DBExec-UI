@@ -156,8 +156,8 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   onDelete(adminId: number) {
-    this.superAdminService.deleteSuperAdmin(adminId).subscribe((res: any) => {
-      if (res.status) {
+    this.superAdminService.deleteSuperAdmin(adminId).then((res: any) => {
+      if (this.globalService.handleSuccessService(res)) {
         this.listSuperAdminAPI();
       }
     });
@@ -168,12 +168,12 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   listSuperAdminAPI() {
-    this.superAdminService
-      .listSuperAdmin(this.listParams)
-      .subscribe((res: any) => {
+    this.superAdminService.listSuperAdmin(this.listParams).then((res: any) => {
+      if (this.globalService.handleSuccessService(res, false)) {
         this.superAdmins = [...res.data.superAdmins];
         this.filteredAdmins = [...this.superAdmins];
         this.totalItems = this.superAdmins.length;
-      });
+      }
+    });
   }
 }

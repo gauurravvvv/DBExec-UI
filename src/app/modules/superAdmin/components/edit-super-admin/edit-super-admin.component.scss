@@ -160,6 +160,17 @@
           display: block;
         }
 
+        input.readonly {
+          background: var(--hover-background) !important;
+          cursor: not-allowed;
+          opacity: 0.7;
+
+          &:focus {
+            box-shadow: none;
+            border-color: var(--border-color);
+          }
+        }
+
         // Status switch styling
         .d-flex {
           display: flex;

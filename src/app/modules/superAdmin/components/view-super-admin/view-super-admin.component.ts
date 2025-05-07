@@ -58,28 +58,15 @@ export class ViewSuperAdminComponent implements OnInit {
   }
 
   private loadAdminDetails(): void {
-    this.superAdminService.viewSuperAdmin(this.adminId).subscribe({
-      next: (response: any) => {
-        if (response.status) {
+    this.superAdminService
+      .viewSuperAdmin(this.adminId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
           this.adminData = response.data;
           this.setAdminInitials();
           this.generateAvatarColor();
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load admin details',
-          });
         }
-      },
-      error: error => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: error.message || 'Failed to load admin details',
-        });
-      },
-    });
+      });
   }
 
   private setAdminInitials(): void {
@@ -136,8 +123,8 @@ export class ViewSuperAdminComponent implements OnInit {
   onDelete(adminId: string) {
     this.superAdminService
       .deleteSuperAdmin(Number(adminId))
-      .subscribe((res: any) => {
-        if (res.status) {
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
           this.router.navigate([SUPER_ADMIN.LIST]);
         }
       });
@@ -151,22 +138,10 @@ export class ViewSuperAdminComponent implements OnInit {
     if (newPassword) {
       this.superAdminService
         .updateSuperAdminPassword(this.adminId, newPassword)
-        .subscribe({
-          next: response => {
-            this.globalService.handleAPIResponse({
-              status: true,
-              message: response.message,
-            });
-          },
-          error: error => {
-            this.globalService.handleAPIResponse({
-              status: false,
-              message:
-                error?.error?.message ||
-                error?.message ||
-                'Failed to update password',
-            });
-          },
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showChangePasswordDialog = false;
+          }
         });
     }
     this.showChangePasswordDialog = false;

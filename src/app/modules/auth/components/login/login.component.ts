@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.loginService.login(this.loginForm).then((res: any) => {
-        if (this.globalService.handleAPIResponse(res)) {
+        if (this.globalService.handleSuccessService(res)) {
           const role = this.globalService.getTokenDetails('role');
           let dashboardRoute = '/app/dashboard';
           switch (role) {

@@ -68,23 +68,13 @@ export class AddSuperAdminComponent implements OnInit {
 
   onSubmit(): void {
     if (this.adminForm.valid) {
-      this.superAdminService.addSuperAdmin(this.adminForm).subscribe({
-        next: response => {
-          if (this.globalService.handleAPIResponse(response)) {
+      this.superAdminService
+        .addSuperAdmin(this.adminForm)
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([SUPER_ADMIN.LIST]);
           }
-        },
-        error: error => {
-          // Handle error response directly from error object
-          this.globalService.handleAPIResponse({
-            status: false,
-            message:
-              error?.error?.message ||
-              error?.message ||
-              'Failed to add super admin',
-          });
-        },
-      });
+        });
     } else {
       // Mark all fields as touched to trigger validation messages
       Object.keys(this.adminForm.controls).forEach(key => {

@@ -1,117 +1,203 @@
 <div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/super-admin">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-                <h2>Edit Super Admin</h2>
-            </div>
-            <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
-                    [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
-                </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="adminForm.invalid || !isFormDirty">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" routerLink="/app/super-admin">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Edit Super Admin</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-danger"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-outlined"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="adminForm.invalid || !isFormDirty"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+
+        {{ adminForm.valid }}
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="adminForm" class="admin-form">
+      <div class="form-grid">
+        <!-- First Name -->
+        <div class="form-field">
+          <label for="firstName"
+            >First Name <span class="required">*</span></label
+          >
+          <span class="p-input-icon-left">
+            <i class="pi pi-user"></i>
+            <input
+              id="firstName"
+              type="text"
+              pInputText
+              formControlName="firstName"
+              placeholder="Enter first name"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  adminForm.get('firstName')?.invalid &&
+                  adminForm.get('firstName')?.touched
+              }"
+            />
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              adminForm.get('firstName')?.invalid &&
+              adminForm.get('firstName')?.touched
+            "
+          >
+            First name is required
+          </small>
         </div>
 
-        <!-- Form Section -->
-        <form [formGroup]="adminForm" class="admin-form">
-            <div class="form-grid">
-                <!-- First Name -->
-                <div class="form-field">
-                    <label for="firstName">First Name <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-user"></i>
-                        <input id="firstName" type="text" pInputText formControlName="firstName"
-                            placeholder="Enter first name"
-                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched">
-                        First name is required
-                    </small>
-                </div>
+        <!-- Last Name -->
+        <div class="form-field">
+          <label for="lastName"
+            >Last Name <span class="required">*</span></label
+          >
+          <span class="p-input-icon-left">
+            <i class="pi pi-user"></i>
+            <input
+              id="lastName"
+              type="text"
+              pInputText
+              formControlName="lastName"
+              placeholder="Enter last name"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  adminForm.get('lastName')?.invalid &&
+                  adminForm.get('lastName')?.touched
+              }"
+            />
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              adminForm.get('lastName')?.invalid &&
+              adminForm.get('lastName')?.touched
+            "
+          >
+            Last name is required
+          </small>
+        </div>
 
-                <!-- Last Name -->
-                <div class="form-field">
-                    <label for="lastName">Last Name <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-user"></i>
-                        <input id="lastName" type="text" pInputText formControlName="lastName"
-                            placeholder="Enter last name"
-                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched">
-                        Last name is required
-                    </small>
-                </div>
+        <!-- Username -->
+        <div class="form-field">
+          <label for="username">Username<span class="required">*</span></label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-user-edit"></i>
+            <input
+              id="username"
+              type="text"
+              pInputText
+              formControlName="username"
+              placeholder="Enter username"
+              readonly
+              [ngClass]="{ readonly: true }"
+            />
+          </span>
+        </div>
 
-                <!-- Username -->
-                <div class="form-field">
-                    <label for="username">Username <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-user-edit"></i>
-                        <input id="username" type="text" pInputText formControlName="username"
-                            placeholder="Enter username"
-                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('username')?.invalid && adminForm.get('username')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="adminForm.get('username')?.invalid && adminForm.get('username')?.touched">
-                        <span *ngIf="adminForm.get('username')?.errors?.['required']">Username is required</span>
-                        <span *ngIf="adminForm.get('username')?.errors?.['minlength']">Username must be at least 4
-                            characters</span>
-                    </small>
-                </div>
+        <!-- Email -->
+        <div class="form-field">
+          <label for="email">Email <span class="required">*</span></label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-envelope"></i>
+            <input
+              id="email"
+              type="email"
+              pInputText
+              formControlName="email"
+              placeholder="Enter email address"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  adminForm.get('email')?.invalid &&
+                  adminForm.get('email')?.touched
+              }"
+            />
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              adminForm.get('email')?.invalid && adminForm.get('email')?.touched
+            "
+          >
+            <span *ngIf="adminForm.get('email')?.errors?.['required']"
+              >Email is required</span
+            >
+            <span *ngIf="adminForm.get('email')?.errors?.['email']"
+              >Please enter a valid email</span
+            >
+          </small>
+        </div>
 
-                <!-- Email -->
-                <div class="form-field">
-                    <label for="email">Email <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-envelope"></i>
-                        <input id="email" type="email" pInputText formControlName="email"
-                            placeholder="Enter email address"
-                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('email')?.invalid && adminForm.get('email')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="adminForm.get('email')?.invalid && adminForm.get('email')?.touched">
-                        <span *ngIf="adminForm.get('email')?.errors?.['required']">Email is required</span>
-                        <span *ngIf="adminForm.get('email')?.errors?.['email']">Please enter a valid email</span>
-                    </small>
-                </div>
+        <!-- Phone -->
+        <div class="form-field">
+          <label for="phone">Phone <span class="required">*</span></label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-phone"></i>
+            <input
+              id="phone"
+              type="text"
+              pInputText
+              formControlName="mobile"
+              placeholder="Enter phone number"
+              (input)="onPhoneInput($event)"
+              maxlength="10"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  adminForm.get('mobile')?.invalid &&
+                  adminForm.get('mobile')?.touched
+              }"
+            />
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              adminForm.get('mobile')?.invalid &&
+              adminForm.get('mobile')?.touched
+            "
+          >
+            <span *ngIf="adminForm.get('mobile')?.errors?.['required']"
+              >Phone number is required</span
+            >
+            <span *ngIf="adminForm.get('mobile')?.errors?.['pattern']"
+              >Please enter a valid 10-digit phone number</span
+            >
+          </small>
+        </div>
 
-                <!-- Phone -->
-                <div class="form-field">
-                    <label for="phone">Phone <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-phone"></i>
-                        <input id="phone" type="text" pInputText formControlName="mobile"
-                            placeholder="Enter phone number" (input)="onPhoneInput($event)" maxlength="10"
-                            [ngClass]="{'ng-invalid ng-dirty': adminForm.get('mobile')?.invalid && adminForm.get('mobile')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="adminForm.get('mobile')?.invalid && adminForm.get('mobile')?.touched">
-                        <span *ngIf="adminForm.get('mobile')?.errors?.['required']">Phone number is required</span>
-                        <span *ngIf="adminForm.get('mobile')?.errors?.['pattern']">Please enter a valid 10-digit phone
-                            number</span>
-                    </small>
-                </div>
-
-                <!-- Status -->
-                <div class="form-field">
-                    <label for="status">Status</label>
-                    <div class="d-flex align-items-center  pt-2">
-                        <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
-                        <span class="ml-2 ">{{ adminForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
-                            }}</span>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+        <!-- Status -->
+        <div class="form-field">
+          <label for="status">Status</label>
+          <div class="d-flex align-items-center pt-2">
+            <p-inputSwitch
+              formControlName="status"
+              [trueValue]="1"
+              [falseValue]="0"
+            ></p-inputSwitch>
+            <span class="ml-2">{{
+              adminForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

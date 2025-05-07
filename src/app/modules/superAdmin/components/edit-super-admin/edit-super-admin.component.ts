@@ -66,18 +66,9 @@ export class EditSuperAdminComponent implements OnInit {
           Validators.pattern('^[a-zA-Z0-9_]+$'),
         ],
       ],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(
-            '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'
-          ),
-        ],
-      ],
       email: ['', [Validators.required, Validators.email]],
       mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      status: [],
+      status: [false],
     });
 
     this.route.params.subscribe(params => {
@@ -89,13 +80,14 @@ export class EditSuperAdminComponent implements OnInit {
   }
 
   patchFormValues(): void {
-    this.superAdminService.viewSuperAdmin(this.adminId).subscribe(response => {
-      if (this.globalService.handleAPIResponse(response)) {
-        this.adminData = response.data;
-        this.adminForm.patchValue(this.adminData);
-        this.adminForm.get('username')?.disable();
-      }
-    });
+    this.superAdminService
+      .viewSuperAdmin(this.adminId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.adminData = response.data;
+          this.adminForm.patchValue(this.adminData);
+        }
+      });
   }
 
   // Method to handle number-only input
@@ -107,29 +99,13 @@ export class EditSuperAdminComponent implements OnInit {
 
   onSubmit(): void {
     if (this.adminForm.valid) {
-      this.superAdminService.updateSuperAdmin(this.adminForm).subscribe({
-        next: response => {
-          if (this.globalService.handleAPIResponse(response)) {
+      this.superAdminService
+        .updateSuperAdmin(this.adminForm)
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([SUPER_ADMIN.LIST]);
           }
-        },
-        error: error => {
-          // Handle error response directly from error object
-          this.globalService.handleAPIResponse({
-            status: false,
-            message:
-              error?.error?.message ||
-              error?.message ||
-              'Failed to add super admin',
-          });
-        },
-      });
-    } else {
-      // Mark all fields as touched to trigger validation messages
-      Object.keys(this.adminForm.controls).forEach(key => {
-        const control = this.adminForm.get(key);
-        control?.markAsTouched();
-      });
+        });
     }
   }
 
