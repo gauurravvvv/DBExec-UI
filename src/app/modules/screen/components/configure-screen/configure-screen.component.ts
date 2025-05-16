@@ -46,8 +46,9 @@ export class ConfigureScreenComponent implements OnInit {
   selectedTab: TabData | null = null;
   openTabs: TabData[] = [];
   activeTabIndex: number = 0;
-  isFreeze: boolean = true;
-  expandedSections: { [key: number]: boolean } = {}; // Change key type to number
+  isFreeze: boolean = false;
+  expandedSections: { [key: number]: boolean } = {};
+  showDeleteConfirm: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -95,6 +96,10 @@ export class ConfigureScreenComponent implements OnInit {
   }
 
   onTabClick(tab: TabData) {
+    if (this.isFreeze) {
+      return;
+    }
+
     this.selectedTab = tab;
 
     // Check if tab is already open
@@ -176,15 +181,28 @@ export class ConfigureScreenComponent implements OnInit {
       // Store current state and show only selected prompts
       this.selectedPrompts = JSON.parse(JSON.stringify(this.openTabs));
 
-      // Filter to show only selected prompts
-      this.openTabs = this.openTabs.map(tab => ({
-        ...tab,
-        sections: tab.sections.map((section: Section) => ({
-          ...section,
-          expanded: this.expandedSections[section.id], // This now expects a number
-          prompts: section.prompts.filter((prompt: Prompt) => prompt.selected),
-        })),
-      }));
+      // Filter to show only selected prompts and remove empty sections/tabs
+      this.openTabs = this.openTabs
+        .map(tab => ({
+          ...tab,
+          sections: tab.sections
+            .map((section: Section) => ({
+              ...section,
+              expanded: this.expandedSections[section.id],
+              prompts: section.prompts.filter(
+                (prompt: Prompt) => prompt.selected
+              ),
+            }))
+            // Remove sections with no selected prompts
+            .filter(section => section.prompts.length > 0),
+        }))
+        // Remove tabs with no sections (all sections were empty)
+        .filter(tab => tab.sections.length > 0);
+
+      // If current active tab was removed, adjust activeTabIndex
+      if (this.activeTabIndex >= this.openTabs.length) {
+        this.activeTabIndex = Math.max(0, this.openTabs.length - 1);
+      }
     } else {
       // Restore all prompts while maintaining selection state
       if (this.selectedPrompts && this.selectedPrompts.length > 0) {
@@ -256,6 +274,43 @@ export class ConfigureScreenComponent implements OnInit {
       ' of ' +
       prompts.length +
       ' selected'
+    );
+  }
+
+  closeDialig() {
+    this.showDeleteConfirm = false;
+  }
+
+  clearSelected() {
+    this.showDeleteConfirm = false;
+
+    // Clear all open tabs
+    this.openTabs = [];
+    this.activeTabIndex = 0;
+    this.selectedTab = null;
+
+    // Reset the expanded sections
+    this.expandedSections = {};
+
+    // Reset all tabs data to original state
+    if (this.refactoredTabData.length > 0) {
+      this.tabsData = JSON.parse(JSON.stringify(this.refactoredTabData));
+    }
+
+    // Ensure we're in unfreeze state
+    this.isFreeze = true;
+
+    // Clear selected prompts array
+    this.selectedPrompts = [];
+
+    this.isFreeze = false;
+  }
+
+  hasSelectedPrompts(): boolean {
+    return this.openTabs.some(tab =>
+      tab.sections.some(section =>
+        section.prompts.some((prompt: any) => prompt.selected)
+      )
     );
   }
 }

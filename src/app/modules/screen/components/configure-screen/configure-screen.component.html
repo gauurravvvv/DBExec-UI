@@ -26,8 +26,16 @@
           type="button"
           label="Cancel"
           class="p-button-outlined p-button-danger"
+          (click)="showDeleteConfirm = true"
+          [disabled]="!hasSelectedPrompts()"
         ></button>
-        <button pButton class="p-button-outlined" type="submit" label="Save">
+        <button
+          pButton
+          class="p-button-outlined"
+          type="submit"
+          label="Save"
+          [disabled]="!hasSelectedPrompts()"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -36,19 +44,35 @@
       <div class="sidebar" [class.collapsed]="isSidebarCollapsed">
         <div class="sidebar-content">
           <div class="rotated-title" *ngIf="isSidebarCollapsed">T A B S</div>
-          <h3 *ngIf="!isSidebarCollapsed">Available Tabs</h3>
-          <div class="tab-cards" *ngIf="!isSidebarCollapsed">
-            <div
-              *ngFor="let tab of tabsData"
-              class="tab-card"
-              (click)="onTabClick(tab)"
-            >
-              <div class="tab-info">
-                <span class="tab-name">{{ tab.name }}</span>
-                <span class="section-count"
-                  >- {{ tab.sections?.length || 0 }} Section(s)</span
-                >
+
+          <div class="sidebar-header" *ngIf="!isSidebarCollapsed">
+            <h3>Available Tabs</h3>
+          </div>
+
+          <div class="tab-cards-container" *ngIf="!isSidebarCollapsed">
+            <div class="tab-cards">
+              <div
+                *ngFor="let tab of tabsData"
+                class="tab-card"
+                (click)="onTabClick(tab)"
+                [class.disabled]="isFreeze"
+                [pTooltip]="isFreeze ? 'Unfreeze to add tabs' : ''"
+                tooltipPosition="top"
+              >
+                <div class="tab-info">
+                  <span class="tab-name">{{ tab.name }}</span>
+                  <span class="section-count"
+                    >- {{ tab.sections?.length || 0 }} Section(s)</span
+                  >
+                </div>
               </div>
+            </div>
+          </div>
+
+          <div class="sidebar-footer" *ngIf="isFreeze && !isSidebarCollapsed">
+            <div class="helper-note">
+              <i class="pi pi-info-circle"></i>
+              <span>Unfreeze screen to modify</span>
             </div>
           </div>
         </div>
@@ -156,6 +180,17 @@
           </p-tabView>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div class="popup-content">
+    <h3>Confirm</h3>
+    <p>Are you sure you want to clear the selection?</p>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="closeDialig()">No</button>
+      <button class="btn-confirm" (click)="clearSelected()">Yes</button>
     </div>
   </div>
 </div>
