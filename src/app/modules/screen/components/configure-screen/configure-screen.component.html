@@ -42,8 +42,6 @@
               *ngFor="let tab of tabsData"
               class="tab-card"
               (click)="onTabClick(tab)"
-              [pTooltip]="tab.description"
-              tooltipPosition="right"
             >
               <div class="tab-info">
                 <span class="tab-name">{{ tab.name }}</span>
@@ -71,7 +69,7 @@
           <div class="helper-text">Click on tab to configure screen</div>
         </div>
 
-        <div class="tab-container">
+        <div class="tab-container" *ngIf="openTabs.length">
           <p-tabView
             [(activeIndex)]="activeTabIndex"
             [scrollable]="true"
@@ -98,10 +96,33 @@
                 </div>
               </ng-template>
               <div class="tab-content">
-                <div class="tab-header">
-                  <h3>{{ tab.name }}</h3>
-                  <p>{{ tab.description }}</p>
-                </div>
+                <p-accordion [multiple]="true">
+                  <p-accordionTab *ngFor="let section of tab.sections">
+                    <ng-template pTemplate="header">
+                      <div class="section-header">
+                        <div class="header-content">
+                          <span class="section-name">{{ section.name }}</span>
+                          <span class="prompt-count">
+                            - {{ section.prompts?.length || 0 }} prompt(s)</span
+                          >
+                        </div>
+                      </div>
+                    </ng-template>
+                    <!-- Section content will go here -->
+                    <div class="section-content">
+                      <div
+                        class="empty-prompts"
+                        *ngIf="!section.prompts?.length"
+                      >
+                        <i class="pi pi-info-circle"></i>
+                        <span>No prompts available</span>
+                      </div>
+                      <div class="prompts-list" *ngIf="section.prompts?.length">
+                        <!-- Prompts content will go here -->
+                      </div>
+                    </div>
+                  </p-accordionTab>
+                </p-accordion>
               </div>
             </p-tabPanel>
           </p-tabView>

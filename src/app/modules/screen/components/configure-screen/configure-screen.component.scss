@@ -459,8 +459,6 @@
 
                 .tab-content {
                   height: 100%;
-                  padding: 16px 0;
-
                   .tab-header {
                     h3 {
                       color: var(--text-color);
@@ -509,6 +507,122 @@
                         opacity: 1;
                         color: var(--error-color);
                       }
+                    }
+                  }
+                }
+              }
+              ::ng-deep {
+                .p-accordion {
+                  .p-accordion-header {
+                    margin: 0;
+
+                    .p-accordion-header-link {
+                      background: var(--card-background);
+                      border: 1px solid var(--border-color);
+                      color: var(--text-color);
+                      padding: 1rem;
+                      font-weight: 500;
+                      border-radius: 4px;
+                      transition: all 0.2s;
+                      gap: 8px;
+                      display: flex;
+                      align-items: center;
+
+                      &:focus {
+                        box-shadow: none;
+                        outline: none;
+                      }
+
+                      &:hover {
+                        background: var(--hover-background);
+                      }
+
+                      .section-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        flex: 1;
+
+                        .section-name {
+                          font-weight: 500;
+                          color: var(--text-color);
+                        }
+
+                        .prompt-count {
+                          color: var(--text-color);
+                          opacity: 0.7;
+                          font-size: 0.9em;
+                        }
+                      }
+
+                      .p-accordion-toggle-icon {
+                        order: 1;
+                        font-size: 1rem;
+                        color: var(--text-color);
+                        margin: 0;
+                        transition: transform 0.2s;
+                      }
+                    }
+
+                    &.p-highlight {
+                      .p-accordion-header-link {
+                        background: var(--card-background);
+                        border-bottom-left-radius: 0;
+                        border-bottom-right-radius: 0;
+                        border-bottom: 1px solid var(--border-color);
+                      }
+                    }
+                  }
+
+                  .p-accordion-content {
+                    background: var(--card-background);
+                    border: 1px solid var(--border-color);
+                    border-top: 0;
+                    padding: 1rem;
+                    color: var(--text-color);
+                    border-bottom-left-radius: 4px;
+                    border-bottom-right-radius: 4px;
+                    margin: 0;
+                    position: relative;
+
+                    &:before {
+                      content: '';
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      height: 1px;
+                      background: var(--border-color);
+                    }
+
+                    .section-content {
+                      .empty-prompts {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        text-align: center;
+                        color: var(--text-color);
+                        opacity: 0.7;
+                        background: var(--surface-ground);
+                        border-radius: 4px;
+
+                        i {
+                          font-size: 1.2rem;
+                        }
+
+                        span {
+                          font-size: 0.9rem;
+                        }
+                      }
+                    }
+                  }
+
+                  .p-accordion-tab {
+                    margin-bottom: 8px;
+
+                    &:last-child {
+                      margin-bottom: 0;
                     }
                   }
                 }
