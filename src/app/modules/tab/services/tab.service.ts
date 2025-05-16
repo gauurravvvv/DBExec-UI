@@ -22,6 +22,19 @@ export class TabService {
       });
   }
 
+  listAllTabData(params: any) {
+    return this.http
+      .get(
+        TAB.GET_ALL +
+          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
+      )
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   deleteTab(orgId: string, id: string) {
     return this.http
       .delete(TAB.DELETE + `${orgId}/${id}`)

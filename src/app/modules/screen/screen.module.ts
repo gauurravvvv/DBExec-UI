@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,6 +14,7 @@ import { ListScreenComponent } from './components/list-screen/list-screen.compon
 import { ViewScreenComponent } from './components/view-screen/view-screen.component';
 import { ConfigureScreenComponent } from './components/configure-screen/configure-screen.component';
 import { RouterModule } from '@angular/router';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     InputTextModule,
     PasswordModule,
@@ -34,6 +36,7 @@ import { RouterModule } from '@angular/router';
     AppPrimeNGModule,
     ScreenRoutingModule,
     RouterModule,
+    InputSwitchModule,
   ],
   exports: [ConfigureScreenComponent],
 })

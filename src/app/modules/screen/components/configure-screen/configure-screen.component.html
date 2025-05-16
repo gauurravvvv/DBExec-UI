@@ -11,6 +11,19 @@
         <button
           pButton
           type="button"
+          [label]="isFreeze ? 'Unfreeze' : 'Freeze'"
+          class="p-button-outlined"
+          (click)="isFreeze = !isFreeze"
+        >
+          <i
+            class="pi"
+            [class.pi-lock]="isFreeze"
+            [class.pi-lock-open]="!isFreeze"
+          ></i>
+        </button>
+        <button
+          pButton
+          type="button"
           label="Cancel"
           class="p-button-outlined p-button-danger"
         ></button>
@@ -22,23 +35,23 @@
     <div class="screen-wrapper">
       <div class="sidebar" [class.collapsed]="isSidebarCollapsed">
         <div class="sidebar-content">
-          <div class="rotated-title" *ngIf="isSidebarCollapsed">
-            C O D E L I S T
-          </div>
-          <h3>Sidebar Navigation</h3>
-          <ul class="nav-list">
-            <li>Dashboard</li>
-            <li>Analytics</li>
-            <li>Reports</li>
-            <li>Settings</li>
-            <li>Users</li>
-          </ul>
-          <div class="dummy-text">
-            <p>
-              This is some sidebar content to test the layout and scrolling
-              behavior.
-            </p>
-            <p>You can add more items here to see how they wrap and flow.</p>
+          <div class="rotated-title" *ngIf="isSidebarCollapsed">T A B S</div>
+          <h3 *ngIf="!isSidebarCollapsed">Available Tabs</h3>
+          <div class="tab-cards" *ngIf="!isSidebarCollapsed">
+            <div
+              *ngFor="let tab of tabsData"
+              class="tab-card"
+              (click)="onTabClick(tab)"
+              [pTooltip]="tab.description"
+              tooltipPosition="right"
+            >
+              <div class="tab-info">
+                <span class="tab-name">{{ tab.name }}</span>
+                <span class="section-count"
+                  >- {{ tab.sections?.length || 0 }} Section(s)</span
+                >
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -54,39 +67,44 @@
       </div>
 
       <div class="main-content" [class.expanded]="isSidebarCollapsed">
-        <h2>Main Content Area</h2>
-        <div class="content-section">
-          <h3>Section 1</h3>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </p>
-          <p>
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-            nisi ut aliquip ex ea commodo consequat.
-          </p>
+        <div class="helper-text-container" *ngIf="!openTabs.length">
+          <div class="helper-text">Click on tab to configure screen</div>
         </div>
-        <div class="content-section">
-          <h3>Section 2</h3>
-          <p>
-            Duis aute irure dolor in reprehenderit in voluptate velit esse
-            cillum dolore eu fugiat nulla pariatur.
-          </p>
-          <p>
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-            officia deserunt mollit anim id est laborum.
-          </p>
-        </div>
-        <div class="content-section">
-          <h3>Section 3</h3>
-          <p>
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-            accusantium doloremque laudantium.
-          </p>
-          <p>
-            Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
-            fugit, sed quia consequuntur magni dolores.
-          </p>
+
+        <div class="tab-container">
+          <p-tabView
+            [(activeIndex)]="activeTabIndex"
+            [scrollable]="true"
+            class="full-height-tabs"
+            *ngIf="openTabs.length"
+          >
+            <p-tabPanel
+              *ngFor="let tab of openTabs; let i = index"
+              [header]="tab.name"
+              [selected]="i === activeTabIndex"
+            >
+              <ng-template pTemplate="header">
+                <div class="tab-header-content">
+                  <span>{{ tab.name }}</span>
+                  <i
+                    *ngIf="!isFreeze"
+                    class="pi pi-times tab-close"
+                    (click)="
+                      handleTabClose(i);
+                      $event.preventDefault();
+                      $event.stopPropagation()
+                    "
+                  ></i>
+                </div>
+              </ng-template>
+              <div class="tab-content">
+                <div class="tab-header">
+                  <h3>{{ tab.name }}</h3>
+                  <p>{{ tab.description }}</p>
+                </div>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
         </div>
       </div>
     </div>

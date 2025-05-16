@@ -17,7 +17,7 @@ const routes: Routes = [
   },
   { path: 'view/:orgId/:id', component: ViewScreenComponent },
   { path: 'edit/:orgId/:id', component: EditScreenComponent },
-  { path: 'config/:orgId/:id', component: ConfigureScreenComponent },
+  { path: 'config/:orgId/:dbId/:id', component: ConfigureScreenComponent },
 ];
 
 @NgModule({

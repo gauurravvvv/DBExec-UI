@@ -1969,7 +1969,6 @@ body {
 // Update PrimeNG components for dark theme
 .dark-theme {
   .p-component {
-    background: var(--card-background);
     color: var(--text-color);
   }
 
@@ -1992,6 +1991,4 @@ body {
       color: var(--text-color);
     }
   }
-
-  // Add more PrimeNG component overrides as needed
 }

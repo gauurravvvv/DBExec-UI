@@ -103,6 +103,7 @@ export const TAB = {
   DELETE: '/tab/delete/',
   VIEW: '/tab/get/',
   UPDATE: '/tab/update',
+  GET_ALL: '/tab/listAll',
 };
 
 export const SECTION = {

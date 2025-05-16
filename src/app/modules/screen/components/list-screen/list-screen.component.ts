@@ -212,6 +212,11 @@ export class ListScreenComponent implements OnInit {
   }
 
   onConfig(id: string) {
-    this.router.navigate([SCREEN.CONFIG, this.selectedScreen.id, id]);
+    this.router.navigate([
+      SCREEN.CONFIG,
+      this.selectedScreen.id,
+      this.selectedDatabase.id,
+      id,
+    ]);
   }
 }
