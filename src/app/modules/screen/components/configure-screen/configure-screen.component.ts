@@ -98,4 +98,25 @@ export class ConfigureScreenComponent implements OnInit {
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
+
+  toggleAllPrompts(section: any) {
+    if (section.prompts) {
+      section.prompts.forEach((prompt: any) => {
+        prompt.selected = section.selectAll;
+      });
+    }
+  }
+
+  togglePrompt(prompt: any, section: any) {
+    prompt.selected = !prompt.selected;
+    this.updateSectionSelectAll(section);
+  }
+
+  updateSectionSelectAll(section: any) {
+    if (section.prompts) {
+      section.selectAll = section.prompts.every(
+        (prompt: any) => prompt.selected
+      );
+    }
+  }
 }

@@ -106,29 +106,40 @@
                             - {{ section.prompts?.length || 0 }} prompt(s)</span
                           >
                         </div>
+                        <div
+                          class="select-all-checkbox"
+                          (click)="$event.stopPropagation()"
+                          *ngIf="section.prompts?.length"
+                        >
+                          <p-checkbox
+                            [(ngModel)]="section.selectAll"
+                            [binary]="true"
+                            (onChange)="toggleAllPrompts(section)"
+                          ></p-checkbox>
+                          <span class="select-all-label">Include All</span>
+                        </div>
                       </div>
                     </ng-template>
-                    <!-- Section content will go here -->
-                    <div class="section-content">
-                      <div
-                        class="empty-prompts"
-                        *ngIf="!section.prompts?.length"
-                      >
-                        <i class="pi pi-info-circle"></i>
-                        <span>No prompts available</span>
-                      </div>
-                      <div class="prompts-list" *ngIf="section.prompts?.length">
-                        <div class="prompts-grid">
+                    <div class="prompts-list" *ngIf="section.prompts?.length">
+                      <div class="prompts-grid">
+                        <div
+                          class="prompt-card"
+                          *ngFor="let prompt of section.prompts"
+                          (click)="togglePrompt(prompt, section)"
+                        >
                           <div
-                            class="prompt-card"
-                            *ngFor="let prompt of section.prompts"
+                            class="card-checkbox"
+                            (click)="$event.stopPropagation()"
                           >
-                            <div class="prompt-header">
-                              <span class="prompt-name">{{ prompt.name }}</span>
-                              <span class="prompt-type"
-                                >({{ prompt.type }})</span
-                              >
-                            </div>
+                            <p-checkbox
+                              [(ngModel)]="prompt.selected"
+                              [binary]="true"
+                              (onChange)="updateSectionSelectAll(section)"
+                            ></p-checkbox>
+                          </div>
+                          <div class="prompt-header">
+                            <span class="prompt-name">{{ prompt.name }}</span>
+                            <span class="prompt-type">({{ prompt.type }})</span>
                           </div>
                         </div>
                       </div>
