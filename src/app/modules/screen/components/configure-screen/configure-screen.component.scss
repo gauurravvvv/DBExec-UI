@@ -246,31 +246,6 @@
                 color: var(--text-color);
                 font-size: 14px;
               }
-
-              ::ng-deep {
-                .p-inputswitch {
-                  .p-inputswitch-slider {
-                    background: var(--border-color);
-
-                    &:before {
-                      background: var(--surface-ground);
-                    }
-                  }
-
-                  &.p-inputswitch-checked {
-                    .p-inputswitch-slider {
-                      background: var(--secondary-color);
-                    }
-                  }
-
-                  &:not(.p-disabled):hover {
-                    .p-inputswitch-slider {
-                      background: var(--secondary-color);
-                      opacity: 0.8;
-                    }
-                  }
-                }
-              }
             }
           }
         }
@@ -601,6 +576,7 @@
                         align-items: center;
                         justify-content: center;
                         gap: 8px;
+                        padding: 1.5rem;
                         text-align: center;
                         color: var(--text-color);
                         opacity: 0.7;
@@ -613,6 +589,45 @@
 
                         span {
                           font-size: 0.9rem;
+                        }
+                      }
+
+                      .prompts-list {
+                        .prompts-grid {
+                          display: grid;
+                          grid-template-columns: repeat(4, 1fr);
+                          gap: 1rem;
+                          padding: 0.5rem;
+
+                          @media screen and (max-width: 1400px) {
+                            grid-template-columns: repeat(3, 1fr);
+                          }
+
+                          @media screen and (max-width: 1024px) {
+                            grid-template-columns: repeat(2, 1fr);
+                          }
+
+                          @media screen and (max-width: 768px) {
+                            grid-template-columns: repeat(1, 1fr);
+                            gap: 0.75rem;
+                          }
+
+                          .prompt-item {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.5rem;
+                            min-width: 0;
+
+                            .prompt-label {
+                              display: block;
+                              margin-bottom: 0.5rem;
+                              color: var(--text-color);
+                              font-weight: 500;
+                              white-space: nowrap;
+                              overflow: hidden;
+                              text-overflow: ellipsis;
+                            }
+                          }
                         }
                       }
                     }
@@ -896,6 +911,43 @@
           }
         }
       }
+    }
+  }
+}
+
+.prompt-card {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .prompt-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .prompt-name {
+      color: var(--text-color);
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prompt-type {
+      color: var(--text-color);
+      opacity: 0.7;
+      font-size: 12px;
+      font-style: italic;
     }
   }
 }

@@ -118,7 +118,19 @@
                         <span>No prompts available</span>
                       </div>
                       <div class="prompts-list" *ngIf="section.prompts?.length">
-                        <!-- Prompts content will go here -->
+                        <div class="prompts-grid">
+                          <div
+                            class="prompt-card"
+                            *ngFor="let prompt of section.prompts"
+                          >
+                            <div class="prompt-header">
+                              <span class="prompt-name">{{ prompt.name }}</span>
+                              <span class="prompt-type"
+                                >({{ prompt.type }})</span
+                              >
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </p-accordionTab>
