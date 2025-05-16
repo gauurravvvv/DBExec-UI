@@ -181,7 +181,6 @@
           background: transparent;
           border: none;
           cursor: pointer;
-          padding: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -189,7 +188,7 @@
           transition: color 0.2s ease;
 
           &:hover {
-            color: var(--primary-color);
+            color: var(--secondary-color);
           }
 
           i {
@@ -307,6 +306,20 @@
                 display: flex;
                 align-items: center;
                 border-bottom: 1px solid var(--border-color);
+
+                .p-tabview-nav-btn {
+                  position: absolute;
+                  top: 0;
+                  z-index: 2;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: var(--text-color);
+                  border: none;
+                  width: 2rem;
+                  cursor: pointer;
+                }
               }
 
               .p-tabview-nav {
@@ -568,8 +581,8 @@
                                 }
 
                                 &.p-highlight {
-                                  background: var(--secondary-color);
-                                  border-color: var(--secondary-color);
+                                  background: var(--primary-color);
+                                  border-color: var(--primary-color);
 
                                   .p-checkbox-icon {
                                     color: var(--primary-color-text);
@@ -1053,8 +1066,8 @@
           }
 
           &.p-highlight {
-            background: var(--secondary-color);
-            border-color: var(--secondary-color);
+            background: var(--primary-color);
+            border-color: var(--primary-color);
 
             .p-checkbox-icon {
               color: var(--primary-color-text);
