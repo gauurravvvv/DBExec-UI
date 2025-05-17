@@ -25,11 +25,20 @@
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="hasExistingConfiguration() ? 'Cancel' : 'Clear'"
           class="p-button-outlined p-button-danger"
-          (click)="showDeleteConfirm = true"
-          [disabled]="!hasChanges() || isFreeze"
-        ></button>
+          (click)="handleCancelOrClear()"
+          [disabled]="
+            isFreeze ||
+            (hasExistingConfiguration() ? !hasChanges() : !hasSelectedPrompts())
+          "
+        >
+          <i
+            class="pi"
+            [class.pi-times]="hasExistingConfiguration()"
+            [class.pi-trash]="!hasExistingConfiguration()"
+          ></i>
+        </button>
         <button
           pButton
           class="p-button-outlined"
@@ -58,8 +67,6 @@
                 class="tab-card"
                 (click)="onTabClick(tab)"
                 [class.disabled]="isFreeze"
-                [pTooltip]="isFreeze ? 'Unfreeze to add tabs' : ''"
-                tooltipPosition="top"
               >
                 <div class="tab-info">
                   <span class="tab-name">{{ tab.name }}</span>
@@ -74,7 +81,7 @@
           <div class="sidebar-footer" *ngIf="isFreeze && !isSidebarCollapsed">
             <div class="helper-note">
               <i class="pi pi-info-circle"></i>
-              <span>Unfreeze screen to modify</span>
+              <span>Unlock screen to modify</span>
             </div>
           </div>
         </div>
@@ -189,10 +196,21 @@
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">
     <h3>Confirm</h3>
-    <p>Are you sure you want to clear the selection?</p>
+    <p>Are you sure you want to revert to the previous configuration?</p>
     <div class="popup-actions">
       <button class="btn-cancel" (click)="closeDialig()">No</button>
       <button class="btn-confirm" (click)="clearSelected()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showClearConfirm">
+  <div class="popup-content">
+    <h3>Confirm</h3>
+    <p>Are you sure you want to clear all selections?</p>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="closeDialig()">No</button>
+      <button class="btn-confirm" (click)="clearAllSelections()">Yes</button>
     </div>
   </div>
 </div>

@@ -88,7 +88,87 @@
     .header-actions {
       display: flex;
       align-items: center;
-      cursor: pointer;
+      gap: 0.25rem;
+
+      .theme-toggle,
+      .fullscreen-btn {
+        width: 40px !important;
+        height: 40px !important;
+        padding: 8px !important;
+        margin: 0 2px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: transparent !important;
+        border: none !important;
+        perspective: 100px;
+
+        .pi {
+          font-size: 1.2rem;
+          color: var(--text-color);
+          position: relative;
+          transition: color 0.3s ease;
+          transform-style: preserve-3d;
+          backface-visibility: visible;
+
+          &:hover {
+            color: var(--primary-color);
+          }
+        }
+
+        // Animation only when animate class is present
+        .animate {
+          animation: rotateY 0.7s ease-in-out;
+        }
+      }
+
+      .notification-btn {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 2px !important;
+        background: transparent !important;
+        border: none !important;
+        color: var(--text-color) !important;
+
+        &:hover {
+          background: transparent !important;
+
+          i {
+            opacity: 0.8;
+          }
+        }
+
+        i {
+          font-size: 1.2rem;
+          color: var(--text-color) !important;
+          transition: all 0.2s ease;
+        }
+
+        .notification-badge {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          background: var(--error-color);
+          color: white;
+          border-radius: 50%;
+          min-width: 16px;
+          height: 16px;
+          font-size: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 4px;
+          animation: zoom-ring 1s ease-in-out infinite;
+          transform-origin: center;
+          transform: translate3d(0, 0, 0) scale(1);
+          backface-visibility: hidden;
+          perspective: 1000px;
+        }
+      }
 
       .p-button {
         min-width: 0rem;
@@ -226,37 +306,6 @@
   --icon-filter: brightness(0) invert(1);
 }
 
-.theme-toggle {
-  width: 40px !important;
-  height: 40px !important;
-  padding: 8px !important;
-  margin: 0 4px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: transparent !important;
-  border: none !important;
-  perspective: 100px;
-
-  .pi {
-    font-size: 1.2rem;
-    color: var(--text-color);
-    position: relative;
-    transition: color 0.3s ease;
-    transform-style: preserve-3d;
-    backface-visibility: visible;
-
-    &:hover {
-      color: var(--primary-color);
-    }
-  }
-
-  // Animation only when animate class is present
-  .animate {
-    animation: rotateY 0.7s ease-in-out;
-  }
-}
-
 @keyframes rotateY {
   0% {
     transform: rotate3d(0, 1, 0, 0deg);
@@ -269,70 +318,6 @@
   }
   100% {
     transform: rotate3d(0, 1, 0, 360deg);
-  }
-}
-
-.notification-btn {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 0.25rem;
-  background: transparent !important;
-  border: none !important;
-  color: var(--text-color) !important;
-
-  &:hover {
-    background: transparent !important;
-
-    i {
-      opacity: 0.8;
-    }
-  }
-
-  i {
-    font-size: 1.2rem;
-    color: var(--text-color) !important;
-    transition: all 0.2s ease;
-  }
-
-  .notification-badge {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: var(--error-color);
-    color: white;
-    border-radius: 50%;
-    min-width: 16px;
-    height: 16px;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    animation: zoom-ring 1s ease-in-out infinite;
-    transform-origin: center;
-    transform: translate3d(0, 0, 0) scale(1);
-    backface-visibility: hidden;
-    perspective: 1000px;
-  }
-}
-
-@keyframes zoom-ring {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(1.2) rotate(-3deg);
-  }
-  50% {
-    transform: scale(0.95) rotate(3deg);
-  }
-  75% {
-    transform: scale(1.1) rotate(-2deg);
   }
 }
 

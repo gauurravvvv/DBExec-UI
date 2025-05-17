@@ -11,18 +11,38 @@
   <div class="header-center">
     <div class="org-info">
       <h2 class="org-name">{{ organisationName }}</h2>
-      <div class="current-time">{{ currentTime | date:'medium' }}</div>
+      <div class="current-time">{{ currentTime | date : 'medium' }}</div>
     </div>
   </div>
 
   <div class="header-right">
     <div class="header-actions">
-      <button pButton class="p-button-text theme-toggle" (click)="toggleTheme()">
+      <button
+        pButton
+        class="p-button-text theme-toggle"
+        (click)="toggleTheme()"
+      >
         <i class="pi" [ngClass]="isDarkMode ? 'pi-sun' : 'pi-moon'"></i>
       </button>
-      <button pButton class="p-button-text notification-btn" (click)="toggleNotificationMenu($event)">
+      <button
+        pButton
+        class="p-button-text fullscreen-btn"
+        (click)="toggleFullscreen()"
+      >
+        <i
+          class="pi"
+          [ngClass]="isFullscreen ? 'pi-window-minimize' : 'pi-window-maximize'"
+        ></i>
+      </button>
+      <button
+        pButton
+        class="p-button-text notification-btn"
+        (click)="toggleNotificationMenu($event)"
+      >
         <i class="pi pi-bell"></i>
-        <span class="notification-badge" *ngIf="unreadNotifications > 0">{{ unreadNotifications }}</span>
+        <span class="notification-badge" *ngIf="unreadNotifications > 0">{{
+          unreadNotifications
+        }}</span>
       </button>
       <div class="user-profile" (click)="toggleProfileMenu($event)">
         <div class="profile-info">
@@ -53,22 +73,35 @@
   </div>
 </header>
 
-<div class="notification-menu" [class.show]="showNotificationMenu" #notificationMenu>
+<div
+  class="notification-menu"
+  [class.show]="showNotificationMenu"
+  #notificationMenu
+>
   <div class="notification-header">
     <h3>Notifications</h3>
-    <button pButton class="p-button-text" *ngIf="hasNotifications" (click)="markAllAsRead()">
+    <button
+      pButton
+      class="p-button-text"
+      *ngIf="hasNotifications"
+      (click)="markAllAsRead()"
+    >
       Mark all as read
     </button>
   </div>
   <div class="notification-list" *ngIf="hasNotifications; else noNotifications">
-    <div class="notification-item" *ngFor="let notification of notifications" [class.unread]="!notification.read"
-      (click)="markAsRead(notification, $event)">
+    <div
+      class="notification-item"
+      *ngFor="let notification of notifications"
+      [class.unread]="!notification.read"
+      (click)="markAsRead(notification, $event)"
+    >
       <div class="notification-icon">
         <i class="pi" [ngClass]="notification.icon"></i>
       </div>
       <div class="notification-content">
         <p class="message">{{ notification.message }}</p>
-        <span class="time">{{ notification.time | date:'shortTime' }}</span>
+        <span class="time">{{ notification.time | date : 'shortTime' }}</span>
       </div>
       <button class="close-btn" (click)="removeNotification(notification.id)">
         <i class="pi pi-times"></i>

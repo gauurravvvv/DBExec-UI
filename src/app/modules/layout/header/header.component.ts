@@ -26,6 +26,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showProfileMenu: boolean = false;
   isDarkMode = true;
   isAnimating = false;
+  isFullscreen = false;
   @ViewChild('notificationMenu') notificationMenu!: ElementRef;
 
   showNotificationMenu = false;
@@ -205,5 +206,30 @@ export class HeaderComponent implements OnInit, OnDestroy {
       notification.read = true;
       this.updateUnreadCount();
     }
+  }
+
+  toggleFullscreen() {
+    const icon = document.querySelector('.fullscreen-btn .pi');
+    if (icon) {
+      icon.classList.add('animate');
+      setTimeout(() => {
+        icon.classList.remove('animate');
+      }, 700); // Match animation duration
+    }
+
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      this.isFullscreen = true;
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        this.isFullscreen = false;
+      }
+    }
+  }
+
+  @HostListener('document:fullscreenchange', ['$event'])
+  onFullscreenChange() {
+    this.isFullscreen = !!document.fullscreenElement;
   }
 }

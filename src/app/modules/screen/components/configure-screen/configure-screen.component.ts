@@ -49,6 +49,8 @@ export class ConfigureScreenComponent implements OnInit {
   isFreeze: boolean = false;
   expandedSections: { [key: string]: boolean } = {};
   showDeleteConfirm: boolean = false;
+  hasReceivedConfig: boolean = false;
+  showClearConfirm: boolean = false;
 
   constructor(
     private globalService: GlobalService,
@@ -99,6 +101,10 @@ export class ConfigureScreenComponent implements OnInit {
           .getScreenConfiguration(this.orgId, this.screenId)
           .then(response => {
             if (this.globalService.handleSuccessService(response)) {
+              // Mark that we received configuration from API
+              this.hasReceivedConfig =
+                response.data && response.data.length > 0;
+
               // Mark checkboxes based on API response
               const configData = response.data;
 
@@ -248,9 +254,6 @@ export class ConfigureScreenComponent implements OnInit {
   screenState() {
     this.isFreeze = !this.isFreeze;
 
-    // Store current expanded state
-    const currentExpandedState = { ...this.expandedSections };
-
     if (this.isFreeze) {
       // Store current state and show only selected prompts
       this.selectedPrompts = JSON.parse(JSON.stringify(this.openTabs));
@@ -262,7 +265,6 @@ export class ConfigureScreenComponent implements OnInit {
           sections: tab.sections
             .map((section: Section) => ({
               ...section,
-              expanded: this.expandedSections[String(section.id)],
               prompts: section.prompts.filter(
                 (prompt: Prompt) => prompt.selected
               ),
@@ -272,6 +274,13 @@ export class ConfigureScreenComponent implements OnInit {
         }))
         // Remove tabs with no sections (all sections were empty)
         .filter(tab => tab.sections.length > 0);
+
+      // Expand all sections when locking
+      this.openTabs.forEach(tab => {
+        tab.sections.forEach(section => {
+          this.expandedSections[String(section.id)] = true;
+        });
+      });
 
       // If current active tab was removed, adjust activeTabIndex
       if (this.activeTabIndex >= this.openTabs.length) {
@@ -293,7 +302,6 @@ export class ConfigureScreenComponent implements OnInit {
               if (!storedSection) {
                 return {
                   ...section,
-                  expanded: this.expandedSections[String(section.id)],
                   selectAll: true,
                   prompts: section.prompts.map((p: Prompt) => ({
                     ...p,
@@ -304,7 +312,6 @@ export class ConfigureScreenComponent implements OnInit {
 
               return {
                 ...section,
-                expanded: this.expandedSections[String(section.id)],
                 selectAll: storedSection.selectAll ?? true,
                 prompts:
                   storedSection.prompts ||
@@ -321,7 +328,6 @@ export class ConfigureScreenComponent implements OnInit {
           ...tab,
           sections: tab.sections.map((section: Section) => ({
             ...section,
-            expanded: this.expandedSections[String(section.id)],
             selectAll: true,
             prompts: section.prompts.map((prompt: Prompt) => ({
               ...prompt,
@@ -331,9 +337,6 @@ export class ConfigureScreenComponent implements OnInit {
         }));
       }
     }
-
-    // Restore expanded state
-    this.expandedSections = currentExpandedState;
   }
 
   onTabAccordionChange(sectionId: string | number, expanded: boolean) {
@@ -352,11 +355,10 @@ export class ConfigureScreenComponent implements OnInit {
 
   closeDialig() {
     this.showDeleteConfirm = false;
+    this.showClearConfirm = false;
   }
 
   clearSelected() {
-    this.showDeleteConfirm = false;
-
     // Check if we have any original screen configuration
     const hasOriginalConfig = this.refactoredTabData.some(tab =>
       tab.sections.some(section =>
@@ -422,6 +424,7 @@ export class ConfigureScreenComponent implements OnInit {
 
     // Reset freeze state
     this.isFreeze = false;
+    this.showDeleteConfirm = false;
   }
 
   hasSelectedPrompts(): boolean {
@@ -433,22 +436,24 @@ export class ConfigureScreenComponent implements OnInit {
   }
 
   saveScreenConfiguration() {
-    const screenConfig = this.openTabs.map(tab => ({
+    const screenConfig = this.openTabs.map((tab: any, tabIndex: number) => ({
       tab: tab.id,
-      sections: tab.sections.map(section => ({
+      tabSequence: tabIndex,
+      sections: tab.sections.map((section: any, sectionIndex: number) => ({
         id: section.id,
         name: section.name,
+        sectionSequence: sectionIndex,
         prompts: section.prompts
           .filter((prompt: any) => prompt.selected)
-          .map((prompt: any) => ({
+          .map((prompt: any, promptIndex: number) => ({
             id: prompt.id,
             name: prompt.name,
             selected: prompt.selected,
+            promptSequence: promptIndex,
           })),
       })),
     }));
 
-    // TODO: Add API call to save configuration
     this.screenService
       .saveScreenConfiguration(
         screenConfig,
@@ -496,5 +501,43 @@ export class ConfigureScreenComponent implements OnInit {
         });
       });
     });
+  }
+
+  handleCancelOrClear() {
+    if (this.hasExistingConfiguration()) {
+      // Show confirmation dialog for cancel
+      this.showDeleteConfirm = true;
+    } else {
+      // Clear all selections without confirmation
+      this.showClearConfirm = true;
+    }
+  }
+
+  hasExistingConfiguration(): boolean {
+    return this.hasReceivedConfig;
+  }
+
+  clearAllSelections() {
+    // Clear all selections in open tabs
+    this.openTabs = []; // Clear all open tabs
+    this.activeTabIndex = 0; // Reset active tab index
+    this.selectedTab = null; // Clear selected tab
+
+    // Clear selections in tabsData
+    this.tabsData = this.tabsData.map(tab => ({
+      ...tab,
+      sections: tab.sections.map(section => ({
+        ...section,
+        selectAll: false,
+        prompts: section.prompts.map(prompt => ({
+          ...prompt,
+          selected: false,
+        })),
+      })),
+    }));
+
+    // Update expanded sections
+    this.expandedSections = {};
+    this.showClearConfirm = false;
   }
 }
