@@ -28,7 +28,7 @@
           label="Cancel"
           class="p-button-outlined p-button-danger"
           (click)="showDeleteConfirm = true"
-          [disabled]="!hasSelectedPrompts()"
+          [disabled]="!hasChanges() || isFreeze"
         ></button>
         <button
           pButton

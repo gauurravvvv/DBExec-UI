@@ -357,25 +357,70 @@ export class ConfigureScreenComponent implements OnInit {
   clearSelected() {
     this.showDeleteConfirm = false;
 
-    // Clear all open tabs
-    this.openTabs = [];
-    this.activeTabIndex = 0;
-    this.selectedTab = null;
+    // Check if we have any original screen configuration
+    const hasOriginalConfig = this.refactoredTabData.some(tab =>
+      tab.sections.some(section =>
+        section.prompts.some((prompt: any) => prompt.selected)
+      )
+    );
 
-    // Reset the expanded sections
-    this.expandedSections = {};
+    if (hasOriginalConfig) {
+      // Restore to original configuration
+      this.openTabs = [];
+      this.activeTabIndex = 0;
+      this.selectedTab = null;
+      this.expandedSections = {};
 
-    // Reset all tabs data to original state
-    if (this.refactoredTabData.length > 0) {
+      // Reset tabs data to original state from refactoredTabData
       this.tabsData = JSON.parse(JSON.stringify(this.refactoredTabData));
+
+      // Re-populate open tabs with original configuration
+      this.refactoredTabData.forEach(tab => {
+        const hasSelectedPrompts = tab.sections.some(section =>
+          section.prompts.some((prompt: any) => prompt.selected)
+        );
+
+        if (hasSelectedPrompts) {
+          const configuredTab = JSON.parse(JSON.stringify(tab));
+          this.openTabs.push(configuredTab);
+        }
+      });
+
+      // Set active tab to first tab if available
+      if (this.openTabs.length > 0) {
+        this.activeTabIndex = 0;
+        this.selectedTab = this.openTabs[0];
+      }
+
+      // Restore expanded state for sections that had selected prompts
+      this.openTabs.forEach(tab => {
+        tab.sections.forEach(section => {
+          if (section.prompts.some((prompt: any) => prompt.selected)) {
+            this.expandedSections[String(section.id)] = true;
+          }
+        });
+      });
+    } else {
+      // Clear everything as no original configuration exists
+      this.openTabs = [];
+      this.activeTabIndex = 0;
+      this.selectedTab = null;
+      this.expandedSections = {};
+      this.selectedPrompts = [];
+      this.tabsData = this.refactoredTabData.map(tab => ({
+        ...tab,
+        sections: tab.sections.map(section => ({
+          ...section,
+          selectAll: false,
+          prompts: section.prompts.map(prompt => ({
+            ...prompt,
+            selected: false,
+          })),
+        })),
+      }));
     }
 
-    // Ensure we're in unfreeze state
-    this.isFreeze = true;
-
-    // Clear selected prompts array
-    this.selectedPrompts = [];
-
+    // Reset freeze state
     this.isFreeze = false;
   }
 
@@ -416,5 +461,40 @@ export class ConfigureScreenComponent implements OnInit {
           this.router.navigate([SCREEN.LIST]);
         }
       });
+  }
+
+  hasChanges(): boolean {
+    // If there are no open tabs but original config exists, changes were made
+    const hasOriginalConfig = this.refactoredTabData.some(tab =>
+      tab.sections.some(section =>
+        section.prompts.some((prompt: any) => prompt.selected)
+      )
+    );
+
+    if (hasOriginalConfig && this.openTabs.length === 0) {
+      return true;
+    }
+
+    // Compare current state with original configuration
+    return this.openTabs.some(openTab => {
+      const originalTab = this.refactoredTabData.find(
+        tab => tab.id === openTab.id
+      );
+      if (!originalTab) return true;
+
+      return openTab.sections.some(openSection => {
+        const originalSection = originalTab.sections.find(
+          section => section.id === openSection.id
+        );
+        if (!originalSection) return true;
+
+        return openSection.prompts.some((openPrompt: any) => {
+          const originalPrompt = originalSection.prompts.find(
+            (p: any) => p.id === openPrompt.id
+          );
+          return originalPrompt?.selected !== openPrompt.selected;
+        });
+      });
+    });
   }
 }
