@@ -275,6 +275,30 @@
         flex-direction: column;
         position: relative;
 
+        // Custom scrollbar styling for main content
+        &::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: transparent;
+          border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: var(--border-color);
+          border-radius: 4px;
+
+          &:hover {
+            background: var(--secondary-color);
+          }
+        }
+
+        // For Firefox
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-color) transparent;
+
         &.expanded {
           margin-left: 0;
         }
@@ -567,6 +591,30 @@
                 border: none;
                 flex: 1;
                 overflow-y: auto;
+
+                // Custom scrollbar styling for tab panels
+                &::-webkit-scrollbar {
+                  width: 8px;
+                  height: 8px;
+                }
+
+                &::-webkit-scrollbar-track {
+                  background: transparent;
+                  border-radius: 4px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                  background: var(--border-color);
+                  border-radius: 4px;
+
+                  &:hover {
+                    background: var(--secondary-color);
+                  }
+                }
+
+                // For Firefox
+                scrollbar-width: thin;
+                scrollbar-color: var(--border-color) transparent;
 
                 .p-tabpanel {
                   height: 100%;

@@ -11,14 +11,15 @@
         <button
           pButton
           type="button"
-          [label]="isFreeze ? 'Unfreeze' : 'Freeze'"
+          [label]="isFreeze ? 'Unlock' : 'Lock'"
           class="p-button-outlined"
           (click)="screenState()"
+          [disabled]="!hasSelectedPrompts()"
         >
           <i
             class="pi"
-            [class.pi-lock]="isFreeze"
-            [class.pi-lock-open]="!isFreeze"
+            [class.pi-lock]="!isFreeze"
+            [class.pi-lock-open]="isFreeze"
           ></i>
         </button>
         <button
