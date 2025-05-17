@@ -557,7 +557,7 @@
 
                   &.p-highlight .p-tabview-nav-link {
                     background: var(--hover-background);
-                    color: var(--secondary-color);
+                    color: var(--text-color);
                     font-weight: 600;
                   }
 
@@ -646,6 +646,14 @@
                     gap: 8px;
                     min-width: 0;
                     padding-right: 4px;
+
+                    .tab-sequence {
+                      color: var(--secondary-color);
+                      font-size: 12px;
+                      font-weight: 600;
+                      opacity: 0.8;
+                      min-width: 20px;
+                    }
 
                     span {
                       white-space: nowrap;
@@ -923,6 +931,8 @@
 
                   .p-accordion-tab {
                     margin-bottom: 8px;
+                    box-shadow: none;
+                    border: none;
 
                     &:last-child {
                       margin-bottom: 0;
@@ -1162,6 +1172,11 @@
       border-right-color: var(--surface-card);
     }
   }
+
+  .p-accordion .p-accordion-tab {
+    box-shadow: none;
+    border: none;
+  }
 }
 
 @media (max-width: 576px) {
@@ -1356,6 +1371,15 @@
           color: white;
         }
       }
+    }
+  }
+}
+
+.screen-wrapper {
+  ::ng-deep {
+    .p-accordion .p-accordion-tab {
+      box-shadow: none !important;
+      border: none !important;
     }
   }
 }

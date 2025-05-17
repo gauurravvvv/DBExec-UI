@@ -10,6 +10,7 @@ interface TabData {
   name: string;
   description: string;
   sections: Section[];
+  sequence: number;
   [key: string]: any;
 }
 
@@ -81,6 +82,7 @@ export class ConfigureScreenComponent implements OnInit {
           // Set all prompts as selected by default
           const tabsWithSelectedPrompts = response.data.map((tab: TabData) => ({
             ...tab,
+            sequence: 0,
             sections: tab.sections?.map((section: Section) => ({
               ...section,
               selectAll: true,
@@ -93,7 +95,7 @@ export class ConfigureScreenComponent implements OnInit {
           this.tabsData = tabsWithSelectedPrompts;
           this.refactoredTabData = JSON.parse(
             JSON.stringify(tabsWithSelectedPrompts)
-          ); // Store a deep copy
+          );
         }
       })
       .then(() => {
@@ -113,6 +115,7 @@ export class ConfigureScreenComponent implements OnInit {
                 JSON.stringify(this.refactoredTabData)
               );
 
+              let sequenceCounter = 1;
               // For each tab in the configuration
               configData.forEach((configTab: any) => {
                 // Convert IDs to strings for comparison
@@ -146,6 +149,7 @@ export class ConfigureScreenComponent implements OnInit {
 
                   // Create a new tab with the configured state
                   const configuredTab = JSON.parse(JSON.stringify(tab));
+                  configuredTab.sequence = sequenceCounter++;
 
                   // Check if tab is already open
                   const existingTabIndex = this.openTabs.findIndex(
@@ -186,7 +190,7 @@ export class ConfigureScreenComponent implements OnInit {
     const existingTabIndex = this.openTabs.findIndex(t => t.id === tab.id);
 
     if (existingTabIndex === -1) {
-      // Add new tab with selected prompts
+      // Add new tab with selected prompts and sequence
       const newTab = JSON.parse(JSON.stringify(tab));
       newTab.sections = newTab.sections.map((section: Section) => ({
         ...section,
@@ -196,6 +200,7 @@ export class ConfigureScreenComponent implements OnInit {
           selected: true,
         })),
       }));
+      newTab.sequence = this.openTabs.length + 1;
       this.openTabs.push(newTab);
       this.activeTabIndex = this.openTabs.length - 1;
     } else {
@@ -206,14 +211,83 @@ export class ConfigureScreenComponent implements OnInit {
 
   handleTabClose(index: number) {
     if (!this.isFreeze) {
+      const closedTabSequence = this.openTabs[index]?.sequence;
+
+      // Remove the tab
       this.openTabs = this.openTabs.filter((_, i) => i !== index);
 
-      // If the closed tab was selected, select the last tab
-      if (this.openTabs.length > 0 && index === this.activeTabIndex) {
-        this.activeTabIndex = Math.min(index, this.openTabs.length - 1);
+      // Resequence remaining tabs - only update sequence for tabs that were after the closed tab
+      this.openTabs = this.openTabs.map(tab => {
+        if (tab.sequence > closedTabSequence) {
+          return {
+            ...tab,
+            sequence: tab.sequence - 1,
+          };
+        }
+        return tab;
+      });
+
+      // Handle active tab selection after closing
+      if (this.openTabs.length > 0) {
+        if (index === this.activeTabIndex) {
+          // If we closed the active tab
+          if (index >= this.openTabs.length) {
+            // If we closed the last tab, select the new last tab
+            this.activeTabIndex = this.openTabs.length - 1;
+          } else {
+            // Keep the same index (which will now point to the next tab)
+            this.activeTabIndex = index;
+          }
+        } else if (index < this.activeTabIndex) {
+          // If we closed a tab before the active tab, decrement the active index
+          this.activeTabIndex--;
+        }
+        // Update the selected tab reference
         this.selectedTab = this.openTabs[this.activeTabIndex];
-      } else if (this.openTabs.length === 0) {
+
+        // Update the content of the selected tab
+        const originalTab = this.selectedTab
+          ? this.tabsData.find(t => t.id === this.selectedTab?.id)
+          : null;
+        if (this.selectedTab && originalTab) {
+          // Update sections and prompts while preserving selection state
+          this.selectedTab.sections = this.selectedTab.sections.map(section => {
+            const originalSection = originalTab.sections.find(
+              s => s.id === section.id
+            );
+            if (originalSection) {
+              return {
+                ...section,
+                prompts: section.prompts.map(prompt => {
+                  const originalPrompt = originalSection.prompts.find(
+                    p => p.id === prompt.id
+                  );
+                  if (originalPrompt) {
+                    return {
+                      ...originalPrompt,
+                      selected: prompt.selected, // Keep the current selection state
+                    };
+                  }
+                  return prompt;
+                }),
+              };
+            }
+            return section;
+          });
+        }
+      } else {
+        // No tabs left
+        this.activeTabIndex = 0;
         this.selectedTab = null;
+      }
+
+      // Update expanded sections state if needed
+      if (this.selectedTab) {
+        this.selectedTab.sections.forEach(section => {
+          if (!this.expandedSections.hasOwnProperty(section.id)) {
+            this.expandedSections[section.id] = true; // Default to expanded
+          }
+        });
       }
     }
   }
@@ -436,9 +510,9 @@ export class ConfigureScreenComponent implements OnInit {
   }
 
   saveScreenConfiguration() {
-    const screenConfig = this.openTabs.map((tab: any, tabIndex: number) => ({
+    const screenConfig = this.openTabs.map((tab: any) => ({
       tab: tab.id,
-      tabSequence: tabIndex,
+      sequence: tab.sequence,
       sections: tab.sections.map((section: any, sectionIndex: number) => ({
         id: section.id,
         name: section.name,
