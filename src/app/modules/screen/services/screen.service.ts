@@ -97,4 +97,14 @@ export class ScreenService {
         return result;
       });
   }
+
+  getScreenConfiguration(orgId: string, id: string) {
+    return this.http
+      .get(SCREEN.GET_SCREEN_CONFIGURATION + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
 }

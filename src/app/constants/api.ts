@@ -131,4 +131,5 @@ export const SCREEN = {
   VIEW: '/screen/get/',
   UPDATE: '/screen/update',
   SAVE_CONFIGURATION: '/screen/config',
+  GET_SCREEN_CONFIGURATION: '/screen/getConfig/',
 };

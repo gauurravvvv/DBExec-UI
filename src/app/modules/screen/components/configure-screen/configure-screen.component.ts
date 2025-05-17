@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { GlobalService } from 'src/app/core/services/global.service';
-import { ScreenService } from '../../services/screen.service';
-import { TabService } from 'src/app/modules/tab/services/tab.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SCREEN } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { TabService } from 'src/app/modules/tab/services/tab.service';
+import { ScreenService } from '../../services/screen.service';
 
 interface TabData {
-  id: number;
+  id: string | number;
   name: string;
   description: string;
   sections: Section[];
@@ -15,7 +14,7 @@ interface TabData {
 }
 
 interface Section {
-  id: number;
+  id: string | number;
   name: string;
   prompts: Prompt[];
   selectAll?: boolean;
@@ -24,7 +23,7 @@ interface Section {
 }
 
 interface Prompt {
-  id: number;
+  id: string | number;
   name: string;
   type: string;
   selected?: boolean;
@@ -48,7 +47,7 @@ export class ConfigureScreenComponent implements OnInit {
   openTabs: TabData[] = [];
   activeTabIndex: number = 0;
   isFreeze: boolean = false;
-  expandedSections: { [key: number]: boolean } = {};
+  expandedSections: { [key: string]: boolean } = {};
   showDeleteConfirm: boolean = false;
 
   constructor(
@@ -73,26 +72,101 @@ export class ConfigureScreenComponent implements OnInit {
       pageNumber: 1,
       limit: 100,
     };
-    this.tabService.listAllTabData(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        // Set all prompts as selected by default
-        const tabsWithSelectedPrompts = response.data.map((tab: TabData) => ({
-          ...tab,
-          sections: tab.sections?.map((section: Section) => ({
-            ...section,
-            selectAll: true,
-            prompts: section.prompts?.map((prompt: Prompt) => ({
-              ...prompt,
-              selected: true,
+    this.tabService
+      .listAllTabData(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          // Set all prompts as selected by default
+          const tabsWithSelectedPrompts = response.data.map((tab: TabData) => ({
+            ...tab,
+            sections: tab.sections?.map((section: Section) => ({
+              ...section,
+              selectAll: true,
+              prompts: section.prompts?.map((prompt: Prompt) => ({
+                ...prompt,
+                selected: true,
+              })),
             })),
-          })),
-        }));
-        this.tabsData = tabsWithSelectedPrompts;
-        this.refactoredTabData = JSON.parse(
-          JSON.stringify(tabsWithSelectedPrompts)
-        ); // Store a deep copy
-      }
-    });
+          }));
+          this.tabsData = tabsWithSelectedPrompts;
+          this.refactoredTabData = JSON.parse(
+            JSON.stringify(tabsWithSelectedPrompts)
+          ); // Store a deep copy
+        }
+      })
+      .then(() => {
+        this.screenService
+          .getScreenConfiguration(this.orgId, this.screenId)
+          .then(response => {
+            if (this.globalService.handleSuccessService(response)) {
+              // Mark checkboxes based on API response
+              const configData = response.data;
+
+              // Deep copy the refactoredTabData to avoid reference issues
+              this.tabsData = JSON.parse(
+                JSON.stringify(this.refactoredTabData)
+              );
+
+              // For each tab in the configuration
+              configData.forEach((configTab: any) => {
+                // Convert IDs to strings for comparison
+                const tab = this.tabsData.find(
+                  t => String(t.id) === String(configTab.id)
+                );
+                if (tab) {
+                  // For each section in the configuration
+                  configTab.sections.forEach((configSection: any) => {
+                    const section = tab.sections.find(
+                      s => String(s.id) === String(configSection.id)
+                    );
+                    if (section) {
+                      // Mark prompts as selected if they exist in the config
+                      section.prompts = section.prompts.map(prompt => ({
+                        ...prompt,
+                        selected: configSection.prompts.some(
+                          (p: any) => String(p.id) === String(prompt.id)
+                        ),
+                      }));
+
+                      // Update section's selectAll status
+                      section.selectAll = section.prompts.every(
+                        p => p.selected
+                      );
+
+                      // Expand the section by default
+                      this.expandedSections[String(section.id)] = true;
+                    }
+                  });
+
+                  // Create a new tab with the configured state
+                  const configuredTab = JSON.parse(JSON.stringify(tab));
+
+                  // Check if tab is already open
+                  const existingTabIndex = this.openTabs.findIndex(
+                    t => String(t.id) === String(tab.id)
+                  );
+                  if (existingTabIndex === -1) {
+                    this.openTabs.push(configuredTab);
+                  } else {
+                    // Update existing tab
+                    this.openTabs[existingTabIndex] = configuredTab;
+                  }
+                }
+              });
+
+              // Set active tab to the first tab
+              if (this.openTabs.length > 0) {
+                this.activeTabIndex = 0;
+                this.selectedTab = this.openTabs[0];
+              }
+
+              // Update refactoredTabData with the new selection state
+              this.refactoredTabData = JSON.parse(
+                JSON.stringify(this.tabsData)
+              );
+            }
+          });
+      });
   }
 
   onTabClick(tab: TabData) {
@@ -188,7 +262,7 @@ export class ConfigureScreenComponent implements OnInit {
           sections: tab.sections
             .map((section: Section) => ({
               ...section,
-              expanded: this.expandedSections[section.id],
+              expanded: this.expandedSections[String(section.id)],
               prompts: section.prompts.filter(
                 (prompt: Prompt) => prompt.selected
               ),
@@ -219,7 +293,7 @@ export class ConfigureScreenComponent implements OnInit {
               if (!storedSection) {
                 return {
                   ...section,
-                  expanded: this.expandedSections[section.id],
+                  expanded: this.expandedSections[String(section.id)],
                   selectAll: true,
                   prompts: section.prompts.map((p: Prompt) => ({
                     ...p,
@@ -230,7 +304,7 @@ export class ConfigureScreenComponent implements OnInit {
 
               return {
                 ...section,
-                expanded: this.expandedSections[section.id],
+                expanded: this.expandedSections[String(section.id)],
                 selectAll: storedSection.selectAll ?? true,
                 prompts:
                   storedSection.prompts ||
@@ -247,7 +321,7 @@ export class ConfigureScreenComponent implements OnInit {
           ...tab,
           sections: tab.sections.map((section: Section) => ({
             ...section,
-            expanded: this.expandedSections[section.id],
+            expanded: this.expandedSections[String(section.id)],
             selectAll: true,
             prompts: section.prompts.map((prompt: Prompt) => ({
               ...prompt,
@@ -262,9 +336,8 @@ export class ConfigureScreenComponent implements OnInit {
     this.expandedSections = currentExpandedState;
   }
 
-  // Update method signature to use number type
-  onTabAccordionChange(sectionId: number, expanded: boolean) {
-    this.expandedSections[sectionId] = expanded;
+  onTabAccordionChange(sectionId: string | number, expanded: boolean) {
+    this.expandedSections[String(sectionId)] = expanded;
   }
 
   getSelectedPromptString(prompts: any[]): string {
