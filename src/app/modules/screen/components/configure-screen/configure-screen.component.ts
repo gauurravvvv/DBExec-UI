@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ScreenService } from '../../services/screen.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
+import { SCREEN } from 'src/app/constants/routes';
 
 interface TabData {
   id: number;
@@ -51,12 +52,11 @@ export class ConfigureScreenComponent implements OnInit {
   showDeleteConfirm: boolean = false;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
     private globalService: GlobalService,
     private screenService: ScreenService,
     private route: ActivatedRoute,
-    private tabService: TabService
+    private tabService: TabService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -312,5 +312,36 @@ export class ConfigureScreenComponent implements OnInit {
         section.prompts.some((prompt: any) => prompt.selected)
       )
     );
+  }
+
+  saveScreenConfiguration() {
+    const screenConfig = this.openTabs.map(tab => ({
+      tab: tab.id,
+      sections: tab.sections.map(section => ({
+        id: section.id,
+        name: section.name,
+        prompts: section.prompts
+          .filter((prompt: any) => prompt.selected)
+          .map((prompt: any) => ({
+            id: prompt.id,
+            name: prompt.name,
+            selected: prompt.selected,
+          })),
+      })),
+    }));
+
+    // TODO: Add API call to save configuration
+    this.screenService
+      .saveScreenConfiguration(
+        screenConfig,
+        this.orgId,
+        this.databaseId,
+        this.screenId
+      )
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.router.navigate([SCREEN.LIST]);
+        }
+      });
   }
 }

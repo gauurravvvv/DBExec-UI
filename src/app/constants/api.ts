@@ -130,4 +130,5 @@ export const SCREEN = {
   DELETE: '/screen/delete/',
   VIEW: '/screen/get/',
   UPDATE: '/screen/update',
+  SAVE_CONFIGURATION: '/screen/config',
 };

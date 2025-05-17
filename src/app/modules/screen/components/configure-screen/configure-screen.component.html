@@ -34,7 +34,8 @@
           class="p-button-outlined"
           type="submit"
           label="Save"
-          [disabled]="!hasSelectedPrompts()"
+          (click)="saveScreenConfiguration()"
+          [disabled]="!hasSelectedPrompts() || !isFreeze"
         >
           <i class="pi pi-save mr-2"></i>
         </button>

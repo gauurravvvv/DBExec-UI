@@ -77,4 +77,24 @@ export class ScreenService {
         return result;
       });
   }
+
+  saveScreenConfiguration(
+    configuration: any,
+    organisationId: string,
+    databaseId: string,
+    screenId: string
+  ) {
+    return this.http
+      .post(SCREEN.SAVE_CONFIGURATION, {
+        configuration,
+        organisationId,
+        databaseId,
+        screenId,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
 }
