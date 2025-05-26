@@ -15,6 +15,9 @@ import { ViewScreenComponent } from './components/view-screen/view-screen.compon
 import { ConfigureScreenComponent } from './components/configure-screen/configure-screen.component';
 import { RouterModule } from '@angular/router';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { TabViewModule } from 'primeng/tabview';
+import { AccordionModule } from 'primeng/accordion';
+import { DragDropModule } from 'primeng/dragdrop';
 
 @NgModule({
   declarations: [
@@ -37,6 +40,9 @@ import { InputSwitchModule } from 'primeng/inputswitch';
     ScreenRoutingModule,
     RouterModule,
     InputSwitchModule,
+    TabViewModule,
+    AccordionModule,
+    DragDropModule,
   ],
   exports: [ConfigureScreenComponent],
 })

@@ -115,7 +115,22 @@
               [selected]="i === activeTabIndex"
             >
               <ng-template pTemplate="header">
-                <div class="tab-header-content">
+                <div
+                  class="tab-header-content"
+                  [class.dragging]="draggedTabIndex === i"
+                  [class.drag-enter]="
+                    draggedTabIndex !== null && draggedTabIndex !== i
+                  "
+                  [pDraggable]="!isFreeze ? 'tabScope' : ''"
+                  [pDroppable]="!isFreeze ? 'tabScope' : ''"
+                  [dragHandle]="'.drag-handle'"
+                  (onDragStart)="onTabDragStart(i)"
+                  (onDragEnd)="onTabDragEnd()"
+                  (onDragEnter)="onTabDragEnter(i)"
+                  (onDragLeave)="onTabDragLeave(i)"
+                  (onDrop)="onTabDrop(i)"
+                >
+                  <i class="pi pi-bars drag-handle mr-2" *ngIf="!isFreeze"></i>
                   <span>{{ tab.name }}</span>
                   <i
                     *ngIf="!isFreeze"
@@ -131,13 +146,35 @@
               <div class="tab-content">
                 <p-accordion [multiple]="true">
                   <p-accordionTab
-                    *ngFor="let section of tab.sections"
+                    *ngFor="
+                      let section of tab.sections;
+                      let sectionIndex = index
+                    "
                     [selected]="expandedSections[section.id]"
                     (selectedChange)="onTabAccordionChange(section.id, $event)"
                   >
                     <ng-template pTemplate="header">
-                      <div class="section-header">
+                      <div
+                        class="section-header"
+                        [pDraggable]="!isFreeze ? 'sectionScope' : ''"
+                        [pDroppable]="!isFreeze ? 'sectionScope' : ''"
+                        [dragHandle]="'.section-drag-handle'"
+                        (onDragStart)="onSectionDragStart(tab.id, sectionIndex)"
+                        (onDragEnd)="onSectionDragEnd()"
+                        (onDragEnter)="onSectionDragEnter(tab.id, sectionIndex)"
+                        (onDragLeave)="onSectionDragLeave(sectionIndex)"
+                        (onDrop)="onSectionDrop(tab.id, sectionIndex)"
+                        [class.dragging]="draggedSectionIndex === sectionIndex"
+                        [class.drag-enter]="
+                          draggedSectionIndex !== null &&
+                          draggedSectionIndex !== sectionIndex
+                        "
+                      >
                         <div class="header-content">
+                          <i
+                            class="pi pi-bars section-drag-handle"
+                            *ngIf="!isFreeze"
+                          ></i>
                           <span class="section-name">{{ section.name }}</span>
                           <span class="prompt-count">
                             {{ getSelectedPromptString(section.prompts) }}
@@ -161,7 +198,37 @@
                       <div class="prompts-grid">
                         <div
                           class="prompt-card"
-                          *ngFor="let prompt of section.prompts"
+                          *ngFor="
+                            let prompt of section.prompts;
+                            let promptIndex = index
+                          "
+                          [pDraggable]="
+                            !isFreeze ? 'promptScope-' + section.id : ''
+                          "
+                          [pDroppable]="
+                            !isFreeze ? 'promptScope-' + section.id : ''
+                          "
+                          [dragHandle]="'.prompt-drag-handle'"
+                          (onDragStart)="
+                            onPromptDragStart(tab.id, section.id, promptIndex)
+                          "
+                          (onDragEnd)="onPromptDragEnd()"
+                          (onDragEnter)="
+                            onPromptDragEnter(tab.id, section.id, promptIndex)
+                          "
+                          (onDragLeave)="onPromptDragLeave(promptIndex)"
+                          (onDrop)="
+                            onPromptDrop(tab.id, section.id, promptIndex)
+                          "
+                          [class.dragging]="
+                            draggedPromptIndex === promptIndex &&
+                            draggedPromptSectionId === section.id
+                          "
+                          [class.drag-enter]="
+                            draggedPromptIndex !== null &&
+                            draggedPromptIndex !== promptIndex &&
+                            draggedPromptSectionId === section.id
+                          "
                           (click)="togglePrompt(prompt, section)"
                         >
                           <div
@@ -176,6 +243,10 @@
                             ></p-checkbox>
                           </div>
                           <div class="prompt-header">
+                            <i
+                              class="pi pi-bars prompt-drag-handle"
+                              *ngIf="!isFreeze"
+                            ></i>
                             <span class="prompt-name">{{ prompt.name }}</span>
                             <span class="prompt-type">({{ prompt.type }})</span>
                           </div>
