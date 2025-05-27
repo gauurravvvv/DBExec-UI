@@ -11,6 +11,32 @@
         <button
           pButton
           type="button"
+          [label]="isGroupingMode ? 'Exit Grouping' : 'Group Prompts'"
+          class="p-button-outlined"
+          (click)="toggleGroupingMode()"
+          [disabled]="!isFreeze"
+        >
+          <i
+            class="pi"
+            [class.pi-sitemap]="!isGroupingMode"
+            [class.pi-times]="isGroupingMode"
+          ></i>
+        </button>
+        <button
+          *ngIf="isGroupingMode"
+          pButton
+          type="button"
+          label="Clear Groups"
+          class="p-button-outlined p-button-danger"
+          (click)="clearAllGroups()"
+          [disabled]="!isFreeze"
+          [pTooltip]="!isFreeze ? 'Lock the screen first to clear groups' : ''"
+        >
+          <i class="pi pi-trash"></i>
+        </button>
+        <button
+          pButton
+          type="button"
           [label]="isFreeze ? 'Unlock' : 'Lock'"
           class="p-button-outlined"
           (click)="screenState()"
@@ -195,6 +221,76 @@
                       </div>
                     </ng-template>
                     <div class="prompts-list" *ngIf="section.prompts?.length">
+                      <div class="group-indicators" *ngIf="isGroupingMode">
+                        <div class="group-list">
+                          <div
+                            *ngFor="
+                              let group of getGroupedPrompts(section) | keyvalue
+                            "
+                            class="group-indicator-item"
+                            [ngStyle]="{
+                              'border-color':
+                                groupColors[
+                                  (+group.key || 0) % groupColors.length
+                                ],
+                              'background-color':
+                                section.selectedGroupId === +group.key
+                                  ? groupColors[
+                                      (+group.key || 0) % groupColors.length
+                                    ] + '22'
+                                  : 'transparent'
+                            }"
+                            (click)="selectGroup(+group.key, section)"
+                          >
+                            <span
+                              >Group {{ (+group.key || 0) + 1 }} ({{
+                                group.value
+                              }})</span
+                            >
+                          </div>
+                          <div
+                            class="group-indicator-item new-group"
+                            *ngIf="section.selectedGroupId === null"
+                          >
+                            <span
+                              >Click prompts to create new group in
+                              {{ section.name }}</span
+                            >
+                          </div>
+                          <div
+                            class="group-indicator-item"
+                            *ngIf="
+                              section.selectedGroupId !== null &&
+                              !hasMinimumPromptsSelected(section)
+                            "
+                            [ngStyle]="{ 'border-color': '#ff4444' }"
+                          >
+                            <span
+                              ><i class="pi pi-exclamation-triangle"></i> Select
+                              at least 2 prompts to create a group</span
+                            >
+                          </div>
+                          <div
+                            class="group-indicator-item active-group"
+                            *ngIf="
+                              section.selectedGroupId !== null &&
+                              hasMinimumPromptsSelected(section)
+                            "
+                            [ngStyle]="{
+                              'border-color':
+                                groupColors[
+                                  (section.selectedGroupId || 0) %
+                                    groupColors.length
+                                ]
+                            }"
+                          >
+                            <span
+                              >Click prompts to add to Group
+                              {{ (section.selectedGroupId || 0) + 1 }}</span
+                            >
+                          </div>
+                        </div>
+                      </div>
                       <div class="prompts-grid">
                         <div
                           class="prompt-card"
@@ -202,11 +298,34 @@
                             let prompt of section.prompts;
                             let promptIndex = index
                           "
+                          [ngClass]="{
+                            dragging:
+                              draggedPromptIndex === promptIndex &&
+                              draggedPromptSectionId === section.id,
+                            'drag-enter':
+                              draggedPromptIndex !== null &&
+                              draggedPromptIndex !== promptIndex &&
+                              draggedPromptSectionId === section.id,
+                            'grouping-mode': isGroupingMode,
+                            grouped:
+                              prompt.groupId !== undefined &&
+                              prompt.groupId !== null
+                          }"
+                          [ngStyle]="getPromptGroupStyle(prompt, section)"
+                          (click)="
+                            isGroupingMode
+                              ? handlePromptGrouping(prompt, section)
+                              : togglePrompt(prompt, section)
+                          "
                           [pDraggable]="
-                            !isFreeze ? 'promptScope-' + section.id : ''
+                            !isFreeze && !isGroupingMode
+                              ? 'promptScope-' + section.id
+                              : ''
                           "
                           [pDroppable]="
-                            !isFreeze ? 'promptScope-' + section.id : ''
+                            !isFreeze && !isGroupingMode
+                              ? 'promptScope-' + section.id
+                              : ''
                           "
                           [dragHandle]="'.prompt-drag-handle'"
                           (onDragStart)="
@@ -220,21 +339,11 @@
                           (onDrop)="
                             onPromptDrop(tab.id, section.id, promptIndex)
                           "
-                          [class.dragging]="
-                            draggedPromptIndex === promptIndex &&
-                            draggedPromptSectionId === section.id
-                          "
-                          [class.drag-enter]="
-                            draggedPromptIndex !== null &&
-                            draggedPromptIndex !== promptIndex &&
-                            draggedPromptSectionId === section.id
-                          "
-                          (click)="togglePrompt(prompt, section)"
                         >
                           <div
                             class="card-checkbox"
                             (click)="$event.stopPropagation()"
-                            *ngIf="!isFreeze"
+                            *ngIf="!isFreeze && !isGroupingMode"
                           >
                             <p-checkbox
                               [(ngModel)]="prompt.selected"
@@ -242,10 +351,19 @@
                               (onChange)="updateSectionSelectAll(section)"
                             ></p-checkbox>
                           </div>
+                          <div
+                            class="group-indicator"
+                            *ngIf="
+                              prompt.groupId !== undefined &&
+                              prompt.groupId !== null
+                            "
+                          >
+                            Group {{ prompt.groupId + 1 }}
+                          </div>
                           <div class="prompt-header">
                             <i
                               class="pi pi-bars prompt-drag-handle"
-                              *ngIf="!isFreeze"
+                              *ngIf="!isFreeze && !isGroupingMode"
                             ></i>
                             <span class="prompt-name">{{ prompt.name }}</span>
                             <span class="prompt-type">({{ prompt.type }})</span>

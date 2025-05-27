@@ -20,7 +20,9 @@ interface Section {
   prompts: Prompt[];
   selectAll?: boolean;
   expanded?: boolean;
-  sectionSequence: number;
+  sequence: number;
+  currentGroupId?: number;
+  selectedGroupId?: number | null;
   [key: string]: any;
 }
 
@@ -29,7 +31,13 @@ interface Prompt {
   name: string;
   type: string;
   selected?: boolean;
+  sequence?: number;
+  groupId?: number;
   [key: string]: any;
+}
+
+interface GroupData {
+  [key: number]: number;
 }
 
 @Component({
@@ -60,6 +68,20 @@ export class ConfigureScreenComponent implements OnInit {
   draggedPromptIndex: number | null = null;
   draggedPromptTabId: string | number | null = null;
   draggedPromptSectionId: string | number | null = null;
+  currentGroupId: number = 0;
+  isGroupingMode: boolean = false;
+  currentGlobalGroupId: number = 0;
+  groupColors: string[] = [
+    '#8BB9DD', // Soft blue
+    '#98D4BB', // Mint green
+    '#F2B6B6', // Soft pink
+    '#B6CCF2', // Light periwinkle
+    '#E2C799', // Warm sand
+    '#C3B1E1', // Soft purple
+    '#9DDBAD', // Sage green
+    '#F2D4C2', // Peach
+  ];
+  selectedGroupId: number | null = null;
 
   constructor(
     private globalService: GlobalService,
@@ -73,7 +95,121 @@ export class ConfigureScreenComponent implements OnInit {
     this.screenId = this.route.snapshot.params['id'];
     this.orgId = this.route.snapshot.params['orgId'];
     this.databaseId = this.route.snapshot.params['dbId'];
+    this.initializeSections();
     this.getTabsData();
+  }
+
+  initializeSections() {
+    if (this.openTabs) {
+      this.openTabs.forEach(tab => {
+        tab.sections.forEach(section => {
+          section.currentGroupId = 0;
+          section.selectedGroupId = null;
+        });
+      });
+    }
+  }
+
+  patchScreenConfiguration(configData: any[]) {
+    // Sort config data by tab sequence
+    configData.sort((a, b) => a.sequence - b.sequence);
+
+    // Create a deep copy of tabsData to work with
+    const patchedTabs = JSON.parse(JSON.stringify(this.tabsData));
+
+    // Process each tab in the configuration
+    configData.forEach(configTab => {
+      const tab = patchedTabs.find(
+        (t: TabData) => String(t.id) === String(configTab.id)
+      );
+      if (tab) {
+        // Set tab sequence
+        tab.sequence = configTab.sequence;
+
+        // Sort sections by sequence
+        configTab.sections.sort((a: any, b: any) => a.sequence - b.sequence);
+
+        // Process each section in the configuration
+        configTab.sections.forEach((configSection: any) => {
+          const section = tab.sections.find(
+            (s: Section) => String(s.id) === String(configSection.id)
+          );
+          if (section) {
+            // Set section sequence
+            section.sequence = configSection.sequence;
+
+            // Sort prompts by sequence
+            configSection.prompts.sort(
+              (a: any, b: any) => a.sequence - b.sequence
+            );
+
+            // Create a map of configured prompts with their sequences
+            const sequenceMap = new Map(
+              configSection.prompts.map((p: any) => [String(p.id), p.sequence])
+            );
+
+            // Update prompts based on configuration
+            section.prompts = section.prompts.map((prompt: Prompt) => {
+              const isConfigured = sequenceMap.has(String(prompt.id));
+              return {
+                ...prompt,
+                selected: isConfigured,
+                sequence: isConfigured
+                  ? sequenceMap.get(String(prompt.id))
+                  : null,
+              };
+            });
+
+            // Sort prompts: configured prompts first (by sequence), then unconfigured prompts
+            section.prompts.sort((a: Prompt, b: Prompt) => {
+              if (a.selected && b.selected) {
+                return (a.sequence || 0) - (b.sequence || 0);
+              }
+              if (a.selected) return -1;
+              if (b.selected) return 1;
+              return 0;
+            });
+
+            // Update section's selectAll status
+            section.selectAll = section.prompts.every(
+              (p: Prompt) => p.selected
+            );
+          }
+        });
+
+        // Sort sections based on sequence
+        tab.sections.sort(
+          (a: Section, b: Section) => (a.sequence || 0) - (b.sequence || 0)
+        );
+      }
+    });
+
+    // Filter and sort tabs
+    this.openTabs = patchedTabs
+      .filter((tab: TabData) =>
+        configData.some(configTab => String(configTab.id) === String(tab.id))
+      )
+      .sort((a: TabData, b: TabData) => (a.sequence || 0) - (b.sequence || 0));
+
+    // Set active tab to first tab
+    if (this.openTabs.length > 0) {
+      this.activeTabIndex = 0;
+      this.selectedTab = this.openTabs[0];
+    }
+
+    // Store the patched data
+    this.tabsData = patchedTabs;
+    this.refactoredTabData = JSON.parse(JSON.stringify(patchedTabs));
+    this.hasReceivedConfig = true;
+
+    // Initialize expanded sections for configured sections
+    this.openTabs.forEach(tab => {
+      tab.sections.forEach(section => {
+        if (section.prompts.some(prompt => prompt.selected)) {
+          this.expandedSections[String(section.id)] = true;
+        }
+      });
+    });
   }
 
   getTabsData() {
@@ -87,23 +223,21 @@ export class ConfigureScreenComponent implements OnInit {
       .listAllTabData(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          // Set all prompts as selected by default
-          const tabsWithSelectedPrompts = response.data.map((tab: TabData) => ({
+          // Set all prompts as unselected by default
+          const tabsWithPrompts = response.data.map((tab: TabData) => ({
             ...tab,
             sequence: 0,
             sections: tab.sections?.map((section: Section) => ({
               ...section,
-              selectAll: true,
+              selectAll: false,
               prompts: section.prompts?.map((prompt: Prompt) => ({
                 ...prompt,
-                selected: true,
+                selected: false,
               })),
             })),
           }));
-          this.tabsData = tabsWithSelectedPrompts;
-          this.refactoredTabData = JSON.parse(
-            JSON.stringify(tabsWithSelectedPrompts)
-          );
+          this.tabsData = tabsWithPrompts;
+          this.refactoredTabData = JSON.parse(JSON.stringify(tabsWithPrompts));
         }
       })
       .then(() => {
@@ -111,77 +245,9 @@ export class ConfigureScreenComponent implements OnInit {
           .getScreenConfiguration(this.orgId, this.screenId)
           .then(response => {
             if (this.globalService.handleSuccessService(response)) {
-              // Mark that we received configuration from API
-              this.hasReceivedConfig =
-                response.data && response.data.length > 0;
-
-              // Mark checkboxes based on API response
-              const configData = response.data;
-
-              // Deep copy the refactoredTabData to avoid reference issues
-              this.tabsData = JSON.parse(
-                JSON.stringify(this.refactoredTabData)
-              );
-
-              let sequenceCounter = 1;
-              // For each tab in the configuration
-              configData.forEach((configTab: any) => {
-                // Convert IDs to strings for comparison
-                const tab = this.tabsData.find(
-                  t => String(t.id) === String(configTab.id)
-                );
-                if (tab) {
-                  // For each section in the configuration
-                  configTab.sections.forEach((configSection: any) => {
-                    const section = tab.sections.find(
-                      s => String(s.id) === String(configSection.id)
-                    );
-                    if (section) {
-                      // Mark prompts as selected if they exist in the config
-                      section.prompts = section.prompts.map(prompt => ({
-                        ...prompt,
-                        selected: configSection.prompts.some(
-                          (p: any) => String(p.id) === String(prompt.id)
-                        ),
-                      }));
-
-                      // Update section's selectAll status
-                      section.selectAll = section.prompts.every(
-                        p => p.selected
-                      );
-
-                      // Expand the section by default
-                      this.expandedSections[String(section.id)] = true;
-                    }
-                  });
-
-                  // Create a new tab with the configured state
-                  const configuredTab = JSON.parse(JSON.stringify(tab));
-                  configuredTab.sequence = sequenceCounter++;
-
-                  // Check if tab is already open
-                  const existingTabIndex = this.openTabs.findIndex(
-                    t => String(t.id) === String(tab.id)
-                  );
-                  if (existingTabIndex === -1) {
-                    this.openTabs.push(configuredTab);
-                  } else {
-                    // Update existing tab
-                    this.openTabs[existingTabIndex] = configuredTab;
-                  }
-                }
-              });
-
-              // Set active tab to the first tab
-              if (this.openTabs.length > 0) {
-                this.activeTabIndex = 0;
-                this.selectedTab = this.openTabs[0];
+              if (response.data && response.data.length > 0) {
+                this.patchScreenConfiguration(response.data);
               }
-
-              // Update refactoredTabData with the new selection state
-              this.refactoredTabData = JSON.parse(
-                JSON.stringify(this.tabsData)
-              );
             }
           });
       });
@@ -356,9 +422,23 @@ export class ConfigureScreenComponent implements OnInit {
       this.openTabs = this.openTabs
         .map(tab => {
           // First filter sections to only keep those with selected prompts
-          const filteredSections = tab.sections.filter(section =>
-            section.prompts.some((prompt: Prompt) => prompt.selected)
-          );
+          const filteredSections = tab.sections
+            .map(section => {
+              // Filter prompts to only keep selected ones
+              const selectedPrompts = section.prompts
+                .filter((prompt: Prompt) => prompt.selected)
+                .map((prompt: any, promptIndex: number) => ({
+                  ...prompt,
+                  sequence: promptIndex + 1,
+                }));
+
+              return {
+                ...section,
+                prompts: selectedPrompts,
+                selectAll: selectedPrompts.length === section.prompts.length,
+              };
+            })
+            .filter(section => section.prompts.length > 0); // Remove sections with no selected prompts
 
           return {
             ...tab,
@@ -373,7 +453,7 @@ export class ConfigureScreenComponent implements OnInit {
         this.activeTabIndex = Math.max(0, this.openTabs.length - 1);
       }
     } else {
-      // Restore all prompts while maintaining selection state
+      // Restore all prompts while maintaining selection state and order
       if (this.selectedPrompts && this.selectedPrompts.length > 0) {
         // Create a map of the current selection state
         const selectionMap = new Map();
@@ -385,25 +465,35 @@ export class ConfigureScreenComponent implements OnInit {
           });
         });
 
-        // Restore tabs from original data while maintaining selection state
+        // Restore tabs from original data while maintaining selection state and order
         this.openTabs = this.tabsData
           .filter(tab => this.openTabs.some(openTab => openTab.id === tab.id))
           .map(tab => {
             const tabCopy = JSON.parse(JSON.stringify(tab));
             tabCopy.sections = tabCopy.sections.map((section: Section) => {
+              // Get all prompts and sort them based on selection
+              const allPrompts = section.prompts.map(prompt => ({
+                ...prompt,
+                selected: selectionMap.has(prompt.id)
+                  ? selectionMap.get(prompt.id)
+                  : false,
+              }));
+
+              // Sort prompts to put selected ones first
+              const sortedPrompts = [
+                ...allPrompts.filter(p => p.selected),
+                ...allPrompts.filter(p => !p.selected),
+              ];
+
+              // Update sequences
+              sortedPrompts.forEach((prompt, index) => {
+                prompt.sequence = index + 1;
+              });
+
               return {
                 ...section,
-                selectAll: section.prompts.every(prompt =>
-                  selectionMap.has(prompt.id)
-                    ? selectionMap.get(prompt.id)
-                    : false
-                ),
-                prompts: section.prompts.map(prompt => ({
-                  ...prompt,
-                  selected: selectionMap.has(prompt.id)
-                    ? selectionMap.get(prompt.id)
-                    : false,
-                })),
+                selectAll: allPrompts.every(prompt => prompt.selected),
+                prompts: sortedPrompts,
               };
             });
             return tabCopy;
@@ -542,14 +632,14 @@ export class ConfigureScreenComponent implements OnInit {
       sections: tab.sections.map((section: any, sectionIndex: number) => ({
         id: section.id,
         name: section.name,
-        sectionSequence: sectionIndex,
+        sequence: sectionIndex,
         prompts: section.prompts
           .filter((prompt: any) => prompt.selected)
           .map((prompt: any, promptIndex: number) => ({
             id: prompt.id,
             name: prompt.name,
             selected: prompt.selected,
-            promptSequence: promptIndex,
+            sequence: promptIndex,
           })),
       })),
     }));
@@ -757,7 +847,7 @@ export class ConfigureScreenComponent implements OnInit {
 
     // Update section sequences
     tab.sections.forEach((section, idx) => {
-      section.sectionSequence = idx + 1;
+      section.sequence = idx + 1;
     });
   }
 
@@ -836,7 +926,7 @@ export class ConfigureScreenComponent implements OnInit {
 
     // Update prompt sequences
     section.prompts.forEach((prompt, idx) => {
-      prompt.promptSequence = idx + 1;
+      prompt.sequence = idx + 1;
     });
   }
 
@@ -863,5 +953,126 @@ export class ConfigureScreenComponent implements OnInit {
     this.draggedPromptIndex = null;
     this.draggedPromptTabId = null;
     this.draggedPromptSectionId = null;
+  }
+
+  toggleGroupingMode() {
+    if (!this.isFreeze) {
+      this.globalService.handleErrorService({
+        message: 'Please lock the screen first to use grouping functionality',
+      });
+      return;
+    }
+    this.isGroupingMode = !this.isGroupingMode;
+    if (!this.isGroupingMode) {
+      // Reset all section group states
+      this.openTabs.forEach(tab => {
+        tab.sections.forEach(section => {
+          section.selectedGroupId = null;
+        });
+      });
+    } else {
+      // Initialize group state for each section
+      this.openTabs.forEach(tab => {
+        tab.sections.forEach(section => {
+          section.selectedGroupId = null;
+        });
+      });
+    }
+  }
+
+  handlePromptGrouping(prompt: Prompt, section: Section) {
+    if (!this.isFreeze || !this.isGroupingMode) return;
+
+    if (section.selectedGroupId === null) {
+      // Check if there are enough selected prompts before creating a new group
+      const selectedPrompts = section.prompts.filter(p => p.selected);
+      if (selectedPrompts.length < 2) {
+        this.globalService.handleErrorService({
+          message: 'Please select at least 2 prompts before creating a group',
+        });
+        return;
+      }
+      // Create a new group using the global counter
+      prompt.groupId = this.currentGlobalGroupId;
+      section.selectedGroupId = this.currentGlobalGroupId;
+      this.currentGlobalGroupId++;
+    } else if (prompt.groupId === section.selectedGroupId) {
+      // Check if removing this prompt would leave only one prompt in the group
+      const promptsInGroup = section.prompts.filter(
+        p => p.groupId === section.selectedGroupId
+      );
+      if (promptsInGroup.length <= 2) {
+        // If only 2 or fewer prompts in group, remove the entire group
+        promptsInGroup.forEach(p => (p.groupId = undefined));
+        section.selectedGroupId = null;
+      } else {
+        // Otherwise just remove this prompt from group
+        prompt.groupId = undefined;
+      }
+    } else {
+      // Add to current selected group
+      prompt.groupId = section.selectedGroupId;
+    }
+  }
+
+  selectGroup(groupId: number, section: Section) {
+    if (!this.isFreeze || !this.isGroupingMode) return;
+    section.selectedGroupId =
+      section.selectedGroupId === groupId ? null : groupId;
+  }
+
+  getGroupedPrompts(section: Section): GroupData {
+    const groups: GroupData = {};
+    section.prompts.forEach(prompt => {
+      if (
+        prompt.groupId !== undefined &&
+        prompt.groupId !== null &&
+        !isNaN(prompt.groupId)
+      ) {
+        groups[prompt.groupId] = (groups[prompt.groupId] || 0) + 1;
+      }
+    });
+    return groups;
+  }
+
+  getPromptGroupStyle(prompt: Prompt, section: Section): any {
+    if (prompt.groupId === undefined || prompt.groupId === null) {
+      return {};
+    }
+
+    const isSelected = section.selectedGroupId === prompt.groupId;
+    const color = this.groupColors[prompt.groupId % this.groupColors.length];
+    return {
+      'border-color': color,
+      'border-width': '1px',
+      'border-style': 'solid',
+      'box-shadow': isSelected ? `0 0 0 1px ${color}33` : 'none',
+      'background-color': isSelected ? `${color}10` : `${color}05`,
+      opacity: isSelected ? 1 : 0.9,
+    };
+  }
+
+  clearAllGroups() {
+    if (!this.isFreeze) {
+      this.globalService.handleErrorService({
+        message: 'Please lock the screen first to clear groups',
+      });
+      return;
+    }
+    this.openTabs.forEach(tab => {
+      tab.sections.forEach(section => {
+        section.prompts.forEach(prompt => {
+          prompt.groupId = undefined;
+        });
+        section.selectedGroupId = null;
+      });
+    });
+    this.currentGlobalGroupId = 0; // Reset the global group counter
+    this.isGroupingMode = false;
+  }
+
+  hasMinimumPromptsSelected(section: Section): boolean {
+    const selectedPrompts = section.prompts.filter(prompt => prompt.selected);
+    return selectedPrompts.length >= 2;
   }
 }

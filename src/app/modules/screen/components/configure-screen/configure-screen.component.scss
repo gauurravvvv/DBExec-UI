@@ -361,7 +361,7 @@
 
             i {
               font-size: 48px;
-              color: var(--text-color-secondary);
+              color: var(--secondary-color);
               opacity: 0.5;
               margin-bottom: 16px;
               display: block;
@@ -375,7 +375,7 @@
             }
 
             p {
-              color: var(--text-color-secondary);
+              color: var(--secondary-color);
               font-size: 14px;
               margin: 0;
               opacity: 0.7;
@@ -1232,13 +1232,13 @@
   // Override PrimeNG tooltip styles
   .p-tooltip {
     max-width: 250px;
-    background: var(--surface-card);
+    background: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     box-shadow: 0 2px 4px var(--shadow-color);
 
     .p-tooltip-text {
-      background: var(--surface-card);
+      background: var(--card-background);
       color: var(--text-color);
       padding: 8px 12px;
       font-size: 12px;
@@ -1246,7 +1246,7 @@
     }
 
     .p-tooltip-arrow {
-      border-right-color: var(--surface-card);
+      border-right-color: var(--card-background);
     }
   }
 
@@ -1341,8 +1341,7 @@
   transition: all 0.2s ease;
   cursor: pointer;
   position: relative;
-  display: flex;
-  flex-direction: column;
+  margin-top: 12px;
 
   &:hover {
     border-color: var(--secondary-color);
@@ -1411,14 +1410,68 @@
       font-style: italic;
     }
   }
+
+  &.grouping-mode {
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    &.grouped {
+      position: relative;
+      border-style: solid;
+      border-width: 1px;
+    }
+  }
+
+  .group-indicator {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-background);
+    padding: 2px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    z-index: 2;
+    border: 1px solid;
+    color: var(--secondary-color);
+    white-space: nowrap;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      border-radius: 12px;
+      z-index: -1;
+    }
+  }
+
+  // Disable drag handle and checkbox in grouping mode
+  &.grouping-mode {
+    .prompt-drag-handle,
+    .card-checkbox {
+      display: none;
+    }
+  }
 }
 
 .prompts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
+  gap: 1.25rem;
   width: 100%;
   padding: 0.5rem;
+  padding-top: 0.25rem;
 
   @media screen and (max-width: 1399px) {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1494,6 +1547,61 @@
     .p-accordion .p-accordion-tab {
       box-shadow: none !important;
       border: none !important;
+    }
+  }
+}
+
+// Add styles for the group button
+.action-buttons {
+  .p-button {
+    &.grouping-active {
+      background-color: var(--primary-color) !important;
+      color: white !important;
+      border-color: var(--primary-color) !important;
+    }
+  }
+}
+
+.group-indicators {
+  padding: 0.75rem;
+  border-radius: 8px;
+
+  .group-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+
+    .group-indicator-item {
+      padding: 0.5rem 1.25rem;
+      border-radius: 20px;
+      border: 1px solid;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background-color: var(--card-background);
+      color: var(--secondary-color);
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      &.new-group {
+        border-color: var(--secondary-color);
+        color: var(--secondary-color);
+        background-color: transparent;
+        opacity: 0.7;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      &.active-group {
+        font-weight: 500;
+        background-color: var(--surface-hover);
+      }
     }
   }
 }
