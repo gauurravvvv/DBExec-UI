@@ -816,53 +816,97 @@
                           }
                         }
 
-                        .select-all-checkbox {
+                        .header-actions {
                           display: flex;
                           align-items: center;
-                          gap: 0.5rem;
-                          margin-left: auto;
-                          padding-left: 1rem;
-                          border-left: 1px solid var(--border-color);
+                          gap: 1rem;
 
-                          ::ng-deep {
-                            .p-checkbox {
-                              width: 18px;
-                              height: 18px;
+                          .group-bullets {
+                            display: flex;
+                            gap: 0.5rem;
+                            align-items: center;
+                            padding-right: 0.5rem;
+                            border-right: 1px solid var(--border-color);
 
-                              .p-checkbox-box {
-                                width: 18px;
-                                height: 18px;
-                                border-radius: 4px;
-                                border: 2px solid var(--border-color);
-                                background: var(--card-background);
-                                transition: all 0.2s;
+                            .group-bullet {
+                              width: 12px;
+                              height: 12px;
+                              border-radius: 50%;
+                              transition: all 0.15s ease;
+                              cursor: pointer;
+                              opacity: 0.7;
 
-                                &:not(.p-disabled):hover {
-                                  border-color: var(--secondary-color);
+                              &:hover {
+                                opacity: 1;
+                                transform: scale(1.1);
+                              }
+
+                              &.active {
+                                opacity: 1;
+                              }
+
+                              &.clear-groups {
+                                background-color: var(--error-color) !important;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin-left: 4px;
+
+                                i {
+                                  color: white;
+                                  font-size: 8px;
                                 }
 
-                                &.p-highlight {
-                                  background: var(--primary-color);
-                                  border-color: var(--primary-color);
+                                &:hover {
+                                  opacity: 1;
+                                  transform: scale(1.1);
+                                }
 
-                                  .p-checkbox-icon {
-                                    color: var(--primary-color-text);
-                                    font-size: 12px;
+                                &.disabled {
+                                  opacity: 0.4;
+                                  cursor: not-allowed;
+                                  pointer-events: none;
+
+                                  &:hover {
+                                    opacity: 0.4;
+                                    transform: none;
                                   }
                                 }
+                              }
 
-                                &.p-focus {
-                                  box-shadow: 0 0 0 2px
-                                    rgba(var(--secondary-rgb), 0.2);
+                              &.add-group {
+                                background-color: var(
+                                  --success-color
+                                ) !important;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin-left: 4px;
+
+                                i {
+                                  color: white;
+                                  font-size: 8px;
+                                }
+
+                                &:hover {
+                                  opacity: 1;
+                                  transform: scale(1.1);
                                 }
                               }
                             }
                           }
 
-                          .select-all-label {
-                            color: var(--text-color);
-                            font-size: 0.9em;
-                            white-space: nowrap;
+                          .select-all-checkbox {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                            padding-left: 0.5rem;
+
+                            .select-all-label {
+                              color: var(--text-color);
+                              font-size: 0.9em;
+                              white-space: nowrap;
+                            }
                           }
                         }
                       }
@@ -1411,56 +1455,26 @@
     }
   }
 
-  &.grouping-mode {
-    cursor: pointer;
-    transition: all 0.2s ease;
+  &.selected {
+    background-color: var(--primary-color-lighter);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  &.group-active {
+    opacity: 0.6;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
       transform: translateY(-2px);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
-    }
-
-    &.grouped {
-      position: relative;
-      border-style: solid;
-      border-width: 1px;
-    }
-  }
-
-  .group-indicator {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--card-background);
-    padding: 2px 12px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    z-index: 2;
-    border: 1px solid;
-    color: var(--secondary-color);
-    white-space: nowrap;
-
-    &:before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: calc(100% + 4px);
-      height: calc(100% + 4px);
-      border-radius: 12px;
-      z-index: -1;
-    }
-  }
-
-  // Disable drag handle and checkbox in grouping mode
-  &.grouping-mode {
-    .prompt-drag-handle,
-    .card-checkbox {
-      display: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
   }
 }
@@ -1562,46 +1576,130 @@
   }
 }
 
-.group-indicators {
-  padding: 0.75rem;
-  border-radius: 8px;
+.section-group-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
 
-  .group-list {
+  .group-bullets {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.5rem;
     align-items: center;
 
-    .group-indicator-item {
-      padding: 0.5rem 1.25rem;
-      border-radius: 20px;
-      border: 1px solid;
-      font-size: 0.85rem;
+    .group-bullet {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      transition: all 0.15s ease;
       cursor: pointer;
-      transition: all 0.2s ease;
-      background-color: var(--card-background);
-      color: var(--secondary-color);
+      opacity: 0.7;
 
       &:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        opacity: 1;
+        transform: scale(1.1);
       }
 
-      &.new-group {
-        border-color: var(--secondary-color);
-        color: var(--secondary-color);
-        background-color: transparent;
-        opacity: 0.7;
+      &.active {
+        opacity: 1;
+      }
+
+      &.clear-groups {
+        background-color: var(--error-color) !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 4px;
+
+        i {
+          color: white;
+          font-size: 8px;
+        }
 
         &:hover {
           opacity: 1;
+          transform: scale(1.1);
+        }
+
+        &.disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+          pointer-events: none;
+
+          &:hover {
+            opacity: 0.4;
+            transform: none;
+          }
         }
       }
 
-      &.active-group {
-        font-weight: 500;
-        background-color: var(--surface-hover);
+      &.add-group {
+        background-color: var(--success-color) !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 4px;
+
+        i {
+          color: white;
+          font-size: 8px;
+        }
+
+        &:hover {
+          opacity: 1;
+          transform: scale(1.1);
+        }
       }
     }
+  }
+
+  .group-helper-text {
+    font-size: 0.875rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    font-style: italic;
+    padding-left: 0.5rem;
+  }
+}
+
+.group-action {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-end;
+
+  .p-button-rounded {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .pi {
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      transition: transform 0.2s ease;
+    }
+  }
+}
+
+// Add keyframes for pulse animation
+@keyframes quickPulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(0.95);
   }
 }
