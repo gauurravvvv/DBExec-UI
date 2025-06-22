@@ -126,6 +126,11 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/screen/screen.module').then(m => m.ScreenModule),
       },
+      {
+        path: 'query',
+        loadChildren: () =>
+          import('./modules/query/query.module').then(m => m.QueryModule),
+      },
     ],
   },
   {
