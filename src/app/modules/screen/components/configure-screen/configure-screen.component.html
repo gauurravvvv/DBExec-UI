@@ -199,7 +199,7 @@
                             <div
                               class="group-bullet"
                               *ngFor="let groupId of Object.keys(groups)"
-                              [ngStyle]="getGroupBulletStyle(+groupId)"
+                              [ngStyle]="getGroupBulletStyle(+groupId, section)"
                               (click)="
                                 $event.stopPropagation();
                                 selectGroupForAdding(+groupId, section)
@@ -269,9 +269,7 @@
                               isGroupActiveInSection(section, activeGroupId)
                           }"
                           [ngStyle]="getPromptGroupStyle(prompt, section)"
-                          (click)="
-                            handlePromptSelection($event, prompt, section)
-                          "
+                          (click)="!isFreeze && togglePrompt(prompt, section)"
                           [pDraggable]="
                             !isFreeze ? 'promptScope-' + section.id : ''
                           "
@@ -291,11 +289,7 @@
                             onPromptDrop(tab.id, section.id, promptIndex)
                           "
                         >
-                          <div
-                            class="card-checkbox"
-                            (click)="$event.stopPropagation()"
-                            *ngIf="!isFreeze"
-                          >
+                          <div class="card-checkbox" *ngIf="!isFreeze">
                             <p-checkbox
                               [(ngModel)]="prompt.selected"
                               [binary]="true"

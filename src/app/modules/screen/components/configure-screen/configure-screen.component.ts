@@ -99,10 +99,17 @@ export class ConfigureScreenComponent implements OnInit {
     '#C3B1E1', // Soft purple
     '#9DDBAD', // Sage green
     '#F2D4C2', // Peach
+    '#FFB6C1', // Light pink
+    '#87CEEB', // Sky blue
+    '#DDA0DD', // Plum
+    '#F0E68C', // Khaki
+    '#B0E0E6', // Powder blue
+    '#FFDAB9', // Peach puff
+    '#C9E4CA', // Pale green
+    '#E6E6FA', // Lavender
   ];
   selectedGroupId: number | null = null;
   activeGroupId: number | null = null;
-  usedColorIndices: Set<number> = new Set();
 
   // Add Object to component to use in template
   protected readonly Object = Object;
@@ -141,9 +148,8 @@ export class ConfigureScreenComponent implements OnInit {
     // Create a deep copy of tabsData to work with
     const patchedTabs = JSON.parse(JSON.stringify(this.tabsData));
 
-    // Reset the current group ID counter and color indices
+    // Reset the current group ID counter
     this.currentGroupId = 0;
-    this.usedColorIndices.clear();
 
     // First pass: Collect all section-specific group colors
     const sectionGroupColors = new Map<string, Map<number, string>>();
@@ -341,6 +347,9 @@ export class ConfigureScreenComponent implements OnInit {
         }
       });
     });
+
+    // Initialize lastSavedConfig with the current configuration
+    this.lastSavedConfig = this.getCurrentConfiguration();
 
     // Increment currentGroupId to be ready for new groups
     this.currentGroupId++;
@@ -589,23 +598,45 @@ export class ConfigureScreenComponent implements OnInit {
         this.activeTabIndex = Math.max(0, this.openTabs.length - 1);
       }
     } else {
+      // Store the current configuration state for comparison
+      const currentConfig = this.getCurrentConfiguration();
+
       // Clear selections
       this.selectedPrompts = {};
 
-      // Restore tabs from original data
+      // Restore tabs from original data while preserving selected states
       this.openTabs = this.tabsData
         .filter(tab => this.openTabs.some(openTab => openTab.id === tab.id))
         .map(tab => {
+          const existingTab = this.openTabs.find(t => t.id === tab.id);
           const tabCopy = JSON.parse(JSON.stringify(tab));
+
+          tabCopy.sequence = existingTab?.sequence;
           tabCopy.sections = tabCopy.sections.map((section: Section) => {
+            const existingSection = existingTab?.sections.find(
+              s => s.id === section.id
+            );
+
             return {
               ...section,
-              selectAll: false,
-              prompts: section.prompts.map((prompt: Prompt) => ({
-                ...prompt,
-                selected: false,
-                sequence: undefined,
-              })),
+              sequence: existingSection?.sequence,
+              prompts: section.prompts.map((prompt: Prompt) => {
+                const existingPrompt = existingSection?.prompts.find(
+                  p => p.id === prompt.id
+                );
+                return {
+                  ...prompt,
+                  selected: existingPrompt ? true : false,
+                  sequence: existingPrompt?.sequence,
+                  groupId: existingPrompt?.groupId,
+                  colorIndex: existingPrompt?.colorIndex,
+                };
+              }),
+              selectAll: existingSection
+                ? section.prompts.every(p =>
+                    existingSection.prompts.some(ep => ep.id === p.id)
+                  )
+                : false,
             };
           });
           return tabCopy;
@@ -613,7 +644,47 @@ export class ConfigureScreenComponent implements OnInit {
 
       // Sort tabs based on sequence
       this.openTabs.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+
+      // Store the new configuration state
+      this.lastSavedConfig = this.getCurrentConfiguration();
     }
+  }
+
+  // Add new properties to track configuration changes
+  private lastSavedConfig: string = '';
+
+  private getCurrentConfiguration(): string {
+    return JSON.stringify(
+      this.openTabs.map(tab => ({
+        id: tab.id,
+        sequence: tab.sequence,
+        sections: tab.sections.map(section => ({
+          id: section.id,
+          sequence: section.sequence,
+          prompts: section.prompts
+            .filter(p => p.selected)
+            .map(prompt => ({
+              id: prompt.id,
+              sequence: prompt.sequence,
+              groupId: prompt.groupId,
+              colorIndex: prompt.colorIndex,
+            })),
+        })),
+      }))
+    );
+  }
+
+  hasChanges(): boolean {
+    // For new configurations (no existing config)
+    if (!this.hasReceivedConfig && this.hasSelectedPrompts()) {
+      return true;
+    }
+
+    // Get current configuration state
+    const currentConfig = this.getCurrentConfiguration();
+
+    // Compare with last saved state
+    return currentConfig !== this.lastSavedConfig;
   }
 
   onTabAccordionChange(sectionId: string | number, expanded: boolean) {
@@ -781,41 +852,6 @@ export class ConfigureScreenComponent implements OnInit {
           this.router.navigate([SCREEN.LIST]);
         }
       });
-  }
-
-  hasChanges(): boolean {
-    // If there are no open tabs but original config exists, changes were made
-    const hasOriginalConfig = this.refactoredTabData.some(tab =>
-      tab.sections.some(section =>
-        section.prompts.some((prompt: any) => prompt.selected)
-      )
-    );
-
-    if (hasOriginalConfig && this.openTabs.length === 0) {
-      return true;
-    }
-
-    // Compare current state with original configuration
-    return this.openTabs.some(openTab => {
-      const originalTab = this.refactoredTabData.find(
-        tab => tab.id === openTab.id
-      );
-      if (!originalTab) return true;
-
-      return openTab.sections.some(openSection => {
-        const originalSection = originalTab.sections.find(
-          section => section.id === openSection.id
-        );
-        if (!originalSection) return true;
-
-        return openSection.prompts.some((openPrompt: any) => {
-          const originalPrompt = originalSection.prompts.find(
-            (p: any) => p.id === openPrompt.id
-          );
-          return originalPrompt?.selected !== openPrompt.selected;
-        });
-      });
-    });
   }
 
   handleCancelOrClear() {
@@ -1107,12 +1143,20 @@ export class ConfigureScreenComponent implements OnInit {
         if (prompt.groupId === this.activeGroupId) {
           // Remove from group
           prompt.groupId = undefined;
+          prompt.colorIndex = undefined;
           // Check if group still has enough prompts
           this.validateAndCleanupGroup(section, this.activeGroupId);
         } else {
           // Add to group (handle case where prompt might be in another group)
           const oldGroupId = prompt.groupId;
+
+          // Find the color index used by the active group in this section
+          const activeGroupColorIndex = section.prompts.find(
+            p => p.groupId === this.activeGroupId && p.colorIndex !== undefined
+          )?.colorIndex;
+
           prompt.groupId = this.activeGroupId;
+          prompt.colorIndex = activeGroupColorIndex;
 
           // If prompt was removed from another group, check if that group still has enough prompts
           if (oldGroupId !== undefined && oldGroupId !== null) {
@@ -1144,7 +1188,6 @@ export class ConfigureScreenComponent implements OnInit {
 
     // If less than 2 prompts, remove the group
     if (promptsInGroup.length < 2) {
-      const colorIndex = promptsInGroup[0]?.colorIndex;
       // Remove group from all prompts in this group
       section.prompts.forEach(prompt => {
         if (prompt.groupId === groupId) {
@@ -1152,11 +1195,6 @@ export class ConfigureScreenComponent implements OnInit {
           prompt.colorIndex = undefined;
         }
       });
-
-      // Remove the color from used colors if no other prompts use it
-      if (colorIndex !== undefined && !this.isColorInUse(colorIndex)) {
-        this.usedColorIndices.delete(colorIndex);
-      }
 
       // If this was the active group, deactivate it
       if (this.activeGroupId === groupId) {
@@ -1201,7 +1239,6 @@ export class ConfigureScreenComponent implements OnInit {
     }
 
     const newGroupId = this.currentGroupId++;
-    this.usedColorIndices.add(nextColorIndex);
 
     this.selectedPrompts[section.id].forEach(prompt => {
       prompt.groupId = newGroupId;
@@ -1264,7 +1301,6 @@ export class ConfigureScreenComponent implements OnInit {
       }
 
       // If we have a section but couldn't find a color, return empty style
-      // This prevents fallback to other sections' colors
       return {};
     }
 
@@ -1275,35 +1311,14 @@ export class ConfigureScreenComponent implements OnInit {
       return {};
     }
 
-    // First, find which section this group belongs to
-    let targetSection: Section | undefined;
-    let targetPrompt: Prompt | undefined;
+    // Find the section that contains this group in the current tab
+    const sectionWithGroup = currentTab.sections.find(s =>
+      s.prompts.some(p => p.selected && p.groupId === groupId)
+    );
 
-    // Look for the group in each section
-    for (const s of currentTab.sections) {
-      // Only look for prompts in this specific section
-      const sectionPrompts = s.prompts.filter(p => {
-        const matches = p.selected && p.groupId === groupId;
-        return matches;
-      });
-
-      if (sectionPrompts.length > 0) {
-        targetSection = s;
-        targetPrompt = sectionPrompts[0];
-        break;
-      }
-    }
-
-    if (
-      targetSection &&
-      targetPrompt &&
-      targetPrompt.colorIndex !== undefined
-    ) {
-      const color = this.groupColors[targetPrompt.colorIndex];
-      const isActive = this.activeGroupId === groupId;
-
-      // Call getGroupBulletStyle again with the found section to ensure consistent color
-      return this.getGroupBulletStyle(groupId, targetSection);
+    if (sectionWithGroup) {
+      // Recursively call with the found section to get the correct color
+      return this.getGroupBulletStyle(groupId, sectionWithGroup);
     }
 
     return {};
@@ -1347,10 +1362,10 @@ export class ConfigureScreenComponent implements OnInit {
       tab.sections.forEach(section => {
         section.prompts.forEach(prompt => {
           prompt.groupId = undefined;
+          prompt.colorIndex = undefined;
         });
       });
     });
-    this.currentGroupId = 0;
     this.selectedPrompts = {};
     this.activeGroupId = null;
   }
@@ -1358,29 +1373,22 @@ export class ConfigureScreenComponent implements OnInit {
   clearSectionGroups(section: Section) {
     if (!this.isFreeze) return;
 
-    // Get all group IDs in this section
-    const groupIds = new Set(
-      section.prompts
-        .filter(p => p.groupId !== undefined && p.groupId !== null)
-        .map(p => p.groupId)
-    );
-
     // Clear all groups in this section
     section.prompts.forEach(prompt => {
       if (prompt.groupId !== undefined && prompt.groupId !== null) {
-        const colorIndex = prompt.colorIndex;
         prompt.groupId = undefined;
         prompt.colorIndex = undefined;
-        // Remove the color from used colors if no other prompts use it
-        if (colorIndex !== undefined && !this.isColorInUse(colorIndex)) {
-          this.usedColorIndices.delete(colorIndex);
-        }
       }
     });
 
     // Reset active group if it was in this section
-    if (this.activeGroupId !== null && groupIds.has(this.activeGroupId)) {
-      this.activeGroupId = null;
+    if (this.activeGroupId !== null) {
+      const isGroupInSection = section.prompts.some(
+        p => p.groupId === this.activeGroupId
+      );
+      if (isGroupInSection) {
+        this.activeGroupId = null;
+      }
     }
   }
 
@@ -1395,13 +1403,62 @@ export class ConfigureScreenComponent implements OnInit {
   }
 
   getNextAvailableColorIndex(): number | null {
+    // Get all currently used color indices across all groups
+    const currentlyUsedIndices = new Set<number>();
+
+    this.openTabs.forEach(tab => {
+      tab.sections.forEach(section => {
+        section.prompts.forEach(prompt => {
+          if (
+            prompt.colorIndex !== undefined &&
+            prompt.groupId !== undefined &&
+            prompt.groupId !== null
+          ) {
+            currentlyUsedIndices.add(prompt.colorIndex);
+          }
+        });
+      });
+    });
+
     // Find the first unused color index
     for (let i = 0; i < this.groupColors.length; i++) {
-      if (!this.usedColorIndices.has(i)) {
+      if (!currentlyUsedIndices.has(i)) {
         return i;
       }
     }
-    return null; // No available colors
+
+    // If all colors are used, find the least used color
+    const colorUsageCount = new Map<number, number>();
+    for (let i = 0; i < this.groupColors.length; i++) {
+      colorUsageCount.set(i, 0);
+    }
+
+    this.openTabs.forEach(tab => {
+      tab.sections.forEach(section => {
+        section.prompts.forEach(prompt => {
+          if (
+            prompt.colorIndex !== undefined &&
+            prompt.groupId !== undefined &&
+            prompt.groupId !== null
+          ) {
+            const count = colorUsageCount.get(prompt.colorIndex) || 0;
+            colorUsageCount.set(prompt.colorIndex, count + 1);
+          }
+        });
+      });
+    });
+
+    // Find the color with minimum usage
+    let minUsage = Infinity;
+    let minUsageIndex = 0;
+    colorUsageCount.forEach((count, index) => {
+      if (count < minUsage) {
+        minUsage = count;
+        minUsageIndex = index;
+      }
+    });
+
+    return minUsageIndex;
   }
 
   getColorIndexForGroup(groupId: number, section?: Section): number | null {
@@ -1424,7 +1481,6 @@ export class ConfigureScreenComponent implements OnInit {
   assignColorToGroup(groupId: number): void {
     const colorIndex = this.getNextAvailableColorIndex();
     if (colorIndex !== null) {
-      this.usedColorIndices.add(colorIndex);
       // Assign this color index to all prompts in the group
       this.openTabs.forEach(tab => {
         tab.sections.forEach(section => {
