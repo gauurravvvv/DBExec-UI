@@ -1,807 +1,453 @@
 @import 'src/variables.scss';
 
-.add-admin-wrapper {
-  height: 100%;
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
 
-  .add-admin-container {
-    background: var(--card-background);
-    border-radius: 8px;
+.run-query-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--background-color);
+
+  // Common panel styling
+  .schema-panel,
+  .editor-panel,
+  .results-panel {
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+  }
 
-    .page-header {
-      margin-bottom: 1.5rem;
+  // Panel header styling
+  .panel-header {
+    flex: 0 0 auto;
+    height: 35px;
+    background: var(--home-background-color);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
 
-      .header-content {
-        .page-title {
-          font-size: 1.8rem;
-          font-family: $font-semi-bold;
-          color: var(--black-color);
-          margin: 0;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-
-          i {
-            color: var(--main-color);
-          }
-        }
-
-        .page-subtitle {
-          color: var(--theme-grey-1);
-          margin: 0.5rem 0 0 0;
-          font-size: 0.95rem;
-        }
-      }
+    i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
     }
 
-    .content-wrapper {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 10px;
-      max-height: calc(100vh - 200px);
+    .editor-actions,
+    .results-info {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
 
-      // Custom scrollbar styling
-      &::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
+    .result-count,
+    .execution-time {
+      background: var(--primary-color);
+      color: white;
+      padding: 0.125rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
 
-      &::-webkit-scrollbar-track {
-        background: transparent;
-        border-radius: 4px;
-      }
+    .execution-time {
+      background: var(--success-color);
+    }
+  }
 
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: 4px;
+  // Panel content styling
+  .panel-content {
+    flex: 1;
+    overflow: hidden;
+    background: var(--card-background);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
 
-        &:hover {
-          background: var(--secondary-color);
-        }
-      }
+  // Schema panel specific
+  .schema-panel {
+    .panel-content {
+      padding: 0.5rem;
+      overflow: auto;
 
-      // For Firefox
-      scrollbar-width: thin;
-      scrollbar-color: var(--border-color) transparent;
+      ::ng-deep {
+        .schema-tree {
+          height: 100%;
+          border: none;
+          background: transparent;
 
-      .editor-section {
-        background: var(--white-color);
-        border: 1px solid var(--theme-grey-3);
-        border-radius: 4px;
-        padding: 1rem;
+          .p-tree {
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
 
-        .editor-toolbar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1rem;
-          flex-wrap: wrap;
-          gap: 0.5rem;
+            .p-tree-container {
+              height: 100%;
 
-          .toolbar-left {
-            display: flex;
-            gap: 0.5rem;
-          }
+              .p-treenode {
+                padding: 0.125rem 0;
 
-          .editor-hint {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--theme-grey-1);
-            font-size: 0.875rem;
+                .p-treenode-content {
+                  padding: 0.375rem 0.5rem;
+                  border-radius: 4px;
+                  transition: all 0.2s;
 
-            kbd {
-              background: var(--theme-grey-5);
-              border: 1px solid var(--theme-grey-3);
-              border-radius: 3px;
-              padding: 0.2rem 0.4rem;
-              font-family: $font-medium;
-              font-size: 0.8rem;
-            }
-          }
-        }
+                  &:hover {
+                    background: var(--hover-background);
+                  }
 
-        .editor-wrapper {
-          position: relative;
-
-          .sql-editor {
-            width: 100%;
-
-            // CodeMirror light theme overrides
-            :deep(.cm-editor) {
-              &.cm-focused {
-                outline: none;
-              }
-
-              .cm-scroller {
-                font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-              }
-
-              .cm-gutters {
-                background-color: var(--theme-grey-6);
-                border-right: 1px solid var(--theme-grey-4);
-              }
-
-              .cm-lineNumbers .cm-gutterElement {
-                color: var(--theme-grey-1);
-                padding: 0 8px;
-              }
-
-              .cm-activeLine {
-                background-color: rgba(0, 120, 211, 0.05);
-              }
-
-              .cm-activeLineGutter {
-                background-color: rgba(0, 120, 211, 0.1);
+                  &.p-highlight {
+                    background: rgba(var(--primary-color), 0.1);
+                    color: var(--primary-color);
+                  }
+                }
               }
             }
-          }
-        }
 
-        .editor-status {
-          margin-top: 1rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+            .p-tree-filter-container {
+              padding: 0 0 0.5rem 0;
 
-          .loading-spinner {
-            ::ng-deep .p-progress-spinner {
-              width: 40px;
-              height: 40px;
-            }
-          }
-
-          .error-message {
-            color: var(--error-color);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-          }
-        }
-      }
-
-      .results-section {
-        background: var(--white-color);
-        border: 1px solid var(--theme-grey-3);
-        border-radius: 4px;
-        padding: 1rem;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-
-        .results-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1rem;
-          padding-bottom: 1rem;
-          border-bottom: 1px solid var(--theme-grey-4);
-
-          .results-info {
-            h3 {
-              margin: 0;
-              font-family: $font-semi-bold;
-              color: var(--black-color);
-            }
-
-            .results-meta {
-              display: flex;
-              gap: 1rem;
-              margin-top: 0.5rem;
-
-              .meta-item {
-                display: flex;
-                align-items: center;
-                gap: 0.3rem;
-                color: var(--theme-grey-1);
+              .p-tree-filter {
+                width: 100%;
+                background: var(--input-background);
+                border: 1px solid var(--border-color);
+                color: var(--text-color);
                 font-size: 0.875rem;
+                height: 32px;
 
-                i {
-                  font-size: 0.875rem;
+                &:focus {
+                  border-color: var(--primary-color);
                 }
               }
             }
           }
         }
 
-        .results-table-wrapper {
-          flex: 1;
-          overflow: auto;
+        .tree-node-content {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          font-size: 0.875rem;
 
-          ::ng-deep .results-table {
+          i {
+            font-size: 0.75rem;
+            color: var(--secondary-color);
+          }
+
+          .node-label {
+            flex: 1;
+          }
+
+          .node-type {
+            font-size: 0.75rem;
+            color: var(--secondary-color);
+            background: var(--hover-background);
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+          }
+        }
+      }
+    }
+  }
+
+  // Editor panel specific
+  .editor-panel {
+    .editor-tabs {
+      display: flex;
+      background: var(--home-background-color);
+      border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+      scrollbar-width: thin;
+
+      .editor-tab {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background: var(--card-background);
+        border-right: 1px solid var(--border-color);
+        cursor: pointer;
+        min-width: 120px;
+        max-width: 200px;
+        transition: all 0.2s;
+
+        &:hover {
+          background: var(--hover-background);
+        }
+
+        &.active {
+          background: var(--primary-color);
+          color: white;
+
+          .tab-close {
+            color: white;
+          }
+        }
+
+        .tab-title {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 0.875rem;
+        }
+
+        .tab-close {
+          margin-left: 0.5rem;
+          font-size: 0.75rem;
+          cursor: pointer;
+          opacity: 0.7;
+          transition: opacity 0.2s;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      &::-webkit-scrollbar {
+        height: 4px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--border-color);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--secondary-color);
+        border-radius: 2px;
+      }
+    }
+
+    .panel-content {
+      padding: 0;
+      flex: 1;
+      display: flex;
+
+      .sql-editor-monaco {
+        flex: 1;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+      }
+
+      ::ng-deep {
+        // Monaco Editor overrides
+        .monaco-editor {
+          height: 100% !important;
+          width: 100% !important;
+
+          .overflow-guard {
+            height: 100% !important;
+          }
+
+          // Custom scrollbar styling
+          .monaco-scrollable-element {
+            .scrollbar {
+              &.vertical {
+                width: 14px !important;
+
+                .slider {
+                  width: 10px !important;
+                  left: 2px !important;
+                  background: var(--secondary-color) !important;
+                  border-radius: 5px !important;
+
+                  &:hover {
+                    background: var(--primary-color) !important;
+                  }
+                }
+              }
+
+              &.horizontal {
+                height: 14px !important;
+
+                .slider {
+                  height: 10px !important;
+                  top: 2px !important;
+                  background: var(--secondary-color) !important;
+                  border-radius: 5px !important;
+
+                  &:hover {
+                    background: var(--primary-color) !important;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Line numbers styling
+        .margin-view-overlays {
+          .line-numbers {
+            color: var(--secondary-color) !important;
+            font-size: 12px !important;
+          }
+
+          .current-line ~ .line-numbers {
+            color: var(--text-color) !important;
+            font-weight: bold;
+          }
+        }
+
+        // Minimap styling
+        .minimap {
+          border-left: 1px solid var(--border-color);
+
+          .minimap-slider {
+            background: rgba(var(--primary-color), 0.2) !important;
+
+            &:hover {
+              background: rgba(var(--primary-color), 0.35) !important;
+            }
+          }
+        }
+
+        // Suggestion widget styling
+        .suggest-widget {
+          border: 1px solid var(--border-color) !important;
+          border-radius: 4px !important;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+
+          .monaco-list-row {
+            &.focused {
+              background: var(--primary-color) !important;
+              color: white !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Results panel specific
+  .results-panel {
+    .panel-content {
+      padding: 0;
+      overflow: hidden;
+
+      ::ng-deep {
+        .results-table {
+          height: 100%;
+
+          .p-datatable {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: transparent;
+            color: var(--text-color);
+            font-size: 0.875rem;
+
             .p-datatable-header {
-              display: none;
+              background: transparent;
+              border: none;
+            }
+
+            .p-datatable-wrapper {
+              flex: 1;
+              overflow: auto;
             }
 
             .p-datatable-thead > tr > th {
-              background: var(--theme-grey-6);
-              color: var(--black-color);
-              font-family: $font-medium;
-              border: 1px solid var(--theme-grey-4);
-              padding: 0.75rem 1rem;
+              background: var(--home-background-color);
+              color: var(--text-color);
+              border-color: var(--border-color);
+              padding: 0.5rem;
+              font-weight: 600;
+              font-size: 0.8125rem;
+              position: sticky;
+              top: 0;
+              z-index: 1;
+
+              .p-sortable-column-icon {
+                color: var(--secondary-color);
+                font-size: 0.75rem;
+              }
             }
 
             .p-datatable-tbody > tr {
-              &:nth-child(even) {
-                background: var(--theme-grey-6);
-              }
+              background: var(--card-background);
 
               &:hover {
-                background: var(--theme-color-3);
+                background: var(--hover-background);
               }
 
               > td {
-                border: 1px solid var(--theme-grey-4);
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
+                border-color: var(--border-color);
+                padding: 0.375rem 0.5rem;
+
+                .cell-content {
+                  display: block;
+                  max-width: 300px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
               }
             }
 
-            .empty-message {
-              text-align: center;
-              color: var(--theme-grey-1);
-              padding: 2rem !important;
+            .p-paginator {
+              background: var(--home-background-color);
+              border-color: var(--border-color);
+              border-top: 1px solid var(--border-color);
+              color: var(--text-color);
+              padding: 0.5rem;
+
+              .p-paginator-current {
+                color: var(--secondary-color);
+                font-size: 0.875rem;
+              }
+
+              .p-paginator-pages .p-paginator-page {
+                min-width: 2rem;
+                height: 2rem;
+
+                &.p-highlight {
+                  background: var(--primary-color);
+                  color: white;
+                }
+              }
             }
-          }
-
-          // Add scrollbar to table wrapper
-          &::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-          }
-
-          &::-webkit-scrollbar-track {
-            background: transparent;
-            border-radius: 4px;
-          }
-
-          &::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
-
-            &:hover {
-              background: var(--secondary-color);
-            }
-          }
-
-          // For Firefox
-          scrollbar-width: thin;
-          scrollbar-color: var(--border-color) transparent;
-        }
-      }
-    }
-
-    .info-section {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 1rem;
-
-      .info-card {
-        background: var(--white-color);
-        border: 1px solid var(--theme-grey-3);
-        border-radius: 4px;
-        padding: 1.5rem;
-
-        > i {
-          font-size: 2rem;
-          color: var(--main-color);
-          margin-bottom: 1rem;
-          display: block;
-        }
-
-        h3 {
-          margin: 0 0 1rem 0;
-          font-family: $font-semi-bold;
-          color: var(--black-color);
-        }
-
-        ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-
-          li {
-            position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: var(--theme-grey-1);
-            line-height: 1.5;
-
-            &:before {
-              content: '\2022';
-              position: absolute;
-              left: 0;
-              color: var(--main-color);
-              font-weight: bold;
-            }
-
-            kbd {
-              background: var(--theme-grey-5);
-              border: 1px solid var(--theme-grey-3);
-              border-radius: 3px;
-              padding: 0.2rem 0.4rem;
-              font-family: $font-medium;
-              font-size: 0.8rem;
-            }
-          }
-        }
-      }
-
-      .schema-info {
-        background: var(--white-color);
-        border: 1px solid var(--theme-grey-3);
-        border-radius: 4px;
-        padding: 1.5rem;
-
-        h4 {
-          margin: 0 0 1rem 0;
-          font-family: $font-semi-bold;
-          color: var(--black-color);
-        }
-
-        .table-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-
-          .table-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            background: var(--theme-grey-6);
-            border-radius: 4px;
-            color: var(--theme-grey-1);
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-
-            &:hover {
-              background: var(--theme-color-3);
-              color: var(--main-color);
-            }
-
-            i {
-              font-size: 0.875rem;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Dark theme styles
-:host-context(.dark-theme) .add-admin-container {
-  .page-header .header-content {
-    .page-title {
-      color: var(--text-color);
-    }
-  }
-
-  .editor-section,
-  .results-section,
-  .info-section .info-card,
-  .info-section .schema-info {
-    background: #1e1e1e;
-    border-color: rgba(255, 255, 255, 0.12);
-  }
-
-  .editor-section {
-    .editor-hint kbd {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      color: var(--text-color);
-    }
-
-    .sql-editor {
-      :deep(.cm-editor) {
-        .cm-gutters {
-          background-color: #2b2b2b;
-          border-color: rgba(255, 255, 255, 0.12);
-        }
-
-        .cm-lineNumbers .cm-gutterElement {
-          color: rgba(255, 255, 255, 0.6);
-        }
-      }
-    }
-  }
-
-  .results-section {
-    .results-header {
-      border-bottom-color: rgba(255, 255, 255, 0.12);
-
-      .results-info h3 {
-        color: var(--text-color);
-      }
-    }
-
-    ::ng-deep .results-table {
-      .p-datatable-thead > tr > th {
-        background: #2b2b2b;
-        color: var(--text-color);
-        border-color: rgba(255, 255, 255, 0.12);
-      }
-
-      .p-datatable-tbody > tr {
-        &:nth-child(even) {
-          background: rgba(255, 255, 255, 0.02);
-        }
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.04);
-        }
-
-        > td {
-          border-color: rgba(255, 255, 255, 0.12);
-          color: var(--text-color);
-        }
-      }
-    }
-  }
-
-  .info-section {
-    .info-card,
-    .schema-info {
-      h3,
-      h4 {
-        color: var(--text-color);
-      }
-
-      ul li {
-        color: rgba(255, 255, 255, 0.6);
-
-        kbd {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.2);
-          color: var(--text-color);
-        }
-      }
-
-      .table-list .table-item {
-        background: rgba(255, 255, 255, 0.04);
-        color: rgba(255, 255, 255, 0.6);
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.08);
-          color: var(--primary-color);
-        }
-      }
-    }
-  }
-}
-
-// Media queries for responsiveness
-@media (max-width: 576px) {
-  .add-admin-wrapper {
-    padding: 10px;
-
-    .add-admin-container {
-      padding: 15px;
-    }
-  }
-}
-
-.run-query-container {
-  padding: 1rem;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-
-  .page-header {
-    margin-bottom: 1.5rem;
-
-    .header-content {
-      .page-title {
-        font-size: 1.8rem;
-        font-family: $font-semi-bold;
-        color: var(--black-color);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-
-        i {
-          color: var(--main-color);
-        }
-      }
-
-      .page-subtitle {
-        color: var(--theme-grey-1);
-        margin: 0.5rem 0 0 0;
-        font-size: 0.95rem;
-      }
-    }
-  }
-
-  .content-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    overflow: hidden;
-  }
-
-  .editor-section {
-    background: var(--white-color);
-    border: 1px solid var(--theme-grey-3);
-    border-radius: 4px;
-    padding: 1rem;
-
-    .editor-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-
-      .toolbar-left {
-        display: flex;
-        gap: 0.5rem;
-      }
-
-      .editor-hint {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: var(--theme-grey-1);
-        font-size: 0.875rem;
-
-        kbd {
-          background: var(--theme-grey-5);
-          border: 1px solid var(--theme-grey-3);
-          border-radius: 3px;
-          padding: 0.2rem 0.4rem;
-          font-family: $font-medium;
-          font-size: 0.8rem;
-        }
-      }
-    }
-
-    .editor-wrapper {
-      position: relative;
-
-      .sql-editor {
-        width: 100%;
-
-        // CodeMirror light theme overrides
-        :deep(.cm-editor) {
-          &.cm-focused {
-            outline: none;
-          }
-
-          .cm-scroller {
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-          }
-
-          .cm-gutters {
-            background-color: var(--theme-grey-6);
-            border-right: 1px solid var(--theme-grey-4);
-          }
-
-          .cm-lineNumbers .cm-gutterElement {
-            color: var(--theme-grey-1);
-            padding: 0 8px;
-          }
-
-          .cm-activeLine {
-            background-color: rgba(0, 120, 211, 0.05);
-          }
-
-          .cm-activeLineGutter {
-            background-color: rgba(0, 120, 211, 0.1);
-          }
-        }
-      }
-    }
-
-    .editor-status {
-      margin-top: 1rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .loading-spinner {
-        ::ng-deep .p-progress-spinner {
-          width: 40px;
-          height: 40px;
-        }
-      }
-
-      .error-message {
-        color: var(--error-color);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-      }
-    }
-  }
-
-  .results-section {
-    background: var(--white-color);
-    border: 1px solid var(--theme-grey-3);
-    border-radius: 4px;
-    padding: 1rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    .results-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--theme-grey-4);
-
-      .results-info {
-        h3 {
-          margin: 0;
-          font-family: $font-semi-bold;
-          color: var(--black-color);
-        }
-
-        .results-meta {
-          display: flex;
-          gap: 1rem;
-          margin-top: 0.5rem;
-
-          .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            color: var(--theme-grey-1);
-            font-size: 0.875rem;
-
-            i {
-              font-size: 0.875rem;
-            }
-          }
-        }
-      }
-    }
-
-    .results-table-wrapper {
-      flex: 1;
-      overflow: auto;
-
-      ::ng-deep .results-table {
-        .p-datatable-header {
-          display: none;
-        }
-
-        .p-datatable-thead > tr > th {
-          background: var(--theme-grey-6);
-          color: var(--black-color);
-          font-family: $font-medium;
-          border: 1px solid var(--theme-grey-4);
-          padding: 0.75rem 1rem;
-        }
-
-        .p-datatable-tbody > tr {
-          &:nth-child(even) {
-            background: var(--theme-grey-6);
-          }
-
-          &:hover {
-            background: var(--theme-color-3);
-          }
-
-          > td {
-            border: 1px solid var(--theme-grey-4);
-            padding: 0.75rem 1rem;
-            font-size: 0.9rem;
           }
         }
 
         .empty-message {
           text-align: center;
-          color: var(--theme-grey-1);
-          padding: 2rem !important;
-        }
-      }
-    }
-  }
+          padding: 3rem 1rem;
 
-  .info-section {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1rem;
+          .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
 
-    .info-card {
-      background: var(--white-color);
-      border: 1px solid var(--theme-grey-3);
-      border-radius: 4px;
-      padding: 1.5rem;
+            i {
+              font-size: 2.5rem;
+              color: var(--border-color);
+            }
 
-      > i {
-        font-size: 2rem;
-        color: var(--main-color);
-        margin-bottom: 1rem;
-        display: block;
-      }
+            p {
+              margin: 0;
+              font-size: 1rem;
+              color: var(--text-color);
+              font-weight: 500;
+            }
 
-      h3 {
-        margin: 0 0 1rem 0;
-        font-family: $font-semi-bold;
-        color: var(--black-color);
-      }
-
-      ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-
-        li {
-          position: relative;
-          padding-left: 1.5rem;
-          margin-bottom: 0.75rem;
-          color: var(--theme-grey-1);
-          line-height: 1.5;
-
-          &:before {
-            content: '\2022';
-            position: absolute;
-            left: 0;
-            color: var(--main-color);
-            font-weight: bold;
-          }
-
-          kbd {
-            background: var(--theme-grey-5);
-            border: 1px solid var(--theme-grey-3);
-            border-radius: 3px;
-            padding: 0.2rem 0.4rem;
-            font-family: $font-medium;
-            font-size: 0.8rem;
-          }
-        }
-      }
-    }
-
-    .schema-info {
-      background: var(--white-color);
-      border: 1px solid var(--theme-grey-3);
-      border-radius: 4px;
-      padding: 1.5rem;
-
-      h4 {
-        margin: 0 0 1rem 0;
-        font-family: $font-semi-bold;
-        color: var(--black-color);
-      }
-
-      .table-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-
-        .table-item {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem;
-          background: var(--theme-grey-6);
-          border-radius: 4px;
-          color: var(--theme-grey-1);
-          font-size: 0.9rem;
-          transition: all 0.2s ease;
-
-          &:hover {
-            background: var(--theme-color-3);
-            color: var(--main-color);
-          }
-
-          i {
-            font-size: 0.875rem;
+            small {
+              color: var(--secondary-color);
+              font-size: 0.875rem;
+            }
           }
         }
       }
@@ -809,122 +455,188 @@
   }
 }
 
-// Dark theme styles
-:host-context(.dark-theme) .run-query-container {
-  .page-header .header-content {
-    .page-title {
-      color: var(--text-color);
-    }
-  }
+// PrimeNG Splitter customization - VSCode style
+::ng-deep {
+  .p-splitter {
+    border: none;
+    background: var(--background-color);
+    height: 100%;
 
-  .editor-section,
-  .results-section,
-  .info-section .info-card,
-  .info-section .schema-info {
-    background: #1e1e1e;
-    border-color: rgba(255, 255, 255, 0.12);
-  }
-
-  .editor-section {
-    .editor-hint kbd {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      color: var(--text-color);
+    .p-splitter-panel {
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
-    .sql-editor {
-      :deep(.cm-editor) {
-        .cm-gutters {
-          background-color: #2b2b2b;
-          border-color: rgba(255, 255, 255, 0.12);
+    .p-splitter-gutter {
+      background: var(--border-color);
+      border: none;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--primary-color);
+        opacity: 0.8;
+      }
+
+      &.p-splitter-gutter-resizing {
+        background: var(--primary-color);
+        opacity: 1;
+      }
+    }
+
+    // Horizontal splitter
+    &.p-splitter-horizontal {
+      .p-splitter-gutter {
+        width: 2px;
+        cursor: col-resize;
+
+        .p-splitter-gutter-handle {
+          display: none;
+        }
+      }
+    }
+
+    // Vertical splitter
+    &.p-splitter-vertical {
+      .p-splitter-gutter {
+        height: 8px;
+        cursor: row-resize;
+        background: transparent;
+        position: relative;
+        width: 100%;
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 50%;
+          height: 1px;
+          background: var(--border-color);
+          transform: translateY(-50%);
         }
 
-        .cm-lineNumbers .cm-gutterElement {
-          color: rgba(255, 255, 255, 0.6);
+        &::before {
+          content: '';
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: 20px;
+          height: 2px;
+          background: var(--border-color);
+          border-radius: 1px;
         }
-      }
-    }
-  }
 
-  .results-section {
-    .results-header {
-      border-bottom-color: rgba(255, 255, 255, 0.12);
-
-      .results-info h3 {
-        color: var(--text-color);
-      }
-    }
-
-    ::ng-deep .results-table {
-      .p-datatable-thead > tr > th {
-        background: #2b2b2b;
-        color: var(--text-color);
-        border-color: rgba(255, 255, 255, 0.12);
-      }
-
-      .p-datatable-tbody > tr {
-        &:nth-child(even) {
-          background: rgba(255, 255, 255, 0.02);
+        .p-splitter-gutter-handle {
+          height: 100%;
+          display: none;
         }
 
         &:hover {
-          background: rgba(255, 255, 255, 0.04);
+          &::after {
+            background: var(--primary-color);
+            height: 2px;
+          }
+
+          &::before {
+            background: var(--primary-color);
+            width: 30px;
+            height: 3px;
+          }
         }
 
-        > td {
-          border-color: rgba(255, 255, 255, 0.12);
-          color: var(--text-color);
+        &.p-splitter-gutter-resizing {
+          &::after {
+            background: var(--primary-color);
+            height: 2px;
+          }
+
+          &::before {
+            background: var(--primary-color);
+            width: 30px;
+            height: 3px;
+          }
         }
       }
     }
   }
 
-  .info-section {
-    .info-card,
-    .schema-info {
-      h3,
-      h4 {
-        color: var(--text-color);
+  // Nested splitter alignment fix
+  .editor-results-splitter {
+    .p-splitter-gutter {
+      &::after {
+        left: 0 !important;
+        right: 0 !important;
       }
+    }
+  }
 
-      ul li {
-        color: rgba(255, 255, 255, 0.6);
+  // Button styling
+  .p-button {
+    &.p-button-sm {
+      font-size: 0.75rem;
+      padding: 0.375rem 0.75rem;
+      height: 28px;
+    }
+  }
+}
 
-        kbd {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.2);
-          color: var(--text-color);
-        }
+// Dark theme adjustments
+.dark-theme {
+  .run-query-container {
+    background: var(--background-color);
+
+    .panel-header {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .panel-content {
+      background: var(--card-background);
+    }
+
+    ::ng-deep .monaco-editor {
+      .monaco-editor-background {
+        background: transparent !important;
       }
+    }
+  }
 
-      .table-list .table-item {
-        background: rgba(255, 255, 255, 0.04);
-        color: rgba(255, 255, 255, 0.6);
+  ::ng-deep {
+    .p-splitter {
+      .p-splitter-gutter {
+        background: rgba(255, 255, 255, 0.1);
 
         &:hover {
-          background: rgba(255, 255, 255, 0.08);
-          color: var(--primary-color);
+          background: var(--primary-color);
         }
       }
     }
   }
 }
 
-// Responsive styles
+// Responsive adjustments
 @media (max-width: 768px) {
   .run-query-container {
-    .editor-section .editor-toolbar {
-      flex-direction: column;
-      align-items: flex-start;
+    .panel-header {
+      padding: 0 0.5rem;
+      font-size: 0.8125rem;
 
-      .toolbar-left {
-        width: 100%;
-        flex-wrap: wrap;
+      .editor-actions {
+        gap: 0.25rem;
       }
     }
+  }
 
-    .info-section {
-      grid-template-columns: 1fr;
+  ::ng-deep {
+    .p-button-label {
+      display: none;
+    }
+
+    .p-button.p-button-icon-only {
+      width: 28px;
     }
   }
 }

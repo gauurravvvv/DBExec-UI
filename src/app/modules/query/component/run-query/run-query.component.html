@@ -1,165 +1,178 @@
-<div class="add-admin-wrapper">
-  <div class="add-admin-container">
-    <div class="page-header">
-      <div class="header-content">
-        <h1 class="page-title">
+<div class="run-query-container">
+  <!-- Main horizontal splitter -->
+  <p-splitter
+    [style]="{ height: '100%', width: '100%' }"
+    [panelSizes]="[20, 80]"
+    [minSizes]="[15, 50]"
+    layout="horizontal"
+    styleClass="main-horizontal-splitter"
+  >
+    <!-- Left Panel - Schema Browser -->
+    <ng-template pTemplate>
+      <div class="schema-panel">
+        <div class="panel-header">
           <i class="pi pi-database"></i>
-          SQL Query Editor
-        </h1>
-        <p class="page-subtitle">
-          Execute PostgreSQL queries with syntax highlighting and autocomplete
-        </p>
-      </div>
-    </div>
-
-    <div class="content-wrapper">
-      <div class="editor-section">
-        <div class="editor-toolbar">
-          <div class="toolbar-left">
-            <button
-              pButton
-              type="button"
-              label="Execute"
-              icon="pi pi-play"
-              class="p-button-primary"
-              (click)="executeQuery()"
-              [disabled]="isLoading"
-            ></button>
-            <button
-              pButton
-              type="button"
-              label="Format"
-              icon="pi pi-align-left"
-              class="p-button-secondary"
-              (click)="formatQuery()"
-              [disabled]="isLoading"
-            ></button>
-            <button
-              pButton
-              type="button"
-              label="Clear"
-              icon="pi pi-trash"
-              class="p-button-outlined"
-              (click)="clearEditor()"
-              [disabled]="isLoading"
-            ></button>
-          </div>
-          <div class="toolbar-right">
-            <span class="editor-hint">
-              <i class="pi pi-info-circle"></i>
-              Press <kbd>Ctrl+Space</kbd> for autocomplete
-            </span>
-          </div>
+          <span>Database Schema</span>
         </div>
-
-        <div class="editor-wrapper">
-          <div #editor class="sql-editor"></div>
-        </div>
-
-        <div class="editor-status" *ngIf="isLoading || errorMessage">
-          <p-progressSpinner
-            *ngIf="isLoading"
-            styleClass="loading-spinner"
-            strokeWidth="4"
-            animationDuration=".8s"
+        <div class="panel-content">
+          <p-tree
+            [value]="schemaTree"
+            [filter]="true"
+            filterMode="lenient"
+            filterPlaceholder="Search schema..."
+            scrollHeight="100%"
+            styleClass="schema-tree"
           >
-          </p-progressSpinner>
-          <div class="error-message" *ngIf="errorMessage && !isLoading">
-            <i class="pi pi-exclamation-triangle"></i>
-            {{ errorMessage }}
-          </div>
+            <ng-template let-node pTemplate="default">
+              <div class="tree-node-content">
+                <i [class]="getNodeIcon(node)"></i>
+                <span class="node-label">{{ node.label }}</span>
+                <span class="node-type" *ngIf="node.data?.type">{{
+                  node.data.type
+                }}</span>
+              </div>
+            </ng-template>
+          </p-tree>
         </div>
       </div>
+    </ng-template>
 
-      <div class="results-section" *ngIf="queryResult && !isLoading">
-        <div class="results-header">
-          <div class="results-info">
-            <h3>Query Results</h3>
-            <div class="results-meta">
-              <span class="meta-item">
-                <i class="pi pi-list"></i>
-                {{ queryResult.rowCount }} rows
-              </span>
-              <span class="meta-item">
-                <i class="pi pi-clock"></i>
-                {{ queryResult.executionTime }}ms
-              </span>
+    <!-- Right Panel - Editor and Results -->
+    <ng-template pTemplate>
+      <!-- Vertical splitter for editor and results -->
+      <p-splitter
+        [style]="{ height: '100%', width: '100%' }"
+        [panelSizes]="[50, 50]"
+        [minSizes]="[30, 20]"
+        layout="vertical"
+        styleClass="editor-results-splitter"
+      >
+        <!-- Top Panel - SQL Editor -->
+        <ng-template pTemplate>
+          <div class="editor-panel">
+            <div class="panel-header">
+              <i class="pi pi-code"></i>
+              <span>SQL Editor</span>
+              <div class="editor-actions">
+                <button
+                  pButton
+                  pRipple
+                  type="button"
+                  icon="pi pi-plus"
+                  label="New Script"
+                  class="p-button-primary p-button-sm p-button-outlined"
+                  (click)="addNewTab()"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  type="button"
+                  icon="pi pi-play"
+                  label="Execute"
+                  class="p-button-success p-button-sm"
+                  (click)="executeQuery()"
+                  [disabled]="isExecuting"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  type="button"
+                  icon="pi pi-times"
+                  label="Clear"
+                  class="p-button-secondary p-button-sm p-button-outlined"
+                  (click)="clearEditor()"
+                ></button>
+              </div>
+            </div>
+            <div class="editor-tabs">
+              <div
+                *ngFor="let tab of tabs"
+                class="editor-tab"
+                [class.active]="tab.id === activeTabId"
+                (click)="switchTab(tab.id)"
+              >
+                <span class="tab-title">{{ tab.title }}</span>
+                <i
+                  class="pi pi-times tab-close"
+                  *ngIf="tabs.length > 1"
+                  (click)="closeTab(tab.id, $event)"
+                ></i>
+              </div>
+            </div>
+            <div class="panel-content">
+              <div #monacoEditor class="sql-editor-monaco"></div>
             </div>
           </div>
-          <button
-            pButton
-            type="button"
-            label="Export CSV"
-            icon="pi pi-download"
-            class="p-button-outlined p-button-sm"
-            (click)="exportResults()"
-          ></button>
-        </div>
+        </ng-template>
 
-        <div class="results-table-wrapper">
-          <p-table
-            [value]="queryResult.rows"
-            [columns]="queryResult.columns"
-            [paginator]="true"
-            [rows]="10"
-            [rowsPerPageOptions]="[10, 25, 50, 100]"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            styleClass="results-table"
-          >
-            <ng-template pTemplate="header">
-              <tr>
-                <th *ngFor="let col of queryResult.columns">{{ col }}</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-row>
-              <tr>
-                <td *ngFor="let col of queryResult.columns">{{ row[col] }}</td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td
-                  [attr.colspan]="queryResult.columns.length"
-                  class="empty-message"
+        <!-- Bottom Panel - Results -->
+        <ng-template pTemplate>
+          <div class="results-panel">
+            <div class="panel-header">
+              <i class="pi pi-table"></i>
+              <span>Query Results</span>
+              <div class="results-info" *ngIf="queryResults.length > 0">
+                <span class="result-count">{{ queryResults.length }} rows</span>
+                <span class="execution-time" *ngIf="executionTime"
+                  >{{ executionTime }}ms</span
                 >
-                  No records found
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
-      </div>
+              </div>
+            </div>
+            <div class="panel-content">
+              <p-table
+                [value]="queryResults"
+                [columns]="resultColumns"
+                [paginator]="true"
+                [rows]="25"
+                [rowsPerPageOptions]="[10, 25, 50, 100]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [globalFilterFields]="resultColumns"
+                styleClass="results-table"
+                [scrollable]="true"
+                scrollHeight="flex"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th
+                      *ngFor="let col of resultColumns"
+                      [pSortableColumn]="col"
+                    >
+                      {{ col }}
+                      <p-sortIcon [field]="col"></p-sortIcon>
+                    </th>
+                  </tr>
+                </ng-template>
 
-      <div
-        class="info-section"
-        *ngIf="!queryResult && !isLoading && !errorMessage"
-      >
-        <div class="info-card">
-          <i class="pi pi-lightbulb"></i>
-          <h3>Quick Tips</h3>
-          <ul>
-            <li>
-              Start typing to see autocomplete suggestions for tables and
-              columns
-            </li>
-            <li>
-              Type a table name followed by a dot (.) to see column suggestions
-            </li>
-            <li>Use <kbd>Ctrl+Space</kbd> to manually trigger autocomplete</li>
-            <li>SQL keywords are automatically highlighted</li>
-            <li>The editor supports PostgreSQL syntax</li>
-          </ul>
-        </div>
-        <div class="schema-info">
-          <h4>Available Tables:</h4>
-          <div class="table-list">
-            <span class="table-item" *ngFor="let table of getTableNames()">
-              <i class="pi pi-table"></i> {{ table }}
-            </span>
+                <ng-template pTemplate="body" let-row>
+                  <tr>
+                    <td *ngFor="let col of resultColumns">
+                      <span class="cell-content" [title]="row[col]">
+                        {{ row[col] }}
+                      </span>
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td
+                      [attr.colspan]="resultColumns.length || 1"
+                      class="empty-message"
+                    >
+                      <div class="empty-state">
+                        <i class="pi pi-inbox"></i>
+                        <p>No results to display</p>
+                        <small>Execute a query to see results</small>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </ng-template>
+      </p-splitter>
+    </ng-template>
+  </p-splitter>
 </div>

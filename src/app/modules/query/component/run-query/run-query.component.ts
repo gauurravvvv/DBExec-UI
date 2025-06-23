@@ -6,44 +6,27 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
-import {
-  EditorView,
-  keymap,
-  lineNumbers,
-  highlightActiveLineGutter,
-  highlightSpecialChars,
-  drawSelection,
-  dropCursor,
-  rectangularSelection,
-  crosshairCursor,
-  highlightActiveLine,
-} from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
-import { sql, PostgreSQL } from '@codemirror/lang-sql';
-import { oneDark } from '@codemirror/theme-one-dark';
-import {
-  autocompletion,
-  CompletionContext,
-  completionKeymap,
-  closeBrackets,
-  closeBracketsKeymap,
-} from '@codemirror/autocomplete';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
-import {
-  bracketMatching,
-  syntaxHighlighting,
-  defaultHighlightStyle,
-  HighlightStyle,
-} from '@codemirror/language';
-import { tags } from '@lezer/highlight';
+import { TreeNode } from 'primeng/api';
 
 interface QueryResult {
-  columns: string[];
-  rows: any[];
-  rowCount: number;
-  executionTime: number;
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  department: string;
+  salary: number;
+  hire_date: string;
+  [key: string]: any;
 }
+
+interface EditorTab {
+  id: string;
+  title: string;
+  content: string;
+  editor?: any;
+}
+
+declare var monaco: any;
 
 @Component({
   selector: 'app-run-query',
@@ -51,44 +34,29 @@ interface QueryResult {
   styleUrls: ['./run-query.component.scss'],
 })
 export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('editor', { static: true }) editorElement!: ElementRef;
+  @ViewChild('monacoEditor', { static: false })
+  monacoEditorElement!: ElementRef;
 
-  editor!: EditorView;
-  isLoading = false;
-  queryResult: QueryResult | null = null;
-  errorMessage = '';
-  isDarkMode = false;
+  // Schema tree data
+  schemaTree: TreeNode[] = [];
 
-  // Sample database schema for autocomplete
+  // Editor properties
+  sqlQuery: string = '';
+  isExecuting: boolean = false;
+  private editor: any;
+
+  // Tab management
+  tabs: EditorTab[] = [];
+  activeTabId: string = '';
+  tabCounter: number = 1;
+
+  // Results properties
+  queryResults: QueryResult[] = [];
+  resultColumns: string[] = [];
+  executionTime: number = 0;
+
+  // Schema for autocomplete
   private schema = {
-    users: [
-      'id',
-      'name',
-      'email',
-      'created_at',
-      'updated_at',
-      'role',
-      'is_active',
-    ],
-    products: [
-      'id',
-      'name',
-      'description',
-      'price',
-      'stock',
-      'category_id',
-      'created_at',
-    ],
-    orders: [
-      'id',
-      'user_id',
-      'product_id',
-      'quantity',
-      'total_price',
-      'order_date',
-      'status',
-    ],
-    categories: ['id', 'name', 'description', 'parent_id'],
     employees: [
       'id',
       'first_name',
@@ -99,401 +67,685 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       'hire_date',
     ],
     departments: ['id', 'name', 'manager_id', 'budget'],
+    projects: [
+      'id',
+      'name',
+      'department_id',
+      'start_date',
+      'end_date',
+      'status',
+    ],
+    employee_projects: ['employee_id', 'project_id', 'role', 'hours_allocated'],
   };
 
-  ngOnInit() {
-    // Check theme preference
-    this.isDarkMode = document.body.classList.contains('dark-theme');
-
-    // Listen for theme changes
-    this.observeThemeChanges();
+  ngOnInit(): void {
+    this.initializeSchemaTree();
+    this.loadDummyData();
+    // Create initial tab
+    this.addNewTab();
   }
 
-  ngAfterViewInit() {
-    this.initializeEditor();
+  ngAfterViewInit(): void {
+    // Wait for Monaco to be available
+    let attempts = 0;
+    const maxAttempts = 50; // 5 seconds max wait
+
+    const checkMonaco = setInterval(() => {
+      attempts++;
+
+      if (typeof monaco !== 'undefined') {
+        console.log('Monaco Editor loaded, initializing...');
+        clearInterval(checkMonaco);
+        setTimeout(() => {
+          this.initializeEditor();
+        }, 100); // Small delay to ensure DOM is ready
+      } else if (attempts >= maxAttempts) {
+        console.error('Monaco Editor failed to load after 5 seconds');
+        clearInterval(checkMonaco);
+      }
+    }, 100);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.editor) {
-      this.editor.destroy();
-    }
-    if (this.themeObserver) {
-      this.themeObserver.disconnect();
+      this.editor.dispose();
     }
   }
 
-  private themeObserver?: MutationObserver;
-
-  private observeThemeChanges() {
-    // Create a MutationObserver to watch for class changes on body
-    this.themeObserver = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        if (
-          mutation.type === 'attributes' &&
-          mutation.attributeName === 'class'
-        ) {
-          const newIsDarkMode = document.body.classList.contains('dark-theme');
-          if (newIsDarkMode !== this.isDarkMode) {
-            this.isDarkMode = newIsDarkMode;
-            // Reinitialize editor with new theme
-            if (this.editor) {
-              const currentContent = this.editor.state.doc.toString();
-              this.editor.destroy();
-              this.initializeEditor();
-              // Restore content
-              this.editor.dispatch({
-                changes: {
-                  from: 0,
-                  to: this.editor.state.doc.length,
-                  insert: currentContent,
-                },
-              });
-            }
-          }
-        }
-      });
-    });
-
-    // Start observing the body element for class changes
-    this.themeObserver.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-  }
-
-  private initializeEditor() {
-    // Custom light theme highlighting
-    const lightHighlightStyle = HighlightStyle.define([
-      { tag: tags.keyword, color: '#0000ff' },
-      { tag: tags.operator, color: '#666666' },
-      { tag: tags.string, color: '#a31515' },
-      { tag: tags.number, color: '#098658' },
-      { tag: tags.comment, color: '#008000' },
-      { tag: tags.function(tags.variableName), color: '#795e26' },
-      { tag: tags.typeName, color: '#267f99' },
-      { tag: tags.className, color: '#267f99' },
-      { tag: tags.name, color: '#001080' },
-      { tag: tags.propertyName, color: '#001080' },
-    ]);
-
-    const customCompletions = (context: CompletionContext) => {
-      const word = context.matchBefore(/\w*/);
-      if (!word || (word.from === word.to && !context.explicit)) {
-        return null;
-      }
-
-      const options: any[] = [];
-
-      // Add table names
-      Object.keys(this.schema).forEach(table => {
-        options.push({
-          label: table,
-          type: 'table',
-          detail: 'table',
-        });
-      });
-
-      // Check if we're after a dot (table.column pattern)
-      const dotBefore = context.matchBefore(/(\w+)\./);
-      if (dotBefore) {
-        const tableName = dotBefore.text.slice(0, -1);
-        const schema = this.schema;
-        if (schema[tableName as keyof typeof schema]) {
-          // Add column names for the specific table
-          schema[tableName as keyof typeof schema].forEach(column => {
-            options.push({
-              label: column,
-              type: 'column',
-              detail: `${tableName}.${column}`,
-            });
-          });
-        }
-      } else {
-        // Add all column names with their table prefix
-        Object.entries(this.schema).forEach(([table, columns]) => {
-          columns.forEach(column => {
-            options.push({
-              label: `${table}.${column}`,
-              type: 'column',
-              detail: 'column',
-            });
-          });
-        });
-      }
-
-      // Add SQL keywords
-      const keywords = [
-        'SELECT',
-        'FROM',
-        'WHERE',
-        'JOIN',
-        'LEFT JOIN',
-        'RIGHT JOIN',
-        'INNER JOIN',
-        'ON',
-        'GROUP BY',
-        'HAVING',
-        'ORDER BY',
-        'LIMIT',
-        'INSERT INTO',
-        'VALUES',
-        'UPDATE',
-        'SET',
-        'DELETE FROM',
-        'CREATE TABLE',
-        'ALTER TABLE',
-        'DROP TABLE',
-        'AS',
-        'AND',
-        'OR',
-        'NOT',
-        'IN',
-        'EXISTS',
-        'BETWEEN',
-        'LIKE',
-        'DISTINCT',
-        'COUNT',
-        'SUM',
-        'AVG',
-        'MAX',
-        'MIN',
-      ];
-
-      keywords.forEach(keyword => {
-        options.push({
-          label: keyword,
-          type: 'keyword',
-          detail: 'SQL keyword',
-        });
-      });
-
-      return {
-        from: word.from,
-        options: options,
-        validFor: /^\w*$/,
-      };
-    };
-
-    const extensions = [
-      lineNumbers(),
-      highlightActiveLineGutter(),
-      highlightSpecialChars(),
-      history(),
-      drawSelection(),
-      dropCursor(),
-      EditorState.allowMultipleSelections.of(true),
-      syntaxHighlighting(
-        this.isDarkMode ? defaultHighlightStyle : lightHighlightStyle,
-        { fallback: true }
-      ),
-      bracketMatching(),
-      closeBrackets(),
-      rectangularSelection(),
-      crosshairCursor(),
-      highlightActiveLine(),
-      highlightSelectionMatches(),
-      keymap.of([
-        ...closeBracketsKeymap,
-        ...defaultKeymap,
-        ...searchKeymap,
-        ...historyKeymap,
-        ...completionKeymap,
-      ]),
-      sql({
-        dialect: PostgreSQL,
-        schema: this.schema,
-      }),
-      autocompletion({
-        override: [customCompletions],
-        activateOnTyping: true,
-      }),
-      EditorView.theme({
-        '&': {
-          fontSize: '14px',
-          border: '1px solid var(--theme-grey-3)',
-          borderRadius: '4px',
-          backgroundColor: this.isDarkMode ? '#1e1e1e' : '#ffffff',
-          color: this.isDarkMode
-            ? 'rgba(255,255,255,0.87)'
-            : 'var(--black-color)',
-        },
-        '&.cm-focused': {
-          outline: 'none',
-          borderColor: 'var(--main-color)',
-        },
-        '.cm-content': {
-          padding: '12px',
-          minHeight: '300px',
-          fontFamily: 'Montserrat-Regular, monospace',
-          caretColor: this.isDarkMode ? '#ffffff' : '#000000',
-        },
-        '.cm-gutters': {
-          backgroundColor: this.isDarkMode ? '#2b2b2b' : 'var(--theme-grey-6)',
-          borderRight: this.isDarkMode
-            ? '1px solid rgba(255,255,255,0.12)'
-            : '1px solid var(--theme-grey-4)',
-          color: this.isDarkMode
-            ? 'rgba(255,255,255,0.6)'
-            : 'var(--theme-grey-1)',
-        },
-        '.cm-activeLineGutter': {
-          backgroundColor: this.isDarkMode
-            ? 'rgba(255,255,255,0.05)'
-            : 'rgba(0,120,211,0.1)',
-        },
-        '.cm-activeLine': {
-          backgroundColor: this.isDarkMode
-            ? 'rgba(255,255,255,0.03)'
-            : 'rgba(0,120,211,0.05)',
-        },
-        '.cm-tooltip-autocomplete': {
-          backgroundColor: this.isDarkMode ? '#2b2b2b' : '#ffffff',
-          border: '1px solid var(--theme-grey-3)',
-          borderRadius: '4px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        },
-        '.cm-tooltip-autocomplete > ul': {
-          fontFamily: 'Montserrat-Regular, monospace',
-          fontSize: '13px',
-        },
-        '.cm-tooltip-autocomplete > ul > li': {
-          padding: '4px 8px',
-          color: this.isDarkMode
-            ? 'rgba(255,255,255,0.87)'
-            : 'var(--black-color)',
-        },
-        '.cm-tooltip-autocomplete > ul > li[aria-selected]': {
-          backgroundColor: 'var(--main-color)',
-          color: 'white',
-        },
-        '.cm-selectionBackground': {
-          backgroundColor: this.isDarkMode
-            ? 'rgba(255,255,255,0.15)'
-            : 'rgba(0,120,211,0.3)',
-        },
-        '.cm-cursor': {
-          borderLeftColor: this.isDarkMode ? '#ffffff' : '#000000',
-        },
-      }),
-    ];
-
-    // Add dark theme if needed
-    if (this.isDarkMode) {
-      extensions.push(oneDark);
-    }
-
-    const state = EditorState.create({
-      doc: `-- Welcome to DBExec SQL Editor
--- Try typing a query, for example:
-
-SELECT u.name, u.email, COUNT(o.id) as order_count
-FROM users u
-LEFT JOIN orders o ON u.id = o.user_id
-WHERE u.is_active = true
-GROUP BY u.id, u.name, u.email
-ORDER BY order_count DESC
-LIMIT 10;`,
-      extensions,
-    });
-
-    this.editor = new EditorView({
-      state,
-      parent: this.editorElement.nativeElement,
-    });
-  }
-
-  executeQuery() {
-    const query = this.editor.state.doc.toString().trim();
-
-    if (!query) {
-      this.errorMessage = 'Please enter a SQL query';
+  private initializeEditor(): void {
+    if (!monaco) {
+      console.error('Monaco is not defined');
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.queryResult = null;
+    if (!this.monacoEditorElement || !this.monacoEditorElement.nativeElement) {
+      console.error('Editor element not found');
+      return;
+    }
+
+    console.log('Initializing Monaco Editor...');
+
+    // Check if dark theme is active
+    const isDarkTheme = document.body.classList.contains('dark-theme');
+
+    try {
+      // Create editor
+      this.editor = monaco.editor.create(
+        this.monacoEditorElement.nativeElement,
+        {
+          value: this.sqlQuery,
+          language: 'sql',
+          theme: isDarkTheme ? 'vs-dark' : 'vs',
+          automaticLayout: true,
+          minimap: {
+            enabled: true,
+          },
+          fontSize: 14,
+          wordWrap: 'off',
+          lineNumbers: 'on',
+          glyphMargin: true,
+          folding: true,
+          lineDecorationsWidth: 0,
+          lineNumbersMinChars: 3,
+          renderLineHighlight: 'all',
+          scrollBeyondLastLine: false,
+          smoothScrolling: true,
+          cursorBlinking: 'smooth',
+          cursorSmoothCaretAnimation: true,
+          formatOnPaste: true,
+          formatOnType: true,
+          suggestOnTriggerCharacters: true,
+          acceptSuggestionOnEnter: 'on',
+          tabCompletion: 'on',
+          wordBasedSuggestions: true,
+          suggestSelection: 'first',
+          quickSuggestions: {
+            other: true,
+            comments: false,
+            strings: false,
+          },
+          parameterHints: {
+            enabled: true,
+          },
+          contextmenu: true,
+          mouseWheelZoom: false, // Disable zoom with mouse wheel
+          bracketPairColorization: {
+            enabled: true,
+          },
+          guides: {
+            indentation: true,
+            bracketPairs: true,
+          },
+          scrollbar: {
+            vertical: 'visible',
+            horizontal: 'visible',
+            useShadows: false,
+            verticalHasArrows: false,
+            horizontalHasArrows: false,
+            verticalScrollbarSize: 4,
+            horizontalScrollbarSize: 4,
+            arrowSize: 10,
+          },
+        }
+      );
+
+      // Add custom keybindings
+      this.editor.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+        () => {
+          this.executeQuery();
+        }
+      );
+      
+      // Disable zoom shortcuts
+      this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal, () => {
+        // Do nothing - disable zoom in
+      });
+      this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus, () => {
+        // Do nothing - disable zoom out
+      });
+      this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit0, () => {
+        // Do nothing - disable reset zoom
+      });
+      
+      // Add custom context menu actions
+      this.editor.addAction({
+        id: 'run-selected-query',
+        label: 'Run Selected Query',
+        contextMenuGroupId: '1_modification',
+        contextMenuOrder: 0,
+        run: () => {
+          const selection = this.editor.getSelection();
+          if (selection && !selection.isEmpty()) {
+            const selectedText = this.editor.getModel().getValueInRange(selection);
+            this.sqlQuery = selectedText;
+            this.executeQuery();
+          }
+        }
+      });
+      
+      this.editor.addAction({
+        id: 'format-sql',
+        label: 'Format SQL',
+        contextMenuGroupId: '1_modification',
+        contextMenuOrder: 1,
+        run: () => {
+          this.editor.getAction('editor.action.formatDocument').run();
+        }
+      });
+      
+      this.editor.addAction({
+        id: 'comment-line',
+        label: 'Comment/Uncomment Line',
+        contextMenuGroupId: '1_modification',
+        contextMenuOrder: 2,
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash],
+        run: () => {
+          this.editor.getAction('editor.action.commentLine').run();
+        }
+      });
+      
+      this.editor.addAction({
+        id: 'copy-as-sql',
+        label: 'Copy as SQL String',
+        contextMenuGroupId: '9_cutcopypaste',
+        contextMenuOrder: 3,
+        run: () => {
+          const selection = this.editor.getSelection();
+          if (selection) {
+            const text = this.editor.getModel().getValueInRange(selection);
+            const sqlString = text.replace(/'/g, "''").replace(/\n/g, ' ');
+            navigator.clipboard.writeText(`'${sqlString}'`);
+          }
+        }
+      });
+
+      // Update sqlQuery on content change
+      this.editor.onDidChangeModelContent(() => {
+        this.sqlQuery = this.editor.getValue();
+
+        // Update active tab content
+        const activeTab = this.tabs.find(t => t.id === this.activeTabId);
+        if (activeTab) {
+          activeTab.content = this.sqlQuery;
+        }
+      });
+
+      // Setup autocomplete
+      this.setupAutoComplete();
+
+      // Focus the editor
+      this.editor.focus();
+
+      console.log('Monaco Editor initialized successfully');
+    } catch (error) {
+      console.error('Error initializing Monaco Editor:', error);
+    }
+  }
+
+  private setupAutoComplete(): void {
+    if (!monaco) return;
+
+    // Register completion provider for SQL
+    monaco.languages.registerCompletionItemProvider('sql', {
+      provideCompletionItems: (model: any, position: any) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+
+        const suggestions: any[] = [];
+
+        // Add SQL keywords
+        const keywords = [
+          'SELECT',
+          'FROM',
+          'WHERE',
+          'JOIN',
+          'LEFT JOIN',
+          'RIGHT JOIN',
+          'INNER JOIN',
+          'ON',
+          'GROUP BY',
+          'HAVING',
+          'ORDER BY',
+          'LIMIT',
+          'OFFSET',
+          'UNION',
+          'UNION ALL',
+          'INSERT INTO',
+          'VALUES',
+          'UPDATE',
+          'SET',
+          'DELETE FROM',
+          'CREATE TABLE',
+          'ALTER TABLE',
+          'DROP TABLE',
+          'CREATE INDEX',
+          'DROP INDEX',
+          'AS',
+          'AND',
+          'OR',
+          'NOT',
+          'IN',
+          'EXISTS',
+          'BETWEEN',
+          'LIKE',
+          'IS NULL',
+          'IS NOT NULL',
+          'DISTINCT',
+          'COUNT',
+          'SUM',
+          'AVG',
+          'MAX',
+          'MIN',
+          'CASE',
+          'WHEN',
+          'THEN',
+          'ELSE',
+          'END',
+          'CAST',
+          'CONVERT',
+          'COALESCE',
+          'NULLIF',
+        ];
+
+        keywords.forEach(keyword => {
+          suggestions.push({
+            label: keyword,
+            kind: monaco.languages.CompletionItemKind.Keyword,
+            insertText: keyword,
+            range: range,
+            detail: 'SQL Keyword',
+          });
+        });
+
+        // Add table names
+        Object.keys(this.schema).forEach(table => {
+          suggestions.push({
+            label: table,
+            kind: monaco.languages.CompletionItemKind.Class,
+            insertText: table,
+            range: range,
+            detail: 'Table',
+            documentation: `Table: ${table}`,
+          });
+        });
+
+        // Add column names with table prefix
+        Object.entries(this.schema).forEach(([table, columns]) => {
+          columns.forEach(column => {
+            suggestions.push({
+              label: `${table}.${column}`,
+              kind: monaco.languages.CompletionItemKind.Field,
+              insertText: `${table}.${column}`,
+              range: range,
+              detail: `Column in ${table}`,
+              documentation: `Column: ${column} from table ${table}`,
+            });
+          });
+        });
+
+        // Add common functions
+        const functions = [
+          'COUNT(*)',
+          'SUM()',
+          'AVG()',
+          'MAX()',
+          'MIN()',
+          'CONCAT()',
+          'LENGTH()',
+          'SUBSTRING()',
+          'UPPER()',
+          'LOWER()',
+          'TRIM()',
+          'DATE()',
+          'NOW()',
+          'CURRENT_DATE',
+          'CURRENT_TIME',
+          'CURRENT_TIMESTAMP',
+        ];
+
+        functions.forEach(func => {
+          suggestions.push({
+            label: func,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: func,
+            range: range,
+            detail: 'SQL Function',
+          });
+        });
+
+        return { suggestions: suggestions };
+      },
+    });
+  }
+
+  initializeSchemaTree(): void {
+    this.schemaTree = [
+      {
+        label: 'postgres_db',
+        expandedIcon: 'pi pi-database',
+        collapsedIcon: 'pi pi-database',
+        expanded: true,
+        children: [
+          {
+            label: 'public',
+            expandedIcon: 'pi pi-folder-open',
+            collapsedIcon: 'pi pi-folder',
+            expanded: true,
+            children: [
+              {
+                label: 'employees',
+                icon: 'pi pi-table',
+                data: { type: 'table' },
+                children: [
+                  { label: 'id', icon: 'pi pi-key', data: { type: 'INTEGER' } },
+                  {
+                    label: 'first_name',
+                    icon: 'pi pi-align-left',
+                    data: { type: 'VARCHAR(50)' },
+                  },
+                  {
+                    label: 'last_name',
+                    icon: 'pi pi-align-left',
+                    data: { type: 'VARCHAR(50)' },
+                  },
+                  {
+                    label: 'email',
+                    icon: 'pi pi-at',
+                    data: { type: 'VARCHAR(100)' },
+                  },
+                  {
+                    label: 'department',
+                    icon: 'pi pi-align-left',
+                    data: { type: 'VARCHAR(50)' },
+                  },
+                  {
+                    label: 'salary',
+                    icon: 'pi pi-dollar',
+                    data: { type: 'DECIMAL(10,2)' },
+                  },
+                  {
+                    label: 'hire_date',
+                    icon: 'pi pi-calendar',
+                    data: { type: 'DATE' },
+                  },
+                ],
+              },
+              {
+                label: 'departments',
+                icon: 'pi pi-table',
+                data: { type: 'table' },
+                children: [
+                  { label: 'id', icon: 'pi pi-key', data: { type: 'INTEGER' } },
+                  {
+                    label: 'name',
+                    icon: 'pi pi-align-left',
+                    data: { type: 'VARCHAR(50)' },
+                  },
+                  {
+                    label: 'manager_id',
+                    icon: 'pi pi-user',
+                    data: { type: 'INTEGER' },
+                  },
+                  {
+                    label: 'budget',
+                    icon: 'pi pi-dollar',
+                    data: { type: 'DECIMAL(12,2)' },
+                  },
+                ],
+              },
+              {
+                label: 'projects',
+                icon: 'pi pi-table',
+                data: { type: 'table' },
+                children: [
+                  { label: 'id', icon: 'pi pi-key', data: { type: 'INTEGER' } },
+                  {
+                    label: 'name',
+                    icon: 'pi pi-align-left',
+                    data: { type: 'VARCHAR(100)' },
+                  },
+                  {
+                    label: 'department_id',
+                    icon: 'pi pi-link',
+                    data: { type: 'INTEGER' },
+                  },
+                  {
+                    label: 'start_date',
+                    icon: 'pi pi-calendar',
+                    data: { type: 'DATE' },
+                  },
+                  {
+                    label: 'end_date',
+                    icon: 'pi pi-calendar',
+                    data: { type: 'DATE' },
+                  },
+                  {
+                    label: 'status',
+                    icon: 'pi pi-info-circle',
+                    data: { type: 'VARCHAR(20)' },
+                  },
+                ],
+              },
+              {
+                label: 'employee_projects',
+                icon: 'pi pi-table',
+                data: { type: 'table' },
+                children: [
+                  {
+                    label: 'employee_id',
+                    icon: 'pi pi-link',
+                    data: { type: 'INTEGER' },
+                  },
+                  {
+                    label: 'project_id',
+                    icon: 'pi pi-link',
+                    data: { type: 'INTEGER' },
+                  },
+                  {
+                    label: 'role',
+                    icon: 'pi pi-align-left',
+                    data: { type: 'VARCHAR(50)' },
+                  },
+                  {
+                    label: 'hours_allocated',
+                    icon: 'pi pi-clock',
+                    data: { type: 'INTEGER' },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  loadDummyData(): void {
+    // Pre-populate with sample query
+    this.sqlQuery = `-- Sample query to get employees in Engineering department
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.email,
+    e.department,
+    e.salary,
+    e.hire_date
+FROM employees e
+WHERE e.department = 'Engineering'
+    AND e.salary > 60000
+ORDER BY e.hire_date DESC
+LIMIT 10;`;
+
+    // If we have tabs, set the content to the first tab
+    if (this.tabs.length > 0) {
+      this.tabs[0].content = this.sqlQuery;
+    }
+
+    // If editor is already initialized, update its value
+    if (this.editor) {
+      this.editor.setValue(this.sqlQuery);
+    }
+  }
+
+  getNodeIcon(node: TreeNode): string {
+    if (node.children && node.children.length > 0) {
+      return node.expanded ? 'pi pi-folder-open' : 'pi pi-folder';
+    }
+    return node.icon || 'pi pi-file';
+  }
+
+  executeQuery(): void {
+    const query = this.sqlQuery.trim();
+    if (!query) return;
+
+    this.isExecuting = true;
 
     // Simulate query execution
     setTimeout(() => {
-      this.isLoading = false;
+      const startTime = Date.now();
 
-      // Mock successful result
-      this.queryResult = {
-        columns: ['id', 'name', 'email', 'order_count'],
-        rows: [
-          {
-            id: 1,
-            name: 'John Doe',
-            email: 'john@example.com',
-            order_count: 5,
-          },
-          {
-            id: 2,
-            name: 'Jane Smith',
-            email: 'jane@example.com',
-            order_count: 3,
-          },
-          {
-            id: 3,
-            name: 'Bob Johnson',
-            email: 'bob@example.com',
-            order_count: 7,
-          },
-        ],
-        rowCount: 3,
-        executionTime: 45,
-      };
-    }, 1000);
+      // Generate dummy results
+      this.queryResults = this.generateDummyResults();
+      this.resultColumns = Object.keys(this.queryResults[0] || {});
+
+      this.executionTime = Date.now() - startTime;
+      this.isExecuting = false;
+    }, 1500);
   }
 
-  clearEditor() {
-    this.editor.dispatch({
-      changes: { from: 0, to: this.editor.state.doc.length, insert: '' },
-    });
-    this.queryResult = null;
-    this.errorMessage = '';
+  clearEditor(): void {
+    this.sqlQuery = '';
+    if (this.editor) {
+      this.editor.setValue('');
+      this.editor.focus();
+    }
+    this.queryResults = [];
+    this.resultColumns = [];
+    this.executionTime = 0;
   }
 
-  formatQuery() {
-    // Simple SQL formatter - in production, use a proper SQL formatter
-    const query = this.editor.state.doc.toString();
-    const formatted = query
-      .replace(/\s+/g, ' ')
-      .replace(/\s*,\s*/g, ', ')
-      .replace(/\s*\(\s*/g, ' (')
-      .replace(/\s*\)\s*/g, ') ')
-      .replace(
-        /(SELECT|FROM|WHERE|JOIN|LEFT JOIN|RIGHT JOIN|INNER JOIN|ON|GROUP BY|HAVING|ORDER BY|LIMIT)/gi,
-        '\n$1'
-      )
-      .trim();
+  private generateDummyResults(): QueryResult[] {
+    const departments = ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance'];
+    const firstNames = [
+      'John',
+      'Jane',
+      'Michael',
+      'Sarah',
+      'David',
+      'Emma',
+      'Robert',
+      'Lisa',
+      'James',
+      'Mary',
+    ];
+    const lastNames = [
+      'Smith',
+      'Johnson',
+      'Williams',
+      'Brown',
+      'Jones',
+      'Garcia',
+      'Miller',
+      'Davis',
+      'Rodriguez',
+      'Martinez',
+    ];
 
-    this.editor.dispatch({
-      changes: { from: 0, to: this.editor.state.doc.length, insert: formatted },
-    });
+    const results: QueryResult[] = [];
+    const numResults = Math.floor(Math.random() * 20) + 10;
+
+    for (let i = 1; i <= numResults; i++) {
+      const firstName =
+        firstNames[Math.floor(Math.random() * firstNames.length)];
+      const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+
+      results.push({
+        id: i,
+        first_name: firstName,
+        last_name: lastName,
+        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@company.com`,
+        department: departments[Math.floor(Math.random() * departments.length)],
+        salary: Math.floor(Math.random() * 80000) + 50000,
+        hire_date: this.generateRandomDate(),
+      });
+    }
+
+    return results;
   }
 
-  exportResults() {
-    if (!this.queryResult) return;
-
-    const csv = [
-      this.queryResult.columns.join(','),
-      ...this.queryResult.rows.map(row =>
-        this.queryResult!.columns.map(col => row[col]).join(',')
-      ),
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `query_results_${new Date().getTime()}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+  private generateRandomDate(): string {
+    const start = new Date(2018, 0, 1);
+    const end = new Date();
+    const date = new Date(
+      start.getTime() + Math.random() * (end.getTime() - start.getTime())
+    );
+    return date.toISOString().split('T')[0];
   }
 
-  getTableNames(): string[] {
-    return Object.keys(this.schema);
+  // Tab management methods
+  addNewTab(): void {
+    const tabId = `tab-${this.tabCounter}`;
+    const newTab: EditorTab = {
+      id: tabId,
+      title: `Query ${this.tabCounter}`,
+      content: '',
+    };
+
+    this.tabs.push(newTab);
+    this.activeTabId = tabId;
+    this.tabCounter++;
+
+    // Update the current editor content
+    if (this.editor) {
+      this.editor.setValue('');
+    }
+  }
+
+  switchTab(tabId: string): void {
+    // Save current tab content
+    const currentTab = this.tabs.find(t => t.id === this.activeTabId);
+    if (currentTab && this.editor) {
+      currentTab.content = this.editor.getValue();
+    }
+
+    // Switch to new tab
+    this.activeTabId = tabId;
+    const newTab = this.tabs.find(t => t.id === tabId);
+
+    if (newTab && this.editor) {
+      this.editor.setValue(newTab.content || '');
+    }
+  }
+
+  closeTab(tabId: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    // Don't close if it's the last tab
+    if (this.tabs.length === 1) {
+      return;
+    }
+
+    const index = this.tabs.findIndex(t => t.id === tabId);
+    if (index !== -1) {
+      this.tabs.splice(index, 1);
+
+      // If closing active tab, switch to another
+      if (this.activeTabId === tabId) {
+        const newIndex = Math.min(index, this.tabs.length - 1);
+        this.activeTabId = this.tabs[newIndex].id;
+
+        if (this.editor) {
+          this.editor.setValue(this.tabs[newIndex].content || '');
+        }
+      }
+    }
   }
 }

@@ -59,6 +59,7 @@ import { KeyFilterModule } from 'primeng/keyfilter';
 import { TreeModule } from 'primeng/tree';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { CarouselModule } from 'primeng/carousel';
+import { SplitterModule } from 'primeng/splitter';
 
 @NgModule({
   imports: [
@@ -82,6 +83,7 @@ import { CarouselModule } from 'primeng/carousel';
     SidebarModule,
     TableModule,
     ToastModule,
+    SplitterModule,
     BlockUIModule,
     InputTextareaModule,
     FieldsetModule,
@@ -177,6 +179,7 @@ import { CarouselModule } from 'primeng/carousel';
     TooltipModule,
     SelectButtonModule,
     KeyFilterModule,
+    SplitterModule,
     TreeModule,
     TreeSelectModule,
     CarouselModule,
