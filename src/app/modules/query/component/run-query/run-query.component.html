@@ -1,160 +1,163 @@
-<div class="run-query-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">
-        <i class="pi pi-database"></i>
-        SQL Query Editor
-      </h1>
-      <p class="page-subtitle">
-        Execute PostgreSQL queries with syntax highlighting and autocomplete
-      </p>
-    </div>
-  </div>
-
-  <div class="content-wrapper">
-    <div class="editor-section">
-      <div class="editor-toolbar">
-        <div class="toolbar-left">
-          <button
-            pButton
-            type="button"
-            label="Execute"
-            icon="pi pi-play"
-            class="p-button-primary"
-            (click)="executeQuery()"
-            [disabled]="isLoading"
-          ></button>
-          <button
-            pButton
-            type="button"
-            label="Format"
-            icon="pi pi-align-left"
-            class="p-button-secondary"
-            (click)="formatQuery()"
-            [disabled]="isLoading"
-          ></button>
-          <button
-            pButton
-            type="button"
-            label="Clear"
-            icon="pi pi-trash"
-            class="p-button-outlined"
-            (click)="clearEditor()"
-            [disabled]="isLoading"
-          ></button>
-        </div>
-        <div class="toolbar-right">
-          <span class="editor-hint">
-            <i class="pi pi-info-circle"></i>
-            Press <kbd>Ctrl+Space</kbd> for autocomplete
-          </span>
-        </div>
-      </div>
-
-      <div class="editor-wrapper">
-        <div #editor class="sql-editor"></div>
-      </div>
-
-      <div class="editor-status" *ngIf="isLoading || errorMessage">
-        <p-progressSpinner
-          *ngIf="isLoading"
-          styleClass="loading-spinner"
-          strokeWidth="4"
-          animationDuration=".8s"
-        >
-        </p-progressSpinner>
-        <div class="error-message" *ngIf="errorMessage && !isLoading">
-          <i class="pi pi-exclamation-triangle"></i>
-          {{ errorMessage }}
-        </div>
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">
+          <i class="pi pi-database"></i>
+          SQL Query Editor
+        </h1>
+        <p class="page-subtitle">
+          Execute PostgreSQL queries with syntax highlighting and autocomplete
+        </p>
       </div>
     </div>
 
-    <div class="results-section" *ngIf="queryResult && !isLoading">
-      <div class="results-header">
-        <div class="results-info">
-          <h3>Query Results</h3>
-          <div class="results-meta">
-            <span class="meta-item">
-              <i class="pi pi-list"></i>
-              {{ queryResult.rowCount }} rows
-            </span>
-            <span class="meta-item">
-              <i class="pi pi-clock"></i>
-              {{ queryResult.executionTime }}ms
+    <div class="content-wrapper">
+      <div class="editor-section">
+        <div class="editor-toolbar">
+          <div class="toolbar-left">
+            <button
+              pButton
+              type="button"
+              label="Execute"
+              icon="pi pi-play"
+              class="p-button-primary"
+              (click)="executeQuery()"
+              [disabled]="isLoading"
+            ></button>
+            <button
+              pButton
+              type="button"
+              label="Format"
+              icon="pi pi-align-left"
+              class="p-button-secondary"
+              (click)="formatQuery()"
+              [disabled]="isLoading"
+            ></button>
+            <button
+              pButton
+              type="button"
+              label="Clear"
+              icon="pi pi-trash"
+              class="p-button-outlined"
+              (click)="clearEditor()"
+              [disabled]="isLoading"
+            ></button>
+          </div>
+          <div class="toolbar-right">
+            <span class="editor-hint">
+              <i class="pi pi-info-circle"></i>
+              Press <kbd>Ctrl+Space</kbd> for autocomplete
             </span>
           </div>
         </div>
-        <button
-          pButton
-          type="button"
-          label="Export CSV"
-          icon="pi pi-download"
-          class="p-button-outlined p-button-sm"
-          (click)="exportResults()"
-        ></button>
+
+        <div class="editor-wrapper">
+          <div #editor class="sql-editor"></div>
+        </div>
+
+        <div class="editor-status" *ngIf="isLoading || errorMessage">
+          <p-progressSpinner
+            *ngIf="isLoading"
+            styleClass="loading-spinner"
+            strokeWidth="4"
+            animationDuration=".8s"
+          >
+          </p-progressSpinner>
+          <div class="error-message" *ngIf="errorMessage && !isLoading">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ errorMessage }}
+          </div>
+        </div>
       </div>
 
-      <div class="results-table-wrapper">
-        <p-table
-          [value]="queryResult.rows"
-          [columns]="queryResult.columns"
-          [paginator]="true"
-          [rows]="10"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-          styleClass="results-table"
-        >
-          <ng-template pTemplate="header">
-            <tr>
-              <th *ngFor="let col of queryResult.columns">{{ col }}</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-row>
-            <tr>
-              <td *ngFor="let col of queryResult.columns">{{ row[col] }}</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr>
-              <td
-                [attr.colspan]="queryResult.columns.length"
-                class="empty-message"
-              >
-                No records found
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-    </div>
+      <div class="results-section" *ngIf="queryResult && !isLoading">
+        <div class="results-header">
+          <div class="results-info">
+            <h3>Query Results</h3>
+            <div class="results-meta">
+              <span class="meta-item">
+                <i class="pi pi-list"></i>
+                {{ queryResult.rowCount }} rows
+              </span>
+              <span class="meta-item">
+                <i class="pi pi-clock"></i>
+                {{ queryResult.executionTime }}ms
+              </span>
+            </div>
+          </div>
+          <button
+            pButton
+            type="button"
+            label="Export CSV"
+            icon="pi pi-download"
+            class="p-button-outlined p-button-sm"
+            (click)="exportResults()"
+          ></button>
+        </div>
 
-    <div
-      class="info-section"
-      *ngIf="!queryResult && !isLoading && !errorMessage"
-    >
-      <div class="info-card">
-        <i class="pi pi-lightbulb"></i>
-        <h3>Quick Tips</h3>
-        <ul>
-          <li>
-            Start typing to see autocomplete suggestions for tables and columns
-          </li>
-          <li>
-            Type a table name followed by a dot (.) to see column suggestions
-          </li>
-          <li>Use <kbd>Ctrl+Space</kbd> to manually trigger autocomplete</li>
-          <li>SQL keywords are automatically highlighted</li>
-          <li>The editor supports PostgreSQL syntax</li>
-        </ul>
+        <div class="results-table-wrapper">
+          <p-table
+            [value]="queryResult.rows"
+            [columns]="queryResult.columns"
+            [paginator]="true"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 25, 50, 100]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            styleClass="results-table"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th *ngFor="let col of queryResult.columns">{{ col }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td *ngFor="let col of queryResult.columns">{{ row[col] }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td
+                  [attr.colspan]="queryResult.columns.length"
+                  class="empty-message"
+                >
+                  No records found
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
       </div>
-      <div class="schema-info">
-        <h4>Available Tables:</h4>
-        <div class="table-list">
-          <span class="table-item" *ngFor="let table of getTableNames()">
-            <i class="pi pi-table"></i> {{ table }}
-          </span>
+
+      <div
+        class="info-section"
+        *ngIf="!queryResult && !isLoading && !errorMessage"
+      >
+        <div class="info-card">
+          <i class="pi pi-lightbulb"></i>
+          <h3>Quick Tips</h3>
+          <ul>
+            <li>
+              Start typing to see autocomplete suggestions for tables and
+              columns
+            </li>
+            <li>
+              Type a table name followed by a dot (.) to see column suggestions
+            </li>
+            <li>Use <kbd>Ctrl+Space</kbd> to manually trigger autocomplete</li>
+            <li>SQL keywords are automatically highlighted</li>
+            <li>The editor supports PostgreSQL syntax</li>
+          </ul>
+        </div>
+        <div class="schema-info">
+          <h4>Available Tables:</h4>
+          <div class="table-list">
+            <span class="table-item" *ngFor="let table of getTableNames()">
+              <i class="pi pi-table"></i> {{ table }}
+            </span>
+          </div>
         </div>
       </div>
     </div>

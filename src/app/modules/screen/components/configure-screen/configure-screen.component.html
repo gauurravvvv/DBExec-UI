@@ -55,7 +55,7 @@
           type="submit"
           label="Save"
           (click)="saveScreenConfiguration()"
-          *ngIf="hasSelectedPrompts() && isFreeze"
+          *ngIf="hasSelectedPrompts() && isFreeze && hasChanges()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -270,7 +270,9 @@
                           }"
                           [ngStyle]="getPromptGroupStyle(prompt, section)"
                           (click)="
-                            handlePromptSelection($event, prompt, section)
+                            isFreeze
+                              ? handlePromptSelection($event, prompt, section)
+                              : togglePrompt(prompt, section)
                           "
                           [pDraggable]="
                             !isFreeze ? 'promptScope-' + section.id : ''
@@ -292,10 +294,12 @@
                           "
                         >
                           <div
-                            class="card-checkbox"
-                            (click)="$event.stopPropagation()"
-                            *ngIf="!isFreeze"
-                          >
+                            class="mandatory-indicator"
+                            [class.active]="prompt.isMandatory"
+                            (click)="toggleMandatory(prompt, $event)"
+                            *ngIf="isFreeze"
+                          ></div>
+                          <div class="card-checkbox" *ngIf="!isFreeze">
                             <p-checkbox
                               [(ngModel)]="prompt.selected"
                               [binary]="true"

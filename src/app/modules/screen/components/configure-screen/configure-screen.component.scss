@@ -1477,6 +1477,33 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
   }
+
+  .mandatory-indicator {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.4rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--error-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 2;
+    background: var(--card-background);
+
+    &:hover {
+      transform: scale(1.2);
+    }
+
+    &.active {
+      background: var(--error-color);
+      border-color: var(--error-color);
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
 }
 
 .prompts-grid {

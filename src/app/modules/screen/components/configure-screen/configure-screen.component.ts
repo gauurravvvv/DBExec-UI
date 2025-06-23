@@ -34,6 +34,7 @@ interface Prompt {
   sequence?: number;
   groupId?: number;
   colorIndex?: number;
+  isMandatory?: boolean;
   [key: string]: any;
 }
 
@@ -47,6 +48,7 @@ interface ConfigPrompt {
   isGrouped: boolean;
   groupId: number;
   color: string | null;
+  isMandatory?: boolean;
 }
 
 interface SectionGroupColor {
@@ -242,52 +244,61 @@ export class ConfigureScreenComponent implements OnInit {
               const configPrompt = promptConfigMap.get(String(prompt.id));
               const isConfigured = configPrompt !== undefined;
 
-              if (
-                isConfigured &&
-                configPrompt.isGrouped &&
-                configPrompt.groupId > 0
-              ) {
-                // Get the color index for this group in this section
-                let colorIndex = colorIndices?.get(configPrompt.groupId);
+              if (isConfigured) {
+                if (configPrompt.isGrouped && configPrompt.groupId > 0) {
+                  // Get the color index for this group in this section
+                  let colorIndex = colorIndices?.get(configPrompt.groupId);
 
-                // If no color index found, assign a new one for this section's group
-                if (
-                  colorIndex === undefined &&
-                  !sectionGroups.has(configPrompt.groupId)
-                ) {
-                  // Find the first unused color index
-                  colorIndex = this.groupColors.findIndex(
-                    (_, idx) =>
-                      !Array.from(colorIndices?.values() || []).includes(idx)
-                  );
-                  if (colorIndex !== -1) {
-                    colorIndices?.set(configPrompt.groupId, colorIndex);
+                  // If no color index found, assign a new one for this section's group
+                  if (
+                    colorIndex === undefined &&
+                    !sectionGroups.has(configPrompt.groupId)
+                  ) {
+                    // Find the first unused color index
+                    colorIndex = this.groupColors.findIndex(
+                      (_, idx) =>
+                        !Array.from(colorIndices?.values() || []).includes(idx)
+                    );
+                    if (colorIndex !== -1) {
+                      colorIndices?.set(configPrompt.groupId, colorIndex);
+                    }
                   }
+
+                  sectionGroups.add(configPrompt.groupId);
+
+                  // Update current group ID counter if needed
+                  section.currentGroupId = Math.max(
+                    section.currentGroupId,
+                    configPrompt.groupId
+                  );
+
+                  return {
+                    ...prompt,
+                    selected: true,
+                    sequence: configPrompt.sequence,
+                    groupId: configPrompt.groupId,
+                    colorIndex: colorIndex,
+                    isMandatory: configPrompt.isMandatory || false,
+                  };
                 }
-
-                sectionGroups.add(configPrompt.groupId);
-
-                // Update current group ID counter if needed
-                section.currentGroupId = Math.max(
-                  section.currentGroupId,
-                  configPrompt.groupId
-                );
 
                 return {
                   ...prompt,
                   selected: true,
                   sequence: configPrompt.sequence,
-                  groupId: configPrompt.groupId,
-                  colorIndex: colorIndex,
+                  groupId: undefined,
+                  colorIndex: undefined,
+                  isMandatory: configPrompt.isMandatory || false,
                 };
               }
 
               return {
                 ...prompt,
-                selected: isConfigured,
-                sequence: isConfigured ? configPrompt.sequence : null,
+                selected: false,
+                sequence: null,
                 groupId: undefined,
                 colorIndex: undefined,
+                isMandatory: false,
               };
             });
 
@@ -656,18 +667,24 @@ export class ConfigureScreenComponent implements OnInit {
   private getCurrentConfiguration(): string {
     return JSON.stringify(
       this.openTabs.map(tab => ({
-        id: tab.id,
+        tab: tab.id,
         sequence: tab.sequence,
-        sections: tab.sections.map(section => ({
+        sections: tab.sections.map((section, sectionIndex) => ({
           id: section.id,
-          sequence: section.sequence,
+          name: section.name,
+          sequence: sectionIndex,
           prompts: section.prompts
             .filter(p => p.selected)
-            .map(prompt => ({
+            .map((prompt, promptIndex) => ({
               id: prompt.id,
-              sequence: prompt.sequence,
-              groupId: prompt.groupId,
+              name: prompt.name,
+              selected: prompt.selected,
+              sequence: promptIndex,
+              isGrouped:
+                prompt.groupId !== undefined && prompt.groupId !== null,
+              groupId: prompt.groupId || 0,
               colorIndex: prompt.colorIndex,
+              isMandatory: prompt.isMandatory || false,
             })),
         })),
       }))
@@ -680,11 +697,18 @@ export class ConfigureScreenComponent implements OnInit {
       return true;
     }
 
+    // If we haven't received the initial config yet, no changes
+    if (!this.hasReceivedConfig) {
+      return false;
+    }
+
     // Get current configuration state
     const currentConfig = this.getCurrentConfiguration();
 
     // Compare with last saved state
-    return currentConfig !== this.lastSavedConfig;
+    const hasConfigChanges = currentConfig !== this.lastSavedConfig;
+
+    return hasConfigChanges;
   }
 
   onTabAccordionChange(sectionId: string | number, expanded: boolean) {
@@ -826,6 +850,7 @@ export class ConfigureScreenComponent implements OnInit {
                 // Use the new mapped group ID if grouped, otherwise 0
                 groupId: isGrouped ? groupIdMap.get(prompt.groupId) : 0,
                 color: undefined as string | undefined,
+                isMandatory: prompt.isMandatory || false,
               };
 
               // Add color information if prompt is in a group
@@ -1133,7 +1158,21 @@ export class ConfigureScreenComponent implements OnInit {
     if (event.ctrlKey || event.metaKey) {
       event.preventDefault();
 
-      // If active group exists, only allow selection in the section that contains the active group
+      // Regular multi-selection behavior
+      if (!this.selectedPrompts[section.id]) {
+        this.selectedPrompts[section.id] = [];
+      }
+
+      const index = this.selectedPrompts[section.id].findIndex(
+        p => p.id === prompt.id
+      );
+      if (index === -1) {
+        this.selectedPrompts[section.id].push(prompt);
+      } else {
+        this.selectedPrompts[section.id].splice(index, 1);
+      }
+
+      // If active group exists, handle group operations
       if (this.activeGroupId !== null) {
         if (!this.isGroupActiveInSection(section, this.activeGroupId)) {
           return; // Don't allow selection in other sections
@@ -1163,21 +1202,6 @@ export class ConfigureScreenComponent implements OnInit {
             this.validateAndCleanupGroup(section, oldGroupId);
           }
         }
-        return;
-      }
-
-      // Regular multi-selection behavior
-      if (!this.selectedPrompts[section.id]) {
-        this.selectedPrompts[section.id] = [];
-      }
-
-      const index = this.selectedPrompts[section.id].findIndex(
-        p => p.id === prompt.id
-      );
-      if (index === -1) {
-        this.selectedPrompts[section.id].push(prompt);
-      } else {
-        this.selectedPrompts[section.id].splice(index, 1);
       }
     }
   }
@@ -1500,5 +1524,40 @@ export class ConfigureScreenComponent implements OnInit {
         section.prompts.some(prompt => prompt.colorIndex === colorIndex)
       )
     );
+  }
+
+  toggleMandatory(prompt: Prompt, event: MouseEvent) {
+    event.stopPropagation(); // Prevent card click event
+
+    // Only allow toggling if screen is frozen
+    if (!this.isFreeze) return;
+
+    // Toggle the mandatory state
+    prompt.isMandatory = !prompt.isMandatory;
+
+    // If this prompt is part of a group, optionally update all prompts in the group
+    if (prompt.groupId !== undefined && prompt.groupId !== null) {
+      const section = this.findSectionContainingPrompt(prompt);
+      if (section) {
+        // Update all prompts in the same group
+        section.prompts.forEach(p => {
+          if (p.groupId === prompt.groupId) {
+            p.isMandatory = prompt.isMandatory;
+          }
+        });
+      }
+    }
+  }
+
+  // Helper method to find the section containing a prompt
+  private findSectionContainingPrompt(prompt: Prompt): Section | null {
+    for (const tab of this.openTabs) {
+      for (const section of tab.sections) {
+        if (section.prompts.some(p => p.id === prompt.id)) {
+          return section;
+        }
+      }
+    }
+    return null;
   }
 }
