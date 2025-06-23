@@ -5,8 +5,16 @@ import {
   ElementRef,
   AfterViewInit,
   OnDestroy,
+  DoCheck,
 } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { TreeNode } from 'primeng/api';
+import { ROLES } from 'src/app/constants/user.constant';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { Chart } from 'chart.js';
+import { UIChart } from 'primeng/chart';
 
 interface QueryResult {
   id: number;
@@ -24,6 +32,7 @@ interface EditorTab {
   title: string;
   content: string;
   editor?: any;
+  isEditing?: boolean;
 }
 
 declare var monaco: any;
@@ -33,9 +42,13 @@ declare var monaco: any;
   templateUrl: './run-query.component.html',
   styleUrls: ['./run-query.component.scss'],
 })
-export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
+export class RunQueryComponent
+  implements OnInit, AfterViewInit, OnDestroy, DoCheck
+{
   @ViewChild('monacoEditor', { static: false })
   monacoEditorElement!: ElementRef;
+
+  @ViewChild('chart') chart!: UIChart;
 
   // Schema tree data
   schemaTree: TreeNode[] = [];
@@ -44,6 +57,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
   sqlQuery: string = '';
   isExecuting: boolean = false;
   private editor: any;
+  private themeObserver: MutationObserver | null = null;
 
   // Tab management
   tabs: EditorTab[] = [];
@@ -78,7 +92,113 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
     employee_projects: ['employee_id', 'project_id', 'role', 'hours_allocated'],
   };
 
+  // Add new properties for dropdowns
+  organisations: any[] = [];
+  databases: any[] = [];
+  selectedOrg: any = {};
+  selectedDatabase: any = {};
+  userRole = this.globalService.getTokenDetails('role');
+  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+
+  // View mode properties
+  viewMode: 'table' | 'graph' = 'table';
+  selectedXAxis: any = null;
+  selectedYAxis: any = null;
+  selectedChartType: string = 'bar';
+
+  columnOptions: any[] = [
+    { id: 1, label: 'id', value: 'id' },
+    { id: 2, label: 'first_name', value: 'first_name' },
+    { id: 3, label: 'last_name', value: 'last_name' },
+    { id: 4, label: 'email', value: 'email' },
+    { id: 5, label: 'department', value: 'department' },
+    { id: 6, label: 'salary', value: 'salary' },
+    { id: 7, label: 'hire_date', value: 'hire_date' },
+  ];
+  chartTypes = [
+    { label: 'Bar Chart', value: 'bar', icon: 'pi pi-chart-bar' },
+    { label: 'Line Chart', value: 'line', icon: 'pi pi-chart-line' },
+    { label: 'Pie Chart', value: 'pie', icon: 'pi pi-chart-pie' },
+    { label: 'Scatter Plot', value: 'scatter', icon: 'pi pi-chart-scatter' },
+  ];
+  chartData: any = {};
+  chartOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: getComputedStyle(document.documentElement).getPropertyValue(
+            '--text-color'
+          ),
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: getComputedStyle(document.documentElement).getPropertyValue(
+            '--text-color'
+          ),
+        },
+        grid: {
+          color: getComputedStyle(document.documentElement).getPropertyValue(
+            '--border-color'
+          ),
+        },
+      },
+      y: {
+        ticks: {
+          color: getComputedStyle(document.documentElement).getPropertyValue(
+            '--text-color'
+          ),
+        },
+        grid: {
+          color: getComputedStyle(document.documentElement).getPropertyValue(
+            '--border-color'
+          ),
+        },
+      },
+    },
+  };
+
+  // Chart generation properties
+  isGeneratingChart: boolean = false;
+  showChart: boolean = false;
+
+  // Form group
+  chartForm: FormGroup;
+
+  constructor(
+    private databaseService: DatabaseService,
+    private organisationService: OrganisationService,
+    private globalService: GlobalService,
+    private fb: FormBuilder
+  ) {
+    // Initialize form
+    this.chartForm = this.fb.group({
+      xAxis: [null],
+      yAxis: [null],
+      chartType: ['bar'],
+    });
+
+    // Subscribe to form value changes
+    this.chartForm.valueChanges.subscribe(() => {
+      this.onFormChange();
+    });
+  }
+
   ngOnInit(): void {
+    // Add organization and database loading
+    if (this.showOrganisationDropdown) {
+      this.loadOrganisations();
+    } else {
+      this.selectedOrg = {
+        id: this.globalService.getTokenDetails('organisationId'),
+      };
+      this.loadDatabases();
+    }
+
     this.initializeSchemaTree();
     this.loadDummyData();
     // Create initial tab
@@ -98,6 +218,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
         clearInterval(checkMonaco);
         setTimeout(() => {
           this.initializeEditor();
+          this.setupThemeObserver();
         }, 100); // Small delay to ensure DOM is ready
       } else if (attempts >= maxAttempts) {
         console.error('Monaco Editor failed to load after 5 seconds');
@@ -109,6 +230,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.editor) {
       this.editor.dispose();
+    }
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
     }
   }
 
@@ -196,18 +320,27 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
           this.executeQuery();
         }
       );
-      
+
       // Disable zoom shortcuts
-      this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal, () => {
-        // Do nothing - disable zoom in
-      });
-      this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus, () => {
-        // Do nothing - disable zoom out
-      });
-      this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit0, () => {
-        // Do nothing - disable reset zoom
-      });
-      
+      this.editor.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal,
+        () => {
+          // Do nothing - disable zoom in
+        }
+      );
+      this.editor.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus,
+        () => {
+          // Do nothing - disable zoom out
+        }
+      );
+      this.editor.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit0,
+        () => {
+          // Do nothing - disable reset zoom
+        }
+      );
+
       // Add custom context menu actions
       this.editor.addAction({
         id: 'run-selected-query',
@@ -217,13 +350,15 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
         run: () => {
           const selection = this.editor.getSelection();
           if (selection && !selection.isEmpty()) {
-            const selectedText = this.editor.getModel().getValueInRange(selection);
+            const selectedText = this.editor
+              .getModel()
+              .getValueInRange(selection);
             this.sqlQuery = selectedText;
             this.executeQuery();
           }
-        }
+        },
       });
-      
+
       this.editor.addAction({
         id: 'format-sql',
         label: 'Format SQL',
@@ -231,9 +366,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
         contextMenuOrder: 1,
         run: () => {
           this.editor.getAction('editor.action.formatDocument').run();
-        }
+        },
       });
-      
+
       this.editor.addAction({
         id: 'comment-line',
         label: 'Comment/Uncomment Line',
@@ -242,9 +377,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash],
         run: () => {
           this.editor.getAction('editor.action.commentLine').run();
-        }
+        },
       });
-      
+
       this.editor.addAction({
         id: 'copy-as-sql',
         label: 'Copy as SQL String',
@@ -257,7 +392,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
             const sqlString = text.replace(/'/g, "''").replace(/\n/g, ' ');
             navigator.clipboard.writeText(`'${sqlString}'`);
           }
-        }
+        },
       });
 
       // Update sqlQuery on content change
@@ -747,5 +882,363 @@ LIMIT 10;`;
         }
       }
     }
+  }
+
+  // Tab editing methods
+  startEditingTab(tab: EditorTab, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    tab.isEditing = true;
+
+    // Focus the input after Angular updates the view
+    setTimeout(() => {
+      const input = document.querySelector(
+        `input[data-tab-id="${tab.id}"]`
+      ) as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
+  }
+
+  finishEditingTab(tab: EditorTab, newTitle: string): void {
+    if (newTitle.trim()) {
+      tab.title = newTitle.trim();
+    }
+    tab.isEditing = false;
+  }
+
+  cancelEditingTab(tab: EditorTab): void {
+    tab.isEditing = false;
+  }
+
+  onTabInputKeydown(
+    event: KeyboardEvent,
+    tab: EditorTab,
+    inputElement: HTMLInputElement
+  ): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.finishEditingTab(tab, inputElement.value);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      inputElement.value = tab.title;
+      this.cancelEditingTab(tab);
+    }
+  }
+
+  private setupThemeObserver(): void {
+    this.themeObserver = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'class'
+        ) {
+          const isDarkTheme = document.body.classList.contains('dark-theme');
+          if (this.editor) {
+            monaco.editor.setTheme(isDarkTheme ? 'vs-dark' : 'vs');
+          }
+          // Update chart if it's visible
+          if (this.showChart) {
+            this.updateChartData();
+          }
+        }
+      });
+    });
+
+    this.themeObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  }
+
+  // Add methods for organization and database handling
+  loadOrganisations() {
+    const params = {
+      pageNumber: 1,
+      limit: 100,
+    };
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
+        if (this.organisations.length > 0) {
+          this.selectedOrg = this.organisations[0];
+          this.loadDatabases();
+        }
+      }
+    });
+  }
+
+  onOrgChange(event: any) {
+    this.selectedOrg = event.value;
+    this.loadDatabases();
+  }
+
+  onDBChange(event: any) {
+    this.selectedDatabase = event.value;
+    // You can add any specific logic needed when database changes
+  }
+
+  loadDatabases() {
+    if (!this.selectedOrg) return;
+    const params = {
+      orgId: this.selectedOrg.id,
+      pageNumber: 1,
+      limit: 100,
+    };
+
+    this.databaseService.listDatabase(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.databases = [...response.data];
+        if (this.databases.length > 0) {
+          this.selectedDatabase = this.databases[0];
+        }
+      }
+    });
+  }
+
+  get numericColumns(): string[] {
+    if (!this.queryResults.length) return [];
+    return this.resultColumns.filter(
+      col => typeof this.queryResults[0][col] === 'number'
+    );
+  }
+
+  // // Transform columns for dropdown
+  // get columnOptions(): any[] {
+  //   return this.resultColumns.map(col => ({
+  //     label: col,
+  //     value: col,
+  //   }));
+  // }
+
+  get numericColumnOptions(): any[] {
+    if (!this.queryResults.length) return [];
+    return this.resultColumns
+      .filter(col => typeof this.queryResults[0][col] === 'number')
+      .map(col => ({
+        label: col,
+        value: col,
+      }));
+  }
+
+  // Helper methods for chart type display
+  getChartTypeIcon(type: string): string {
+    const chartType = this.chartTypes.find(t => t.value === type);
+    return chartType ? chartType.icon : 'pi pi-chart-bar';
+  }
+
+  getChartTypeLabel(type: string): string {
+    const chartType = this.chartTypes.find(t => t.value === type);
+    return chartType ? chartType.label : 'Select Chart Type';
+  }
+
+  // Update chart options with theme colors
+  private updateChartOptionsColors(): void {
+    const style = getComputedStyle(document.documentElement);
+    const textColor = style.getPropertyValue('--text-color').trim();
+    const borderColor = style.getPropertyValue('--border-color').trim();
+    const primaryColor = style.getPropertyValue('--primary-color').trim();
+    const primaryColorRgb = style.getPropertyValue('--primary-rgb').trim();
+
+    this.chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor,
+            font: {
+              family: "'Montserrat', sans-serif",
+              size: 12,
+            },
+          },
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleFont: {
+            family: "'Montserrat', sans-serif",
+            size: 13,
+          },
+          bodyFont: {
+            family: "'Montserrat', sans-serif",
+            size: 12,
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: {
+            color: borderColor,
+            drawBorder: false,
+          },
+          ticks: {
+            color: textColor,
+            font: {
+              family: "'Montserrat', sans-serif",
+              size: 11,
+            },
+          },
+        },
+        y: {
+          grid: {
+            color: borderColor,
+            drawBorder: false,
+          },
+          ticks: {
+            color: textColor,
+            font: {
+              family: "'Montserrat', sans-serif",
+              size: 11,
+            },
+          },
+        },
+      },
+    };
+  }
+
+  // Update the existing updateChartData method
+  updateChartData() {
+    const formValues = this.chartForm.value;
+    if (
+      !formValues.xAxis?.value ||
+      !formValues.yAxis?.value ||
+      !this.queryResults.length
+    ) {
+      this.chartData = {};
+      return;
+    }
+
+    const xAxisField = formValues.xAxis.value;
+    const yAxisField = formValues.yAxis.value;
+
+    const labels = this.queryResults.map(row => row[xAxisField]);
+    const data = this.queryResults.map(row => row[yAxisField]);
+    const style = getComputedStyle(document.documentElement);
+    const primaryColorRgb = style.getPropertyValue('--primary-rgb').trim();
+
+    // For pie charts, aggregate data by unique labels
+    if (formValues.chartType === 'pie') {
+      const aggregatedData = labels.reduce((acc, label, index) => {
+        if (!acc[label]) {
+          acc[label] = 0;
+        }
+        acc[label] += data[index];
+        return acc;
+      }, {});
+
+      this.chartData = {
+        labels: Object.keys(aggregatedData),
+        datasets: [
+          {
+            data: Object.values(aggregatedData),
+            backgroundColor: this.generateColors(
+              Object.keys(aggregatedData).length
+            ),
+            borderColor: 'rgba(255, 255, 255, 0.5)',
+            borderWidth: 1,
+          },
+        ],
+      };
+    } else {
+      // For other chart types
+      this.chartData = {
+        labels,
+        datasets: [
+          {
+            label: formValues.yAxis.label,
+            data,
+            backgroundColor: `rgba(${primaryColorRgb}, 0.2)`,
+            borderColor: `rgb(${primaryColorRgb})`,
+            borderWidth: 1,
+            tension: formValues.chartType === 'line' ? 0.4 : 0,
+            pointBackgroundColor: `rgb(${primaryColorRgb})`,
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: `rgb(${primaryColorRgb})`,
+          },
+        ],
+      };
+    }
+
+    // Update chart options with current theme colors
+    this.updateChartOptionsColors();
+  }
+
+  // Generate random colors for pie chart
+  private generateColors(count: number): string[] {
+    const colors = [];
+    for (let i = 0; i < count; i++) {
+      const hue = (i * 360) / count;
+      colors.push(`hsl(${hue}, 70%, 60%)`);
+    }
+    return colors;
+  }
+
+  // Watch for changes in selected axes and chart type
+  ngDoCheck() {
+    this.updateChartData();
+  }
+
+  // Update chart when query results change
+  onQueryResultsUpdate() {
+    this.updateChartData();
+  }
+
+  onAxisChange() {
+    this.updateChartData();
+  }
+
+  canGenerateChart(): boolean {
+    const formValues = this.chartForm.value;
+    return (
+      !this.isGeneratingChart &&
+      this.queryResults.length > 0 &&
+      formValues.xAxis?.value &&
+      formValues.yAxis?.value
+    );
+  }
+
+  getGenerateChartTooltip(): string {
+    const formValues = this.chartForm.value;
+    if (!this.queryResults.length) {
+      return 'Execute a query to get data for the chart';
+    }
+    if (!formValues.xAxis?.value || !formValues.yAxis?.value) {
+      return 'Select both X and Y axes to generate chart';
+    }
+    return 'Generate chart with selected axes';
+  }
+
+  // Generate chart method
+  generateChart(): void {
+    if (!this.canGenerateChart()) return;
+
+    this.isGeneratingChart = true;
+    this.showChart = false;
+
+    // Simulate chart generation delay
+    setTimeout(() => {
+      this.updateChartData();
+      this.showChart = true;
+      this.isGeneratingChart = false;
+
+      // Force chart update
+      if (this.chart) {
+        setTimeout(() => {
+          this.chart.refresh();
+        }, 100);
+      }
+    }, 800); // Simulate processing time
+  }
+
+  onFormChange() {
+    const formValues = this.chartForm.value;
+    this.selectedXAxis = formValues.xAxis;
+    this.selectedYAxis = formValues.yAxis;
+    this.selectedChartType = formValues.chartType;
+    this.updateChartData();
   }
 }

@@ -5,6 +5,7 @@ import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { QueryRoutingModule } from './query-routing.module';
 import { RunQueryComponent } from './component/run-query/run-query.component';
+import { ChartModule } from 'primeng/chart';
 
 @NgModule({
   declarations: [RunQueryComponent],
@@ -14,7 +15,8 @@ import { RunQueryComponent } from './component/run-query/run-query.component';
     FormsModule,
     AppPrimeNGModule,
     QueryRoutingModule,
-    SharedModule
+    SharedModule,
+    ChartModule,
   ],
 })
 export class QueryModule {}

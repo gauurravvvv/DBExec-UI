@@ -1,178 +1,411 @@
-<div class="run-query-container">
-  <!-- Main horizontal splitter -->
-  <p-splitter
-    [style]="{ height: '100%', width: '100%' }"
-    [panelSizes]="[20, 80]"
-    [minSizes]="[15, 50]"
-    layout="horizontal"
-    styleClass="main-horizontal-splitter"
-  >
-    <!-- Left Panel - Schema Browser -->
-    <ng-template pTemplate>
-      <div class="schema-panel">
-        <div class="panel-header">
-          <i class="pi pi-database"></i>
-          <span>Database Schema</span>
+<div class="super-admin-wrapper">
+  <div class="super-admin-container">
+    <!-- Filter Container -->
+    <div class="filter-container">
+      <div class="dropdowns-wrapper">
+        <!-- Organisation Dropdown -->
+        <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+          <span class="p-float-label">
+            <p-dropdown
+              [options]="organisations"
+              [(ngModel)]="selectedOrg"
+              optionLabel="name"
+              [filter]="true"
+              filterBy="name"
+              [style]="{ width: '100%' }"
+              [panelStyle]="{ width: '100%' }"
+              (onChange)="onOrgChange($event)"
+              inputId="org-dropdown"
+            >
+            </p-dropdown>
+            <label for="org-dropdown">Organisation</label>
+          </span>
         </div>
-        <div class="panel-content">
-          <p-tree
-            [value]="schemaTree"
-            [filter]="true"
-            filterMode="lenient"
-            filterPlaceholder="Search schema..."
-            scrollHeight="100%"
-            styleClass="schema-tree"
-          >
-            <ng-template let-node pTemplate="default">
-              <div class="tree-node-content">
-                <i [class]="getNodeIcon(node)"></i>
-                <span class="node-label">{{ node.label }}</span>
-                <span class="node-type" *ngIf="node.data?.type">{{
-                  node.data.type
-                }}</span>
-              </div>
-            </ng-template>
-          </p-tree>
+
+        <!-- Database Dropdown -->
+        <div class="dropdown-field">
+          <span class="p-float-label">
+            <p-dropdown
+              [options]="databases"
+              [(ngModel)]="selectedDatabase"
+              optionLabel="name"
+              [filter]="true"
+              filterBy="name"
+              [style]="{ width: '100%' }"
+              [panelStyle]="{ width: '100%' }"
+              (onChange)="onDBChange($event)"
+              inputId="db-dropdown"
+            >
+            </p-dropdown>
+            <label for="db-dropdown">Database</label>
+          </span>
         </div>
       </div>
-    </ng-template>
+    </div>
 
-    <!-- Right Panel - Editor and Results -->
-    <ng-template pTemplate>
-      <!-- Vertical splitter for editor and results -->
+    <!-- Existing Content -->
+    <div class="run-query-container">
+      <!-- Main horizontal splitter -->
       <p-splitter
         [style]="{ height: '100%', width: '100%' }"
-        [panelSizes]="[50, 50]"
-        [minSizes]="[30, 20]"
-        layout="vertical"
-        styleClass="editor-results-splitter"
+        [panelSizes]="[20, 80]"
+        [minSizes]="[15, 80]"
+        layout="horizontal"
+        styleClass="main-horizontal-splitter"
       >
-        <!-- Top Panel - SQL Editor -->
+        <!-- Left Panel - Schema Browser -->
         <ng-template pTemplate>
-          <div class="editor-panel">
-            <div class="panel-header">
-              <i class="pi pi-code"></i>
-              <span>SQL Editor</span>
-              <div class="editor-actions">
-                <button
-                  pButton
-                  pRipple
-                  type="button"
-                  icon="pi pi-plus"
-                  label="New Script"
-                  class="p-button-primary p-button-sm p-button-outlined"
-                  (click)="addNewTab()"
-                ></button>
-                <button
-                  pButton
-                  pRipple
-                  type="button"
-                  icon="pi pi-play"
-                  label="Execute"
-                  class="p-button-success p-button-sm"
-                  (click)="executeQuery()"
-                  [disabled]="isExecuting"
-                ></button>
-                <button
-                  pButton
-                  pRipple
-                  type="button"
-                  icon="pi pi-times"
-                  label="Clear"
-                  class="p-button-secondary p-button-sm p-button-outlined"
-                  (click)="clearEditor()"
-                ></button>
-              </div>
-            </div>
-            <div class="editor-tabs">
-              <div
-                *ngFor="let tab of tabs"
-                class="editor-tab"
-                [class.active]="tab.id === activeTabId"
-                (click)="switchTab(tab.id)"
-              >
-                <span class="tab-title">{{ tab.title }}</span>
-                <i
-                  class="pi pi-times tab-close"
-                  *ngIf="tabs.length > 1"
-                  (click)="closeTab(tab.id, $event)"
-                ></i>
-              </div>
-            </div>
+          <div class="schema-panel">
             <div class="panel-content">
-              <div #monacoEditor class="sql-editor-monaco"></div>
+              <p-tree
+                [value]="schemaTree"
+                [filter]="true"
+                filterMode="lenient"
+                filterPlaceholder="Search schema..."
+                scrollHeight="100%"
+                styleClass="schema-tree"
+              >
+                <ng-template let-node pTemplate="default">
+                  <div class="tree-node-content">
+                    <i [class]="getNodeIcon(node)"></i>
+                    <span class="node-label">{{ node.label }}</span>
+                    <span class="node-type" *ngIf="node.data?.type">{{
+                      node.data.type
+                    }}</span>
+                  </div>
+                </ng-template>
+              </p-tree>
             </div>
           </div>
         </ng-template>
 
-        <!-- Bottom Panel - Results -->
+        <!-- Right Panel - Editor and Results -->
         <ng-template pTemplate>
-          <div class="results-panel">
-            <div class="panel-header">
-              <i class="pi pi-table"></i>
-              <span>Query Results</span>
-              <div class="results-info" *ngIf="queryResults.length > 0">
-                <span class="result-count">{{ queryResults.length }} rows</span>
-                <span class="execution-time" *ngIf="executionTime"
-                  >{{ executionTime }}ms</span
-                >
+          <!-- Vertical splitter for editor and results -->
+          <p-splitter
+            [style]="{ height: '100%', width: '100%' }"
+            [panelSizes]="[50, 50]"
+            [minSizes]="[30, 20]"
+            layout="vertical"
+            styleClass="editor-results-splitter"
+          >
+            <!-- Top Panel - SQL Editor -->
+            <ng-template pTemplate>
+              <div class="editor-panel">
+                <div class="editor-tabs">
+                  <div class="tabs-container">
+                    <div
+                      *ngFor="let tab of tabs"
+                      class="editor-tab"
+                      [class.active]="tab.id === activeTabId"
+                      (click)="!tab.isEditing && switchTab(tab.id)"
+                      (dblclick)="startEditingTab(tab, $event)"
+                    >
+                      <ng-container *ngIf="!tab.isEditing">
+                        <span class="tab-title" [title]="tab.title">{{
+                          tab.title
+                        }}</span>
+                      </ng-container>
+                      <ng-container *ngIf="tab.isEditing">
+                        <input
+                          #tabInput
+                          type="text"
+                          class="tab-title-input"
+                          [value]="tab.title"
+                          [attr.data-tab-id]="tab.id"
+                          (blur)="finishEditingTab(tab, tabInput.value)"
+                          (keydown)="onTabInputKeydown($event, tab, tabInput)"
+                          (click)="$event.stopPropagation()"
+                        />
+                      </ng-container>
+                      <i
+                        class="pi pi-times tab-close"
+                        *ngIf="tabs.length > 1 && !tab.isEditing"
+                        (click)="closeTab(tab.id, $event)"
+                      ></i>
+                    </div>
+                  </div>
+                  <div class="editor-actions">
+                    <button
+                      pButton
+                      pRipple
+                      type="button"
+                      icon="pi pi-plus"
+                      class="p-button-text p-button-rounded add-btn"
+                      tooltipPosition="bottom"
+                      (click)="addNewTab()"
+                    ></button>
+                    <button
+                      pButton
+                      pRipple
+                      type="button"
+                      icon="pi pi-play"
+                      class="p-button-text p-button-rounded run-btn"
+                      [class.executing]="isExecuting"
+                      tooltipPosition="bottom"
+                      (click)="executeQuery()"
+                      [disabled]="isExecuting"
+                    ></button>
+                    <button
+                      pButton
+                      pRipple
+                      type="button"
+                      icon="pi pi-times"
+                      class="p-button-text p-button-rounded clear-btn"
+                      tooltipPosition="bottom"
+                      (click)="clearEditor()"
+                    ></button>
+                  </div>
+                </div>
+                <div class="panel-content">
+                  <div #monacoEditor class="sql-editor-monaco"></div>
+                </div>
               </div>
-            </div>
-            <div class="panel-content">
-              <p-table
-                [value]="queryResults"
-                [columns]="resultColumns"
-                [paginator]="true"
-                [rows]="25"
-                [rowsPerPageOptions]="[10, 25, 50, 100]"
-                [showCurrentPageReport]="true"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                [globalFilterFields]="resultColumns"
-                styleClass="results-table"
-                [scrollable]="true"
-                scrollHeight="flex"
-              >
-                <ng-template pTemplate="header">
-                  <tr>
-                    <th
-                      *ngFor="let col of resultColumns"
-                      [pSortableColumn]="col"
-                    >
-                      {{ col }}
-                      <p-sortIcon [field]="col"></p-sortIcon>
-                    </th>
-                  </tr>
-                </ng-template>
+            </ng-template>
 
-                <ng-template pTemplate="body" let-row>
-                  <tr>
-                    <td *ngFor="let col of resultColumns">
-                      <span class="cell-content" [title]="row[col]">
-                        {{ row[col] }}
-                      </span>
-                    </td>
-                  </tr>
-                </ng-template>
-
-                <ng-template pTemplate="emptymessage">
-                  <tr>
-                    <td
-                      [attr.colspan]="resultColumns.length || 1"
-                      class="empty-message"
+            <!-- Bottom Panel - Results -->
+            <ng-template pTemplate>
+              <div class="results-panel">
+                <div class="panel-header">
+                  <div class="header-left">
+                    <i class="pi pi-table"></i>
+                    <span>Query Results</span>
+                    <div class="results-info" *ngIf="queryResults.length > 0">
+                      <span class="result-count"
+                        >{{ queryResults.length }} rows</span
+                      >
+                      <span class="execution-time" *ngIf="executionTime"
+                        >{{ executionTime }}ms</span
+                      >
+                    </div>
+                  </div>
+                  <div class="view-toggle">
+                    <button
+                      pButton
+                      [class.active]="viewMode === 'table'"
+                      class="p-button-text p-button-rounded toggle-btn"
+                      (click)="viewMode = 'table'"
                     >
-                      <div class="empty-state">
-                        <i class="pi pi-inbox"></i>
-                        <p>No results to display</p>
+                      <i class="pi pi-table"></i>
+                      <span>Table</span>
+                    </button>
+                    <button
+                      pButton
+                      [class.active]="viewMode === 'graph'"
+                      class="p-button-text p-button-rounded toggle-btn"
+                      (click)="viewMode = 'graph'"
+                    >
+                      <i class="pi pi-chart-line"></i>
+                      <span>Graph</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="panel-content">
+                  <!-- Table View -->
+                  <div class="table-view" *ngIf="viewMode === 'table'">
+                    <p-table
+                      [value]="queryResults"
+                      [columns]="resultColumns"
+                      [paginator]="true"
+                      [rows]="25"
+                      [rowsPerPageOptions]="[10, 25, 50, 100]"
+                      [showCurrentPageReport]="true"
+                      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                      [globalFilterFields]="resultColumns"
+                      styleClass="results-table"
+                      [scrollable]="true"
+                      scrollHeight="flex"
+                    >
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th
+                            *ngFor="let col of resultColumns"
+                            [pSortableColumn]="col"
+                          >
+                            {{ col }}
+                            <p-sortIcon [field]="col"></p-sortIcon>
+                          </th>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template pTemplate="body" let-row>
+                        <tr>
+                          <td *ngFor="let col of resultColumns">
+                            <span class="cell-content" [title]="row[col]">
+                              {{ row[col] }}
+                            </span>
+                          </td>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td
+                            [attr.colspan]="resultColumns.length || 1"
+                            class="empty-message"
+                          >
+                            <div class="empty-state">
+                              <i class="pi pi-inbox"></i>
+                              <p>No results to display</p>
+                              <small>Execute a query to see results</small>
+                            </div>
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+
+                  <!-- Graph View -->
+                  <div class="graph-view" *ngIf="viewMode === 'graph'">
+                    <div class="filter-container">
+                      <div class="dropdowns-wrapper" [formGroup]="chartForm">
+                        <!-- X-Axis Dropdown -->
+                        <div class="dropdown-field">
+                          <span class="p-float-label">
+                            <!-- <p-dropdown
+                              [options]="columnOptions"
+                              formControlName="xAxis"
+                              [filter]="true"
+                              [style]="{ width: '100%' }"
+                              [panelStyle]="{ width: '100%' }"
+                              [showClear]="true"
+                              placeholder="Select X-Axis"
+                              optionLabel="label"
+                              optionValue="value"
+                            >
+                            </p-dropdown> -->
+
+                            {{ chartForm.value | json }}
+
+                            <p-dropdown
+                              [options]="columnOptions"
+                              formControlName="xAxis"
+                              optionLabel="label"
+                              [filter]="true"
+                              filterBy="label"
+                              [style]="{ width: '100%' }"
+                              [panelStyle]="{ width: '100%' }"
+                              inputId="x-axis-dropdown"
+                            >
+                            </p-dropdown>
+                            <label>X-Axis Column</label>
+                          </span>
+                        </div>
+
+                        <!-- Y-Axis Dropdown -->
+                        <div class="dropdown-field">
+                          <span class="p-float-label">
+                            <p-dropdown
+                              [options]="columnOptions"
+                              formControlName="yAxis"
+                              [filter]="true"
+                              filterBy="label"
+                              [style]="{ width: '100%' }"
+                              [panelStyle]="{ width: '100%' }"
+                              [showClear]="true"
+                              placeholder="Select Y-Axis"
+                              optionLabel="label"
+                              optionValue="value"
+                            >
+                            </p-dropdown>
+                            <label>Y-Axis Column</label>
+                          </span>
+                        </div>
+
+                        <!-- Chart Type Dropdown -->
+                        <div class="dropdown-field">
+                          <span class="p-float-label">
+                            <p-dropdown
+                              [options]="chartTypes"
+                              formControlName="chartType"
+                              [style]="{ width: '100%' }"
+                              [panelStyle]="{ width: '100%' }"
+                              [showClear]="false"
+                              placeholder="Select Chart Type"
+                              optionLabel="label"
+                              optionValue="value"
+                            >
+                              <!-- <ng-template pTemplate="selectedItem">
+                                <div class="selected-item">
+                                  <i
+                                    [class]="
+                                      getChartTypeIcon(
+                                        chartForm.get('chartType')?.value
+                                      )
+                                    "
+                                  ></i>
+                                  <span>{{
+                                    getChartTypeLabel(
+                                      chartForm.get('chartType')?.value
+                                    )
+                                  }}</span>
+                                </div>
+                              </ng-template>
+                              <ng-template let-type pTemplate="item">
+                                <div class="dropdown-item">
+                                  <i [class]="type.icon"></i>
+                                  <span>{{ type.label }}</span>
+                                </div>
+                              </ng-template> -->
+                            </p-dropdown>
+                            <label>Chart Type</label>
+                          </span>
+                        </div>
+
+                        <!-- Generate Chart Button -->
+                        <div class="dropdown-field">
+                          <button
+                            pButton
+                            class="p-button-primary"
+                            icon="pi pi-chart-line"
+                            label="Generate Chart"
+                            [loading]="isGeneratingChart"
+                            (click)="generateChart()"
+                          ></button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="chart-container">
+                      <p-chart
+                        #chart
+                        [type]="chartForm.get('chartType')?.value"
+                        [data]="chartData"
+                        [options]="chartOptions"
+                        *ngIf="showChart"
+                      ></p-chart>
+                      <div class="empty-chart" *ngIf="!queryResults.length">
+                        <i class="pi pi-chart-line"></i>
+                        <p>No data available to visualize</p>
                         <small>Execute a query to see results</small>
                       </div>
-                    </td>
-                  </tr>
-                </ng-template>
-              </p-table>
-            </div>
-          </div>
+                      <div
+                        class="empty-chart"
+                        *ngIf="
+                          queryResults.length &&
+                          (!chartForm.get('xAxis')?.value ||
+                            !chartForm.get('yAxis')?.value)
+                        "
+                      >
+                        <i class="pi pi-chart-bar"></i>
+                        <p>Select axes to visualize data</p>
+                        <small
+                          >Choose columns for X and Y axes, then click Generate
+                          Chart</small
+                        >
+                      </div>
+                      <div class="chart-loading" *ngIf="isGeneratingChart">
+                        <i class="pi pi-spin pi-spinner"></i>
+                        <span>Generating chart...</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </p-splitter>
         </ng-template>
       </p-splitter>
-    </ng-template>
-  </p-splitter>
+    </div>
+  </div>
 </div>
