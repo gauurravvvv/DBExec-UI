@@ -15,11 +15,11 @@ import { DatabaseService } from 'src/app/modules/database/services/database.serv
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { Chart } from 'chart.js';
 import { UIChart } from 'primeng/chart';
-import { 
-  ALL_POSTGRES_KEYWORDS, 
-  ALL_POSTGRES_FUNCTIONS, 
-  ALL_POSTGRES_DATA_TYPES, 
-  ALL_POSTGRES_OPERATORS 
+import {
+  ALL_POSTGRES_KEYWORDS,
+  ALL_POSTGRES_FUNCTIONS,
+  ALL_POSTGRES_DATA_TYPES,
+  ALL_POSTGRES_OPERATORS,
 } from '../../constants/postgres-sql.constants';
 
 interface QueryResult {
@@ -101,7 +101,7 @@ export class RunQueryComponent
   readonly AUTO_SAVE_INTERVALS = [
     { label: '5 seconds', value: 5000 },
     { label: '10 seconds', value: 10000 },
-    { label: '15 seconds', value: 15000 }
+    { label: '15 seconds', value: 15000 },
   ];
 
   // Splitter collapse properties
@@ -308,7 +308,6 @@ export class RunQueryComponent
       attempts++;
 
       if (typeof monaco !== 'undefined') {
-        console.log('Monaco Editor loaded, initializing...');
         clearInterval(checkMonaco);
         setTimeout(() => {
           this.initializeEditor();
@@ -317,7 +316,6 @@ export class RunQueryComponent
           this.setupFullscreenListener();
         }, 100); // Small delay to ensure DOM is ready
       } else if (attempts >= maxAttempts) {
-        console.error('Monaco Editor failed to load after 5 seconds');
         clearInterval(checkMonaco);
       }
     }, 100);
@@ -342,8 +340,6 @@ export class RunQueryComponent
       console.error('Editor element not found');
       return;
     }
-
-    console.log('Initializing Monaco Editor...');
 
     // Check if dark theme is active
     const isDarkTheme = document.body.classList.contains('dark-theme');
@@ -510,11 +506,7 @@ export class RunQueryComponent
 
       // Focus the editor
       this.editor.focus();
-
-      console.log('Monaco Editor initialized successfully');
-    } catch (error) {
-      console.error('Error initializing Monaco Editor:', error);
-    }
+    } catch (error) {}
   }
 
   private setupAutoComplete(): void {
@@ -795,7 +787,7 @@ LIMIT 10;`;
 
       this.executionTime = Date.now() - startTime;
       this.isExecuting = false;
-      
+
       // Fix layout after results load - defer to avoid splitter interference
       setTimeout(() => {
         if (this.editor) {
@@ -1240,11 +1232,8 @@ LIMIT 10;`;
   toggleDatabaseMenu(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    console.log('Toggle menu clicked, menu items:', this.databaseMenuItems);
     if (this.databaseMenu) {
       this.databaseMenu.toggle(event);
-    } else {
-      console.error('Database menu not initialized');
     }
   }
 
@@ -1500,13 +1489,11 @@ LIMIT 10;`;
   }
 
   updateDatabaseMenuItems(): void {
-    console.log('Updating database menu items, databases:', this.databases);
     if (this.databases && this.databases.length > 0) {
       this.databaseMenuItems = this.databases.map(database => ({
         label: database.name,
         icon: 'pi pi-database',
         command: () => {
-          console.log('Database selected:', database);
           this.addNewTab(database);
         },
       }));
@@ -1522,7 +1509,6 @@ LIMIT 10;`;
           label: 'Test Database 1',
           icon: 'pi pi-database',
           command: () => {
-            console.log('Test database 1 selected');
             this.addNewTab({ name: 'Test Database 1', id: 'test1' });
           },
         },
@@ -1530,13 +1516,11 @@ LIMIT 10;`;
           label: 'Test Database 2',
           icon: 'pi pi-database',
           command: () => {
-            console.log('Test database 2 selected');
             this.addNewTab({ name: 'Test Database 2', id: 'test2' });
           },
         },
       ];
     }
-    console.log('Final menu items:', this.databaseMenuItems);
   }
 
   updateSaveMenuItems(): void {
@@ -1554,16 +1538,13 @@ LIMIT 10;`;
         command: () => {
           this.saveAllScripts();
         },
-      }
+      },
     ];
-
-    console.log('Save menu items updated:', this.saveMenuItems);
   }
 
   toggleSaveMenu(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    console.log('Save menu toggle clicked, menu items:', this.saveMenuItems);
     if (this.saveMenu) {
       this.saveMenu.toggle(event);
     } else {
@@ -1575,22 +1556,27 @@ LIMIT 10;`;
     this.autoSaveMenuItems = [
       ...this.AUTO_SAVE_INTERVALS.map(interval => ({
         label: interval.label,
-        icon: this.autoSaveInterval === interval.value ? 'pi pi-check' : 'pi pi-circle',
+        icon:
+          this.autoSaveInterval === interval.value
+            ? 'pi pi-check'
+            : 'pi pi-circle',
         command: () => {
           this.setAutoSaveInterval(interval.value);
         },
       })),
       {
-        separator: true
+        separator: true,
       },
       {
-        label: this.isAutoSaveEnabled ? 'Disable Auto-Save' : 'Enable Auto-Save',
+        label: this.isAutoSaveEnabled
+          ? 'Disable Auto-Save'
+          : 'Enable Auto-Save',
         icon: this.isAutoSaveEnabled ? 'pi pi-pause' : 'pi pi-play',
         command: () => {
           this.toggleAutoSave();
           this.updateAutoSaveMenuItems(); // Refresh menu items
         },
-      }
+      },
     ];
   }
 
@@ -1607,15 +1593,14 @@ LIMIT 10;`;
 
   setAutoSaveInterval(interval: number): void {
     this.autoSaveInterval = interval;
-    
+
     // Enable auto-save and start with the new interval
     this.isAutoSaveEnabled = true;
     this.stopAutoSave();
     this.startAutoSave();
-    
+
     // Update menu items to reflect the change
     this.updateAutoSaveMenuItems();
-    console.log(`Auto-save enabled with ${interval}ms interval`);
   }
 
   getAutoSaveTooltip(): string {
@@ -1648,34 +1633,23 @@ LIMIT 10;`;
     }
     // Update save menu to show the restore option
     this.updateSaveMenuItems();
-    console.log('Auto-save button hidden');
   }
 
   showAutoSaveButton(): void {
     this.isAutoSaveVisible = true;
     // Update save menu to remove the restore option
     this.updateSaveMenuItems();
-    console.log('Auto-save button shown');
   }
 
   saveCurrentScript(): void {
-    console.log('Saving current script...');
     const activeTab = this.tabs.find(tab => tab.id === this.activeTabId);
     if (activeTab) {
       // Get the current query content from the editor
       const currentQuery = this.editor ? this.editor.getValue() : this.sqlQuery;
-      
+
       // Update the tab's content
       activeTab.content = currentQuery;
-      
-      // Here you would typically save to backend/local storage
-      console.log(`Saved script: ${activeTab.title}`, {
-        tabId: activeTab.id,
-        title: activeTab.title,
-        content: currentQuery,
-        database: activeTab.database
-      });
-      
+
       // Show success feedback (you could add a toast notification here)
       alert(`Script "${activeTab.title}" saved successfully!`);
     } else {
@@ -1685,7 +1659,6 @@ LIMIT 10;`;
   }
 
   saveAllScripts(): void {
-    console.log('Saving all scripts...');
     if (this.tabs.length === 0) {
       alert('No scripts to save');
       return;
@@ -1693,7 +1666,7 @@ LIMIT 10;`;
 
     // Get current content from editor for active tab
     const currentQuery = this.editor ? this.editor.getValue() : this.sqlQuery;
-    
+
     // Update active tab content
     const activeTab = this.tabs.find(tab => tab.id === this.activeTabId);
     if (activeTab) {
@@ -1705,12 +1678,9 @@ LIMIT 10;`;
       tabId: tab.id,
       title: tab.title,
       content: tab.content,
-      database: tab.database
+      database: tab.database,
     }));
 
-    // Here you would typically save all to backend/local storage
-    console.log('Saved all scripts:', savedScripts);
-    
     // Show success feedback
     alert(`All ${this.tabs.length} scripts saved successfully!`);
   }
@@ -2057,7 +2027,7 @@ LIMIT 10;`;
     if (this.autoSaveTimer) {
       clearTimeout(this.autoSaveTimer);
     }
-    
+
     this.autoSaveTimer = setTimeout(() => {
       this.performAutoSave();
     }, this.autoSaveInterval);
@@ -2074,19 +2044,19 @@ LIMIT 10;`;
     if (!this.isAutoSaveEnabled) return;
 
     this.autoSaveStatus = 'saving';
-    
+
     // Simulate save operation
     setTimeout(() => {
       try {
         // Here you would implement actual save logic
         // For now, just simulate success
         this.autoSaveStatus = 'saved';
-        
+
         // Show 'completed' status with animation after save
         setTimeout(() => {
           if (this.autoSaveStatus === 'saved') {
             this.autoSaveStatus = 'completed';
-            
+
             // Brief animation period for completed status
             setTimeout(() => {
               if (this.autoSaveStatus === 'completed') {
@@ -2095,7 +2065,7 @@ LIMIT 10;`;
             }, 1500); // Show completed status for 1.5 seconds with animation
           }
         }, 1000); // Show saved status for 1 second before transitioning to completed
-        
+
         // Schedule next auto-save
         if (this.isAutoSaveEnabled) {
           this.startAutoSave();
