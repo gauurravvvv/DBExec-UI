@@ -64,6 +64,12 @@ export class RunQueryComponent
   activeTabId: string = '';
   tabCounter: number = 1;
 
+  // Context menu properties
+  showTabContextMenu: boolean = false;
+  contextMenuPosition = { x: 0, y: 0 };
+  selectedTabForContext: EditorTab | null = null;
+  selectedTabIndexForContext: number = -1;
+
   // Results properties
   queryResults: QueryResult[] = [];
   resultColumns: string[] = [];
@@ -565,18 +571,19 @@ export class RunQueryComponent
         label: 'postgres_db',
         expandedIcon: 'pi pi-database',
         collapsedIcon: 'pi pi-database',
-        expanded: true,
+        expanded: false,
         children: [
           {
             label: 'public',
             expandedIcon: 'pi pi-folder-open',
             collapsedIcon: 'pi pi-folder',
-            expanded: true,
+            expanded: false,
             children: [
               {
                 label: 'employees',
                 icon: 'pi pi-table',
                 data: { type: 'table' },
+                expanded: false,
                 children: [
                   { label: 'id', icon: 'pi pi-key', data: { type: 'INTEGER' } },
                   {
@@ -615,6 +622,7 @@ export class RunQueryComponent
                 label: 'departments',
                 icon: 'pi pi-table',
                 data: { type: 'table' },
+                expanded: false,
                 children: [
                   { label: 'id', icon: 'pi pi-key', data: { type: 'INTEGER' } },
                   {
@@ -638,6 +646,7 @@ export class RunQueryComponent
                 label: 'projects',
                 icon: 'pi pi-table',
                 data: { type: 'table' },
+                expanded: false,
                 children: [
                   { label: 'id', icon: 'pi pi-key', data: { type: 'INTEGER' } },
                   {
@@ -671,6 +680,7 @@ export class RunQueryComponent
                 label: 'employee_projects',
                 icon: 'pi pi-table',
                 data: { type: 'table' },
+                expanded: false,
                 children: [
                   {
                     label: 'employee_id',
@@ -927,6 +937,131 @@ LIMIT 10;`;
       inputElement.value = tab.title;
       this.cancelEditingTab(tab);
     }
+  }
+
+  // Context menu methods
+  onTabRightClick(event: MouseEvent, tab: EditorTab, index: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.selectedTabForContext = tab;
+    this.selectedTabIndexForContext = index;
+    this.contextMenuPosition = {
+      x: event.clientX,
+      y: event.clientY
+    };
+    this.showTabContextMenu = true;
+
+    // Close context menu when clicking outside
+    setTimeout(() => {
+      document.addEventListener('click', this.onDocumentClick.bind(this), { once: true });
+    }, 0);
+  }
+
+  private onDocumentClick(): void {
+    this.hideTabContextMenu();
+  }
+
+  hideTabContextMenu(): void {
+    this.showTabContextMenu = false;
+    this.selectedTabForContext = null;
+    this.selectedTabIndexForContext = -1;
+  }
+
+  closeTabFromContext(tabId: string): void {
+    this.closeTab(tabId);
+    this.hideTabContextMenu();
+  }
+
+  closeOtherTabs(keepTabId: string): void {
+    if (this.tabs.length <= 1) {
+      this.hideTabContextMenu();
+      return;
+    }
+
+    // Save the content of the current tab before closing others
+    const currentTab = this.tabs.find(t => t.id === this.activeTabId);
+    if (currentTab && this.editor) {
+      currentTab.content = this.editor.getValue();
+    }
+
+    // Keep only the specified tab
+    this.tabs = this.tabs.filter(tab => tab.id === keepTabId);
+    
+    // Switch to the kept tab if it's not already active
+    if (this.activeTabId !== keepTabId) {
+      this.activeTabId = keepTabId;
+      const newTab = this.tabs.find(t => t.id === keepTabId);
+      if (newTab && this.editor) {
+        this.editor.setValue(newTab.content || '');
+      }
+    }
+
+    this.hideTabContextMenu();
+  }
+
+  closeTabsToRight(fromIndex: number): void {
+    if (fromIndex >= this.tabs.length - 1) {
+      this.hideTabContextMenu();
+      return;
+    }
+
+    // Save current tab content
+    const currentTab = this.tabs.find(t => t.id === this.activeTabId);
+    if (currentTab && this.editor) {
+      currentTab.content = this.editor.getValue();
+    }
+
+    // Remove tabs to the right
+    const tabsToRemove = this.tabs.slice(fromIndex + 1);
+    this.tabs = this.tabs.slice(0, fromIndex + 1);
+
+    // If the active tab was removed, switch to the rightmost remaining tab
+    if (tabsToRemove.some(tab => tab.id === this.activeTabId)) {
+      const newActiveTab = this.tabs[this.tabs.length - 1];
+      this.activeTabId = newActiveTab.id;
+      if (this.editor) {
+        this.editor.setValue(newActiveTab.content || '');
+      }
+    }
+
+    this.hideTabContextMenu();
+  }
+
+  closeTabsToLeft(fromIndex: number): void {
+    if (fromIndex <= 0) {
+      this.hideTabContextMenu();
+      return;
+    }
+
+    // Save current tab content
+    const currentTab = this.tabs.find(t => t.id === this.activeTabId);
+    if (currentTab && this.editor) {
+      currentTab.content = this.editor.getValue();
+    }
+
+    // Remove tabs to the left
+    const tabsToRemove = this.tabs.slice(0, fromIndex);
+    this.tabs = this.tabs.slice(fromIndex);
+
+    // If the active tab was removed, switch to the leftmost remaining tab
+    if (tabsToRemove.some(tab => tab.id === this.activeTabId)) {
+      const newActiveTab = this.tabs[0];
+      this.activeTabId = newActiveTab.id;
+      if (this.editor) {
+        this.editor.setValue(newActiveTab.content || '');
+      }
+    }
+
+    this.hideTabContextMenu();
+  }
+
+  hasTabsToRight(index: number): boolean {
+    return index < this.tabs.length - 1;
+  }
+
+  hasTabsToLeft(index: number): boolean {
+    return index > 0;
   }
 
   private setupThemeObserver(): void {

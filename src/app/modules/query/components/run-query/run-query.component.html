@@ -95,11 +95,12 @@
                 <div class="editor-tabs">
                   <div class="tabs-container">
                     <div
-                      *ngFor="let tab of tabs"
+                      *ngFor="let tab of tabs; let i = index"
                       class="editor-tab"
                       [class.active]="tab.id === activeTabId"
                       (click)="!tab.isEditing && switchTab(tab.id)"
                       (dblclick)="startEditingTab(tab, $event)"
+                      (contextmenu)="onTabRightClick($event, tab, i)"
                     >
                       <ng-container *ngIf="!tab.isEditing">
                         <span class="tab-title" [title]="tab.title">{{
@@ -409,3 +410,51 @@
     </div>
   </div>
 </div>
+
+<!-- Tab Context Menu -->
+<div
+  class="tab-context-menu"
+  *ngIf="showTabContextMenu"
+  [style.left.px]="contextMenuPosition.x"
+  [style.top.px]="contextMenuPosition.y"
+  (click)="$event.stopPropagation()"
+>
+  <div
+    class="context-menu-item"
+    (click)="selectedTabForContext && closeTabFromContext(selectedTabForContext.id)"
+  >
+    <i class="pi pi-times"></i>
+    <span>Close This Tab</span>
+  </div>
+  <div
+    class="context-menu-item"
+    (click)="selectedTabForContext && closeOtherTabs(selectedTabForContext.id)"
+    [class.disabled]="tabs.length <= 1"
+  >
+    <i class="pi pi-minus-circle"></i>
+    <span>Close Others</span>
+  </div>
+  <div
+    class="context-menu-item"
+    (click)="closeTabsToRight(selectedTabIndexForContext)"
+    [class.disabled]="!hasTabsToRight(selectedTabIndexForContext)"
+  >
+    <i class="pi pi-angle-right"></i>
+    <span>Close All to Right</span>
+  </div>
+  <div
+    class="context-menu-item"
+    (click)="closeTabsToLeft(selectedTabIndexForContext)"
+    [class.disabled]="!hasTabsToLeft(selectedTabIndexForContext)"
+  >
+    <i class="pi pi-angle-left"></i>
+    <span>Close All to Left</span>
+  </div>
+</div>
+
+<!-- Backdrop to close context menu -->
+<div
+  class="context-menu-backdrop"
+  *ngIf="showTabContextMenu"
+  (click)="hideTabContextMenu()"
+></div>
