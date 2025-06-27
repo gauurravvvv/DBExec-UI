@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { RunQueryComponent } from './component/run-query/run-query.component';
+import { RunQueryComponent } from './components/run-query/run-query.component';
 
 const routes: Routes = [
   {

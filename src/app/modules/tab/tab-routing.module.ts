@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AddTabComponent } from './component/add-tab/add-tab.component';
-import { EditTabComponent } from './component/edit-tab/edit-tab.component';
-import { ListTabComponent } from './component/list-tab/list-tab.component';
-import { ViewTabComponent } from './component/view-tab/view-tab.component';
+import { AddTabComponent } from './components/add-tab/add-tab.component';
+import { EditTabComponent } from './components/edit-tab/edit-tab.component';
+import { ListTabComponent } from './components/list-tab/list-tab.component';
+import { ViewTabComponent } from './components/view-tab/view-tab.component';
 
 const routes: Routes = [
   {

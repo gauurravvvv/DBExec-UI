@@ -133,3 +133,15 @@ export const SCREEN = {
   SAVE_CONFIGURATION: '/screen/config',
   GET_SCREEN_CONFIGURATION: '/screen/getConfig/',
 };
+
+export const QUERY = {
+  EXECUTE: '/query/execute',
+  SAVE: '/query/save',
+  LIST: '/query/list',
+  DELETE: '/query/delete/',
+  VIEW: '/query/get/',
+  HISTORY: '/query/history',
+  VALIDATE: '/query/validate',
+  EXPLAIN: '/query/explain',
+  EXPORT: '/query/export',
+};

@@ -5,13 +5,13 @@ import {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
 } from '@angular/router';
-import { LoginService } from 'src/app/modules/auth/services/auth.service';
+import { LoginService } from 'src/app/core/services/login.service';
 import { GlobalService } from '../services/global.service';
 import { ROLES } from 'src/app/constants/user.constant';
 import {
   DASHBOARD_ROUTES,
   AUTH_ROUTES,
-} from 'src/app/modules/layout/sidebar/sidebar.constant';
+} from 'src/app/shared/components/layout/sidebar/sidebar.constant';
 
 @Injectable({
   providedIn: 'root',

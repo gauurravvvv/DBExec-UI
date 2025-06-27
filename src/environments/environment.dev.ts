@@ -1,4 +1,4 @@
-import { IEnvironment } from 'src/app/common/interfaces/environment';
+import { IEnvironment } from 'src/app/types/environment.types';
 
 export const environment: IEnvironment = {
   production: false,

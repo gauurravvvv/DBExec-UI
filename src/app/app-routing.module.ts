@@ -3,7 +3,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './modules/auth/components/login/login.component';
 import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
 import { AuthGuard } from './core/guards/auth.guard';
-import { HomeComponent } from './modules/layout/home/home.component';
+import { HomeComponent } from './shared/components/layout/home/home.component';
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 
 const routes: Routes = [
@@ -38,14 +38,14 @@ const routes: Routes = [
       {
         path: 'dashboard',
         loadChildren: () =>
-          import('./modules/dashboard/dashbaord.module').then(
+          import('./modules/dashboard/dashboard.module').then(
             m => m.DashboardModule
           ),
       },
       {
         path: 'super-admin',
         loadChildren: () =>
-          import('./modules/superAdmin/superAdmin.module').then(
+          import('./modules/superAdmin/super-admin.module').then(
             m => m.SuperAdminModule
           ),
       },
@@ -59,7 +59,7 @@ const routes: Routes = [
       {
         path: 'org-admin',
         loadChildren: () =>
-          import('./modules/organisationAdmin/orgAdmin.module').then(
+          import('./modules/organisation-admin/organisation-admin.module').then(
             m => m.OrgAdminModule
           ),
       },

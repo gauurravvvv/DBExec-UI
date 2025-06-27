@@ -112,6 +112,7 @@ export class ConfigureScreenComponent implements OnInit {
   ];
   selectedGroupId: number | null = null;
   activeGroupId: number | null = null;
+  activeGroupSectionId: string | number | null = null;
 
   // Add Object to component to use in template
   protected readonly Object = Object;
@@ -1223,6 +1224,7 @@ export class ConfigureScreenComponent implements OnInit {
       // If this was the active group, deactivate it
       if (this.activeGroupId === groupId) {
         this.activeGroupId = null;
+    this.activeGroupSectionId = null;
       }
     }
   }
@@ -1230,13 +1232,16 @@ export class ConfigureScreenComponent implements OnInit {
   selectGroupForAdding(groupId: number, section: Section) {
     if (!this.isFreeze) return;
 
-    // If clicking the same group or a group from a different section, deactivate
-    if (this.activeGroupId === groupId) {
+    // If clicking the same group in the same section, deactivate
+    if (this.activeGroupId === groupId && this.activeGroupSectionId === section.id) {
       this.activeGroupId = null;
+    this.activeGroupSectionId = null;
+      this.activeGroupSectionId = null;
     } else {
       // Only activate if the group belongs to this section
       if (this.isGroupActiveInSection(section, groupId)) {
         this.activeGroupId = groupId;
+        this.activeGroupSectionId = section.id;
       }
     }
 
@@ -1273,23 +1278,12 @@ export class ConfigureScreenComponent implements OnInit {
     this.selectedPrompts[section.id] = [];
   }
 
-  getPromptGroupStyle(prompt: Prompt, section: Section): any {
-    if (prompt.groupId === undefined || prompt.groupId === null) {
+  getPromptMandatoryStyle(prompt: Prompt): any {
+    if (!prompt.isMandatory) {
       return {};
     }
 
-    // Only show group style if the active group belongs to this section
-    if (
-      this.activeGroupId === prompt.groupId &&
-      !this.isGroupActiveInSection(section, this.activeGroupId)
-    ) {
-      return {};
-    }
-
-    const colorIndex = this.getColorIndexForGroup(prompt.groupId, section);
-    if (colorIndex === null) return {}; // Handle case when no colors are available
-
-    const color = this.groupColors[colorIndex];
+    const color = '#ff4444'; // Red color for mandatory
     return {
       'border-color': color,
       'border-width': '2px',
@@ -1312,7 +1306,7 @@ export class ConfigureScreenComponent implements OnInit {
         const prompt = sectionPrompts[0];
         if (prompt.colorIndex !== undefined) {
           const color = this.groupColors[prompt.colorIndex];
-          const isActive = this.activeGroupId === groupId;
+          const isActive = this.activeGroupId === groupId && this.activeGroupSectionId === section.id;
 
           return {
             'background-color': color,
@@ -1346,6 +1340,53 @@ export class ConfigureScreenComponent implements OnInit {
     }
 
     return {};
+  }
+
+  getPromptGroupStyle(prompt: Prompt, section: Section): any {
+    if (prompt.groupId === undefined || prompt.groupId === null) {
+      return {};
+    }
+
+    const colorIndex = this.getColorIndexForGroup(prompt.groupId, section);
+    if (colorIndex === null) return {};
+
+    const color = this.groupColors[colorIndex];
+    const isActive = this.activeGroupId === prompt.groupId && 
+                     this.activeGroupSectionId === section.id;
+
+    return {
+      'border-color': color,
+      'border-width': '2px',
+      'border-style': 'solid',
+      'box-shadow': `0 0 0 1px ${color}33`,
+      'background-color': `${color}10`,
+      opacity: isActive ? '1' : '0.7',
+    };
+  }
+
+  getPromptGroupDotStyle(prompt: Prompt, section: Section): any {
+    if (prompt.groupId === undefined || prompt.groupId === null) {
+      return { display: 'none' };
+    }
+
+    const colorIndex = this.getColorIndexForGroup(prompt.groupId, section);
+    if (colorIndex === null) return { display: 'none' };
+
+    const color = this.groupColors[colorIndex];
+    const isActive = this.activeGroupId === prompt.groupId && 
+                     this.activeGroupSectionId === section.id;
+
+    return {
+      display: 'block',
+      'background-color': color,
+      opacity: isActive ? '1' : '0.7',
+      animation: isActive
+        ? 'groupDotGlow 1.5s ease-in-out infinite'
+        : 'none',
+      'box-shadow': isActive
+        ? `0 0 8px ${color}, 0 0 16px ${color}66, 0 0 24px ${color}33`
+        : 'none',
+    };
   }
 
   // Helper method to get section-specific color
@@ -1392,6 +1433,7 @@ export class ConfigureScreenComponent implements OnInit {
     });
     this.selectedPrompts = {};
     this.activeGroupId = null;
+    this.activeGroupSectionId = null;
   }
 
   clearSectionGroups(section: Section) {
@@ -1412,6 +1454,7 @@ export class ConfigureScreenComponent implements OnInit {
       );
       if (isGroupInSection) {
         this.activeGroupId = null;
+    this.activeGroupSectionId = null;
       }
     }
   }
@@ -1528,6 +1571,7 @@ export class ConfigureScreenComponent implements OnInit {
 
   toggleMandatory(prompt: Prompt, event: MouseEvent) {
     event.stopPropagation(); // Prevent card click event
+    event.preventDefault(); // Prevent context menu from appearing
 
     // Only allow toggling if screen is frozen
     if (!this.isFreeze) return;
@@ -1547,6 +1591,16 @@ export class ConfigureScreenComponent implements OnInit {
         });
       }
     }
+  }
+
+  onPromptRightClick(event: MouseEvent, prompt: Prompt) {
+    event.preventDefault(); // Prevent context menu
+    event.stopPropagation();
+    
+    // Only allow right-click toggle if screen is frozen
+    if (!this.isFreeze) return;
+    
+    this.toggleMandatory(prompt, event);
   }
 
   // Helper method to find the section containing a prompt

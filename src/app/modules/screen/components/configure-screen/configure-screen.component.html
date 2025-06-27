@@ -204,7 +204,7 @@
                                 $event.stopPropagation();
                                 selectGroupForAdding(+groupId, section)
                               "
-                              [class.active]="activeGroupId === +groupId"
+                              [class.active]="activeGroupId === +groupId && activeGroupSectionId === section.id"
                             ></div>
                             <div
                               class="group-bullet clear-groups"
@@ -261,19 +261,21 @@
                               draggedPromptSectionId === section.id,
                             selected:
                               isPromptSelected(prompt, section) &&
-                              (!activeGroupId ||
+                              (!activeGroupId || activeGroupSectionId !== section.id ||
                                 isGroupActiveInSection(section, activeGroupId)),
                             'group-active':
                               activeGroupId !== null &&
+                              activeGroupSectionId === section.id &&
                               prompt.groupId !== activeGroupId &&
                               isGroupActiveInSection(section, activeGroupId)
                           }"
-                          [ngStyle]="getPromptGroupStyle(prompt, section)"
+                          [ngStyle]="getPromptMandatoryStyle(prompt)"
                           (click)="
                             isFreeze
                               ? handlePromptSelection($event, prompt, section)
                               : togglePrompt(prompt, section)
                           "
+                          (contextmenu)="onPromptRightClick($event, prompt)"
                           [pDraggable]="
                             !isFreeze ? 'promptScope-' + section.id : ''
                           "
@@ -294,10 +296,9 @@
                           "
                         >
                           <div
-                            class="mandatory-indicator"
-                            [class.active]="prompt.isMandatory"
-                            (click)="toggleMandatory(prompt, $event)"
-                            *ngIf="isFreeze"
+                            class="group-dot-indicator"
+                            [ngStyle]="getPromptGroupDotStyle(prompt, section)"
+                            *ngIf="isFreeze && (prompt.groupId !== undefined && prompt.groupId !== null)"
                           ></div>
                           <div class="card-checkbox" *ngIf="!isFreeze">
                             <p-checkbox

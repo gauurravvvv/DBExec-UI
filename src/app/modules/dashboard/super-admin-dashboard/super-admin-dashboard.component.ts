@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { GlobalService } from 'src/app/core/services/global.service';
 // import { OrganisationService } from '../../organisation/organisation.service';
-import { DashboardService } from '../dashbaord.service';
+import { DashboardService } from '../services/dashboard.service';
 
 @Component({
   selector: 'app-super-admin-dashboard',

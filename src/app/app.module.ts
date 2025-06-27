@@ -17,11 +17,10 @@ import { AppPrimeNGModule } from './shared/modules/app-primeng.module';
 import { LoginComponent } from './modules/auth/components/login/login.component';
 import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
 import { HttpRequestInterceptor } from './core/interceptor/HttpRequestInterceptor';
-import { EmptyRootComponent } from './modules/dashboard/empty-root/empty-root.component';
-import { FooterComponent } from './modules/layout/footer/footer.component';
-import { HeaderComponent } from './modules/layout/header/header.component';
-import { HomeComponent } from './modules/layout/home/home.component';
-import { SidebarComponent } from './modules/layout/sidebar/sidebar.component';
+import { FooterComponent } from './shared/components/layout/footer/footer.component';
+import { HeaderComponent } from './shared/components/layout/header/header.component';
+import { HomeComponent } from './shared/components/layout/home/home.component';
+import { SidebarComponent } from './shared/components/layout/sidebar/sidebar.component';
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 
 @NgModule({

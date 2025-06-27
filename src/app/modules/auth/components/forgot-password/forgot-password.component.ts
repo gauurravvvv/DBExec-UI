@@ -3,7 +3,7 @@ import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { LoginService } from '../../services/auth.service';
+import { LoginService } from 'src/app/core/services/login.service';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { AUTH } from 'src/app/constants/routes';
 
