@@ -1,10 +1,10 @@
-<div class="super-admin-wrapper">
+<div class="super-admin-wrapper" [class.fullscreen-mode]="isFullscreen">
   <div class="super-admin-container">
     <!-- Filter Container -->
-    <div class="filter-container">
+    <div class="filter-container" *ngIf="showOrganisationDropdown">
       <div class="dropdowns-wrapper">
         <!-- Organisation Dropdown -->
-        <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+        <div class="dropdown-field">
           <span class="p-float-label">
             <p-dropdown
               [options]="organisations"
@@ -21,25 +21,6 @@
             <label for="org-dropdown">Organisation</label>
           </span>
         </div>
-
-        <!-- Database Dropdown -->
-        <div class="dropdown-field">
-          <span class="p-float-label">
-            <p-dropdown
-              [options]="databases"
-              [(ngModel)]="selectedDatabase"
-              optionLabel="name"
-              [filter]="true"
-              filterBy="name"
-              [style]="{ width: '100%' }"
-              [panelStyle]="{ width: '100%' }"
-              (onChange)="onDBChange($event)"
-              inputId="db-dropdown"
-            >
-            </p-dropdown>
-            <label for="db-dropdown">Database</label>
-          </span>
-        </div>
       </div>
     </div>
 
@@ -48,10 +29,11 @@
       <!-- Main horizontal splitter -->
       <p-splitter
         [style]="{ height: '100%', width: '100%' }"
-        [panelSizes]="[20, 80]"
-        [minSizes]="[15, 80]"
+        [panelSizes]="horizontalSplitterSizes"
+        [minSizes]="[10, 60]"
         layout="horizontal"
         styleClass="main-horizontal-splitter"
+        (onResizeEnd)="onHorizontalSplitterResize($event)"
       >
         <!-- Left Panel - Schema Browser -->
         <ng-template pTemplate>
@@ -67,7 +49,6 @@
               >
                 <ng-template let-node pTemplate="default">
                   <div class="tree-node-content">
-                    <i [class]="getNodeIcon(node)"></i>
                     <span class="node-label">{{ node.label }}</span>
                     <span class="node-type" *ngIf="node.data?.type">{{
                       node.data.type
@@ -84,10 +65,11 @@
           <!-- Vertical splitter for editor and results -->
           <p-splitter
             [style]="{ height: '100%', width: '100%' }"
-            [panelSizes]="[50, 50]"
-            [minSizes]="[30, 20]"
+            [panelSizes]="verticalSplitterSizes"
+            [minSizes]="[30, 15]"
             layout="vertical"
             styleClass="editor-results-splitter"
+            (onResizeEnd)="onVerticalSplitterResize($event)"
           >
             <!-- Top Panel - SQL Editor -->
             <ng-template pTemplate>
@@ -98,13 +80,18 @@
                       *ngFor="let tab of tabs; let i = index"
                       class="editor-tab"
                       [class.active]="tab.id === activeTabId"
+                      [attr.data-tab-id]="tab.id"
+                      [pTooltip]="tab.database?.name"
+                      tooltipPosition="top"
+                      [showDelay]="0"
+                      [hideDelay]="0"
                       (click)="!tab.isEditing && switchTab(tab.id)"
                       (dblclick)="startEditingTab(tab, $event)"
                       (contextmenu)="onTabRightClick($event, tab, i)"
                     >
                       <ng-container *ngIf="!tab.isEditing">
-                        <span class="tab-title" [title]="tab.title">{{
-                          tab.title
+                        <span class="tab-title">{{
+                          getQueryNumberFromTitle(tab.title)
                         }}</span>
                       </ng-container>
                       <ng-container *ngIf="tab.isEditing">
@@ -112,7 +99,7 @@
                           #tabInput
                           type="text"
                           class="tab-title-input"
-                          [value]="tab.title"
+                          [value]="getQueryNumberFromTitle(tab.title)"
                           [attr.data-tab-id]="tab.id"
                           (blur)="finishEditingTab(tab, tabInput.value)"
                           (keydown)="onTabInputKeydown($event, tab, tabInput)"
@@ -133,8 +120,17 @@
                       type="button"
                       icon="pi pi-plus"
                       class="p-button-text p-button-rounded add-btn"
-                      tooltipPosition="bottom"
-                      (click)="addNewTab()"
+                      [disabled]="isMaxScriptsReached"
+                      (click)="toggleDatabaseMenu($event)"
+                      #addBtn
+                    ></button>
+                    <button
+                      pButton
+                      pRipple
+                      type="button"
+                      icon="pi pi-align-left"
+                      class="p-button-text p-button-rounded format-btn"
+                      (click)="formatSQL()"
                     ></button>
                     <button
                       pButton
@@ -143,7 +139,6 @@
                       icon="pi pi-play"
                       class="p-button-text p-button-rounded run-btn"
                       [class.executing]="isExecuting"
-                      tooltipPosition="bottom"
                       (click)="executeQuery()"
                       [disabled]="isExecuting"
                     ></button>
@@ -151,10 +146,33 @@
                       pButton
                       pRipple
                       type="button"
-                      icon="pi pi-times"
-                      class="p-button-text p-button-rounded clear-btn"
-                      tooltipPosition="bottom"
-                      (click)="clearEditor()"
+                      icon="pi pi-save"
+                      class="p-button-text p-button-rounded save-btn"
+                      (click)="toggleSaveMenu($event)"
+                      #saveBtn
+                    ></button>
+                    <button
+                      pButton
+                      pRipple
+                      type="button"
+                      [icon]="getAutoSaveIconClass()"
+                      class="p-button-text p-button-rounded auto-save-btn"
+                      [class.enabled]="isAutoSaveEnabled"
+                      [class.completed]="autoSaveStatus === 'completed'"
+                      (click)="toggleAutoSaveMenu($event)"
+                      #autoSaveBtn
+                    ></button>
+                    <button
+                      pButton
+                      pRipple
+                      type="button"
+                      [icon]="
+                        isFullscreen
+                          ? 'pi pi-window-minimize'
+                          : 'pi pi-window-maximize'
+                      "
+                      class="p-button-text p-button-rounded fullscreen-btn"
+                      (click)="toggleFullscreen()"
                     ></button>
                   </div>
                 </div>
@@ -421,7 +439,9 @@
 >
   <div
     class="context-menu-item"
-    (click)="selectedTabForContext && closeTabFromContext(selectedTabForContext.id)"
+    (click)="
+      selectedTabForContext && closeTabFromContext(selectedTabForContext.id)
+    "
   >
     <i class="pi pi-times"></i>
     <span>Close This Tab</span>
@@ -450,6 +470,15 @@
     <i class="pi pi-angle-left"></i>
     <span>Close All to Left</span>
   </div>
+  <div class="context-menu-separator"></div>
+  <div
+    class="context-menu-item"
+    (click)="closeAllTabs()"
+    [class.disabled]="tabs.length <= 1"
+  >
+    <i class="pi pi-times-circle"></i>
+    <span>Close All Tabs</span>
+  </div>
 </div>
 
 <!-- Backdrop to close context menu -->
@@ -458,3 +487,38 @@
   *ngIf="showTabContextMenu"
   (click)="hideTabContextMenu()"
 ></div>
+
+<!-- Database Menu -->
+<p-menu
+  #databaseMenu
+  [model]="databaseMenuItems"
+  [popup]="true"
+  styleClass="database-menu"
+></p-menu>
+
+<!-- Save Menu -->
+<p-menu
+  #saveMenu
+  [model]="saveMenuItems"
+  [popup]="true"
+  styleClass="database-menu"
+></p-menu>
+
+<!-- Auto Save Menu -->
+<p-menu
+  #autoSaveMenu
+  [model]="autoSaveMenuItems"
+  [popup]="true"
+  styleClass="database-menu"
+></p-menu>
+
+<!-- Duplicate Name Confirmation Dialog -->
+<div class="confirmation-popup" *ngIf="showDuplicateConfirm">
+  <div class="popup-content">
+    <h3>Duplicacy Found</h3>
+    <p>Script name already exists.</p>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDuplicate()">OK</button>
+    </div>
+  </div>
+</div>

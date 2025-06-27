@@ -8,13 +8,19 @@ import {
   DoCheck,
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { TreeNode } from 'primeng/api';
+import { TreeNode, MenuItem } from 'primeng/api';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { Chart } from 'chart.js';
 import { UIChart } from 'primeng/chart';
+import { 
+  ALL_POSTGRES_KEYWORDS, 
+  ALL_POSTGRES_FUNCTIONS, 
+  ALL_POSTGRES_DATA_TYPES, 
+  ALL_POSTGRES_OPERATORS 
+} from '../../constants/postgres-sql.constants';
 
 interface QueryResult {
   id: number;
@@ -33,6 +39,7 @@ interface EditorTab {
   content: string;
   editor?: any;
   isEditing?: boolean;
+  database?: any;
 }
 
 declare var monaco: any;
@@ -49,6 +56,12 @@ export class RunQueryComponent
   monacoEditorElement!: ElementRef;
 
   @ViewChild('chart') chart!: UIChart;
+
+  @ViewChild('databaseMenu') databaseMenu!: any;
+
+  @ViewChild('saveMenu') saveMenu!: any;
+
+  @ViewChild('autoSaveMenu') autoSaveMenu!: any;
 
   // Schema tree data
   schemaTree: TreeNode[] = [];
@@ -69,6 +82,43 @@ export class RunQueryComponent
   contextMenuPosition = { x: 0, y: 0 };
   selectedTabForContext: EditorTab | null = null;
   selectedTabIndexForContext: number = -1;
+
+  // Duplicate name confirmation dialog
+  showDuplicateConfirm: boolean = false;
+  duplicateQueryName: string = '';
+  duplicateDatabaseName: string = '';
+  tabBeingEdited: EditorTab | null = null;
+
+  // Script limit and coloring
+  readonly MAX_SCRIPTS = 10;
+
+  // Auto-save functionality
+  isAutoSaveEnabled: boolean = false;
+  isAutoSaveVisible: boolean = true; // Controls if auto-save button is shown
+  autoSaveStatus: 'idle' | 'saving' | 'saved' | 'error' | 'completed' = 'idle';
+  private autoSaveTimer: any = null;
+  autoSaveInterval: number = 5000; // Default 5 seconds
+  readonly AUTO_SAVE_INTERVALS = [
+    { label: '5 seconds', value: 5000 },
+    { label: '10 seconds', value: 10000 },
+    { label: '15 seconds', value: 15000 }
+  ];
+
+  // Splitter collapse properties
+  isSchemaCollapsed: boolean = false;
+  isResultsCollapsed: boolean = false;
+  horizontalSplitterSizes: number[] = [10, 90]; // Start with schema collapsed
+  verticalSplitterSizes: number[] = [60, 40]; // Start with results panel visible
+
+  // Store previous sizes for proper expand behavior
+  previousHorizontalSizes: number[] = [10, 90];
+  previousVerticalSizes: number[] = [60, 40];
+
+  // Track if splitter has been manually adjusted by user
+  private splitterManuallyAdjusted: boolean = false;
+
+  // Fullscreen mode
+  isFullscreen: boolean = false;
 
   // Results properties
   queryResults: QueryResult[] = [];
@@ -105,6 +155,15 @@ export class RunQueryComponent
   selectedDatabase: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+
+  // Split button menu items for databases
+  databaseMenuItems: MenuItem[] = [];
+
+  // Split button menu items for save actions
+  saveMenuItems: MenuItem[] = [];
+
+  // Split button menu items for auto-save options
+  autoSaveMenuItems: MenuItem[] = [];
 
   // View mode properties
   viewMode: 'table' | 'graph' = 'table';
@@ -207,8 +266,37 @@ export class RunQueryComponent
 
     this.initializeSchemaTree();
     this.loadDummyData();
-    // Create initial tab
-    this.addNewTab();
+    // Initialize database menu items (fallback)
+    this.updateDatabaseMenuItems();
+    // Initialize save menu items
+    this.updateSaveMenuItems();
+    // Initialize auto-save menu items
+    this.updateAutoSaveMenuItems();
+    // Create initial tab only if databases are already loaded
+    if (this.databases.length > 0) {
+      this.addNewTab();
+    }
+
+    // Add ESC key handler for query editor fullscreen
+    this.setupEscapeKeyHandler();
+  }
+
+  private setupEscapeKeyHandler(): void {
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && this.isFullscreen) {
+        // Only exit query editor fullscreen if it's active
+        // Don't interfere with app fullscreen
+        event.stopPropagation();
+        this.isFullscreen = false;
+
+        // Ensure Monaco editor resizes properly
+        if (this.editor) {
+          setTimeout(() => {
+            this.editor.layout();
+          }, 300);
+        }
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -225,6 +313,8 @@ export class RunQueryComponent
         setTimeout(() => {
           this.initializeEditor();
           this.setupThemeObserver();
+          this.setupSplitterDoubleClick();
+          this.setupFullscreenListener();
         }, 100); // Small delay to ensure DOM is ready
       } else if (attempts >= maxAttempts) {
         console.error('Monaco Editor failed to load after 5 seconds');
@@ -410,6 +500,9 @@ export class RunQueryComponent
         if (activeTab) {
           activeTab.content = this.sqlQuery;
         }
+
+        // Trigger auto-save if enabled
+        this.triggerAutoSave();
       });
 
       // Setup autocomplete
@@ -440,67 +533,14 @@ export class RunQueryComponent
 
         const suggestions: any[] = [];
 
-        // Add SQL keywords
-        const keywords = [
-          'SELECT',
-          'FROM',
-          'WHERE',
-          'JOIN',
-          'LEFT JOIN',
-          'RIGHT JOIN',
-          'INNER JOIN',
-          'ON',
-          'GROUP BY',
-          'HAVING',
-          'ORDER BY',
-          'LIMIT',
-          'OFFSET',
-          'UNION',
-          'UNION ALL',
-          'INSERT INTO',
-          'VALUES',
-          'UPDATE',
-          'SET',
-          'DELETE FROM',
-          'CREATE TABLE',
-          'ALTER TABLE',
-          'DROP TABLE',
-          'CREATE INDEX',
-          'DROP INDEX',
-          'AS',
-          'AND',
-          'OR',
-          'NOT',
-          'IN',
-          'EXISTS',
-          'BETWEEN',
-          'LIKE',
-          'IS NULL',
-          'IS NOT NULL',
-          'DISTINCT',
-          'COUNT',
-          'SUM',
-          'AVG',
-          'MAX',
-          'MIN',
-          'CASE',
-          'WHEN',
-          'THEN',
-          'ELSE',
-          'END',
-          'CAST',
-          'CONVERT',
-          'COALESCE',
-          'NULLIF',
-        ];
-
-        keywords.forEach(keyword => {
+        // Add PostgreSQL keywords
+        ALL_POSTGRES_KEYWORDS.forEach((keyword: string) => {
           suggestions.push({
             label: keyword,
             kind: monaco.languages.CompletionItemKind.Keyword,
             insertText: keyword,
             range: range,
-            detail: 'SQL Keyword',
+            detail: 'PostgreSQL Keyword',
           });
         });
 
@@ -530,33 +570,27 @@ export class RunQueryComponent
           });
         });
 
-        // Add common functions
-        const functions = [
-          'COUNT(*)',
-          'SUM()',
-          'AVG()',
-          'MAX()',
-          'MIN()',
-          'CONCAT()',
-          'LENGTH()',
-          'SUBSTRING()',
-          'UPPER()',
-          'LOWER()',
-          'TRIM()',
-          'DATE()',
-          'NOW()',
-          'CURRENT_DATE',
-          'CURRENT_TIME',
-          'CURRENT_TIMESTAMP',
-        ];
-
-        functions.forEach(func => {
+        // Add PostgreSQL functions
+        ALL_POSTGRES_FUNCTIONS.forEach((func: string) => {
+          // Add parentheses for functions that aren't already literals
+          const insertText = func.includes('(') ? func : `${func}()`;
           suggestions.push({
             label: func,
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: func,
+            insertText: insertText,
             range: range,
-            detail: 'SQL Function',
+            detail: 'PostgreSQL Function',
+          });
+        });
+
+        // Add PostgreSQL data types
+        ALL_POSTGRES_DATA_TYPES.forEach((dataType: string) => {
+          suggestions.push({
+            label: dataType,
+            kind: monaco.languages.CompletionItemKind.TypeParameter,
+            insertText: dataType,
+            range: range,
+            detail: 'PostgreSQL Data Type',
           });
         });
 
@@ -761,6 +795,13 @@ LIMIT 10;`;
 
       this.executionTime = Date.now() - startTime;
       this.isExecuting = false;
+      
+      // Fix layout after results load - defer to avoid splitter interference
+      setTimeout(() => {
+        if (this.editor) {
+          this.editor.layout();
+        }
+      }, 300);
     }, 1500);
   }
 
@@ -833,13 +874,29 @@ LIMIT 10;`;
     return date.toISOString().split('T')[0];
   }
 
+  // Check if maximum scripts limit is reached
+  get isMaxScriptsReached(): boolean {
+    return this.tabs.length >= this.MAX_SCRIPTS;
+  }
+
   // Tab management methods
-  addNewTab(): void {
+  addNewTab(database?: any): void {
+    // Don't create new tab if maximum limit is reached
+    if (this.isMaxScriptsReached) {
+      return;
+    }
+
     const tabId = `tab-${this.tabCounter}`;
+    // Use the first database from the databases array if no database is specified
+    const targetDatabase =
+      database ||
+      (this.databases.length > 0 ? this.databases[0] : this.selectedDatabase);
+    const dbName = targetDatabase?.name || 'Default';
     const newTab: EditorTab = {
       id: tabId,
-      title: `Query ${this.tabCounter}`,
+      title: `${dbName} - Query ${this.tabCounter}`,
       content: '',
+      database: targetDatabase,
     };
 
     this.tabs.push(newTab);
@@ -850,6 +907,49 @@ LIMIT 10;`;
     if (this.editor) {
       this.editor.setValue('');
     }
+
+    // Auto-scroll to the newly created tab
+    this.scrollToNewTab(tabId);
+  }
+
+  private scrollToNewTab(tabId: string): void {
+    // Use setTimeout to ensure the DOM is updated with the new tab
+    setTimeout(() => {
+      const tabsContainer = document.querySelector('.tabs-container');
+      const newTabElement = document.querySelector(`[data-tab-id="${tabId}"]`);
+
+      if (tabsContainer && newTabElement) {
+        // Get the new tab's position
+        const newTabOffsetLeft = (newTabElement as HTMLElement).offsetLeft;
+        const newTabWidth = (newTabElement as HTMLElement).offsetWidth;
+        const containerWidth = tabsContainer.clientWidth;
+        const currentScrollLeft = tabsContainer.scrollLeft;
+
+        // Check if the new tab is visible in the current view
+        const tabStartPos = newTabOffsetLeft;
+        const tabEndPos = newTabOffsetLeft + newTabWidth;
+        const viewStartPos = currentScrollLeft;
+        const viewEndPos = currentScrollLeft + containerWidth;
+
+        // If the tab is not fully visible, scroll to show it
+        if (tabEndPos > viewEndPos) {
+          // Tab is cut off on the right, scroll right to show it
+          const targetScrollLeft = tabEndPos - containerWidth + 20; // 20px padding
+          tabsContainer.scrollTo({
+            left: targetScrollLeft,
+            behavior: 'smooth',
+          });
+        } else if (tabStartPos < viewStartPos) {
+          // Tab is cut off on the left, scroll left to show it
+          const targetScrollLeft = tabStartPos - 20; // 20px padding
+          tabsContainer.scrollTo({
+            left: Math.max(0, targetScrollLeft),
+            behavior: 'smooth',
+          });
+        }
+        // If tab is already fully visible, no scrolling needed
+      }
+    }, 150); // Slightly longer delay to ensure DOM update
   }
 
   switchTab(tabId: string): void {
@@ -913,11 +1013,46 @@ LIMIT 10;`;
     }, 0);
   }
 
-  finishEditingTab(tab: EditorTab, newTitle: string): void {
-    if (newTitle.trim()) {
-      tab.title = newTitle.trim();
+  finishEditingTab(tab: EditorTab, newQueryNumber: string): void {
+    const trimmedQueryNumber = newQueryNumber.trim();
+    if (trimmedQueryNumber) {
+      const dbName = tab.database?.name || 'Default';
+      const proposedTitle = `${dbName} - ${trimmedQueryNumber}`;
+
+      // Check for duplicates (excluding the current tab)
+      const isDuplicate = this.tabs.some(
+        t => t.id !== tab.id && t.title === proposedTitle
+      );
+
+      if (isDuplicate) {
+        // Show custom confirmation dialog
+        this.duplicateQueryName = trimmedQueryNumber;
+        this.duplicateDatabaseName = dbName;
+        this.tabBeingEdited = tab;
+        this.showDuplicateConfirm = true;
+        // Don't exit editing mode yet
+        return;
+      } else {
+        tab.title = proposedTitle;
+      }
     }
     tab.isEditing = false;
+  }
+
+  cancelDuplicate(): void {
+    this.showDuplicateConfirm = false;
+    this.duplicateQueryName = '';
+    this.duplicateDatabaseName = '';
+    if (this.tabBeingEdited) {
+      this.tabBeingEdited.isEditing = false;
+      this.tabBeingEdited = null;
+    }
+  }
+
+  getQueryNumberFromTitle(title: string): string {
+    // Extract the query number/name part after " - "
+    const parts = title.split(' - ');
+    return parts.length > 1 ? parts.slice(1).join(' - ') : title;
   }
 
   cancelEditingTab(tab: EditorTab): void {
@@ -934,7 +1069,7 @@ LIMIT 10;`;
       this.finishEditingTab(tab, inputElement.value);
     } else if (event.key === 'Escape') {
       event.preventDefault();
-      inputElement.value = tab.title;
+      inputElement.value = this.getQueryNumberFromTitle(tab.title);
       this.cancelEditingTab(tab);
     }
   }
@@ -943,18 +1078,20 @@ LIMIT 10;`;
   onTabRightClick(event: MouseEvent, tab: EditorTab, index: number): void {
     event.preventDefault();
     event.stopPropagation();
-    
+
     this.selectedTabForContext = tab;
     this.selectedTabIndexForContext = index;
     this.contextMenuPosition = {
       x: event.clientX,
-      y: event.clientY
+      y: event.clientY,
     };
     this.showTabContextMenu = true;
 
     // Close context menu when clicking outside
     setTimeout(() => {
-      document.addEventListener('click', this.onDocumentClick.bind(this), { once: true });
+      document.addEventListener('click', this.onDocumentClick.bind(this), {
+        once: true,
+      });
     }, 0);
   }
 
@@ -987,7 +1124,7 @@ LIMIT 10;`;
 
     // Keep only the specified tab
     this.tabs = this.tabs.filter(tab => tab.id === keepTabId);
-    
+
     // Switch to the kept tab if it's not already active
     if (this.activeTabId !== keepTabId) {
       this.activeTabId = keepTabId;
@@ -1064,6 +1201,229 @@ LIMIT 10;`;
     return index > 0;
   }
 
+  closeAllTabs(): void {
+    // Keep only one tab (create a new one if needed)
+    if (this.tabs.length <= 1) {
+      this.hideTabContextMenu();
+      return;
+    }
+
+    // Save current tab content before closing all
+    const currentTab = this.tabs.find(t => t.id === this.activeTabId);
+    if (currentTab && this.editor) {
+      currentTab.content = this.editor.getValue();
+    }
+
+    // Keep only the first tab and clear its content
+    const firstTab = this.tabs[0];
+    this.tabs = [firstTab];
+    this.activeTabId = firstTab.id;
+
+    // Clear the content of the remaining tab
+    firstTab.content = '';
+    const dbName =
+      firstTab.database?.name || this.selectedDatabase?.name || 'Default';
+    firstTab.title = `${dbName} - Query 1`;
+
+    // Clear the editor
+    if (this.editor) {
+      this.editor.setValue('');
+    }
+
+    // Reset counter
+    this.tabCounter = 2;
+
+    this.hideTabContextMenu();
+  }
+
+  // Database menu toggle method
+  toggleDatabaseMenu(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    console.log('Toggle menu clicked, menu items:', this.databaseMenuItems);
+    if (this.databaseMenu) {
+      this.databaseMenu.toggle(event);
+    } else {
+      console.error('Database menu not initialized');
+    }
+  }
+
+  // Splitter collapse methods with max/min expansion
+  toggleSchemaPanel(): void {
+    const currentSchemaSize = this.horizontalSplitterSizes[0];
+
+    if (currentSchemaSize <= 12) {
+      // Panel is collapsed, expand to maximum allowed (40%)
+      this.horizontalSplitterSizes = [40, 60];
+      this.isSchemaCollapsed = false;
+    } else if (currentSchemaSize >= 35) {
+      // Panel is at or near maximum, collapse to a more visible minimum (10%)
+      this.horizontalSplitterSizes = [10, 90];
+      this.isSchemaCollapsed = false; // Keep false as it's still visible
+    } else {
+      // Panel is in between, expand to maximum
+      this.horizontalSplitterSizes = [40, 60];
+      this.isSchemaCollapsed = false;
+    }
+
+    // Update previous sizes for resize events
+    this.previousHorizontalSizes = [...this.horizontalSplitterSizes];
+  }
+
+  toggleResultsPanel(): void {
+    const currentResultsSize = this.verticalSplitterSizes[1];
+
+    if (currentResultsSize <= 10) {
+      // Panel is collapsed, expand to maximum allowed (70%)
+      this.verticalSplitterSizes = [30, 70];
+      this.isResultsCollapsed = false;
+    } else if (currentResultsSize >= 60) {
+      // Panel is at or near maximum, collapse to a more visible minimum (15%)
+      this.verticalSplitterSizes = [85, 15];
+      this.isResultsCollapsed = false; // Keep false as it's still visible
+    } else {
+      // Panel is in between, expand to maximum
+      this.verticalSplitterSizes = [30, 70];
+      this.isResultsCollapsed = false;
+    }
+
+    // Update previous sizes for resize events
+    this.previousVerticalSizes = [...this.verticalSplitterSizes];
+  }
+
+  // Splitter resize event handlers
+  onHorizontalSplitterResize(event: any): void {
+    let leftSize = event.sizes[0];
+    let rightSize = event.sizes[1];
+
+    // Mark splitter as manually adjusted
+    this.splitterManuallyAdjusted = true;
+
+    // Enforce absolute maximum 40% for schema panel
+    if (leftSize > 40) {
+      leftSize = 40;
+      rightSize = 60;
+      this.horizontalSplitterSizes = [leftSize, rightSize];
+      return;
+    }
+
+    // Enforce absolute minimum 10% for schema panel (no complete hiding)
+    if (leftSize < 10) {
+      leftSize = 10;
+      rightSize = 90;
+      this.horizontalSplitterSizes = [leftSize, rightSize];
+      return;
+    }
+
+    // Enforce minimum 60% for main content area
+    if (rightSize < 60) {
+      leftSize = 40;
+      rightSize = 60;
+      this.horizontalSplitterSizes = [leftSize, rightSize];
+      return;
+    }
+
+    // Update the sizes when user manually resizes
+    this.horizontalSplitterSizes = event.sizes;
+    this.previousHorizontalSizes = [...event.sizes];
+
+    // Update collapsed state based on size
+    this.isSchemaCollapsed = event.sizes[0] <= 10;
+  }
+
+  onVerticalSplitterResize(event: any): void {
+    let topSize = event.sizes[0];
+    let bottomSize = event.sizes[1];
+
+    // Enforce absolute minimum 30% for editor panel
+    if (topSize < 30) {
+      topSize = 30;
+      bottomSize = 70;
+      this.verticalSplitterSizes = [topSize, bottomSize];
+      return;
+    }
+
+    // Enforce absolute maximum 85% for editor panel
+    if (topSize > 85) {
+      topSize = 85;
+      bottomSize = 15;
+      this.verticalSplitterSizes = [topSize, bottomSize];
+      return;
+    }
+
+    // Enforce absolute minimum 15% for results panel (no complete hiding)
+    if (bottomSize < 15) {
+      topSize = 85;
+      bottomSize = 15;
+      this.verticalSplitterSizes = [topSize, bottomSize];
+      return;
+    }
+
+    // Update the sizes when user manually resizes
+    this.verticalSplitterSizes = event.sizes;
+    this.previousVerticalSizes = [...event.sizes];
+
+    // Update collapsed state based on size
+    this.isResultsCollapsed = event.sizes[1] <= 15;
+  }
+
+  // Setup double-click listeners on splitter gutters
+  setupSplitterDoubleClick(): void {
+    setTimeout(() => {
+      // Horizontal splitter gutter
+      const horizontalGutter = document.querySelector(
+        '.main-horizontal-splitter .p-splitter-gutter'
+      );
+      if (horizontalGutter) {
+        horizontalGutter.addEventListener('dblclick', () => {
+          this.toggleSchemaPanel();
+        });
+
+        // Add visual indicator
+        horizontalGutter.setAttribute(
+          'title',
+          'Double-click to collapse/expand schema panel'
+        );
+      }
+
+      // Vertical splitter gutter
+      const verticalGutter = document.querySelector(
+        '.editor-results-splitter .p-splitter-gutter'
+      );
+      if (verticalGutter) {
+        verticalGutter.addEventListener('dblclick', () => {
+          this.toggleResultsPanel();
+        });
+
+        // Add visual indicator
+        verticalGutter.setAttribute(
+          'title',
+          'Double-click to collapse/expand results panel'
+        );
+      }
+    }, 200); // Wait for PrimeNG to render the gutters
+  }
+
+  // Fullscreen toggle method - Only for query editor area
+  toggleFullscreen(): void {
+    this.isFullscreen = !this.isFullscreen;
+
+    // Just toggle the CSS class, don't use native fullscreen API
+    // This allows the header's fullscreen to work independently
+
+    // If in fullscreen mode, ensure Monaco editor resizes properly
+    if (this.editor) {
+      setTimeout(() => {
+        this.editor.layout();
+      }, 300); // Wait for CSS transition
+    }
+  }
+
+  private setupFullscreenListener(): void {
+    // Empty method kept for compatibility
+    // We're not using native fullscreen API anymore
+  }
+
   private setupThemeObserver(): void {
     this.themeObserver = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
@@ -1129,9 +1489,230 @@ LIMIT 10;`;
         this.databases = [...response.data];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0];
+          // Create initial tab with first database from dropdown
+          if (this.tabs.length === 0) {
+            this.addNewTab();
+          }
         }
+        this.updateDatabaseMenuItems();
       }
     });
+  }
+
+  updateDatabaseMenuItems(): void {
+    console.log('Updating database menu items, databases:', this.databases);
+    if (this.databases && this.databases.length > 0) {
+      this.databaseMenuItems = this.databases.map(database => ({
+        label: database.name,
+        icon: 'pi pi-database',
+        command: () => {
+          console.log('Database selected:', database);
+          this.addNewTab(database);
+        },
+      }));
+    } else {
+      // Fallback when no databases are available
+      this.databaseMenuItems = [
+        {
+          label: 'No databases available',
+          icon: 'pi pi-info-circle',
+          disabled: true,
+        },
+        {
+          label: 'Test Database 1',
+          icon: 'pi pi-database',
+          command: () => {
+            console.log('Test database 1 selected');
+            this.addNewTab({ name: 'Test Database 1', id: 'test1' });
+          },
+        },
+        {
+          label: 'Test Database 2',
+          icon: 'pi pi-database',
+          command: () => {
+            console.log('Test database 2 selected');
+            this.addNewTab({ name: 'Test Database 2', id: 'test2' });
+          },
+        },
+      ];
+    }
+    console.log('Final menu items:', this.databaseMenuItems);
+  }
+
+  updateSaveMenuItems(): void {
+    this.saveMenuItems = [
+      {
+        label: 'Save Current Script',
+        icon: 'pi pi-save',
+        command: () => {
+          this.saveCurrentScript();
+        },
+      },
+      {
+        label: 'Save All Scripts',
+        icon: 'pi pi-save',
+        command: () => {
+          this.saveAllScripts();
+        },
+      }
+    ];
+
+    console.log('Save menu items updated:', this.saveMenuItems);
+  }
+
+  toggleSaveMenu(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    console.log('Save menu toggle clicked, menu items:', this.saveMenuItems);
+    if (this.saveMenu) {
+      this.saveMenu.toggle(event);
+    } else {
+      console.error('Save menu not initialized');
+    }
+  }
+
+  updateAutoSaveMenuItems(): void {
+    this.autoSaveMenuItems = [
+      ...this.AUTO_SAVE_INTERVALS.map(interval => ({
+        label: interval.label,
+        icon: this.autoSaveInterval === interval.value ? 'pi pi-check' : 'pi pi-circle',
+        command: () => {
+          this.setAutoSaveInterval(interval.value);
+        },
+      })),
+      {
+        separator: true
+      },
+      {
+        label: this.isAutoSaveEnabled ? 'Disable Auto-Save' : 'Enable Auto-Save',
+        icon: this.isAutoSaveEnabled ? 'pi pi-pause' : 'pi pi-play',
+        command: () => {
+          this.toggleAutoSave();
+          this.updateAutoSaveMenuItems(); // Refresh menu items
+        },
+      }
+    ];
+  }
+
+  toggleAutoSaveMenu(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.updateAutoSaveMenuItems(); // Refresh menu before showing
+    if (this.autoSaveMenu) {
+      this.autoSaveMenu.toggle(event);
+    } else {
+      console.error('Auto-save menu not initialized');
+    }
+  }
+
+  setAutoSaveInterval(interval: number): void {
+    this.autoSaveInterval = interval;
+    
+    // Enable auto-save and start with the new interval
+    this.isAutoSaveEnabled = true;
+    this.stopAutoSave();
+    this.startAutoSave();
+    
+    // Update menu items to reflect the change
+    this.updateAutoSaveMenuItems();
+    console.log(`Auto-save enabled with ${interval}ms interval`);
+  }
+
+  getAutoSaveTooltip(): string {
+    if (this.isAutoSaveEnabled) {
+      const seconds = this.autoSaveInterval / 1000;
+      return `Auto-save enabled (${seconds}s)`;
+    }
+    return 'Auto-save disabled - Click to configure';
+  }
+
+  getAutoSaveIconClass(): string {
+    switch (this.autoSaveStatus) {
+      case 'saving':
+        return 'pi pi-spin pi-spinner';
+      case 'saved':
+      case 'completed':
+        return 'pi pi-check';
+      case 'error':
+        return 'pi pi-times';
+      default:
+        return 'pi pi-clock';
+    }
+  }
+
+  hideAutoSaveButton(): void {
+    this.isAutoSaveVisible = false;
+    // Disable auto-save when hiding the button
+    if (this.isAutoSaveEnabled) {
+      this.toggleAutoSave();
+    }
+    // Update save menu to show the restore option
+    this.updateSaveMenuItems();
+    console.log('Auto-save button hidden');
+  }
+
+  showAutoSaveButton(): void {
+    this.isAutoSaveVisible = true;
+    // Update save menu to remove the restore option
+    this.updateSaveMenuItems();
+    console.log('Auto-save button shown');
+  }
+
+  saveCurrentScript(): void {
+    console.log('Saving current script...');
+    const activeTab = this.tabs.find(tab => tab.id === this.activeTabId);
+    if (activeTab) {
+      // Get the current query content from the editor
+      const currentQuery = this.editor ? this.editor.getValue() : this.sqlQuery;
+      
+      // Update the tab's content
+      activeTab.content = currentQuery;
+      
+      // Here you would typically save to backend/local storage
+      console.log(`Saved script: ${activeTab.title}`, {
+        tabId: activeTab.id,
+        title: activeTab.title,
+        content: currentQuery,
+        database: activeTab.database
+      });
+      
+      // Show success feedback (you could add a toast notification here)
+      alert(`Script "${activeTab.title}" saved successfully!`);
+    } else {
+      console.error('No active tab found');
+      alert('No active script to save');
+    }
+  }
+
+  saveAllScripts(): void {
+    console.log('Saving all scripts...');
+    if (this.tabs.length === 0) {
+      alert('No scripts to save');
+      return;
+    }
+
+    // Get current content from editor for active tab
+    const currentQuery = this.editor ? this.editor.getValue() : this.sqlQuery;
+    
+    // Update active tab content
+    const activeTab = this.tabs.find(tab => tab.id === this.activeTabId);
+    if (activeTab) {
+      activeTab.content = currentQuery;
+    }
+
+    // Save all tabs
+    const savedScripts = this.tabs.map(tab => ({
+      tabId: tab.id,
+      title: tab.title,
+      content: tab.content,
+      database: tab.database
+    }));
+
+    // Here you would typically save all to backend/local storage
+    console.log('Saved all scripts:', savedScripts);
+    
+    // Show success feedback
+    alert(`All ${this.tabs.length} scripts saved successfully!`);
   }
 
   get numericColumns(): string[] {
@@ -1314,7 +1895,10 @@ LIMIT 10;`;
 
   // Watch for changes in selected axes and chart type
   ngDoCheck() {
-    this.updateChartData();
+    // Only update chart data if query results have actually changed
+    if (this.queryResults.length > 0 && this.viewMode === 'graph') {
+      this.updateChartData();
+    }
   }
 
   // Update chart when query results change
@@ -1375,5 +1959,162 @@ LIMIT 10;`;
     this.selectedYAxis = formValues.yAxis;
     this.selectedChartType = formValues.chartType;
     this.updateChartData();
+  }
+
+  // Format SQL method
+  formatSQL(): void {
+    if (!this.editor) return;
+
+    const currentSQL = this.editor.getValue();
+    if (!currentSQL.trim()) return;
+
+    try {
+      const formattedSQL = this.formatSQLString(currentSQL);
+      this.editor.setValue(formattedSQL);
+      this.editor.getAction('editor.action.formatDocument').run();
+    } catch (error) {
+      console.error('Error formatting SQL:', error);
+    }
+  }
+
+  private formatSQLString(sql: string): string {
+    // Remove extra whitespace and normalize
+    let formatted = sql.replace(/\s+/g, ' ').trim();
+
+    // Add line breaks before major SQL keywords
+    const keywords = [
+      'SELECT',
+      'FROM',
+      'WHERE',
+      'GROUP BY',
+      'HAVING',
+      'ORDER BY',
+      'INSERT INTO',
+      'UPDATE',
+      'DELETE FROM',
+      'CREATE TABLE',
+      'ALTER TABLE',
+      'DROP TABLE',
+      'JOIN',
+      'LEFT JOIN',
+      'RIGHT JOIN',
+      'INNER JOIN',
+      'OUTER JOIN',
+      'UNION',
+      'INTERSECT',
+      'EXCEPT',
+    ];
+
+    keywords.forEach(keyword => {
+      const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+      formatted = formatted.replace(regex, `\n${keyword}`);
+    });
+
+    // Handle subqueries and parentheses
+    formatted = formatted.replace(/\(\s*SELECT/gi, '(\n    SELECT');
+    formatted = formatted.replace(/\)\s*([,;])/gi, '\n)$1');
+
+    // Add proper indentation
+    const lines = formatted.split('\n');
+    let indentLevel = 0;
+    const indentSize = '    ';
+
+    const formattedLines = lines.map(line => {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) return '';
+
+      // Decrease indent for closing parentheses
+      if (trimmedLine.startsWith(')')) {
+        indentLevel = Math.max(0, indentLevel - 1);
+      }
+
+      const indentedLine = indentSize.repeat(indentLevel) + trimmedLine;
+
+      // Increase indent for opening parentheses and subqueries
+      if (trimmedLine.includes('(') && !trimmedLine.includes(')')) {
+        indentLevel++;
+      }
+
+      return indentedLine;
+    });
+
+    // Clean up and return
+    return formattedLines.join('\n').replace(/^\s*\n/gm, '');
+  }
+
+  // Auto-save methods
+  toggleAutoSave(): void {
+    this.isAutoSaveEnabled = !this.isAutoSaveEnabled;
+    if (this.isAutoSaveEnabled) {
+      this.startAutoSave();
+    } else {
+      this.stopAutoSave();
+      this.autoSaveStatus = 'idle';
+    }
+  }
+
+  private startAutoSave(): void {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+    }
+    
+    this.autoSaveTimer = setTimeout(() => {
+      this.performAutoSave();
+    }, this.autoSaveInterval);
+  }
+
+  private stopAutoSave(): void {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
+  }
+
+  private performAutoSave(): void {
+    if (!this.isAutoSaveEnabled) return;
+
+    this.autoSaveStatus = 'saving';
+    
+    // Simulate save operation
+    setTimeout(() => {
+      try {
+        // Here you would implement actual save logic
+        // For now, just simulate success
+        this.autoSaveStatus = 'saved';
+        
+        // Show 'completed' status with animation after save
+        setTimeout(() => {
+          if (this.autoSaveStatus === 'saved') {
+            this.autoSaveStatus = 'completed';
+            
+            // Brief animation period for completed status
+            setTimeout(() => {
+              if (this.autoSaveStatus === 'completed') {
+                this.autoSaveStatus = 'idle';
+              }
+            }, 1500); // Show completed status for 1.5 seconds with animation
+          }
+        }, 1000); // Show saved status for 1 second before transitioning to completed
+        
+        // Schedule next auto-save
+        if (this.isAutoSaveEnabled) {
+          this.startAutoSave();
+        }
+      } catch (error) {
+        this.autoSaveStatus = 'error';
+        setTimeout(() => {
+          if (this.autoSaveStatus === 'error') {
+            this.autoSaveStatus = 'idle';
+          }
+        }, 3000);
+      }
+    }, 1000); // Simulate save delay
+  }
+
+  private triggerAutoSave(): void {
+    if (this.isAutoSaveEnabled) {
+      this.stopAutoSave();
+      this.startAutoSave();
+    }
   }
 }

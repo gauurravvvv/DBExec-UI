@@ -1,0 +1,308 @@
+// PostgreSQL SQL Keywords, Functions, and Data Types Constants
+
+export const POSTGRES_KEYWORDS = [
+  // Basic SQL Keywords
+  'SELECT', 'FROM', 'WHERE', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'OUTER JOIN',
+  'FULL JOIN', 'CROSS JOIN', 'ON', 'USING', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET',
+  'UNION', 'UNION ALL', 'INTERSECT', 'EXCEPT', 'WITH', 'RECURSIVE',
+  
+  // Data Manipulation
+  'INSERT', 'INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE', 'TRUNCATE', 'MERGE', 'UPSERT',
+  
+  // Data Definition
+  'CREATE', 'ALTER', 'DROP', 'TABLE', 'INDEX', 'VIEW', 'MATERIALIZED VIEW', 'SEQUENCE',
+  'DATABASE', 'SCHEMA', 'FUNCTION', 'PROCEDURE', 'TRIGGER', 'DOMAIN', 'TYPE', 'EXTENSION',
+  'TABLESPACE', 'ROLE', 'USER', 'POLICY', 'RULE',
+  
+  // Constraints
+  'PRIMARY KEY', 'FOREIGN KEY', 'UNIQUE', 'CHECK', 'NOT NULL', 'DEFAULT', 'REFERENCES',
+  'CONSTRAINT', 'DEFERRABLE', 'INITIALLY DEFERRED', 'INITIALLY IMMEDIATE',
+  
+  // Logical Operators
+  'AND', 'OR', 'NOT', 'IN', 'NOT IN', 'EXISTS', 'NOT EXISTS', 'BETWEEN', 'NOT BETWEEN',
+  'LIKE', 'ILIKE', 'NOT LIKE', 'NOT ILIKE', 'SIMILAR TO', 'NOT SIMILAR TO',
+  'IS', 'IS NOT', 'IS NULL', 'IS NOT NULL', 'IS TRUE', 'IS FALSE', 'IS UNKNOWN',
+  
+  // Comparison Operators
+  'ALL', 'ANY', 'SOME',
+  
+  // Data Types and Modifiers
+  'AS', 'CAST', 'COLLATE', 'DISTINCT', 'DISTINCT ON', 'ONLY',
+  
+  // Transaction Control
+  'BEGIN', 'COMMIT', 'ROLLBACK', 'SAVEPOINT', 'RELEASE', 'START TRANSACTION',
+  'ISOLATION LEVEL', 'READ COMMITTED', 'REPEATABLE READ', 'SERIALIZABLE',
+  'READ WRITE', 'READ ONLY', 'DEFERRABLE', 'NOT DEFERRABLE',
+  
+  // Window Functions
+  'OVER', 'PARTITION BY', 'ROWS', 'RANGE', 'UNBOUNDED', 'PRECEDING', 'FOLLOWING',
+  'CURRENT ROW', 'WINDOW',
+  
+  // Common Table Expressions
+  'WITH RECURSIVE', 'SEARCH', 'CYCLE',
+  
+  // Conditional
+  'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'NULLIF', 'COALESCE',
+  
+  // Set Operations
+  'EXCEPT ALL', 'INTERSECT ALL',
+  
+  // Admin and Utility
+  'ANALYZE', 'VACUUM', 'REINDEX', 'CLUSTER', 'EXPLAIN', 'COPY', 'LISTEN', 'NOTIFY',
+  'LOCK', 'UNLISTEN', 'LOAD', 'RESET', 'SET', 'SHOW', 'PREPARE', 'EXECUTE', 'DEALLOCATE',
+  
+  // Security
+  'GRANT', 'REVOKE', 'SECURITY DEFINER', 'SECURITY INVOKER',
+  
+  // Inheritance and Partitioning
+  'INHERITS', 'PARTITION BY', 'PARTITION OF', 'FOR VALUES',
+  
+  // JSON/JSONB
+  'JSON', 'JSONB', 'JSON_EXTRACT_PATH', 'JSON_EXTRACT_PATH_TEXT'
+];
+
+export const POSTGRES_FUNCTIONS = [
+  // Aggregate Functions
+  'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'STDDEV', 'VARIANCE', 'STDDEV_POP', 'STDDEV_SAMP',
+  'VAR_POP', 'VAR_SAMP', 'CORR', 'COVAR_POP', 'COVAR_SAMP', 'REGR_SLOPE', 'REGR_INTERCEPT',
+  'ARRAY_AGG', 'STRING_AGG', 'XMLAGG', 'JSON_AGG', 'JSONB_AGG', 'JSON_OBJECT_AGG', 'JSONB_OBJECT_AGG',
+  'BIT_AND', 'BIT_OR', 'BOOL_AND', 'BOOL_OR', 'EVERY',
+  
+  // Window Functions
+  'ROW_NUMBER', 'RANK', 'DENSE_RANK', 'PERCENT_RANK', 'CUME_DIST', 'NTILE',
+  'LAG', 'LEAD', 'FIRST_VALUE', 'LAST_VALUE', 'NTH_VALUE',
+  
+  // String Functions
+  'CONCAT', 'CONCAT_WS', 'LENGTH', 'CHAR_LENGTH', 'CHARACTER_LENGTH', 'OCTET_LENGTH',
+  'UPPER', 'LOWER', 'INITCAP', 'TRIM', 'LTRIM', 'RTRIM', 'BTRIM',
+  'SUBSTRING', 'SUBSTR', 'POSITION', 'STRPOS', 'OVERLAY', 'SPLIT_PART',
+  'REGEXP_REPLACE', 'REGEXP_SPLIT_TO_TABLE', 'REGEXP_SPLIT_TO_ARRAY', 'REGEXP_MATCHES',
+  'LEFT', 'RIGHT', 'REVERSE', 'REPEAT', 'REPLACE', 'TRANSLATE',
+  'LPAD', 'RPAD', 'MD5', 'SHA224', 'SHA256', 'SHA384', 'SHA512',
+  'ENCODE', 'DECODE', 'FORMAT', 'QUOTE_IDENT', 'QUOTE_LITERAL', 'QUOTE_NULLABLE',
+  
+  // Numeric Functions
+  'ABS', 'CEIL', 'CEILING', 'FLOOR', 'ROUND', 'TRUNC', 'SIGN', 'SQRT', 'CBRT',
+  'EXP', 'LN', 'LOG', 'LOG10', 'POWER', 'MOD', 'DIV', 'FACTORIAL',
+  'SIN', 'COS', 'TAN', 'ASIN', 'ACOS', 'ATAN', 'ATAN2', 'SINH', 'COSH', 'TANH',
+  'ASINH', 'ACOSH', 'ATANH', 'DEGREES', 'RADIANS', 'PI', 'RANDOM', 'SETSEED',
+  'WIDTH_BUCKET', 'SCALE', 'MIN_SCALE', 'TRIM_SCALE',
+  
+  // Date/Time Functions
+  'NOW', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 'LOCALTIME', 'LOCALTIMESTAMP',
+  'DATE_TRUNC', 'DATE_PART', 'EXTRACT', 'AGE', 'MAKE_DATE', 'MAKE_TIME', 'MAKE_TIMESTAMP',
+  'MAKE_TIMESTAMPTZ', 'MAKE_INTERVAL', 'TO_TIMESTAMP', 'TO_DATE', 'TO_CHAR',
+  'CLOCK_TIMESTAMP', 'STATEMENT_TIMESTAMP', 'TRANSACTION_TIMESTAMP',
+  'TIMEOFDAY', 'JUSTIFY_DAYS', 'JUSTIFY_HOURS', 'JUSTIFY_INTERVAL',
+  'ISFINITE', 'DATE', 'TIME', 'TIMESTAMP', 'TIMESTAMPTZ', 'INTERVAL',
+  
+  // Array Functions
+  'ARRAY_LENGTH', 'ARRAY_DIMS', 'ARRAY_NDIMS', 'ARRAY_LOWER', 'ARRAY_UPPER',
+  'ARRAY_APPEND', 'ARRAY_PREPEND', 'ARRAY_CAT', 'ARRAY_REMOVE', 'ARRAY_REPLACE',
+  'ARRAY_TO_STRING', 'STRING_TO_ARRAY', 'ARRAY_POSITION', 'ARRAY_POSITIONS',
+  'CARDINALITY', 'UNNEST',
+  
+  // JSON/JSONB Functions
+  'JSON_BUILD_ARRAY', 'JSON_BUILD_OBJECT', 'JSON_OBJECT', 'JSON_ARRAY',
+  'JSONB_BUILD_ARRAY', 'JSONB_BUILD_OBJECT', 'JSONB_OBJECT', 'JSONB_ARRAY',
+  'JSON_EXTRACT_PATH', 'JSON_EXTRACT_PATH_TEXT', 'JSONB_EXTRACT_PATH', 'JSONB_EXTRACT_PATH_TEXT',
+  'JSON_ARRAY_LENGTH', 'JSONB_ARRAY_LENGTH', 'JSON_EACH', 'JSON_EACH_TEXT',
+  'JSONB_EACH', 'JSONB_EACH_TEXT', 'JSON_OBJECT_KEYS', 'JSONB_OBJECT_KEYS',
+  'JSON_POPULATE_RECORD', 'JSONB_POPULATE_RECORD', 'JSON_POPULATE_RECORDSET', 'JSONB_POPULATE_RECORDSET',
+  'JSON_TO_RECORD', 'JSONB_TO_RECORD', 'JSON_TO_RECORDSET', 'JSONB_TO_RECORDSET',
+  'JSON_STRIP_NULLS', 'JSONB_STRIP_NULLS', 'JSONB_SET', 'JSONB_INSERT', 'JSONB_PRETTY',
+  'JSON_TYPEOF', 'JSONB_TYPEOF', 'ROW_TO_JSON', 'TO_JSON', 'TO_JSONB',
+  
+  // Type Conversion Functions
+  'CAST', 'CONVERT', 'TO_NUMBER', 'TO_BINARY', 'TO_HEX',
+  
+  // Conditional Functions
+  'COALESCE', 'NULLIF', 'GREATEST', 'LEAST',
+  
+  // System Information Functions
+  'VERSION', 'CURRENT_USER', 'SESSION_USER', 'USER', 'CURRENT_ROLE', 'CURRENT_CATALOG',
+  'CURRENT_SCHEMA', 'CURRENT_SCHEMAS', 'INET_CLIENT_ADDR', 'INET_CLIENT_PORT',
+  'INET_SERVER_ADDR', 'INET_SERVER_PORT', 'PG_BACKEND_PID', 'PG_POSTMASTER_START_TIME',
+  'PG_CONF_LOAD_TIME', 'PG_IS_IN_RECOVERY', 'PG_IS_WAL_REPLAY_PAUSED',
+  
+  // Geometric Functions
+  'AREA', 'CENTER', 'DIAMETER', 'HEIGHT', 'ISCLOSED', 'ISOPEN', 'NPOINTS',
+  'PCLOSE', 'POPEN', 'RADIUS', 'WIDTH', 'BOX', 'BOUND_BOX', 'CIRCLE', 'LINE',
+  'LSEG', 'PATH', 'POINT', 'POLYGON',
+  
+  // Network Address Functions
+  'ABBREV', 'BROADCAST', 'FAMILY', 'HOST', 'HOSTMASK', 'MASKLEN', 'NETMASK',
+  'NETWORK', 'SET_MASKLEN', 'TEXT', 'INET_SAME_FAMILY', 'INET_MERGE',
+  
+  // Text Search Functions
+  'TO_TSVECTOR', 'TO_TSQUERY', 'PLAINTO_TSQUERY', 'PHRASETO_TSQUERY', 'WEBSEARCH_TO_TSQUERY',
+  'TS_RANK', 'TS_RANK_CD', 'TS_HEADLINE', 'TS_REWRITE', 'QUERYTREE',
+  'SETWEIGHT', 'STRIP', 'LENGTH', 'NUMNODE',
+  
+  // UUID Functions
+  'GEN_RANDOM_UUID', 'UUID_GENERATE_V1', 'UUID_GENERATE_V1MC', 'UUID_GENERATE_V3',
+  'UUID_GENERATE_V4', 'UUID_GENERATE_V5', 'UUID_NIL', 'UUID_NS_DNS', 'UUID_NS_URL',
+  'UUID_NS_OID', 'UUID_NS_X500',
+  
+  // Range Functions
+  'RANGE_MERGE', 'RANGE_INTERSECT', 'ISEMPTY', 'LOWER_INC', 'UPPER_INC',
+  'LOWER_INF', 'UPPER_INF', 'RANGE_INTERSECT_AGG', 'RANGE_AGG',
+  
+  // Enum Functions
+  'ENUM_FIRST', 'ENUM_LAST', 'ENUM_RANGE',
+  
+  // Administrative Functions
+  'PG_CANCEL_BACKEND', 'PG_RELOAD_CONF', 'PG_ROTATE_LOGFILE', 'PG_TERMINATE_BACKEND',
+  'PG_SIZE_DATABASE', 'PG_SIZE_RELATION', 'PG_SIZE_TABLE', 'PG_TOTAL_RELATION_SIZE',
+  'PG_COLUMN_SIZE', 'PG_DATABASE_SIZE', 'PG_INDEXES_SIZE', 'PG_RELATION_SIZE',
+  'PG_TABLE_SIZE', 'PG_TABLESPACE_SIZE', 'PG_SIZE_PRETTY', 'PG_RELATION_FILEPATH'
+];
+
+export const POSTGRES_DATA_TYPES = [
+  // Numeric Types
+  'SMALLINT', 'INTEGER', 'INT', 'INT2', 'INT4', 'INT8', 'BIGINT', 'DECIMAL', 'NUMERIC',
+  'REAL', 'DOUBLE PRECISION', 'FLOAT', 'FLOAT4', 'FLOAT8', 'SMALLSERIAL', 'SERIAL',
+  'BIGSERIAL', 'SERIAL2', 'SERIAL4', 'SERIAL8', 'MONEY',
+  
+  // Character Types
+  'CHARACTER VARYING', 'VARCHAR', 'CHARACTER', 'CHAR', 'TEXT', 'NAME',
+  
+  // Binary Data Types
+  'BYTEA',
+  
+  // Date/Time Types
+  'TIMESTAMP', 'TIMESTAMP WITHOUT TIME ZONE', 'TIMESTAMP WITH TIME ZONE', 'TIMESTAMPTZ',
+  'DATE', 'TIME', 'TIME WITHOUT TIME ZONE', 'TIME WITH TIME ZONE', 'TIMETZ', 'INTERVAL',
+  
+  // Boolean Type
+  'BOOLEAN', 'BOOL',
+  
+  // Enumerated Types
+  'ENUM',
+  
+  // Geometric Types
+  'POINT', 'LINE', 'LSEG', 'BOX', 'PATH', 'POLYGON', 'CIRCLE',
+  
+  // Network Address Types
+  'CIDR', 'INET', 'MACADDR', 'MACADDR8',
+  
+  // Bit String Types
+  'BIT', 'BIT VARYING', 'VARBIT',
+  
+  // Text Search Types
+  'TSVECTOR', 'TSQUERY',
+  
+  // UUID Type
+  'UUID',
+  
+  // XML Type
+  'XML',
+  
+  // JSON Types
+  'JSON', 'JSONB',
+  
+  // Array Types
+  'ARRAY',
+  
+  // Composite Types
+  'RECORD',
+  
+  // Range Types
+  'INT4RANGE', 'INT8RANGE', 'NUMRANGE', 'TSRANGE', 'TSTZRANGE', 'DATERANGE',
+  
+  // Domain Types
+  'DOMAIN',
+  
+  // Object Identifier Types
+  'OID', 'REGCLASS', 'REGCOLLATION', 'REGCONFIG', 'REGDICTIONARY', 'REGNAMESPACE',
+  'REGOPER', 'REGOPERATOR', 'REGPROC', 'REGPROCEDURE', 'REGROLE', 'REGTYPE',
+  
+  // pg_lsn Type
+  'PG_LSN',
+  
+  // Pseudo-Types
+  'ANY', 'ANYELEMENT', 'ANYARRAY', 'ANYNONARRAY', 'ANYENUM', 'ANYRANGE',
+  'CSTRING', 'INTERNAL', 'LANGUAGE_HANDLER', 'FDW_HANDLER', 'INDEX_AM_HANDLER',
+  'TSM_HANDLER', 'RECORD', 'TRIGGER', 'VOID', 'UNKNOWN', 'OPAQUE'
+];
+
+export const POSTGRES_OPERATORS = [
+  // Arithmetic Operators
+  '+', '-', '*', '/', '%', '^', '|/', '||/', '!', '!!', '@',
+  
+  // Comparison Operators
+  '=', '<>', '!=', '<', '<=', '>', '>=',
+  
+  // Pattern Matching
+  '~~', '!~~', '~~*', '!~~*', '~', '!~', '~*', '!~*',
+  
+  // Array Operators
+  '@>', '<@', '&&', '||',
+  
+  // JSON/JSONB Operators
+  '->', '->>', '#>', '#>>', '?', '?|', '?&', '@>', '<@', '?', '||', '-', '#-',
+  
+  // Range Operators
+  '@>', '<@', '&&', '<<', '>>', '&<', '&>', '-|-', '+', '*',
+  
+  // Network Operators
+  '<<', '<<=', '>>', '>>=', '&&', '~',
+  
+  // Geometric Operators
+  '+', '-', '*', '/', '@-@', '@@', '##', '<->', '&<', '&>', '<<', '>>', '&<|', '|&>',
+  
+  // Bitwise Operators
+  '&', '|', '#', '~', '<<', '>>',
+  
+  // String Operators
+  '||'
+];
+
+export const POSTGRES_SYSTEM_COLUMNS = [
+  'oid', 'tableoid', 'xmin', 'cmin', 'xmax', 'cmax', 'ctid'
+];
+
+export const POSTGRES_RESERVED_KEYWORDS = [
+  'ALL', 'ANALYSE', 'ANALYZE', 'AND', 'ANY', 'ARRAY', 'AS', 'ASC', 'ASYMMETRIC',
+  'AUTHORIZATION', 'BINARY', 'BOTH', 'CASE', 'CAST', 'CHECK', 'COLLATE', 'COLLATION',
+  'COLUMN', 'CONCURRENTLY', 'CONSTRAINT', 'CREATE', 'CROSS', 'CURRENT_CATALOG',
+  'CURRENT_DATE', 'CURRENT_ROLE', 'CURRENT_SCHEMA', 'CURRENT_TIME', 'CURRENT_TIMESTAMP',
+  'CURRENT_USER', 'DEFAULT', 'DEFERRABLE', 'DESC', 'DISTINCT', 'DO', 'ELSE', 'END',
+  'EXCEPT', 'FALSE', 'FETCH', 'FOR', 'FOREIGN', 'FREEZE', 'FROM', 'FULL', 'GRANT',
+  'GROUP', 'HAVING', 'ILIKE', 'IN', 'INITIALLY', 'INNER', 'INTERSECT', 'INTO', 'IS',
+  'ISNULL', 'JOIN', 'LATERAL', 'LEADING', 'LEFT', 'LIKE', 'LIMIT', 'LOCALTIME',
+  'LOCALTIMESTAMP', 'NATURAL', 'NOT', 'NOTNULL', 'NULL', 'OFFSET', 'ON', 'ONLY',
+  'OR', 'ORDER', 'OUTER', 'OVERLAPS', 'PLACING', 'PRIMARY', 'REFERENCES', 'RETURNING',
+  'RIGHT', 'SELECT', 'SESSION_USER', 'SIMILAR', 'SOME', 'SYMMETRIC', 'TABLE', 'TABLESAMPLE',
+  'THEN', 'TO', 'TRAILING', 'TRUE', 'UNION', 'UNIQUE', 'USER', 'USING', 'VARIADIC',
+  'VERBOSE', 'WHEN', 'WHERE', 'WINDOW', 'WITH'
+];
+
+// Combined arrays for easy import
+export const ALL_POSTGRES_KEYWORDS = [
+  ...POSTGRES_KEYWORDS,
+  ...POSTGRES_RESERVED_KEYWORDS
+];
+
+export const ALL_POSTGRES_FUNCTIONS = POSTGRES_FUNCTIONS;
+
+export const ALL_POSTGRES_DATA_TYPES = POSTGRES_DATA_TYPES;
+
+export const ALL_POSTGRES_OPERATORS = POSTGRES_OPERATORS;
+
+// For autocomplete suggestions
+export interface PostgresCompletionItem {
+  label: string;
+  kind: string;
+  insertText: string;
+  detail: string;
+  documentation?: string;
+}
+
+export const POSTGRES_COMPLETION_ITEMS = {
+  keywords: ALL_POSTGRES_KEYWORDS,
+  functions: ALL_POSTGRES_FUNCTIONS,
+  dataTypes: ALL_POSTGRES_DATA_TYPES,
+  operators: ALL_POSTGRES_OPERATORS,
+  systemColumns: POSTGRES_SYSTEM_COLUMNS
+};
