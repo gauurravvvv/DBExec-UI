@@ -38,24 +38,43 @@
         <!-- Left Panel - Schema Browser -->
         <ng-template pTemplate>
           <div class="schema-panel">
+            <div class="panel-header">
+              <h3>Databases</h3>
+            </div>
             <div class="panel-content">
+              <!-- Loading indicator -->
+              <div class="loading-container" *ngIf="isDatabasesLoading">
+                <i class="pi pi-spin pi-spinner loading-icon"></i>
+                <span class="loading-text">Loading databases...</span>
+              </div>
+              
+              <!-- Database Tree -->
               <p-tree
-                [value]="schemaTree"
+                [value]="databaseTree"
                 [filter]="true"
                 filterMode="lenient"
-                filterPlaceholder="Search schema..."
-                scrollHeight="100%"
-                styleClass="schema-tree"
+                filterPlaceholder="Search databases..."
+                styleClass="database-tree"
+                (onNodeExpand)="onDatabaseNodeExpand($event)"
               >
                 <ng-template let-node pTemplate="default">
-                  <div class="tree-node-content">
-                    <span class="node-label">{{ node.label }}</span>
-                    <span class="node-type" *ngIf="node.data?.type">{{
-                      node.data.type
-                    }}</span>
+                  <div class="tree-node-content" [class]="'level-' + node.data?.level" [attr.data-type]="node.data?.type">
+                    <div class="node-main">
+                      <i class="node-icon" 
+                         [class]="getNodeIcon(node.data?.type)"></i>
+                      <span class="node-label">{{ node.label }}</span>
+                      <span class="node-type" *ngIf="node.data?.type">{{ node.data.type }}</span>
+                      <i class="pi pi-spin pi-spinner loading-indicator" *ngIf="node.data?.loading"></i>
+                    </div>
                   </div>
                 </ng-template>
               </p-tree>
+              
+              <!-- Empty state -->
+              <div class="empty-state" *ngIf="!isDatabasesLoading && databases.length === 0">
+                <i class="pi pi-database empty-icon"></i>
+                <p>No databases available</p>
+              </div>
             </div>
           </div>
         </ng-template>
@@ -90,6 +109,7 @@
                       (contextmenu)="onTabRightClick($event, tab, i)"
                     >
                       <ng-container *ngIf="!tab.isEditing">
+                        <i class="pi pi-bookmark-fill tab-pin-icon" *ngIf="tab.isPinned"></i>
                         <span class="tab-title">{{
                           getQueryNumberFromTitle(tab.title)
                         }}</span>
@@ -469,6 +489,21 @@
   >
     <i class="pi pi-angle-left"></i>
     <span>Close All to Left</span>
+  </div>
+  <div class="context-menu-separator"></div>
+  <div
+    class="context-menu-item"
+    (click)="renameTabFromContextMenu()"
+  >
+    <i class="pi pi-pencil"></i>
+    <span>Rename Tab</span>
+  </div>
+  <div
+    class="context-menu-item"
+    (click)="togglePinTabFromContextMenu()"
+  >
+    <i class="pi" [class.pi-bookmark]="!selectedTabForContext?.isPinned" [class.pi-bookmark-fill]="selectedTabForContext?.isPinned"></i>
+    <span>{{ selectedTabForContext?.isPinned ? 'Unpin Tab' : 'Pin Tab' }}</span>
   </div>
   <div class="context-menu-separator"></div>
   <div

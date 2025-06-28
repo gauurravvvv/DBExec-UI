@@ -40,6 +40,7 @@ interface EditorTab {
   editor?: any;
   isEditing?: boolean;
   database?: any;
+  isPinned?: boolean;
 }
 
 declare var monaco: any;
@@ -155,6 +156,13 @@ export class RunQueryComponent
   selectedDatabase: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+
+  // Loading states
+  isDatabasesLoading: boolean = false;
+  isSchemaLoading: boolean = false;
+
+  // Database tree for unified view
+  databaseTree: TreeNode[] = [];
 
   // Split button menu items for databases
   databaseMenuItems: MenuItem[] = [];
@@ -764,13 +772,6 @@ LIMIT 10;`;
     }
   }
 
-  getNodeIcon(node: TreeNode): string {
-    if (node.children && node.children.length > 0) {
-      return node.expanded ? 'pi pi-folder-open' : 'pi pi-folder';
-    }
-    return node.icon || 'pi pi-file';
-  }
-
   executeQuery(): void {
     const query = this.sqlQuery.trim();
     if (!query) return;
@@ -891,7 +892,12 @@ LIMIT 10;`;
       database: targetDatabase,
     };
 
+    // Add new tab at the end to maintain ascending order
     this.tabs.push(newTab);
+
+    // Reorganize tabs: pinned tabs first, then unpinned tabs in order
+    this.reorganizeTabs();
+
     this.activeTabId = tabId;
     this.tabCounter++;
 
@@ -1071,6 +1077,17 @@ LIMIT 10;`;
     event.preventDefault();
     event.stopPropagation();
 
+    // Close other menus first
+    if (this.databaseMenu) {
+      this.databaseMenu.hide();
+    }
+    if (this.saveMenu) {
+      this.saveMenu.hide();
+    }
+    if (this.autoSaveMenu) {
+      this.autoSaveMenu.hide();
+    }
+
     this.selectedTabForContext = tab;
     this.selectedTabIndexForContext = index;
     this.contextMenuPosition = {
@@ -1095,6 +1112,576 @@ LIMIT 10;`;
     this.showTabContextMenu = false;
     this.selectedTabForContext = null;
     this.selectedTabIndexForContext = -1;
+  }
+
+  renameTabFromContextMenu(): void {
+    if (this.selectedTabForContext) {
+      this.startEditingTab(this.selectedTabForContext);
+      this.hideTabContextMenu();
+    }
+  }
+
+  togglePinTabFromContextMenu(): void {
+    if (this.selectedTabForContext) {
+      this.togglePinTab(this.selectedTabForContext);
+      this.hideTabContextMenu();
+    }
+  }
+
+  togglePinTab(tab: EditorTab): void {
+    // Toggle pin status
+    tab.isPinned = !tab.isPinned;
+
+    if (tab.isPinned) {
+      // When pinning, move the tab to the very first position
+      const tabIndex = this.tabs.findIndex((t: EditorTab) => t.id === tab.id);
+      if (tabIndex > 0) {
+        // Remove tab from current position
+        const [pinnedTab] = this.tabs.splice(tabIndex, 1);
+        // Insert at the very beginning (first position)
+        this.tabs.unshift(pinnedTab);
+      }
+    } else {
+      // When unpinning, reorganize to maintain order
+      this.reorganizeTabs();
+    }
+  }
+
+  reorganizeTabs(): void {
+    // Separate pinned and unpinned tabs while preserving their individual order
+    const pinnedTabs = this.tabs.filter((tab: EditorTab) => tab.isPinned);
+    const unpinnedTabs = this.tabs.filter((tab: EditorTab) => !tab.isPinned);
+
+    // Recombine: pinned tabs first, then unpinned tabs
+    this.tabs = [...pinnedTabs, ...unpinnedTabs];
+  }
+
+  generateDummySchemaForDatabase(database: any): TreeNode[] {
+    const databaseTypes = [
+      'PostgreSQL',
+      'MySQL',
+      'MongoDB',
+      'SQLite',
+      'Oracle',
+    ];
+    const dbType =
+      database.type ||
+      databaseTypes[Math.floor(Math.random() * databaseTypes.length)];
+
+    // Different dummy data based on database name/type
+    switch (dbType.toLowerCase()) {
+      case 'postgresql':
+      case 'postgres':
+        return this.generatePostgreSQLDummyData(database.name);
+      case 'mysql':
+        return this.generateMySQLDummyData(database.name);
+      case 'mongodb':
+        return this.generateMongoDummyData(database.name);
+      case 'sqlite':
+        return this.generateSQLiteDummyData(database.name);
+      default:
+        return this.generateGenericDummyData(database.name);
+    }
+  }
+
+  generatePostgreSQLDummyData(dbName: string): TreeNode[] {
+    return [
+      {
+        label: dbName,
+        expanded: true,
+        data: { type: 'Database', level: 0 },
+        children: [
+          {
+            label: 'public',
+            expanded: true,
+            data: { type: 'Schema', level: 1 },
+            children: [
+              {
+                label: 'Tables',
+                expanded: true,
+                data: { type: 'Tables', level: 2 },
+                children: [
+                  {
+                    label: 'users',
+                    data: { type: 'Table', level: 3 },
+                    children: [
+                      {
+                        label: 'id (SERIAL PRIMARY KEY)',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'username (VARCHAR(50))',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'email (VARCHAR(100))',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'created_at (TIMESTAMP)',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                    ],
+                  },
+                  {
+                    label: 'products',
+                    data: { type: 'Table', level: 3 },
+                    children: [
+                      {
+                        label: 'id (SERIAL PRIMARY KEY)',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'name (VARCHAR(200))',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'price (DECIMAL(10,2))',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'category_id (INTEGER)',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                    ],
+                  },
+                  {
+                    label: 'orders',
+                    data: { type: 'Table', level: 3 },
+                    children: [
+                      {
+                        label: 'id (SERIAL PRIMARY KEY)',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'user_id (INTEGER)',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'total_amount (DECIMAL(10,2))',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                      {
+                        label: 'order_date (TIMESTAMP)',
+                        data: { type: 'Column', level: 4 },
+                        leaf: true
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                label: 'Views',
+                data: { type: 'Views', level: 2 },
+                children: [
+                  {
+                    label: 'user_orders_view',
+                    data: { type: 'View', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'product_sales_view',
+                    data: { type: 'View', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  generateMySQLDummyData(dbName: string): TreeNode[] {
+    return [
+      {
+        label: dbName,
+        expanded: true,
+        data: { type: 'Database', level: 0 },
+        children: [
+          {
+            label: 'Tables',
+            expanded: true,
+            data: { type: 'Tables', level: 1 },
+            children: [
+              {
+                label: 'customers',
+                data: { type: 'Table', level: 2 },
+                children: [
+                  {
+                    label: 'customer_id (INT AUTO_INCREMENT PRIMARY KEY)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'first_name (VARCHAR(50))',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'last_name (VARCHAR(50))',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'phone (VARCHAR(20))',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+              {
+                label: 'inventory',
+                data: { type: 'Table', level: 2 },
+                children: [
+                  {
+                    label: 'item_id (INT AUTO_INCREMENT PRIMARY KEY)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'item_name (VARCHAR(100))',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'quantity (INT)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'unit_price (DECIMAL(8,2))',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  generateMongoDummyData(dbName: string): TreeNode[] {
+    return [
+      {
+        label: dbName,
+        expanded: true,
+        data: { type: 'Database', level: 0 },
+        children: [
+          {
+            label: 'Collections',
+            expanded: true,
+            data: { type: 'Collections', level: 1 },
+            children: [
+              {
+                label: 'posts',
+                data: { type: 'Collection', level: 2 },
+                children: [
+                  {
+                    label: '_id (ObjectId)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'title (String)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'content (String)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'author (String)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'createdAt (Date)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+              {
+                label: 'comments',
+                data: { type: 'Collection', level: 2 },
+                children: [
+                  {
+                    label: '_id (ObjectId)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'postId (ObjectId)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'message (String)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'userId (ObjectId)',
+                    data: { type: 'Field', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  generateSQLiteDummyData(dbName: string): TreeNode[] {
+    return [
+      {
+        label: dbName,
+        expanded: true,
+        data: { type: 'Database', level: 0 },
+        children: [
+          {
+            label: 'Tables',
+            expanded: true,
+            data: { type: 'Tables', level: 1 },
+            children: [
+              {
+                label: 'contacts',
+                data: { type: 'Table', level: 2 },
+                children: [
+                  {
+                    label: 'id (INTEGER PRIMARY KEY)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'name (TEXT)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'email (TEXT)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'phone (TEXT)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+              {
+                label: 'notes',
+                data: { type: 'Table', level: 2 },
+                children: [
+                  {
+                    label: 'id (INTEGER PRIMARY KEY)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'contact_id (INTEGER)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'note_text (TEXT)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'created_date (TEXT)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  generateGenericDummyData(dbName: string): TreeNode[] {
+    return [
+      {
+        label: dbName,
+        expanded: true,
+        data: { type: 'Database', level: 0 },
+        children: [
+          {
+            label: 'dbo',
+            expanded: true,
+            data: { type: 'Schema', level: 1 },
+            children: [
+              {
+                label: 'employees',
+                data: { type: 'Table', level: 2 },
+                children: [
+                  {
+                    label: 'emp_id (PRIMARY KEY)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'emp_name (VARCHAR)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'department (VARCHAR)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'salary (DECIMAL)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+              {
+                label: 'departments',
+                data: { type: 'Table', level: 2 },
+                children: [
+                  {
+                    label: 'dept_id (PRIMARY KEY)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'dept_name (VARCHAR)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                  {
+                    label: 'manager_id (INTEGER)',
+                    data: { type: 'Column', level: 3 },
+                    leaf: true
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  createDatabaseTreeNodes(databases: any[]): TreeNode[] {
+    return databases.map((database: any) => ({
+      label: database.name,
+      expanded: false,
+      leaf: false, // Important: this makes the node expandable
+      data: {
+        type: 'Database',
+        id: database.id,
+        database: database,
+        loading: false,
+        level: 0,
+      },
+      children: [], // Empty array initially, populated on expand
+    }));
+  }
+
+  onDatabaseNodeExpand(event: any): void {
+    const node = event.node;
+    if (
+      node.data?.type === 'Database' &&
+      (!node.children || node.children.length === 0)
+    ) {
+      // Set loading state for this specific node
+      node.data.loading = true;
+
+      // Load schema data for this database after 5 seconds
+      setTimeout(() => {
+        const schemaData = this.generateDummySchemaForDatabase(
+          node.data.database
+        );
+        // Extract children from the generated schema (skip the database root level)
+        node.children = schemaData[0]?.children || [];
+        node.data.loading = false;
+      }, 5000);
+    }
+  }
+
+  getNodeIcon(nodeType: string): string {
+    switch (nodeType) {
+      case 'Database':
+        return 'pi pi-database database-icon';
+      case 'Schema':
+        return 'pi pi-folder schema-icon';
+      case 'Table':
+        return 'pi pi-list table-icon';
+      case 'Collection':
+        return 'pi pi-file collection-icon';
+      case 'Column':
+      case 'Field':
+        return 'pi pi-minus column-icon';
+      case 'Tables':
+      case 'Collections':
+        return 'pi pi-list tables-icon';
+      case 'View':
+      case 'Views':
+        return 'pi pi-eye view-icon';
+      default:
+        return 'pi pi-circle-fill default-icon';
+    }
+  }
+
+  getNodeTypeIcon(node: any): string {
+    if (!node.data?.type) return 'pi pi-file';
+    
+    switch (node.data.type) {
+      case 'Database':
+      case 'MySQL Database':
+      case 'PostgreSQL Database':
+      case 'MongoDB Database':
+      case 'SQLite Database':
+        return 'pi-database';
+      
+      case 'Schema':
+      case 'Collections':
+        return 'pi-folder';
+      
+      case 'Tables':
+      case 'Views':
+        return 'pi-table';
+      
+      case 'Table':
+      case 'Collection':
+        return 'pi-list';
+      
+      case 'View':
+        return 'pi-eye';
+      
+      case 'Column':
+      case 'Field':
+        return 'pi-minus';
+      
+      default:
+        return 'pi-file';
+    }
   }
 
   closeTabFromContext(tabId: string): void {
@@ -1228,10 +1815,35 @@ LIMIT 10;`;
     this.hideTabContextMenu();
   }
 
+  // Close all menus helper method
+  private closeAllMenus(): void {
+    if (this.databaseMenu) {
+      this.databaseMenu.hide();
+    }
+    if (this.saveMenu) {
+      this.saveMenu.hide();
+    }
+    if (this.autoSaveMenu) {
+      this.autoSaveMenu.hide();
+    }
+    // Close tab context menu
+    this.hideTabContextMenu();
+  }
+
   // Database menu toggle method
   toggleDatabaseMenu(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
+    
+    // Close other menus first
+    if (this.saveMenu) {
+      this.saveMenu.hide();
+    }
+    if (this.autoSaveMenu) {
+      this.autoSaveMenu.hide();
+    }
+    this.hideTabContextMenu();
+    
     if (this.databaseMenu) {
       this.databaseMenu.toggle(event);
     }
@@ -1467,25 +2079,47 @@ LIMIT 10;`;
 
   loadDatabases() {
     if (!this.selectedOrg) return;
+
+    // Set loading state to true when starting the request
+    this.isDatabasesLoading = true;
+
     const params = {
       orgId: this.selectedOrg.id,
       pageNumber: 1,
       limit: 100,
     };
 
-    this.databaseService.listDatabase(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...response.data];
-        if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0];
-          // Create initial tab with first database from dropdown
-          if (this.tabs.length === 0) {
-            this.addNewTab();
+    this.databaseService
+      .listDatabase(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.databases = [...response.data];
+
+          // Create database tree nodes
+          this.databaseTree = this.createDatabaseTreeNodes(this.databases);
+
+          if (this.databases.length > 0) {
+            this.selectedDatabase = this.databases[0];
+            // Create initial tab with first database from dropdown
+            if (this.tabs.length === 0) {
+              this.addNewTab();
+            }
           }
+          this.updateDatabaseMenuItems();
         }
+      })
+      .catch(error => {
+        // Handle error case
+        console.error('Error loading databases:', error);
+        this.databases = [];
+        this.selectedDatabase = {};
+        this.databaseTree = [];
         this.updateDatabaseMenuItems();
-      }
-    });
+      })
+      .finally(() => {
+        // Always set loading state to false when request completes
+        this.isDatabasesLoading = false;
+      });
   }
 
   updateDatabaseMenuItems(): void {
@@ -1545,6 +2179,16 @@ LIMIT 10;`;
   toggleSaveMenu(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
+    
+    // Close other menus first
+    if (this.databaseMenu) {
+      this.databaseMenu.hide();
+    }
+    if (this.autoSaveMenu) {
+      this.autoSaveMenu.hide();
+    }
+    this.hideTabContextMenu();
+    
     if (this.saveMenu) {
       this.saveMenu.toggle(event);
     } else {
@@ -1583,6 +2227,16 @@ LIMIT 10;`;
   toggleAutoSaveMenu(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
+    
+    // Close other menus first
+    if (this.databaseMenu) {
+      this.databaseMenu.hide();
+    }
+    if (this.saveMenu) {
+      this.saveMenu.hide();
+    }
+    this.hideTabContextMenu();
+    
     this.updateAutoSaveMenuItems(); // Refresh menu before showing
     if (this.autoSaveMenu) {
       this.autoSaveMenu.toggle(event);
