@@ -3,16 +3,20 @@ import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ORGANISATION } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrganisationService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private httpClientService: HttpClientService
+  ) {}
 
   listOrganisation(params: IParams) {
-    return this.http
-      .get(ORGANISATION.LIST + `/${params.pageNumber}/${params.limit}`)
+    return this.httpClientService
+      .apiGet(ORGANISATION.LIST + `/${params.pageNumber}/${params.limit}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -33,8 +37,8 @@ export class OrganisationService {
       encryptionAlgorithm,
       pepperKey,
     } = orgForm.value;
-    return this.http
-      .post(ORGANISATION.ADD, {
+    return this.httpClientService
+      .apiPost(ORGANISATION.ADD, {
         name,
         description,
         maxUsers,
@@ -65,8 +69,8 @@ export class OrganisationService {
       maxGroups,
       status,
     } = orgForm.getRawValue();
-    return this.http
-      .put(ORGANISATION.EDIT, {
+    return this.httpClientService
+      .apiPut(ORGANISATION.EDIT, {
         id,
         name,
         maxUsers,
@@ -85,8 +89,8 @@ export class OrganisationService {
   }
 
   deleteOrganisation(orgId: string) {
-    return this.http
-      .delete(ORGANISATION.DELETE + `${orgId}`)
+    return this.httpClientService
+      .apiDelete(ORGANISATION.DELETE + `${orgId}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -95,8 +99,8 @@ export class OrganisationService {
   }
 
   viewOrganisation(id: string) {
-    return this.http
-      .get(ORGANISATION.VIEW + `${id}`)
+    return this.httpClientService
+      .apiGet(ORGANISATION.VIEW + `${id}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

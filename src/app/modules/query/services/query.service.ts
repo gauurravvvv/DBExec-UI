@@ -1,24 +1,30 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class QueryService {
-  private baseUrl = environment.apiUrl;
+  constructor(private httpClientService: HttpClientService) {}
 
-  constructor(private http: HttpClient) {}
-
+  // Query execution - use Query Server
   executeQuery(queryData: {
     orgId: number;
     databaseId: number;
     query: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/query/execute`, queryData);
+    return this.httpClientService.queryPost('/query/execute', queryData);
+  }
+  getDatabaseStructure(databaseId: number, orgId: number): Observable<any> {
+    return this.httpClientService.queryPostNoLoader(`/query/getStructure`, {
+      databaseId,
+      orgId,
+    });
   }
 
+  // Save query metadata - use API Server
   saveQuery(queryData: {
     orgId: number;
     databaseId: number;
@@ -26,26 +32,34 @@ export class QueryService {
     query: string;
     description?: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/query/save`, queryData);
+    return this.httpClientService.apiPost('/query/save', queryData);
   }
 
+  // Get saved queries - use API Server
   getSavedQueries(params: {
     orgId?: number;
     pageNumber?: number;
     limit?: number;
   }): Observable<any> {
     let httpParams = new HttpParams();
-    if (params.orgId) httpParams = httpParams.set('orgId', params.orgId.toString());
-    if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
-    if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    
-    return this.http.get(`${this.baseUrl}/query/saved`, { params: httpParams });
+    if (params.orgId)
+      httpParams = httpParams.set('orgId', params.orgId.toString());
+    if (params.pageNumber)
+      httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+    if (params.limit)
+      httpParams = httpParams.set('limit', params.limit.toString());
+
+    return this.httpClientService.apiGet('/query/saved', {
+      params: httpParams,
+    });
   }
 
+  // Delete query - use API Server
   deleteQuery(queryId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/query/${queryId}`);
+    return this.httpClientService.apiDelete(`/query/${queryId}`);
   }
 
+  // Get query history - use Query Server
   getQueryHistory(params: {
     orgId?: number;
     databaseId?: number;
@@ -53,36 +67,60 @@ export class QueryService {
     limit?: number;
   }): Observable<any> {
     let httpParams = new HttpParams();
-    if (params.orgId) httpParams = httpParams.set('orgId', params.orgId.toString());
-    if (params.databaseId) httpParams = httpParams.set('databaseId', params.databaseId.toString());
-    if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
-    if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    
-    return this.http.get(`${this.baseUrl}/query/history`, { params: httpParams });
+    if (params.orgId)
+      httpParams = httpParams.set('orgId', params.orgId.toString());
+    if (params.databaseId)
+      httpParams = httpParams.set('databaseId', params.databaseId.toString());
+    if (params.pageNumber)
+      httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+    if (params.limit)
+      httpParams = httpParams.set('limit', params.limit.toString());
+
+    return this.httpClientService.queryGet('/query/history', {
+      params: httpParams,
+    });
   }
 
+  // Validate query - use Query Server
   validateQuery(queryData: {
     databaseId: number;
     query: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/query/validate`, queryData);
+    return this.httpClientService.queryPost('/query/validate', queryData);
   }
 
+  // Get query explain - use Query Server
   getQueryExplain(queryData: {
     databaseId: number;
     query: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/query/explain`, queryData);
+    return this.httpClientService.queryPost('/query/explain', queryData);
   }
 
+  // Export query results - use Query Server
   exportQueryResults(queryData: {
     orgId: number;
     databaseId: number;
     query: string;
     format: 'csv' | 'json' | 'xlsx';
   }): Observable<Blob> {
-    return this.http.post(`${this.baseUrl}/query/export`, queryData, {
-      responseType: 'blob'
+    return this.httpClientService.queryPost('/query/export', queryData, {
+      responseType: 'blob',
     });
+  }
+
+  // New methods demonstrating database schema operations on Query Server
+  getDatabaseSchema(databaseId: number): Observable<any> {
+    return this.httpClientService.queryGet(`/database/schema/${databaseId}`);
+  }
+
+  getDatabaseTables(databaseId: number): Observable<any> {
+    return this.httpClientService.queryGet(`/database/tables/${databaseId}`);
+  }
+
+  getTableColumns(databaseId: number, tableName: string): Observable<any> {
+    return this.httpClientService.queryGet(
+      `/database/columns/${databaseId}/${tableName}`
+    );
   }
 }

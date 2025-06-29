@@ -141,7 +141,8 @@
                       icon="pi pi-plus"
                       class="p-button-text p-button-rounded add-btn"
                       [disabled]="isMaxScriptsReached"
-                      (click)="toggleDatabaseMenu($event)"
+                      (mouseenter)="showDatabaseMenu($event)"
+                      (mouseleave)="hideDatabaseMenuDelayed()"
                       #addBtn
                     ></button>
                     <button
@@ -168,7 +169,8 @@
                       type="button"
                       icon="pi pi-save"
                       class="p-button-text p-button-rounded save-btn"
-                      (click)="toggleSaveMenu($event)"
+                      (mouseenter)="showSaveMenu($event)"
+                      (mouseleave)="hideSaveMenuDelayed()"
                       #saveBtn
                     ></button>
                     <button
@@ -179,7 +181,8 @@
                       class="p-button-text p-button-rounded auto-save-btn"
                       [class.enabled]="isAutoSaveEnabled"
                       [class.completed]="autoSaveStatus === 'completed'"
-                      (click)="toggleAutoSaveMenu($event)"
+                      (mouseenter)="showAutoSaveMenu($event)"
+                      (mouseleave)="hideAutoSaveMenuDelayed()"
                       #autoSaveBtn
                     ></button>
                     <button
@@ -529,6 +532,8 @@
   [model]="databaseMenuItems"
   [popup]="true"
   styleClass="database-menu"
+  (mouseenter)="cancelMenuHide('database')"
+  (mouseleave)="hideMenuDelayed('database')"
 ></p-menu>
 
 <!-- Save Menu -->
@@ -537,6 +542,8 @@
   [model]="saveMenuItems"
   [popup]="true"
   styleClass="database-menu"
+  (mouseenter)="cancelMenuHide('save')"
+  (mouseleave)="hideMenuDelayed('save')"
 ></p-menu>
 
 <!-- Auto Save Menu -->
@@ -545,6 +552,8 @@
   [model]="autoSaveMenuItems"
   [popup]="true"
   styleClass="database-menu"
+  (mouseenter)="cancelMenuHide('autoSave')"
+  (mouseleave)="hideMenuDelayed('autoSave')"
 ></p-menu>
 
 <!-- Duplicate Name Confirmation Dialog -->

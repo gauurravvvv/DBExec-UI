@@ -4,5 +4,6 @@ export interface IEnvironment {
   defaultBaseUrl?: string;
   assetsUrl?: string;
   apiServer?: string;
+  queryServer?: string;
   appURL?: string;
 }

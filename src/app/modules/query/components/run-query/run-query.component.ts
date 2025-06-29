@@ -11,8 +11,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { TreeNode, MenuItem } from 'primeng/api';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { QueryService } from '../../services/query.service';
 import { Chart } from 'chart.js';
 import { UIChart } from 'primeng/chart';
 import {
@@ -63,6 +65,9 @@ export class RunQueryComponent
   @ViewChild('saveMenu') saveMenu!: any;
 
   @ViewChild('autoSaveMenu') autoSaveMenu!: any;
+
+  // Menu hover timeout references
+  private menuTimeouts: { [key: string]: any } = {};
 
   // Schema tree data
   schemaTree: TreeNode[] = [];
@@ -246,7 +251,9 @@ export class RunQueryComponent
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private httpClientService: HttpClientService,
+    private queryService: QueryService
   ) {
     // Initialize form
     this.chartForm = this.fb.group({
@@ -776,26 +783,72 @@ LIMIT 10;`;
     const query = this.sqlQuery.trim();
     if (!query) return;
 
+    // Validate required data
+    if (!this.selectedDatabase?.id) {
+      console.error('No database selected');
+      return;
+    }
+
+    if (!this.selectedOrg?.id) {
+      console.error('No organization selected');
+      return;
+    }
+
     this.isExecuting = true;
+    const startTime = Date.now();
 
-    // Simulate query execution
-    setTimeout(() => {
-      const startTime = Date.now();
+    // Prepare request body
+    const requestBody = {
+      query: query,
+      databaseId: this.selectedDatabase.id.toString(),
+      orgId: this.selectedOrg.id.toString()
+    };
 
-      // Generate dummy results
-      this.queryResults = this.generateDummyResults();
-      this.resultColumns = Object.keys(this.queryResults[0] || {});
-
-      this.executionTime = Date.now() - startTime;
-      this.isExecuting = false;
-
-      // Fix layout after results load - defer to avoid splitter interference
-      setTimeout(() => {
-        if (this.editor) {
-          this.editor.layout();
+    // Call query server API
+    this.httpClientService.queryPost('/query/execute', requestBody)
+      .toPromise()
+      .then((response: any) => {
+        // Handle successful response
+        const result = JSON.parse(JSON.stringify(response));
+        
+        if (result && result.data) {
+          this.queryResults = result.data;
+          this.resultColumns = this.queryResults.length > 0 ? Object.keys(this.queryResults[0]) : [];
+        } else {
+          this.queryResults = [];
+          this.resultColumns = [];
         }
-      }, 300);
-    }, 1500);
+
+        this.executionTime = Date.now() - startTime;
+        this.isExecuting = false;
+
+        // Fix layout after results load - defer to avoid splitter interference
+        setTimeout(() => {
+          if (this.editor) {
+            this.editor.layout();
+          }
+        }, 300);
+      })
+      .catch((error: any) => {
+        // Handle error response
+        console.error('Query execution error:', error);
+        this.queryResults = [];
+        this.resultColumns = [];
+        this.executionTime = Date.now() - startTime;
+        this.isExecuting = false;
+
+        // Show error message to user (you can customize this based on your error handling approach)
+        if (error.error && error.error.message) {
+          console.error('API Error:', error.error.message);
+        }
+
+        // Fix layout even after error
+        setTimeout(() => {
+          if (this.editor) {
+            this.editor.layout();
+          }
+        }, 300);
+      });
   }
 
   clearEditor(): void {
@@ -1610,19 +1663,118 @@ LIMIT 10;`;
       node.data?.type === 'Database' &&
       (!node.children || node.children.length === 0)
     ) {
+      // Validate required data
+      if (!node.data.database?.id) {
+        console.error('Database ID not found in node data');
+        return;
+      }
+
+      if (!this.selectedOrg?.id) {
+        console.error('No organization selected');
+        return;
+      }
+
       // Set loading state for this specific node
       node.data.loading = true;
 
-      // Load schema data for this database after 5 seconds
-      setTimeout(() => {
-        const schemaData = this.generateDummySchemaForDatabase(
-          node.data.database
-        );
-        // Extract children from the generated schema (skip the database root level)
-        node.children = schemaData[0]?.children || [];
-        node.data.loading = false;
-      }, 5000);
+      // Call API to get database structure
+      this.queryService.getDatabaseStructure(
+        node.data.database.id,
+        this.selectedOrg.id
+      ).toPromise()
+        .then((response: any) => {
+          // Handle successful response
+          const result = JSON.parse(JSON.stringify(response));
+          
+          if (result && result.data) {
+            // Transform API response to tree node structure
+            node.children = this.transformDatabaseStructureToTreeNodes(result.data);
+          } else {
+            // Fallback to dummy data if API response is empty
+            const schemaData = this.generateDummySchemaForDatabase(node.data.database);
+            node.children = schemaData[0]?.children || [];
+          }
+          
+          node.data.loading = false;
+        })
+        .catch((error: any) => {
+          // Handle error response
+          console.error('Error loading database structure:', error);
+          
+          // Fallback to dummy data on error
+          const schemaData = this.generateDummySchemaForDatabase(node.data.database);
+          node.children = schemaData[0]?.children || [];
+          
+          node.data.loading = false;
+
+          // Show error message to user (you can customize this based on your error handling approach)
+          if (error.error && error.error.message) {
+            console.error('API Error:', error.error.message);
+          }
+        });
     }
+  }
+
+  // Transform API response to tree node structure
+  transformDatabaseStructureToTreeNodes(structureData: any): TreeNode[] {
+    // API returns structure like:
+    // { schemas: [{ schema: 'schema_name', tables: [{ table: 'table_name', columns: [...] }] }] }
+    
+    if (!structureData || !structureData.schemas) {
+      return [];
+    }
+
+    return structureData.schemas.map((schemaItem: any) => ({
+      label: schemaItem.schema,
+      data: {
+        type: 'Schema',
+        level: 1,
+        schema: schemaItem
+      },
+      expandedIcon: 'pi pi-sitemap',
+      collapsedIcon: 'pi pi-sitemap',
+      children: schemaItem.tables && schemaItem.tables.length > 0 ? schemaItem.tables.map((tableItem: any) => ({
+        label: tableItem.table,
+        data: {
+          type: 'Table',
+          level: 2,
+          table: tableItem
+        },
+        expandedIcon: 'pi pi-table',
+        collapsedIcon: 'pi pi-table',
+        children: tableItem.columns && tableItem.columns.length > 0 ? tableItem.columns.map((column: any) => {
+          // Format column display with only name and type
+          let columnLabel = `${column.name}`;
+          if (column.type) {
+            if (column.maxLength) {
+              columnLabel += ` (${column.type}(${column.maxLength}))`;
+            } else {
+              columnLabel += ` (${column.type})`;
+            }
+          }
+          
+          return {
+            label: columnLabel,
+            data: {
+              type: 'Column',
+              level: 3,
+              column: column
+            },
+            icon: 'pi pi-minus',
+            leaf: true
+          };
+        }) : []
+      })) : [{
+        label: 'No tables found',
+        data: {
+          type: 'EmptyState',
+          level: 2
+        },
+        icon: 'pi pi-info-circle',
+        leaf: true,
+        styleClass: 'empty-state-node'
+      }]
+    }));
   }
 
   getNodeIcon(nodeType: string): string {
@@ -1630,7 +1782,7 @@ LIMIT 10;`;
       case 'Database':
         return 'pi pi-database database-icon';
       case 'Schema':
-        return 'pi pi-folder schema-icon';
+        return 'pi pi-sitemap schema-icon';
       case 'Table':
         return 'pi pi-list table-icon';
       case 'Collection':
@@ -1828,6 +1980,96 @@ LIMIT 10;`;
     }
     // Close tab context menu
     this.hideTabContextMenu();
+  }
+
+  // Common menu hover functionality
+  showMenu(event: Event, menuType: 'database' | 'save' | 'autoSave'): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.cancelMenuHide(menuType);
+    
+    // Close all other menus first
+    this.closeAllMenusExcept(menuType);
+    
+    // Show the specific menu
+    const menu = this.getMenuByType(menuType);
+    if (menu) {
+      // Special handling for auto-save menu
+      if (menuType === 'autoSave') {
+        this.updateAutoSaveMenuItems();
+      }
+      menu.show(event);
+    }
+  }
+
+  hideMenuDelayed(menuType: 'database' | 'save' | 'autoSave'): void {
+    this.menuTimeouts[menuType] = setTimeout(() => {
+      const menu = this.getMenuByType(menuType);
+      if (menu) {
+        menu.hide();
+      }
+    }, 200);
+  }
+
+  cancelMenuHide(menuType: 'database' | 'save' | 'autoSave'): void {
+    if (this.menuTimeouts[menuType]) {
+      clearTimeout(this.menuTimeouts[menuType]);
+      this.menuTimeouts[menuType] = null;
+    }
+  }
+
+  private getMenuByType(menuType: 'database' | 'save' | 'autoSave'): any {
+    switch (menuType) {
+      case 'database':
+        return this.databaseMenu;
+      case 'save':
+        return this.saveMenu;
+      case 'autoSave':
+        return this.autoSaveMenu;
+      default:
+        return null;
+    }
+  }
+
+  private closeAllMenusExcept(exceptType: 'database' | 'save' | 'autoSave'): void {
+    const menuTypes: ('database' | 'save' | 'autoSave')[] = ['database', 'save', 'autoSave'];
+    
+    menuTypes.forEach(type => {
+      if (type !== exceptType) {
+        const menu = this.getMenuByType(type);
+        if (menu) {
+          menu.hide();
+        }
+      }
+    });
+    
+    // Also close tab context menu
+    this.hideTabContextMenu();
+  }
+
+  // Wrapper methods for template compatibility
+  showDatabaseMenu(event: Event): void {
+    this.showMenu(event, 'database');
+  }
+
+  hideDatabaseMenuDelayed(): void {
+    this.hideMenuDelayed('database');
+  }
+
+  showSaveMenu(event: Event): void {
+    this.showMenu(event, 'save');
+  }
+
+  hideSaveMenuDelayed(): void {
+    this.hideMenuDelayed('save');
+  }
+
+  showAutoSaveMenu(event: Event): void {
+    this.showMenu(event, 'autoSave');
+  }
+
+  hideAutoSaveMenuDelayed(): void {
+    this.hideMenuDelayed('autoSave');
   }
 
   // Database menu toggle method
