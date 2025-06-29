@@ -131,28 +131,11 @@ export class RunQueryComponent
   resultColumns: string[] = [];
   executionTime: number = 0;
 
-  // Schema for autocomplete
-  private schema = {
-    employees: [
-      'id',
-      'first_name',
-      'last_name',
-      'email',
-      'department',
-      'salary',
-      'hire_date',
-    ],
-    departments: ['id', 'name', 'manager_id', 'budget'],
-    projects: [
-      'id',
-      'name',
-      'department_id',
-      'start_date',
-      'end_date',
-      'status',
-    ],
-    employee_projects: ['employee_id', 'project_id', 'role', 'hours_allocated'],
-  };
+  // Schema storage for autocomplete - key is databaseId
+  private loadedSchemas: { [databaseId: string]: any } = {};
+  
+  // Current schema for autocomplete (will be populated from loadedSchemas)
+  private schema: { [tableName: string]: string[] } = {};
 
   // Add new properties for dropdowns
   organisations: any[] = [];
@@ -511,6 +494,9 @@ export class RunQueryComponent
         if (activeTab) {
           activeTab.content = this.sqlQuery;
         }
+
+        // Check if schema needs to be loaded for autocomplete
+        this.checkAndLoadSchemaForAutocomplete();
 
         // Trigger auto-save if enabled
         this.triggerAutoSave();
@@ -959,6 +945,11 @@ LIMIT 10;`;
       this.editor.setValue('');
     }
 
+    // Set schema for the new tab's database
+    if (targetDatabase?.id) {
+      this.setSchemaForDatabase(targetDatabase.id.toString());
+    }
+
     // Auto-scroll to the newly created tab
     this.scrollToNewTab(tabId);
   }
@@ -1016,6 +1007,11 @@ LIMIT 10;`;
 
     if (newTab && this.editor) {
       this.editor.setValue(newTab.content || '');
+      
+      // Set schema for the new tab's database
+      if (newTab.database?.id) {
+        this.setSchemaForDatabase(newTab.database.id.toString());
+      }
     }
   }
 
@@ -1652,6 +1648,8 @@ LIMIT 10;`;
         database: database,
         loading: false,
         level: 0,
+        structureData: null, // Store raw API response data
+        hasStructure: false // Track if structure has been loaded
       },
       children: [], // Empty array initially, populated on expand
     }));
@@ -1687,8 +1685,17 @@ LIMIT 10;`;
           const result = JSON.parse(JSON.stringify(response));
           
           if (result && result.data) {
-            // Transform API response to tree node structure
-            node.children = this.transformDatabaseStructureToTreeNodes(result.data);
+            // Store raw structure data in node
+            node.data.structureData = result.data;
+            node.data.hasStructure = true;
+            
+            // Transform API response to tree node structure and store schema for autocomplete
+            node.children = this.transformDatabaseStructureToTreeNodes(result.data, node.data.database.id.toString());
+            
+            // If this database is currently active in editor, update schema immediately
+            if (this.selectedDatabase?.id === node.data.database.id) {
+              this.updateActiveSchema(node.data.database.id.toString());
+            }
           } else {
             // Fallback to dummy data if API response is empty
             const schemaData = this.generateDummySchemaForDatabase(node.data.database);
@@ -1706,6 +1713,7 @@ LIMIT 10;`;
           node.children = schemaData[0]?.children || [];
           
           node.data.loading = false;
+          node.data.hasStructure = false;
 
           // Show error message to user (you can customize this based on your error handling approach)
           if (error.error && error.error.message) {
@@ -1716,12 +1724,44 @@ LIMIT 10;`;
   }
 
   // Transform API response to tree node structure
-  transformDatabaseStructureToTreeNodes(structureData: any): TreeNode[] {
+  transformDatabaseStructureToTreeNodes(structureData: any, databaseId?: string): TreeNode[] {
     // API returns structure like:
     // { schemas: [{ schema: 'schema_name', tables: [{ table: 'table_name', columns: [...] }] }] }
     
     if (!structureData || !structureData.schemas) {
       return [];
+    }
+    
+    // Build schema for autocomplete if databaseId is provided
+    if (databaseId) {
+      const schemaForAutocomplete: { [tableName: string]: string[] } = {};
+      
+      structureData.schemas.forEach((schemaItem: any) => {
+        if (schemaItem.tables) {
+          schemaItem.tables.forEach((tableItem: any) => {
+            const tableName = `${schemaItem.schema}.${tableItem.table}`;
+            const columns: string[] = [];
+            
+            if (tableItem.columns) {
+              tableItem.columns.forEach((column: any) => {
+                columns.push(column.name);
+              });
+            }
+            
+            schemaForAutocomplete[tableName] = columns;
+            // Also add without schema prefix for convenience
+            schemaForAutocomplete[tableItem.table] = columns;
+          });
+        }
+      });
+      
+      // Store in loaded schemas
+      this.loadedSchemas[databaseId] = schemaForAutocomplete;
+      
+      // Update active schema if this is the current database
+      if (this.selectedDatabase && this.selectedDatabase.id === databaseId) {
+        this.schema = schemaForAutocomplete;
+      }
     }
 
     return structureData.schemas.map((schemaItem: any) => ({
@@ -2316,7 +2356,109 @@ LIMIT 10;`;
 
   onDBChange(event: any) {
     this.selectedDatabase = event.value;
-    // You can add any specific logic needed when database changes
+    
+    // Update the active schema for autocomplete
+    if (this.selectedDatabase && this.selectedDatabase.id) {
+      this.setSchemaForDatabase(this.selectedDatabase.id.toString());
+    }
+  }
+  
+  // Update the active schema for autocomplete
+  private updateActiveSchema(databaseId: string): void {
+    if (this.loadedSchemas[databaseId]) {
+      // Use cached schema
+      this.schema = this.loadedSchemas[databaseId];
+    } else {
+      // Schema not loaded yet, will be loaded on first keystroke
+      this.schema = {};
+    }
+  }
+
+  // Check if schema is loaded for current database, load if needed
+  private checkAndLoadSchemaForAutocomplete(): void {
+    // Only load if we have a selected database and organization
+    if (!this.selectedDatabase?.id || !this.selectedOrg?.id) {
+      return;
+    }
+
+    const databaseId = this.selectedDatabase.id.toString();
+    
+    // If schema is already loaded, no need to reload
+    if (this.loadedSchemas[databaseId]) {
+      return;
+    }
+
+    // Load schema in background for autocomplete
+    this.loadSchemaForDatabase(databaseId);
+  }
+
+  // Find database tree node by database ID
+  private findDatabaseTreeNode(databaseId: string): TreeNode | null {
+    for (const node of this.databaseTree) {
+      if (node.data?.database?.id?.toString() === databaseId) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  // Set schema for a specific database (use tree data if available, otherwise load from API)
+  private setSchemaForDatabase(databaseId: string): void {
+    // First check if tree node has structure data
+    const treeNode = this.findDatabaseTreeNode(databaseId);
+    
+    if (treeNode?.data?.hasStructure && treeNode.data.structureData) {
+      // Use existing tree node data
+      this.transformDatabaseStructureToTreeNodes(treeNode.data.structureData, databaseId);
+      this.updateActiveSchema(databaseId);
+    } else if (this.loadedSchemas[databaseId]) {
+      // Use cached schema
+      this.updateActiveSchema(databaseId);
+    } else {
+      // Load schema from API
+      this.loadSchemaForDatabase(databaseId);
+    }
+  }
+
+  // Load schema for a specific database for autocomplete
+  private loadSchemaForDatabase(databaseId: string): void {
+    if (!this.selectedOrg?.id) {
+      return;
+    }
+
+    // Call API to get database structure for autocomplete
+    this.queryService.getDatabaseStructure(
+      parseInt(databaseId),
+      this.selectedOrg.id
+    ).toPromise()
+      .then((response: any) => {
+        // Handle successful response
+        const result = JSON.parse(JSON.stringify(response));
+        
+        if (result && result.data) {
+          // Transform API response and store schema for autocomplete
+          this.transformDatabaseStructureToTreeNodes(result.data, databaseId);
+          
+          // Update tree node with structure data if it exists
+          const treeNode = this.findDatabaseTreeNode(databaseId);
+          if (treeNode) {
+            treeNode.data.structureData = result.data;
+            treeNode.data.hasStructure = true;
+            
+            // Update tree children if not already expanded
+            if (!treeNode.children || treeNode.children.length === 0) {
+              treeNode.children = this.transformDatabaseStructureToTreeNodes(result.data, databaseId);
+            }
+          }
+          
+          // Update active schema
+          this.updateActiveSchema(databaseId);
+        }
+      })
+      .catch((error: any) => {
+        // Handle error silently for background loading
+        console.warn('Could not load schema for autocomplete:', error);
+      });
   }
 
   loadDatabases() {
