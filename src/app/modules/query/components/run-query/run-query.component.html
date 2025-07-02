@@ -47,7 +47,7 @@
                 <i class="pi pi-spin pi-spinner loading-icon"></i>
                 <span class="loading-text">Loading databases...</span>
               </div>
-              
+
               <!-- Database Tree -->
               <p-tree
                 [value]="databaseTree"
@@ -58,20 +58,35 @@
                 (onNodeExpand)="onDatabaseNodeExpand($event)"
               >
                 <ng-template let-node pTemplate="default">
-                  <div class="tree-node-content" [class]="'level-' + node.data?.level" [attr.data-type]="node.data?.type">
+                  <div
+                    class="tree-node-content"
+                    [class]="'level-' + node.data?.level"
+                    [attr.data-type]="node.data?.type"
+                    (contextmenu)="onDatabaseNodeRightClick($event, node)"
+                  >
                     <div class="node-main">
-                      <i class="node-icon" 
-                         [class]="getNodeIcon(node.data?.type)"></i>
+                      <i
+                        class="node-icon"
+                        [class]="getNodeIcon(node.data?.type)"
+                      ></i>
                       <span class="node-label">{{ node.label }}</span>
-                      <span class="node-type" *ngIf="node.data?.type">{{ node.data.type }}</span>
-                      <i class="pi pi-spin pi-spinner loading-indicator" *ngIf="node.data?.loading"></i>
+                      <span class="node-type" *ngIf="node.data?.type">{{
+                        node.data.type
+                      }}</span>
+                      <i
+                        class="pi pi-spin pi-spinner loading-indicator"
+                        *ngIf="node.data?.loading"
+                      ></i>
                     </div>
                   </div>
                 </ng-template>
               </p-tree>
-              
+
               <!-- Empty state -->
-              <div class="empty-state" *ngIf="!isDatabasesLoading && databases.length === 0">
+              <div
+                class="empty-state"
+                *ngIf="!isDatabasesLoading && databases.length === 0"
+              >
                 <i class="pi pi-database empty-icon"></i>
                 <p>No databases available</p>
               </div>
@@ -109,7 +124,10 @@
                       (contextmenu)="onTabRightClick($event, tab, i)"
                     >
                       <ng-container *ngIf="!tab.isEditing">
-                        <i class="pi pi-bookmark-fill tab-pin-icon" *ngIf="tab.isPinned"></i>
+                        <i
+                          class="pi pi-bookmark-fill tab-pin-icon"
+                          *ngIf="tab.isPinned"
+                        ></i>
                         <span class="tab-title">{{
                           getQueryNumberFromTitle(tab.title)
                         }}</span>
@@ -151,6 +169,7 @@
                       type="button"
                       icon="pi pi-align-left"
                       class="p-button-text p-button-rounded format-btn"
+                      [disabled]="tabs.length === 0"
                       (click)="formatSQL()"
                     ></button>
                     <button
@@ -161,7 +180,7 @@
                       class="p-button-text p-button-rounded run-btn"
                       [class.executing]="isExecuting"
                       (click)="executeQuery()"
-                      [disabled]="isExecuting"
+                      [disabled]="isExecuting || tabs.length === 0"
                     ></button>
                     <button
                       pButton
@@ -169,8 +188,9 @@
                       type="button"
                       icon="pi pi-save"
                       class="p-button-text p-button-rounded save-btn"
-                      (mouseenter)="showSaveMenu($event)"
-                      (mouseleave)="hideSaveMenuDelayed()"
+                      [disabled]="tabs.length === 0"
+                      (mouseenter)="tabs.length > 0 && showSaveMenu($event)"
+                      (mouseleave)="tabs.length > 0 && hideSaveMenuDelayed()"
                       #saveBtn
                     ></button>
                     <button
@@ -181,8 +201,9 @@
                       class="p-button-text p-button-rounded auto-save-btn"
                       [class.enabled]="isAutoSaveEnabled"
                       [class.completed]="autoSaveStatus === 'completed'"
-                      (mouseenter)="showAutoSaveMenu($event)"
-                      (mouseleave)="hideAutoSaveMenuDelayed()"
+                      [disabled]="tabs.length === 0"
+                      (mouseenter)="tabs.length > 0 && showAutoSaveMenu($event)"
+                      (mouseleave)="tabs.length > 0 && hideAutoSaveMenuDelayed()"
                       #autoSaveBtn
                     ></button>
                     <button
@@ -200,7 +221,20 @@
                   </div>
                 </div>
                 <div class="panel-content">
-                  <div #monacoEditor class="sql-editor-monaco"></div>
+                  <div
+                    #monacoEditor
+                    class="sql-editor-monaco"
+                    *ngIf="tabs.length > 0"
+                  ></div>
+                  <div class="no-tabs-message" *ngIf="tabs.length === 0">
+                    <i class="pi pi-database"></i>
+                    <h3>No Query Tab Open</h3>
+                    <p>Select a database to run query</p>
+                    <p class="hint">
+                      Hover over the <i class="pi pi-plus"></i> button above and
+                      select a database to get started
+                    </p>
+                  </div>
                 </div>
               </div>
             </ng-template>
@@ -494,18 +528,16 @@
     <span>Close All to Left</span>
   </div>
   <div class="context-menu-separator"></div>
-  <div
-    class="context-menu-item"
-    (click)="renameTabFromContextMenu()"
-  >
+  <div class="context-menu-item" (click)="renameTabFromContextMenu()">
     <i class="pi pi-pencil"></i>
     <span>Rename Tab</span>
   </div>
-  <div
-    class="context-menu-item"
-    (click)="togglePinTabFromContextMenu()"
-  >
-    <i class="pi" [class.pi-bookmark]="!selectedTabForContext?.isPinned" [class.pi-bookmark-fill]="selectedTabForContext?.isPinned"></i>
+  <div class="context-menu-item" (click)="togglePinTabFromContextMenu()">
+    <i
+      class="pi"
+      [class.pi-bookmark]="!selectedTabForContext?.isPinned"
+      [class.pi-bookmark-fill]="selectedTabForContext?.isPinned"
+    ></i>
     <span>{{ selectedTabForContext?.isPinned ? 'Unpin Tab' : 'Pin Tab' }}</span>
   </div>
   <div class="context-menu-separator"></div>
@@ -555,6 +587,31 @@
   (mouseenter)="cancelMenuHide('autoSave')"
   (mouseleave)="hideMenuDelayed('autoSave')"
 ></p-menu>
+
+<!-- Database Context Menu -->
+<div
+  class="database-context-menu"
+  *ngIf="showDatabaseContextMenu"
+  [style.left.px]="databaseContextMenuPosition.x"
+  [style.top.px]="databaseContextMenuPosition.y"
+  (click)="$event.stopPropagation()"
+>
+  <div class="context-menu-item" (click)="addNewScriptFromContextMenu()">
+    <i class="pi pi-plus"></i>
+    <span>New Script</span>
+  </div>
+  <div class="context-menu-item" (click)="refreshDatabaseFromContextMenu()">
+    <i class="pi pi-refresh"></i>
+    <span>Refresh</span>
+  </div>
+</div>
+
+<!-- Backdrop to close database context menu -->
+<div
+  class="context-menu-backdrop"
+  *ngIf="showDatabaseContextMenu"
+  (click)="hideDatabaseContextMenu()"
+></div>
 
 <!-- Duplicate Name Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDuplicateConfirm">

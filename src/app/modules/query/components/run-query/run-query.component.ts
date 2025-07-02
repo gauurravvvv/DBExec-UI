@@ -23,6 +23,7 @@ import {
   ALL_POSTGRES_DATA_TYPES,
   ALL_POSTGRES_OPERATORS,
 } from '../../constants/postgres-sql.constants';
+import { parse } from 'pgsql-ast-parser';
 
 interface QueryResult {
   id: number;
@@ -77,6 +78,9 @@ export class RunQueryComponent
   isExecuting: boolean = false;
   private editor: any;
   private themeObserver: MutationObserver | null = null;
+  
+  // Default query template
+  private readonly DEFAULT_QUERY = `SELECT * FROM your_table_name LIMIT 10;`;
 
   // Tab management
   tabs: EditorTab[] = [];
@@ -88,6 +92,18 @@ export class RunQueryComponent
   contextMenuPosition = { x: 0, y: 0 };
   selectedTabForContext: EditorTab | null = null;
   selectedTabIndexForContext: number = -1;
+  
+  // Autocomplete properties
+  private tableAliases: Map<string, string> = new Map();
+  private schemaMetadata: Record<string, Record<string, string[]>> = {};
+  private suggestionProvider: any = null;
+  private suggestionCache: Map<string, any[]> = new Map();
+  private frequentlyUsed: Map<string, number> = new Map();
+  
+  // Database context menu properties
+  showDatabaseContextMenu: boolean = false;
+  databaseContextMenuPosition = { x: 0, y: 0 };
+  selectedDatabaseNodeForContext: TreeNode | null = null;
 
   // Duplicate name confirmation dialog
   showDuplicateConfirm: boolean = false;
@@ -148,6 +164,8 @@ export class RunQueryComponent
   // Loading states
   isDatabasesLoading: boolean = false;
   isSchemaLoading: boolean = false;
+  private isInitialOrgLoad: boolean = true;
+  private loadingSchemas: Set<string> = new Set(); // Track schemas being loaded
 
   // Database tree for unified view
   databaseTree: TreeNode[] = [];
@@ -252,6 +270,9 @@ export class RunQueryComponent
   }
 
   ngOnInit(): void {
+    // Set default query
+    this.sqlQuery = this.DEFAULT_QUERY;
+    
     // Add organization and database loading
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
@@ -263,17 +284,13 @@ export class RunQueryComponent
     }
 
     this.initializeSchemaTree();
-    this.loadDummyData();
+    // this.loadDummyData(); // Not needed anymore, using DEFAULT_QUERY
     // Initialize database menu items (fallback)
     this.updateDatabaseMenuItems();
     // Initialize save menu items
     this.updateSaveMenuItems();
     // Initialize auto-save menu items
     this.updateAutoSaveMenuItems();
-    // Create initial tab only if databases are already loaded
-    if (this.databases.length > 0) {
-      this.addNewTab();
-    }
 
     // Add ESC key handler for query editor fullscreen
     this.setupEscapeKeyHandler();
@@ -319,18 +336,15 @@ export class RunQueryComponent
     }, 100);
   }
 
-  ngOnDestroy(): void {
-    if (this.editor) {
-      this.editor.dispose();
-    }
-    if (this.themeObserver) {
-      this.themeObserver.disconnect();
-    }
-  }
 
   private initializeEditor(): void {
     if (!monaco) {
       console.error('Monaco is not defined');
+      return;
+    }
+
+    // Don't initialize editor if there are no tabs
+    if (this.tabs.length === 0) {
       return;
     }
 
@@ -513,10 +527,23 @@ export class RunQueryComponent
   private setupAutoComplete(): void {
     if (!monaco) return;
 
-    // Register completion provider for SQL
-    monaco.languages.registerCompletionItemProvider('sql', {
+    // Dispose previous provider if exists
+    if (this.suggestionProvider) {
+      this.suggestionProvider.dispose();
+    }
+
+    // Build schema metadata from current schema
+    this.buildSchemaMetadata();
+
+    // Register enhanced completion provider for SQL
+    this.suggestionProvider = monaco.languages.registerCompletionItemProvider('sql', {
+      triggerCharacters: ['.', ' ', '(', ',', '*'],
       provideCompletionItems: (model: any, position: any) => {
         const word = model.getWordUntilPosition(position);
+        const line = model.getLineContent(position.lineNumber);
+        const lineBeforeCursor = line.substring(0, position.column - 1);
+        const fullQuery = model.getValue();
+        
         const range = {
           startLineNumber: position.lineNumber,
           endLineNumber: position.lineNumber,
@@ -525,71 +552,767 @@ export class RunQueryComponent
         };
 
         const suggestions: any[] = [];
+        
+        // Extract table aliases using SQL parser
+        this.extractTableAliases(fullQuery);
+        
+        // Get context-aware suggestions
+        const context = this.getAdvancedQueryContext(lineBeforeCursor, fullQuery, position);
+        
+        // Debug logging
+        console.log('Autocomplete Debug:', {
+          lineBeforeCursor,
+          word: word.word,
+          context,
+          schemaMetadata: Object.keys(this.schemaMetadata),
+          currentLine: model.getLineContent(position.lineNumber)
+        });
+        
+        if (context.afterDot) {
+          console.log('Processing dot notation for:', context.beforeDot);
+          this.addDotNotationSuggestions(suggestions, range, word.word, context.beforeDot, fullQuery);
+        } else if (context.expectingTable) {
+          this.addTableSuggestions(suggestions, range, word.word);
+        } else if (context.expectingColumn) {
+          this.addColumnSuggestions(suggestions, range, word.word, context.availableTables, fullQuery);
+        } else {
+          this.addGeneralSuggestions(suggestions, range, word.word, context);
+        }
 
-        // Add PostgreSQL keywords
-        ALL_POSTGRES_KEYWORDS.forEach((keyword: string) => {
-          suggestions.push({
-            label: keyword,
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: keyword,
-            range: range,
-            detail: 'PostgreSQL Keyword',
-          });
+        // Remove duplicates and sort suggestions by relevance
+        const uniqueSuggestions = this.removeDuplicateSuggestions(suggestions);
+        
+        uniqueSuggestions.forEach(suggestion => {
+          suggestion.score = this.calculateSuggestionScore(suggestion.label, word.word);
+        });
+        
+        uniqueSuggestions.sort((a, b) => {
+          // Primary sort by score (descending)
+          if (a.score !== b.score) {
+            return b.score - a.score;
+          }
+          
+          // Secondary sort by category (using sortText)
+          if (a.sortText && b.sortText && a.sortText !== b.sortText) {
+            return a.sortText.localeCompare(b.sortText);
+          }
+          
+          // Tertiary sort by label length (shorter first)
+          if (a.label.length !== b.label.length) {
+            return a.label.length - b.label.length;
+          }
+          
+          // Final sort by alphabetical
+          return a.label.localeCompare(b.label);
         });
 
-        // Add table names
-        Object.keys(this.schema).forEach(table => {
-          suggestions.push({
-            label: table,
-            kind: monaco.languages.CompletionItemKind.Class,
-            insertText: table,
-            range: range,
-            detail: 'Table',
-            documentation: `Table: ${table}`,
-          });
-        });
-
-        // Add column names with table prefix
-        Object.entries(this.schema).forEach(([table, columns]) => {
-          columns.forEach(column => {
-            suggestions.push({
-              label: `${table}.${column}`,
-              kind: monaco.languages.CompletionItemKind.Field,
-              insertText: `${table}.${column}`,
-              range: range,
-              detail: `Column in ${table}`,
-              documentation: `Column: ${column} from table ${table}`,
-            });
-          });
-        });
-
-        // Add PostgreSQL functions
-        ALL_POSTGRES_FUNCTIONS.forEach((func: string) => {
-          // Add parentheses for functions that aren't already literals
-          const insertText = func.includes('(') ? func : `${func}()`;
-          suggestions.push({
-            label: func,
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: insertText,
-            range: range,
-            detail: 'PostgreSQL Function',
-          });
-        });
-
-        // Add PostgreSQL data types
-        ALL_POSTGRES_DATA_TYPES.forEach((dataType: string) => {
-          suggestions.push({
-            label: dataType,
-            kind: monaco.languages.CompletionItemKind.TypeParameter,
-            insertText: dataType,
-            range: range,
-            detail: 'PostgreSQL Data Type',
-          });
-        });
-
-        return { suggestions: suggestions };
+        return {
+          suggestions: uniqueSuggestions,
+          incomplete: false
+        };
       },
     });
+  }
+
+  private extractTableAliases(sql: string): void {
+    this.tableAliases.clear();
+    try {
+      const ast = parse(sql);
+      
+      for (const stmt of ast) {
+        if (stmt.type === 'select') {
+          this.processSelectStatement(stmt);
+        }
+      }
+    } catch (error) {
+      // If parsing fails, try regex fallback
+      this.extractAliasesWithRegex(sql);
+    }
+  }
+
+  private processSelectStatement(stmt: any): void {
+    if (stmt.from) {
+      for (const from of stmt.from) {
+        if (from.type === 'table') {
+          const tableName = from.name?.name || from.name;
+          const alias = from.alias?.name || tableName;
+          if (tableName && alias) {
+            this.tableAliases.set(alias, tableName);
+          }
+        } else if (from.type === 'table ref' && from.table) {
+          const tableName = from.table.name;
+          const alias = from.alias?.name || tableName;
+          if (tableName && alias) {
+            this.tableAliases.set(alias, tableName);
+          }
+        }
+      }
+    }
+
+    // Process joins
+    if (stmt.join) {
+      for (const join of stmt.join) {
+        if (join.from?.type === 'table') {
+          const tableName = join.from.name?.name || join.from.name;
+          const alias = join.from.alias?.name || tableName;
+          if (tableName && alias) {
+            this.tableAliases.set(alias, tableName);
+          }
+        }
+      }
+    }
+  }
+
+  private extractAliasesWithRegex(sql: string): void {
+    // Regex fallback for alias extraction
+    const fromRegex = /from\s+(\w+(?:\.\w+)?)(?:\s+(?:as\s+)?(\w+))?/gi;
+    const joinRegex = /join\s+(\w+(?:\.\w+)?)(?:\s+(?:as\s+)?(\w+))?/gi;
+    
+    let match;
+    
+    // Extract FROM aliases
+    while ((match = fromRegex.exec(sql)) !== null) {
+      const tableName = match[1];
+      const alias = match[2] || tableName.split('.').pop() || tableName;
+      if (alias && tableName) {
+        this.tableAliases.set(alias, tableName);
+      }
+    }
+    
+    // Extract JOIN aliases
+    while ((match = joinRegex.exec(sql)) !== null) {
+      const tableName = match[1];
+      const alias = match[2] || tableName.split('.').pop() || tableName;
+      if (alias && tableName) {
+        this.tableAliases.set(alias, tableName);
+      }
+    }
+  }
+
+  private getAdvancedQueryContext(lineBeforeCursor: string, fullQuery: string, position: any): any {
+    const line = lineBeforeCursor.toLowerCase().trim();
+    
+    // Enhanced dot notation detection with multiple patterns
+    const dotPatterns = [
+      /(\w+)\.$/,           // word.
+      /(\w+)\.\s*$/,        // word. (with spaces)
+      /(\w+)\.(\w*)$/       // word.partial
+    ];
+    
+    let dotMatch = null;
+    let beforeDot = null;
+    
+    for (const pattern of dotPatterns) {
+      dotMatch = lineBeforeCursor.match(pattern);
+      if (dotMatch) {
+        beforeDot = dotMatch[1];
+        break;
+      }
+    }
+    
+    const justTypedDot = lineBeforeCursor.endsWith('.') || lineBeforeCursor.match(/\.\s*$/);
+    
+    console.log('Dot detection:', {
+      lineBeforeCursor,
+      dotMatch,
+      beforeDot,
+      justTypedDot,
+      line
+    });
+    
+    if (dotMatch || justTypedDot) {
+      if (!beforeDot && justTypedDot) {
+        // Extract the word before the dot
+        const wordBeforeDot = lineBeforeCursor.match(/(\w+)\.\s*$/);
+        beforeDot = wordBeforeDot ? wordBeforeDot[1] : null;
+      }
+      
+      if (beforeDot) {
+        const isSchema = this.isSchemaName(beforeDot);
+        const isTableOrAlias = this.isTableOrAlias(beforeDot);
+        
+        console.log('Found dot notation:', {
+          beforeDot,
+          isSchema,
+          isTableOrAlias,
+          availableSchemas: Object.keys(this.schemaMetadata),
+          availableTables: Object.keys(this.schema)
+        });
+        
+        return {
+          afterDot: true,
+          beforeDot: beforeDot,
+          expectingColumn: isTableOrAlias,
+          expectingTable: isSchema,
+          isSchema: isSchema,
+          isTableOrAlias: isTableOrAlias
+        };
+      }
+    }
+
+    const context = {
+      expectingTable: false,
+      expectingColumn: false,
+      afterDot: false,
+      availableTables: this.getAvailableTablesInContext(fullQuery),
+      inSelectClause: false,
+      inFromClause: false,
+      inWhereClause: false,
+      inJoinClause: false
+    };
+
+    // Enhanced context detection with more precise patterns
+    const patterns = {
+      expectingTable: [
+        /(^|\s)(from|join|update|into)\s+$/i,
+        /(^|\s)(from|join)\s+\w*$/i,
+        /(inner|left|right|outer|cross)\s+(join)\s+$/i,
+        /(insert\s+into)\s+$/i
+      ],
+      expectingColumn: [
+        /(^|\s)select\s+$/i,
+        /(^|\s)select\s+\*?\s*$/i, // Handle SELECT * or SELECT with optional *
+        /(^|\s)select\s+\w*$/i,
+        /,\s*$/i,
+        /,\s*\w*$/i,
+        /(^|\s)(where|having|and|or)\s+$/i,
+        /(^|\s)(where|having|and|or)\s+\w*$/i,
+        /(^|\s)(order\s+by|group\s+by)\s+$/i,
+        /(^|\s)(order\s+by|group\s+by)\s+\w*$/i,
+        /\(\s*$/i, // After opening parenthesis
+        /=\s*$/i,  // After equals sign
+        />\s*$/i,  // After greater than
+        /<\s*$/i,  // After less than
+        // Special case: after removing * from SELECT
+        /(^|\s)select\s+from\s+\w+/i // This pattern shouldn't match for expectingColumn
+      ],
+      expectingJoinCondition: [
+        /(^|\s)on\s+$/i,
+        /(^|\s)on\s+\w*$/i
+      ]
+    };
+
+    // Special handling for SELECT clause context
+    const selectFromMatch = line.match(/(^|\s)select\s+(.*?)\s+from\s+(\w+)/i);
+    if (selectFromMatch) {
+      const selectPart = selectFromMatch[2].trim();
+      const tableName = selectFromMatch[3];
+      
+      // If cursor is in the SELECT part (between SELECT and FROM)
+      const selectEndPos = line.indexOf(' from');
+      const cursorInSelect = lineBeforeCursor.length <= selectEndPos;
+      
+      if (cursorInSelect && (selectPart === '*' || selectPart === '')) {
+        return {
+          expectingTable: false,
+          expectingColumn: true,
+          afterDot: false,
+          availableTables: [tableName],
+          inSelectClause: true,
+          inFromClause: false,
+          inWhereClause: false,
+          inJoinClause: false,
+          contextTable: tableName
+        };
+      }
+    }
+
+    // Check table patterns
+    if (patterns.expectingTable.some(pattern => pattern.test(line))) {
+      context.expectingTable = true;
+      context.inFromClause = true;
+    }
+    
+    // Check column patterns
+    else if (patterns.expectingColumn.some(pattern => pattern.test(line))) {
+      context.expectingColumn = true;
+      
+      // Determine specific clause context
+      if (/(^|\s)select/i.test(line)) {
+        context.inSelectClause = true;
+      } else if (/(^|\s)(where|having|and|or)/i.test(line)) {
+        context.inWhereClause = true;
+      } else if (/(^|\s)(order\s+by|group\s+by)/i.test(line)) {
+        context.inSelectClause = true; // For ordering/grouping
+      }
+    }
+    
+    // Check join condition patterns
+    else if (patterns.expectingJoinCondition.some(pattern => pattern.test(line))) {
+      context.expectingColumn = true;
+      context.inJoinClause = true;
+    }
+
+    return context;
+  }
+
+  private buildSchemaMetadata(): void {
+    this.schemaMetadata = {};
+    
+    console.log('Building schema metadata from:', this.schema);
+    
+    Object.entries(this.schema).forEach(([fullTableName, columns]) => {
+      const parts = fullTableName.split('.');
+      const schema = parts.length > 1 ? parts[0] : 'public';
+      const tableName = parts[parts.length - 1];
+      
+      if (!this.schemaMetadata[schema]) {
+        this.schemaMetadata[schema] = {};
+      }
+      
+      this.schemaMetadata[schema][tableName] = columns;
+    });
+    
+    console.log('Built schema metadata:', this.schemaMetadata);
+  }
+
+  private getAvailableTablesInContext(sql: string): string[] {
+    const tables: string[] = [];
+    
+    // Add all aliased tables
+    this.tableAliases.forEach((tableName, alias) => {
+      tables.push(alias);
+      tables.push(tableName);
+    });
+    
+    // Add all schema tables
+    Object.keys(this.schema).forEach(fullTableName => {
+      const tableName = fullTableName.split('.').pop();
+      if (tableName && !tables.includes(tableName)) {
+        tables.push(tableName);
+      }
+    });
+    
+    return tables;
+  }
+
+  private isTableOrAlias(name: string): boolean {
+    return this.tableAliases.has(name) || this.isTableName(name);
+  }
+
+  private isSchemaName(name: string): boolean {
+    return Object.keys(this.schemaMetadata).includes(name);
+  }
+
+  private addTableSuggestions(suggestions: any[], range: any, currentWord: string): void {
+    // Get unique schema names
+    const schemas = new Set<string>();
+    const tables = new Map<string, string[]>();
+    
+    Object.keys(this.schema).forEach(fullTableName => {
+      const parts = fullTableName.split('.');
+      if (parts.length > 1) {
+        const schemaName = parts[0];
+        const tableName = parts[1];
+        schemas.add(schemaName);
+        
+        if (!tables.has(schemaName)) {
+          tables.set(schemaName, []);
+        }
+        tables.get(schemaName)!.push(tableName);
+      } else {
+        // Table without schema (assume public)
+        schemas.add('public');
+        if (!tables.has('public')) {
+          tables.set('public', []);
+        }
+        tables.get('public')!.push(fullTableName);
+      }
+    });
+
+    // Add schema suggestions
+    schemas.forEach(schemaName => {
+      if (this.matchesInput(schemaName, currentWord)) {
+        const tableCount = tables.get(schemaName)?.length || 0;
+        suggestions.push({
+          label: schemaName,
+          kind: monaco.languages.CompletionItemKind.Module,
+          insertText: schemaName,
+          range: range,
+          detail: `📁 Schema (${tableCount} tables)`,
+          documentation: `Schema: ${schemaName}\nTables: ${tables.get(schemaName)?.join(', ')}\nType: Database Schema`,
+          sortText: `0_${schemaName}`
+        });
+      }
+    });
+
+    // Also add direct table names for convenience
+    Object.keys(this.schema).forEach(fullTableName => {
+      const parts = fullTableName.split('.');
+      const tableOnly = parts[parts.length - 1];
+      
+      if (this.matchesInput(tableOnly, currentWord)) {
+        const schemaOnly = parts.length > 1 ? parts[0] : 'public';
+        
+        suggestions.push({
+          label: tableOnly,
+          kind: monaco.languages.CompletionItemKind.Class,
+          insertText: tableOnly,
+          range: range,
+          detail: `📋 Table in ${schemaOnly}`,
+          documentation: `Table: ${tableOnly}\nSchema: ${schemaOnly}\nColumns: ${this.schema[fullTableName].join(', ')}\nType: Database Table`,
+          sortText: `1_${tableOnly}`
+        });
+      }
+    });
+  }
+
+  private addColumnSuggestions(suggestions: any[], range: any, currentWord: string, availableTables: string[], fullQuery: string): void {
+    const addedColumns = new Set<string>();
+    
+    // Prioritize columns from tables in current query context
+    availableTables.forEach(tableName => {
+      const fullTableName = this.resolveFullTableName(tableName);
+      if (fullTableName && this.schema[fullTableName]) {
+        this.schema[fullTableName].forEach(column => {
+          if (this.matchesInput(column, currentWord) && !addedColumns.has(column)) {
+            addedColumns.add(column);
+            const isAlias = this.tableAliases.has(tableName);
+            const displayTable = isAlias ? `${tableName} (${this.tableAliases.get(tableName)})` : tableName;
+            
+            suggestions.push({
+              label: column,
+              kind: monaco.languages.CompletionItemKind.Field,
+              insertText: column,
+              range: range,
+              detail: `🔹 Column in ${displayTable}`,
+              documentation: `Column: ${column}\nTable: ${fullTableName}\nContext: Available in current query\nType: Table Column`,
+              sortText: `1_${column}`
+            });
+          }
+        });
+      }
+    });
+    
+    // Add columns from all other tables with lower priority
+    Object.entries(this.schema).forEach(([tableName, columns]) => {
+      columns.forEach(column => {
+        if (this.matchesInput(column, currentWord) && !addedColumns.has(column)) {
+          addedColumns.add(column);
+          suggestions.push({
+            label: column,
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: column,
+            range: range,
+            detail: `🔸 Column in ${tableName}`,
+            documentation: `Column: ${column}\nTable: ${tableName}\nContext: Available globally\nType: Table Column`,
+            sortText: `3_${column}`
+          });
+        }
+      });
+    });
+  }
+  
+  private resolveFullTableName(tableName: string): string | null {
+    // Check if it's an alias
+    if (this.tableAliases.has(tableName)) {
+      return this.tableAliases.get(tableName)!;
+    }
+    
+    // Check if it's a direct table name
+    return Object.keys(this.schema).find(name => 
+      name === tableName || name.endsWith('.' + tableName)
+    ) || null;
+  }
+
+  private addDotNotationSuggestions(suggestions: any[], range: any, currentWord: string, beforeDot: string, fullQuery: string): void {
+    console.log('Adding dot notation suggestions for:', beforeDot, 'currentWord:', currentWord);
+    console.log('Available schema metadata:', this.schemaMetadata);
+    console.log('Available table aliases:', Array.from(this.tableAliases.entries()));
+    
+    // Check if beforeDot is a table alias
+    if (this.tableAliases.has(beforeDot)) {
+      console.log('Found table alias:', beforeDot, '->', this.tableAliases.get(beforeDot));
+      const actualTableName = this.tableAliases.get(beforeDot)!;
+      this.addColumnsForTable(suggestions, range, currentWord, actualTableName, `Alias: ${beforeDot} → ${actualTableName}`);
+      return;
+    }
+    
+    // Check if beforeDot is a schema name
+    if (this.schemaMetadata[beforeDot]) {
+      console.log('Found schema:', beforeDot, 'with tables:', Object.keys(this.schemaMetadata[beforeDot]));
+      const tables = this.schemaMetadata[beforeDot];
+      Object.keys(tables).forEach(tableName => {
+        if (this.matchesInput(tableName, currentWord)) {
+          const columns = tables[tableName];
+          console.log('Adding table suggestion:', tableName);
+          suggestions.push({
+            label: tableName,
+            kind: monaco.languages.CompletionItemKind.Class,
+            insertText: tableName,
+            range: range,
+            detail: `📋 Table in ${beforeDot} schema`,
+            documentation: `Table: ${beforeDot}.${tableName}\nColumns: ${columns.join(', ')}`,
+            sortText: `0_${tableName}`
+          });
+        }
+      });
+      return;
+    }
+    
+    // Check if beforeDot is a direct table name
+    if (this.isTableName(beforeDot)) {
+      console.log('Found direct table name:', beforeDot);
+      this.addColumnsForTable(suggestions, range, currentWord, beforeDot, `📋 Table: ${beforeDot}`);
+    } else {
+      console.log('No match found for beforeDot:', beforeDot);
+      console.log('Available schemas:', Object.keys(this.schemaMetadata));
+      console.log('Available tables:', Object.keys(this.schema));
+    }
+  }
+  
+  private addColumnsForTable(suggestions: any[], range: any, currentWord: string, tableName: string, detail: string): void {
+    // Find the full table name (with schema)
+    const fullTableName = Object.keys(this.schema).find(name => 
+      name === tableName || name.endsWith('.' + tableName)
+    );
+    
+    if (fullTableName && this.schema[fullTableName]) {
+      this.schema[fullTableName].forEach(column => {
+        if (this.matchesInput(column, currentWord)) {
+          suggestions.push({
+            label: column,
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: column,
+            range: range,
+            detail: `🔹 ${detail}`,
+            documentation: `Column: ${column}\nTable: ${fullTableName}\nType: Field`,
+            sortText: `1_${column}`
+          });
+        }
+      });
+    }
+  }
+
+  private addGeneralSuggestions(suggestions: any[], range: any, currentWord: string, context: any): void {
+    // Add SQL keywords with context awareness
+    ALL_POSTGRES_KEYWORDS.forEach((keyword: string) => {
+      if (this.matchesInput(keyword, currentWord)) {
+        suggestions.push({
+          label: keyword,
+          kind: monaco.languages.CompletionItemKind.Keyword,
+          insertText: keyword,
+          range: range,
+          detail: `🔤 SQL Keyword`,
+          documentation: `SQL Keyword: ${keyword.toUpperCase()}\nType: PostgreSQL Reserved Word`,
+          sortText: `4_${keyword}`
+        });
+      }
+    });
+
+    // Add schema names and table names separately
+    const schemas = new Set<string>();
+    const tables = new Map<string, string[]>();
+    
+    Object.keys(this.schema).forEach(fullTableName => {
+      const parts = fullTableName.split('.');
+      if (parts.length > 1) {
+        const schemaName = parts[0];
+        const tableName = parts[1];
+        schemas.add(schemaName);
+        
+        if (!tables.has(schemaName)) {
+          tables.set(schemaName, []);
+        }
+        tables.get(schemaName)!.push(tableName);
+      } else {
+        schemas.add('public');
+        if (!tables.has('public')) {
+          tables.set('public', []);
+        }
+        tables.get('public')!.push(fullTableName);
+      }
+    });
+
+    // Add schema suggestions
+    schemas.forEach(schemaName => {
+      if (this.matchesInput(schemaName, currentWord)) {
+        const tableCount = tables.get(schemaName)?.length || 0;
+        suggestions.push({
+          label: schemaName,
+          kind: monaco.languages.CompletionItemKind.Module,
+          insertText: schemaName,
+          range: range,
+          detail: `Schema (${tableCount} tables)`,
+          documentation: `Schema: ${schemaName}\nTables: ${tables.get(schemaName)?.join(', ')}`,
+          sortText: `1_${schemaName}`
+        });
+      }
+    });
+
+    // Add table names
+    Object.keys(this.schema).forEach(fullTableName => {
+      const parts = fullTableName.split('.');
+      const tableOnly = parts[parts.length - 1];
+      
+      if (this.matchesInput(tableOnly, currentWord)) {
+        const schemaOnly = parts.length > 1 ? parts[0] : 'public';
+        
+        suggestions.push({
+          label: tableOnly,
+          kind: monaco.languages.CompletionItemKind.Class,
+          insertText: tableOnly,
+          range: range,
+          detail: `Table in ${schemaOnly}`,
+          documentation: `Table: ${tableOnly}\nColumns: ${this.schema[fullTableName].join(', ')}`,
+          sortText: `2_${tableOnly}`
+        });
+      }
+    });
+
+    // Add columns from all tables
+    Object.entries(this.schema).forEach(([tableName, columns]) => {
+      columns.forEach(column => {
+        if (this.matchesInput(column, currentWord)) {
+          suggestions.push({
+            label: `${column}`,
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: column,
+            range: range,
+            detail: `Column in ${tableName}`,
+            documentation: `Column: ${column} from table ${tableName}`,
+            sortText: `4_${column}`
+          });
+        }
+      });
+    });
+
+    // Add PostgreSQL functions
+    ALL_POSTGRES_FUNCTIONS.forEach((func: string) => {
+      if (this.matchesInput(func, currentWord)) {
+        const insertText = func.includes('(') ? func : `${func}()`;
+        suggestions.push({
+          label: func,
+          kind: monaco.languages.CompletionItemKind.Function,
+          insertText: insertText,
+          range: range,
+          detail: `⚡ PostgreSQL Function`,
+          documentation: `Function: ${func}\nType: Built-in PostgreSQL Function\nUsage: ${insertText}`,
+          sortText: `5_${func}`
+        });
+      }
+    });
+  }
+
+  private matchesInput(suggestion: string, input: string): boolean {
+    if (!input) return true;
+    
+    const suggestionLower = suggestion.toLowerCase();
+    const inputLower = input.toLowerCase();
+    
+    // Exact match (highest priority)
+    if (suggestionLower === inputLower) return true;
+    
+    // Starts with match (high priority)
+    if (suggestionLower.startsWith(inputLower)) return true;
+    
+    // Contains match (medium priority)
+    if (suggestionLower.includes(inputLower)) return true;
+    
+    // Fuzzy match for common typos and partial matches
+    return this.fuzzyMatch(suggestionLower, inputLower);
+  }
+
+  private fuzzyMatch(text: string, pattern: string): boolean {
+    let textIndex = 0;
+    let patternIndex = 0;
+    
+    while (textIndex < text.length && patternIndex < pattern.length) {
+      if (text[textIndex] === pattern[patternIndex]) {
+        patternIndex++;
+      }
+      textIndex++;
+    }
+    
+    return patternIndex === pattern.length;
+  }
+
+  private calculateSuggestionScore(suggestion: string, input: string): number {
+    let baseScore = 0;
+    
+    if (!input) {
+      baseScore = 1;
+    } else {
+      const suggestionLower = suggestion.toLowerCase();
+      const inputLower = input.toLowerCase();
+      
+      // Exact match
+      if (suggestionLower === inputLower) {
+        baseScore = 100;
+      }
+      // Starts with
+      else if (suggestionLower.startsWith(inputLower)) {
+        baseScore = 90 - (suggestion.length - input.length);
+      }
+      // Contains at beginning of word
+      else {
+        const words = suggestionLower.split(/[_\s]/);
+        let foundWordMatch = false;
+        for (const word of words) {
+          if (word.startsWith(inputLower)) {
+            baseScore = 80 - (suggestion.length - input.length);
+            foundWordMatch = true;
+            break;
+          }
+        }
+        
+        if (!foundWordMatch) {
+          // Contains anywhere
+          if (suggestionLower.includes(inputLower)) {
+            baseScore = 70 - (suggestion.length - input.length);
+          }
+          // Fuzzy match
+          else if (this.fuzzyMatch(suggestionLower, inputLower)) {
+            baseScore = 50 - (suggestion.length - input.length);
+          }
+        }
+      }
+    }
+    
+    // Add frequency bonus (up to 20 points)
+    const frequency = this.frequentlyUsed.get(suggestion.toLowerCase()) || 0;
+    const frequencyBonus = Math.min(20, frequency * 2);
+    
+    return Math.max(0, baseScore + frequencyBonus);
+  }
+
+  private trackSuggestionUsage(suggestion: string): void {
+    const key = suggestion.toLowerCase();
+    const currentCount = this.frequentlyUsed.get(key) || 0;
+    this.frequentlyUsed.set(key, currentCount + 1);
+    
+    // Keep cache size manageable
+    if (this.frequentlyUsed.size > 200) {
+      const entries = Array.from(this.frequentlyUsed.entries());
+      entries.sort((a, b) => b[1] - a[1]);
+      this.frequentlyUsed.clear();
+      
+      // Keep top 100 most frequently used
+      entries.slice(0, 100).forEach(([key, count]) => {
+        this.frequentlyUsed.set(key, count);
+      });
+    }
+  }
+
+  private removeDuplicateSuggestions(suggestions: any[]): any[] {
+    const seen = new Set<string>();
+    const unique: any[] = [];
+    
+    for (const suggestion of suggestions) {
+      const key = `${suggestion.label.toLowerCase()}_${suggestion.kind}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(suggestion);
+      }
+    }
+    
+    return unique;
+  }
+
+  private isTableName(name: string): boolean {
+    return Object.keys(this.schema).some(table => 
+      table === name || table.endsWith('.' + name)
+    );
   }
 
   initializeSchemaTree(): void {
@@ -739,20 +1462,8 @@ export class RunQueryComponent
   }
 
   loadDummyData(): void {
-    // Pre-populate with sample query
-    this.sqlQuery = `-- Sample query to get employees in Engineering department
-SELECT 
-    e.first_name,
-    e.last_name,
-    e.email,
-    e.department,
-    e.salary,
-    e.hire_date
-FROM employees e
-WHERE e.department = 'Engineering'
-    AND e.salary > 60000
-ORDER BY e.hire_date DESC
-LIMIT 10;`;
+    // Use the consistent default query
+    this.sqlQuery = this.DEFAULT_QUERY;
 
     // If we have tabs, set the content to the first tab
     if (this.tabs.length > 0) {
@@ -911,6 +1622,7 @@ LIMIT 10;`;
     return this.tabs.length >= this.MAX_SCRIPTS;
   }
 
+
   // Tab management methods
   addNewTab(database?: any): void {
     // Don't create new tab if maximum limit is reached
@@ -924,10 +1636,11 @@ LIMIT 10;`;
       database ||
       (this.databases.length > 0 ? this.databases[0] : this.selectedDatabase);
     const dbName = targetDatabase?.name || 'Default';
+
     const newTab: EditorTab = {
       id: tabId,
       title: `${dbName} - Query ${this.tabCounter}`,
-      content: '',
+      content: this.DEFAULT_QUERY,
       database: targetDatabase,
     };
 
@@ -940,9 +1653,22 @@ LIMIT 10;`;
     this.activeTabId = tabId;
     this.tabCounter++;
 
-    // Update the current editor content
-    if (this.editor) {
-      this.editor.setValue('');
+    // Initialize editor if this is the first tab
+    if (this.tabs.length === 1 && !this.editor) {
+      // Wait for DOM update before initializing editor
+      setTimeout(() => {
+        this.initializeEditor();
+        // Set the content after editor is initialized
+        if (this.editor && this.tabs.length > 0) {
+          const activeTab = this.tabs.find(t => t.id === this.activeTabId);
+          if (activeTab) {
+            this.editor.setValue(activeTab.content || this.DEFAULT_QUERY);
+          }
+        }
+      }, 100);
+    } else if (this.editor) {
+      // Update the current editor content with default query
+      this.editor.setValue(this.DEFAULT_QUERY);
     }
 
     // Set schema for the new tab's database
@@ -1020,17 +1746,20 @@ LIMIT 10;`;
       event.stopPropagation();
     }
 
-    // Don't close if it's the last tab
-    if (this.tabs.length === 1) {
-      return;
-    }
-
     const index = this.tabs.findIndex(t => t.id === tabId);
     if (index !== -1) {
       this.tabs.splice(index, 1);
 
-      // If closing active tab, switch to another
-      if (this.activeTabId === tabId) {
+      // If this was the last tab, dispose the editor
+      if (this.tabs.length === 0) {
+        if (this.editor) {
+          this.editor.dispose();
+          this.editor = null;
+        }
+        this.activeTabId = '';
+        this.sqlQuery = this.DEFAULT_QUERY; // Reset to default query
+      } else if (this.activeTabId === tabId) {
+        // If closing active tab, switch to another
         const newIndex = Math.min(index, this.tabs.length - 1);
         this.activeTabId = this.tabs[newIndex].id;
 
@@ -1155,12 +1884,76 @@ LIMIT 10;`;
 
   private onDocumentClick(): void {
     this.hideTabContextMenu();
+    this.hideDatabaseContextMenu();
   }
 
   hideTabContextMenu(): void {
     this.showTabContextMenu = false;
     this.selectedTabForContext = null;
     this.selectedTabIndexForContext = -1;
+  }
+
+  // Database context menu methods
+  onDatabaseNodeRightClick(event: MouseEvent, node: TreeNode): void {
+    console.log('Right click on node:', node.data?.type, node.label); // Debug log
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Only show context menu for database nodes
+    if (node.data?.type !== 'Database') {
+      console.log('Not a database node, ignoring'); // Debug log
+      return;
+    }
+    
+    console.log('Showing database context menu'); // Debug log
+    this.selectedDatabaseNodeForContext = node;
+    this.databaseContextMenuPosition = {
+      x: event.clientX,
+      y: event.clientY
+    };
+    this.showDatabaseContextMenu = true;
+    
+    // Hide any other context menus
+    this.hideTabContextMenu();
+  }
+
+  hideDatabaseContextMenu(): void {
+    this.showDatabaseContextMenu = false;
+    this.selectedDatabaseNodeForContext = null;
+  }
+
+  addNewScriptFromContextMenu(): void {
+    if (this.selectedDatabaseNodeForContext?.data?.database) {
+      this.addNewTab(this.selectedDatabaseNodeForContext.data.database);
+      this.hideDatabaseContextMenu();
+    }
+  }
+
+  refreshDatabaseFromContextMenu(): void {
+    if (this.selectedDatabaseNodeForContext) {
+      const node = this.selectedDatabaseNodeForContext;
+      
+      // Clear existing children and structure data
+      node.children = [];
+      node.data.hasStructure = false;
+      node.data.structureData = null;
+      
+      // Clear loaded schema for this database
+      if (node.data.database?.id) {
+        const databaseId = node.data.database.id.toString();
+        delete this.loadedSchemas[databaseId];
+        this.loadingSchemas.delete(databaseId);
+      }
+      
+      // Collapse and re-expand to trigger reload
+      node.expanded = false;
+      setTimeout(() => {
+        node.expanded = true;
+        this.onDatabaseNodeExpand({ node });
+      }, 100);
+      
+      this.hideDatabaseContextMenu();
+    }
   }
 
   renameTabFromContextMenu(): void {
@@ -1761,6 +2554,8 @@ LIMIT 10;`;
       // Update active schema if this is the current database
       if (this.selectedDatabase && this.selectedDatabase.id === databaseId) {
         this.schema = schemaForAutocomplete;
+        // Rebuild schema metadata after loading schema
+        this.buildSchemaMetadata();
       }
     }
 
@@ -2350,6 +3145,11 @@ LIMIT 10;`;
   }
 
   onOrgChange(event: any) {
+    // Skip if this is triggered by initial load
+    if (this.isInitialOrgLoad) {
+      this.isInitialOrgLoad = false;
+      return;
+    }
     this.selectedOrg = event.value;
     this.loadDatabases();
   }
@@ -2368,6 +3168,8 @@ LIMIT 10;`;
     if (this.loadedSchemas[databaseId]) {
       // Use cached schema
       this.schema = this.loadedSchemas[databaseId];
+      // Rebuild schema metadata after loading cached schema
+      this.buildSchemaMetadata();
     } else {
       // Schema not loaded yet, will be loaded on first keystroke
       this.schema = {};
@@ -2426,6 +3228,14 @@ LIMIT 10;`;
       return;
     }
 
+    // Check if already loading or loaded
+    if (this.loadingSchemas.has(databaseId) || this.loadedSchemas[databaseId]) {
+      return;
+    }
+
+    // Mark as loading
+    this.loadingSchemas.add(databaseId);
+
     // Call API to get database structure for autocomplete
     this.queryService.getDatabaseStructure(
       parseInt(databaseId),
@@ -2458,6 +3268,10 @@ LIMIT 10;`;
       .catch((error: any) => {
         // Handle error silently for background loading
         console.warn('Could not load schema for autocomplete:', error);
+      })
+      .finally(() => {
+        // Remove from loading set
+        this.loadingSchemas.delete(databaseId);
       });
   }
 
@@ -2484,10 +3298,6 @@ LIMIT 10;`;
 
           if (this.databases.length > 0) {
             this.selectedDatabase = this.databases[0];
-            // Create initial tab with first database from dropdown
-            if (this.tabs.length === 0) {
-              this.addNewTab();
-            }
           }
           this.updateDatabaseMenuItems();
         }
@@ -3124,5 +3934,30 @@ LIMIT 10;`;
       this.stopAutoSave();
       this.startAutoSave();
     }
+  }
+
+  ngOnDestroy(): void {
+    // Dispose Monaco editor
+    if (this.editor) {
+      this.editor.dispose();
+    }
+    
+    // Dispose autocomplete provider
+    if (this.suggestionProvider) {
+      this.suggestionProvider.dispose();
+    }
+    
+    // Clean up theme observer
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+    }
+    
+    // Stop auto-save
+    this.stopAutoSave();
+    
+    // Clear autocomplete caches
+    this.tableAliases.clear();
+    this.suggestionCache.clear();
+    this.frequentlyUsed.clear();
   }
 }

@@ -57,6 +57,7 @@
     "ngx-clipboard": "^14.0.2",
     "ngx-monaco-editor-v2": "^19.0.2",
     "ngx-spinner": "^13.1.1",
+    "pgsql-ast-parser": "^12.0.1",
     "primeflex": "^3.3.1",
     "primeicons": "^5.0.0",
     "primeng": "^15.4.1",
