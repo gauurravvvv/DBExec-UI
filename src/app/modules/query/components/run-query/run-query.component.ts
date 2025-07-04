@@ -1653,6 +1653,9 @@ export class RunQueryComponent
     this.activeTabId = tabId;
     this.tabCounter++;
 
+    // Update selectedDatabase to match the new tab's database
+    this.selectedDatabase = targetDatabase;
+
     // Initialize editor if this is the first tab
     if (this.tabs.length === 1 && !this.editor) {
       // Wait for DOM update before initializing editor
@@ -1734,6 +1737,9 @@ export class RunQueryComponent
     if (newTab && this.editor) {
       this.editor.setValue(newTab.content || '');
       
+      // Update selectedDatabase to match the new tab's database
+      this.selectedDatabase = newTab.database;
+      
       // Set schema for the new tab's database
       if (newTab.database?.id) {
         this.setSchemaForDatabase(newTab.database.id.toString());
@@ -1758,10 +1764,14 @@ export class RunQueryComponent
         }
         this.activeTabId = '';
         this.sqlQuery = this.DEFAULT_QUERY; // Reset to default query
+        this.selectedDatabase = {}; // Reset selected database
       } else if (this.activeTabId === tabId) {
         // If closing active tab, switch to another
         const newIndex = Math.min(index, this.tabs.length - 1);
         this.activeTabId = this.tabs[newIndex].id;
+
+        // Update selectedDatabase to match the new active tab's database
+        this.selectedDatabase = this.tabs[newIndex].database;
 
         if (this.editor) {
           this.editor.setValue(this.tabs[newIndex].content || '');
