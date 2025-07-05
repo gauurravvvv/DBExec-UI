@@ -136,6 +136,9 @@ $icon-url: '../icons/';
     &.ci-visualization {
       content: url($icon-url + 'visualization.svg');
     }
+    &.ci-analyses {
+      content: url($icon-url + 'visualization.svg');
+    }
     &.ci-dashboard {
       content: url($icon-url + 'dashboard.svg');
     }
