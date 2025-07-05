@@ -133,6 +133,12 @@ $icon-url: '../icons/';
     &.ci-screen {
       content: url($icon-url + 'screen.svg');
     }
+    &.ci-visualization {
+      content: url($icon-url + 'visualization.svg');
+    }
+    &.ci-dashboard {
+      content: url($icon-url + 'dashboard.svg');
+    }
   }
 }
 
