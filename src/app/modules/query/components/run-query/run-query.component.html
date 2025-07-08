@@ -279,56 +279,144 @@
                 <div class="panel-content">
                   <!-- Table View -->
                   <div class="table-view" *ngIf="viewMode === 'table'">
-                    <p-table
-                      [value]="queryResults"
-                      [columns]="resultColumns"
-                      [paginator]="true"
-                      [rows]="25"
-                      [rowsPerPageOptions]="[10, 25, 50, 100]"
-                      [showCurrentPageReport]="true"
-                      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                      [globalFilterFields]="resultColumns"
-                      styleClass="results-table"
-                      [scrollable]="true"
-                      scrollHeight="flex"
-                    >
-                      <ng-template pTemplate="header">
-                        <tr>
-                          <th
-                            *ngFor="let col of resultColumns"
-                            [pSortableColumn]="col"
-                          >
-                            {{ col }}
-                            <p-sortIcon [field]="col"></p-sortIcon>
-                          </th>
-                        </tr>
-                      </ng-template>
+                    <div class="custom-table-container">
+                      <!-- Table Controls -->
+                      <div class="table-controls" *ngIf="queryResults.length > 0">
+                        <div class="table-info">
+                          <span class="result-count">{{ getDisplayedRowCount() }} of {{ queryResults.length }} rows</span>
+                          <span class="column-count">{{ resultColumns.length }} columns</span>
+                        </div>
+                        <div class="table-actions">
+                          <div class="rows-per-page">
+                            <label>Rows per page:</label>
+                            <select [(ngModel)]="tableRowsPerPage" (change)="onRowsPerPageChange()">
+                              <option [value]="10">10</option>
+                              <option [value]="25">25</option>
+                              <option [value]="50">50</option>
+                              <option [value]="100">100</option>
+                              <option [value]="200">200</option>
+                              <option [value]="999999">All</option>
+                            </select>
+                          </div>
+                          <button 
+                            class="table-action-btn" 
+                            (click)="exportToCSV()" 
+                            title="Export to CSV">
+                            <i class="pi pi-download"></i>
+                          </button>
+                        </div>
+                      </div>
 
-                      <ng-template pTemplate="body" let-row>
-                        <tr>
-                          <td *ngFor="let col of resultColumns">
-                            <span class="cell-content" [title]="row[col]">
-                              {{ row[col] }}
-                            </span>
-                          </td>
-                        </tr>
-                      </ng-template>
+                      <!-- Custom Table -->
+                      <div class="table-wrapper" *ngIf="queryResults.length > 0">
+                        <div class="table-scroll-container" 
+                             #tableContainer
+                             tabindex="0"
+                             role="region"
+                             aria-label="Query results table"
+                             (mouseenter)="onTableMouseEnter()"
+                             (mouseleave)="onTableMouseLeave()"
+                             (keydown)="onTableKeydown($event)">
+                          <table class="modern-table">
+                            <!-- Table Header -->
+                            <thead class="table-header">
+                              <tr>
+                                <th 
+                                  *ngFor="let col of resultColumns; trackBy: trackByColumn"
+                                  class="table-header-cell"
+                                  [class.sortable]="true"
+                                  (click)="sortByColumn(col)">
+                                  <div class="header-content">
+                                    <span class="column-name">{{ col }}</span>
+                                    <i class="sort-icon pi" 
+                                       [ngClass]="getSortIcon(col)"
+                                       *ngIf="getSortIcon(col)"></i>
+                                  </div>
+                                </th>
+                              </tr>
+                            </thead>
 
-                      <ng-template pTemplate="emptymessage">
-                        <tr>
-                          <td
-                            [attr.colspan]="resultColumns.length || 1"
-                            class="empty-message"
-                          >
-                            <div class="empty-state">
-                              <i class="pi pi-inbox"></i>
-                              <p>No results to display</p>
-                              <small>Execute a query to see results</small>
-                            </div>
-                          </td>
-                        </tr>
-                      </ng-template>
-                    </p-table>
+                            <!-- Table Body -->
+                            <tbody class="table-body">
+                              <tr 
+                                *ngFor="let row of getPaginatedData(); trackBy: trackByRow; let i = index"
+                                class="table-row"
+                                [class.even]="i % 2 === 0"
+                                [class.odd]="i % 2 !== 0">
+                                <td 
+                                  *ngFor="let col of resultColumns; trackBy: trackByColumn"
+                                  class="table-cell"
+                                  [title]="getCellValue(row, col)">
+                                  <div class="cell-content" 
+                                       [class.null-value]="isNullValue(getCellValue(row, col))"
+                                       [class.number-value]="isNumberValue(getCellValue(row, col))"
+                                       [class.boolean-value]="isBooleanValue(getCellValue(row, col))"
+                                       [class.date-value]="isDateValue(getCellValue(row, col))">
+                                    <span *ngIf="isNullValue(getCellValue(row, col))" class="null-text">NULL</span>
+                                    <span *ngIf="!isNullValue(getCellValue(row, col))">{{ formatCellValue(getCellValue(row, col)) }}</span>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      <!-- Pagination -->
+                      <div class="table-pagination" *ngIf="getTotalPages() > 1">
+                        <div class="pagination-info">
+                          <span>Page {{ currentPage + 1 }} of {{ getTotalPages() }}</span>
+                        </div>
+                        <div class="pagination-controls">
+                          <button 
+                            class="pagination-btn" 
+                            [disabled]="currentPage === 0"
+                            (click)="goToFirstPage()"
+                            title="First page">
+                            <i class="pi pi-angle-double-left"></i>
+                          </button>
+                          <button 
+                            class="pagination-btn" 
+                            [disabled]="currentPage === 0"
+                            (click)="goToPreviousPage()"
+                            title="Previous page">
+                            <i class="pi pi-angle-left"></i>
+                          </button>
+                          
+                          <div class="page-numbers">
+                            <button 
+                              *ngFor="let page of getVisiblePageNumbers()"
+                              class="page-number-btn"
+                              [class.active]="page === currentPage"
+                              (click)="goToPage(page)">
+                              {{ page + 1 }}
+                            </button>
+                          </div>
+                          
+                          <button 
+                            class="pagination-btn" 
+                            [disabled]="currentPage >= getTotalPages() - 1"
+                            (click)="goToNextPage()"
+                            title="Next page">
+                            <i class="pi pi-angle-right"></i>
+                          </button>
+                          <button 
+                            class="pagination-btn" 
+                            [disabled]="currentPage >= getTotalPages() - 1"
+                            (click)="goToLastPage()"
+                            title="Last page">
+                            <i class="pi pi-angle-double-right"></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Empty State -->
+                      <div class="empty-state" *ngIf="queryResults.length === 0">
+                        <i class="pi pi-inbox empty-icon"></i>
+                        <h3>No results to display</h3>
+                        <p>Execute a query to see results</p>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Graph View -->

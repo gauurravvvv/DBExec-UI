@@ -31,30 +31,30 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 4px;
-            height: 20px;
+            width: 1px;
+            height: 8px;
             background: var(--secondary-color);
-            border-radius: 2px;
-            opacity: 0.6;
+            border-radius: 0.5px;
+            opacity: 0.3;
             transition: all 0.2s ease;
           }
 
           // Horizontal splitter specific
           &.p-splitter-gutter-horizontal {
             &::before {
-              width: 20px;
-              height: 4px;
+              width: 8px;
+              height: 1px;
             }
           }
 
           &:not(.p-splitter-gutter-resizing) {
             &:hover {
-              background: var(--hover-background);
+              background: var(--primary-color) !important;
 
               &::before {
-                background: var(--primary-color);
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.2);
+                background: white !important;
+                opacity: 1 !important;
+                transform: translate(-50%, -50%) scale(1.1) !important;
               }
             }
           }
@@ -230,7 +230,7 @@
                   }
 
                   &.p-highlight {
-                    background: rgba(33, 150, 243, 0.1);
+                    background: color-mix(in srgb, var(--primary-color) 10%, transparent);
                     color: var(--primary-color);
                   }
 
@@ -730,28 +730,28 @@
       
       // Enhanced custom scrollbar
       scrollbar-width: thin;
-      scrollbar-color: rgba(0, 0, 0, 0.4) rgba(0, 0, 0, 0.1);
+      scrollbar-color: var(--shadow-color) color-mix(in srgb, var(--shadow-color) 25%, transparent);
 
       &::-webkit-scrollbar {
         width: 10px;
       }
 
       &::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.1);
+        background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
         border-radius: 5px;
       }
 
       &::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.4);
+        background: var(--shadow-color);
         border-radius: 5px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
+        border: 2px solid color-mix(in srgb, var(--text-color) 10%, transparent);
 
         &:hover {
-          background: rgba(0, 0, 0, 0.6);
+          background: color-mix(in srgb, var(--shadow-color) 150%, transparent);
         }
 
         &:active {
-          background: rgba(0, 0, 0, 0.8);
+          background: color-mix(in srgb, var(--shadow-color) 200%, transparent);
         }
       }
 
@@ -1095,16 +1095,16 @@
               }
               
               &::-webkit-scrollbar-track {
-                background: rgba(0, 0, 0, 0.1);
+                background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
                 border-radius: 4px;
               }
               
               &::-webkit-scrollbar-thumb {
-                background: rgba(0, 0, 0, 0.3);
+                background: color-mix(in srgb, var(--shadow-color) 75%, transparent);
                 border-radius: 4px;
                 
                 &:hover {
-                  background: rgba(0, 0, 0, 0.5);
+                  background: var(--shadow-color);
                 }
               }
             }
@@ -1220,14 +1220,14 @@
             &.add-btn {
               color: var(--primary-color);
               &:enabled:hover {
-                background: rgba(33, 150, 243, 0.1);
+                background: color-mix(in srgb, var(--primary-color) 10%, transparent);
               }
             }
 
             &.run-btn {
               color: var(--success-color);
               &:enabled:hover {
-                background: rgba(76, 175, 80, 0.1);
+                background: color-mix(in srgb, var(--success-color) 10%, transparent);
               }
               &.executing {
                 animation: pulse 1.5s infinite;
@@ -1237,14 +1237,14 @@
             &.format-btn {
               color: var(--warning-color);
               &:enabled:hover {
-                background: rgba(255, 152, 0, 0.1);
+                background: color-mix(in srgb, var(--warning-color) 10%, transparent);
               }
             }
 
             &.fullscreen-btn {
               color: var(--secondary-color);
               &:enabled:hover {
-                background: rgba(117, 117, 117, 0.1);
+                background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
               }
             }
 
@@ -1253,7 +1253,7 @@
               color: var(--secondary-color);
 
               &:enabled:hover {
-                background: rgba(117, 117, 117, 0.1);
+                background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
               }
 
               // Enabled state styling
@@ -1288,14 +1288,14 @@
           &.save-btn {
             color: var(--primary-color);
             &:enabled:hover {
-              background: rgba(33, 150, 243, 0.1);
+              background: color-mix(in srgb, var(--primary-color) 10%, transparent);
             }
           }
 
           &.clear-btn {
             color: var(--error-color);
             &:enabled:hover {
-              background: rgba(244, 67, 54, 0.1);
+              background: color-mix(in srgb, var(--error-color) 10%, transparent);
             }
           }
 
@@ -1304,8 +1304,14 @@
           }
 
           &:disabled {
-            opacity: 0.6;
+            opacity: 0.4 !important;
             cursor: not-allowed;
+            color: var(--disabled-color) !important;
+            background: transparent !important;
+            
+            .p-button-icon {
+              color: var(--disabled-color) !important;
+            }
           }
 
           .p-button-icon {
@@ -1446,91 +1452,218 @@
         }
       }
 
-      // Suggestion widget styling
+      // Comprehensive suggestion widget styling
       .suggest-widget {
+        background: var(--card-background) !important;
         border: 1px solid var(--border-color) !important;
-        border-radius: 4px !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-
-        .monaco-list-row {
-          &.focused {
-            background: var(--primary-color) !important;
-            color: white !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px var(--shadow-color) !important;
+        min-width: 300px !important;
+        max-width: 500px !important;
+        
+        // Main container
+        .monaco-list {
+          background: var(--card-background) !important;
+          border-radius: 8px !important;
+          
+          .monaco-list-row {
+            background: var(--card-background) !important;
+            color: var(--text-color) !important;
+            border: none !important;
+            padding: 8px 12px !important;
+            transition: all 0.2s ease !important;
+            
+            // Default state
+            &:not(.focused) {
+              &:hover {
+                background: var(--hover-background) !important;
+              }
+            }
+            
+            // Focused/selected state
+            &.focused {
+              background: var(--primary-color) !important;
+              color: white !important;
+              
+              .suggest-icon {
+                color: white !important;
+              }
+              
+              .codicon {
+                color: white !important;
+              }
+            }
+            
+            // Suggestion content
+            .contents {
+              display: flex !important;
+              align-items: center !important;
+              gap: 8px !important;
+              width: 100% !important;
+              
+              // Icon styling
+              .suggest-icon {
+                color: var(--primary-color) !important;
+                font-size: 16px !important;
+                width: 16px !important;
+                text-align: center !important;
+                flex-shrink: 0 !important;
+              }
+              
+              // Codicon fallback
+              .codicon {
+                color: var(--primary-color) !important;
+                font-size: 16px !important;
+                width: 16px !important;
+                flex-shrink: 0 !important;
+              }
+              
+              // Main label
+              .label {
+                color: inherit !important;
+                font-weight: 500 !important;
+                flex-grow: 1 !important;
+                min-width: 0 !important;
+              }
+              
+              // Type/detail info
+              .detail,
+              .type-label {
+                color: var(--secondary-color) !important;
+                font-size: 12px !important;
+                opacity: 0.8 !important;
+                flex-shrink: 0 !important;
+                margin-left: auto !important;
+              }
+            }
           }
+        }
+        
+        // Details widget (documentation popup)
+        .details {
+          background: var(--card-background) !important;
+          border: 1px solid var(--border-color) !important;
+          border-radius: 8px !important;
+          box-shadow: 0 4px 12px var(--shadow-color) !important;
+          color: var(--text-color) !important;
+          
+          .monaco-scrollable-element {
+            background: var(--card-background) !important;
+          }
+          
+          .body {
+            background: var(--card-background) !important;
+            color: var(--text-color) !important;
+            padding: 12px !important;
+            
+            .header {
+              color: var(--text-color) !important;
+              font-weight: 600 !important;
+              margin-bottom: 8px !important;
+            }
+            
+            .docs {
+              color: var(--secondary-color) !important;
+              font-size: 13px !important;
+              line-height: 1.4 !important;
+            }
+          }
+        }
+      }
+      
+      // Parameter hints widget
+      .parameter-hints-widget {
+        background: var(--card-background) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 6px !important;
+        box-shadow: 0 2px 8px var(--shadow-color) !important;
+        color: var(--text-color) !important;
+        
+        .monaco-scrollable-element {
+          background: var(--card-background) !important;
+        }
+        
+        .parameter-hints-widget-content {
+          background: var(--card-background) !important;
+          color: var(--text-color) !important;
+          padding: 8px 12px !important;
+        }
+      }
+      
+      // Quick suggestions (inline)
+      .ghost-text {
+        color: var(--secondary-color) !important;
+        opacity: 0.6 !important;
+      }
+    }
+  }
+}
+
+// Global Monaco editor theming (applies to all instances)
+::ng-deep {
+  // Override Monaco's built-in suggestion theming globally
+  .monaco-editor .suggest-widget {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+    
+    .monaco-list {
+      background: var(--card-background) !important;
+      
+      .monaco-list-row {
+        background: var(--card-background) !important;
+        color: var(--text-color) !important;
+        
+        &:hover:not(.focused) {
+          background: var(--hover-background) !important;
+        }
+        
+        &.focused {
+          background: var(--primary-color) !important;
+          color: white !important;
+        }
+        
+        .suggest-icon,
+        .codicon {
+          color: var(--primary-color) !important;
+        }
+        
+        &.focused .suggest-icon,
+        &.focused .codicon {
+          color: white !important;
         }
       }
     }
   }
-
-  .panel-header {
-    .editor-actions {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      ::ng-deep {
-        .p-button {
-          width: 2rem;
-          height: 2rem;
-          padding: 0;
-          border: none;
-          background: transparent;
-          transition: all 0.2s;
-
-          &.add-btn {
-            color: var(--primary-color);
-            &:enabled:hover {
-              background: rgba(33, 150, 243, 0.1);
-            }
-          }
-
-          &.run-btn {
-            color: var(--success-color);
-            &:enabled:hover {
-              background: rgba(76, 175, 80, 0.1);
-            }
-            &.executing {
-              animation: pulse 1.5s infinite;
-            }
-          }
-
-          &.clear-btn {
-            color: var(--error-color);
-            &:enabled:hover {
-              background: rgba(244, 67, 54, 0.1);
-            }
-          }
-
-          &:enabled:active {
-            transform: scale(0.95);
-          }
-
-          &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-          }
-
-          .p-button-icon {
-            font-size: 1rem;
-            font-weight: bold;
-          }
-        }
-
-        // Tooltip customization
-        .p-tooltip {
-          .p-tooltip-text {
-            background: var(--tooltip-background, rgba(0, 0, 0, 0.9));
-            color: var(--tooltip-text-color, white);
-            padding: 0.5rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          }
-
-          .p-tooltip-arrow {
-            border-top-color: var(--tooltip-background, rgba(0, 0, 0, 0.9));
+  
+  // Hover widget (documentation)
+  .monaco-editor .hover-widget {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+    color: var(--text-color) !important;
+    
+    .monaco-scrollable-element {
+      background: var(--card-background) !important;
+    }
+  }
+  
+  // Context menu theming
+  .monaco-menu {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+    
+    .monaco-action-bar {
+      .action-item {
+        .action-label {
+          color: var(--text-color) !important;
+          
+          &:hover {
+            background: var(--hover-background) !important;
           }
         }
       }
@@ -1853,8 +1986,14 @@
                 }
 
                 &:disabled {
-                  opacity: 0.6;
+                  opacity: 0.4 !important;
                   cursor: not-allowed;
+                  color: var(--disabled-color) !important;
+                  background: transparent !important;
+                  
+                  .p-button-icon {
+                    color: var(--disabled-color) !important;
+                  }
                 }
 
                 .p-button-icon {
@@ -1978,8 +2117,7 @@
       transition: all 0.2s ease;
 
       &:hover {
-        background: var(--primary-color);
-        opacity: 0.8;
+        background: var(--primary-color) !important;
       }
 
       &.p-splitter-gutter-resizing {
@@ -1991,7 +2129,7 @@
     // Horizontal splitter
     &.p-splitter-horizontal {
       .p-splitter-gutter {
-        width: 2px;
+        width: 0.25px;
         cursor: col-resize;
 
         .p-splitter-gutter-handle {
@@ -2003,7 +2141,7 @@
     // Vertical splitter
     &.p-splitter-vertical {
       .p-splitter-gutter {
-        height: 8px;
+        height: 2px;
         cursor: row-resize;
         background: transparent;
         position: relative;
@@ -2015,7 +2153,7 @@
           left: 0;
           right: 0;
           top: 50%;
-          height: 1px;
+          height: 0.25px;
           background: var(--border-color);
           transform: translateY(-50%);
         }
@@ -2026,10 +2164,10 @@
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
-          width: 20px;
-          height: 2px;
+          width: 8px;
+          height: 0.5px;
           background: var(--border-color);
-          border-radius: 1px;
+          border-radius: 0.5px;
         }
 
         .p-splitter-gutter-handle {
@@ -2039,14 +2177,14 @@
 
         &:hover {
           &::after {
-            background: var(--primary-color);
-            height: 2px;
+            background: var(--primary-color) !important;
+            height: 0.5px !important;
           }
 
           &::before {
-            background: var(--primary-color);
-            width: 30px;
-            height: 3px;
+            background: var(--primary-color) !important;
+            width: 12px !important;
+            height: 1px !important;
           }
         }
 
@@ -2092,8 +2230,8 @@
     background: var(--card-background);
 
     .panel-header {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.1);
+      background: color-mix(in srgb, var(--text-color) 5%, transparent);
+      border-color: color-mix(in srgb, var(--text-color) 10%, transparent);
     }
 
     .panel-content {
@@ -2109,7 +2247,7 @@
       }
 
       .p-splitter-gutter {
-        background: rgba(255, 255, 255, 0.1);
+        background: color-mix(in srgb, var(--text-color) 10%, transparent);
 
         &:hover {
           background: var(--primary-color);
@@ -2141,14 +2279,14 @@
       .tab-title-input {
         background: linear-gradient(
           135deg,
-          rgba(255, 255, 255, 0.12) 0%,
-          rgba(255, 255, 255, 0.08) 100%
+          color-mix(in srgb, var(--text-color) 12%, transparent) 0%,
+          color-mix(in srgb, var(--text-color) 8%, transparent) 100%
         ) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid color-mix(in srgb, var(--text-color) 15%, transparent) !important;
         color: #ffffff !important;
         font-weight: 500;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2),
-          inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+          inset 0 1px 0 color-mix(in srgb, var(--text-color) 10%, transparent) !important;
         width: 80px;
         max-width: 100px;
         min-width: 35px;
@@ -2156,18 +2294,18 @@
         &:focus {
           background: linear-gradient(
             135deg,
-            rgba(255, 255, 255, 0.15) 0%,
-            rgba(255, 255, 255, 0.1) 100%
+            color-mix(in srgb, var(--text-color) 15%, transparent) 0%,
+            color-mix(in srgb, var(--text-color) 10%, transparent) 100%
           ) !important;
           border-color: var(--primary-color) !important;
           box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2),
             0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+            inset 0 1px 0 color-mix(in srgb, var(--text-color) 15%, transparent) !important;
           color: #ffffff !important;
         }
 
         &::placeholder {
-          color: rgba(255, 255, 255, 0.4) !important;
+          color: color-mix(in srgb, var(--text-color) 40%, transparent) !important;
         }
 
         &::selection {
@@ -2183,12 +2321,12 @@
           background: var(--card-background) !important;
 
           .p-datatable-thead > tr > th {
-            background: rgba(255, 255, 255, 0.05) !important;
+            background: color-mix(in srgb, var(--text-color) 5%, transparent) !important;
             color: var(--text-color) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
 
             .p-sortable-column-icon {
-              color: rgba(255, 255, 255, 0.5) !important;
+              color: color-mix(in srgb, var(--text-color) 50%, transparent) !important;
             }
           }
 
@@ -2197,22 +2335,22 @@
             color: var(--text-color) !important;
 
             &:hover {
-              background: rgba(255, 255, 255, 0.08) !important;
+              background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
             }
 
             > td {
-              border-color: rgba(255, 255, 255, 0.1) !important;
+              border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
               color: var(--text-color) !important;
             }
           }
 
           .p-paginator {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            background: color-mix(in srgb, var(--text-color) 5%, transparent) !important;
+            border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
             color: var(--text-color) !important;
 
             .p-paginator-current {
-              color: rgba(255, 255, 255, 0.6) !important;
+              color: color-mix(in srgb, var(--text-color) 60%, transparent) !important;
             }
 
             .p-paginator-pages {
@@ -2221,7 +2359,7 @@
                 border-color: transparent !important;
 
                 &:hover {
-                  background: rgba(255, 255, 255, 0.08) !important;
+                  background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
                 }
 
                 &.p-highlight {
@@ -2234,7 +2372,7 @@
             // Dropdown in paginator
             .p-dropdown {
               background: var(--card-background) !important;
-              border-color: rgba(255, 255, 255, 0.1) !important;
+              border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
 
               .p-dropdown-label {
                 color: var(--text-color) !important;
@@ -2250,14 +2388,14 @@
         // Dropdown panel
         .p-dropdown-panel {
           background: var(--card-background) !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
+          border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
 
           .p-dropdown-items {
             .p-dropdown-item {
               color: var(--text-color) !important;
 
               &:hover {
-                background: rgba(255, 255, 255, 0.08) !important;
+                background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
               }
 
               &.p-highlight {
@@ -2271,7 +2409,7 @@
         // Empty state in dark theme
         .empty-state {
           i {
-            color: rgba(255, 255, 255, 0.3) !important;
+            color: color-mix(in srgb, var(--text-color) 30%, transparent) !important;
           }
 
           p {
@@ -2279,7 +2417,7 @@
           }
 
           small {
-            color: rgba(255, 255, 255, 0.5) !important;
+            color: color-mix(in srgb, var(--text-color) 50%, transparent) !important;
           }
         }
       }
@@ -2289,7 +2427,7 @@
   ::ng-deep {
     .p-splitter {
       .p-splitter-gutter {
-        background: rgba(255, 255, 255, 0.1);
+        background: color-mix(in srgb, var(--text-color) 10%, transparent);
 
         &:hover {
           background: var(--primary-color);
@@ -2300,19 +2438,19 @@
     // Global dropdown panel styles for dark theme
     .p-dropdown-panel {
       background: #1e1e1e !important;
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent) !important;
 
       .p-dropdown-header {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
+        background: color-mix(in srgb, var(--text-color) 5%, transparent) !important;
+        border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
 
         .p-dropdown-filter {
-          background: rgba(255, 255, 255, 0.1) !important;
-          border-color: rgba(255, 255, 255, 0.2) !important;
+          background: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+          border-color: color-mix(in srgb, var(--text-color) 20%, transparent) !important;
           color: var(--text-color) !important;
 
           &::placeholder {
-            color: rgba(255, 255, 255, 0.5) !important;
+            color: color-mix(in srgb, var(--text-color) 50%, transparent) !important;
           }
         }
       }
@@ -2324,7 +2462,7 @@
             background: transparent !important;
 
             &:hover {
-              background: rgba(255, 255, 255, 0.1) !important;
+              background: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
               color: white !important;
             }
 
@@ -2334,12 +2472,12 @@
             }
 
             &.p-disabled {
-              color: rgba(255, 255, 255, 0.3) !important;
+              color: color-mix(in srgb, var(--text-color) 30%, transparent) !important;
             }
           }
 
           .p-dropdown-empty-message {
-            color: rgba(255, 255, 255, 0.5) !important;
+            color: color-mix(in srgb, var(--text-color) 50%, transparent) !important;
           }
         }
       }
@@ -2352,15 +2490,15 @@
       }
 
       &::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
+        background: color-mix(in srgb, var(--text-color) 5%, transparent);
       }
 
       &::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
+        background: color-mix(in srgb, var(--text-color) 20%, transparent);
         border-radius: 4px;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.3);
+          background: color-mix(in srgb, var(--text-color) 30%, transparent);
         }
       }
     }
@@ -2401,7 +2539,7 @@
         }
 
         &:hover {
-          background: rgba(var(--primary-color-rgb), 0.1) !important;
+          background: color-mix(in srgb, var(--primary-color) 15%, transparent) !important;
         }
       }
     }
@@ -2421,7 +2559,7 @@
         }
 
         &:hover {
-          background: rgba(var(--primary-color-rgb), 0.1) !important;
+          background: color-mix(in srgb, var(--primary-color) 15%, transparent) !important;
         }
       }
     }
@@ -2431,16 +2569,14 @@
 // Enhanced gutter styling for better UX
 ::ng-deep .p-splitter {
   .p-splitter-gutter {
-    transition: all 0.2s ease;
+    transition: background-color 0.15s ease;
 
     &:hover {
       background: var(--primary-color) !important;
-      opacity: 0.8;
     }
 
     &:active {
       background: var(--primary-color) !important;
-      opacity: 1;
     }
   }
 }
@@ -2466,7 +2602,7 @@
   background: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-color);
   padding: 0.25rem 0;
   z-index: 9999;
   min-width: 160px;
@@ -2506,9 +2642,14 @@
     }
 
     &.disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: not-allowed;
       pointer-events: none;
+      color: var(--disabled-color) !important;
+      
+      i {
+        color: var(--disabled-color) !important;
+      }
     }
 
     &:first-child {
@@ -2556,7 +2697,7 @@
   background: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-color);
   padding: 0.25rem 0;
   z-index: 9999;
   min-width: 160px;
@@ -2620,14 +2761,14 @@
   .tab-context-menu,
   .database-context-menu {
     background: var(--card-background);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: color-mix(in srgb, var(--text-color) 10%, transparent);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--shadow-color) 200%, transparent);
 
     .context-menu-item {
       color: var(--text-color);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.08);
+        background: color-mix(in srgb, var(--text-color) 8%, transparent);
       }
     }
   }
@@ -2711,16 +2852,16 @@
       }
       
       &::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.1);
+        background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
         border-radius: 4px;
       }
       
       &::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.3);
+        background: color-mix(in srgb, var(--shadow-color) 75%, transparent);
         border-radius: 4px;
         
         &:hover {
-          background: rgba(0, 0, 0, 0.5);
+          background: var(--shadow-color);
         }
       }
       
@@ -3083,7 +3224,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: color-mix(in srgb, var(--shadow-color) 125%, transparent);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -3266,14 +3407,15 @@
   // Monaco Editor suggestion widget styling
   .monaco-editor .suggest-widget {
     background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
+    border: 2px solid var(--border-color) !important;
     border-radius: 8px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 8px 32px var(--shadow-color), 0 4px 16px color-mix(in srgb, var(--shadow-color) 75%, transparent) !important;
     overflow: visible !important;
-    min-width: 320px !important;
-    max-width: 480px !important;
+    min-width: 350px !important;
+    max-width: 500px !important;
     width: auto !important;
     backdrop-filter: blur(10px) !important;
+    z-index: 999999 !important;
     
     .monaco-list {
       overflow: visible !important;
@@ -3295,31 +3437,34 @@
     }
     
     .monaco-list .monaco-list-row {
-      background: transparent !important;
+      background: var(--card-background) !important;
       border: none !important;
       padding: 8px 12px !important;
       color: var(--text-color) !important;
       font-size: 13px !important;
       line-height: 1.5 !important;
-      min-height: 24px !important;
+      min-height: 28px !important;
       display: flex !important;
       align-items: center !important;
       white-space: nowrap !important;
       overflow: visible !important;
+      border-bottom: 1px solid color-mix(in srgb, var(--border-color) 30%, transparent) !important;
       
       &:hover {
         background: var(--hover-background) !important;
         margin: 0 4px !important;
         border-radius: 4px !important;
         padding: 8px 8px !important;
+        border-bottom: 1px solid transparent !important;
       }
       
       &.focused {
-        background: var(--primary-color-10) !important;
+        background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
         outline: none !important;
         margin: 0 4px !important;
         border-radius: 4px !important;
         padding: 8px 8px !important;
+        border-bottom: 1px solid transparent !important;
         
         .suggest-icon {
           opacity: 1 !important;
@@ -3334,11 +3479,11 @@
         white-space: nowrap !important;
         
         .highlight {
-          background: var(--primary-color-20) !important;
+          background: color-mix(in srgb, var(--primary-color) 25%, transparent) !important;
           color: var(--primary-color) !important;
           font-weight: 700 !important;
-          border-radius: 2px !important;
-          padding: 0 2px !important;
+          border-radius: 3px !important;
+          padding: 1px 3px !important;
         }
       }
       
@@ -3352,29 +3497,29 @@
         align-items: center !important;
         justify-content: center !important;
         
-        // Enhanced icon colors for better distinction
+        // Enhanced icon colors for better distinction using theme variables
         &.codicon-symbol-field::before {
-          color: #ff4757 !important; // Bright red for columns
+          color: var(--error-color) !important; // Red for columns
           font-weight: 600 !important;
         }
         
         &.codicon-symbol-class::before {
-          color: #00d2d3 !important; // Bright cyan for tables
+          color: var(--primary-color) !important; // Blue for tables
           font-weight: 600 !important;
         }
         
         &.codicon-symbol-module::before {
-          color: #3742fa !important; // Bright blue for schemas
+          color: var(--primary-color) !important; // Blue for schemas
           font-weight: 600 !important;
         }
         
         &.codicon-symbol-keyword::before {
-          color: #7bed9f !important; // Bright green for keywords
+          color: var(--success-color) !important; // Green for keywords
           font-weight: 600 !important;
         }
         
         &.codicon-symbol-function::before {
-          color: #ffa502 !important; // Bright orange for functions
+          color: var(--warning-color) !important; // Orange for functions
           font-weight: 600 !important;
         }
       }
@@ -3388,14 +3533,15 @@
       }
       
       .suggest-details {
-        color: var(--text-muted-color) !important;
+        color: var(--secondary-color) !important;
         font-size: 12px !important;
-        opacity: 0.8 !important;
+        opacity: 0.9 !important;
         flex-shrink: 0 !important;
         white-space: nowrap !important;
         max-width: 150px !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
+        font-weight: 400 !important;
       }
     }
     
@@ -3443,7 +3589,7 @@
     background: var(--card-background) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 6px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--shadow-color) 50%, transparent) !important;
     color: var(--text-color) !important;
     
     .parameter-hints-next,
@@ -3462,7 +3608,7 @@
     background: var(--card-background) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 6px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--shadow-color) 50%, transparent) !important;
     color: var(--text-color) !important;
     
     .hover-contents {
@@ -3540,5 +3686,1246 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+// Dark theme comprehensive fixes for database section and query results
+::ng-deep {
+  // PrimeNG Table dark theme fixes
+  .p-datatable {
+    background: var(--card-background) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+
+    .p-datatable-thead > tr > th {
+      background: var(--card-background) !important;
+      color: var(--text-color) !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      border-right: 1px solid var(--border-color) !important;
+      padding: 0.75rem !important;
+
+      &:last-child {
+        border-right: none !important;
+      }
+
+      .p-sortable-column-icon {
+        color: var(--text-color) !important;
+        opacity: 0.6;
+      }
+
+      &.p-highlight {
+        background: color-mix(in srgb, var(--primary-color) 10%, var(--card-background)) !important;
+        color: var(--primary-color) !important;
+
+        .p-sortable-column-icon {
+          color: var(--primary-color) !important;
+          opacity: 1;
+        }
+      }
+
+      &:hover {
+        background: var(--hover-background) !important;
+        color: var(--text-color) !important;
+      }
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--card-background) !important;
+      color: var(--text-color) !important;
+      border-bottom: 1px solid var(--border-color) !important;
+
+      > td {
+        border-right: 1px solid var(--border-color) !important;
+        padding: 0.75rem !important;
+        color: var(--text-color) !important;
+
+        &:last-child {
+          border-right: none !important;
+        }
+
+        .cell-content {
+          color: var(--text-color) !important;
+        }
+      }
+
+      &:nth-child(even) {
+        background: color-mix(in srgb, var(--border-color) 20%, var(--card-background)) !important;
+      }
+
+      &:hover {
+        background: var(--hover-background) !important;
+        color: var(--text-color) !important;
+
+        > td {
+          color: var(--text-color) !important;
+        }
+      }
+
+      &.p-highlight {
+        background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+        color: var(--text-color) !important;
+
+        > td {
+          color: var(--text-color) !important;
+        }
+      }
+    }
+
+    .p-datatable-emptymessage > td {
+      background: var(--card-background) !important;
+      color: var(--text-color) !important;
+      text-align: center !important;
+      padding: 2rem !important;
+
+      .empty-state {
+        color: var(--secondary-color) !important;
+
+        i {
+          color: var(--secondary-color) !important;
+          font-size: 2rem !important;
+          margin-bottom: 1rem !important;
+        }
+
+        p {
+          color: var(--text-color) !important;
+          margin: 0.5rem 0 !important;
+          font-weight: 500 !important;
+        }
+
+        small {
+          color: var(--secondary-color) !important;
+          font-size: 0.875rem !important;
+        }
+      }
+    }
+  }
+
+  // PrimeNG Paginator dark theme fixes
+  .p-paginator {
+    background: var(--card-background) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-top: none !important;
+    padding: 0.5rem 1rem !important;
+
+    .p-paginator-first,
+    .p-paginator-prev,
+    .p-paginator-next,
+    .p-paginator-last {
+      color: var(--text-color) !important;
+      background: transparent !important;
+      border: 1px solid var(--border-color) !important;
+      margin: 0 0.125rem !important;
+
+      &:not(.p-disabled):hover {
+        background: var(--hover-background) !important;
+        color: var(--text-color) !important;
+        border-color: var(--primary-color) !important;
+      }
+
+      &.p-disabled {
+        color: var(--disabled-color) !important;
+        background: transparent !important;
+        border-color: var(--border-color) !important;
+      }
+    }
+
+    .p-paginator-pages {
+      .p-paginator-page {
+        color: var(--text-color) !important;
+        background: transparent !important;
+        border: 1px solid var(--border-color) !important;
+        margin: 0 0.125rem !important;
+
+        &:hover {
+          background: var(--hover-background) !important;
+          color: var(--text-color) !important;
+          border-color: var(--primary-color) !important;
+        }
+
+        &.p-highlight {
+          background: var(--primary-color) !important;
+          color: white !important;
+          border-color: var(--primary-color) !important;
+        }
+      }
+    }
+
+    .p-dropdown {
+      background: var(--card-background) !important;
+      color: var(--text-color) !important;
+      border: 1px solid var(--border-color) !important;
+
+      .p-dropdown-label {
+        color: var(--text-color) !important;
+      }
+
+      .p-dropdown-trigger {
+        color: var(--text-color) !important;
+      }
+
+      &:hover {
+        border-color: var(--primary-color) !important;
+      }
+    }
+  }
+
+  // PrimeNG Tree dark theme enhancements
+  .p-tree {
+    background: var(--card-background) !important;
+    color: var(--text-color) !important;
+    border: none !important;
+
+    .p-tree-container {
+      background: var(--card-background) !important;
+
+      .p-treenode {
+        .p-treenode-content {
+          color: var(--text-color) !important;
+          padding: 0.25rem 0.5rem !important;
+          border-radius: 4px !important;
+          transition: all 0.2s ease !important;
+
+          &:hover {
+            background: var(--hover-background) !important;
+            color: var(--text-color) !important;
+          }
+
+          &.p-highlight {
+            background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+            color: var(--primary-color) !important;
+          }
+
+          .p-tree-toggler {
+            color: var(--text-color) !important;
+            opacity: 0.7 !important;
+
+            &:hover {
+              color: var(--primary-color) !important;
+              opacity: 1 !important;
+            }
+          }
+
+          .p-treenode-label {
+            color: var(--text-color) !important;
+          }
+
+          .p-treenode-icon {
+            color: var(--secondary-color) !important;
+            margin-right: 0.5rem !important;
+          }
+        }
+      }
+    }
+
+    .p-tree-filter-container {
+      background: var(--card-background) !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      padding: 0.5rem !important;
+
+      .p-tree-filter {
+        background: var(--input-background) !important;
+        color: var(--text-color) !important;
+        border: 1px solid var(--border-color) !important;
+
+        &:focus {
+          border-color: var(--primary-color) !important;
+          box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
+        }
+
+        &::placeholder {
+          color: var(--secondary-color) !important;
+        }
+      }
+
+      .p-tree-filter-icon {
+        color: var(--secondary-color) !important;
+      }
+    }
+  }
+
+  // Comprehensive disabled state fixes for dark theme compatibility
+  .p-button:disabled,
+  .p-button.p-disabled {
+    opacity: 0.4 !important;
+    color: var(--disabled-color) !important;
+    background: transparent !important;
+    border-color: var(--disabled-color) !important;
+    cursor: not-allowed !important;
+
+    .p-button-icon {
+      color: var(--disabled-color) !important;
+    }
+
+    .p-button-label {
+      color: var(--disabled-color) !important;
+    }
+
+    &:hover {
+      color: var(--disabled-color) !important;
+      background: transparent !important;
+      border-color: var(--disabled-color) !important;
+    }
+  }
+
+  // Disabled dropdown styling
+  .p-dropdown:disabled,
+  .p-dropdown.p-disabled {
+    opacity: 0.4 !important;
+    background: color-mix(in srgb, var(--disabled-color) 10%, var(--card-background)) !important;
+    color: var(--disabled-color) !important;
+    border-color: var(--disabled-color) !important;
+    cursor: not-allowed !important;
+
+    .p-dropdown-label {
+      color: var(--disabled-color) !important;
+    }
+
+    .p-dropdown-trigger {
+      color: var(--disabled-color) !important;
+    }
+
+    &:hover {
+      border-color: var(--disabled-color) !important;
+    }
+  }
+
+  // Disabled input styling
+  input:disabled,
+  textarea:disabled,
+  .p-inputtext:disabled {
+    opacity: 0.4 !important;
+    background: color-mix(in srgb, var(--disabled-color) 10%, var(--card-background)) !important;
+    color: var(--disabled-color) !important;
+    border-color: var(--disabled-color) !important;
+    cursor: not-allowed !important;
+
+    &::placeholder {
+      color: var(--disabled-color) !important;
+      opacity: 0.6 !important;
+    }
+  }
+
+  // Disabled tree node styling
+  .p-tree .p-treenode.p-disabled {
+    .p-treenode-content {
+      opacity: 0.4 !important;
+      color: var(--disabled-color) !important;
+      cursor: not-allowed !important;
+
+      .p-treenode-label {
+        color: var(--disabled-color) !important;
+      }
+
+      .p-treenode-icon {
+        color: var(--disabled-color) !important;
+      }
+
+      .p-tree-toggler {
+        color: var(--disabled-color) !important;
+        cursor: not-allowed !important;
+      }
+
+      &:hover {
+        background: transparent !important;
+        color: var(--disabled-color) !important;
+      }
+    }
+  }
+
+  // Disabled menu item styling
+  .p-menu .p-menuitem.p-disabled {
+    .p-menuitem-link {
+      opacity: 0.4 !important;
+      color: var(--disabled-color) !important;
+      cursor: not-allowed !important;
+
+      .p-menuitem-icon {
+        color: var(--disabled-color) !important;
+      }
+
+      .p-menuitem-text {
+        color: var(--disabled-color) !important;
+      }
+
+      &:hover {
+        background: transparent !important;
+        color: var(--disabled-color) !important;
+      }
+    }
+  }
+
+  // Disabled paginator controls
+  .p-paginator {
+    .p-paginator-first.p-disabled,
+    .p-paginator-prev.p-disabled,
+    .p-paginator-next.p-disabled,
+    .p-paginator-last.p-disabled {
+      opacity: 0.4 !important;
+      color: var(--disabled-color) !important;
+      background: transparent !important;
+      border-color: var(--disabled-color) !important;
+      cursor: not-allowed !important;
+
+      &:hover {
+        color: var(--disabled-color) !important;
+        background: transparent !important;
+        border-color: var(--disabled-color) !important;
+      }
+    }
+  }
+
+  // Disabled chart controls
+  .filter-container .p-button:disabled {
+    opacity: 0.4 !important;
+    color: var(--disabled-color) !important;
+    background: transparent !important;
+    border-color: var(--disabled-color) !important;
+
+    .p-button-icon {
+      color: var(--disabled-color) !important;
+    }
+
+    .p-button-label {
+      color: var(--disabled-color) !important;
+    }
+  }
+
+  // Comprehensive menu theming for all menu types (database, save, auto-save menus)
+  .p-menu {
+    background: var(--menu-background) !important;
+    border: 1px solid var(--menu-border-color) !important;
+    box-shadow: var(--menu-shadow) !important;
+    border-radius: 8px !important;
+    
+    .p-menu-list {
+      background: var(--menu-background) !important;
+      border: none !important;
+      padding: 0.5rem 0 !important;
+      
+      .p-menuitem {
+        margin: 0 !important;
+        
+        .p-menuitem-link {
+          color: var(--menu-text-color) !important;
+          transition: all 0.2s ease !important;
+          padding: 0.75rem 1rem !important;
+          border-radius: 0 !important;
+          border: none !important;
+          background: transparent !important;
+          
+          &:hover {
+            background: var(--menu-hover-background) !important;
+            color: var(--menu-text-color) !important;
+          }
+          
+          &:focus {
+            background: var(--menu-hover-background) !important;
+            color: var(--menu-text-color) !important;
+            box-shadow: none !important;
+            outline: none !important;
+          }
+          
+          .p-menuitem-icon {
+            color: var(--menu-icon-color) !important;
+            margin-right: 0.75rem !important;
+            font-size: 0.875rem !important;
+            width: 16px !important;
+            text-align: center !important;
+          }
+          
+          .p-menuitem-text {
+            color: var(--menu-text-color) !important;
+            font-size: 0.875rem !important;
+            font-weight: 400 !important;
+          }
+        }
+        
+        &.p-disabled {
+          .p-menuitem-link {
+            opacity: var(--menu-disabled-opacity) !important;
+            cursor: not-allowed !important;
+            
+            &:hover {
+              background: transparent !important;
+            }
+            
+            .p-menuitem-icon {
+              color: var(--disabled-color) !important;
+            }
+            
+            .p-menuitem-text {
+              color: var(--disabled-color) !important;
+            }
+          }
+        }
+        
+        &.p-menuitem-separator {
+          height: 1px !important;
+          background: var(--menu-border-color) !important;
+          margin: 0.5rem 0 !important;
+          opacity: 0.6 !important;
+        }
+      }
+    }
+  }
+
+  // Specific styling for database menu to match existing behavior
+  .p-menu.database-menu {
+    .p-menu-list {
+      max-height: 400px !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      
+      // Custom scrollbar for database menu
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
+        border-radius: 4px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: color-mix(in srgb, var(--shadow-color) 75%, transparent);
+        border-radius: 4px;
+        
+        &:hover {
+          background: var(--shadow-color);
+        }
+      }
+      
+      .p-menuitem {
+        .p-menuitem-link {
+          padding: 0.5rem 0.75rem !important;
+          font-size: 0.875rem !important;
+          
+          .p-menuitem-icon {
+            font-size: 0.875rem !important;
+            opacity: 0.7;
+            
+            &:hover {
+              opacity: 1;
+            }
+          }
+          
+          &:hover {
+            .p-menuitem-icon {
+              color: var(--primary-color) !important;
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Comprehensive Monaco editor suggestions theme override
+  .monaco-editor .suggest-widget {
+    // Force theme colors regardless of Monaco theme
+    background: var(--card-background) !important;
+    color: var(--text-color) !important;
+    
+    // Override all possible Monaco theme variations
+    &,
+    &.vs,
+    &.vs-dark,
+    &.hc-black {
+      background: var(--card-background) !important;
+      color: var(--text-color) !important;
+      border: 2px solid var(--border-color) !important;
+    }
+    
+    .monaco-list {
+      background: var(--card-background) !important;
+      color: var(--text-color) !important;
+      
+      .monaco-list-row {
+        background: var(--card-background) !important;
+        color: var(--text-color) !important;
+        
+        // Force all text elements to use theme colors
+        * {
+          color: var(--text-color) !important;
+        }
+        
+        .monaco-highlighted-label {
+          color: var(--text-color) !important;
+          
+          .highlight {
+            background: color-mix(in srgb, var(--primary-color) 30%, transparent) !important;
+            color: var(--primary-color) !important;
+          }
+        }
+        
+        .suggest-details {
+          color: var(--secondary-color) !important;
+        }
+        
+        &.focused,
+        &:focus,
+        &.selected {
+          background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+          color: var(--text-color) !important;
+          
+          * {
+            color: var(--text-color) !important;
+          }
+          
+          .suggest-details {
+            color: var(--text-color) !important;
+            opacity: 0.8 !important;
+          }
+        }
+        
+        &:hover {
+          background: var(--hover-background) !important;
+          color: var(--text-color) !important;
+          
+          * {
+            color: var(--text-color) !important;
+          }
+        }
+      }
+    }
+    
+    // Details panel theming
+    .details {
+      background: var(--card-background) !important;
+      color: var(--text-color) !important;
+      border-left-color: var(--border-color) !important;
+      
+      * {
+        color: var(--text-color) !important;
+      }
+      
+      .header .type {
+        color: var(--secondary-color) !important;
+      }
+    }
+  }
+
+  // Force override for all Monaco themes
+  .monaco-editor {
+    &.vs,
+    &.vs-dark,
+    &.hc-black {
+      .suggest-widget {
+        background: var(--card-background) !important;
+        color: var(--text-color) !important;
+        border-color: var(--border-color) !important;
+        
+        .monaco-list {
+          background: var(--card-background) !important;
+          
+          .monaco-list-row {
+            background: var(--card-background) !important;
+            color: var(--text-color) !important;
+            
+            &.focused,
+            &:focus,
+            &.selected {
+              background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+              color: var(--text-color) !important;
+            }
+            
+            &:hover {
+              background: var(--hover-background) !important;
+              color: var(--text-color) !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Ultimate fallback - target any possible Monaco suggestion element
+  .suggest-widget,
+  [class*="suggest"],
+  [class*="monaco-list"],
+  [class*="monaco-highlighted"] {
+    background: var(--card-background) !important;
+    color: var(--text-color) !important;
+    
+    &[style*="background"] {
+      background: var(--card-background) !important;
+    }
+    
+    &[style*="color"] {
+      color: var(--text-color) !important;
+    }
+  }
+}
+
+// Scroll indicator animation
+@keyframes pulse-scroll {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(-50%) scaleY(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(-50%) scaleY(1.2);
+  }
+}
+
+// Table View Wrapper - ensure full height usage
+.table-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  overflow: hidden;
+}
+
+// Modern Custom Table Styling
+.custom-table-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--card-background);
+  border-radius: 8px;
+  overflow: hidden;
+
+  .table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+    gap: 1rem;
+
+    .table-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-color);
+
+      .result-count {
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+
+      .column-count {
+        color: var(--secondary-color);
+      }
+    }
+
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .rows-per-page {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-color);
+
+        label {
+          font-weight: 500;
+        }
+
+        select {
+          padding: 0.375rem 0.75rem;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          background: var(--input-background);
+          color: var(--text-color);
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            border-color: var(--primary-color);
+          }
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+          }
+        }
+      }
+
+      .table-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--card-background);
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: var(--hover-background);
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+
+        i {
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+
+  .table-wrapper {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px; // Ensure minimum height for vertical scrolling
+
+    .table-scroll-container {
+      flex: 1;
+      overflow: auto; // Always enable scrolling for both directions
+      background: var(--card-background);
+      position: relative;
+      height: 100%; // Use full height from splitter
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+
+      // Enhanced styling on hover
+      &:hover {
+        box-shadow: 0 4px 12px var(--shadow-color);
+        border-color: var(--primary-color);
+      }
+
+      // Enhanced styling when focused (for keyboard navigation)
+      &:focus-within {
+        box-shadow: 0 4px 12px var(--shadow-color);
+        border-color: var(--primary-color);
+      }
+
+      // Clean table container without scroll indicators
+
+      // Focus outline for accessibility
+      &:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: -2px;
+      }
+
+      // Smooth scroll behavior
+      scroll-behavior: smooth;
+
+      // Enhanced scrollbar styling
+      &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--background-color);
+        border-radius: 5px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 5px;
+        border: 2px solid var(--background-color);
+        
+        &:hover {
+          background: var(--secondary-color);
+        }
+
+        &:active {
+          background: var(--primary-color);
+        }
+      }
+
+      &::-webkit-scrollbar-corner {
+        background: var(--background-color);
+      }
+
+      // Firefox scrollbar styling
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) var(--background-color);
+
+      // Subtle scroll shadow for horizontal overflow
+      &::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(to left, color-mix(in srgb, var(--shadow-color) 20%, transparent), transparent);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        z-index: 15;
+      }
+
+      // Show shadow when scrolling horizontally
+      &:hover::after {
+        opacity: 1;
+      }
+
+      .modern-table {
+        width: 100%;
+        min-width: max-content; // Ensure table expands for many columns
+        border-collapse: collapse;
+        font-size: 0.875rem;
+        background: var(--card-background);
+        table-layout: auto; // Allow dynamic column sizing
+        height: auto; // Let table grow with content
+
+        .table-header {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          background: var(--background-color);
+          border-bottom: 2px solid var(--border-color);
+
+          .table-header-cell {
+            padding: 1rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--background-color);
+            border-right: 1px solid var(--border-color);
+            position: relative;
+            white-space: nowrap;
+            user-select: none;
+            min-width: 120px; // Ensure minimum column width
+            max-width: 300px; // Prevent columns from becoming too wide
+            height: auto; // Let header height adjust dynamically
+            min-height: 60px; // Match row height for consistency
+
+            &:last-child {
+              border-right: none;
+            }
+
+            &.sortable {
+              cursor: pointer;
+              transition: all 0.2s ease;
+
+              &:hover {
+                background: var(--hover-background);
+                color: var(--primary-color);
+              }
+            }
+
+            .header-content {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 0.5rem;
+
+              .column-name {
+                font-weight: 600;
+                flex: 1;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              .sort-icon {
+                font-size: 0.75rem;
+                color: var(--primary-color);
+                flex-shrink: 0;
+              }
+            }
+          }
+        }
+
+        .table-body {
+          .table-row {
+            transition: background-color 0.15s ease;
+            border-bottom: 1px solid var(--border-color);
+
+            &:hover {
+              background: var(--hover-background);
+            }
+
+            &.even {
+              background: var(--card-background);
+            }
+
+            &.odd {
+              background: color-mix(in srgb, var(--border-color) 3%, var(--card-background));
+            }
+
+            &:hover.even,
+            &:hover.odd {
+              background: var(--hover-background);
+            }
+
+            .table-cell {
+              padding: 1rem 1rem; // Increase padding for more height per row
+              border-right: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+              color: var(--text-color);
+              vertical-align: top;
+              position: relative;
+              min-width: 120px; // Ensure minimum column width
+              max-width: 300px; // Prevent columns from becoming too wide
+              white-space: nowrap; // Prevent text wrapping for better scrolling
+              overflow: hidden;
+              text-overflow: ellipsis;
+              height: auto; // Let row height adjust dynamically
+              min-height: 60px; // Ensure adequate row height for scrolling
+
+              &:last-child {
+                border-right: none;
+              }
+
+              .cell-content {
+                line-height: 1.4;
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                // Value type specific styling
+                &.null-value {
+                  .null-text {
+                    color: var(--secondary-color);
+                    font-style: italic;
+                    opacity: 0.7;
+                    font-size: 0.8125rem;
+                  }
+                }
+
+                &.number-value {
+                  text-align: right;
+                  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                  color: var(--primary-color);
+                  font-weight: 500;
+                }
+
+                &.boolean-value {
+                  text-align: center;
+                  font-weight: 600;
+                  text-transform: uppercase;
+                  font-size: 0.8125rem;
+                  
+                  span {
+                    padding: 0.125rem 0.375rem;
+                    border-radius: 4px;
+                    background: var(--hover-background);
+                    border: 1px solid var(--border-color);
+                  }
+                }
+
+                &.date-value {
+                  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                  color: var(--success-color);
+                  font-size: 0.8125rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .table-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--background-color);
+    border-top: 1px solid var(--border-color);
+    gap: 1rem;
+
+    .pagination-info {
+      font-size: 0.875rem;
+      color: var(--text-color);
+      font-weight: 500;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .pagination-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--card-background);
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: var(--hover-background);
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        i {
+          font-size: 0.75rem;
+        }
+      }
+
+      .page-numbers {
+        display: flex;
+        gap: 0.25rem;
+        margin: 0 0.5rem;
+
+        .page-number-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2rem;
+          height: 2rem;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          background: var(--card-background);
+          color: var(--text-color);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 0.875rem;
+          font-weight: 500;
+
+          &:hover {
+            background: var(--hover-background);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+          }
+
+          &.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--secondary-color);
+    background: var(--card-background);
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      opacity: 0.8;
+    }
+  }
+}
+
+// Responsive design for smaller screens
+@media (max-width: 768px) {
+  .custom-table-container {
+    .table-controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+
+      .table-info {
+        justify-content: center;
+      }
+
+      .table-actions {
+        justify-content: center;
+      }
+    }
+
+    .table-pagination {
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .pagination-controls {
+        justify-content: center;
+      }
+    }
+
+    .table-wrapper {
+      .table-scroll-container {
+        height: 350px; // Fixed height for mobile
+        max-height: 60vh; // Reduce height on mobile
+        
+        // Better touch scrolling on mobile
+        -webkit-overflow-scrolling: touch;
+        
+        // Larger scrollbars for touch devices
+        &::-webkit-scrollbar {
+          width: 12px;
+          height: 12px;
+        }
+
+        .modern-table {
+          .table-header .table-header-cell {
+            padding: 0.625rem 0.75rem;
+            font-size: 0.8125rem;
+            min-width: 100px; // Smaller min-width on mobile
+          }
+
+          .table-body .table-cell {
+            padding: 0.625rem 0.75rem;
+            font-size: 0.8125rem;
+            min-width: 100px; // Smaller min-width on mobile
+          }
+        }
+      }
+    }
+  }
+}
+
+// For very small screens
+@media (max-width: 480px) {
+  .custom-table-container {
+    .table-wrapper {
+      .table-scroll-container {
+        height: 100%; // Use full available height from splitter
+        min-height: 200px; // Minimum height for small screens
+        
+        .modern-table {
+          .table-header .table-header-cell,
+          .table-body .table-cell {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            min-width: 80px;
+          }
+        }
+      }
+    }
   }
 }
