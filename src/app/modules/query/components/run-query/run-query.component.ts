@@ -5,9 +5,10 @@ import {
   ElementRef,
   AfterViewInit,
   OnDestroy,
-  DoCheck,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { TreeNode, MenuItem } from 'primeng/api';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -15,8 +16,7 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { QueryService } from '../../services/query.service';
-import { Chart } from 'chart.js';
-import { UIChart } from 'primeng/chart';
+// Removed Chart.js imports - using ngx-charts instead
 import {
   ALL_POSTGRES_KEYWORDS,
   ALL_POSTGRES_FUNCTIONS,
@@ -52,14 +52,13 @@ declare var monaco: any;
   selector: 'app-run-query',
   templateUrl: './run-query.component.html',
   styleUrls: ['./run-query.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RunQueryComponent
-  implements OnInit, AfterViewInit, OnDestroy, DoCheck
-{
+export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('monacoEditor', { static: false })
   monacoEditorElement!: ElementRef;
 
-  @ViewChild('chart') chart!: UIChart;
+  // Removed chart ViewChild - using ngx-charts instead
 
   @ViewChild('databaseMenu') databaseMenu!: any;
 
@@ -80,9 +79,9 @@ export class RunQueryComponent
   isExecuting: boolean = false;
   private editor: any;
   private themeObserver: MutationObserver | null = null;
-  
+
   // Default query template
-  private readonly DEFAULT_QUERY = `SELECT * FROM your_table_name LIMIT 10;`;
+  private readonly DEFAULT_QUERY = `SELECT * FROM dbexec_master.screen s;`;
 
   // Tab management
   tabs: EditorTab[] = [];
@@ -94,14 +93,14 @@ export class RunQueryComponent
   contextMenuPosition = { x: 0, y: 0 };
   selectedTabForContext: EditorTab | null = null;
   selectedTabIndexForContext: number = -1;
-  
+
   // Autocomplete properties
   private tableAliases: Map<string, string> = new Map();
   private schemaMetadata: Record<string, Record<string, string[]>> = {};
   private suggestionProvider: any = null;
   private suggestionCache: Map<string, any[]> = new Map();
   private frequentlyUsed: Map<string, number> = new Map();
-  
+
   // Database context menu properties
   showDatabaseContextMenu: boolean = false;
   databaseContextMenuPosition = { x: 0, y: 0 };
@@ -158,7 +157,7 @@ export class RunQueryComponent
 
   // Schema storage for autocomplete - key is databaseId
   private loadedSchemas: { [databaseId: string]: any } = {};
-  
+
   // Current schema for autocomplete (will be populated from loadedSchemas)
   private schema: { [tableName: string]: string[] } = {};
 
@@ -189,66 +188,298 @@ export class RunQueryComponent
   autoSaveMenuItems: MenuItem[] = [];
 
   // View mode properties
-  viewMode: 'table' | 'graph' = 'table';
-  selectedXAxis: any = null;
-  selectedYAxis: any = null;
-  selectedChartType: string = 'bar';
+  viewMode: 'table' | 'analytics' = 'table';
+  selectedChartType: any = null;
+  selectedChartInputs: any = {};
 
-  columnOptions: any[] = [
-    { id: 1, label: 'id', value: 'id' },
-    { id: 2, label: 'first_name', value: 'first_name' },
-    { id: 3, label: 'last_name', value: 'last_name' },
-    { id: 4, label: 'email', value: 'email' },
-    { id: 5, label: 'department', value: 'department' },
-    { id: 6, label: 'salary', value: 'salary' },
-    { id: 7, label: 'hire_date', value: 'hire_date' },
-  ];
-  chartTypes = [
-    { label: 'Bar Chart', value: 'bar', icon: 'pi pi-chart-bar' },
-    { label: 'Line Chart', value: 'line', icon: 'pi pi-chart-line' },
-    { label: 'Pie Chart', value: 'pie', icon: 'pi pi-chart-pie' },
-    { label: 'Scatter Plot', value: 'scatter', icon: 'pi pi-chart-scatter' },
-  ];
-  chartData: any = {};
-  chartOptions: any = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        labels: {
-          color: getComputedStyle(document.documentElement).getPropertyValue(
-            '--text-color'
-          ),
-        },
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: getComputedStyle(document.documentElement).getPropertyValue(
-            '--text-color'
-          ),
-        },
-        grid: {
-          color: getComputedStyle(document.documentElement).getPropertyValue(
-            '--border-color'
-          ),
-        },
-      },
-      y: {
-        ticks: {
-          color: getComputedStyle(document.documentElement).getPropertyValue(
-            '--text-color'
-          ),
-        },
-        grid: {
-          color: getComputedStyle(document.documentElement).getPropertyValue(
-            '--border-color'
-          ),
-        },
-      },
-    },
+  columnOptions: any[] = [];
+  numericColumns: any[] = [];
+  categoricalColumns: any[] = [];
+  dateColumns: any[] = [];
+
+  // ngx-charts specific properties
+  ngxChartData: any[] = [];
+  ngxChartScheme: any = {
+    domain: [
+      '#5AA454',
+      '#A10A28',
+      '#C7B42C',
+      '#AAAAAA',
+      '#FF6B6B',
+      '#4ECDC4',
+      '#45B7D1',
+      '#96CEB4',
+      '#DDA0DD',
+      '#F7DC6F',
+    ],
   };
+  ngxChartView: [number, number] = [700, 400];
+  showXAxis = true;
+  showYAxis = true;
+  gradient = false;
+  showLegend = true;
+  showXAxisLabel = true;
+  showYAxisLabel = true;
+  xAxisLabel = '';
+  yAxisLabel = '';
+  animations = true;
+  showGridLines = true;
+  roundDomains = true;
+
+  // Additional ngx-charts options
+  legendTitle = '';
+  legendPosition: 'below' | 'right' = 'below';
+  showDataLabel = false;
+  // Comprehensive chart type configuration for ngx-charts
+  chartTypes = [
+    {
+      label: 'Vertical Bar Chart',
+      value: 'bar-vertical',
+      icon: 'pi pi-chart-bar',
+      description: 'Compare values across categories',
+      inputs: [
+        {
+          name: 'xAxis',
+          label: 'X-Axis (Categories)',
+          type: 'categorical',
+          required: true,
+        },
+        {
+          name: 'yAxis',
+          label: 'Y-Axis (Values)',
+          type: 'numeric',
+          required: true,
+        },
+      ],
+    },
+    {
+      label: 'Horizontal Bar Chart',
+      value: 'bar-horizontal',
+      icon: 'pi pi-bars',
+      description: 'Compare values with horizontal bars',
+      inputs: [
+        {
+          name: 'xAxis',
+          label: 'Categories',
+          type: 'categorical',
+          required: true,
+        },
+        { name: 'yAxis', label: 'Values', type: 'numeric', required: true },
+      ],
+    },
+    {
+      label: 'Grouped Bar Chart',
+      value: 'bar-vertical-grouped',
+      icon: 'pi pi-chart-bar',
+      description: 'Compare multiple series across categories',
+      inputs: [
+        {
+          name: 'xAxis',
+          label: 'X-Axis (Categories)',
+          type: 'categorical',
+          required: true,
+        },
+        {
+          name: 'yAxis',
+          label: 'Y-Axis (Values)',
+          type: 'numeric',
+          required: true,
+          multiple: true,
+        },
+        {
+          name: 'groupBy',
+          label: 'Group By',
+          type: 'categorical',
+          required: false,
+        },
+      ],
+    },
+    {
+      label: 'Line Chart',
+      value: 'line-chart',
+      icon: 'pi pi-chart-line',
+      description: 'Show trends over time or categories',
+      inputs: [
+        { name: 'xAxis', label: 'X-Axis', type: 'any', required: true },
+        {
+          name: 'yAxis',
+          label: 'Y-Axis (Values)',
+          type: 'numeric',
+          required: true,
+          multiple: true,
+        },
+      ],
+    },
+    {
+      label: 'Area Chart',
+      value: 'area-chart',
+      icon: 'pi pi-chart-line',
+      description: 'Show cumulative trends',
+      inputs: [
+        { name: 'xAxis', label: 'X-Axis', type: 'any', required: true },
+        {
+          name: 'yAxis',
+          label: 'Y-Axis (Values)',
+          type: 'numeric',
+          required: true,
+          multiple: true,
+        },
+      ],
+    },
+    {
+      label: 'Pie Chart',
+      value: 'pie-chart',
+      icon: 'pi pi-chart-pie',
+      description: 'Show proportions of a whole',
+      inputs: [
+        {
+          name: 'labels',
+          label: 'Labels',
+          type: 'categorical',
+          required: true,
+        },
+        { name: 'values', label: 'Values', type: 'numeric', required: true },
+      ],
+    },
+    {
+      label: 'Advanced Pie Chart',
+      value: 'pie-chart-advanced',
+      icon: 'pi pi-chart-pie',
+      description: 'Pie chart with exploded slices',
+      inputs: [
+        {
+          name: 'labels',
+          label: 'Labels',
+          type: 'categorical',
+          required: true,
+        },
+        { name: 'values', label: 'Values', type: 'numeric', required: true },
+      ],
+    },
+    {
+      label: 'Donut Chart',
+      value: 'pie-chart-grid',
+      icon: 'pi pi-circle',
+      description: 'Pie chart with center hole',
+      inputs: [
+        {
+          name: 'labels',
+          label: 'Labels',
+          type: 'categorical',
+          required: true,
+        },
+        { name: 'values', label: 'Values', type: 'numeric', required: true },
+      ],
+    },
+    {
+      label: 'Bubble Chart',
+      value: 'bubble-chart',
+      icon: 'pi pi-circle',
+      description: 'Show relationships between 3 variables',
+      inputs: [
+        { name: 'xAxis', label: 'X-Axis', type: 'numeric', required: true },
+        { name: 'yAxis', label: 'Y-Axis', type: 'numeric', required: true },
+        { name: 'size', label: 'Bubble Size', type: 'numeric', required: true },
+        {
+          name: 'groupBy',
+          label: 'Group By',
+          type: 'categorical',
+          required: false,
+        },
+      ],
+    },
+    {
+      label: 'Heatmap',
+      value: 'heat-map',
+      icon: 'pi pi-th-large',
+      description: 'Show patterns in matrix data',
+      inputs: [
+        { name: 'xAxis', label: 'X-Axis', type: 'categorical', required: true },
+        { name: 'yAxis', label: 'Y-Axis', type: 'categorical', required: true },
+        { name: 'values', label: 'Values', type: 'numeric', required: true },
+      ],
+    },
+    {
+      label: 'Tree Map',
+      value: 'tree-map',
+      icon: 'pi pi-sitemap',
+      description: 'Show hierarchical data as rectangles',
+      inputs: [
+        {
+          name: 'labels',
+          label: 'Labels',
+          type: 'categorical',
+          required: true,
+        },
+        { name: 'values', label: 'Values', type: 'numeric', required: true },
+        {
+          name: 'groupBy',
+          label: 'Group By',
+          type: 'categorical',
+          required: false,
+        },
+      ],
+    },
+    {
+      label: 'Number Cards',
+      value: 'number-card',
+      icon: 'pi pi-id-card',
+      description: 'Display key metrics',
+      inputs: [
+        {
+          name: 'labels',
+          label: 'Labels',
+          type: 'categorical',
+          required: true,
+        },
+        { name: 'values', label: 'Values', type: 'numeric', required: true },
+      ],
+    },
+    {
+      label: 'Gauge Chart',
+      value: 'gauge',
+      icon: 'pi pi-compass',
+      description: 'Show single value against a scale',
+      inputs: [
+        {
+          name: 'value',
+          label: 'Value',
+          type: 'numeric',
+          required: true,
+          single: true,
+        },
+        {
+          name: 'label',
+          label: 'Label',
+          type: 'categorical',
+          required: false,
+          single: true,
+        },
+      ],
+    },
+    {
+      label: 'Linear Gauge',
+      value: 'linear-gauge',
+      icon: 'pi pi-minus',
+      description: 'Horizontal gauge display',
+      inputs: [
+        {
+          name: 'value',
+          label: 'Value',
+          type: 'numeric',
+          required: true,
+          single: true,
+        },
+        {
+          name: 'label',
+          label: 'Label',
+          type: 'categorical',
+          required: false,
+          single: true,
+        },
+      ],
+    },
+  ];
 
   // Chart generation properties
   isGeneratingChart: boolean = false;
@@ -263,25 +494,26 @@ export class RunQueryComponent
     private globalService: GlobalService,
     private fb: FormBuilder,
     private httpClientService: HttpClientService,
-    private queryService: QueryService
+    private queryService: QueryService,
+    private cdr: ChangeDetectorRef
   ) {
-    // Initialize form
+    // Initialize form with chart type selection only
     this.chartForm = this.fb.group({
-      xAxis: [null],
-      yAxis: [null],
-      chartType: ['bar'],
+      chartType: [null, Validators.required],
     });
 
-    // Subscribe to form value changes
-    this.chartForm.valueChanges.subscribe(() => {
-      this.onFormChange();
+    // Subscribe to chart type changes to dynamically update form
+    this.chartForm.get('chartType')?.valueChanges.subscribe(chartType => {
+      if (chartType) {
+        this.onChartTypeChange(chartType);
+      }
     });
   }
 
   ngOnInit(): void {
     // Set default query
     this.sqlQuery = this.DEFAULT_QUERY;
-    
+
     // Add organization and database loading
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
@@ -345,7 +577,6 @@ export class RunQueryComponent
       }
     }, 100);
   }
-
 
   private initializeEditor(): void {
     if (!monaco) {
@@ -547,17 +778,20 @@ export class RunQueryComponent
     this.buildSchemaMetadata();
 
     // Register PERFECT SQL completion provider
-    this.suggestionProvider = monaco.languages.registerCompletionItemProvider('sql', {
-      triggerCharacters: ['.', ' ', '\t'],
-      provideCompletionItems: (model: any, position: any) => {
-        try {
-          return this.providePerfectCompletions(model, position);
-        } catch (error) {
-          console.error('Autocomplete error:', error);
-          return { suggestions: [], incomplete: false };
-        }
-      },
-    });
+    this.suggestionProvider = monaco.languages.registerCompletionItemProvider(
+      'sql',
+      {
+        triggerCharacters: ['.', ' ', '\t'],
+        provideCompletionItems: (model: any, position: any) => {
+          try {
+            return this.providePerfectCompletions(model, position);
+          } catch (error) {
+            console.error('Autocomplete error:', error);
+            return { suggestions: [], incomplete: false };
+          }
+        },
+      }
+    );
   }
 
   private providePerfectCompletions(model: any, position: any): any {
@@ -566,10 +800,14 @@ export class RunQueryComponent
     const cursorOffset = model.getOffsetAt(position);
     const word = model.getWordUntilPosition(position);
     const currentWord = word.word;
-    
+
     // Build comprehensive query context
-    const queryInfo = this.buildPerfectQueryContext(fullQuery, cursorOffset, currentWord);
-    
+    const queryInfo = this.buildPerfectQueryContext(
+      fullQuery,
+      cursorOffset,
+      currentWord
+    );
+
     // Generate intelligent suggestions
     const suggestions = this.generateIntelligentSuggestions(queryInfo, {
       startLineNumber: position.lineNumber,
@@ -577,27 +815,38 @@ export class RunQueryComponent
       startColumn: word.startColumn,
       endColumn: word.endColumn,
     });
-    
+
     // Apply perfect scoring and sorting
     return {
       suggestions: this.perfectSuggestionSort(suggestions, currentWord),
-      incomplete: false
+      incomplete: false,
     };
   }
-  
-  private buildPerfectQueryContext(fullQuery: string, cursorOffset: number, currentWord: string): any {
+
+  private buildPerfectQueryContext(
+    fullQuery: string,
+    cursorOffset: number,
+    currentWord: string
+  ): any {
     // Extract complete query structure
     this.extractTableAliases(fullQuery);
-    
+
     const beforeCursor = fullQuery.substring(0, cursorOffset);
     const afterCursor = fullQuery.substring(cursorOffset);
-    const nearCursor = fullQuery.substring(Math.max(0, cursorOffset - 100), cursorOffset + 100);
-    
+    const nearCursor = fullQuery.substring(
+      Math.max(0, cursorOffset - 100),
+      cursorOffset + 100
+    );
+
     // Intelligent SQL parsing
     const queryStructure = this.parseQueryStructure(fullQuery);
     const currentClause = this.detectCurrentClause(beforeCursor);
-    const expectation = this.determineExpectation(beforeCursor, currentWord, queryStructure);
-    
+    const expectation = this.determineExpectation(
+      beforeCursor,
+      currentWord,
+      queryStructure
+    );
+
     return {
       fullQuery,
       beforeCursor,
@@ -611,10 +860,10 @@ export class RunQueryComponent
       availableSchemas: this.getAvailableSchemas(),
       availableTables: this.getAvailableTablesFromContext(queryStructure),
       availableColumns: this.getAvailableColumnsFromContext(queryStructure),
-      existingAliases: Array.from(this.tableAliases.entries())
+      existingAliases: Array.from(this.tableAliases.entries()),
     };
   }
-  
+
   private parseQueryStructure(query: string): any {
     const structure = {
       type: 'unknown',
@@ -631,10 +880,10 @@ export class RunQueryComponent
         groupBy: null,
         having: null,
         orderBy: null,
-        limit: null
-      }
+        limit: null,
+      },
     };
-    
+
     try {
       // Use existing parser or create enhanced one
       const ast = parse(query);
@@ -643,29 +892,29 @@ export class RunQueryComponent
       // Fallback to regex parsing
       this.parseWithRegex(query, structure);
     }
-    
+
     return structure;
   }
-  
+
   private processASTIntoStructure(ast: any, structure: any): void {
     for (const stmt of ast) {
       if (stmt.type === 'select') {
         structure.type = 'select';
-        
+
         // Process FROM clause
         if (stmt.from) {
           for (const from of stmt.from) {
             this.processFromClause(from, structure);
           }
         }
-        
+
         // Process JOINs
         if (stmt.join) {
           for (const join of stmt.join) {
             this.processJoinClause(join, structure);
           }
         }
-        
+
         // Process SELECT columns
         if (stmt.columns) {
           for (const col of stmt.columns) {
@@ -675,16 +924,16 @@ export class RunQueryComponent
       }
     }
   }
-  
+
   private processFromClause(from: any, structure: any): void {
     if (from.type === 'table') {
       const tableName = from.name?.name || from.name;
       const alias = from.alias?.name || tableName;
-      
+
       structure.mainTable = tableName;
       structure.aliases.set(alias, tableName);
       this.tableAliases.set(alias, tableName);
-      
+
       // Extract schema
       if (tableName.includes('.')) {
         const [schema] = tableName.split('.');
@@ -692,65 +941,69 @@ export class RunQueryComponent
       }
     }
   }
-  
+
   private processJoinClause(join: any, structure: any): void {
     if (join.from?.type === 'table') {
       const tableName = join.from.name?.name || join.from.name;
       const alias = join.from.alias?.name || tableName;
-      
+
       structure.joinedTables.push({
         table: tableName,
         alias: alias,
-        type: join.type || 'inner'
+        type: join.type || 'inner',
       });
-      
+
       structure.aliases.set(alias, tableName);
       this.tableAliases.set(alias, tableName);
-      
+
       if (tableName.includes('.')) {
         const [schema] = tableName.split('.');
         structure.schemas.add(schema);
       }
     }
   }
-  
+
   private processSelectColumn(col: any, structure: any): void {
     if (col.expr?.column) {
       structure.columns.add(col.expr.column);
     }
   }
-  
+
   private parseWithRegex(query: string, structure: any): void {
     const queryLower = query.toLowerCase();
-    
+
     // Detect query type
     if (queryLower.includes('select')) structure.type = 'select';
     else if (queryLower.includes('insert')) structure.type = 'insert';
     else if (queryLower.includes('update')) structure.type = 'update';
     else if (queryLower.includes('delete')) structure.type = 'delete';
-    
+
     // Extract tables and aliases with enhanced patterns
     const patterns = [
       /\bfrom\s+(\w+(?:\.\w+)?)\s*(?:(?:as\s+)?(\w+))?\s*/gi,
       /\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\s+(\w+(?:\.\w+)?)\s*(?:(?:as\s+)?(\w+))?\s*/gi,
-      /\bupdate\s+(\w+(?:\.\w+)?)\s*(?:(?:as\s+)?(\w+))?\s*/gi
+      /\bupdate\s+(\w+(?:\.\w+)?)\s*(?:(?:as\s+)?(\w+))?\s*/gi,
     ];
-    
+
     patterns.forEach(pattern => {
       let match;
       while ((match = pattern.exec(query)) !== null) {
         const tableName = match[1];
         const alias = match[2] || tableName.split('.').pop() || tableName;
-        
+
         if (!structure.mainTable) {
           structure.mainTable = tableName;
         } else {
-          structure.joinedTables.push({ table: tableName, alias, type: 'join' });
+          structure.joinedTables.push({
+            table: tableName,
+            alias,
+            type: 'join',
+          });
         }
-        
+
         structure.aliases.set(alias, tableName);
         this.tableAliases.set(alias, tableName);
-        
+
         if (tableName.includes('.')) {
           const [schema] = tableName.split('.');
           structure.schemas.add(schema);
@@ -758,34 +1011,45 @@ export class RunQueryComponent
       }
     });
   }
-  
+
   private detectCurrentClause(beforeCursor: string): string {
     const text = beforeCursor.toLowerCase();
     const clauses = [
       { name: 'select', pattern: /\bselect\b.*$/i },
-      { name: 'from', pattern: /\bfrom\b[^(where|group|order|having|limit)]*$/i },
-      { name: 'join', pattern: /\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\b[^(where|group|order|having)]*$/i },
+      {
+        name: 'from',
+        pattern: /\bfrom\b[^(where|group|order|having|limit)]*$/i,
+      },
+      {
+        name: 'join',
+        pattern:
+          /\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\b[^(where|group|order|having)]*$/i,
+      },
       { name: 'where', pattern: /\bwhere\b[^(group|order|having|limit)]*$/i },
       { name: 'on', pattern: /\bon\b[^(where|group|order|having)]*$/i },
       { name: 'group', pattern: /\bgroup\s+by\b[^(order|having|limit)]*$/i },
       { name: 'having', pattern: /\bhaving\b[^(order|limit)]*$/i },
       { name: 'order', pattern: /\border\s+by\b[^limit]*$/i },
-      { name: 'limit', pattern: /\blimit\b.*$/i }
+      { name: 'limit', pattern: /\blimit\b.*$/i },
     ];
-    
+
     for (const clause of clauses) {
       if (clause.pattern.test(text)) {
         return clause.name;
       }
     }
-    
+
     return 'unknown';
   }
-  
-  private determineExpectation(beforeCursor: string, currentWord: string, queryStructure: any): any {
+
+  private determineExpectation(
+    beforeCursor: string,
+    currentWord: string,
+    queryStructure: any
+  ): any {
     const text = beforeCursor.toLowerCase();
     const lastWord = text.match(/\b(\w+)\s*$/)?.[1] || '';
-    
+
     // Dot notation check
     if (currentWord.includes('.') || beforeCursor.endsWith('.')) {
       const beforeDot = beforeCursor.match(/(\w+)\.\w*$/)?.[1];
@@ -794,86 +1058,117 @@ export class RunQueryComponent
           type: 'dot_notation',
           beforeDot,
           expectColumns: this.isTableOrAlias(beforeDot),
-          expectTables: this.isSchemaName(beforeDot)
+          expectTables: this.isSchemaName(beforeDot),
         };
       }
     }
-    
+
     // Context-based expectations
     const expectations = [
       // Keywords expecting tables
       {
-        pattern: /\b(from|join|inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join)\s*\w*$/i,
-        expectation: { type: 'table_or_schema', withAlias: /join/i.test(lastWord) }
+        pattern:
+          /\b(from|join|inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join)\s*\w*$/i,
+        expectation: {
+          type: 'table_or_schema',
+          withAlias: /join/i.test(lastWord),
+        },
       },
-      // Keywords expecting columns  
+      // Keywords expecting columns
       {
-        pattern: /\b(select|where|having|and|or|on|group\s+by|order\s+by)\s*\w*$/i,
-        expectation: { type: 'column' }
+        pattern:
+          /\b(select|where|having|and|or|on|group\s+by|order\s+by)\s*\w*$/i,
+        expectation: { type: 'column' },
       },
       // After table names expecting keywords
       {
         pattern: /\bfrom\s+\w+(?:\.\w+)?(?:\s+\w+)?\s*\w*$/i,
-        expectation: { type: 'keyword', keywords: ['WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'ORDER BY', 'GROUP BY', 'LIMIT'] }
+        expectation: {
+          type: 'keyword',
+          keywords: [
+            'WHERE',
+            'JOIN',
+            'INNER JOIN',
+            'LEFT JOIN',
+            'RIGHT JOIN',
+            'ORDER BY',
+            'GROUP BY',
+            'LIMIT',
+          ],
+        },
       },
       // After WHERE conditions
       {
         pattern: /\bwhere\s+\w+\s*[=<>!]+\s*\w+\s*\w*$/i,
-        expectation: { type: 'keyword', keywords: ['AND', 'OR', 'ORDER BY', 'GROUP BY', 'LIMIT'] }
+        expectation: {
+          type: 'keyword',
+          keywords: ['AND', 'OR', 'ORDER BY', 'GROUP BY', 'LIMIT'],
+        },
       },
       // Start of query
       {
         pattern: /^\s*\w*$/i,
-        expectation: { type: 'keyword', keywords: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'] }
-      }
+        expectation: {
+          type: 'keyword',
+          keywords: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
+        },
+      },
     ];
-    
+
     for (const { pattern, expectation } of expectations) {
       if (pattern.test(text)) {
         return expectation;
       }
     }
-    
+
     return { type: 'unknown' };
   }
-  
+
   private generateIntelligentSuggestions(queryInfo: any, range: any): any[] {
     const suggestions: any[] = [];
     const { expectation, currentWord } = queryInfo;
-    
+
     switch (expectation.type) {
       case 'dot_notation':
         this.addPerfectDotSuggestions(suggestions, range, queryInfo);
         break;
-        
+
       case 'table_or_schema':
         if (expectation.withAlias) {
-          this.addPerfectTableWithAliasSuggestions(suggestions, range, queryInfo);
+          this.addPerfectTableWithAliasSuggestions(
+            suggestions,
+            range,
+            queryInfo
+          );
         } else {
           this.addPerfectSchemaSuggestions(suggestions, range, queryInfo);
         }
         break;
-        
+
       case 'column':
         this.addPerfectColumnSuggestions(suggestions, range, queryInfo);
         break;
-        
+
       case 'keyword':
         this.addPerfectKeywordSuggestions(suggestions, range, queryInfo);
         break;
-        
+
       default:
         this.addContextualSuggestions(suggestions, range, queryInfo);
         break;
     }
-    
+
     return suggestions;
   }
-  
-  private addPerfectDotSuggestions(suggestions: any[], range: any, queryInfo: any): void {
+
+  private addPerfectDotSuggestions(
+    suggestions: any[],
+    range: any,
+    queryInfo: any
+  ): void {
     const { expectation, currentWord } = queryInfo;
     const beforeDot = expectation.beforeDot;
-    
+
     if (expectation.expectColumns) {
       // After table/alias dot - suggest columns
       this.addColumnsForTable(suggestions, range, currentWord, beforeDot);
@@ -882,11 +1177,15 @@ export class RunQueryComponent
       this.addTablesInSchema(suggestions, range, currentWord, beforeDot);
     }
   }
-  
-  private addPerfectSchemaSuggestions(suggestions: any[], range: any, queryInfo: any): void {
+
+  private addPerfectSchemaSuggestions(
+    suggestions: any[],
+    range: any,
+    queryInfo: any
+  ): void {
     const { currentWord } = queryInfo;
     const schemas = this.getAvailableSchemas();
-    
+
     schemas.forEach(schema => {
       if (this.perfectMatch(schema, currentWord)) {
         suggestions.push({
@@ -897,73 +1196,95 @@ export class RunQueryComponent
           detail: `📁 Schema`,
           documentation: `Schema: ${schema}`,
           sortText: `0_${schema}`,
-          score: this.calculatePerfectScore(schema, currentWord)
+          score: this.calculatePerfectScore(schema, currentWord),
         });
       }
     });
   }
-  
-  private addPerfectTableWithAliasSuggestions(suggestions: any[], range: any, queryInfo: any): void {
+
+  private addPerfectTableWithAliasSuggestions(
+    suggestions: any[],
+    range: any,
+    queryInfo: any
+  ): void {
     const { currentWord } = queryInfo;
-    
+
     // Add schemas first
     this.addPerfectSchemaSuggestions(suggestions, range, queryInfo);
-    
+
     // Add direct table suggestions with smart aliases
     Object.keys(this.schema).forEach(fullTableName => {
       const tableName = fullTableName.split('.').pop() || fullTableName;
-      
-      if (this.perfectMatch(tableName, currentWord) || this.perfectMatch(fullTableName, currentWord)) {
+
+      if (
+        this.perfectMatch(tableName, currentWord) ||
+        this.perfectMatch(fullTableName, currentWord)
+      ) {
         const alias = this.generateUniqueTableAlias(tableName);
         const insertText = `${fullTableName} ${alias}`;
-        
+
         suggestions.push({
           label: `${fullTableName} ${alias}`,
           kind: monaco.languages.CompletionItemKind.Class,
           insertText: insertText,
           range: range,
           detail: `📋 Table with alias`,
-          documentation: `Table: ${fullTableName}\nAlias: ${alias}\nColumns: ${this.schema[fullTableName].join(', ')}`,
+          documentation: `Table: ${fullTableName}\nAlias: ${alias}\nColumns: ${this.schema[
+            fullTableName
+          ].join(', ')}`,
           sortText: `1_${tableName}`,
-          score: this.calculatePerfectScore(tableName, currentWord)
+          score: this.calculatePerfectScore(tableName, currentWord),
         });
       }
     });
   }
-  
-  private addPerfectColumnSuggestions(suggestions: any[], range: any, queryInfo: any): void {
+
+  private addPerfectColumnSuggestions(
+    suggestions: any[],
+    range: any,
+    queryInfo: any
+  ): void {
     const { currentWord, queryStructure } = queryInfo;
     const availableTables = this.getAvailableTablesFromContext(queryStructure);
     const addedColumns = new Set<string>();
-    
+
     // Add columns from available tables with context info
     availableTables.forEach(({ table, alias }) => {
       const fullTableName = this.resolveFullTableName(table);
       if (fullTableName && this.schema[fullTableName]) {
         this.schema[fullTableName].forEach(column => {
-          if (this.perfectMatch(column, currentWord) && !addedColumns.has(column)) {
+          if (
+            this.perfectMatch(column, currentWord) &&
+            !addedColumns.has(column)
+          ) {
             addedColumns.add(column);
-            
+
             suggestions.push({
               label: column,
               kind: monaco.languages.CompletionItemKind.Field,
               insertText: column,
               range: range,
               detail: `🔹 Column from ${alias || table}`,
-              documentation: `Column: ${column}\nTable: ${table}\nAlias: ${alias || 'None'}`,
+              documentation: `Column: ${column}\nTable: ${table}\nAlias: ${
+                alias || 'None'
+              }`,
               sortText: `0_${column}`,
-              score: this.calculatePerfectScore(column, currentWord)
+              score: this.calculatePerfectScore(column, currentWord),
             });
           }
         });
       }
     });
   }
-  
-  private addPerfectKeywordSuggestions(suggestions: any[], range: any, queryInfo: any): void {
+
+  private addPerfectKeywordSuggestions(
+    suggestions: any[],
+    range: any,
+    queryInfo: any
+  ): void {
     const { currentWord, expectation } = queryInfo;
     const keywords = expectation.keywords || [];
-    
+
     keywords.forEach((keyword: string) => {
       if (this.perfectMatch(keyword, currentWord)) {
         suggestions.push({
@@ -974,21 +1295,33 @@ export class RunQueryComponent
           detail: `🔤 SQL Keyword`,
           documentation: `SQL Keyword: ${keyword}`,
           sortText: `0_${keyword}`,
-          score: this.calculatePerfectScore(keyword, currentWord)
+          score: this.calculatePerfectScore(keyword, currentWord),
         });
       }
     });
   }
-  
-  private addContextualSuggestions(suggestions: any[], range: any, queryInfo: any): void {
+
+  private addContextualSuggestions(
+    suggestions: any[],
+    range: any,
+    queryInfo: any
+  ): void {
     const { currentWord } = queryInfo;
-    
+
     // Add most relevant suggestions based on context
     this.addPerfectSchemaSuggestions(suggestions, range, queryInfo);
     this.addPerfectColumnSuggestions(suggestions, range, queryInfo);
-    
+
     // Add common SQL keywords
-    const commonKeywords = ['SELECT', 'FROM', 'WHERE', 'JOIN', 'ORDER BY', 'GROUP BY', 'LIMIT'];
+    const commonKeywords = [
+      'SELECT',
+      'FROM',
+      'WHERE',
+      'JOIN',
+      'ORDER BY',
+      'GROUP BY',
+      'LIMIT',
+    ];
     commonKeywords.forEach(keyword => {
       if (this.perfectMatch(keyword, currentWord)) {
         suggestions.push({
@@ -999,34 +1332,41 @@ export class RunQueryComponent
           detail: `🔤 SQL Keyword`,
           documentation: `SQL Keyword: ${keyword}`,
           sortText: `2_${keyword}`,
-          score: this.calculatePerfectScore(keyword, currentWord)
+          score: this.calculatePerfectScore(keyword, currentWord),
         });
       }
     });
   }
-  
-  private addTablesInSchema(suggestions: any[], range: any, currentWord: string, schemaName: string): void {
+
+  private addTablesInSchema(
+    suggestions: any[],
+    range: any,
+    currentWord: string,
+    schemaName: string
+  ): void {
     if (this.schemaMetadata[schemaName]) {
       const tables = this.schemaMetadata[schemaName];
       Object.keys(tables).forEach(tableName => {
         if (this.perfectMatch(tableName, currentWord)) {
           const alias = this.generateUniqueTableAlias(tableName);
-          
+
           suggestions.push({
             label: `${tableName} ${alias}`,
             kind: monaco.languages.CompletionItemKind.Class,
             insertText: `${tableName} ${alias}`,
             range: range,
             detail: `📋 Table with alias`,
-            documentation: `Table: ${schemaName}.${tableName}\nAlias: ${alias}\nColumns: ${tables[tableName].join(', ')}`,
+            documentation: `Table: ${schemaName}.${tableName}\nAlias: ${alias}\nColumns: ${tables[
+              tableName
+            ].join(', ')}`,
             sortText: `0_${tableName}`,
-            score: this.calculatePerfectScore(tableName, currentWord)
+            score: this.calculatePerfectScore(tableName, currentWord),
           });
         }
       });
     }
   }
-  
+
   private getAvailableSchemas(): string[] {
     const schemas = new Set<string>();
     Object.keys(this.schema).forEach(fullTableName => {
@@ -1039,44 +1379,46 @@ export class RunQueryComponent
     });
     return Array.from(schemas);
   }
-  
+
   private getAvailableTablesFromContext(queryStructure: any): any[] {
     const tables: any[] = [];
-    
+
     if (queryStructure.mainTable) {
-      const alias = queryStructure.aliases.get(queryStructure.mainTable) || queryStructure.mainTable;
+      const alias =
+        queryStructure.aliases.get(queryStructure.mainTable) ||
+        queryStructure.mainTable;
       tables.push({ table: queryStructure.mainTable, alias });
     }
-    
+
     queryStructure.joinedTables.forEach((joined: any) => {
       tables.push({ table: joined.table, alias: joined.alias });
     });
-    
+
     return tables;
   }
-  
+
   private getAvailableColumnsFromContext(queryStructure: any): string[] {
     const columns = new Set<string>();
     const tables = this.getAvailableTablesFromContext(queryStructure);
-    
+
     tables.forEach(({ table }) => {
       const fullTableName = this.resolveFullTableName(table);
       if (fullTableName && this.schema[fullTableName]) {
         this.schema[fullTableName].forEach(column => columns.add(column));
       }
     });
-    
+
     return Array.from(columns);
   }
-  
+
   private perfectMatch(suggestion: string, input: string): boolean {
     if (!input || input.trim() === '') return true;
-    
+
     const suggestionLower = suggestion.toLowerCase();
     const inputLower = input.toLowerCase().trim();
-    
+
     if (suggestionLower === inputLower) return false;
-    
+
     // Perfect matching algorithm
     return (
       suggestionLower.startsWith(inputLower) ||
@@ -1085,14 +1427,14 @@ export class RunQueryComponent
       this.acronymMatch(suggestion, inputLower)
     );
   }
-  
+
   private smartWordMatch(suggestion: string, input: string): boolean {
     if (suggestion.includes('_')) {
       return suggestion.split('_').some(word => word.startsWith(input));
     }
     return false;
   }
-  
+
   private acronymMatch(suggestion: string, input: string): boolean {
     const capitals = suggestion.match(/[A-Z]/g);
     if (capitals) {
@@ -1100,38 +1442,46 @@ export class RunQueryComponent
     }
     return false;
   }
-  
+
   private calculatePerfectScore(suggestion: string, input: string): number {
     if (!input) return 50;
-    
+
     const suggestionLower = suggestion.toLowerCase();
     const inputLower = input.toLowerCase();
-    
+
     // Perfect scoring algorithm
     if (suggestionLower.startsWith(inputLower)) return 100;
     if (suggestionLower.includes(inputLower)) return 80;
     if (this.smartWordMatch(suggestionLower, inputLower)) return 70;
     if (this.acronymMatch(suggestion, inputLower)) return 60;
-    
+
     return 40;
   }
-  
-  private perfectSuggestionSort(suggestions: any[], currentWord: string): any[] {
+
+  private perfectSuggestionSort(
+    suggestions: any[],
+    currentWord: string
+  ): any[] {
     return suggestions
       .filter(s => s.score > 30)
       .sort((a, b) => {
         // Sort by score (descending)
         if (b.score !== a.score) return b.score - a.score;
-        
+
         // Sort by type priority
-        const typePriority: { [key: string]: number } = { '0_': 0, '1_': 1, '2_': 2 };
+        const typePriority: { [key: string]: number } = {
+          '0_': 0,
+          '1_': 1,
+          '2_': 2,
+        };
         const aPriority = typePriority[a.sortText?.substring(0, 2) || ''] ?? 3;
         const bPriority = typePriority[b.sortText?.substring(0, 2) || ''] ?? 3;
         if (aPriority !== bPriority) return aPriority - bPriority;
-        
+
         // Sort by length (shorter first)
-        if (a.label.length !== b.label.length) return a.label.length - b.label.length;
-        
+        if (a.label.length !== b.label.length)
+          return a.label.length - b.label.length;
+
         // Sort alphabetically
         return a.label.localeCompare(b.label);
       });
@@ -1141,7 +1491,7 @@ export class RunQueryComponent
     this.tableAliases.clear();
     try {
       const ast = parse(sql);
-      
+
       for (const stmt of ast) {
         if (stmt.type === 'select') {
           this.processSelectStatement(stmt);
@@ -1196,19 +1546,23 @@ export class RunQueryComponent
       // UPDATE table AS alias
       /\bupdate\s+(\w+(?:\.\w+)?)(?:\s+(?:as\s+)?(\w+))?/gi,
       // DELETE FROM table AS alias
-      /\bdelete\s+from\s+(\w+(?:\.\w+)?)(?:\s+(?:as\s+)?(\w+))?/gi
+      /\bdelete\s+from\s+(\w+(?:\.\w+)?)(?:\s+(?:as\s+)?(\w+))?/gi,
     ];
-    
+
     patterns.forEach(pattern => {
       let match;
       while ((match = pattern.exec(sql)) !== null) {
         const tableName = match[1];
         const alias = match[2] || tableName.split('.').pop() || tableName;
-        
-        if (alias && tableName && alias.toLowerCase() !== tableName.toLowerCase()) {
+
+        if (
+          alias &&
+          tableName &&
+          alias.toLowerCase() !== tableName.toLowerCase()
+        ) {
           this.tableAliases.set(alias, tableName);
         }
-        
+
         // Also add the table name itself for direct access
         const tableOnly = tableName.split('.').pop();
         if (tableOnly && tableOnly !== alias) {
@@ -1218,224 +1572,311 @@ export class RunQueryComponent
     });
   }
 
-  private getPreciseQueryContext(lineBeforeCursor: string, fullQuery: string, currentWord: string, absoluteCursorPosition?: number): any {
+  private getPreciseQueryContext(
+    lineBeforeCursor: string,
+    fullQuery: string,
+    currentWord: string,
+    absoluteCursorPosition?: number
+  ): any {
     const line = lineBeforeCursor.toLowerCase().trim();
-    
+
     // Enhanced context detection that considers full query, not just line before cursor
     const fullQueryLower = fullQuery.toLowerCase();
     const cursorPosition = absoluteCursorPosition || lineBeforeCursor.length;
-    
+
     // Check for dot notation (schema.table or table.column or alias.column)
     if (currentWord.includes('.') || lineBeforeCursor.endsWith('.')) {
       const dotMatch = lineBeforeCursor.match(/(\w+)\.(\w*)$/);
-      const beforeDot = dotMatch ? dotMatch[1] : lineBeforeCursor.match(/(\w+)\.\s*$/)?.[1];
-      
+      const beforeDot = dotMatch
+        ? dotMatch[1]
+        : lineBeforeCursor.match(/(\w+)\.\s*$/)?.[1];
+
       if (beforeDot) {
         const isSchema = this.isSchemaName(beforeDot);
         const isTableOrAlias = this.isTableOrAlias(beforeDot);
-        
+
         return {
           afterDot: true,
           beforeDot: beforeDot,
           expectingColumn: isTableOrAlias,
           expectingTable: isSchema,
           isSchema: isSchema,
-          isTableOrAlias: isTableOrAlias
+          isTableOrAlias: isTableOrAlias,
         };
       }
     }
 
     // Context-specific patterns - Enhanced to work anywhere in query
-    
+
     // Find the context around the cursor position in the full query
     const beforeCursor = fullQuery.substring(0, cursorPosition);
     const afterCursor = fullQuery.substring(cursorPosition);
-    const queryContext = this.analyzeQueryContext(beforeCursor, afterCursor, currentWord);
-    
+    const queryContext = this.analyzeQueryContext(
+      beforeCursor,
+      afterCursor,
+      currentWord
+    );
+
     if (queryContext) {
       return queryContext;
     }
-    
+
     // Fallback to line-based patterns
     // 1. After FROM/JOIN - expect schemas only (not the keyword again)
-    if (/\b(from|join|inner\s+join|left\s+join|right\s+join|cross\s+join)\s+$/i.test(line)) {
+    if (
+      /\b(from|join|inner\s+join|left\s+join|right\s+join|cross\s+join)\s+$/i.test(
+        line
+      )
+    ) {
       return {
         expectingTable: true,
-        availableTables: this.getAvailableTablesInContext(fullQuery)
+        availableTables: this.getAvailableTablesInContext(fullQuery),
       };
     }
-    
-    // 1b. Also handle partial typing after FROM/JOIN  
-    if (/\b(from|join|inner\s+join|left\s+join|right\s+join|cross\s+join)\s+\w+$/i.test(line)) {
+
+    // 1b. Also handle partial typing after FROM/JOIN
+    if (
+      /\b(from|join|inner\s+join|left\s+join|right\s+join|cross\s+join)\s+\w+$/i.test(
+        line
+      )
+    ) {
       return {
         expectingTable: true,
-        availableTables: this.getAvailableTablesInContext(fullQuery)
+        availableTables: this.getAvailableTablesInContext(fullQuery),
       };
     }
-    
+
     // 2. After SELECT - expect columns only (not SELECT again)
     if (/\bselect\s+$/i.test(line)) {
       const table = this.findTableInFromClause(fullQuery);
       return {
         expectingColumn: true,
-        availableTables: table ? [table] : this.getAvailableTablesInContext(fullQuery)
+        availableTables: table
+          ? [table]
+          : this.getAvailableTablesInContext(fullQuery),
       };
     }
-    
+
     // 3. After comma in SELECT - expect columns
     if (/,\s*$/i.test(line) && /\bselect\b/i.test(fullQuery)) {
       const table = this.findTableInFromClause(fullQuery);
       return {
         expectingColumn: true,
-        availableTables: table ? [table] : this.getAvailableTablesInContext(fullQuery)
+        availableTables: table
+          ? [table]
+          : this.getAvailableTablesInContext(fullQuery),
       };
     }
-    
+
     // 3a. After table name in FROM clause - expect JOIN keywords or WHERE
     if (/\bfrom\s+\w+(?:\.\w+)?\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN', 'ORDER BY', 'GROUP BY', 'LIMIT']
+        keywords: [
+          'WHERE',
+          'JOIN',
+          'INNER JOIN',
+          'LEFT JOIN',
+          'RIGHT JOIN',
+          'FULL JOIN',
+          'CROSS JOIN',
+          'ORDER BY',
+          'GROUP BY',
+          'LIMIT',
+        ],
       };
     }
-    
+
     // 3b. After table alias in FROM clause - expect JOIN keywords or WHERE
     if (/\bfrom\s+\w+(?:\.\w+)?\s+\w+\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN', 'ORDER BY', 'GROUP BY', 'LIMIT']
+        keywords: [
+          'WHERE',
+          'JOIN',
+          'INNER JOIN',
+          'LEFT JOIN',
+          'RIGHT JOIN',
+          'FULL JOIN',
+          'CROSS JOIN',
+          'ORDER BY',
+          'GROUP BY',
+          'LIMIT',
+        ],
       };
     }
-    
+
     // 3c. After JOIN keywords - expect schema names or tables with aliases
-    if (/\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\s*$/i.test(line)) {
+    if (
+      /\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\s*$/i.test(
+        line
+      )
+    ) {
       return {
         expectingTableWithAlias: true,
-        availableTables: this.getAvailableTablesInContext(fullQuery)
+        availableTables: this.getAvailableTablesInContext(fullQuery),
       };
     }
-    
+
     // 4. After WHERE/HAVING/AND/OR - expect columns
     if (/\b(where|having|and|or)\s+$/i.test(line)) {
       return {
         expectingColumn: true,
-        availableTables: this.getAvailableTablesInContext(fullQuery)
+        availableTables: this.getAvailableTablesInContext(fullQuery),
       };
     }
-    
+
     // 5. After ON (join condition) - expect columns
     if (/\bon\s+$/i.test(line)) {
       return {
         expectingColumn: true,
-        availableTables: this.getAvailableTablesInContext(fullQuery)
+        availableTables: this.getAvailableTablesInContext(fullQuery),
       };
     }
-    
+
     // 6. After ORDER BY/GROUP BY - expect columns
     if (/\b(order\s+by|group\s+by)\s+$/i.test(line)) {
       return {
         expectingColumn: true,
-        availableTables: this.getAvailableTablesInContext(fullQuery)
+        availableTables: this.getAvailableTablesInContext(fullQuery),
       };
     }
-    
+
     // 6a. After WHERE condition - expect AND/OR/ORDER BY/GROUP BY/LIMIT
     if (/\bwhere\s+\w+\s*(=|>|<|>=|<=|!=|<>)\s*\w+\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['AND', 'OR', 'ORDER BY', 'GROUP BY', 'LIMIT']
+        keywords: ['AND', 'OR', 'ORDER BY', 'GROUP BY', 'LIMIT'],
       };
     }
-    
+
     // 6b. After JOIN table - expect ON
-    if (/\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\s+\w+(?:\.\w+)?(?:\s+\w+)?\s*$/i.test(line)) {
+    if (
+      /\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\s+\w+(?:\.\w+)?(?:\s+\w+)?\s*$/i.test(
+        line
+      )
+    ) {
       return {
         expectingKeyword: true,
-        keywords: ['ON']
+        keywords: ['ON'],
       };
     }
-    
+
     // 6c. After JOIN ON condition - expect AND/OR/WHERE/ORDER BY/GROUP BY/LIMIT
     if (/\bon\s+\w+\s*(=|>|<|>=|<=|!=|<>)\s*\w+\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['AND', 'OR', 'WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'ORDER BY', 'GROUP BY', 'LIMIT']
+        keywords: [
+          'AND',
+          'OR',
+          'WHERE',
+          'JOIN',
+          'INNER JOIN',
+          'LEFT JOIN',
+          'RIGHT JOIN',
+          'ORDER BY',
+          'GROUP BY',
+          'LIMIT',
+        ],
       };
     }
-    
+
     // 6d. After ORDER BY column - expect ASC/DESC/LIMIT
     if (/\border\s+by\s+\w+(?:\.\w+)?\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['ASC', 'DESC', 'LIMIT']
+        keywords: ['ASC', 'DESC', 'LIMIT'],
       };
     }
-    
+
     // 6da. After ORDER BY column ASC/DESC - expect LIMIT
     if (/\border\s+by\s+\w+(?:\.\w+)?\s+(asc|desc)\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['LIMIT']
+        keywords: ['LIMIT'],
       };
     }
-    
+
     // 6e. After GROUP BY column - expect HAVING/ORDER BY/LIMIT
     if (/\bgroup\s+by\s+\w+(?:\.\w+)?\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['HAVING', 'ORDER BY', 'LIMIT']
+        keywords: ['HAVING', 'ORDER BY', 'LIMIT'],
       };
     }
-    
+
     // 7. Start of query or after semicolon - expect main keywords
     if (/^\s*$/i.test(line) || /;\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['SELECT', 'INSERT', 'UPDATE', 'DELETE']
+        keywords: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
       };
     }
-    
+
     // 8. After SELECT * - expect FROM only
     if (/\bselect\s+\*\s*$/i.test(line)) {
       return {
         expectingKeyword: true,
-        keywords: ['FROM']
+        keywords: ['FROM'],
       };
     }
 
     // 9. Partial keyword matching - only if typing incomplete keyword at start
     if (/^\s*[a-z]*$/i.test(line) && currentWord.length > 0) {
       const possibleKeywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE'];
-      const matchingKeywords = possibleKeywords.filter(k => 
-        k.toLowerCase().startsWith(currentWord.toLowerCase()) && 
-        k.toLowerCase() !== currentWord.toLowerCase()
+      const matchingKeywords = possibleKeywords.filter(
+        k =>
+          k.toLowerCase().startsWith(currentWord.toLowerCase()) &&
+          k.toLowerCase() !== currentWord.toLowerCase()
       );
-      
+
       if (matchingKeywords.length > 0) {
         return {
           expectingKeyword: true,
-          keywords: matchingKeywords
+          keywords: matchingKeywords,
         };
       }
     }
-    
+
     // 10. Partial keyword matching in any context
     if (currentWord.length > 0) {
       const allKeywords = [
-        'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN',
-        'ON', 'AND', 'OR', 'ORDER BY', 'GROUP BY', 'HAVING', 'LIMIT', 'ASC', 'DESC',
-        'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'ALTER', 'DROP'
+        'SELECT',
+        'FROM',
+        'WHERE',
+        'JOIN',
+        'INNER JOIN',
+        'LEFT JOIN',
+        'RIGHT JOIN',
+        'FULL JOIN',
+        'CROSS JOIN',
+        'ON',
+        'AND',
+        'OR',
+        'ORDER BY',
+        'GROUP BY',
+        'HAVING',
+        'LIMIT',
+        'ASC',
+        'DESC',
+        'INSERT',
+        'UPDATE',
+        'DELETE',
+        'CREATE',
+        'ALTER',
+        'DROP',
       ];
-      
-      const matchingKeywords = allKeywords.filter(k => 
-        k.toLowerCase().startsWith(currentWord.toLowerCase()) && 
-        k.toLowerCase() !== currentWord.toLowerCase()
+
+      const matchingKeywords = allKeywords.filter(
+        k =>
+          k.toLowerCase().startsWith(currentWord.toLowerCase()) &&
+          k.toLowerCase() !== currentWord.toLowerCase()
       );
-      
+
       if (matchingKeywords.length > 0) {
         return {
           expectingKeyword: true,
-          keywords: matchingKeywords
+          keywords: matchingKeywords,
         };
       }
     }
@@ -1444,27 +1885,27 @@ export class RunQueryComponent
       expectingTable: false,
       expectingColumn: false,
       afterDot: false,
-      expectingKeyword: false
+      expectingKeyword: false,
     };
   }
 
   private buildSchemaMetadata(): void {
     this.schemaMetadata = {};
-    
+
     console.log('Building schema metadata from:', this.schema);
-    
+
     Object.entries(this.schema).forEach(([fullTableName, columns]) => {
       const parts = fullTableName.split('.');
       const schema = parts.length > 1 ? parts[0] : 'public';
       const tableName = parts[parts.length - 1];
-      
+
       if (!this.schemaMetadata[schema]) {
         this.schemaMetadata[schema] = {};
       }
-      
+
       this.schemaMetadata[schema][tableName] = columns;
     });
-    
+
     console.log('Built schema metadata:', this.schemaMetadata);
   }
 
@@ -1472,75 +1913,97 @@ export class RunQueryComponent
     const fromMatch = sql.match(/\bfrom\s+(\w+)/i);
     return fromMatch ? fromMatch[1] : null;
   }
-  
-  private analyzeQueryContext(beforeCursor: string, afterCursor: string, currentWord: string): any {
+
+  private analyzeQueryContext(
+    beforeCursor: string,
+    afterCursor: string,
+    currentWord: string
+  ): any {
     const beforeLower = beforeCursor.toLowerCase();
     const wordBeforeCursor = beforeCursor.match(/(\w+)\s*$/)?.[1] || '';
-    
+
     // Check if we're in the middle of typing after certain keywords
     const patterns = [
       // FROM context
       {
         pattern: /\bfrom\s+\w*$/i,
-        context: { expectingTable: true }
+        context: { expectingTable: true },
       },
-      // JOIN context  
+      // JOIN context
       {
-        pattern: /\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\s+\w*$/i,
-        context: { expectingTableWithAlias: true }
+        pattern:
+          /\b(?:inner\s+join|left\s+join|right\s+join|full\s+join|cross\s+join|join)\s+\w*$/i,
+        context: { expectingTableWithAlias: true },
       },
       // SELECT context
       {
         pattern: /\bselect\s+\w*$/i,
-        context: { expectingColumn: true }
+        context: { expectingColumn: true },
       },
       // WHERE context
       {
         pattern: /\bwhere\s+\w*$/i,
-        context: { expectingColumn: true }
+        context: { expectingColumn: true },
       },
       // ON context (join conditions)
       {
         pattern: /\bon\s+\w*$/i,
-        context: { expectingColumn: true }
+        context: { expectingColumn: true },
       },
       // ORDER BY context
       {
         pattern: /\border\s+by\s+\w*$/i,
-        context: { expectingColumn: true }
+        context: { expectingColumn: true },
       },
       // GROUP BY context
       {
         pattern: /\bgroup\s+by\s+\w*$/i,
-        context: { expectingColumn: true }
+        context: { expectingColumn: true },
       },
       // After WHERE conditions
       {
         pattern: /\bwhere\s+\w+\s*(=|>|<|>=|<=|!=|<>)\s*\w+\s+\w*$/i,
-        context: { expectingKeyword: true, keywords: ['AND', 'OR', 'ORDER BY', 'GROUP BY', 'LIMIT'] }
+        context: {
+          expectingKeyword: true,
+          keywords: ['AND', 'OR', 'ORDER BY', 'GROUP BY', 'LIMIT'],
+        },
       },
       // After FROM table
       {
         pattern: /\bfrom\s+\w+(?:\.\w+)?(?:\s+\w+)?\s+\w*$/i,
-        context: { expectingKeyword: true, keywords: ['WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'ORDER BY', 'GROUP BY', 'LIMIT'] }
-      }
+        context: {
+          expectingKeyword: true,
+          keywords: [
+            'WHERE',
+            'JOIN',
+            'INNER JOIN',
+            'LEFT JOIN',
+            'RIGHT JOIN',
+            'ORDER BY',
+            'GROUP BY',
+            'LIMIT',
+          ],
+        },
+      },
     ];
-    
+
     for (const { pattern, context } of patterns) {
       if (pattern.test(beforeCursor)) {
         return {
           ...context,
-          availableTables: this.getAvailableTablesInContext(beforeCursor + afterCursor)
+          availableTables: this.getAvailableTablesInContext(
+            beforeCursor + afterCursor
+          ),
         };
       }
     }
-    
+
     return null;
   }
 
   private getAllTablesFromQuery(sql: string): string[] {
     const tables: string[] = [];
-    
+
     // Add all aliased tables from the current query
     this.tableAliases.forEach((tableName, alias) => {
       tables.push(alias);
@@ -1548,19 +2011,19 @@ export class RunQueryComponent
         tables.push(tableName);
       }
     });
-    
+
     return tables;
   }
 
   private getAvailableTablesInContext(sql: string): string[] {
     const tables: string[] = [];
-    
+
     // Add all aliased tables
     this.tableAliases.forEach((tableName, alias) => {
       tables.push(alias);
       tables.push(tableName);
     });
-    
+
     // Add all schema tables
     Object.keys(this.schema).forEach(fullTableName => {
       const tableName = fullTableName.split('.').pop();
@@ -1568,7 +2031,7 @@ export class RunQueryComponent
         tables.push(tableName);
       }
     });
-    
+
     return tables;
   }
 
@@ -1580,10 +2043,14 @@ export class RunQueryComponent
     return Object.keys(this.schemaMetadata).includes(name);
   }
 
-  private addTableSuggestions(suggestions: any[], range: any, currentWord: string): void {
+  private addTableSuggestions(
+    suggestions: any[],
+    range: any,
+    currentWord: string
+  ): void {
     // Only add schema names (not table names)
     const schemas = new Set<string>();
-    
+
     Object.keys(this.schema).forEach(fullTableName => {
       const parts = fullTableName.split('.');
       if (parts.length > 1) {
@@ -1592,7 +2059,7 @@ export class RunQueryComponent
         schemas.add('public');
       }
     });
-    
+
     schemas.forEach(schemaName => {
       if (this.matchesInput(schemaName, currentWord)) {
         suggestions.push({
@@ -1602,16 +2069,20 @@ export class RunQueryComponent
           range: range,
           detail: `📁 Schema`,
           documentation: `Schema: ${schemaName}`,
-          sortText: `0_${schemaName}`
+          sortText: `0_${schemaName}`,
         });
       }
     });
   }
 
-  private addTableSuggestionsWithAlias(suggestions: any[], range: any, currentWord: string): void {
+  private addTableSuggestionsWithAlias(
+    suggestions: any[],
+    range: any,
+    currentWord: string
+  ): void {
     // Add schema names first
     const schemas = new Set<string>();
-    
+
     Object.keys(this.schema).forEach(fullTableName => {
       const parts = fullTableName.split('.');
       if (parts.length > 1) {
@@ -1620,7 +2091,7 @@ export class RunQueryComponent
         schemas.add('public');
       }
     });
-    
+
     schemas.forEach(schemaName => {
       if (this.matchesInput(schemaName, currentWord)) {
         suggestions.push({
@@ -1630,88 +2101,116 @@ export class RunQueryComponent
           range: range,
           detail: `📁 Schema`,
           documentation: `Schema: ${schemaName}`,
-          sortText: `0_${schemaName}`
+          sortText: `0_${schemaName}`,
         });
       }
     });
-    
+
     // Also add direct table suggestions with aliases for JOIN context
     Object.keys(this.schema).forEach(fullTableName => {
       const parts = fullTableName.split('.');
       const schemaName = parts.length > 1 ? parts[0] : 'public';
       const tableName = parts[parts.length - 1];
-      
-      if (this.matchesInput(fullTableName, currentWord) || this.matchesInput(tableName, currentWord)) {
+
+      if (
+        this.matchesInput(fullTableName, currentWord) ||
+        this.matchesInput(tableName, currentWord)
+      ) {
         const alias = this.generateUniqueTableAlias(tableName);
         const insertTextWithAlias = `${fullTableName} ${alias}`;
-        
+
         suggestions.push({
           label: `${fullTableName} ${alias}`,
           kind: monaco.languages.CompletionItemKind.Class,
           insertText: insertTextWithAlias,
           range: range,
           detail: `📋 Table with alias`,
-          documentation: `Table: ${fullTableName}\nAlias: ${alias}\nColumns: ${this.schema[fullTableName].join(', ')}\nUsage: SELECT ${alias}.column FROM ... JOIN ${fullTableName} ${alias}`,
-          sortText: `1_${tableName}`
+          documentation: `Table: ${fullTableName}\nAlias: ${alias}\nColumns: ${this.schema[
+            fullTableName
+          ].join(
+            ', '
+          )}\nUsage: SELECT ${alias}.column FROM ... JOIN ${fullTableName} ${alias}`,
+          sortText: `1_${tableName}`,
         });
       }
     });
   }
 
-  private addColumnSuggestions(suggestions: any[], range: any, currentWord: string, availableTables: string[], fullQuery: string): void {
+  private addColumnSuggestions(
+    suggestions: any[],
+    range: any,
+    currentWord: string,
+    availableTables: string[],
+    fullQuery: string
+  ): void {
     const addedColumns = new Set<string>();
-    
+
     // Get all available tables and aliases from the query
     const queryTables = this.getAllTablesFromQuery(fullQuery);
     const allAvailableTables = [...availableTables, ...queryTables];
-    
+
     // Add columns from tables in current query context first
     allAvailableTables.forEach(tableName => {
       const fullTableName = this.resolveFullTableName(tableName);
       if (fullTableName && this.schema[fullTableName]) {
         this.schema[fullTableName].forEach(column => {
-          if (this.matchesInput(column, currentWord) && !addedColumns.has(column)) {
+          if (
+            this.matchesInput(column, currentWord) &&
+            !addedColumns.has(column)
+          ) {
             addedColumns.add(column);
-            
+
             // Check if this is an alias
             const isAlias = this.tableAliases.has(tableName);
-            const displayTable = isAlias ? `${tableName} (${this.tableAliases.get(tableName)})` : tableName;
-            
+            const displayTable = isAlias
+              ? `${tableName} (${this.tableAliases.get(tableName)})`
+              : tableName;
+
             suggestions.push({
               label: column,
               kind: monaco.languages.CompletionItemKind.Field,
               insertText: column,
               range: range,
               detail: `🔹 Column from ${displayTable}`,
-              documentation: `Column: ${column}\nTable: ${fullTableName}\nAlias: ${isAlias ? tableName : 'None'}`,
-              sortText: `0_${column}`
+              documentation: `Column: ${column}\nTable: ${fullTableName}\nAlias: ${
+                isAlias ? tableName : 'None'
+              }`,
+              sortText: `0_${column}`,
             });
           }
         });
       }
     });
   }
-  
+
   private resolveFullTableName(tableName: string): string | null {
     // Check if it's an alias
     if (this.tableAliases.has(tableName)) {
       return this.tableAliases.get(tableName)!;
     }
-    
+
     // Check if it's a direct table name
-    return Object.keys(this.schema).find(name => 
-      name === tableName || name.endsWith('.' + tableName)
-    ) || null;
+    return (
+      Object.keys(this.schema).find(
+        name => name === tableName || name.endsWith('.' + tableName)
+      ) || null
+    );
   }
 
-  private addDotNotationSuggestions(suggestions: any[], range: any, currentWord: string, beforeDot: string, fullQuery: string): void {
+  private addDotNotationSuggestions(
+    suggestions: any[],
+    range: any,
+    currentWord: string,
+    beforeDot: string,
+    fullQuery: string
+  ): void {
     // Check if beforeDot is a table alias -> suggest columns
     if (this.tableAliases.has(beforeDot)) {
       const actualTableName = this.tableAliases.get(beforeDot)!;
       this.addColumnsForTable(suggestions, range, currentWord, actualTableName);
       return;
     }
-    
+
     // Check if beforeDot is a schema name -> suggest tables with automatic aliases
     if (this.isSchemaName(beforeDot)) {
       const tables = this.schemaMetadata[beforeDot];
@@ -1720,34 +2219,43 @@ export class RunQueryComponent
           const alias = this.generateUniqueTableAlias(tableName);
           const fullTableName = `${beforeDot}.${tableName}`;
           const insertTextWithAlias = `${tableName} ${alias}`;
-          
+
           suggestions.push({
             label: `${tableName} ${alias}`,
             kind: monaco.languages.CompletionItemKind.Class,
             insertText: insertTextWithAlias,
             range: range,
             detail: `📋 Table with alias in ${beforeDot}`,
-            documentation: `Table: ${fullTableName}\nAlias: ${alias}\nColumns: ${tables[tableName].join(', ')}\nUsage: SELECT ${alias}.column FROM ${fullTableName} ${alias}`,
-            sortText: `0_${tableName}`
+            documentation: `Table: ${fullTableName}\nAlias: ${alias}\nColumns: ${tables[
+              tableName
+            ].join(
+              ', '
+            )}\nUsage: SELECT ${alias}.column FROM ${fullTableName} ${alias}`,
+            sortText: `0_${tableName}`,
           });
         }
       });
       return;
     }
-    
+
     // Check if beforeDot is a direct table name -> suggest columns
     if (this.isTableName(beforeDot)) {
       this.addColumnsForTable(suggestions, range, currentWord, beforeDot);
       return;
     }
   }
-  
-  private addColumnsForTable(suggestions: any[], range: any, currentWord: string, tableName: string): void {
+
+  private addColumnsForTable(
+    suggestions: any[],
+    range: any,
+    currentWord: string,
+    tableName: string
+  ): void {
     // Find the full table name (with schema)
-    const fullTableName = Object.keys(this.schema).find(name => 
-      name === tableName || name.endsWith('.' + tableName)
+    const fullTableName = Object.keys(this.schema).find(
+      name => name === tableName || name.endsWith('.' + tableName)
     );
-    
+
     if (fullTableName && this.schema[fullTableName]) {
       this.schema[fullTableName].forEach(column => {
         if (this.matchesInput(column, currentWord)) {
@@ -1758,17 +2266,26 @@ export class RunQueryComponent
             range: range,
             detail: `🔹 Column`,
             documentation: `Column: ${column}\nTable: ${tableName}`,
-            sortText: `0_${column}`
+            sortText: `0_${column}`,
           });
         }
       });
     }
   }
 
-  private addKeywordSuggestions(suggestions: any[], range: any, currentWord: string, keywords: string[]): void {
+  private addKeywordSuggestions(
+    suggestions: any[],
+    range: any,
+    currentWord: string,
+    keywords: string[]
+  ): void {
     keywords.forEach((keyword: string) => {
       // Only suggest if the keyword is incomplete or empty input
-      if (currentWord === '' || (keyword.toLowerCase().startsWith(currentWord.toLowerCase()) && keyword.toLowerCase() !== currentWord.toLowerCase())) {
+      if (
+        currentWord === '' ||
+        (keyword.toLowerCase().startsWith(currentWord.toLowerCase()) &&
+          keyword.toLowerCase() !== currentWord.toLowerCase())
+      ) {
         suggestions.push({
           label: keyword,
           kind: monaco.languages.CompletionItemKind.Keyword,
@@ -1776,37 +2293,42 @@ export class RunQueryComponent
           range: range,
           detail: `🔤 SQL Keyword`,
           documentation: `SQL Keyword: ${keyword}`,
-          sortText: `0_${keyword}`
+          sortText: `0_${keyword}`,
         });
       }
     });
   }
 
-
   private matchesInput(suggestion: string, input: string): boolean {
     // If no input, show all suggestions
     if (!input || input.trim() === '') return true;
-    
+
     const suggestionLower = suggestion.toLowerCase();
     const inputLower = input.toLowerCase().trim();
-    
+
     // Don't suggest if exactly matching (avoid repetition like "SELECT" suggesting "SELECT")
     if (suggestionLower === inputLower) {
       return false;
     }
-    
+
     // Enhanced matching for better schema/table name suggestions
-    
+
     // 1. Prefix matching (highest priority)
-    if (suggestionLower.startsWith(inputLower) && suggestionLower.length > inputLower.length) {
+    if (
+      suggestionLower.startsWith(inputLower) &&
+      suggestionLower.length > inputLower.length
+    ) {
       return true;
     }
-    
+
     // 2. Contains matching (for cases like 'p' matching 'c_public')
-    if (suggestionLower.includes(inputLower) && suggestionLower.length > inputLower.length) {
+    if (
+      suggestionLower.includes(inputLower) &&
+      suggestionLower.length > inputLower.length
+    ) {
       return true;
     }
-    
+
     // 3. Word boundary matching (for underscore separated names)
     if (suggestionLower.includes('_')) {
       const words = suggestionLower.split('_');
@@ -1816,42 +2338,45 @@ export class RunQueryComponent
         }
       }
     }
-    
+
     // 4. Camel case matching
     const capitalLetters = suggestion.match(/[A-Z]/g);
     if (capitalLetters) {
       const acronym = capitalLetters.join('').toLowerCase();
-      if (acronym.startsWith(inputLower) && acronym.length > inputLower.length) {
+      if (
+        acronym.startsWith(inputLower) &&
+        acronym.length > inputLower.length
+      ) {
         return true;
       }
     }
-    
+
     return false;
   }
 
   private fuzzyMatch(text: string, pattern: string): boolean {
     let textIndex = 0;
     let patternIndex = 0;
-    
+
     while (textIndex < text.length && patternIndex < pattern.length) {
       if (text[textIndex] === pattern[patternIndex]) {
         patternIndex++;
       }
       textIndex++;
     }
-    
+
     return patternIndex === pattern.length;
   }
 
   private calculateSuggestionScore(suggestion: string, input: string): number {
     let baseScore = 0;
-    
+
     if (!input) {
       baseScore = 1;
     } else {
       const suggestionLower = suggestion.toLowerCase();
       const inputLower = input.toLowerCase();
-      
+
       // Exact match
       if (suggestionLower === inputLower) {
         baseScore = 100;
@@ -1871,7 +2396,7 @@ export class RunQueryComponent
             break;
           }
         }
-        
+
         if (!foundWordMatch) {
           // Contains anywhere
           if (suggestionLower.includes(inputLower)) {
@@ -1884,11 +2409,11 @@ export class RunQueryComponent
         }
       }
     }
-    
+
     // Add frequency bonus (up to 20 points)
     const frequency = this.frequentlyUsed.get(suggestion.toLowerCase()) || 0;
     const frequencyBonus = Math.min(20, frequency * 2);
-    
+
     return Math.max(0, baseScore + frequencyBonus);
   }
 
@@ -1896,13 +2421,13 @@ export class RunQueryComponent
     const key = suggestion.toLowerCase();
     const currentCount = this.frequentlyUsed.get(key) || 0;
     this.frequentlyUsed.set(key, currentCount + 1);
-    
+
     // Keep cache size manageable
     if (this.frequentlyUsed.size > 200) {
       const entries = Array.from(this.frequentlyUsed.entries());
       entries.sort((a, b) => b[1] - a[1]);
       this.frequentlyUsed.clear();
-      
+
       // Keep top 100 most frequently used
       entries.slice(0, 100).forEach(([key, count]) => {
         this.frequentlyUsed.set(key, count);
@@ -1913,7 +2438,7 @@ export class RunQueryComponent
   private removeDuplicateSuggestions(suggestions: any[]): any[] {
     const seen = new Set<string>();
     const unique: any[] = [];
-    
+
     for (const suggestion of suggestions) {
       const key = `${suggestion.label.toLowerCase()}_${suggestion.kind}`;
       if (!seen.has(key)) {
@@ -1921,44 +2446,43 @@ export class RunQueryComponent
         unique.push(suggestion);
       }
     }
-    
+
     return unique;
   }
 
   private isTableName(name: string): boolean {
-    return Object.keys(this.schema).some(table => 
-      table === name || table.endsWith('.' + name)
+    return Object.keys(this.schema).some(
+      table => table === name || table.endsWith('.' + name)
     );
   }
-
 
   private generateUniqueTableAlias(tableName: string): string {
     // Generate smart aliases based on table name
     let baseAlias = this.generateSmartAlias(tableName);
-    
+
     // Check if alias is already used in current query
     const existingAliases = Array.from(this.tableAliases.keys());
-    
+
     if (!existingAliases.includes(baseAlias)) {
       return baseAlias;
     }
-    
+
     // If base alias exists, append number
     let counter = 1;
     let uniqueAlias = `${baseAlias}${counter}`;
-    
+
     while (existingAliases.includes(uniqueAlias)) {
       counter++;
       uniqueAlias = `${baseAlias}${counter}`;
     }
-    
+
     return uniqueAlias;
   }
-  
+
   private generateSmartAlias(tableName: string): string {
     // Remove schema prefix if present
     const cleanTableName = tableName.split('.').pop() || tableName;
-    
+
     // Smart alias generation rules
     const aliasRules = [
       // Common table names with standard aliases
@@ -1989,15 +2513,30 @@ export class RunQueryComponent
       { pattern: /^files?$/i, alias: 'f' },
       { pattern: /^images?$/i, alias: 'img' },
       { pattern: /^documents?$/i, alias: 'doc' },
-      
+
       // Pattern-based rules
-      { pattern: /^(.+)_details?$/i, alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'd' },
-      { pattern: /^(.+)_history$/i, alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'h' },
-      { pattern: /^(.+)_logs?$/i, alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'l' },
-      { pattern: /^(.+)_items?$/i, alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'i' },
-      { pattern: /^(.+)_data$/i, alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'data' },
+      {
+        pattern: /^(.+)_details?$/i,
+        alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'd',
+      },
+      {
+        pattern: /^(.+)_history$/i,
+        alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'h',
+      },
+      {
+        pattern: /^(.+)_logs?$/i,
+        alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'l',
+      },
+      {
+        pattern: /^(.+)_items?$/i,
+        alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'i',
+      },
+      {
+        pattern: /^(.+)_data$/i,
+        alias: (match: RegExpMatchArray) => match[1].substring(0, 3) + 'data',
+      },
     ];
-    
+
     // Check against predefined rules
     for (const rule of aliasRules) {
       const match = cleanTableName.match(rule.pattern);
@@ -2008,29 +2547,33 @@ export class RunQueryComponent
         return rule.alias;
       }
     }
-    
+
     // Fallback: generate alias from table name
     return this.generateFallbackAlias(cleanTableName);
   }
-  
+
   private generateFallbackAlias(tableName: string): string {
     // Remove common prefixes/suffixes
-    let cleaned = tableName.toLowerCase()
-      .replace(/^(tbl_|table_|tb_)/, '')  // Remove table prefixes
+    let cleaned = tableName
+      .toLowerCase()
+      .replace(/^(tbl_|table_|tb_)/, '') // Remove table prefixes
       .replace(/(_table|_tbl|_tb)$/, ''); // Remove table suffixes
-    
+
     // If table name has underscores, use first letter of each word
     if (cleaned.includes('_')) {
       const parts = cleaned.split('_');
-      return parts.map(part => part.charAt(0)).join('').substring(0, 4);
+      return parts
+        .map(part => part.charAt(0))
+        .join('')
+        .substring(0, 4);
     }
-    
+
     // If camelCase, use capital letters
     const capitalLetters = tableName.match(/[A-Z]/g);
     if (capitalLetters && capitalLetters.length > 1) {
       return capitalLetters.join('').toLowerCase().substring(0, 4);
     }
-    
+
     // If single word, use first few characters
     if (cleaned.length <= 3) {
       return cleaned;
@@ -2229,23 +2772,32 @@ export class RunQueryComponent
     const requestBody = {
       query: query,
       databaseId: this.selectedDatabase.id.toString(),
-      orgId: this.selectedOrg.id.toString()
+      orgId: this.selectedOrg.id.toString(),
     };
 
     // Call query server API
-    this.httpClientService.queryPost('/query/execute', requestBody)
+    this.httpClientService
+      .queryPostNoLoader('/query/execute', requestBody)
       .toPromise()
       .then((response: any) => {
         // Handle successful response
         const result = JSON.parse(JSON.stringify(response));
-        
+
         if (result && result.data && result.data.data) {
           this.queryResults = result.data.data;
-          this.resultColumns = this.queryResults.length > 0 ? Object.keys(this.queryResults[0]) : [];
-          
+          this.resultColumns =
+            this.queryResults.length > 0
+              ? Object.keys(this.queryResults[0])
+              : [];
+
+          // Populate column options for chart generation
+          this.populateColumnOptions();
+
           // Use server execution time if available, otherwise use client time
           if (result.data.executionTime) {
-            this.executionTime = parseInt(result.data.executionTime.replace('ms', '')) || (Date.now() - startTime);
+            this.executionTime =
+              parseInt(result.data.executionTime.replace('ms', '')) ||
+              Date.now() - startTime;
           } else {
             this.executionTime = Date.now() - startTime;
           }
@@ -2253,6 +2805,9 @@ export class RunQueryComponent
           this.queryResults = [];
           this.resultColumns = [];
           this.executionTime = Date.now() - startTime;
+
+          // Clear column options when no results
+          this.populateColumnOptions();
         }
 
         // Reset table state for new results
@@ -2277,6 +2832,9 @@ export class RunQueryComponent
         this.resultColumns = [];
         this.executionTime = Date.now() - startTime;
         this.isExecuting = false;
+
+        // Clear column options on error
+        this.populateColumnOptions();
 
         // Show error message to user (you can customize this based on your error handling approach)
         if (error.error && error.error.message) {
@@ -2365,7 +2923,6 @@ export class RunQueryComponent
   get isMaxScriptsReached(): boolean {
     return this.tabs.length >= this.MAX_SCRIPTS;
   }
-
 
   // Tab management methods
   addNewTab(database?: any): void {
@@ -2480,10 +3037,10 @@ export class RunQueryComponent
 
     if (newTab && this.editor) {
       this.editor.setValue(newTab.content || '');
-      
+
       // Update selectedDatabase to match the new tab's database
       this.selectedDatabase = newTab.database;
-      
+
       // Set schema for the new tab's database
       if (newTab.database?.id) {
         this.setSchemaForDatabase(newTab.database.id.toString());
@@ -2652,21 +3209,21 @@ export class RunQueryComponent
     console.log('Right click on node:', node.data?.type, node.label); // Debug log
     event.preventDefault();
     event.stopPropagation();
-    
+
     // Only show context menu for database nodes
     if (node.data?.type !== 'Database') {
       console.log('Not a database node, ignoring'); // Debug log
       return;
     }
-    
+
     console.log('Showing database context menu'); // Debug log
     this.selectedDatabaseNodeForContext = node;
     this.databaseContextMenuPosition = {
       x: event.clientX,
-      y: event.clientY
+      y: event.clientY,
     };
     this.showDatabaseContextMenu = true;
-    
+
     // Hide any other context menus
     this.hideTabContextMenu();
   }
@@ -2686,26 +3243,26 @@ export class RunQueryComponent
   refreshDatabaseFromContextMenu(): void {
     if (this.selectedDatabaseNodeForContext) {
       const node = this.selectedDatabaseNodeForContext;
-      
+
       // Clear existing children and structure data
       node.children = [];
       node.data.hasStructure = false;
       node.data.structureData = null;
-      
+
       // Clear loaded schema for this database
       if (node.data.database?.id) {
         const databaseId = node.data.database.id.toString();
         delete this.loadedSchemas[databaseId];
         this.loadingSchemas.delete(databaseId);
       }
-      
+
       // Collapse and re-expand to trigger reload
       node.expanded = false;
       setTimeout(() => {
         node.expanded = true;
         this.onDatabaseNodeExpand({ node });
       }, 100);
-      
+
       this.hideDatabaseContextMenu();
     }
   }
@@ -2804,22 +3361,22 @@ export class RunQueryComponent
                       {
                         label: 'id (SERIAL PRIMARY KEY)',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'username (VARCHAR(50))',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'email (VARCHAR(100))',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'created_at (TIMESTAMP)',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                     ],
                   },
@@ -2830,22 +3387,22 @@ export class RunQueryComponent
                       {
                         label: 'id (SERIAL PRIMARY KEY)',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'name (VARCHAR(200))',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'price (DECIMAL(10,2))',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'category_id (INTEGER)',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                     ],
                   },
@@ -2856,22 +3413,22 @@ export class RunQueryComponent
                       {
                         label: 'id (SERIAL PRIMARY KEY)',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'user_id (INTEGER)',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'total_amount (DECIMAL(10,2))',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                       {
                         label: 'order_date (TIMESTAMP)',
                         data: { type: 'Column', level: 4 },
-                        leaf: true
+                        leaf: true,
                       },
                     ],
                   },
@@ -2884,12 +3441,12 @@ export class RunQueryComponent
                   {
                     label: 'user_orders_view',
                     data: { type: 'View', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'product_sales_view',
                     data: { type: 'View', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -2919,22 +3476,22 @@ export class RunQueryComponent
                   {
                     label: 'customer_id (INT AUTO_INCREMENT PRIMARY KEY)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'first_name (VARCHAR(50))',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'last_name (VARCHAR(50))',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'phone (VARCHAR(20))',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -2945,22 +3502,22 @@ export class RunQueryComponent
                   {
                     label: 'item_id (INT AUTO_INCREMENT PRIMARY KEY)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'item_name (VARCHAR(100))',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'quantity (INT)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'unit_price (DECIMAL(8,2))',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -2990,27 +3547,27 @@ export class RunQueryComponent
                   {
                     label: '_id (ObjectId)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'title (String)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'content (String)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'author (String)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'createdAt (Date)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -3021,22 +3578,22 @@ export class RunQueryComponent
                   {
                     label: '_id (ObjectId)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'postId (ObjectId)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'message (String)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'userId (ObjectId)',
                     data: { type: 'Field', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -3066,22 +3623,22 @@ export class RunQueryComponent
                   {
                     label: 'id (INTEGER PRIMARY KEY)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'name (TEXT)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'email (TEXT)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'phone (TEXT)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -3092,22 +3649,22 @@ export class RunQueryComponent
                   {
                     label: 'id (INTEGER PRIMARY KEY)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'contact_id (INTEGER)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'note_text (TEXT)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'created_date (TEXT)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -3137,22 +3694,22 @@ export class RunQueryComponent
                   {
                     label: 'emp_id (PRIMARY KEY)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'emp_name (VARCHAR)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'department (VARCHAR)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'salary (DECIMAL)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -3163,17 +3720,17 @@ export class RunQueryComponent
                   {
                     label: 'dept_id (PRIMARY KEY)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'dept_name (VARCHAR)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                   {
                     label: 'manager_id (INTEGER)',
                     data: { type: 'Column', level: 3 },
-                    leaf: true
+                    leaf: true,
                   },
                 ],
               },
@@ -3196,7 +3753,7 @@ export class RunQueryComponent
         loading: false,
         level: 0,
         structureData: null, // Store raw API response data
-        hasStructure: false // Track if structure has been loaded
+        hasStructure: false, // Track if structure has been loaded
       },
       children: [], // Empty array initially, populated on expand
     }));
@@ -3223,42 +3780,48 @@ export class RunQueryComponent
       node.data.loading = true;
 
       // Call API to get database structure
-      this.queryService.getDatabaseStructure(
-        node.data.database.id,
-        this.selectedOrg.id
-      ).toPromise()
+      this.queryService
+        .getDatabaseStructure(node.data.database.id, this.selectedOrg.id)
+        .toPromise()
         .then((response: any) => {
           // Handle successful response
           const result = JSON.parse(JSON.stringify(response));
-          
+
           if (result && result.data) {
             // Store raw structure data in node
             node.data.structureData = result.data;
             node.data.hasStructure = true;
-            
+
             // Transform API response to tree node structure and store schema for autocomplete
-            node.children = this.transformDatabaseStructureToTreeNodes(result.data, node.data.database.id.toString());
-            
+            node.children = this.transformDatabaseStructureToTreeNodes(
+              result.data,
+              node.data.database.id.toString()
+            );
+
             // If this database is currently active in editor, update schema immediately
             if (this.selectedDatabase?.id === node.data.database.id) {
               this.updateActiveSchema(node.data.database.id.toString());
             }
           } else {
             // Fallback to dummy data if API response is empty
-            const schemaData = this.generateDummySchemaForDatabase(node.data.database);
+            const schemaData = this.generateDummySchemaForDatabase(
+              node.data.database
+            );
             node.children = schemaData[0]?.children || [];
           }
-          
+
           node.data.loading = false;
         })
         .catch((error: any) => {
           // Handle error response
           console.error('Error loading database structure:', error);
-          
+
           // Fallback to dummy data on error
-          const schemaData = this.generateDummySchemaForDatabase(node.data.database);
+          const schemaData = this.generateDummySchemaForDatabase(
+            node.data.database
+          );
           node.children = schemaData[0]?.children || [];
-          
+
           node.data.loading = false;
           node.data.hasStructure = false;
 
@@ -3271,40 +3834,43 @@ export class RunQueryComponent
   }
 
   // Transform API response to tree node structure
-  transformDatabaseStructureToTreeNodes(structureData: any, databaseId?: string): TreeNode[] {
+  transformDatabaseStructureToTreeNodes(
+    structureData: any,
+    databaseId?: string
+  ): TreeNode[] {
     // API returns structure like:
     // { schemas: [{ schema: 'schema_name', tables: [{ table: 'table_name', columns: [...] }] }] }
-    
+
     if (!structureData || !structureData.schemas) {
       return [];
     }
-    
+
     // Build schema for autocomplete if databaseId is provided
     if (databaseId) {
       const schemaForAutocomplete: { [tableName: string]: string[] } = {};
-      
+
       structureData.schemas.forEach((schemaItem: any) => {
         if (schemaItem.tables) {
           schemaItem.tables.forEach((tableItem: any) => {
             const tableName = `${schemaItem.schema}.${tableItem.table}`;
             const columns: string[] = [];
-            
+
             if (tableItem.columns) {
               tableItem.columns.forEach((column: any) => {
                 columns.push(column.name);
               });
             }
-            
+
             schemaForAutocomplete[tableName] = columns;
             // Also add without schema prefix for convenience
             schemaForAutocomplete[tableItem.table] = columns;
           });
         }
       });
-      
+
       // Store in loaded schemas
       this.loadedSchemas[databaseId] = schemaForAutocomplete;
-      
+
       // Update active schema if this is the current database
       if (this.selectedDatabase && this.selectedDatabase.id === databaseId) {
         this.schema = schemaForAutocomplete;
@@ -3318,51 +3884,59 @@ export class RunQueryComponent
       data: {
         type: 'Schema',
         level: 1,
-        schema: schemaItem
+        schema: schemaItem,
       },
       expandedIcon: 'pi pi-sitemap',
       collapsedIcon: 'pi pi-sitemap',
-      children: schemaItem.tables && schemaItem.tables.length > 0 ? schemaItem.tables.map((tableItem: any) => ({
-        label: tableItem.table,
-        data: {
-          type: 'Table',
-          level: 2,
-          table: tableItem
-        },
-        expandedIcon: 'pi pi-table',
-        collapsedIcon: 'pi pi-table',
-        children: tableItem.columns && tableItem.columns.length > 0 ? tableItem.columns.map((column: any) => {
-          // Format column display with only name and type
-          let columnLabel = `${column.name}`;
-          if (column.type) {
-            if (column.maxLength) {
-              columnLabel += ` (${column.type}(${column.maxLength}))`;
-            } else {
-              columnLabel += ` (${column.type})`;
-            }
-          }
-          
-          return {
-            label: columnLabel,
-            data: {
-              type: 'Column',
-              level: 3,
-              column: column
-            },
-            icon: 'pi pi-minus',
-            leaf: true
-          };
-        }) : []
-      })) : [{
-        label: 'No tables found',
-        data: {
-          type: 'EmptyState',
-          level: 2
-        },
-        icon: 'pi pi-info-circle',
-        leaf: true,
-        styleClass: 'empty-state-node'
-      }]
+      children:
+        schemaItem.tables && schemaItem.tables.length > 0
+          ? schemaItem.tables.map((tableItem: any) => ({
+              label: tableItem.table,
+              data: {
+                type: 'Table',
+                level: 2,
+                table: tableItem,
+              },
+              expandedIcon: 'pi pi-table',
+              collapsedIcon: 'pi pi-table',
+              children:
+                tableItem.columns && tableItem.columns.length > 0
+                  ? tableItem.columns.map((column: any) => {
+                      // Format column display with only name and type
+                      let columnLabel = `${column.name}`;
+                      if (column.type) {
+                        if (column.maxLength) {
+                          columnLabel += ` (${column.type}(${column.maxLength}))`;
+                        } else {
+                          columnLabel += ` (${column.type})`;
+                        }
+                      }
+
+                      return {
+                        label: columnLabel,
+                        data: {
+                          type: 'Column',
+                          level: 3,
+                          column: column,
+                        },
+                        icon: 'pi pi-minus',
+                        leaf: true,
+                      };
+                    })
+                  : [],
+            }))
+          : [
+              {
+                label: 'No tables found',
+                data: {
+                  type: 'EmptyState',
+                  level: 2,
+                },
+                icon: 'pi pi-info-circle',
+                leaf: true,
+                styleClass: 'empty-state-node',
+              },
+            ],
     }));
   }
 
@@ -3392,7 +3966,7 @@ export class RunQueryComponent
 
   getNodeTypeIcon(node: any): string {
     if (!node.data?.type) return 'pi pi-file';
-    
+
     switch (node.data.type) {
       case 'Database':
       case 'MySQL Database':
@@ -3400,26 +3974,26 @@ export class RunQueryComponent
       case 'MongoDB Database':
       case 'SQLite Database':
         return 'pi-database';
-      
+
       case 'Schema':
       case 'Collections':
         return 'pi-folder';
-      
+
       case 'Tables':
       case 'Views':
         return 'pi-table';
-      
+
       case 'Table':
       case 'Collection':
         return 'pi-list';
-      
+
       case 'View':
         return 'pi-eye';
-      
+
       case 'Column':
       case 'Field':
         return 'pi-minus';
-      
+
       default:
         return 'pi-file';
     }
@@ -3576,10 +4150,10 @@ export class RunQueryComponent
     event.stopPropagation();
     event.preventDefault();
     this.cancelMenuHide(menuType);
-    
+
     // Close all other menus first
     this.closeAllMenusExcept(menuType);
-    
+
     // Show the specific menu
     const menu = this.getMenuByType(menuType);
     if (menu) {
@@ -3620,9 +4194,15 @@ export class RunQueryComponent
     }
   }
 
-  private closeAllMenusExcept(exceptType: 'database' | 'save' | 'autoSave'): void {
-    const menuTypes: ('database' | 'save' | 'autoSave')[] = ['database', 'save', 'autoSave'];
-    
+  private closeAllMenusExcept(
+    exceptType: 'database' | 'save' | 'autoSave'
+  ): void {
+    const menuTypes: ('database' | 'save' | 'autoSave')[] = [
+      'database',
+      'save',
+      'autoSave',
+    ];
+
     menuTypes.forEach(type => {
       if (type !== exceptType) {
         const menu = this.getMenuByType(type);
@@ -3631,7 +4211,7 @@ export class RunQueryComponent
         }
       }
     });
-    
+
     // Also close tab context menu
     this.hideTabContextMenu();
   }
@@ -3665,7 +4245,7 @@ export class RunQueryComponent
   toggleDatabaseMenu(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    
+
     // Close other menus first
     if (this.saveMenu) {
       this.saveMenu.hide();
@@ -3674,7 +4254,7 @@ export class RunQueryComponent
       this.autoSaveMenu.hide();
     }
     this.hideTabContextMenu();
-    
+
     if (this.databaseMenu) {
       this.databaseMenu.toggle(event);
     }
@@ -3910,13 +4490,13 @@ export class RunQueryComponent
 
   onDBChange(event: any) {
     this.selectedDatabase = event.value;
-    
+
     // Update the active schema for autocomplete
     if (this.selectedDatabase && this.selectedDatabase.id) {
       this.setSchemaForDatabase(this.selectedDatabase.id.toString());
     }
   }
-  
+
   // Update the active schema for autocomplete
   private updateActiveSchema(databaseId: string): void {
     if (this.loadedSchemas[databaseId]) {
@@ -3938,7 +4518,7 @@ export class RunQueryComponent
     }
 
     const databaseId = this.selectedDatabase.id.toString();
-    
+
     // If schema is already loaded, no need to reload
     if (this.loadedSchemas[databaseId]) {
       return;
@@ -3962,10 +4542,13 @@ export class RunQueryComponent
   private setSchemaForDatabase(databaseId: string): void {
     // First check if tree node has structure data
     const treeNode = this.findDatabaseTreeNode(databaseId);
-    
+
     if (treeNode?.data?.hasStructure && treeNode.data.structureData) {
       // Use existing tree node data
-      this.transformDatabaseStructureToTreeNodes(treeNode.data.structureData, databaseId);
+      this.transformDatabaseStructureToTreeNodes(
+        treeNode.data.structureData,
+        databaseId
+      );
       this.updateActiveSchema(databaseId);
     } else if (this.loadedSchemas[databaseId]) {
       // Use cached schema
@@ -3991,30 +4574,32 @@ export class RunQueryComponent
     this.loadingSchemas.add(databaseId);
 
     // Call API to get database structure for autocomplete
-    this.queryService.getDatabaseStructure(
-      parseInt(databaseId),
-      this.selectedOrg.id
-    ).toPromise()
+    this.queryService
+      .getDatabaseStructure(parseInt(databaseId), this.selectedOrg.id)
+      .toPromise()
       .then((response: any) => {
         // Handle successful response
         const result = JSON.parse(JSON.stringify(response));
-        
+
         if (result && result.data) {
           // Transform API response and store schema for autocomplete
           this.transformDatabaseStructureToTreeNodes(result.data, databaseId);
-          
+
           // Update tree node with structure data if it exists
           const treeNode = this.findDatabaseTreeNode(databaseId);
           if (treeNode) {
             treeNode.data.structureData = result.data;
             treeNode.data.hasStructure = true;
-            
+
             // Update tree children if not already expanded
             if (!treeNode.children || treeNode.children.length === 0) {
-              treeNode.children = this.transformDatabaseStructureToTreeNodes(result.data, databaseId);
+              treeNode.children = this.transformDatabaseStructureToTreeNodes(
+                result.data,
+                databaseId
+              );
             }
           }
-          
+
           // Update active schema
           this.updateActiveSchema(databaseId);
         }
@@ -4127,7 +4712,7 @@ export class RunQueryComponent
   toggleSaveMenu(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    
+
     // Close other menus first
     if (this.databaseMenu) {
       this.databaseMenu.hide();
@@ -4136,7 +4721,7 @@ export class RunQueryComponent
       this.autoSaveMenu.hide();
     }
     this.hideTabContextMenu();
-    
+
     if (this.saveMenu) {
       this.saveMenu.toggle(event);
     } else {
@@ -4175,7 +4760,7 @@ export class RunQueryComponent
   toggleAutoSaveMenu(event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    
+
     // Close other menus first
     if (this.databaseMenu) {
       this.databaseMenu.hide();
@@ -4184,7 +4769,7 @@ export class RunQueryComponent
       this.saveMenu.hide();
     }
     this.hideTabContextMenu();
-    
+
     this.updateAutoSaveMenuItems(); // Refresh menu before showing
     if (this.autoSaveMenu) {
       this.autoSaveMenu.toggle(event);
@@ -4287,30 +4872,160 @@ export class RunQueryComponent
     alert(`All ${this.tabs.length} scripts saved successfully!`);
   }
 
-  get numericColumns(): string[] {
-    if (!this.queryResults.length) return [];
-    return this.resultColumns.filter(
-      col => typeof this.queryResults[0][col] === 'number'
+  // Removed duplicate getter - using property instead
+
+  // Populate column options dynamically from query results
+  private populateColumnOptions(): void {
+    if (!this.queryResults.length || !this.resultColumns.length) {
+      this.columnOptions = [];
+      this.numericColumns = [];
+      this.categoricalColumns = [];
+      return;
+    }
+
+    // Create column options with data type detection
+    this.columnOptions = this.resultColumns.map(col => ({
+      label: col,
+      value: col,
+      type: this.detectColumnType(col),
+    }));
+
+    // Separate columns by type
+    this.numericColumns = this.columnOptions.filter(
+      col => col.type === 'numeric'
     );
+    this.categoricalColumns = this.columnOptions.filter(
+      col => col.type === 'categorical'
+    );
+    this.dateColumns = this.columnOptions.filter(col => col.type === 'date');
+
+    // Auto-select chart inputs if a chart type is already selected
+    if (this.selectedChartType) {
+      this.autoSelectChartInputs();
+    }
   }
 
-  // // Transform columns for dropdown
-  // get columnOptions(): any[] {
-  //   return this.resultColumns.map(col => ({
-  //     label: col,
-  //     value: col,
-  //   }));
-  // }
+  // Detect column data type from sample data
+  private detectColumnType(
+    columnName: string
+  ): 'numeric' | 'categorical' | 'date' {
+    if (!this.queryResults.length) return 'categorical';
 
-  get numericColumnOptions(): any[] {
-    if (!this.queryResults.length) return [];
-    return this.resultColumns
-      .filter(col => typeof this.queryResults[0][col] === 'number')
-      .map(col => ({
-        label: col,
-        value: col,
-      }));
+    const sampleValues = this.queryResults
+      .slice(0, 10)
+      .map(row => row[columnName]);
+    const nonNullValues = sampleValues.filter(
+      val => val !== null && val !== undefined
+    );
+
+    if (nonNullValues.length === 0) return 'categorical';
+
+    // Check if all values are numeric
+    const numericCount = nonNullValues.filter(
+      val => !isNaN(Number(val)) && isFinite(Number(val))
+    ).length;
+
+    // Check if values look like dates
+    const dateCount = nonNullValues.filter(val => {
+      if (typeof val === 'string') {
+        const date = new Date(val);
+        return !isNaN(date.getTime()) && val.match(/\d{4}-\d{2}-\d{2}/);
+      }
+      return false;
+    }).length;
+
+    // Determine type based on majority
+    if (dateCount > nonNullValues.length * 0.8) return 'date';
+    if (numericCount > nonNullValues.length * 0.8) return 'numeric';
+    return 'categorical';
   }
+
+  // Handle chart type selection change
+  private onChartTypeChange(chartTypeValue: string): void {
+    if (!chartTypeValue) {
+      this.selectedChartType = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Find the selected chart type configuration
+    this.selectedChartType = this.chartTypes.find(
+      ct => ct.value === chartTypeValue
+    );
+    if (!this.selectedChartType) return;
+
+    // Clear previous dynamic controls
+    Object.keys(this.chartForm.controls).forEach(key => {
+      if (key !== 'chartType') {
+        this.chartForm.removeControl(key);
+      }
+    });
+
+    // Add new form controls based on chart type inputs
+    this.selectedChartType.inputs.forEach((input: any) => {
+      if (input.multiple) {
+        // Create FormArray for multiple selection
+        const formArray = this.fb.array(
+          [],
+          input.required ? [Validators.required] : []
+        );
+        this.chartForm.addControl(input.name, formArray);
+      } else {
+        this.chartForm.addControl(
+          input.name,
+          this.fb.control(null, input.required ? [Validators.required] : [])
+        );
+      }
+    });
+
+    // Auto-select smart defaults if data is available
+    if (this.queryResults.length > 0) {
+      this.autoSelectChartInputs();
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  // Auto-select appropriate columns based on chart type
+  private autoSelectChartInputs(): void {
+    if (!this.selectedChartType || !this.queryResults.length) return;
+
+    // Use requestAnimationFrame to prevent UI blocking
+    requestAnimationFrame(() => {
+      this.selectedChartType.inputs.forEach((input: any) => {
+        let selectedValue = null;
+
+        if (
+          input.type === 'categorical' &&
+          this.categoricalColumns.length > 0
+        ) {
+          selectedValue = this.categoricalColumns[0].value;
+        } else if (input.type === 'numeric' && this.numericColumns.length > 0) {
+          selectedValue = this.numericColumns[0].value;
+        } else if (input.type === 'date' && this.dateColumns.length > 0) {
+          selectedValue = this.dateColumns[0].value;
+        } else if (input.type === 'any' && this.columnOptions.length > 0) {
+          selectedValue = this.columnOptions[0].value;
+        }
+
+        if (selectedValue) {
+          const control = this.chartForm.get(input.name);
+          if (control) {
+            if (input.multiple) {
+              // For FormArray, push the value
+              const formArray = control as FormArray;
+              formArray.clear();
+              formArray.push(this.fb.control(selectedValue));
+            } else {
+              control.setValue(selectedValue);
+            }
+          }
+        }
+      });
+    });
+  }
+
+  // Removed duplicate getter - using numericColumns property instead
 
   // Helper methods for chart type display
   getChartTypeIcon(type: string): string {
@@ -4323,136 +5038,426 @@ export class RunQueryComponent
     return chartType ? chartType.label : 'Select Chart Type';
   }
 
-  // Update chart options with theme colors
-  private updateChartOptionsColors(): void {
-    const style = getComputedStyle(document.documentElement);
-    const textColor = style.getPropertyValue('--text-color').trim();
-    const borderColor = style.getPropertyValue('--border-color').trim();
-    const primaryColor = style.getPropertyValue('--primary-color').trim();
-    const primaryColorRgb = style.getPropertyValue('--primary-rgb').trim();
+  // Removed updateChartOptionsColors - ngx-charts handles theming automatically
 
-    this.chartOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: textColor,
-            font: {
-              family: "'Montserrat', sans-serif",
-              size: 12,
-            },
-          },
-        },
-        tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleFont: {
-            family: "'Montserrat', sans-serif",
-            size: 13,
-          },
-          bodyFont: {
-            family: "'Montserrat', sans-serif",
-            size: 12,
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: {
-            color: borderColor,
-            drawBorder: false,
-          },
-          ticks: {
-            color: textColor,
-            font: {
-              family: "'Montserrat', sans-serif",
-              size: 11,
-            },
-          },
-        },
-        y: {
-          grid: {
-            color: borderColor,
-            drawBorder: false,
-          },
-          ticks: {
-            color: textColor,
-            font: {
-              family: "'Montserrat', sans-serif",
-              size: 11,
-            },
-          },
-        },
-      },
-    };
-  }
-
-  // Update the existing updateChartData method
+  // Transform data for ngx-charts based on selected chart type
   updateChartData() {
-    const formValues = this.chartForm.value;
-    if (
-      !formValues.xAxis?.value ||
-      !formValues.yAxis?.value ||
-      !this.queryResults.length
-    ) {
-      this.chartData = {};
+    if (!this.selectedChartType || !this.queryResults.length) {
+      this.ngxChartData = [];
       return;
     }
 
-    const xAxisField = formValues.xAxis.value;
-    const yAxisField = formValues.yAxis.value;
+    const formValues = this.chartForm.value;
+    const chartType = this.selectedChartType.value;
 
-    const labels = this.queryResults.map(row => row[xAxisField]);
-    const data = this.queryResults.map(row => row[yAxisField]);
-    const style = getComputedStyle(document.documentElement);
-    const primaryColorRgb = style.getPropertyValue('--primary-rgb').trim();
+    // Transform data based on chart type
+    switch (chartType) {
+      case 'bar-vertical':
+      case 'bar-horizontal':
+      case 'pie-chart':
+      case 'pie-chart-advanced':
+      case 'pie-chart-grid':
+      case 'number-card':
+        this.ngxChartData = this.transformToSingleSeries(formValues);
+        break;
 
-    // For pie charts, aggregate data by unique labels
-    if (formValues.chartType === 'pie') {
-      const aggregatedData = labels.reduce((acc, label, index) => {
-        if (!acc[label]) {
-          acc[label] = 0;
-        }
-        acc[label] += data[index];
-        return acc;
-      }, {});
+      case 'bar-vertical-grouped':
+      case 'line-chart':
+      case 'area-chart':
+        this.ngxChartData = this.transformToMultiSeries(formValues);
+        break;
 
-      this.chartData = {
-        labels: Object.keys(aggregatedData),
-        datasets: [
-          {
-            data: Object.values(aggregatedData),
-            backgroundColor: this.generateColors(
-              Object.keys(aggregatedData).length
-            ),
-            borderColor: 'rgba(255, 255, 255, 0.5)',
-            borderWidth: 1,
-          },
-        ],
-      };
-    } else {
-      // For other chart types
-      this.chartData = {
-        labels,
-        datasets: [
-          {
-            label: formValues.yAxis.label,
-            data,
-            backgroundColor: `rgba(${primaryColorRgb}, 0.2)`,
-            borderColor: `rgb(${primaryColorRgb})`,
-            borderWidth: 1,
-            tension: formValues.chartType === 'line' ? 0.4 : 0,
-            pointBackgroundColor: `rgb(${primaryColorRgb})`,
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: `rgb(${primaryColorRgb})`,
-          },
-        ],
-      };
+      case 'bubble-chart':
+        this.ngxChartData = this.transformToBubbleSeries(formValues);
+        break;
+
+      case 'heat-map':
+        this.ngxChartData = this.transformToHeatmapData(formValues);
+        break;
+
+      case 'tree-map':
+        this.ngxChartData = this.transformToTreemapData(formValues);
+        break;
+
+      case 'gauge':
+      case 'linear-gauge':
+        this.ngxChartData = this.transformToGaugeData(formValues);
+        break;
     }
 
-    // Update chart options with current theme colors
-    this.updateChartOptionsColors();
+    // Update axis labels based on selection
+    this.updateAxisLabels(formValues);
+  }
+
+  // Transform data to single series format [{name: string, value: number}]
+  private transformToSingleSeries(formValues: any): any[] {
+    const labelField = formValues.labels || formValues.xAxis;
+    const valueField = formValues.values || formValues.yAxis;
+
+    if (!labelField || !valueField) return [];
+
+    // Aggregate data by label
+    const aggregatedData = new Map<string, number>();
+
+    this.queryResults.forEach(row => {
+      const label = String(row[labelField]);
+      const value = Number(row[valueField]) || 0;
+
+      if (aggregatedData.has(label)) {
+        aggregatedData.set(label, aggregatedData.get(label)! + value);
+      } else {
+        aggregatedData.set(label, value);
+      }
+    });
+
+    return Array.from(aggregatedData.entries()).map(([name, value]) => ({
+      name,
+      value,
+    }));
+  }
+
+  // Transform data to multi-series format [{name: string, series: [{name: string, value: number}]}]
+  private transformToMultiSeries(formValues: any): any[] {
+    const xAxisField = formValues.xAxis;
+    const yAxisFields = formValues.yAxis;
+    const groupByField = formValues.groupBy;
+
+    if (!xAxisField || !yAxisFields) return [];
+
+    // Handle multiple Y-axis fields (when FormArray is used)
+    const yFields = Array.isArray(yAxisFields) ? yAxisFields : [yAxisFields];
+
+    if (groupByField) {
+      // Group data by groupBy field
+      const groupedData = new Map<string, Map<string, number>>();
+
+      this.queryResults.forEach(row => {
+        const group = String(row[groupByField]);
+        const xValue = String(row[xAxisField]);
+
+        if (!groupedData.has(group)) {
+          groupedData.set(group, new Map());
+        }
+
+        yFields.forEach(yField => {
+          const yValue = Number(row[yField]) || 0;
+          const key = `${xValue}`;
+
+          if (groupedData.get(group)!.has(key)) {
+            groupedData
+              .get(group)!
+              .set(key, groupedData.get(group)!.get(key)! + yValue);
+          } else {
+            groupedData.get(group)!.set(key, yValue);
+          }
+        });
+      });
+
+      return Array.from(groupedData.entries()).map(([name, seriesMap]) => ({
+        name,
+        series: Array.from(seriesMap.entries()).map(([xValue, yValue]) => ({
+          name: xValue,
+          value: yValue,
+        })),
+      }));
+    } else {
+      // Create series for each Y-axis field
+      return yFields.map(yField => ({
+        name: yField || yField,
+        series: this.queryResults.map(row => ({
+          name: String(row[xAxisField]),
+          value: Number(row[yField]) || 0,
+        })),
+      }));
+    }
+  }
+
+  // Transform data for bubble charts
+  private transformToBubbleSeries(formValues: any): any[] {
+    const xAxisField = formValues.xAxis;
+    const yAxisField = formValues.yAxis;
+    const sizeField = formValues.size;
+    const groupByField = formValues.groupBy;
+
+    if (!xAxisField || !yAxisField || !sizeField) return [];
+
+    if (groupByField) {
+      // Group by field for multiple series
+      const groupedData = new Map<string, any[]>();
+
+      this.queryResults.forEach(row => {
+        const group = String(row[groupByField]);
+        if (!groupedData.has(group)) {
+          groupedData.set(group, []);
+        }
+
+        groupedData.get(group)!.push({
+          x: Number(row[xAxisField]) || 0,
+          y: Number(row[yAxisField]) || 0,
+          r: Math.sqrt(Number(row[sizeField]) || 0), // Square root for better visual scaling
+        });
+      });
+
+      return Array.from(groupedData.entries()).map(([name, series]) => ({
+        name,
+        series,
+      }));
+    } else {
+      // Single series
+      return [
+        {
+          name: 'Data',
+          series: this.queryResults.map(row => ({
+            x: Number(row[xAxisField]) || 0,
+            y: Number(row[yAxisField]) || 0,
+            r: Math.sqrt(Number(row[sizeField]) || 0),
+          })),
+        },
+      ];
+    }
+  }
+
+  // Transform data for heatmap
+  private transformToHeatmapData(formValues: any): any[] {
+    const xAxisField = formValues.xAxis;
+    const yAxisField = formValues.yAxis;
+    const valueField = formValues.values;
+
+    if (!xAxisField || !yAxisField || !valueField) return [];
+
+    // Create matrix data
+    const matrix = new Map<string, Map<string, number>>();
+
+    this.queryResults.forEach(row => {
+      const xValue = String(row[xAxisField]);
+      const yValue = String(row[yAxisField]);
+      const value = Number(row[valueField]) || 0;
+
+      if (!matrix.has(yValue)) {
+        matrix.set(yValue, new Map());
+      }
+
+      matrix.get(yValue)!.set(xValue, value);
+    });
+
+    // Convert to ngx-charts format
+    return Array.from(matrix.entries()).map(([yValue, xMap]) => ({
+      name: yValue,
+      series: Array.from(xMap.entries()).map(([xValue, value]) => ({
+        name: xValue,
+        value,
+      })),
+    }));
+  }
+
+  // Transform data for treemap
+  private transformToTreemapData(formValues: any): any[] {
+    const labelField = formValues.labels;
+    const valueField = formValues.values;
+    const groupByField = formValues.groupBy;
+
+    if (!labelField || !valueField) return [];
+
+    if (groupByField) {
+      // Create hierarchical structure
+      const grouped = new Map<string, any[]>();
+
+      this.queryResults.forEach(row => {
+        const group = String(row[groupByField]);
+        if (!grouped.has(group)) {
+          grouped.set(group, []);
+        }
+
+        grouped.get(group)!.push({
+          name: String(row[labelField]),
+          value: Number(row[valueField]) || 0,
+        });
+      });
+
+      return Array.from(grouped.entries()).map(([name, children]) => ({
+        name,
+        children,
+      }));
+    } else {
+      // Flat structure
+      return this.transformToSingleSeries(formValues);
+    }
+  }
+
+  // Transform data for gauge charts
+  private transformToGaugeData(formValues: any): any[] {
+    const valueField = formValues.value;
+    const labelField = formValues.label;
+
+    if (!valueField) return [];
+
+    // For gauge, we typically show a single value or aggregate
+    const values = this.queryResults.map(row => Number(row[valueField]) || 0);
+    const avgValue = values.reduce((sum, val) => sum + val, 0) / values.length;
+
+    const label = labelField
+      ? String(this.queryResults[0][labelField])
+      : 'Value';
+
+    return [
+      {
+        name: label,
+        value: avgValue,
+      },
+    ];
+  }
+
+  // Update axis labels based on selected columns
+  private updateAxisLabels(formValues: any): void {
+    if (formValues.xAxis) {
+      this.xAxisLabel = formValues.xAxis || 'X Axis';
+    }
+    if (formValues.yAxis) {
+      if (Array.isArray(formValues.yAxis) && formValues.yAxis.length > 0) {
+        this.yAxisLabel = formValues.yAxis[0] || 'Y Axis';
+      } else if (formValues.yAxis) {
+        this.yAxisLabel = formValues.yAxis || 'Y Axis';
+      }
+    }
+  }
+
+  // Check if a chart type can be used with current data
+  canUseChartType(chartType: any): boolean {
+    if (!this.queryResults.length) return false;
+
+    // Check if required inputs are available
+    return chartType.inputs.every((input: any) => {
+      if (!input.required) return true;
+
+      if (input.type === 'numeric') {
+        return this.numericColumns.length > 0;
+      } else if (input.type === 'categorical') {
+        return this.categoricalColumns.length > 0;
+      } else if (input.type === 'date') {
+        return this.dateColumns.length > 0;
+      } else if (input.type === 'any') {
+        return this.columnOptions.length > 0;
+      }
+
+      return true;
+    });
+  }
+
+  // Select a chart type and update form
+  selectChartType(chartType: any): void {
+    if (!this.canUseChartType(chartType)) return;
+
+    this.chartForm.patchValue({ chartType: chartType.value });
+  }
+
+  // Handle dropdown change event
+  onChartTypeDropdownChange(event: any): void {
+    const selectedValue = event.value;
+    const chartType = this.chartTypes.find(ct => ct.value === selectedValue);
+    if (chartType) {
+      this.selectChartType(chartType);
+    }
+  }
+
+  // Reset chart configuration
+  resetChartConfiguration(): void {
+    this.selectedChartType = null;
+    this.showChart = false;
+    this.ngxChartData = [];
+    this.chartForm.reset();
+    this.cdr.detectChanges();
+  }
+
+  // Get appropriate column options for an input field
+  getOptionsForInput(input: any): any[] {
+    switch (input.type) {
+      case 'numeric':
+        return this.numericColumns;
+      case 'categorical':
+        return this.categoricalColumns;
+      case 'date':
+        return this.dateColumns;
+      case 'any':
+        return this.columnOptions;
+      default:
+        return this.columnOptions;
+    }
+  }
+
+  // Helper method to get FormArray value for multiselect
+  getFormArrayValue(controlName: string): any[] {
+    const control = this.chartForm.get(controlName);
+    if (control instanceof FormArray) {
+      return control.value || [];
+    }
+    return [];
+  }
+
+  // Helper method to update FormArray value from multiselect
+  updateFormArray(controlName: string, values: any[]): void {
+    const control = this.chartForm.get(controlName);
+    if (control instanceof FormArray) {
+      control.clear();
+      values.forEach(value => {
+        control.push(this.fb.control(value));
+      });
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Updated canGenerateChart method for ngx-charts
+  canGenerateChart(): boolean {
+    if (!this.selectedChartType || !this.queryResults.length) return false;
+
+    // Check if all required inputs are filled
+    return this.selectedChartType.inputs.every((input: any) => {
+      if (!input.required) return true;
+
+      const control = this.chartForm.get(input.name);
+      if (!control) return false;
+
+      const controlValue = control.value;
+      if (input.multiple) {
+        // For FormArray, check if it has valid values
+        return (
+          Array.isArray(controlValue) &&
+          controlValue.length > 0 &&
+          controlValue.every(val => val !== null && val !== undefined)
+        );
+      } else {
+        return (
+          controlValue !== null &&
+          controlValue !== undefined &&
+          controlValue !== ''
+        );
+      }
+    });
+  }
+
+  // Updated generateChart method for ngx-charts
+  generateChart(): void {
+    if (!this.canGenerateChart()) return;
+
+    this.isGeneratingChart = true;
+    this.showChart = false;
+    this.cdr.detectChanges();
+
+    // Process data transformation with reduced delay
+    requestAnimationFrame(() => {
+      try {
+        this.updateChartData();
+        this.showChart = true;
+        console.log('Chart generated successfully:', {
+          chartType: this.selectedChartType?.value,
+          dataPoints: this.ngxChartData.length,
+        });
+      } catch (error) {
+        console.error('Error generating chart:', error);
+        this.showChart = false;
+      }
+      this.isGeneratingChart = false;
+      this.cdr.detectChanges();
+    });
   }
 
   // Generate random colors for pie chart
@@ -4465,73 +5470,11 @@ export class RunQueryComponent
     return colors;
   }
 
-  // Watch for changes in selected axes and chart type
-  ngDoCheck() {
-    // Only update chart data if query results have actually changed
-    if (this.queryResults.length > 0 && this.viewMode === 'graph') {
-      this.updateChartData();
-    }
-  }
+  // Removed ngDoCheck to improve performance - chart data is now updated on demand
 
-  // Update chart when query results change
-  onQueryResultsUpdate() {
-    this.updateChartData();
-  }
+  // Removed old duplicate methods - using new ngx-charts methods instead
 
-  onAxisChange() {
-    this.updateChartData();
-  }
-
-  canGenerateChart(): boolean {
-    const formValues = this.chartForm.value;
-    return (
-      !this.isGeneratingChart &&
-      this.queryResults.length > 0 &&
-      formValues.xAxis?.value &&
-      formValues.yAxis?.value
-    );
-  }
-
-  getGenerateChartTooltip(): string {
-    const formValues = this.chartForm.value;
-    if (!this.queryResults.length) {
-      return 'Execute a query to get data for the chart';
-    }
-    if (!formValues.xAxis?.value || !formValues.yAxis?.value) {
-      return 'Select both X and Y axes to generate chart';
-    }
-    return 'Generate chart with selected axes';
-  }
-
-  // Generate chart method
-  generateChart(): void {
-    if (!this.canGenerateChart()) return;
-
-    this.isGeneratingChart = true;
-    this.showChart = false;
-
-    // Simulate chart generation delay
-    setTimeout(() => {
-      this.updateChartData();
-      this.showChart = true;
-      this.isGeneratingChart = false;
-
-      // Force chart update
-      if (this.chart) {
-        setTimeout(() => {
-          this.chart.refresh();
-        }, 100);
-      }
-    }, 800); // Simulate processing time
-  }
-
-  onFormChange() {
-    const formValues = this.chartForm.value;
-    this.selectedXAxis = formValues.xAxis;
-    this.selectedYAxis = formValues.yAxis;
-    this.selectedChartType = formValues.chartType;
-    this.updateChartData();
-  }
+  // Removed old duplicate methods - using new ngx-charts implementation
 
   // Format SQL method
   formatSQL(): void {
@@ -4726,7 +5669,7 @@ export class RunQueryComponent
     if (value === null || value === undefined) {
       return '';
     }
-    
+
     // Handle different data types
     if (typeof value === 'string') {
       // Check if it's a date string
@@ -4738,14 +5681,14 @@ export class RunQueryComponent
           // Fall through to string handling
         }
       }
-      
+
       // Truncate long strings
       if (value.length > 100) {
         return value.substring(0, 100) + '...';
       }
       return value;
     }
-    
+
     if (typeof value === 'number') {
       // Format numbers with appropriate precision
       if (Number.isInteger(value)) {
@@ -4754,21 +5697,23 @@ export class RunQueryComponent
         return value.toFixed(2);
       }
     }
-    
+
     if (typeof value === 'boolean') {
       return value ? 'true' : 'false';
     }
-    
+
     // For objects, arrays, etc.
     if (typeof value === 'object') {
       try {
         const jsonStr = JSON.stringify(value);
-        return jsonStr.length > 100 ? jsonStr.substring(0, 100) + '...' : jsonStr;
+        return jsonStr.length > 100
+          ? jsonStr.substring(0, 100) + '...'
+          : jsonStr;
       } catch {
         return String(value);
       }
     }
-    
+
     return String(value);
   }
 
@@ -4784,7 +5729,10 @@ export class RunQueryComponent
 
   getDisplayedRowCount(): number {
     const start = this.currentPage * this.tableRowsPerPage;
-    const end = Math.min(start + this.tableRowsPerPage, this.queryResults.length);
+    const end = Math.min(
+      start + this.tableRowsPerPage,
+      this.queryResults.length
+    );
     return end - start;
   }
 
@@ -4804,17 +5752,17 @@ export class RunQueryComponent
     this.queryResults.sort((a, b) => {
       const aVal = a[column];
       const bVal = b[column];
-      
+
       if (aVal === null || aVal === undefined) return 1;
       if (bVal === null || bVal === undefined) return -1;
-      
+
       let comparison = 0;
       if (typeof aVal === 'number' && typeof bVal === 'number') {
         comparison = aVal - bVal;
       } else {
         comparison = String(aVal).localeCompare(String(bVal));
       }
-      
+
       return this.sortDirection === 'asc' ? comparison : -comparison;
     });
 
@@ -4854,15 +5802,15 @@ export class RunQueryComponent
     const totalPages = this.getTotalPages();
     const visiblePages = 5; // Show 5 page numbers at most
     const halfVisible = Math.floor(visiblePages / 2);
-    
+
     let start = Math.max(0, this.currentPage - halfVisible);
     let end = Math.min(totalPages - 1, start + visiblePages - 1);
-    
+
     // Adjust start if we're near the end
     if (end - start + 1 < visiblePages) {
       start = Math.max(0, end - visiblePages + 1);
     }
-    
+
     const pages = [];
     for (let i = start; i <= end; i++) {
       pages.push(i);
@@ -4878,23 +5826,32 @@ export class RunQueryComponent
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `query-results-${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `query-results-${
+      new Date().toISOString().split('T')[0]
+    }.csv`;
     link.click();
     window.URL.revokeObjectURL(url);
   }
 
   private convertToCSV(data: any[], columns: string[]): string {
     const header = columns.join(',');
-    const rows = data.map(row => 
-      columns.map(col => {
-        const value = row[col];
-        const stringValue = value === null || value === undefined ? '' : String(value);
-        // Escape quotes and wrap in quotes if contains comma, quote, or newline
-        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-          return `"${stringValue.replace(/"/g, '""')}"`;
-        }
-        return stringValue;
-      }).join(',')
+    const rows = data.map(row =>
+      columns
+        .map(col => {
+          const value = row[col];
+          const stringValue =
+            value === null || value === undefined ? '' : String(value);
+          // Escape quotes and wrap in quotes if contains comma, quote, or newline
+          if (
+            stringValue.includes(',') ||
+            stringValue.includes('"') ||
+            stringValue.includes('\n')
+          ) {
+            return `"${stringValue.replace(/"/g, '""')}"`;
+          }
+          return stringValue;
+        })
+        .join(',')
     );
     return [header, ...rows].join('\n');
   }
@@ -4974,25 +5931,25 @@ export class RunQueryComponent
     if (this.editor) {
       this.editor.dispose();
     }
-    
+
     // Dispose autocomplete provider
     if (this.suggestionProvider) {
       this.suggestionProvider.dispose();
     }
-    
+
     // Clean up theme observer
     if (this.themeObserver) {
       this.themeObserver.disconnect();
     }
-    
+
     // Clean up resize timeout
     if (this.resizeTimeout) {
       clearTimeout(this.resizeTimeout);
     }
-    
+
     // Stop auto-save
     this.stopAutoSave();
-    
+
     // Clear autocomplete caches
     this.tableAliases.clear();
     this.suggestionCache.clear();

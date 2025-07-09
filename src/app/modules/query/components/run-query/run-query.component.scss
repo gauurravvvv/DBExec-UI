@@ -155,7 +155,7 @@
       flex-direction: column;
       padding: 0;
       height: calc(100% - 35px); // Subtract header height
-      
+
       // Ensure loading and empty states are positioned correctly
       .loading-container,
       .empty-state {
@@ -164,13 +164,13 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 10;
-        
+
         .loading-icon,
         .empty-icon {
           font-size: 2rem;
           color: var(--secondary-color);
         }
-        
+
         .loading-text {
           font-size: 0.875rem;
           color: var(--text-muted-color);
@@ -230,7 +230,11 @@
                   }
 
                   &.p-highlight {
-                    background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+                    background: color-mix(
+                      in srgb,
+                      var(--primary-color) 10%,
+                      transparent
+                    );
                     color: var(--primary-color);
                   }
 
@@ -538,13 +542,13 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    
+
     .panel-header {
       padding: 1rem;
       background: var(--card-background);
       border-bottom: 1px solid var(--border-color);
       flex-shrink: 0;
-      
+
       h3 {
         margin: 0;
         font-size: 1rem;
@@ -574,13 +578,13 @@
       justify-content: center;
       padding: 2rem;
       background: var(--card-background);
-      
+
       .loading-icon {
         font-size: 1.5rem;
         color: var(--primary-color);
         margin-bottom: 0.5rem;
       }
-      
+
       .loading-text {
         color: var(--text-muted-color);
         font-size: 0.875rem;
@@ -596,7 +600,7 @@
       border: none !important;
       font-size: 0.875rem !important;
       font-weight: normal !important;
-      
+
       // Target the actual text content
       .tree-node-content,
       .node-label,
@@ -604,7 +608,7 @@
         font-size: 0.875rem !important;
         font-weight: normal !important;
       }
-      
+
       // Show togglers but style them properly
       .p-tree-toggler {
         width: 1.5rem !important;
@@ -613,19 +617,19 @@
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
-        
+
         .p-tree-toggler-icon {
           font-size: 0.75rem !important;
           color: var(--text-color) !important;
         }
       }
-      
+
       // Hide PrimeNG's default node icons to prevent duplicates
       .p-treenode-icon {
         display: none !important;
       }
     }
-    
+
     // Also hide any other default PrimeNG icons
     ::ng-deep .database-tree {
       .p-treenode-icon,
@@ -633,12 +637,12 @@
         display: none !important;
       }
     }
-    
+
     // Hide togglers only for leaf nodes (columns/fields - no children)
     ::ng-deep .database-tree .p-treenode-leaf .p-tree-toggler {
       display: none !important;
     }
-    
+
     // Also target the custom template content
     ::ng-deep .database-tree .tree-node-content {
       font-size: 0.875rem !important;
@@ -646,69 +650,69 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      
+
       .node-label {
         font-size: 0.875rem !important;
         font-weight: normal !important;
       }
-      
+
       .node-type {
         font-size: 0.625rem !important;
         font-weight: normal !important;
         text-transform: none !important;
       }
-      
+
       // Style the node icons and layout
       .node-main {
         display: flex;
         align-items: center;
         gap: 0.375rem;
-        
+
         .node-icon {
           font-size: 0.875rem;
           flex-shrink: 0;
           width: 16px;
           text-align: center;
-          
+
           &.database-icon {
             color: var(--primary-color);
           }
-          
+
           &.schema-icon {
             color: var(--secondary-color);
           }
-          
+
           &.table-icon {
             color: var(--success-color);
           }
-          
+
           &.collection-icon {
             color: var(--success-color);
           }
-          
+
           &.column-icon {
             color: var(--text-color);
             opacity: 0.7;
           }
-          
+
           &.tables-icon {
             color: var(--info-color);
           }
-          
+
           &.view-icon {
             color: var(--warning-color);
           }
-          
+
           &.default-icon {
             color: var(--text-color);
             opacity: 0.5;
           }
         }
-        
+
         .node-label {
           white-space: nowrap;
         }
-        
+
         .node-type {
           font-size: 0.625rem;
           opacity: 0.7;
@@ -727,10 +731,11 @@
       overflow-y: auto !important;
       overflow-x: auto !important;
       padding: 0.5rem;
-      
+
       // Enhanced custom scrollbar
       scrollbar-width: thin;
-      scrollbar-color: var(--shadow-color) color-mix(in srgb, var(--shadow-color) 25%, transparent);
+      scrollbar-color: var(--shadow-color)
+        color-mix(in srgb, var(--shadow-color) 25%, transparent);
 
       &::-webkit-scrollbar {
         width: 10px;
@@ -758,14 +763,14 @@
       &::-webkit-scrollbar-corner {
         background: transparent;
       }
-      
+
       ::ng-deep {
         .p-tree {
           width: 100% !important;
           height: auto !important;
           background: transparent !important;
           border: none !important;
-          
+
           .p-tree-container {
             background: transparent !important;
             border: none !important;
@@ -778,61 +783,69 @@
         .p-treenode {
           padding: 0 !important;
           margin: 0 !important;
-          
+
           .p-treenode-content {
             border-radius: 4px !important;
             transition: none !important;
             padding: 0 !important;
             margin: 0 !important;
             border: none !important;
-            
+
             &:hover {
               background: var(--hover-background);
             }
-            
+
             .p-tree-toggler {
               margin-right: 0.5rem;
               width: 1.5rem;
               height: 1.5rem;
-              
+
               .p-tree-toggler-icon {
                 font-size: 0.75rem;
               }
             }
           }
-          
+
           // Database level styling
           &[aria-level='1'] .p-treenode-content {
-            background: color-mix(in srgb, var(--primary-color) 8%, var(--card-background));
+            background: color-mix(
+              in srgb,
+              var(--primary-color) 8%,
+              var(--card-background)
+            );
             border-left: 3px solid var(--primary-color);
             font-weight: 600;
-            
+
             .tree-node-content {
               .node-main {
                 .pi-database {
                   color: var(--primary-color);
                 }
-                
+
                 .node-label {
                   color: var(--primary-color);
                 }
               }
             }
           }
-          
+
           // Schema/Tables level styling
           &[aria-level='2'] .p-treenode-content {
-            background: color-mix(in srgb, var(--secondary-color) 5%, var(--card-background));
+            background: color-mix(
+              in srgb,
+              var(--secondary-color) 5%,
+              var(--card-background)
+            );
             border-left: 2px solid var(--secondary-color);
             margin-left: 1rem;
           }
-          
+
           // Table level styling
           &[aria-level='3'] .p-treenode-content {
             margin-left: 2rem;
             border-left: 1px solid var(--border-color);
           }
-          
+
           // Column level styling
           &[aria-level='4'] .p-treenode-content {
             margin-left: 3rem;
@@ -841,7 +854,7 @@
           }
         }
       }
-      
+
       .tree-node-content {
         display: flex;
         align-items: center;
@@ -850,12 +863,12 @@
         padding: 0.25rem 0.5rem;
         border-radius: 4px;
         transition: background-color 0.2s ease;
-        
+
         // Ensure database nodes are right-clickable
-        &[data-type="Database"] {
+        &[data-type='Database'] {
           position: relative;
           z-index: 1;
-          
+
           // Ensure the entire area is clickable
           &::before {
             content: '';
@@ -867,27 +880,27 @@
             z-index: -1;
           }
         }
-        
+
         .node-main {
           display: flex;
           align-items: center;
-          
+
           .pi {
             margin-right: 0.5rem;
             font-size: 0.875rem;
-            
+
             &.pi-spin {
               color: var(--primary-color);
             }
           }
-          
+
           .node-label {
             font-size: 0.875rem;
             color: var(--text-color);
             margin-right: 0.5rem;
             white-space: nowrap;
           }
-          
+
           .node-type {
             font-size: 0.625rem;
             color: var(--text-muted-color);
@@ -898,7 +911,7 @@
             letter-spacing: normal;
             margin-right: 0.5rem;
           }
-          
+
           .loading-indicator {
             color: var(--primary-color);
             font-size: 0.875rem;
@@ -921,14 +934,14 @@
       padding: 2rem;
       text-align: center;
       background: var(--card-background);
-      
+
       .empty-icon {
         font-size: 2rem;
         color: var(--text-muted-color);
         margin-bottom: 1rem;
         opacity: 0.5;
       }
-      
+
       p {
         margin: 0;
         color: var(--text-muted-color);
@@ -940,7 +953,8 @@
     ::ng-deep .p-tree .p-tree-container .p-treenode {
       .p-treenode-content {
         .tree-node-content {
-          &.level-3 { // Column level
+          &.level-3 {
+            // Column level
             .node-label {
               font-size: 0.875rem;
               line-height: 1.4;
@@ -966,17 +980,16 @@
     .database-tree {
       // Ensure smooth scrolling on mobile
       -webkit-overflow-scrolling: touch;
-      
+
       // Better spacing for expanded content
       ::ng-deep .p-tree .p-tree-container .p-treenode {
         margin-bottom: 2px;
-        
+
         &:last-child {
           margin-bottom: 0.5rem;
         }
       }
     }
-
   }
 
   // Editor panel specific
@@ -1088,21 +1101,29 @@
               max-height: 400px !important;
               overflow-y: auto !important;
               overflow-x: hidden !important;
-              
+
               // Custom scrollbar for database menu
               &::-webkit-scrollbar {
                 width: 8px;
               }
-              
+
               &::-webkit-scrollbar-track {
-                background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
+                background: color-mix(
+                  in srgb,
+                  var(--shadow-color) 25%,
+                  transparent
+                );
                 border-radius: 4px;
               }
-              
+
               &::-webkit-scrollbar-thumb {
-                background: color-mix(in srgb, var(--shadow-color) 75%, transparent);
+                background: color-mix(
+                  in srgb,
+                  var(--shadow-color) 75%,
+                  transparent
+                );
                 border-radius: 4px;
-                
+
                 &:hover {
                   background: var(--shadow-color);
                 }
@@ -1220,14 +1241,22 @@
             &.add-btn {
               color: var(--primary-color);
               &:enabled:hover {
-                background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+                background: color-mix(
+                  in srgb,
+                  var(--primary-color) 10%,
+                  transparent
+                );
               }
             }
 
             &.run-btn {
               color: var(--success-color);
               &:enabled:hover {
-                background: color-mix(in srgb, var(--success-color) 10%, transparent);
+                background: color-mix(
+                  in srgb,
+                  var(--success-color) 10%,
+                  transparent
+                );
               }
               &.executing {
                 animation: pulse 1.5s infinite;
@@ -1237,14 +1266,22 @@
             &.format-btn {
               color: var(--warning-color);
               &:enabled:hover {
-                background: color-mix(in srgb, var(--warning-color) 10%, transparent);
+                background: color-mix(
+                  in srgb,
+                  var(--warning-color) 10%,
+                  transparent
+                );
               }
             }
 
             &.fullscreen-btn {
               color: var(--secondary-color);
               &:enabled:hover {
-                background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+                background: color-mix(
+                  in srgb,
+                  var(--secondary-color) 10%,
+                  transparent
+                );
               }
             }
 
@@ -1253,7 +1290,11 @@
               color: var(--secondary-color);
 
               &:enabled:hover {
-                background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
+                background: color-mix(
+                  in srgb,
+                  var(--secondary-color) 10%,
+                  transparent
+                );
               }
 
               // Enabled state styling
@@ -1270,7 +1311,7 @@
               // Icon animations based on auto-save status
               .p-button-icon {
                 transition: all 0.3s ease;
-                
+
                 &.pi-check {
                   color: var(--success-color);
                   animation: check-bounce 0.6s ease-out;
@@ -1284,18 +1325,25 @@
             }
           }
 
-
           &.save-btn {
             color: var(--primary-color);
             &:enabled:hover {
-              background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+              background: color-mix(
+                in srgb,
+                var(--primary-color) 10%,
+                transparent
+              );
             }
           }
 
           &.clear-btn {
             color: var(--error-color);
             &:enabled:hover {
-              background: color-mix(in srgb, var(--error-color) 10%, transparent);
+              background: color-mix(
+                in srgb,
+                var(--error-color) 10%,
+                transparent
+              );
             }
           }
 
@@ -1308,7 +1356,7 @@
             cursor: not-allowed;
             color: var(--disabled-color) !important;
             background: transparent !important;
-            
+
             .p-button-icon {
               color: var(--disabled-color) !important;
             }
@@ -1460,47 +1508,47 @@
         box-shadow: 0 4px 12px var(--shadow-color) !important;
         min-width: 300px !important;
         max-width: 500px !important;
-        
+
         // Main container
         .monaco-list {
           background: var(--card-background) !important;
           border-radius: 8px !important;
-          
+
           .monaco-list-row {
             background: var(--card-background) !important;
             color: var(--text-color) !important;
             border: none !important;
             padding: 8px 12px !important;
             transition: all 0.2s ease !important;
-            
+
             // Default state
             &:not(.focused) {
               &:hover {
                 background: var(--hover-background) !important;
               }
             }
-            
+
             // Focused/selected state
             &.focused {
               background: var(--primary-color) !important;
               color: white !important;
-              
+
               .suggest-icon {
                 color: white !important;
               }
-              
+
               .codicon {
                 color: white !important;
               }
             }
-            
+
             // Suggestion content
             .contents {
               display: flex !important;
               align-items: center !important;
               gap: 8px !important;
               width: 100% !important;
-              
+
               // Icon styling
               .suggest-icon {
                 color: var(--primary-color) !important;
@@ -1509,7 +1557,7 @@
                 text-align: center !important;
                 flex-shrink: 0 !important;
               }
-              
+
               // Codicon fallback
               .codicon {
                 color: var(--primary-color) !important;
@@ -1517,7 +1565,7 @@
                 width: 16px !important;
                 flex-shrink: 0 !important;
               }
-              
+
               // Main label
               .label {
                 color: inherit !important;
@@ -1525,7 +1573,7 @@
                 flex-grow: 1 !important;
                 min-width: 0 !important;
               }
-              
+
               // Type/detail info
               .detail,
               .type-label {
@@ -1538,7 +1586,7 @@
             }
           }
         }
-        
+
         // Details widget (documentation popup)
         .details {
           background: var(--card-background) !important;
@@ -1546,22 +1594,22 @@
           border-radius: 8px !important;
           box-shadow: 0 4px 12px var(--shadow-color) !important;
           color: var(--text-color) !important;
-          
+
           .monaco-scrollable-element {
             background: var(--card-background) !important;
           }
-          
+
           .body {
             background: var(--card-background) !important;
             color: var(--text-color) !important;
             padding: 12px !important;
-            
+
             .header {
               color: var(--text-color) !important;
               font-weight: 600 !important;
               margin-bottom: 8px !important;
             }
-            
+
             .docs {
               color: var(--secondary-color) !important;
               font-size: 13px !important;
@@ -1570,7 +1618,7 @@
           }
         }
       }
-      
+
       // Parameter hints widget
       .parameter-hints-widget {
         background: var(--card-background) !important;
@@ -1578,18 +1626,18 @@
         border-radius: 6px !important;
         box-shadow: 0 2px 8px var(--shadow-color) !important;
         color: var(--text-color) !important;
-        
+
         .monaco-scrollable-element {
           background: var(--card-background) !important;
         }
-        
+
         .parameter-hints-widget-content {
           background: var(--card-background) !important;
           color: var(--text-color) !important;
           padding: 8px 12px !important;
         }
       }
-      
+
       // Quick suggestions (inline)
       .ghost-text {
         color: var(--secondary-color) !important;
@@ -1607,28 +1655,28 @@
     border: 1px solid var(--border-color) !important;
     border-radius: 8px !important;
     box-shadow: 0 4px 12px var(--shadow-color) !important;
-    
+
     .monaco-list {
       background: var(--card-background) !important;
-      
+
       .monaco-list-row {
         background: var(--card-background) !important;
         color: var(--text-color) !important;
-        
+
         &:hover:not(.focused) {
           background: var(--hover-background) !important;
         }
-        
+
         &.focused {
           background: var(--primary-color) !important;
           color: white !important;
         }
-        
+
         .suggest-icon,
         .codicon {
           color: var(--primary-color) !important;
         }
-        
+
         &.focused .suggest-icon,
         &.focused .codicon {
           color: white !important;
@@ -1636,7 +1684,7 @@
       }
     }
   }
-  
+
   // Hover widget (documentation)
   .monaco-editor .hover-widget {
     background: var(--card-background) !important;
@@ -1644,24 +1692,24 @@
     border-radius: 8px !important;
     box-shadow: 0 4px 12px var(--shadow-color) !important;
     color: var(--text-color) !important;
-    
+
     .monaco-scrollable-element {
       background: var(--card-background) !important;
     }
   }
-  
+
   // Context menu theming
   .monaco-menu {
     background: var(--card-background) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 6px !important;
     box-shadow: 0 4px 12px var(--shadow-color) !important;
-    
+
     .monaco-action-bar {
       .action-item {
         .action-label {
           color: var(--text-color) !important;
-          
+
           &:hover {
             background: var(--hover-background) !important;
           }
@@ -1699,7 +1747,6 @@
       display: flex;
       gap: 0.25rem;
       padding: 0.25rem;
-      background: var(--hover-background);
       border-radius: 6px;
 
       .toggle-btn {
@@ -1710,12 +1757,11 @@
         color: var(--text-color-secondary);
         transition: all 0.2s;
 
-        i {
-          font-size: 0.875rem;
-        }
-
+        i,
         span {
+          color: inherit;
           font-size: 0.875rem;
+          transition: color 0.2s;
         }
 
         &:hover {
@@ -1726,18 +1772,460 @@
         &.active {
           background: var(--primary-color);
           color: white;
+
+          i,
+          span {
+            color: inherit;
+          }
         }
       }
     }
   }
 
   .panel-content {
-    .graph-view {
+    .analytics-view {
       display: flex;
       flex-direction: column;
       height: 100%;
       padding: 1rem;
       background: var(--surface-ground);
+
+      // Simplified Chart Configuration
+      .chart-configuration-simple {
+        max-width: 1000px;
+        margin: 0 auto;
+        
+        // Chart Type Selection Row
+        .chart-type-row {
+          margin-bottom: 2rem;
+          
+          .chart-type-field {
+            max-width: 400px;
+            
+            .field-label {
+              display: block;
+              font-size: 0.875rem;
+              font-weight: 600;
+              color: var(--text-color);
+              margin-bottom: 0.5rem;
+              
+              .required-marker {
+                color: var(--red-500);
+              }
+            }
+            
+            ::ng-deep {
+              .p-dropdown {
+                height: 48px;
+                border-radius: 8px;
+                border: 1px solid var(--surface-border);
+                
+                &:hover {
+                  border-color: var(--primary-color);
+                }
+                
+                &.p-focus {
+                  border-color: var(--primary-color);
+                  box-shadow: 0 0 0 0.2rem var(--primary-color-50);
+                }
+                
+                .p-dropdown-label {
+                  padding: 0.75rem 1rem;
+                  font-size: 0.875rem;
+                }
+              }
+              
+              .p-dropdown-panel {
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                
+                .p-dropdown-items {
+                  .p-dropdown-item {
+                    padding: 0.75rem 1rem;
+                    border-radius: 4px;
+                    margin: 0.25rem;
+                    
+                    &:hover {
+                      background: var(--surface-hover);
+                    }
+                    
+                    &.p-highlight {
+                      background: var(--primary-color-50);
+                      color: var(--primary-color);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        // Data Configuration Row
+        .data-config-row {
+          display: flex;
+          gap: 1.5rem;
+          align-items: flex-end;
+          
+          .config-fields {
+            flex: 1;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            
+            .config-field {
+              flex: 1;
+              min-width: 200px;
+              
+              .field-container {
+                .field-label {
+                  display: block;
+                  font-size: 0.875rem;
+                  font-weight: 500;
+                  color: var(--text-color);
+                  margin-bottom: 0.5rem;
+                  
+                  .required-marker {
+                    color: var(--red-500);
+                  }
+                }
+                
+                ::ng-deep {
+                  .p-dropdown,
+                  .p-multiselect {
+                    height: 44px;
+                    border-radius: 6px;
+                    border: 1px solid var(--surface-border);
+                    
+                    &:hover {
+                      border-color: var(--primary-color);
+                    }
+                    
+                    &.p-focus {
+                      border-color: var(--primary-color);
+                      box-shadow: 0 0 0 0.2rem var(--primary-color-50);
+                    }
+                    
+                    .p-dropdown-label,
+                    .p-multiselect-label {
+                      padding: 0.625rem 0.75rem;
+                      font-size: 0.875rem;
+                    }
+                  }
+                  
+                  .p-dropdown-panel,
+                  .p-multiselect-panel {
+                    border-radius: 6px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    
+                    .p-dropdown-items,
+                    .p-multiselect-items {
+                      .p-dropdown-item,
+                      .p-multiselect-item {
+                        padding: 0.625rem 0.75rem;
+                        border-radius: 4px;
+                        margin: 0.125rem;
+                        
+                        &:hover {
+                          background: var(--surface-hover);
+                        }
+                        
+                        &.p-highlight {
+                          background: var(--primary-color-50);
+                          color: var(--primary-color);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
+          .generate-button {
+            flex: 0 0 auto;
+            
+            .generate-chart-btn {
+              height: 44px;
+              padding: 0 1.5rem;
+              border-radius: 6px;
+              font-weight: 500;
+              font-size: 0.875rem;
+              min-width: 140px;
+              
+              &:hover:not(:disabled) {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              }
+            }
+          }
+        }
+        
+        // Responsive Design
+        @media (max-width: 768px) {
+          .data-config-row {
+            flex-direction: column;
+            gap: 1rem;
+            
+            .config-fields {
+              .config-field {
+                min-width: 100%;
+              }
+            }
+            
+            .generate-button {
+              align-self: stretch;
+              
+              .generate-chart-btn {
+                width: 100%;
+              }
+            }
+          }
+        }
+      }
+      
+      // Chart Option Styling
+      .chart-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.25rem 0;
+        
+        .chart-icon {
+          font-size: 1.25rem;
+          color: var(--primary-color);
+          width: 24px;
+          text-align: center;
+        }
+        
+        .chart-info {
+          flex: 1;
+          
+          .chart-name {
+            display: block;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 0.125rem;
+            font-size: 0.875rem;
+          }
+          
+          .chart-desc {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-color-secondary);
+            line-height: 1.2;
+          }
+        }
+      }
+      
+      .chart-selected {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        .chart-icon {
+          color: var(--primary-color);
+          font-size: 1.125rem;
+        }
+        
+        span {
+          font-weight: 500;
+          color: var(--text-color);
+        }
+      }
+      
+      // Column Option Styling
+      .column-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        
+        .column-name {
+          flex: 1;
+          font-weight: 500;
+          color: var(--text-color);
+        }
+        
+        .column-type {
+          font-size: 0.75rem;
+          padding: 0.125rem 0.375rem;
+          border-radius: 12px;
+          font-weight: 500;
+          
+          &.type-numeric {
+            background: var(--blue-50);
+            color: var(--blue-600);
+          }
+          
+          &.type-categorical {
+            background: var(--green-50);
+            color: var(--green-600);
+          }
+          
+          &.type-date {
+            background: var(--purple-50);
+            color: var(--purple-600);
+          }
+        }
+      }
+      
+      // Chart Configuration Section
+      .chart-configuration {
+        .configuration-header {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+          
+          h4 {
+            color: var(--text-color);
+            margin: 0;
+            font-size: 1.125rem;
+          }
+        }
+        
+        .configuration-form {
+          margin-top: 1rem;
+
+          .chart-controls-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 1rem;
+            flex-wrap: wrap;
+
+            .input-field-inline {
+              min-width: 200px;
+              flex: 1;
+            }
+
+            .dropdown-field-inline,
+            .multiselect-field-inline {
+              display: flex;
+              flex-direction: column;
+              gap: 0.5rem;
+
+              .field-label {
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: var(--text-color);
+                margin-bottom: 0.25rem;
+
+                .required-marker {
+                  color: var(--primary-color);
+                }
+              }
+
+              ::ng-deep {
+                .p-dropdown,
+                .p-multiselect {
+                  min-height: 40px;
+                  
+                  .p-inputtext {
+                    font-size: 0.875rem;
+                  }
+                }
+              }
+            }
+
+            .action-buttons-inline {
+              display: flex;
+              align-items: center;
+              margin-top: 1.5rem;
+
+              button {
+                min-width: 140px;
+                height: 40px;
+                font-size: 0.875rem;
+                border-radius: 6px;
+                transition: all 0.2s ease;
+
+                &:hover:not([disabled]) {
+                  transform: translateY(-1px);
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+                }
+              }
+            }
+          }
+
+          // Responsive adjustments
+          @media (max-width: 768px) {
+            .chart-controls-row {
+              flex-direction: column;
+              align-items: stretch;
+
+              .input-field-inline {
+                min-width: unset;
+                flex: none;
+              }
+
+              .action-buttons-inline {
+                margin-top: 1rem;
+                justify-content: center;
+              }
+            }
+          }
+        }
+      }
+      
+      // Chart Display Container
+      .chart-container {
+        flex: 1;
+        min-height: 400px;
+        background: var(--surface-card);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        will-change: transform;
+        transform: translateZ(0);
+        
+        // Override ngx-charts styling for theme consistency
+        ::ng-deep {
+          .ngx-charts {
+            will-change: transform;
+            transform: translateZ(0);
+            
+            .legend {
+              .legend-labels {
+                .legend-label {
+                  color: var(--text-color) !important;
+                  
+                  .legend-label-text {
+                    color: var(--text-color) !important;
+                  }
+                }
+              }
+            }
+            
+            .axis {
+              .tick {
+                text {
+                  fill: var(--text-color) !important;
+                }
+              }
+              
+              .axis-label {
+                text {
+                  fill: var(--text-color) !important;
+                }
+              }
+            }
+            
+            .grid-panel {
+              .grid-line {
+                stroke: var(--surface-border) !important;
+              }
+            }
+          }
+          
+          // Performance optimizations
+          .chart,
+          .chart-container {
+            will-change: transform;
+            transform: translateZ(0);
+          }
+        }
+      }
 
       .graph-options {
         background: var(--surface-card);
@@ -1856,8 +2344,41 @@
                   .dropdown-item {
                     display: flex;
                     align-items: center;
+                    justify-content: space-between;
+                    padding: 0.5rem 0.75rem;
                     gap: 0.5rem;
-                    padding: 0.25rem;
+                    
+                    .column-name {
+                      flex: 1;
+                      font-weight: 500;
+                    }
+                    
+                    .column-type {
+                      font-size: 0.75rem;
+                      padding: 0.25rem 0.5rem;
+                      border-radius: 12px;
+                      font-weight: 500;
+                      text-transform: uppercase;
+                      letter-spacing: 0.5px;
+                      
+                      &.type-numeric {
+                        background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+                        color: var(--primary-color);
+                        border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
+                      }
+                      
+                      &.type-categorical {
+                        background: color-mix(in srgb, var(--warning-color) 15%, transparent);
+                        color: var(--warning-color);
+                        border: 1px solid color-mix(in srgb, var(--warning-color) 30%, transparent);
+                      }
+                      
+                      &.type-date {
+                        background: color-mix(in srgb, var(--success-color) 15%, transparent);
+                        color: var(--success-color);
+                        border: 1px solid color-mix(in srgb, var(--success-color) 30%, transparent);
+                      }
+                    }
 
                     i {
                       font-size: 1rem;
@@ -1866,7 +2387,7 @@
                       text-align: center;
                     }
 
-                    span {
+                    span:not(.column-type) {
                       color: var(--text-color);
                       font-size: 0.875rem;
                     }
@@ -1990,7 +2511,7 @@
                   cursor: not-allowed;
                   color: var(--disabled-color) !important;
                   background: transparent !important;
-                  
+
                   .p-button-icon {
                     color: var(--disabled-color) !important;
                   }
@@ -2305,7 +2826,11 @@
         }
 
         &::placeholder {
-          color: color-mix(in srgb, var(--text-color) 40%, transparent) !important;
+          color: color-mix(
+            in srgb,
+            var(--text-color) 40%,
+            transparent
+          ) !important;
         }
 
         &::selection {
@@ -2321,12 +2846,24 @@
           background: var(--card-background) !important;
 
           .p-datatable-thead > tr > th {
-            background: color-mix(in srgb, var(--text-color) 5%, transparent) !important;
+            background: color-mix(
+              in srgb,
+              var(--text-color) 5%,
+              transparent
+            ) !important;
             color: var(--text-color) !important;
-            border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+            border-color: color-mix(
+              in srgb,
+              var(--text-color) 10%,
+              transparent
+            ) !important;
 
             .p-sortable-column-icon {
-              color: color-mix(in srgb, var(--text-color) 50%, transparent) !important;
+              color: color-mix(
+                in srgb,
+                var(--text-color) 50%,
+                transparent
+              ) !important;
             }
           }
 
@@ -2335,22 +2872,42 @@
             color: var(--text-color) !important;
 
             &:hover {
-              background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
+              background: color-mix(
+                in srgb,
+                var(--text-color) 8%,
+                transparent
+              ) !important;
             }
 
             > td {
-              border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+              border-color: color-mix(
+                in srgb,
+                var(--text-color) 10%,
+                transparent
+              ) !important;
               color: var(--text-color) !important;
             }
           }
 
           .p-paginator {
-            background: color-mix(in srgb, var(--text-color) 5%, transparent) !important;
-            border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+            background: color-mix(
+              in srgb,
+              var(--text-color) 5%,
+              transparent
+            ) !important;
+            border-color: color-mix(
+              in srgb,
+              var(--text-color) 10%,
+              transparent
+            ) !important;
             color: var(--text-color) !important;
 
             .p-paginator-current {
-              color: color-mix(in srgb, var(--text-color) 60%, transparent) !important;
+              color: color-mix(
+                in srgb,
+                var(--text-color) 60%,
+                transparent
+              ) !important;
             }
 
             .p-paginator-pages {
@@ -2359,7 +2916,11 @@
                 border-color: transparent !important;
 
                 &:hover {
-                  background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
+                  background: color-mix(
+                    in srgb,
+                    var(--text-color) 8%,
+                    transparent
+                  ) !important;
                 }
 
                 &.p-highlight {
@@ -2372,7 +2933,11 @@
             // Dropdown in paginator
             .p-dropdown {
               background: var(--card-background) !important;
-              border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+              border-color: color-mix(
+                in srgb,
+                var(--text-color) 10%,
+                transparent
+              ) !important;
 
               .p-dropdown-label {
                 color: var(--text-color) !important;
@@ -2388,14 +2953,22 @@
         // Dropdown panel
         .p-dropdown-panel {
           background: var(--card-background) !important;
-          border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+          border-color: color-mix(
+            in srgb,
+            var(--text-color) 10%,
+            transparent
+          ) !important;
 
           .p-dropdown-items {
             .p-dropdown-item {
               color: var(--text-color) !important;
 
               &:hover {
-                background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
+                background: color-mix(
+                  in srgb,
+                  var(--text-color) 8%,
+                  transparent
+                ) !important;
               }
 
               &.p-highlight {
@@ -2409,7 +2982,11 @@
         // Empty state in dark theme
         .empty-state {
           i {
-            color: color-mix(in srgb, var(--text-color) 30%, transparent) !important;
+            color: color-mix(
+              in srgb,
+              var(--text-color) 30%,
+              transparent
+            ) !important;
           }
 
           p {
@@ -2417,7 +2994,11 @@
           }
 
           small {
-            color: color-mix(in srgb, var(--text-color) 50%, transparent) !important;
+            color: color-mix(
+              in srgb,
+              var(--text-color) 50%,
+              transparent
+            ) !important;
           }
         }
       }
@@ -2441,16 +3022,36 @@
       border: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent) !important;
 
       .p-dropdown-header {
-        background: color-mix(in srgb, var(--text-color) 5%, transparent) !important;
-        border-color: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+        background: color-mix(
+          in srgb,
+          var(--text-color) 5%,
+          transparent
+        ) !important;
+        border-color: color-mix(
+          in srgb,
+          var(--text-color) 10%,
+          transparent
+        ) !important;
 
         .p-dropdown-filter {
-          background: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
-          border-color: color-mix(in srgb, var(--text-color) 20%, transparent) !important;
+          background: color-mix(
+            in srgb,
+            var(--text-color) 10%,
+            transparent
+          ) !important;
+          border-color: color-mix(
+            in srgb,
+            var(--text-color) 20%,
+            transparent
+          ) !important;
           color: var(--text-color) !important;
 
           &::placeholder {
-            color: color-mix(in srgb, var(--text-color) 50%, transparent) !important;
+            color: color-mix(
+              in srgb,
+              var(--text-color) 50%,
+              transparent
+            ) !important;
           }
         }
       }
@@ -2462,7 +3063,11 @@
             background: transparent !important;
 
             &:hover {
-              background: color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+              background: color-mix(
+                in srgb,
+                var(--text-color) 10%,
+                transparent
+              ) !important;
               color: white !important;
             }
 
@@ -2472,12 +3077,20 @@
             }
 
             &.p-disabled {
-              color: color-mix(in srgb, var(--text-color) 30%, transparent) !important;
+              color: color-mix(
+                in srgb,
+                var(--text-color) 30%,
+                transparent
+              ) !important;
             }
           }
 
           .p-dropdown-empty-message {
-            color: color-mix(in srgb, var(--text-color) 50%, transparent) !important;
+            color: color-mix(
+              in srgb,
+              var(--text-color) 50%,
+              transparent
+            ) !important;
           }
         }
       }
@@ -2539,7 +3152,11 @@
         }
 
         &:hover {
-          background: color-mix(in srgb, var(--primary-color) 15%, transparent) !important;
+          background: color-mix(
+            in srgb,
+            var(--primary-color) 15%,
+            transparent
+          ) !important;
         }
       }
     }
@@ -2559,7 +3176,11 @@
         }
 
         &:hover {
-          background: color-mix(in srgb, var(--primary-color) 15%, transparent) !important;
+          background: color-mix(
+            in srgb,
+            var(--primary-color) 15%,
+            transparent
+          ) !important;
         }
       }
     }
@@ -2646,7 +3267,7 @@
       cursor: not-allowed;
       pointer-events: none;
       color: var(--disabled-color) !important;
-      
+
       i {
         color: var(--disabled-color) !important;
       }
@@ -2762,7 +3383,8 @@
   .database-context-menu {
     background: var(--card-background);
     border-color: color-mix(in srgb, var(--text-color) 10%, transparent);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--shadow-color) 200%, transparent);
+    box-shadow: 0 4px 12px
+      color-mix(in srgb, var(--shadow-color) 200%, transparent);
 
     .context-menu-item {
       color: var(--text-color);
@@ -2845,36 +3467,36 @@
       max-height: 400px !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
-      
+
       // Custom scrollbar styling
       &::-webkit-scrollbar {
         width: 8px;
       }
-      
+
       &::-webkit-scrollbar-track {
         background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
         border-radius: 4px;
       }
-      
+
       &::-webkit-scrollbar-thumb {
         background: color-mix(in srgb, var(--shadow-color) 75%, transparent);
         border-radius: 4px;
-        
+
         &:hover {
           background: var(--shadow-color);
         }
       }
-      
+
       .p-menuitem {
         margin: 0;
-        
+
         .p-menuitem-link {
           padding: 0.5rem 0.75rem;
           gap: 0.5rem;
           font-size: 0.875rem;
           transition: all 0.2s ease;
           color: var(--text-color);
-          
+
           .p-menuitem-icon {
             font-size: 0.875rem;
             color: var(--text-color);
@@ -2882,28 +3504,28 @@
             width: 16px;
             text-align: center;
           }
-          
+
           .p-menuitem-text {
             flex: 1;
             white-space: nowrap;
           }
-          
+
           &:hover {
             background: var(--hover-background);
             color: var(--text-color);
-            
+
             .p-menuitem-icon {
               opacity: 1;
               color: var(--primary-color);
             }
           }
-          
+
           &:focus {
             box-shadow: none;
             background: var(--hover-background);
           }
         }
-        
+
         &.p-menuitem-separator {
           height: 1px;
           background: var(--border-color);
@@ -3409,25 +4031,26 @@
     background: var(--card-background) !important;
     border: 2px solid var(--border-color) !important;
     border-radius: 8px !important;
-    box-shadow: 0 8px 32px var(--shadow-color), 0 4px 16px color-mix(in srgb, var(--shadow-color) 75%, transparent) !important;
+    box-shadow: 0 8px 32px var(--shadow-color),
+      0 4px 16px color-mix(in srgb, var(--shadow-color) 75%, transparent) !important;
     overflow: visible !important;
     min-width: 350px !important;
     max-width: 500px !important;
     width: auto !important;
     backdrop-filter: blur(10px) !important;
     z-index: 999999 !important;
-    
+
     .monaco-list {
       overflow: visible !important;
-      
+
       .monaco-scrollable-element {
         overflow: visible !important;
-        
+
         .scrollbar {
           .slider {
             background: var(--primary-color-20) !important;
             border-radius: 4px !important;
-            
+
             &:hover {
               background: var(--primary-color-30) !important;
             }
@@ -3435,7 +4058,7 @@
         }
       }
     }
-    
+
     .monaco-list .monaco-list-row {
       background: var(--card-background) !important;
       border: none !important;
@@ -3448,8 +4071,9 @@
       align-items: center !important;
       white-space: nowrap !important;
       overflow: visible !important;
-      border-bottom: 1px solid color-mix(in srgb, var(--border-color) 30%, transparent) !important;
-      
+      border-bottom: 1px solid
+        color-mix(in srgb, var(--border-color) 30%, transparent) !important;
+
       &:hover {
         background: var(--hover-background) !important;
         margin: 0 4px !important;
@@ -3457,36 +4081,44 @@
         padding: 8px 8px !important;
         border-bottom: 1px solid transparent !important;
       }
-      
+
       &.focused {
-        background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+        background: color-mix(
+          in srgb,
+          var(--primary-color) 15%,
+          var(--card-background)
+        ) !important;
         outline: none !important;
         margin: 0 4px !important;
         border-radius: 4px !important;
         padding: 8px 8px !important;
         border-bottom: 1px solid transparent !important;
-        
+
         .suggest-icon {
           opacity: 1 !important;
         }
       }
-      
+
       .monaco-highlighted-label {
         color: var(--text-color) !important;
         font-weight: 500 !important;
         flex: 1 !important;
         overflow: visible !important;
         white-space: nowrap !important;
-        
+
         .highlight {
-          background: color-mix(in srgb, var(--primary-color) 25%, transparent) !important;
+          background: color-mix(
+            in srgb,
+            var(--primary-color) 25%,
+            transparent
+          ) !important;
           color: var(--primary-color) !important;
           font-weight: 700 !important;
           border-radius: 3px !important;
           padding: 1px 3px !important;
         }
       }
-      
+
       .suggest-icon {
         opacity: 0.9 !important;
         margin-right: 8px !important;
@@ -3496,34 +4128,34 @@
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        
+
         // Enhanced icon colors for better distinction using theme variables
         &.codicon-symbol-field::before {
           color: var(--error-color) !important; // Red for columns
           font-weight: 600 !important;
         }
-        
+
         &.codicon-symbol-class::before {
           color: var(--primary-color) !important; // Blue for tables
           font-weight: 600 !important;
         }
-        
+
         &.codicon-symbol-module::before {
           color: var(--primary-color) !important; // Blue for schemas
           font-weight: 600 !important;
         }
-        
+
         &.codicon-symbol-keyword::before {
           color: var(--success-color) !important; // Green for keywords
           font-weight: 600 !important;
         }
-        
+
         &.codicon-symbol-function::before {
           color: var(--warning-color) !important; // Orange for functions
           font-weight: 600 !important;
         }
       }
-      
+
       .suggest-label {
         flex: 1 !important;
         overflow: hidden !important;
@@ -3531,7 +4163,7 @@
         white-space: nowrap !important;
         margin-right: 8px !important;
       }
-      
+
       .suggest-details {
         color: var(--secondary-color) !important;
         font-size: 12px !important;
@@ -3544,7 +4176,7 @@
         font-weight: 400 !important;
       }
     }
-    
+
     .details {
       background: var(--card-background) !important;
       border-left: 1px solid var(--border-color) !important;
@@ -3553,7 +4185,7 @@
       max-width: 300px !important;
       word-wrap: break-word !important;
       overflow-wrap: break-word !important;
-      
+
       .header .type {
         color: var(--text-muted-color) !important;
         font-size: 0.75rem !important;
@@ -3562,14 +4194,14 @@
         font-weight: 600 !important;
         margin-bottom: 0.5rem !important;
       }
-      
+
       .docs {
         color: var(--text-color) !important;
         font-size: 0.875rem !important;
         line-height: 1.4 !important;
         word-wrap: break-word !important;
         overflow-wrap: break-word !important;
-        
+
         .markdown-docs {
           code {
             background: var(--surface-d) !important;
@@ -3589,14 +4221,15 @@
     background: var(--card-background) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 6px !important;
-    box-shadow: 0 4px 16px color-mix(in srgb, var(--shadow-color) 50%, transparent) !important;
+    box-shadow: 0 4px 16px
+      color-mix(in srgb, var(--shadow-color) 50%, transparent) !important;
     color: var(--text-color) !important;
-    
+
     .parameter-hints-next,
     .parameter-hints-previous {
       background: transparent !important;
       color: var(--primary-color) !important;
-      
+
       &:hover {
         background: var(--hover-background) !important;
       }
@@ -3608,12 +4241,13 @@
     background: var(--card-background) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 6px !important;
-    box-shadow: 0 4px 16px color-mix(in srgb, var(--shadow-color) 50%, transparent) !important;
+    box-shadow: 0 4px 16px
+      color-mix(in srgb, var(--shadow-color) 50%, transparent) !important;
     color: var(--text-color) !important;
-    
+
     .hover-contents {
       color: var(--text-color) !important;
-      
+
       code {
         background: var(--surface-d) !important;
         color: var(--primary-color) !important;
@@ -3634,21 +4268,21 @@
             padding: 0 !important;
             margin: 0 !important;
             overflow: visible !important;
-            
+
             .icon {
               margin-right: 8px !important;
               flex-shrink: 0 !important;
             }
-            
+
             .main {
               flex: 1 !important;
               overflow: visible !important;
-              
+
               .codicon {
                 margin-right: 8px !important;
               }
             }
-            
+
             .readMore {
               opacity: 0.7 !important;
               font-size: 11px !important;
@@ -3660,12 +4294,16 @@
     }
   }
 
-  // Enhanced scrollbar for suggestion list  
-  .monaco-editor .suggest-widget .monaco-list .monaco-scrollable-element .scrollbar {
+  // Enhanced scrollbar for suggestion list
+  .monaco-editor
+    .suggest-widget
+    .monaco-list
+    .monaco-scrollable-element
+    .scrollbar {
     .slider {
       background: var(--primary-color-20) !important;
       border-radius: 4px !important;
-      
+
       &:hover {
         background: var(--primary-color-30) !important;
       }
@@ -3714,7 +4352,11 @@
       }
 
       &.p-highlight {
-        background: color-mix(in srgb, var(--primary-color) 10%, var(--card-background)) !important;
+        background: color-mix(
+          in srgb,
+          var(--primary-color) 10%,
+          var(--card-background)
+        ) !important;
         color: var(--primary-color) !important;
 
         .p-sortable-column-icon {
@@ -3749,7 +4391,11 @@
       }
 
       &:nth-child(even) {
-        background: color-mix(in srgb, var(--border-color) 20%, var(--card-background)) !important;
+        background: color-mix(
+          in srgb,
+          var(--border-color) 20%,
+          var(--card-background)
+        ) !important;
       }
 
       &:hover {
@@ -3762,7 +4408,11 @@
       }
 
       &.p-highlight {
-        background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+        background: color-mix(
+          in srgb,
+          var(--primary-color) 15%,
+          var(--card-background)
+        ) !important;
         color: var(--text-color) !important;
 
         > td {
@@ -3892,7 +4542,11 @@
           }
 
           &.p-highlight {
-            background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+            background: color-mix(
+              in srgb,
+              var(--primary-color) 15%,
+              var(--card-background)
+            ) !important;
             color: var(--primary-color) !important;
           }
 
@@ -3930,7 +4584,8 @@
 
         &:focus {
           border-color: var(--primary-color) !important;
-          box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
+          box-shadow: 0 0 0 1px
+            color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
         }
 
         &::placeholder {
@@ -3972,7 +4627,11 @@
   .p-dropdown:disabled,
   .p-dropdown.p-disabled {
     opacity: 0.4 !important;
-    background: color-mix(in srgb, var(--disabled-color) 10%, var(--card-background)) !important;
+    background: color-mix(
+      in srgb,
+      var(--disabled-color) 10%,
+      var(--card-background)
+    ) !important;
     color: var(--disabled-color) !important;
     border-color: var(--disabled-color) !important;
     cursor: not-allowed !important;
@@ -3995,7 +4654,11 @@
   textarea:disabled,
   .p-inputtext:disabled {
     opacity: 0.4 !important;
-    background: color-mix(in srgb, var(--disabled-color) 10%, var(--card-background)) !important;
+    background: color-mix(
+      in srgb,
+      var(--disabled-color) 10%,
+      var(--card-background)
+    ) !important;
     color: var(--disabled-color) !important;
     border-color: var(--disabled-color) !important;
     cursor: not-allowed !important;
@@ -4097,15 +4760,15 @@
     border: 1px solid var(--menu-border-color) !important;
     box-shadow: var(--menu-shadow) !important;
     border-radius: 8px !important;
-    
+
     .p-menu-list {
       background: var(--menu-background) !important;
       border: none !important;
       padding: 0.5rem 0 !important;
-      
+
       .p-menuitem {
         margin: 0 !important;
-        
+
         .p-menuitem-link {
           color: var(--menu-text-color) !important;
           transition: all 0.2s ease !important;
@@ -4113,19 +4776,19 @@
           border-radius: 0 !important;
           border: none !important;
           background: transparent !important;
-          
+
           &:hover {
             background: var(--menu-hover-background) !important;
             color: var(--menu-text-color) !important;
           }
-          
+
           &:focus {
             background: var(--menu-hover-background) !important;
             color: var(--menu-text-color) !important;
             box-shadow: none !important;
             outline: none !important;
           }
-          
+
           .p-menuitem-icon {
             color: var(--menu-icon-color) !important;
             margin-right: 0.75rem !important;
@@ -4133,33 +4796,33 @@
             width: 16px !important;
             text-align: center !important;
           }
-          
+
           .p-menuitem-text {
             color: var(--menu-text-color) !important;
             font-size: 0.875rem !important;
             font-weight: 400 !important;
           }
         }
-        
+
         &.p-disabled {
           .p-menuitem-link {
             opacity: var(--menu-disabled-opacity) !important;
             cursor: not-allowed !important;
-            
+
             &:hover {
               background: transparent !important;
             }
-            
+
             .p-menuitem-icon {
               color: var(--disabled-color) !important;
             }
-            
+
             .p-menuitem-text {
               color: var(--disabled-color) !important;
             }
           }
         }
-        
+
         &.p-menuitem-separator {
           height: 1px !important;
           background: var(--menu-border-color) !important;
@@ -4176,40 +4839,40 @@
       max-height: 400px !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
-      
+
       // Custom scrollbar for database menu
       &::-webkit-scrollbar {
         width: 8px;
       }
-      
+
       &::-webkit-scrollbar-track {
         background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
         border-radius: 4px;
       }
-      
+
       &::-webkit-scrollbar-thumb {
         background: color-mix(in srgb, var(--shadow-color) 75%, transparent);
         border-radius: 4px;
-        
+
         &:hover {
           background: var(--shadow-color);
         }
       }
-      
+
       .p-menuitem {
         .p-menuitem-link {
           padding: 0.5rem 0.75rem !important;
           font-size: 0.875rem !important;
-          
+
           .p-menuitem-icon {
             font-size: 0.875rem !important;
             opacity: 0.7;
-            
+
             &:hover {
               opacity: 1;
             }
           }
-          
+
           &:hover {
             .p-menuitem-icon {
               color: var(--primary-color) !important;
@@ -4226,7 +4889,7 @@
     // Force theme colors regardless of Monaco theme
     background: var(--card-background) !important;
     color: var(--text-color) !important;
-    
+
     // Override all possible Monaco theme variations
     &,
     &.vs,
@@ -4236,70 +4899,78 @@
       color: var(--text-color) !important;
       border: 2px solid var(--border-color) !important;
     }
-    
+
     .monaco-list {
       background: var(--card-background) !important;
       color: var(--text-color) !important;
-      
+
       .monaco-list-row {
         background: var(--card-background) !important;
         color: var(--text-color) !important;
-        
+
         // Force all text elements to use theme colors
         * {
           color: var(--text-color) !important;
         }
-        
+
         .monaco-highlighted-label {
           color: var(--text-color) !important;
-          
+
           .highlight {
-            background: color-mix(in srgb, var(--primary-color) 30%, transparent) !important;
+            background: color-mix(
+              in srgb,
+              var(--primary-color) 30%,
+              transparent
+            ) !important;
             color: var(--primary-color) !important;
           }
         }
-        
+
         .suggest-details {
           color: var(--secondary-color) !important;
         }
-        
+
         &.focused,
         &:focus,
         &.selected {
-          background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+          background: color-mix(
+            in srgb,
+            var(--primary-color) 15%,
+            var(--card-background)
+          ) !important;
           color: var(--text-color) !important;
-          
+
           * {
             color: var(--text-color) !important;
           }
-          
+
           .suggest-details {
             color: var(--text-color) !important;
             opacity: 0.8 !important;
           }
         }
-        
+
         &:hover {
           background: var(--hover-background) !important;
           color: var(--text-color) !important;
-          
+
           * {
             color: var(--text-color) !important;
           }
         }
       }
     }
-    
+
     // Details panel theming
     .details {
       background: var(--card-background) !important;
       color: var(--text-color) !important;
       border-left-color: var(--border-color) !important;
-      
+
       * {
         color: var(--text-color) !important;
       }
-      
+
       .header .type {
         color: var(--secondary-color) !important;
       }
@@ -4315,21 +4986,25 @@
         background: var(--card-background) !important;
         color: var(--text-color) !important;
         border-color: var(--border-color) !important;
-        
+
         .monaco-list {
           background: var(--card-background) !important;
-          
+
           .monaco-list-row {
             background: var(--card-background) !important;
             color: var(--text-color) !important;
-            
+
             &.focused,
             &:focus,
             &.selected {
-              background: color-mix(in srgb, var(--primary-color) 15%, var(--card-background)) !important;
+              background: color-mix(
+                in srgb,
+                var(--primary-color) 15%,
+                var(--card-background)
+              ) !important;
               color: var(--text-color) !important;
             }
-            
+
             &:hover {
               background: var(--hover-background) !important;
               color: var(--text-color) !important;
@@ -4342,17 +5017,17 @@
 
   // Ultimate fallback - target any possible Monaco suggestion element
   .suggest-widget,
-  [class*="suggest"],
-  [class*="monaco-list"],
-  [class*="monaco-highlighted"] {
+  [class*='suggest'],
+  [class*='monaco-list'],
+  [class*='monaco-highlighted'] {
     background: var(--card-background) !important;
     color: var(--text-color) !important;
-    
-    &[style*="background"] {
+
+    &[style*='background'] {
       background: var(--card-background) !important;
     }
-    
-    &[style*="color"] {
+
+    &[style*='color'] {
       color: var(--text-color) !important;
     }
   }
@@ -4360,7 +5035,8 @@
 
 // Scroll indicator animation
 @keyframes pulse-scroll {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.3;
     transform: translateY(-50%) scaleY(1);
   }
@@ -4447,7 +5123,8 @@
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+            box-shadow: 0 0 0 3px
+              color-mix(in srgb, var(--primary-color) 20%, transparent);
           }
         }
       }
@@ -4537,7 +5214,7 @@
         background: var(--border-color);
         border-radius: 5px;
         border: 2px solid var(--background-color);
-        
+
         &:hover {
           background: var(--secondary-color);
         }
@@ -4563,7 +5240,11 @@
         top: 0;
         bottom: 0;
         width: 20px;
-        background: linear-gradient(to left, color-mix(in srgb, var(--shadow-color) 20%, transparent), transparent);
+        background: linear-gradient(
+          to left,
+          color-mix(in srgb, var(--shadow-color) 20%, transparent),
+          transparent
+        );
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s ease;
@@ -4657,7 +5338,11 @@
             }
 
             &.odd {
-              background: color-mix(in srgb, var(--border-color) 3%, var(--card-background));
+              background: color-mix(
+                in srgb,
+                var(--border-color) 3%,
+                var(--card-background)
+              );
             }
 
             &:hover.even,
@@ -4667,7 +5352,8 @@
 
             .table-cell {
               padding: 1rem 1rem; // Increase padding for more height per row
-              border-right: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+              border-right: 1px solid
+                color-mix(in srgb, var(--border-color) 50%, transparent);
               color: var(--text-color);
               vertical-align: top;
               position: relative;
@@ -4712,7 +5398,7 @@
                   font-weight: 600;
                   text-transform: uppercase;
                   font-size: 0.8125rem;
-                  
+
                   span {
                     padding: 0.125rem 0.375rem;
                     border-radius: 4px;
@@ -4881,10 +5567,10 @@
       .table-scroll-container {
         height: 350px; // Fixed height for mobile
         max-height: 60vh; // Reduce height on mobile
-        
+
         // Better touch scrolling on mobile
         -webkit-overflow-scrolling: touch;
-        
+
         // Larger scrollbars for touch devices
         &::-webkit-scrollbar {
           width: 12px;
@@ -4916,7 +5602,7 @@
       .table-scroll-container {
         height: 100%; // Use full available height from splitter
         min-height: 200px; // Minimum height for small screens
-        
+
         .modern-table {
           .table-header .table-header-cell,
           .table-body .table-cell {

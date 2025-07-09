@@ -6,6 +6,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { QueryRoutingModule } from './query-routing.module';
 import { RunQueryComponent } from './components/run-query/run-query.component';
 import { ChartModule } from 'primeng/chart';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @NgModule({
   declarations: [RunQueryComponent],
@@ -17,6 +18,7 @@ import { ChartModule } from 'primeng/chart';
     QueryRoutingModule,
     SharedModule,
     ChartModule,
+    NgxChartsModule,
   ],
 })
 export class QueryModule {}
