@@ -495,119 +495,192 @@
 
                   <!-- Analytics View -->
                   <div class="analytics-view" *ngIf="viewMode === 'analytics'">
-                    <!-- Simplified Chart Configuration -->
-                    <div class="chart-configuration-simple" [formGroup]="chartForm">
-                      <!-- Chart Type Selection - Single Row -->
-                      <div class="chart-type-row">
-                        <div class="chart-type-field">
-                          <label class="field-label">Chart Type <span class="required-marker">*</span></label>
-                          <p-dropdown
-                            [options]="chartTypes"
-                            [formControlName]="'chartType'"
-                            optionLabel="label"
-                            optionValue="value"
-                            placeholder="Choose a chart type..."
-                            [style]="{ width: '100%' }"
-                            [panelStyle]="{ width: '100%' }"
-                            [filter]="true"
-                            filterBy="label"
-                            (onChange)="onChartTypeDropdownChange($event)"
-                          >
-                            <ng-template let-chartType pTemplate="item">
-                              <div class="chart-option">
-                                <i [class]="chartType.icon" class="chart-icon"></i>
-                                <div class="chart-info">
-                                  <span class="chart-name">{{ chartType.label }}</span>
-                                  <span class="chart-desc">{{ chartType.description }}</span>
-                                </div>
-                              </div>
-                            </ng-template>
-                            <ng-template let-chartType pTemplate="selectedItem">
-                              <div class="chart-selected">
-                                <i [class]="chartType.icon" class="chart-icon"></i>
-                                <span>{{ chartType.label }}</span>
-                              </div>
-                            </ng-template>
-                          </p-dropdown>
-                        </div>
-                      </div>
-
-                      <!-- Data Configuration Row -->
-                      <div class="data-config-row" *ngIf="selectedChartType">
-                        <div class="config-fields">
-                          <!-- Dynamic Input Fields -->
-                          <div 
-                            *ngFor="let input of selectedChartType.inputs" 
-                            class="config-field"
-                          >
-                            <!-- Single Selection -->
-                            <div *ngIf="!input.multiple" class="field-container">
-                              <label class="field-label">{{ input.label }}<span *ngIf="input.required" class="required-marker"> *</span></label>
-                              <p-dropdown
-                                [options]="getOptionsForInput(input)"
-                                [formControlName]="input.name"
-                                optionLabel="label"
-                                optionValue="value"
-                                [filter]="true"
-                                filterBy="label"
-                                [style]="{ width: '100%' }"
-                                [showClear]="!input.required"
-                                [placeholder]="'Select ' + input.label.toLowerCase()"
-                              >
-                                <ng-template let-column pTemplate="item">
-                                  <div class="column-option">
-                                    <span class="column-name">{{ column.label }}</span>
-                                    <span class="column-type" [ngClass]="'type-' + column.type">{{ column.type }}</span>
-                                  </div>
-                                </ng-template>
-                              </p-dropdown>
-                            </div>
-
-                            <!-- Multiple Selection -->
-                            <div *ngIf="input.multiple" class="field-container">
-                              <label class="field-label">{{ input.label }}<span *ngIf="input.required" class="required-marker"> *</span></label>
-                              <p-multiSelect
-                                [options]="getOptionsForInput(input)"
-                                [ngModel]="getFormArrayValue(input.name)"
-                                (ngModelChange)="updateFormArray(input.name, $event)"
-                                optionLabel="label"
-                                optionValue="value"
-                                [filter]="true"
-                                filterBy="label"
-                                [style]="{ width: '100%' }"
-                                [placeholder]="'Select ' + input.label.toLowerCase()"
-                                [showToggleAll]="false"
-                                [maxSelectedLabels]="2"
-                              >
-                                <ng-template let-column pTemplate="item">
-                                  <div class="column-option">
-                                    <span class="column-name">{{ column.label }}</span>
-                                    <span class="column-type" [ngClass]="'type-' + column.type">{{ column.type }}</span>
-                                  </div>
-                                </ng-template>
-                              </p-multiSelect>
+                    <!-- Two Column Layout -->
+                    <div class="analytics-layout">
+                      
+                      <!-- Left Panel - Chart Configuration -->
+                      <div class="chart-config-panel">
+                        <div class="config-header">
+                          <div class="header-content">
+                            <i class="pi pi-cog config-icon"></i>
+                            <div class="header-text">
+                              <h3>Chart Configuration</h3>
+                              <p>Configure your visualization settings</p>
                             </div>
                           </div>
                         </div>
 
-                        <!-- Generate Button -->
-                        <div class="generate-button">
-                          <button
-                            pButton
-                            class="p-button-primary generate-chart-btn"
-                            icon="pi pi-chart-line"
-                            label="Generate Chart"
-                            [loading]="isGeneratingChart"
-                            [disabled]="!canGenerateChart()"
-                            (click)="generateChart()"
-                          ></button>
+                        <div class="config-content" [formGroup]="chartForm">
+                          <!-- Chart Type Selection -->
+                          <div class="config-section">
+                            <div class="section-header">
+                              <i class="pi pi-chart-line section-icon"></i>
+                              <span class="section-title">Chart Type</span>
+                              <span class="required-indicator">*</span>
+                            </div>
+                            
+                            <div class="chart-type-grid">
+                              <div 
+                                *ngFor="let chartType of chartTypes" 
+                                class="chart-type-card"
+                                [class.selected]="chartForm.get('chartType')?.value === chartType.value"
+                                (click)="selectChartType(chartType)"
+                                [title]="chartType.description"
+                              >
+                                <i [class]="chartType.icon" class="chart-icon"></i>
+                                <span class="chart-name">{{ chartType.label }}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Data Configuration -->
+                          <div class="config-section" *ngIf="selectedChartType">
+                            <div class="section-header">
+                              <i class="pi pi-database section-icon"></i>
+                              <span class="section-title">Data Mapping</span>
+                              <span class="required-indicator">*</span>
+                            </div>
+
+                            <div class="data-fields">
+                              <div 
+                                *ngFor="let input of selectedChartType.inputs" 
+                                class="field-group"
+                              >
+                                <label class="field-label">
+                                  <i [class]="getFieldIcon(input.type)" class="field-icon"></i>
+                                  {{ input.label }}
+                                  <span *ngIf="input.required" class="required-star">*</span>
+                                </label>
+
+                                <!-- Single Selection -->
+                                <div *ngIf="!input.multiple" class="field-wrapper">
+                                  <p-dropdown
+                                    [options]="getOptionsForInput(input)"
+                                    [formControlName]="input.name"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    [filter]="true"
+                                    filterBy="label"
+                                    [style]="{ width: '100%' }"
+                                    [showClear]="!input.required"
+                                    [placeholder]="'Choose ' + input.label.toLowerCase() + '...'"
+                                    styleClass="custom-dropdown"
+                                  >
+                                    <ng-template let-column pTemplate="item">
+                                      <div class="column-option">
+                                        <div class="column-details">
+                                          <span class="column-name">{{ column.label }}</span>
+                                          <span class="column-type" [ngClass]="'type-' + column.type">
+                                            <i class="pi pi-tag"></i>
+                                            {{ column.type }}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </ng-template>
+                                  </p-dropdown>
+                                </div>
+
+                                <!-- Multiple Selection -->
+                                <div *ngIf="input.multiple" class="field-wrapper">
+                                  <p-multiSelect
+                                    [options]="getOptionsForInput(input)"
+                                    [ngModel]="getFormArrayValue(input.name)"
+                                    (ngModelChange)="updateFormArray(input.name, $event)"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    [filter]="true"
+                                    filterBy="label"
+                                    [style]="{ width: '100%' }"
+                                    [placeholder]="'Choose ' + input.label.toLowerCase() + '...'"
+                                    [showToggleAll]="false"
+                                    [maxSelectedLabels]="3"
+                                    styleClass="custom-multiselect"
+                                  >
+                                    <ng-template let-column pTemplate="item">
+                                      <div class="column-option">
+                                        <div class="column-details">
+                                          <span class="column-name">{{ column.label }}</span>
+                                          <span class="column-type" [ngClass]="'type-' + column.type">
+                                            <i class="pi pi-tag"></i>
+                                            {{ column.type }}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </ng-template>
+                                  </p-multiSelect>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Action Buttons -->
+                          <div class="config-actions" *ngIf="selectedChartType">
+                            <button
+                              pButton
+                              class="p-button-primary generate-btn"
+                              icon="pi pi-play"
+                              label="Generate Visualization"
+                              [loading]="isGeneratingChart"
+                              [disabled]="!canGenerateChart()"
+                              (click)="generateChart()"
+                            ></button>
+                            
+                            <button
+                              pButton
+                              class="p-button-outlined reset-btn"
+                              icon="pi pi-refresh"
+                              label="Reset"
+                              [disabled]="isGeneratingChart"
+                              (click)="resetChartConfig()"
+                            ></button>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <!-- Chart Display Section -->
-                    <div class="chart-container" *ngIf="showChart && ngxChartData.length > 0">
-                      <!-- Bar Charts -->
+                      <!-- Right Panel - Chart Display -->
+                      <div class="chart-display-panel">
+                        <div class="display-header">
+                          <div class="header-content">
+                            <div class="header-left">
+                              <i class="pi pi-chart-bar display-icon"></i>
+                              <div class="header-text">
+                                <h3>Visualization</h3>
+                                <p>Your generated chart will appear here</p>
+                              </div>
+                            </div>
+                            <div class="header-actions" *ngIf="showChart && ngxChartData.length > 0">
+                              <button
+                                pButton
+                                class="p-button-text action-btn"
+                                icon="pi pi-expand"
+                                pTooltip="Fullscreen"
+                                (click)="openChartPopup()"
+                              ></button>
+                              <button
+                                pButton
+                                class="p-button-text action-btn"
+                                icon="pi pi-download"
+                                pTooltip="Export Chart"
+                                (click)="exportChart()"
+                              ></button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="display-content">
+                          <!-- Chart Container -->
+                          <div class="chart-wrapper" *ngIf="showChart && ngxChartData.length > 0 && !showChartPopup">
+                            <!-- Expand Button -->
+                            <button 
+                              pButton 
+                              class="expand-chart-btn p-button-rounded p-button-text"
+                              icon="pi pi-external-link"
+                              (click)="openChartPopup()"
+                              pTooltip="Expand Chart"
+                              tooltipPosition="left">
+                            </button>
+                            <div class="chart-visualization">
+                              <!-- Bar Charts -->
                       <ngx-charts-bar-vertical
                         *ngIf="selectedChartType?.value === 'bar-vertical'"
                         [results]="ngxChartData"
@@ -624,6 +697,7 @@
                         [showGridLines]="showGridLines"
                         [roundDomains]="roundDomains"
                         [showDataLabel]="showDataLabel"
+                        [gradient]="gradient"
                       >
                       </ngx-charts-bar-vertical>
 
@@ -643,6 +717,7 @@
                         [showGridLines]="showGridLines"
                         [roundDomains]="roundDomains"
                         [showDataLabel]="showDataLabel"
+                        [gradient]="gradient"
                       >
                       </ngx-charts-bar-horizontal>
 
@@ -662,6 +737,7 @@
                         [showGridLines]="showGridLines"
                         [roundDomains]="roundDomains"
                         [showDataLabel]="showDataLabel"
+                        [gradient]="gradient"
                       >
                       </ngx-charts-bar-vertical-2d>
 
@@ -812,24 +888,79 @@
                         [max]="100"
                         [units]="'units'"
                       >
-                      </ngx-charts-linear-gauge>
-                    </div>
-                    <!-- Empty States -->
-                    <div class="empty-chart" *ngIf="!queryResults.length && !selectedChartType">
-                      <i class="pi pi-chart-line"></i>
-                      <p>No data available to visualize</p>
-                      <small>Execute a query to see results</small>
-                    </div>
-                    
-                    <div class="empty-chart" *ngIf="queryResults.length && selectedChartType && !showChart">
-                      <i class="pi pi-info-circle"></i>
-                      <p>Configure your chart</p>
-                      <small>Select the required fields and click Generate Chart</small>
-                    </div>
+                              </ngx-charts-linear-gauge>
+                            </div>
+                          </div>
 
-                    <div class="chart-loading" *ngIf="isGeneratingChart">
-                      <i class="pi pi-spin pi-spinner"></i>
-                      <span>Generating chart...</span>
+                          <!-- Popup Open Message -->
+                          <div class="popup-open-message" *ngIf="showChart && ngxChartData.length > 0 && showChartPopup">
+                            <div class="popup-message-content">
+                              <i class="pi pi-external-link popup-message-icon"></i>
+                              <h4>Chart in Popup View</h4>
+                              <p>Your chart is currently displayed in the popup window</p>
+                            </div>
+                          </div>
+
+                          <!-- Empty States -->
+                          <div class="empty-state" *ngIf="!queryResults.length">
+                            <div class="empty-content">
+                              <i class="pi pi-database empty-icon"></i>
+                              <h4>No Data Available</h4>
+                              <p>Execute a query first to generate visualizations</p>
+                              <div class="empty-actions">
+                                <button 
+                                  pButton 
+                                  class="p-button-outlined" 
+                                  icon="pi pi-arrow-left" 
+                                  label="Go to Table View"
+                                  (click)="viewMode = 'table'"
+                                ></button>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="empty-state" *ngIf="queryResults.length && !selectedChartType">
+                            <div class="empty-content">
+                              <i class="pi pi-chart-line empty-icon"></i>
+                              <h4>Select Chart Type</h4>
+                              <p>Choose a visualization type from the configuration panel</p>
+                              <div class="empty-tip">
+                                <i class="pi pi-lightbulb"></i>
+                                <span>Tip: Start with a simple bar or line chart for best results</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="empty-state" *ngIf="queryResults.length && selectedChartType && !showChart && !isGeneratingChart">
+                            <div class="empty-content">
+                              <i class="pi pi-sliders-h empty-icon"></i>
+                              <h4>Configure Data Mapping</h4>
+                              <p>Map your data columns to chart properties and generate visualization</p>
+                              <div class="config-preview" *ngIf="selectedChartType">
+                                <span class="preview-label">Selected: </span>
+                                <div class="preview-chip">
+                                  <i [class]="selectedChartType.icon"></i>
+                                  {{ selectedChartType.label }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Loading State -->
+                          <div class="loading-state" *ngIf="isGeneratingChart">
+                            <div class="loading-content">
+                              <div class="loading-spinner">
+                                <i class="pi pi-spin pi-spinner"></i>
+                              </div>
+                              <h4>Generating Visualization</h4>
+                              <p>Processing your data and creating the chart...</p>
+                              <div class="loading-progress">
+                                <div class="progress-bar"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -841,6 +972,452 @@
     </div>
   </div>
 </div>
+
+<!-- Chart Popup Dialog -->
+<p-dialog 
+  header="Chart Visualization" 
+  [(visible)]="showChartPopup"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="true"
+  [maximizable]="false"
+  [style]="{width: '90vw', height: '80vh', 'min-width': '800px', 'min-height': '600px'}"
+  styleClass="chart-popup-dialog"
+  (onHide)="closeChartPopup()">
+  
+  <div class="chart-popup-content">
+    <!-- Left Panel - Chart Options Only -->
+    <div class="popup-chart-config-panel">
+      <div class="config-content">
+        <!-- Chart Appearance Options -->
+        <div class="config-section" *ngIf="selectedChartType">
+          <label class="config-label">Chart Options</label>
+          <div class="chart-options">
+            
+            <!-- Axis Options - Only for charts with axes -->
+            <div class="option-group" *ngIf="chartHasAxes()">
+              <h5 class="option-group-title">Axes</h5>
+              <div class="option-item">
+                <p-checkbox
+                  [(ngModel)]="showXAxis"
+                  [binary]="true"
+                  inputId="popup-show-x-axis"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-show-x-axis">Show X-Axis</label>
+              </div>
+              <div class="option-item">
+                <p-checkbox
+                  [(ngModel)]="showYAxis"
+                  [binary]="true"
+                  inputId="popup-show-y-axis"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-show-y-axis">Show Y-Axis</label>
+              </div>
+              <div class="option-item">
+                <p-checkbox
+                  [(ngModel)]="showXAxisLabel"
+                  [binary]="true"
+                  inputId="popup-show-x-axis-label"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-show-x-axis-label">Show X-Axis Label</label>
+              </div>
+              <div class="option-item">
+                <p-checkbox
+                  [(ngModel)]="showYAxisLabel"
+                  [binary]="true"
+                  inputId="popup-show-y-axis-label"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-show-y-axis-label">Show Y-Axis Label</label>
+              </div>
+            </div>
+
+            <!-- Axis Labels - Only for charts with axes -->
+            <div class="option-group" *ngIf="chartHasAxes()">
+              <h5 class="option-group-title">Axis Labels</h5>
+              <div class="input-item">
+                <label class="input-label">X-Axis Label</label>
+                <input 
+                  pInputText 
+                  [(ngModel)]="customXAxisLabel" 
+                  placeholder="Enter X-axis label"
+                  (ngModelChange)="onXAxisLabelChange($event)"
+                  class="chart-input"
+                />
+              </div>
+              <div class="input-item">
+                <label class="input-label">Y-Axis Label</label>
+                <input 
+                  pInputText 
+                  [(ngModel)]="customYAxisLabel" 
+                  placeholder="Enter Y-axis label"
+                  (ngModelChange)="onYAxisLabelChange($event)"
+                  class="chart-input"
+                />
+              </div>
+            </div>
+
+            <!-- Legend Options - Only for charts that support legends -->
+            <div class="option-group" *ngIf="chartSupportsLegend()">
+              <h5 class="option-group-title">Legend</h5>
+              <div class="option-item">
+                <p-checkbox
+                  [(ngModel)]="showLegend"
+                  [binary]="true"
+                  inputId="popup-show-legend"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-show-legend">Show Legend</label>
+              </div>
+              <div class="input-item" *ngIf="showLegend">
+                <label class="input-label">Legend Position</label>
+                <p-dropdown
+                  [(ngModel)]="legendPosition"
+                  [options]="[
+                    {label: 'Below', value: 'below'},
+                    {label: 'Right', value: 'right'}
+                  ]"
+                  optionLabel="label"
+                  optionValue="value"
+                  (onChange)="onAppearanceChange()"
+                  styleClass="chart-dropdown"
+                ></p-dropdown>
+              </div>
+              <div class="option-item" *ngIf="showLegend">
+                <p-checkbox
+                  [(ngModel)]="showLegendTitle"
+                  [binary]="true"
+                  inputId="popup-show-legend-title"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-show-legend-title">Show Legend Title</label>
+                <small class="legend-note">*Legend shows series names from data</small>
+              </div>
+            </div>
+
+            <!-- Display Options -->
+            <div class="option-group">
+              <h5 class="option-group-title">Display</h5>
+              <!-- Grid Lines - Only for charts with axes -->
+              <div class="option-item" *ngIf="chartHasGridLines()">
+                <p-checkbox
+                  [(ngModel)]="showGridLines"
+                  [binary]="true"
+                  inputId="popup-show-grid"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-show-grid">Show Grid Lines</label>
+              </div>
+              <!-- Gradient - Only for charts that support it -->
+              <div class="option-item" *ngIf="chartSupportsGradient()">
+                <p-checkbox
+                  [(ngModel)]="gradient"
+                  [binary]="true"
+                  inputId="popup-gradient"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-gradient">Gradient Fill</label>
+              </div>
+              <!-- Data Labels - Only for charts that support it -->
+              <div class="option-item" *ngIf="chartSupportsDataLabels()">
+                <p-checkbox
+                  [(ngModel)]="showDataLabel"
+                  [binary]="true"
+                  inputId="popup-show-data-label"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-show-data-label">Show Data Labels</label>
+              </div>
+              <!-- Round Domains - Only for charts with axes -->
+              <div class="option-item" *ngIf="chartHasAxes()">
+                <p-checkbox
+                  [(ngModel)]="roundDomains"
+                  [binary]="true"
+                  inputId="popup-round-domains"
+                  (onChange)="updateChartData()"
+                ></p-checkbox>
+                <label for="popup-round-domains">Round Domains</label>
+              </div>
+              <!-- Animations - Available for all charts -->
+              <div class="option-item">
+                <p-checkbox
+                  [(ngModel)]="animations"
+                  [binary]="true"
+                  inputId="popup-animations"
+                  (onChange)="onAppearanceChange()"
+                ></p-checkbox>
+                <label for="popup-animations">Animations</label>
+              </div>
+            </div>
+
+            <!-- Chart Theme -->
+            <div class="option-group">
+              <h5 class="option-group-title">Theme</h5>
+              <div class="input-item">
+                <label class="input-label">Color Theme</label>
+                <p-dropdown
+                  [(ngModel)]="selectedChartTheme"
+                  [options]="chartThemes"
+                  optionLabel="label"
+                  optionValue="name"
+                  (onChange)="onChartThemeChange($event.value)"
+                  styleClass="chart-dropdown"
+                >
+                  <ng-template let-theme pTemplate="item">
+                    <div class="theme-option">
+                      <div class="theme-colors">
+                        <span 
+                          *ngFor="let color of theme.domain.slice(0, 5)" 
+                          class="color-preview"
+                          [style.background-color]="color">
+                        </span>
+                      </div>
+                      <span class="theme-name">{{ theme.label }}</span>
+                    </div>
+                  </ng-template>
+                  <ng-template let-theme pTemplate="selectedItem">
+                    <div class="theme-option selected">
+                      <div class="theme-colors">
+                        <span 
+                          *ngFor="let color of theme.domain.slice(0, 5)" 
+                          class="color-preview"
+                          [style.background-color]="color">
+                        </span>
+                      </div>
+                      <span class="theme-name">{{ theme.label }}</span>
+                    </div>
+                  </ng-template>
+                </p-dropdown>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Chart Display (larger) -->
+    <div class="popup-chart-display-panel">
+      <div class="popup-chart-container">
+        <div class="popup-chart-wrapper" *ngIf="showChart && ngxChartData.length > 0">
+          <div class="popup-chart-visualization">
+            <!-- All chart types (same as Analytics) -->
+            <!-- Bar Charts -->
+            <ngx-charts-bar-vertical
+              *ngIf="selectedChartType?.value === 'bar-vertical'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="showLegend"
+              [showXAxisLabel]="showXAxisLabel"
+              [showYAxisLabel]="showYAxisLabel"
+              [xAxisLabel]="xAxisLabel"
+              [yAxisLabel]="yAxisLabel"
+              [animations]="animations"
+              [showGridLines]="showGridLines"
+              [roundDomains]="roundDomains"
+              [showDataLabel]="showDataLabel"
+              [gradient]="gradient">
+            </ngx-charts-bar-vertical>
+
+            <ngx-charts-bar-horizontal
+              *ngIf="selectedChartType?.value === 'bar-horizontal'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="showLegend"
+              [showXAxisLabel]="showXAxisLabel"
+              [showYAxisLabel]="showYAxisLabel"
+              [xAxisLabel]="yAxisLabel"
+              [yAxisLabel]="xAxisLabel"
+              [animations]="animations"
+              [showGridLines]="showGridLines"
+              [roundDomains]="roundDomains"
+              [showDataLabel]="showDataLabel"
+              [gradient]="gradient">
+            </ngx-charts-bar-horizontal>
+
+            <ngx-charts-bar-vertical-2d
+              *ngIf="selectedChartType?.value === 'bar-vertical-grouped'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="showLegend"
+              [showXAxisLabel]="showXAxisLabel"
+              [showYAxisLabel]="showYAxisLabel"
+              [xAxisLabel]="xAxisLabel"
+              [yAxisLabel]="yAxisLabel"
+              [animations]="animations"
+              [showGridLines]="showGridLines"
+              [roundDomains]="roundDomains"
+              [showDataLabel]="showDataLabel"
+              [gradient]="gradient">
+            </ngx-charts-bar-vertical-2d>
+
+            <!-- Line & Area Charts -->
+            <ngx-charts-line-chart
+              *ngIf="selectedChartType?.value === 'line-chart'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="showLegend"
+              [showXAxisLabel]="showXAxisLabel"
+              [showYAxisLabel]="showYAxisLabel"
+              [xAxisLabel]="xAxisLabel"
+              [yAxisLabel]="yAxisLabel"
+              [animations]="animations"
+              [showGridLines]="showGridLines"
+              [roundDomains]="roundDomains"
+              [gradient]="gradient">
+            </ngx-charts-line-chart>
+
+            <ngx-charts-area-chart
+              *ngIf="selectedChartType?.value === 'area-chart'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="showLegend"
+              [showXAxisLabel]="showXAxisLabel"
+              [showYAxisLabel]="showYAxisLabel"
+              [xAxisLabel]="xAxisLabel"
+              [yAxisLabel]="yAxisLabel"
+              [animations]="animations"
+              [showGridLines]="showGridLines"
+              [roundDomains]="roundDomains"
+              [gradient]="gradient">
+            </ngx-charts-area-chart>
+
+            <!-- Pie Charts -->
+            <ngx-charts-pie-chart
+              *ngIf="selectedChartType?.value === 'pie-chart'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [legend]="showLegend"
+              [animations]="animations"
+              [labels]="true"
+              [doughnut]="false">
+            </ngx-charts-pie-chart>
+
+            <ngx-charts-advanced-pie-chart
+              *ngIf="selectedChartType?.value === 'pie-chart-advanced'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [animations]="animations">
+            </ngx-charts-advanced-pie-chart>
+
+            <ngx-charts-pie-grid
+              *ngIf="selectedChartType?.value === 'pie-chart-grid'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [animations]="animations">
+            </ngx-charts-pie-grid>
+
+            <!-- Other Charts -->
+            <ngx-charts-bubble-chart
+              *ngIf="selectedChartType?.value === 'bubble-chart'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="showLegend"
+              [showXAxisLabel]="showXAxisLabel"
+              [showYAxisLabel]="showYAxisLabel"
+              [xAxisLabel]="xAxisLabel"
+              [yAxisLabel]="yAxisLabel"
+              [animations]="animations"
+              [showGridLines]="showGridLines"
+              [roundDomains]="roundDomains">
+            </ngx-charts-bubble-chart>
+
+            <ngx-charts-heat-map
+              *ngIf="selectedChartType?.value === 'heat-map'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="showLegend"
+              [showXAxisLabel]="showXAxisLabel"
+              [showYAxisLabel]="showYAxisLabel"
+              [xAxisLabel]="xAxisLabel"
+              [yAxisLabel]="yAxisLabel"
+              [animations]="animations">
+            </ngx-charts-heat-map>
+
+            <ngx-charts-tree-map
+              *ngIf="selectedChartType?.value === 'tree-map'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [animations]="animations">
+            </ngx-charts-tree-map>
+
+            <ngx-charts-number-card
+              *ngIf="selectedChartType?.value === 'number-card'"
+              [results]="ngxChartData"
+              [view]="ngxChartView"
+              [scheme]="ngxChartScheme"
+              [animations]="animations">
+            </ngx-charts-number-card>
+
+            <ngx-charts-gauge
+              *ngIf="selectedChartType?.value === 'gauge'"
+              [results]="ngxChartData"
+              [view]="[500, 500]"
+              [scheme]="ngxChartScheme"
+              [animations]="animations"
+              [legend]="false"
+              [min]="0"
+              [max]="100"
+              [angleSpan]="240"
+              [startAngle]="-120"
+              [units]="'%'"
+              [showAxis]="true">
+            </ngx-charts-gauge>
+
+            <ngx-charts-linear-gauge
+              *ngIf="selectedChartType?.value === 'linear-gauge'"
+              [results]="ngxChartData"
+              [view]="[800, 150]"
+              [scheme]="ngxChartScheme"
+              [animations]="animations"
+              [min]="0"
+              [max]="100"
+              [units]="'units'">
+            </ngx-charts-linear-gauge>
+          </div>
+        </div>
+
+        <!-- Empty state for popup -->
+        <div class="popup-empty-state" *ngIf="!showChart || !ngxChartData.length">
+          <div class="empty-content">
+            <i class="pi pi-chart-line empty-icon"></i>
+            <h4>Configure Chart</h4>
+            <p>Select chart type and configure data mapping to generate visualization</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
 
 <!-- Tab Context Menu -->
 <div

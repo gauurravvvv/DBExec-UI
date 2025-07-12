@@ -1795,157 +1795,284 @@
     flex-direction: column;
     min-height: 0; // Important for flexbox height calculations
     height: 100%; // Ensure full height usage
-    
+
     .analytics-view {
       display: flex;
       flex-direction: column;
       height: 100%;
-      padding: 1rem;
-      background: var(--surface-ground);
-      overflow: auto; // Allow scrolling if content exceeds height
+      min-height: 0;
+      flex: 1;
+      background: var(--background-color);
+      overflow: hidden;
+      position: relative;
 
-      // Simplified Chart Configuration
-      .chart-configuration-simple {
-        max-width: 1000px;
-        margin: 0 auto;
-        
-        // Chart Type Selection Row
-        .chart-type-row {
-          margin-bottom: 2rem;
-          
-          .chart-type-field {
-            max-width: 400px;
-            
-            .field-label {
-              display: block;
-              font-size: 0.875rem;
-              font-weight: 600;
-              color: var(--text-color);
-              margin-bottom: 0.5rem;
-              
-              .required-marker {
-                color: var(--red-500);
-              }
+      // Two Column Layout
+      .analytics-layout {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        height: 100%;
+        gap: 0;
+
+        @media (max-width: 1200px) {
+          grid-template-columns: 350px 1fr;
+        }
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto 1fr;
+        }
+      }
+
+      // Left Panel - Chart Configuration
+      .chart-config-panel {
+        background: var(--card-background);
+        border-right: 2px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        max-height: 100%;
+        overflow: hidden;
+        position: relative;
+
+        // Enhanced vertical divider
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: -1px;
+          width: 1px;
+          height: 100%;
+          background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            var(--border-color) 10%,
+            var(--secondary-color) 50%,
+            var(--border-color) 90%,
+            transparent 100%
+          );
+          z-index: 1;
+        }
+
+        .config-header {
+          flex: 0 0 auto;
+          padding: 1rem;
+          border-bottom: 1px solid var(--border-color);
+          background: var(--card-background);
+          color: var(--text-color);
+
+          .header-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+
+            .config-icon {
+              font-size: 1.125rem;
+              color: var(--primary-color);
             }
-            
-            ::ng-deep {
-              .p-dropdown {
-                height: 48px;
-                border-radius: 8px;
-                border: 1px solid var(--surface-border);
-                
-                &:hover {
-                  border-color: var(--primary-color);
-                }
-                
-                &.p-focus {
-                  border-color: var(--primary-color);
-                  box-shadow: 0 0 0 0.2rem var(--primary-color-50);
-                }
-                
-                .p-dropdown-label {
-                  padding: 0.75rem 1rem;
-                  font-size: 0.875rem;
-                }
+
+            .header-text {
+              h3 {
+                margin: 0 0 0.125rem 0;
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: var(--text-color);
               }
-              
-              .p-dropdown-panel {
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                
-                .p-dropdown-items {
-                  .p-dropdown-item {
-                    padding: 0.75rem 1rem;
-                    border-radius: 4px;
-                    margin: 0.25rem;
-                    
-                    &:hover {
-                      background: var(--surface-hover);
-                    }
-                    
-                    &.p-highlight {
-                      background: var(--primary-color-50);
-                      color: var(--primary-color);
-                    }
-                  }
-                }
+
+              p {
+                margin: 0;
+                font-size: 0.75rem;
+                color: var(--secondary-color);
               }
             }
           }
         }
-        
-        // Data Configuration Row
-        .data-config-row {
-          display: flex;
-          gap: 1.5rem;
-          align-items: flex-end;
-          
-          .config-fields {
-            flex: 1;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            
-            .config-field {
-              flex: 1;
-              min-width: 200px;
-              
-              .field-container {
-                .field-label {
-                  display: block;
-                  font-size: 0.875rem;
-                  font-weight: 500;
+
+        .config-content {
+          flex: 1;
+          padding: 1rem;
+          padding-bottom: 2rem;
+          overflow-y: auto;
+          overflow-x: hidden;
+          min-height: 0;
+          max-height: 100%;
+
+          // Custom scrollbar for better aesthetics
+          &::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: var(--hover-background);
+            border-radius: 3px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 3px;
+            opacity: 0.7;
+
+            &:hover {
+              background: var(--primary-color);
+              opacity: 1;
+            }
+          }
+
+          // Analytics-specific dropdown and multiselect styling to match app UI
+          ::ng-deep {
+            .custom-dropdown,
+            .custom-multiselect {
+              .p-dropdown,
+              .p-multiselect {
+                width: 100%;
+                border-radius: 4px;
+                border: 1px solid var(--border-color);
+                background: var(--input-background);
+                transition: all 0.2s ease;
+                min-height: 2.25rem;
+                font-size: 0.875rem;
+
+                &:hover {
+                  border-color: var(--primary-color);
+                }
+
+                &.p-focus {
+                  border-color: var(--primary-color);
+                  box-shadow: 0 0 0 1px var(--primary-color);
+                }
+
+                .p-dropdown-label,
+                .p-multiselect-label {
                   color: var(--text-color);
-                  margin-bottom: 0.5rem;
-                  
-                  .required-marker {
-                    color: var(--red-500);
+                  padding: 0.5rem 0.75rem;
+                  font-size: 0.875rem;
+                  line-height: 1.5;
+
+                  &.p-placeholder {
+                    color: var(--secondary-color);
+                    opacity: 0.7;
                   }
                 }
-                
-                ::ng-deep {
-                  .p-dropdown,
-                  .p-multiselect {
-                    height: 44px;
-                    border-radius: 6px;
-                    border: 1px solid var(--surface-border);
-                    
-                    &:hover {
-                      border-color: var(--primary-color);
-                    }
-                    
-                    &.p-focus {
-                      border-color: var(--primary-color);
-                      box-shadow: 0 0 0 0.2rem var(--primary-color-50);
-                    }
-                    
-                    .p-dropdown-label,
-                    .p-multiselect-label {
-                      padding: 0.625rem 0.75rem;
-                      font-size: 0.875rem;
-                    }
+
+                .p-dropdown-trigger,
+                .p-multiselect-trigger {
+                  color: var(--secondary-color);
+                  width: 2.25rem;
+
+                  &:hover {
+                    color: var(--primary-color);
                   }
-                  
-                  .p-dropdown-panel,
-                  .p-multiselect-panel {
-                    border-radius: 6px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                    
-                    .p-dropdown-items,
-                    .p-multiselect-items {
-                      .p-dropdown-item,
-                      .p-multiselect-item {
-                        padding: 0.625rem 0.75rem;
-                        border-radius: 4px;
-                        margin: 0.125rem;
-                        
-                        &:hover {
-                          background: var(--surface-hover);
-                        }
-                        
-                        &.p-highlight {
-                          background: var(--primary-color-50);
+                }
+              }
+            }
+
+            // Analytics dropdown panel styling to match app panels
+            .p-dropdown-panel,
+            .p-multiselect-panel {
+              border-radius: 4px;
+              border: 1px solid var(--border-color);
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              background: var(--card-background);
+              margin-top: 1px;
+              max-height: 180px;
+
+              .p-dropdown-header {
+                background: var(--card-background);
+                border-bottom: 1px solid var(--border-color);
+                padding: 0.375rem;
+
+                .p-dropdown-filter {
+                  background: var(--input-background);
+                  border: 1px solid var(--border-color);
+                  border-radius: 3px;
+                  color: var(--text-color);
+                  padding: 0.25rem 0.5rem;
+                  font-size: 0.8rem;
+
+                  &::placeholder {
+                    color: var(--secondary-color);
+                    opacity: 0.6;
+                  }
+                }
+              }
+
+              .p-dropdown-items,
+              .p-multiselect-items {
+                .p-dropdown-item,
+                .p-multiselect-item {
+                  padding: 0.5rem 0.75rem;
+                  color: var(--text-color);
+                  transition: all 0.15s ease;
+                  border: none;
+                  font-size: 0.875rem;
+
+                  &:hover {
+                    background: var(--hover-background);
+                    color: var(--text-color);
+                  }
+
+                  &.p-highlight {
+                    background: var(--primary-color);
+                    color: white;
+                  }
+
+                  .column-option {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+
+                    .column-details {
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      width: 100%;
+
+                      .column-name {
+                        font-weight: 500;
+                        color: inherit;
+                        flex: 1;
+                      }
+
+                      .column-type {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.25rem;
+                        padding: 0.125rem 0.25rem;
+                        border-radius: 3px;
+                        font-size: 0.6rem;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.3px;
+                        background: var(--hover-background);
+                        color: var(--secondary-color);
+                        border: 1px solid var(--border-color);
+
+                        &.type-numeric {
+                          background: rgba(33, 150, 243, 0.1);
                           color: var(--primary-color);
+                          border-color: rgba(33, 150, 243, 0.2);
+                        }
+
+                        &.type-categorical {
+                          background: rgba(76, 175, 80, 0.1);
+                          color: var(--success-color);
+                          border-color: rgba(76, 175, 80, 0.2);
+                        }
+
+                        &.type-date {
+                          background: rgba(255, 152, 0, 0.1);
+                          color: var(--warning-color);
+                          border-color: rgba(255, 152, 0, 0.2);
+                        }
+
+                        &.type-any {
+                          background: var(--hover-background);
+                          color: var(--secondary-color);
+                          border-color: var(--border-color);
+                        }
+
+                        .pi-tag {
+                          font-size: 0.5rem;
                         }
                       }
                     }
@@ -1954,595 +2081,592 @@
               }
             }
           }
-          
-          .generate-button {
-            flex: 0 0 auto;
-            
-            .generate-chart-btn {
-              height: 44px;
-              padding: 0 1.5rem;
-              border-radius: 6px;
-              font-weight: 500;
-              font-size: 0.875rem;
-              min-width: 140px;
-              
-              &:hover:not(:disabled) {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-              }
-            }
-          }
-        }
-        
-        // Responsive Design
-        @media (max-width: 768px) {
-          .data-config-row {
-            flex-direction: column;
+
+          // Data fields styling
+          .data-fields {
+            display: grid;
             gap: 1rem;
-            
-            .config-fields {
-              .config-field {
-                min-width: 100%;
-              }
-            }
-            
-            .generate-button {
-              align-self: stretch;
-              
-              .generate-chart-btn {
-                width: 100%;
-              }
-            }
-          }
-        }
-      }
-      
-      // Chart Option Styling
-      .chart-option {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.25rem 0;
-        
-        .chart-icon {
-          font-size: 1.25rem;
-          color: var(--primary-color);
-          width: 24px;
-          text-align: center;
-        }
-        
-        .chart-info {
-          flex: 1;
-          
-          .chart-name {
-            display: block;
-            font-weight: 500;
-            color: var(--text-color);
-            margin-bottom: 0.125rem;
-            font-size: 0.875rem;
-          }
-          
-          .chart-desc {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-color-secondary);
-            line-height: 1.2;
-          }
-        }
-      }
-      
-      .chart-selected {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        
-        .chart-icon {
-          color: var(--primary-color);
-          font-size: 1.125rem;
-        }
-        
-        span {
-          font-weight: 500;
-          color: var(--text-color);
-        }
-      }
-      
-      // Column Option Styling
-      .column-option {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
-        
-        .column-name {
-          flex: 1;
-          font-weight: 500;
-          color: var(--text-color);
-        }
-        
-        .column-type {
-          font-size: 0.75rem;
-          padding: 0.125rem 0.375rem;
-          border-radius: 12px;
-          font-weight: 500;
-          
-          &.type-numeric {
-            background: var(--blue-50);
-            color: var(--blue-600);
-          }
-          
-          &.type-categorical {
-            background: var(--green-50);
-            color: var(--green-600);
-          }
-          
-          &.type-date {
-            background: var(--purple-50);
-            color: var(--purple-600);
-          }
-        }
-      }
-      
-      // Chart Configuration Section
-      .chart-configuration {
-        .configuration-header {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-          
-          h4 {
-            color: var(--text-color);
-            margin: 0;
-            font-size: 1.125rem;
-          }
-        }
-        
-        .configuration-form {
-          margin-top: 1rem;
+            margin-top: 1rem;
 
-          .chart-controls-row {
-            display: flex;
-            align-items: flex-end;
-            gap: 1rem;
-            flex-wrap: wrap;
-
-            .input-field-inline {
-              min-width: 200px;
-              flex: 1;
-            }
-
-            .dropdown-field-inline,
-            .multiselect-field-inline {
+            .field-group {
               display: flex;
               flex-direction: column;
               gap: 0.5rem;
 
               .field-label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: 600;
                 font-size: 0.875rem;
-                font-weight: 500;
                 color: var(--text-color);
                 margin-bottom: 0.25rem;
 
-                .required-marker {
+                .field-icon {
+                  font-size: 0.875rem;
+                  color: var(--primary-color);
+                }
+
+                .required-star {
+                  color: var(--error-color);
+                  font-weight: bold;
+                }
+              }
+
+              .field-wrapper {
+                position: relative;
+              }
+            }
+          }
+
+          // Config actions styling (inside scrollable content)
+          .config-actions {
+            display: flex !important;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-background);
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+            .generate-btn,
+            .reset-btn {
+              flex: 1;
+              height: 2.5rem;
+              border-radius: 6px;
+              font-weight: 600;
+              font-size: 0.875rem;
+              transition: all 0.2s ease;
+              position: relative;
+              z-index: 10;
+
+              &:hover:not(:disabled) {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              }
+            }
+
+            .generate-btn {
+              background: var(--primary-color);
+              border-color: var(--primary-color);
+
+              &:hover:not(:disabled) {
+                background: var(--primary-color);
+                opacity: 0.9;
+              }
+
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+            }
+
+            .reset-btn {
+              background: transparent;
+              color: var(--secondary-color);
+              border: 1px solid var(--border-color);
+
+              &:hover:not(:disabled) {
+                background: var(--hover-background);
+                border-color: var(--secondary-color);
+                color: var(--text-color);
+              }
+            }
+          }
+
+          .config-section {
+            margin-bottom: 1.5rem;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .section-header {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              margin-bottom: 0.75rem;
+
+              .section-icon {
+                color: var(--primary-color);
+                font-size: 1rem;
+              }
+
+              .section-title {
+                font-weight: 600;
+                color: var(--text-color);
+                font-size: 0.875rem;
+              }
+
+              .required-indicator {
+                color: var(--error-color);
+                font-weight: bold;
+                margin-left: auto;
+                font-size: 0.75rem;
+              }
+            }
+
+            // Chart Type Grid - Small Square Boxes
+            .chart-type-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+              gap: 0.5rem;
+
+              .chart-type-card {
+                border: 2px solid var(--border-color);
+                border-radius: 6px;
+                padding: 0.5rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                background: var(--background-color);
+                aspect-ratio: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                min-height: 60px;
+
+                &:hover {
+                  border-color: var(--primary-color);
+                  transform: translateY(-2px);
+                  box-shadow: var(--shadow-color) 0 6px 16px;
+                  background: var(--hover-background);
+                }
+
+                &.selected {
+                  border-color: var(--primary-color);
+                  background: var(--hover-background);
+                  box-shadow: var(--shadow-color) 0 4px 12px;
+
+                  .chart-icon {
+                    color: var(--primary-color);
+                    transform: scale(1.1);
+                  }
+
+                  .chart-name {
+                    color: var(--primary-color);
+                    font-weight: 700;
+                  }
+                }
+
+                .chart-icon {
+                  font-size: 1.25rem;
+                  color: var(--secondary-color);
+                  transition: all 0.2s ease;
+                  margin-bottom: 0.25rem;
+                }
+
+                .chart-name {
+                  font-weight: 600;
+                  color: var(--text-color);
+                  font-size: 0.65rem;
+                  line-height: 1.1;
+                  transition: all 0.2s ease;
+                }
+
+                // Hide description in square layout
+                .chart-desc {
+                  display: none;
+                }
+              }
+            }
+
+            // Field Configuration
+            .field-config-grid {
+              display: grid;
+              gap: 1rem;
+
+              .field-config-item {
+                .field-header {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  margin-bottom: 0.5rem;
+
+                  .field-icon {
+                    color: var(--primary-color);
+                    font-size: 1rem;
+                  }
+
+                  .field-label {
+                    font-weight: 500;
+                    color: var(--text-color);
+                    font-size: 0.875rem;
+                  }
+
+                  .field-required {
+                    color: var(--red-500);
+                    font-size: 0.75rem;
+                  }
+                }
+
+                ::ng-deep {
+                  .p-dropdown,
+                  .p-multiselect {
+                    width: 100%;
+                    border-radius: 6px;
+                    border: 1px solid var(--border-color);
+                    background: var(--input-background);
+
+                    &:hover {
+                      border-color: var(--primary-color);
+                    }
+
+                    &.p-focus {
+                      border-color: var(--primary-color);
+                      box-shadow: 0 0 0 0.2rem var(--shadow-color);
+                    }
+
+                    .p-dropdown-label,
+                    .p-multiselect-label {
+                      color: var(--text-color);
+                    }
+                  }
+                }
+              }
+            }
+
+            // Action Buttons
+            .section-actions {
+              display: flex;
+              gap: 0.75rem;
+              margin-top: 1.5rem;
+
+              .action-btn {
+                flex: 1;
+                height: 2.5rem;
+                border-radius: 6px;
+                font-weight: 500;
+                font-size: 0.875rem;
+
+                &.generate-btn {
+                  background: var(--primary-color);
+                  border-color: var(--primary-color);
+
+                  &:hover:not(:disabled) {
+                    background: var(--primary-600);
+                    border-color: var(--primary-600);
+                    transform: translateY(-1px);
+                  }
+                }
+
+                &.reset-btn {
+                  background: transparent;
+                  color: var(--secondary-color);
+                  border: 1px solid var(--border-color);
+
+                  &:hover {
+                    background: var(--hover-background);
+                    border-color: var(--secondary-color);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Right Panel - Chart Display
+      .chart-display-panel {
+        background: var(--background-color);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+
+        .display-header {
+          padding: 1rem;
+          border-bottom: 1px solid var(--border-color);
+          background: var(--card-background);
+          color: var(--text-color);
+
+          .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .header-left {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+
+              .display-icon {
+                font-size: 1.125rem;
+                color: var(--primary-color);
+              }
+
+              .header-text {
+                h3 {
+                  margin: 0 0 0.125rem 0;
+                  font-size: 0.95rem;
+                  font-weight: 600;
+                  color: var(--text-color);
+                }
+
+                p {
+                  margin: 0;
+                  font-size: 0.75rem;
+                  color: var(--secondary-color);
+                }
+              }
+            }
+
+            .header-actions {
+              display: flex;
+              gap: 0.5rem;
+
+              .action-btn {
+                width: 2.5rem;
+                height: 2.5rem;
+                border-radius: 6px;
+                border: 1px solid var(--border-color);
+                background: transparent;
+                color: var(--secondary-color);
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                  background: var(--hover-background);
+                  color: var(--text-color);
+                  border-color: var(--primary-color);
+                }
+              }
+            }
+          }
+        }
+
+        .display-content {
+          flex: 1;
+          padding: 1rem;
+          overflow: auto;
+
+          .chart-container {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-background);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+          }
+
+          // Chart wrapper with expand button
+          .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .expand-chart-btn {
+              position: absolute;
+              top: 1rem;
+              right: 1rem;
+              z-index: 10;
+              width: 2.5rem;
+              height: 2.5rem;
+              background: var(--card-background) !important;
+              border: 1px solid var(--border-color) !important;
+              color: var(--secondary-color) !important;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              transition: all 0.2s ease;
+
+              &:hover {
+                background: var(--primary-color) !important;
+                color: white !important;
+                border-color: var(--primary-color) !important;
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              }
+
+              .p-button-icon {
+                font-size: 1rem;
+              }
+            }
+
+            .chart-visualization {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 1rem;
+            }
+          }
+
+          // Popup Open Message
+          .popup-open-message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 400px;
+
+            .popup-message-content {
+              text-align: center;
+
+              .popup-message-icon {
+                font-size: 4rem;
+                color: var(--primary-color);
+                opacity: 0.6;
+                margin-bottom: 1.5rem;
+              }
+
+              h4 {
+                color: var(--text-color);
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+              }
+
+              p {
+                color: var(--secondary-color);
+                font-size: 1rem;
+                margin: 0;
+              }
+            }
+          }
+
+          // Empty States
+          .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 400px;
+
+            .empty-content {
+              text-align: center;
+              max-width: 400px;
+
+              .empty-icon {
+                font-size: 4rem;
+                color: var(--secondary-color);
+                opacity: 0.5;
+                margin-bottom: 1rem;
+              }
+
+              h4 {
+                margin: 0 0 0.5rem 0;
+                font-size: 1.25rem;
+                color: var(--text-color);
+                font-weight: 600;
+              }
+
+              p {
+                margin: 0 0 1.5rem 0;
+                color: var(--secondary-color);
+                line-height: 1.5;
+              }
+
+              .empty-actions {
+                .action-btn {
+                  height: 2.5rem;
+                  padding: 0 1.5rem;
+                  border-radius: 6px;
+                  font-weight: 500;
+                }
+              }
+
+              .empty-tip {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+                font-size: 0.875rem;
+                color: var(--secondary-color);
+
+                .pi-lightbulb {
+                  color: var(--warning-color);
+                  font-size: 1rem;
+                }
+              }
+
+              .config-preview {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+
+                .preview-label {
+                  font-size: 0.875rem;
+                  color: var(--secondary-color);
+                }
+
+                .preview-chip {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  padding: 0.375rem 0.75rem;
+                  background: var(--hover-background);
+                  color: var(--primary-color);
+                  border: 1px solid var(--primary-color);
+                  border-radius: 12px;
+                  font-size: 0.875rem;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+
+          // Loading State
+          .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 400px;
+
+            .loading-content {
+              text-align: center;
+
+              .loading-spinner {
+                margin-bottom: 1rem;
+
+                .pi-spinner {
+                  font-size: 2rem;
                   color: var(--primary-color);
                 }
               }
 
-              ::ng-deep {
-                .p-dropdown,
-                .p-multiselect {
-                  min-height: 40px;
-                  
-                  .p-inputtext {
-                    font-size: 0.875rem;
-                  }
-                }
-              }
-            }
-
-            .action-buttons-inline {
-              display: flex;
-              align-items: center;
-              margin-top: 1.5rem;
-
-              button {
-                min-width: 140px;
-                height: 40px;
-                font-size: 0.875rem;
-                border-radius: 6px;
-                transition: all 0.2s ease;
-
-                &:hover:not([disabled]) {
-                  transform: translateY(-1px);
-                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-                }
-              }
-            }
-          }
-
-          // Responsive adjustments
-          @media (max-width: 768px) {
-            .chart-controls-row {
-              flex-direction: column;
-              align-items: stretch;
-
-              .input-field-inline {
-                min-width: unset;
-                flex: none;
+              h4 {
+                margin: 0 0 0.5rem 0;
+                font-size: 1.125rem;
+                color: var(--text-color);
+                font-weight: 600;
               }
 
-              .action-buttons-inline {
-                margin-top: 1rem;
-                justify-content: center;
-              }
-            }
-          }
-        }
-      }
-      
-      // Chart Display Container
-      .chart-container {
-        flex: 1;
-        min-height: 400px;
-        background: var(--surface-card);
-        border: 1px solid var(--surface-border);
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1rem;
-        will-change: transform;
-        transform: translateZ(0);
-        
-        // Override ngx-charts styling for theme consistency
-        ::ng-deep {
-          .ngx-charts {
-            will-change: transform;
-            transform: translateZ(0);
-            
-            .legend {
-              .legend-labels {
-                .legend-label {
-                  color: var(--text-color) !important;
-                  
-                  .legend-label-text {
-                    color: var(--text-color) !important;
-                  }
-                }
-              }
-            }
-            
-            .axis {
-              .tick {
-                text {
-                  fill: var(--text-color) !important;
-                }
-              }
-              
-              .axis-label {
-                text {
-                  fill: var(--text-color) !important;
-                }
-              }
-            }
-            
-            .grid-panel {
-              .grid-line {
-                stroke: var(--surface-border) !important;
-              }
-            }
-          }
-          
-          // Performance optimizations
-          .chart,
-          .chart-container {
-            will-change: transform;
-            transform: translateZ(0);
-          }
-        }
-      }
-
-      .graph-options {
-        background: var(--surface-card);
-        border-radius: 8px;
-        box-shadow: var(--card-shadow);
-        padding: 1rem;
-        margin-bottom: 1rem;
-
-        .controls-wrapper {
-          display: flex;
-          gap: 1rem;
-          align-items: flex-start;
-          width: 100%;
-
-          @media screen and (min-width: 1200px) {
-            .dropdown-field {
-              width: 25%;
-              min-width: 200px;
-            }
-
-            .action-field {
-              width: auto;
-              padding-top: 0.5rem;
-            }
-          }
-
-          @media screen and (max-width: 1199px) {
-            flex-wrap: wrap;
-
-            .dropdown-field {
-              width: calc(33.33% - 0.67rem);
-              min-width: 180px;
-            }
-
-            .action-field {
-              width: 100%;
-              display: flex;
-              justify-content: flex-end;
-              padding-top: 0.5rem;
-            }
-          }
-
-          @media screen and (max-width: 768px) {
-            .dropdown-field {
-              width: 100%;
-            }
-          }
-
-          .dropdown-field {
-            .p-float-label {
-              width: 100%;
-              display: block;
-
-              label {
-                color: var(--text-color-secondary);
-                font-size: 0.875rem;
-                margin-left: 0.5rem;
-                background: var(--surface-card);
-                padding: 0 0.25rem;
+              p {
+                margin: 0 0 1.5rem 0;
+                color: var(--secondary-color);
               }
 
-              ::ng-deep {
-                .p-dropdown {
-                  width: 100%;
-                  background: var(--surface-card);
-                  border: 1px solid var(--surface-border);
-                  border-radius: 6px;
-                  transition: all 0.2s;
+              .loading-progress {
+                width: 200px;
+                height: 4px;
+                background: var(--border-color);
+                border-radius: 2px;
+                overflow: hidden;
+                margin: 0 auto;
 
-                  &:not(.p-disabled):hover {
-                    border-color: var(--primary-color);
-                  }
-
-                  &.p-focus {
-                    outline: 0 none;
-                    outline-offset: 0;
-                    box-shadow: 0 0 0 0.2rem var(--primary-color-alpha-20);
-                    border-color: var(--primary-color);
-                  }
-
-                  .p-dropdown-label {
-                    padding: 0.75rem;
-                    font-size: 0.875rem;
-                    color: var(--text-color);
-                    background: transparent;
-
-                    &.p-placeholder {
-                      color: var(--text-color-secondary);
-                    }
-
-                    &.p-dropdown-label {
-                      padding-right: 2.5rem;
-                    }
-                  }
-
-                  .p-dropdown-clear-icon {
-                    color: var(--text-color-secondary);
-                    right: 2.5rem;
-
-                    &:hover {
-                      color: var(--primary-color);
-                    }
-                  }
-
-                  .p-dropdown-trigger {
-                    width: 2.5rem;
-                    background: transparent;
-                    color: var(--text-color-secondary);
-
-                    &:hover {
-                      color: var(--primary-color);
-                    }
-                  }
-
-                  .selected-item,
-                  .dropdown-item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 0.5rem 0.75rem;
-                    gap: 0.5rem;
-                    
-                    .column-name {
-                      flex: 1;
-                      font-weight: 500;
-                    }
-                    
-                    .column-type {
-                      font-size: 0.75rem;
-                      padding: 0.25rem 0.5rem;
-                      border-radius: 12px;
-                      font-weight: 500;
-                      text-transform: uppercase;
-                      letter-spacing: 0.5px;
-                      
-                      &.type-numeric {
-                        background: color-mix(in srgb, var(--primary-color) 15%, transparent);
-                        color: var(--primary-color);
-                        border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
-                      }
-                      
-                      &.type-categorical {
-                        background: color-mix(in srgb, var(--warning-color) 15%, transparent);
-                        color: var(--warning-color);
-                        border: 1px solid color-mix(in srgb, var(--warning-color) 30%, transparent);
-                      }
-                      
-                      &.type-date {
-                        background: color-mix(in srgb, var(--success-color) 15%, transparent);
-                        color: var(--success-color);
-                        border: 1px solid color-mix(in srgb, var(--success-color) 30%, transparent);
-                      }
-                    }
-
-                    i {
-                      font-size: 1rem;
-                      color: var(--primary-color);
-                      width: 1.25rem;
-                      text-align: center;
-                    }
-
-                    span:not(.column-type) {
-                      color: var(--text-color);
-                      font-size: 0.875rem;
-                    }
-                  }
-                }
-
-                .p-dropdown-panel {
-                  background: var(--surface-overlay);
-                  border: 0 none;
-                  border-radius: 6px;
-                  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%),
-                    0 4px 5px 0 rgb(0 0 0 / 14%), 0 1px 10px 0 rgb(0 0 0 / 12%);
-
-                  .p-dropdown-header {
-                    padding: 0.75rem;
-                    border-bottom: 1px solid var(--surface-border);
-                    background: var(--surface-overlay);
-
-                    .p-dropdown-filter {
-                      padding: 0.75rem;
-                      background: var(--surface-ground);
-                      border: 1px solid var(--surface-border);
-                      border-radius: 6px;
-                      color: var(--text-color);
-                      margin: 0;
-
-                      &:focus {
-                        outline: 0 none;
-                        outline-offset: 0;
-                        box-shadow: 0 0 0 0.2rem var(--primary-color-alpha-20);
-                        border-color: var(--primary-color);
-                      }
-
-                      &::placeholder {
-                        color: var(--text-color-secondary);
-                      }
-                    }
-
-                    .p-dropdown-filter-icon {
-                      right: 0.75rem;
-                      color: var(--text-color-secondary);
-                    }
-                  }
-
-                  .p-dropdown-items {
-                    padding: 0.5rem 0;
-
-                    .p-dropdown-item {
-                      margin: 0;
-                      padding: 0.75rem 1rem;
-                      border: 0 none;
-                      color: var(--text-color);
-                      background: transparent;
-                      transition: box-shadow 0.2s;
-                      border-radius: 0;
-
-                      &:hover {
-                        color: var(--text-color);
-                        background: var(--surface-hover);
-                      }
-
-                      &.p-highlight {
-                        color: var(--primary-color);
-                        background: var(--primary-color-alpha-10);
-
-                        .dropdown-item {
-                          i,
-                          span {
-                            color: var(--primary-color);
-                          }
-                        }
-                      }
-
-                      &:focus {
-                        outline: 0 none;
-                        outline-offset: 0;
-                        box-shadow: inset 0 0 0 0.15rem
-                          var(--primary-color-alpha-20);
-                      }
-                    }
-
-                    .p-dropdown-empty-message {
-                      padding: 0.75rem 1rem;
-                      color: var(--text-color-secondary);
-                      background: transparent;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        .action-field {
-          ::ng-deep {
-            .p-button {
-              margin: 0;
-              height: 3rem;
-
-              &.p-button-primary {
-                background: var(--primary-color);
-                border-color: var(--primary-color);
-                color: var(--primary-color-text);
-
-                &:enabled:hover {
-                  background: var(--primary-color-darker);
-                  border-color: var(--primary-color-darker);
-                }
-
-                &:enabled:active {
-                  background: var(--primary-color-darker);
-                  border-color: var(--primary-color-darker);
-                }
-
-                &:focus {
-                  box-shadow: 0 0 0 0.2rem var(--primary-color-alpha-20);
-                }
-
-                &:disabled {
-                  opacity: 0.4 !important;
-                  cursor: not-allowed;
-                  color: var(--disabled-color) !important;
-                  background: transparent !important;
-
-                  .p-button-icon {
-                    color: var(--disabled-color) !important;
-                  }
-                }
-
-                .p-button-icon {
-                  font-size: 1rem;
-                  margin-right: 0.5rem;
-                }
-
-                &.p-button-loading {
-                  background: var(--primary-color);
-                  border-color: var(--primary-color);
-
-                  .p-button-label {
-                    opacity: 0.8;
-                  }
+                .progress-bar {
+                  height: 100%;
+                  background: linear-gradient(
+                    90deg,
+                    var(--primary-color),
+                    var(--primary-color)
+                  );
+                  border-radius: 2px;
+                  animation: loading-progress 2s ease-in-out infinite;
                 }
               }
             }
@@ -2550,87 +2674,21 @@
         }
       }
 
-      .chart-container {
-        flex: 1;
-        background: var(--surface-card);
-        border-radius: 8px;
-        padding: 1rem;
-        box-shadow: var(--card-shadow);
-        position: relative;
-        min-height: 300px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .chart-loading {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: rgba(var(--card-background-rgb), 0.9);
-          backdrop-filter: blur(2px);
-          border-radius: 8px;
-          gap: 1rem;
-
-          i {
-            font-size: 2rem;
-            color: var(--primary-color);
-          }
-
-          span {
-            color: var(--text-color);
-            font-size: 0.875rem;
-          }
+      // Loading animation
+      @keyframes loading-progress {
+        0% {
+          transform: translateX(-100%);
         }
-
-        .empty-chart {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.75rem;
-          text-align: center;
-          padding: 2rem;
-
-          i {
-            font-size: 3rem;
-            color: var(--primary-color);
-            opacity: 0.5;
-          }
-
-          p {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-color);
-          }
-
-          small {
-            color: var(--text-color-secondary);
-            font-size: 0.875rem;
-          }
+        50% {
+          transform: translateX(0%);
         }
-
-        ::ng-deep {
-          canvas {
-            max-height: 100%;
-            transition: opacity 0.3s ease;
-          }
-
-          .p-chart {
-            width: 100%;
-            height: 100%;
-          }
+        100% {
+          transform: translateX(100%);
         }
       }
     }
   }
 }
-
 // PrimeNG Splitter customization - VSCode style
 ::ng-deep {
   .p-splitter {
@@ -5194,26 +5252,26 @@
       display: flex;
       flex-direction: column;
       height: 100%; // Ensure full height usage
-      
+
       // Enhanced scrollbar styling
       scrollbar-width: thin;
       scrollbar-color: var(--border-color) transparent;
-      
+
       // Webkit scrollbar styling
       &::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
-      
+
       &::-webkit-scrollbar-track {
         background: color-mix(in srgb, var(--border-color) 20%, transparent);
         border-radius: 4px;
       }
-      
+
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
         border-radius: 4px;
-        
+
         &:hover {
           background: var(--primary-color);
         }
@@ -5305,7 +5363,7 @@
         background: var(--background-color);
         border-bottom: 2px solid var(--border-color);
         overflow: hidden;
-        
+
         .table-header-table {
           width: 100%;
           min-width: max-content;
@@ -5314,7 +5372,7 @@
           background: var(--background-color);
           table-layout: fixed; // Fixed layout for column alignment
           margin: 0;
-          
+
           .table-header-cell {
             padding: 1rem 1rem;
             text-align: left;
@@ -5365,7 +5423,7 @@
           }
         }
       }
-      
+
       // Scrollable table body container
       .table-body-wrapper {
         flex: 1;
@@ -5374,30 +5432,30 @@
         max-height: min(400px, 50vh); // Responsive max height based on viewport
         position: relative;
         padding-bottom: 1rem; // Additional padding to prevent last row cut-off
-        
+
         // Scrollbar styling
         scrollbar-width: thin;
         scrollbar-color: var(--border-color) transparent;
-        
+
         &::-webkit-scrollbar {
           width: 8px;
           height: 8px;
         }
-        
+
         &::-webkit-scrollbar-track {
           background: color-mix(in srgb, var(--border-color) 20%, transparent);
           border-radius: 4px;
         }
-        
+
         &::-webkit-scrollbar-thumb {
           background: var(--border-color);
           border-radius: 4px;
-          
+
           &:hover {
             background: var(--primary-color);
           }
         }
-        
+
         // Add bottom padding to the wrapper instead of table
         &::after {
           content: '';
@@ -5405,7 +5463,7 @@
           height: 3rem; // Increased padding to ensure last row is fully visible
           width: 100%;
         }
-        
+
         .table-body-table {
           width: 100%;
           min-width: max-content;
@@ -5417,11 +5475,11 @@
           display: table;
           margin: 0;
           padding: 0; // Remove padding from table
-          
+
           .table-body {
             margin: 0; // Ensure no margin on tbody
             padding: 0; // Ensure no padding on tbody
-            
+
             .table-row {
               transition: background-color 0.15s ease;
               border-bottom: 1px solid var(--border-color);
@@ -5448,7 +5506,7 @@
               &:hover.odd {
                 background: var(--hover-background);
               }
-              
+
               // Ensure last row doesn't have bottom margin/padding issues
               &:last-child {
                 border-bottom: none;
@@ -5869,6 +5927,327 @@
             padding: 0.5rem;
             font-size: 0.75rem;
             min-width: 80px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Chart Popup Dialog Styling
+::ng-deep .chart-popup-dialog {
+  .p-dialog-header {
+    background: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-weight: 600;
+
+    .p-dialog-title {
+      font-size: 1.25rem;
+      color: var(--primary-color);
+    }
+
+    .p-dialog-header-icons {
+      .p-dialog-header-icon {
+        color: var(--secondary-color);
+
+        &:hover {
+          color: var(--primary-color);
+          background: var(--hover-background);
+        }
+      }
+    }
+  }
+
+  .p-dialog-content {
+    background: var(--background-color);
+    padding: 0;
+    border: none;
+  }
+
+  .chart-popup-content {
+    display: flex;
+    height: 100%;
+    min-height: 500px;
+
+    // Left Panel - Chart Options Only
+    .popup-chart-config-panel {
+      width: 320px;
+      min-width: 320px;
+      background: var(--card-background);
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      .config-content {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: var(--hover-background);
+          border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: var(--secondary-color);
+          border-radius: 3px;
+          opacity: 0.7;
+
+          &:hover {
+            background: var(--primary-color);
+            opacity: 1;
+          }
+        }
+
+        .config-section {
+          margin-bottom: 1rem;
+
+          .config-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+          }
+
+          // Chart options
+          .chart-options {
+            .option-group {
+              margin-bottom: 1.5rem;
+              padding: 1rem;
+              background: var(--background-color);
+              border-radius: 6px;
+              border: 1px solid var(--border-color);
+
+              .option-group-title {
+                margin: 0 0 1rem 0;
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: var(--primary-color);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              }
+
+              .option-item {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 0.75rem;
+
+                &:last-child {
+                  margin-bottom: 0;
+                }
+
+                label {
+                  font-size: 0.875rem;
+                  color: var(--text-color);
+                  cursor: pointer;
+                }
+              }
+
+              .input-item {
+                margin-bottom: 1rem;
+
+                &:last-child {
+                  margin-bottom: 0;
+                }
+
+                .input-label {
+                  display: block;
+                  font-size: 0.875rem;
+                  font-weight: 500;
+                  color: var(--text-color);
+                  margin-bottom: 0.5rem;
+                }
+
+                .chart-input {
+                  width: 100%;
+                  padding: 0.5rem;
+                  border: 1px solid var(--border-color);
+                  border-radius: 4px;
+                  background: var(--input-background);
+                  color: var(--text-color);
+                  font-size: 0.875rem;
+
+                  &:focus {
+                    outline: none;
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+                  }
+                }
+
+                .legend-note {
+                  display: block;
+                  margin-top: 0.25rem;
+                  font-size: 0.75rem;
+                  color: var(--secondary-color);
+                  font-style: italic;
+                }
+
+                ::ng-deep .chart-dropdown {
+                  width: 100%;
+
+                  .p-dropdown {
+                    width: 100%;
+                    border: 1px solid var(--border-color);
+                    background: var(--input-background);
+
+                    &:not(.p-disabled):hover {
+                      border-color: var(--primary-color);
+                    }
+
+                    &:not(.p-disabled).p-focus {
+                      border-color: var(--primary-color);
+                      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+                    }
+                  }
+                }
+
+                // Theme selector styles
+                ::ng-deep .chart-dropdown .p-dropdown-panel {
+                  .theme-option {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.5rem;
+
+                    &.selected {
+                      background: var(--hover-background);
+                    }
+
+                    .theme-colors {
+                      display: flex;
+                      gap: 2px;
+
+                      .color-preview {
+                        width: 12px;
+                        height: 12px;
+                        border-radius: 50%;
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        display: inline-block;
+                      }
+                    }
+
+                    .theme-name {
+                      font-size: 0.875rem;
+                      color: var(--text-color);
+                      font-weight: 500;
+                    }
+                  }
+                }
+              }
+
+              .size-controls {
+                display: flex;
+                gap: 1rem;
+
+                .size-input {
+                  flex: 1;
+
+                  .input-label {
+                    display: block;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: var(--text-color);
+                    margin-bottom: 0.5rem;
+                  }
+
+                  ::ng-deep .chart-number-input {
+                    width: 100%;
+
+                    .p-inputnumber-input {
+                      width: 100%;
+                      border: 1px solid var(--border-color);
+                      background: var(--input-background);
+                      color: var(--text-color);
+
+                      &:focus {
+                        border-color: var(--primary-color);
+                        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Right Panel - Chart Display (larger)
+    .popup-chart-display-panel {
+      flex: 1;
+      background: var(--background-color);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+
+      .popup-chart-container {
+        flex: 1;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .popup-chart-wrapper {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--card-background);
+          border-radius: 12px;
+          border: 1px solid var(--border-color);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          min-height: 500px;
+
+          .popup-chart-visualization {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+          }
+        }
+
+        .popup-empty-state {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 500px;
+
+          .empty-content {
+            text-align: center;
+
+            .empty-icon {
+              font-size: 4rem;
+              color: var(--primary-color);
+              opacity: 0.3;
+              margin-bottom: 1.5rem;
+            }
+
+            h4 {
+              color: var(--text-color);
+              font-size: 1.5rem;
+              margin-bottom: 0.5rem;
+              font-weight: 600;
+            }
+
+            p {
+              color: var(--secondary-color);
+              font-size: 1rem;
+              margin: 0;
+            }
           }
         }
       }

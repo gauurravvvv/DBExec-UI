@@ -203,6 +203,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ngx-charts specific properties
   ngxChartData: any[] = [];
+  selectedChartTheme: string = 'vivid';
   ngxChartScheme: any = {
     domain: [
       '#5AA454',
@@ -217,6 +218,51 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       '#F7DC6F',
     ],
   };
+  
+  // Chart theme options
+  chartThemes = [
+    {
+      name: 'vivid',
+      label: 'Vivid',
+      domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#DDA0DD', '#F7DC6F']
+    },
+    {
+      name: 'natural',
+      label: 'Natural',
+      domain: ['#C7B42C', '#5AA454', '#A10A28', '#FFC658', '#82CA9D', '#8884D8', '#FFBB28', '#FF8042', '#0088FE', '#00C49F']
+    },
+    {
+      name: 'cool',
+      label: 'Cool',
+      domain: ['#a8edea', '#fed6e3', '#d299c2', '#ffa726', '#42a5f5', '#66bb6a', '#ef5350', '#ab47bc', '#26c6da', '#78909c']
+    },
+    {
+      name: 'fire',
+      label: 'Fire',
+      domain: ['#FF6B35', '#F7931E', '#FFD23F', '#EE964B', '#F06292', '#BA68C8', '#9575CD', '#7986CB', '#64B5F6', '#4FC3F7']
+    },
+    {
+      name: 'solar',
+      label: 'Solar',
+      domain: ['#FFA726', '#FFCC02', '#FFAB00', '#FF8F00', '#FF6F00', '#E65100', '#BF360C', '#FF5722', '#FF9800', '#FB8C00']
+    },
+    {
+      name: 'air',
+      label: 'Air',
+      domain: ['#CED4DA', '#ADB5BD', '#6C757D', '#495057', '#343A40', '#E9ECEF', '#F8F9FA', '#DEE2E6', '#868E96', '#212529']
+    },
+    {
+      name: 'aqua',
+      label: 'Aqua',
+      domain: ['#1DE9B6', '#00BCD4', '#03DAC6', '#18FFFF', '#64FFDA', '#A7FFEB', '#4DD0E1', '#26C6DA', '#00ACC1', '#0097A7']
+    },
+    {
+      name: 'flame',
+      label: 'Flame',
+      domain: ['#D32F2F', '#F57C00', '#FBC02D', '#689F38', '#1976D2', '#512DA8', '#C2185B', '#00796B', '#455A64', '#37474F']
+    }
+  ];
+  
   ngxChartView: [number, number] = [700, 400];
   showXAxis = true;
   showYAxis = true;
@@ -233,11 +279,16 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
   // Additional ngx-charts options
   legendTitle = '';
   legendPosition: 'below' | 'right' = 'below';
+  showLegendTitle = false;
   showDataLabel = false;
+  
+  // Custom label properties (separate from auto-generated ones)
+  customXAxisLabel = '';
+  customYAxisLabel = '';
   // Comprehensive chart type configuration for ngx-charts
   chartTypes = [
     {
-      label: 'Vertical Bar Chart',
+      label: 'Vertical Bar',
       value: 'bar-vertical',
       icon: 'pi pi-chart-bar',
       description: 'Compare values across categories',
@@ -257,7 +308,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Horizontal Bar Chart',
+      label: 'Horizontal Bar',
       value: 'bar-horizontal',
       icon: 'pi pi-bars',
       description: 'Compare values with horizontal bars',
@@ -272,7 +323,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Grouped Bar Chart',
+      label: 'Grouped Bar',
       value: 'bar-vertical-grouped',
       icon: 'pi pi-chart-bar',
       description: 'Compare multiple series across categories',
@@ -299,7 +350,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Line Chart',
+      label: 'Line',
       value: 'line-chart',
       icon: 'pi pi-chart-line',
       description: 'Show trends over time or categories',
@@ -315,7 +366,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Area Chart',
+      label: 'Area',
       value: 'area-chart',
       icon: 'pi pi-chart-line',
       description: 'Show cumulative trends',
@@ -331,7 +382,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Pie Chart',
+      label: 'Pie',
       value: 'pie-chart',
       icon: 'pi pi-chart-pie',
       description: 'Show proportions of a whole',
@@ -346,7 +397,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Advanced Pie Chart',
+      label: 'Advanced Pie',
       value: 'pie-chart-advanced',
       icon: 'pi pi-chart-pie',
       description: 'Pie chart with exploded slices',
@@ -361,7 +412,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Donut Chart',
+      label: 'Donut',
       value: 'pie-chart-grid',
       icon: 'pi pi-circle',
       description: 'Pie chart with center hole',
@@ -376,7 +427,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Bubble Chart',
+      label: 'Bubble',
       value: 'bubble-chart',
       icon: 'pi pi-circle',
       description: 'Show relationships between 3 variables',
@@ -440,7 +491,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
     },
     {
-      label: 'Gauge Chart',
+      label: 'Gauge',
       value: 'gauge',
       icon: 'pi pi-compass',
       description: 'Show single value against a scale',
@@ -488,6 +539,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
   // Chart generation properties
   isGeneratingChart: boolean = false;
   showChart: boolean = false;
+  showChartPopup: boolean = false;
 
   // Form group
   chartForm: FormGroup;
@@ -5388,6 +5440,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Update axis labels based on selection
     this.updateAxisLabels(formValues);
+    
+    // Force change detection for real-time updates
+    this.cdr.detectChanges();
   }
 
   // Transform data to single series format [{name: string, value: number}]
@@ -5610,15 +5665,21 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Update axis labels based on selected columns
   private updateAxisLabels(formValues: any): void {
-    if (formValues.xAxis) {
+    // Only update axis labels if custom labels are empty (not set by user)
+    if (formValues.xAxis && !this.customXAxisLabel) {
       this.xAxisLabel = formValues.xAxis || 'X Axis';
+    } else if (this.customXAxisLabel) {
+      this.xAxisLabel = this.customXAxisLabel;
     }
-    if (formValues.yAxis) {
+    
+    if (formValues.yAxis && !this.customYAxisLabel) {
       if (Array.isArray(formValues.yAxis) && formValues.yAxis.length > 0) {
         this.yAxisLabel = formValues.yAxis[0] || 'Y Axis';
       } else if (formValues.yAxis) {
         this.yAxisLabel = formValues.yAxis || 'Y Axis';
       }
+    } else if (this.customYAxisLabel) {
+      this.yAxisLabel = this.customYAxisLabel;
     }
   }
 
@@ -5658,6 +5719,146 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
     if (chartType) {
       this.selectChartType(chartType);
     }
+  }
+
+  // Get icon for field types
+  getFieldIcon(type: string): string {
+    switch (type) {
+      case 'x-axis':
+      case 'category':
+        return 'pi pi-chart-bar';
+      case 'y-axis':
+      case 'value':
+        return 'pi pi-hashtag';
+      case 'series':
+        return 'pi pi-list';
+      case 'size':
+        return 'pi pi-circle';
+      case 'color':
+        return 'pi pi-palette';
+      default:
+        return 'pi pi-tag';
+    }
+  }
+
+  // Reset chart configuration
+  resetChartConfig(): void {
+    this.chartForm.reset();
+    this.selectedChartType = null;
+    this.showChart = false;
+    this.ngxChartData = [];
+    this.cdr.detectChanges();
+  }
+
+  // Open chart in fullscreen popup
+  openChartPopup(): void {
+    this.showChartPopup = true;
+    
+    // Initialize custom labels with current values if empty
+    if (!this.customXAxisLabel && this.xAxisLabel) {
+      this.customXAxisLabel = this.xAxisLabel;
+    }
+    if (!this.customYAxisLabel && this.yAxisLabel) {
+      this.customYAxisLabel = this.yAxisLabel;
+    }
+    
+    // Ensure chart data is preserved and refreshed
+    if (this.ngxChartData.length === 0 && this.queryResults.length > 0 && this.selectedChartType) {
+      console.log('Restoring chart data in popup...');
+      this.updateChartData();
+    }
+    
+    this.cdr.detectChanges();
+  }
+
+  // Close chart popup
+  closeChartPopup(): void {
+    this.showChartPopup = false;
+    this.cdr.detectChanges();
+  }
+
+  // Change chart theme
+  onChartThemeChange(themeName: string): void {
+    this.selectedChartTheme = themeName;
+    const selectedTheme = this.chartThemes.find(theme => theme.name === themeName);
+    if (selectedTheme) {
+      this.ngxChartScheme = { domain: selectedTheme.domain };
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Debounced chart update for text inputs
+  private textUpdateTimeout: any;
+  onTextInputChange(): void {
+    if (this.textUpdateTimeout) {
+      clearTimeout(this.textUpdateTimeout);
+    }
+    this.textUpdateTimeout = setTimeout(() => {
+      // Only trigger change detection for label updates
+      this.cdr.detectChanges();
+    }, 300); // 300ms debounce
+  }
+
+  // Method for appearance-only changes that don't require data transformation
+  onAppearanceChange(): void {
+    // Bar charts in ngx-charts need special handling due to their rendering behavior
+    if (this.selectedChartType?.value.includes('bar')) {
+      // Create a new reference to trigger ngx-charts update
+      this.ngxChartData = [...this.ngxChartData];
+      // Also update the scheme reference for color changes
+      this.ngxChartScheme = { ...this.ngxChartScheme };
+    }
+    this.cdr.detectChanges();
+  }
+
+  // Export chart functionality
+  exportChart(): void {
+    // Implementation for chart export
+    console.log('Exporting chart...');
+  }
+
+  // Conditional display methods for chart options
+  chartHasAxes(): boolean {
+    const noAxesCharts = ['pie-chart', 'pie-chart-advanced', 'pie-chart-grid', 'number-card', 'gauge', 'linear-gauge'];
+    return !noAxesCharts.includes(this.selectedChartType?.value);
+  }
+
+  chartSupportsGradient(): boolean {
+    const gradientCharts = ['bar-vertical', 'bar-horizontal', 'bar-vertical-grouped', 'line-chart', 'area-chart'];
+    return gradientCharts.includes(this.selectedChartType?.value);
+  }
+
+  chartSupportsDataLabels(): boolean {
+    const dataLabelCharts = ['bar-vertical', 'bar-horizontal', 'bar-vertical-grouped', 'bar-horizontal-grouped', 'pie-chart', 'pie-chart-advanced'];
+    return dataLabelCharts.includes(this.selectedChartType?.value);
+  }
+
+  chartSupportsLegend(): boolean {
+    const legendCharts = ['pie-chart', 'pie-chart-advanced', 'line-chart', 'area-chart', 'bar-vertical-grouped', 'bar-horizontal-grouped'];
+    return legendCharts.includes(this.selectedChartType?.value);
+  }
+
+  // Custom label change handlers
+  onXAxisLabelChange(value: string): void {
+    this.customXAxisLabel = value;
+    this.xAxisLabel = value;
+    // Immediate update for responsive feedback
+    this.cdr.detectChanges();
+    this.onTextInputChange();
+  }
+
+  onYAxisLabelChange(value: string): void {
+    this.customYAxisLabel = value;
+    this.yAxisLabel = value;
+    // Immediate update for responsive feedback
+    this.cdr.detectChanges();
+    this.onTextInputChange();
+  }
+
+
+  chartHasGridLines(): boolean {
+    const gridLineCharts = ['bar-vertical', 'bar-horizontal', 'bar-vertical-grouped', 'bar-horizontal-grouped', 'line-chart', 'area-chart'];
+    return gridLineCharts.includes(this.selectedChartType?.value);
   }
 
   // Reset chart configuration
@@ -6231,6 +6432,11 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
     // Clean up theme observer
     if (this.themeObserver) {
       this.themeObserver.disconnect();
+    }
+
+    // Clean up text input timeout
+    if (this.textUpdateTimeout) {
+      clearTimeout(this.textUpdateTimeout);
     }
 
     // Clean up resize timeout
