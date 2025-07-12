@@ -7,6 +7,7 @@ import {
   OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  NgZone,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { TreeNode, MenuItem } from 'primeng/api';
@@ -139,6 +140,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Track if splitter has been manually adjusted by user
   private splitterManuallyAdjusted: boolean = false;
+  
+  // Dynamic sizing properties
+  private resizeObserver: ResizeObserver | null = null;
 
   // Fullscreen mode
   isFullscreen: boolean = false;
@@ -495,7 +499,8 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
     private fb: FormBuilder,
     private httpClientService: HttpClientService,
     private queryService: QueryService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {
     // Initialize form with chart type selection only
     this.chartForm = this.fb.group({
@@ -522,6 +527,8 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
         id: this.globalService.getTokenDetails('organisationId'),
       };
       this.loadDatabases();
+      // Trigger change detection for the selected org
+      this.cdr.detectChanges();
     }
 
     this.initializeSchemaTree();
@@ -535,6 +542,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Add ESC key handler for query editor fullscreen
     this.setupEscapeKeyHandler();
+    
+    // Setup window resize listener for responsive panel sizing
+    this.setupWindowResizeListener();
   }
 
   private setupEscapeKeyHandler(): void {
@@ -2810,6 +2820,19 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
           this.populateColumnOptions();
         }
 
+        // Trigger change detection to update results table immediately
+        this.cdr.detectChanges();
+        
+        // Dynamically adjust results panel size based on content
+        this.adjustResultsPanelSize();
+        
+        // Synchronize column widths between header and body tables
+        setTimeout(() => {
+          this.synchronizeTableColumns();
+          this.setOptimalTableBodyHeight();
+          this.verifyTableScrolling();
+        }, 200);
+
         // Reset table state for new results
         this.currentPage = 0;
         this.sortColumn = '';
@@ -2835,6 +2858,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
         // Clear column options on error
         this.populateColumnOptions();
+
+        // Trigger change detection to update UI after error
+        this.cdr.detectChanges();
 
         // Show error message to user (you can customize this based on your error handling approach)
         if (error.error && error.error.message) {
@@ -3811,6 +3837,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
           }
 
           node.data.loading = false;
+          
+          // Trigger change detection to update tree UI immediately
+          this.cdr.detectChanges();
         })
         .catch((error: any) => {
           // Handle error response
@@ -3824,6 +3853,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
           node.data.loading = false;
           node.data.hasStructure = false;
+
+          // Trigger change detection to update tree UI even in error case
+          this.cdr.detectChanges();
 
           // Show error message to user (you can customize this based on your error handling approach)
           if (error.error && error.error.message) {
@@ -4280,6 +4312,19 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Update previous sizes for resize events
     this.previousHorizontalSizes = [...this.horizontalSplitterSizes];
+    
+    // Trigger change detection immediately for instant UI update
+    this.cdr.detectChanges();
+    
+    // Additional change detection cycle to ensure splitter updates
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      
+      // Force layout update for Monaco editor if it exists
+      if (this.editor) {
+        this.editor.layout();
+      }
+    }, 50);
   }
 
   toggleResultsPanel(): void {
@@ -4301,6 +4346,19 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Update previous sizes for resize events
     this.previousVerticalSizes = [...this.verticalSplitterSizes];
+    
+    // Trigger change detection immediately for instant UI update
+    this.cdr.detectChanges();
+    
+    // Additional change detection cycle to ensure splitter updates
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      
+      // Force layout update for Monaco editor if it exists
+      if (this.editor) {
+        this.editor.layout();
+      }
+    }, 50);
   }
 
   // Splitter resize event handlers
@@ -4346,6 +4404,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
   onVerticalSplitterResize(event: any): void {
     let topSize = event.sizes[0];
     let bottomSize = event.sizes[1];
+    
+    // Mark splitter as manually adjusted to prevent auto-sizing
+    this.splitterManuallyAdjusted = true;
 
     // Enforce absolute minimum 30% for editor panel
     if (topSize < 30) {
@@ -4379,6 +4440,216 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isResultsCollapsed = event.sizes[1] <= 15;
   }
 
+  // Dynamic results panel sizing based on content and viewport
+  private adjustResultsPanelSize(): void {
+    // Only adjust if user hasn't manually resized the splitter
+    if (this.splitterManuallyAdjusted) {
+      return;
+    }
+
+    // Get viewport height
+    const viewportHeight = window.innerHeight;
+    
+    // Calculate ideal size based on content and auto-sizing needs
+    const resultsCount = this.queryResults.length;
+    
+    // Calculate the actual height needed for the table
+    const headerHeight = 60;
+    const rowHeight = 50;
+    const controlsHeight = 80; // Table controls
+    const padding = 64; // Various paddings
+    const neededTableHeight = headerHeight + (resultsCount * rowHeight) + controlsHeight + padding;
+    
+    // Calculate what percentage of viewport this represents
+    const neededPercentage = Math.min(Math.max((neededTableHeight / viewportHeight) * 100, 25), 75);
+    
+    let idealResultsPercentage = neededPercentage;
+    
+    // Adjust based on viewport height for very small/large screens
+    if (viewportHeight < 700) {
+      // Small screens - ensure minimum visibility
+      idealResultsPercentage = Math.max(idealResultsPercentage, 30);
+    } else if (viewportHeight > 1200) {
+      // Large screens - can afford more space
+      idealResultsPercentage = Math.min(idealResultsPercentage + 10, 70);
+    }
+    
+    // Ensure within acceptable bounds (minimum 25%, maximum 75%)
+    idealResultsPercentage = Math.max(25, Math.min(75, idealResultsPercentage));
+    
+    // Update splitter sizes
+    const editorPercentage = 100 - idealResultsPercentage;
+    this.verticalSplitterSizes = [editorPercentage, idealResultsPercentage];
+    
+    // Update previous sizes
+    this.previousVerticalSizes = [...this.verticalSplitterSizes];
+    
+    // Trigger change detection to update splitter
+    this.cdr.detectChanges();
+    
+    console.log(`Auto-sized results panel: ${resultsCount} rows need ${neededTableHeight}px (${idealResultsPercentage.toFixed(1)}%)`);
+  }
+
+  // Setup window resize listener for responsive behavior
+  private setupWindowResizeListener(): void {
+    let resizeTimeout: any;
+    
+    window.addEventListener('resize', () => {
+      // Debounce resize events
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Only adjust if there are results and user hasn't manually adjusted
+        if (this.queryResults.length > 0 && !this.splitterManuallyAdjusted) {
+          this.adjustResultsPanelSize();
+        }
+        
+        // Ensure Monaco editor resizes properly
+        if (this.editor) {
+          this.editor.layout();
+        }
+      }, 300);
+    });
+  }
+
+
+  // Synchronize column widths between header and body tables
+  private synchronizeTableColumns(): void {
+    setTimeout(() => {
+      const tableContainer = this.tableContainer?.nativeElement;
+      if (!tableContainer) return;
+
+      const headerTable = tableContainer.querySelector('.table-header-table');
+      const bodyTable = tableContainer.querySelector('.table-body-table');
+      
+      if (!headerTable || !bodyTable) return;
+
+      const headerCells = headerTable.querySelectorAll('.table-header-cell');
+      const bodyCells = bodyTable.querySelectorAll('tbody tr:first-child .table-cell');
+      
+      if (headerCells.length !== bodyCells.length) return;
+
+      // Calculate optimal column widths based on content
+      const columnWidths: string[] = [];
+      
+      headerCells.forEach((headerCell: Element, index: number) => {
+        const bodyCell = bodyCells[index] as HTMLElement;
+        if (bodyCell) {
+          // Get natural width requirements
+          const headerWidth = (headerCell as HTMLElement).scrollWidth;
+          const bodyWidth = bodyCell.scrollWidth;
+          const optimalWidth = Math.max(headerWidth, bodyWidth, 120); // Minimum 120px
+          
+          columnWidths.push(`${Math.min(optimalWidth, 300)}px`); // Maximum 300px
+        }
+      });
+
+      // Apply synchronized widths
+      headerCells.forEach((cell: Element, index: number) => {
+        (cell as HTMLElement).style.width = columnWidths[index];
+      });
+      
+      bodyCells.forEach((cell: Element, index: number) => {
+        (cell as HTMLElement).style.width = columnWidths[index];
+      });
+      
+      console.log('Table columns synchronized with widths:', columnWidths);
+    }, 50);
+  }
+
+  // Set optimal table body height to ensure scrolling works
+  private setOptimalTableBodyHeight(): void {
+    setTimeout(() => {
+      const tableContainer = this.tableContainer?.nativeElement;
+      if (!tableContainer) return;
+
+      const bodyWrapper = tableContainer.querySelector('.table-body-wrapper') as HTMLElement;
+      const tableScrollContainer = tableContainer.closest('.table-scroll-container') as HTMLElement;
+      const headerWrapper = tableContainer.querySelector('.table-header-wrapper') as HTMLElement;
+      
+      if (!bodyWrapper || !tableScrollContainer || !headerWrapper) return;
+
+      // Calculate available height
+      const containerHeight = tableScrollContainer.clientHeight;
+      const headerHeight = headerWrapper.offsetHeight;
+      const availableHeight = containerHeight - headerHeight - 40; // 40px for padding/borders and bottom spacing
+      
+      // Set max-height to ensure scrolling (accounting for bottom padding)
+      const optimalMaxHeight = Math.max(200, Math.min(availableHeight, 500));
+      bodyWrapper.style.maxHeight = `${optimalMaxHeight}px`;
+      
+      console.log('Table body height set:', {
+        containerHeight,
+        headerHeight,
+        availableHeight,
+        optimalMaxHeight,
+        displayedRows: this.getPaginatedData().length
+      });
+    }, 50);
+  }
+
+  // Verify and debug table scrolling issues
+  private verifyTableScrolling(): void {
+    setTimeout(() => {
+      const tableContainer = this.tableContainer?.nativeElement;
+      if (!tableContainer) return;
+
+      const bodyWrapper = tableContainer.querySelector('.table-body-wrapper');
+      const bodyTable = tableContainer.querySelector('.table-body-table');
+      
+      if (!bodyWrapper || !bodyTable) return;
+
+      // Get dimensions
+      const wrapperHeight = bodyWrapper.clientHeight;
+      const wrapperScrollHeight = bodyWrapper.scrollHeight;
+      const tableHeight = (bodyTable as HTMLElement).offsetHeight;
+      const rowCount = bodyTable.querySelectorAll('tbody tr').length;
+      
+      console.log('Table scrolling debug:', {
+        displayedRows: this.getPaginatedData().length,
+        totalRows: this.queryResults.length,
+        wrapperHeight,
+        wrapperScrollHeight,
+        tableHeight,
+        rowCount,
+        canScroll: wrapperScrollHeight > wrapperHeight,
+        scrollableArea: wrapperScrollHeight - wrapperHeight
+      });
+      
+      // Force scroll to bottom to test
+      if (wrapperScrollHeight > wrapperHeight) {
+        bodyWrapper.scrollTop = wrapperScrollHeight - wrapperHeight;
+        
+        setTimeout(() => {
+          const finalScrollTop = bodyWrapper.scrollTop;
+          const lastRowVisible = finalScrollTop >= (wrapperScrollHeight - wrapperHeight - 10);
+          
+          // Check if last row is fully visible
+          const lastRow = bodyTable.querySelector('tbody tr:last-child') as HTMLElement;
+          if (lastRow) {
+            const lastRowRect = lastRow.getBoundingClientRect();
+            const wrapperRect = bodyWrapper.getBoundingClientRect();
+            const lastRowFullyVisible = lastRowRect.bottom <= wrapperRect.bottom;
+            
+            console.log('Scroll verification:', {
+              scrollTop: finalScrollTop,
+              maxScroll: wrapperScrollHeight - wrapperHeight,
+              lastRowVisible,
+              lastRowFullyVisible,
+              lastRowBottom: lastRowRect.bottom,
+              wrapperBottom: wrapperRect.bottom,
+              scrollPercentage: (finalScrollTop / (wrapperScrollHeight - wrapperHeight)) * 100
+            });
+          }
+          
+          // Reset scroll position
+          setTimeout(() => {
+            bodyWrapper.scrollTop = 0;
+          }, 1000);
+        }, 100);
+      }
+    }, 100);
+  }
+
   // Setup double-click listeners on splitter gutters
   setupSplitterDoubleClick(): void {
     setTimeout(() => {
@@ -4388,7 +4659,10 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       if (horizontalGutter) {
         horizontalGutter.addEventListener('dblclick', () => {
-          this.toggleSchemaPanel();
+          // Run in Angular zone to ensure proper change detection
+          this.ngZone.run(() => {
+            this.toggleSchemaPanel();
+          });
         });
 
         // Add visual indicator
@@ -4404,7 +4678,10 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       if (verticalGutter) {
         verticalGutter.addEventListener('dblclick', () => {
-          this.toggleResultsPanel();
+          // Run in Angular zone to ensure proper change detection
+          this.ngZone.run(() => {
+            this.toggleResultsPanel();
+          });
         });
 
         // Add visual indicator
@@ -4467,15 +4744,25 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       pageNumber: 1,
       limit: 100,
     };
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs];
-        if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
-          this.loadDatabases();
+    this.organisationService.listOrganisation(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = [...response.data.orgs];
+          if (this.organisations.length > 0) {
+            this.selectedOrg = this.organisations[0];
+            this.loadDatabases();
+          }
+          // Trigger change detection to update the dropdown UI
+          this.cdr.detectChanges();
         }
-      }
-    });
+      })
+      .catch(error => {
+        console.error('Error loading organisations:', error);
+        this.organisations = [];
+        this.selectedOrg = {};
+        // Trigger change detection even in error case
+        this.cdr.detectChanges();
+      });
   }
 
   onOrgChange(event: any) {
@@ -4602,15 +4889,22 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
           // Update active schema
           this.updateActiveSchema(databaseId);
+          
+          // Trigger change detection for tree node updates
+          this.cdr.detectChanges();
         }
       })
       .catch((error: any) => {
         // Handle error silently for background loading
         console.warn('Could not load schema for autocomplete:', error);
+        // Trigger change detection even in error case
+        this.cdr.detectChanges();
       })
       .finally(() => {
         // Remove from loading set
         this.loadingSchemas.delete(databaseId);
+        // Final change detection trigger to ensure loading state is updated
+        this.cdr.detectChanges();
       });
   }
 
@@ -4639,6 +4933,9 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
             this.selectedDatabase = this.databases[0];
           }
           this.updateDatabaseMenuItems();
+          
+          // Trigger change detection to update the database tree UI
+          this.cdr.detectChanges();
         }
       })
       .catch(error => {
@@ -4648,10 +4945,14 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedDatabase = {};
         this.databaseTree = [];
         this.updateDatabaseMenuItems();
+        // Trigger change detection even in error case
+        this.cdr.detectChanges();
       })
       .finally(() => {
         // Always set loading state to false when request completes
         this.isDatabasesLoading = false;
+        // Final change detection trigger to ensure loading state is updated
+        this.cdr.detectChanges();
       });
   }
 
@@ -5859,16 +6160,6 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateScrollIndicators(): void {
     // Simplified method - no longer needed with always-enabled scrolling
     // Keep method for backward compatibility but remove indicator logic
-  }
-
-  private setupWindowResizeListener(): void {
-    window.addEventListener('resize', () => {
-      // Debounce the resize event for table updates
-      clearTimeout(this.resizeTimeout);
-      this.resizeTimeout = setTimeout(() => {
-        // Table will automatically handle scrolling with CSS
-      }, 250);
-    });
   }
 
   private resizeTimeout: any;

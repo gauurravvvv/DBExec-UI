@@ -1721,6 +1721,12 @@
 
 // Results panel specific
 .results-panel {
+  // Dynamic height management
+  min-height: 150px; // Minimum viable height
+  max-height: calc(100vh - 200px); // Responsive max height based on viewport
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   .panel-header {
     display: flex;
     justify-content: space-between;
@@ -1783,12 +1789,20 @@
   }
 
   .panel-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Important for flexbox height calculations
+    height: 100%; // Ensure full height usage
+    
     .analytics-view {
       display: flex;
       flex-direction: column;
       height: 100%;
       padding: 1rem;
       background: var(--surface-ground);
+      overflow: auto; // Allow scrolling if content exceeds height
 
       // Simplified Chart Configuration
       .chart-configuration-simple {
@@ -5046,23 +5060,25 @@
   }
 }
 
-// Table View Wrapper - ensure full height usage
+// Table View Wrapper - proper height management for scrolling
 .table-view {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  flex: 1;
-  overflow: hidden;
+  height: 100%; // Use full height from parent
+  flex: 1; // Use flex to fill available space
+  overflow: hidden; // Contain scrolling to child containers
+  min-height: 0; // Allow shrinking below content size
 }
 
 // Modern Custom Table Styling
 .custom-table-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100%; // Use full height from parent
+  flex: 1; // Fill available space
   background: var(--card-background);
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden; // Contain scrolling to child containers
 
   .table-controls {
     display: flex;
@@ -5160,21 +5176,48 @@
   }
 
   .table-wrapper {
-    flex: 1;
-    overflow: hidden;
+    flex: 1; // Use flex to fill available space properly
+    overflow: hidden; // Contain scrolling to child container
     display: flex;
     flex-direction: column;
-    min-height: 400px; // Ensure minimum height for vertical scrolling
+    min-height: 0; // Allow shrinking below content size
 
     .table-scroll-container {
-      flex: 1;
-      overflow: auto; // Always enable scrolling for both directions
+      flex: 1; // Use flex to fill available space
+      overflow: hidden; // Hide overflow on container
       background: var(--card-background);
       position: relative;
-      height: 100%; // Use full height from splitter
+      min-height: 0; // Allow shrinking below content size
       border: 1px solid var(--border-color);
       border-radius: 6px;
       transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%; // Ensure full height usage
+      
+      // Enhanced scrollbar styling
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
+      
+      // Webkit scrollbar styling
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: color-mix(in srgb, var(--border-color) 20%, transparent);
+        border-radius: 4px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+        
+        &:hover {
+          background: var(--primary-color);
+        }
+      }
 
       // Enhanced styling on hover
       &:hover {
@@ -5256,6 +5299,222 @@
         opacity: 1;
       }
 
+      // Separate table header from scrollable body
+      .table-header-wrapper {
+        flex: 0 0 auto;
+        background: var(--background-color);
+        border-bottom: 2px solid var(--border-color);
+        overflow: hidden;
+        
+        .table-header-table {
+          width: 100%;
+          min-width: max-content;
+          border-collapse: collapse;
+          font-size: 0.875rem;
+          background: var(--background-color);
+          table-layout: fixed; // Fixed layout for column alignment
+          margin: 0;
+          
+          .table-header-cell {
+            padding: 1rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-color);
+            background: var(--background-color);
+            border-right: 1px solid var(--border-color);
+            position: relative;
+            white-space: nowrap;
+            user-select: none;
+            min-width: 120px;
+            width: auto;
+
+            &:last-child {
+              border-right: none;
+            }
+
+            &.sortable {
+              cursor: pointer;
+              transition: all 0.2s ease;
+
+              &:hover {
+                background: var(--hover-background);
+                color: var(--primary-color);
+              }
+            }
+
+            .header-content {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 0.5rem;
+
+              .column-name {
+                font-weight: 600;
+                flex: 1;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              .sort-icon {
+                font-size: 0.75rem;
+                color: var(--primary-color);
+                flex-shrink: 0;
+              }
+            }
+          }
+        }
+      }
+      
+      // Scrollable table body container
+      .table-body-wrapper {
+        flex: 1;
+        overflow: auto;
+        min-height: 0;
+        max-height: min(400px, 50vh); // Responsive max height based on viewport
+        position: relative;
+        padding-bottom: 1rem; // Additional padding to prevent last row cut-off
+        
+        // Scrollbar styling
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-color) transparent;
+        
+        &::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: color-mix(in srgb, var(--border-color) 20%, transparent);
+          border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: var(--border-color);
+          border-radius: 4px;
+          
+          &:hover {
+            background: var(--primary-color);
+          }
+        }
+        
+        // Add bottom padding to the wrapper instead of table
+        &::after {
+          content: '';
+          display: block;
+          height: 3rem; // Increased padding to ensure last row is fully visible
+          width: 100%;
+        }
+        
+        .table-body-table {
+          width: 100%;
+          min-width: max-content;
+          border-collapse: collapse;
+          font-size: 0.875rem;
+          background: var(--card-background);
+          table-layout: fixed; // Fixed layout to match header
+          height: auto;
+          display: table;
+          margin: 0;
+          padding: 0; // Remove padding from table
+          
+          .table-body {
+            margin: 0; // Ensure no margin on tbody
+            padding: 0; // Ensure no padding on tbody
+            
+            .table-row {
+              transition: background-color 0.15s ease;
+              border-bottom: 1px solid var(--border-color);
+              margin: 0; // Ensure no margin
+              padding: 0; // Ensure no padding
+
+              &:hover {
+                background: var(--hover-background);
+              }
+
+              &.even {
+                background: var(--card-background);
+              }
+
+              &.odd {
+                background: color-mix(
+                  in srgb,
+                  var(--border-color) 3%,
+                  var(--card-background)
+                );
+              }
+
+              &:hover.even,
+              &:hover.odd {
+                background: var(--hover-background);
+              }
+              
+              // Ensure last row doesn't have bottom margin/padding issues
+              &:last-child {
+                border-bottom: none;
+                margin-bottom: 0.5rem; // Extra margin for last row visibility
+              }
+
+              .table-cell {
+                padding: 0.75rem 1rem; // Reduced padding for better height usage
+                border-right: 1px solid
+                  color-mix(in srgb, var(--border-color) 50%, transparent);
+                vertical-align: top;
+                position: relative;
+                min-width: 120px; // Match header min-width
+                width: auto;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                margin: 0; // Ensure no margin
+
+                &:last-child {
+                  border-right: none;
+                }
+
+                .cell-content {
+                  display: flex;
+                  align-items: center;
+                  min-height: 1.5rem;
+                  line-height: 1.4;
+                  color: var(--text-color);
+                  font-weight: 400;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+
+                  &.null-value {
+                    .null-text {
+                      color: var(--text-muted-color);
+                      font-style: italic;
+                      opacity: 0.7;
+                    }
+                  }
+
+                  &.number-value {
+                    color: var(--info-color);
+                    font-weight: 500;
+                    text-align: right;
+                    justify-content: flex-end;
+                  }
+
+                  &.boolean-value {
+                    color: var(--warning-color);
+                    font-weight: 500;
+                  }
+
+                  &.date-value {
+                    color: var(--success-color);
+                    font-family: monospace;
+                    font-size: 0.8125rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
       .modern-table {
         width: 100%;
         min-width: max-content; // Ensure table expands for many columns
@@ -5264,11 +5523,11 @@
         background: var(--card-background);
         table-layout: auto; // Allow dynamic column sizing
         height: auto; // Let table grow with content
+        display: table;
+        // Add padding to ensure last row is fully visible when scrolled
+        padding-bottom: 2rem;
 
         .table-header {
-          position: sticky;
-          top: 0;
-          z-index: 10;
           background: var(--background-color);
           border-bottom: 2px solid var(--border-color);
 
@@ -5363,7 +5622,7 @@
               overflow: hidden;
               text-overflow: ellipsis;
               height: auto; // Let row height adjust dynamically
-              min-height: 60px; // Ensure adequate row height for scrolling
+              min-height: 50px; // Optimized row height for better scrolling
 
               &:last-child {
                 border-right: none;
@@ -5565,8 +5824,9 @@
 
     .table-wrapper {
       .table-scroll-container {
-        height: 350px; // Fixed height for mobile
-        max-height: 60vh; // Reduce height on mobile
+        height: 100%; // Use full available height from splitter
+        min-height: 300px; // Adequate minimum height for mobile
+        // Remove max-height to allow full content display on mobile
 
         // Better touch scrolling on mobile
         -webkit-overflow-scrolling: touch;

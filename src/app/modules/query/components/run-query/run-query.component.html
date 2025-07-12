@@ -336,86 +336,92 @@
                           (mouseleave)="onTableMouseLeave()"
                           (keydown)="onTableKeydown($event)"
                         >
-                          <table class="modern-table">
-                            <!-- Table Header -->
-                            <thead class="table-header">
-                              <tr>
-                                <th
-                                  *ngFor="
-                                    let col of resultColumns;
-                                    trackBy: trackByColumn
-                                  "
-                                  class="table-header-cell"
-                                  [class.sortable]="true"
-                                  (click)="sortByColumn(col)"
-                                >
-                                  <div class="header-content">
-                                    <span class="column-name">{{ col }}</span>
-                                    <i
-                                      class="sort-icon pi"
-                                      [ngClass]="getSortIcon(col)"
-                                      *ngIf="getSortIcon(col)"
-                                    ></i>
-                                  </div>
-                                </th>
-                              </tr>
-                            </thead>
-
-                            <!-- Table Body -->
-                            <tbody class="table-body">
-                              <tr
-                                *ngFor="
-                                  let row of getPaginatedData();
-                                  trackBy: trackByRow;
-                                  let i = index
-                                "
-                                class="table-row"
-                                [class.even]="i % 2 === 0"
-                                [class.odd]="i % 2 !== 0"
-                              >
-                                <td
-                                  *ngFor="
-                                    let col of resultColumns;
-                                    trackBy: trackByColumn
-                                  "
-                                  class="table-cell"
-                                  [title]="getCellValue(row, col)"
-                                >
-                                  <div
-                                    class="cell-content"
-                                    [class.null-value]="
-                                      isNullValue(getCellValue(row, col))
+                          <!-- Fixed Table Header -->
+                          <div class="table-header-wrapper">
+                            <table class="table-header-table">
+                              <thead>
+                                <tr>
+                                  <th
+                                    *ngFor="
+                                      let col of resultColumns;
+                                      trackBy: trackByColumn
                                     "
-                                    [class.number-value]="
-                                      isNumberValue(getCellValue(row, col))
-                                    "
-                                    [class.boolean-value]="
-                                      isBooleanValue(getCellValue(row, col))
-                                    "
-                                    [class.date-value]="
-                                      isDateValue(getCellValue(row, col))
-                                    "
+                                    class="table-header-cell"
+                                    [class.sortable]="true"
+                                    (click)="sortByColumn(col)"
                                   >
-                                    <span
-                                      *ngIf="
+                                    <div class="header-content">
+                                      <span class="column-name">{{ col }}</span>
+                                      <i
+                                        class="sort-icon pi"
+                                        [ngClass]="getSortIcon(col)"
+                                        *ngIf="getSortIcon(col)"
+                                      ></i>
+                                    </div>
+                                  </th>
+                                </tr>
+                              </thead>
+                            </table>
+                          </div>
+
+                          <!-- Scrollable Table Body -->
+                          <div class="table-body-wrapper">
+                            <table class="table-body-table">
+                              <tbody class="table-body">
+                                <tr
+                                  *ngFor="
+                                    let row of getPaginatedData();
+                                    trackBy: trackByRow;
+                                    let i = index
+                                  "
+                                  class="table-row"
+                                  [class.even]="i % 2 === 0"
+                                  [class.odd]="i % 2 !== 0"
+                                >
+                                  <td
+                                    *ngFor="
+                                      let col of resultColumns;
+                                      trackBy: trackByColumn
+                                    "
+                                    class="table-cell"
+                                    [title]="getCellValue(row, col)"
+                                  >
+                                    <div
+                                      class="cell-content"
+                                      [class.null-value]="
                                         isNullValue(getCellValue(row, col))
                                       "
-                                      class="null-text"
-                                      >NULL</span
-                                    >
-                                    <span
-                                      *ngIf="
-                                        !isNullValue(getCellValue(row, col))
+                                      [class.number-value]="
+                                        isNumberValue(getCellValue(row, col))
                                       "
-                                      >{{
-                                        formatCellValue(getCellValue(row, col))
-                                      }}</span
+                                      [class.boolean-value]="
+                                        isBooleanValue(getCellValue(row, col))
+                                      "
+                                      [class.date-value]="
+                                        isDateValue(getCellValue(row, col))
+                                      "
                                     >
-                                  </div>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
+                                      <span
+                                        *ngIf="
+                                          isNullValue(getCellValue(row, col))
+                                        "
+                                        class="null-text"
+                                        >NULL</span
+                                      >
+                                      <span
+                                        *ngIf="
+                                          !isNullValue(getCellValue(row, col))
+                                        "
+                                        >{{
+                                          formatCellValue(getCellValue(row, col))
+                                        }}</span
+                                      >
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </div>
 
