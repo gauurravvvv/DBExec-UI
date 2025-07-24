@@ -94,6 +94,12 @@ const routes: Routes = [
             m => m.DatabaseModule
           ),
       },
+
+      {
+        path: 'role',
+        loadChildren: () =>
+          import('./modules/role/role.module').then(m => m.RoleModule),
+      },
       {
         path: 'secrets',
         loadChildren: () =>

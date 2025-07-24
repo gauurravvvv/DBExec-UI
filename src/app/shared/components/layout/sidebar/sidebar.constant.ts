@@ -32,6 +32,10 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/database',
   },
   {
+    value: 'setupRole',
+    route: '/app/role',
+  },
+  {
     value: 'dbExecStudio',
     route: '/app/studio',
   },
