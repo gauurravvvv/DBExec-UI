@@ -103,3 +103,10 @@ export const SCREEN = {
   VIEW: '/app/screen/view',
   CONFIG: '/app/screen/config',
 };
+
+export const ROLE = {
+  ADD: '/app/role/add',
+  LIST: '/app/role',
+  EDIT: '/app/role/edit',
+  VIEW: '/app/role/view',
+};

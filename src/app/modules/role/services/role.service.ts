@@ -1,21 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { GROUP } from 'src/app/constants/api';
+import { GROUP, ROLE } from 'src/app/constants/api';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class GroupService {
+export class RoleService {
   constructor(private http: HttpClient) {}
 
-  listGroupps(params: IParams) {
+  listRoles(params: IParams) {
     return this.http
       .get(
-        GROUP.LIST +
-          `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`
+        ROLE.LIST + `/${params.orgId}` + `/${params.pageNumber}/${params.limit}`
       )
       .toPromise()
       .then((response: any) => {
@@ -24,11 +22,11 @@ export class GroupService {
       });
   }
 
-  addGroup(categoryForm: FormGroup) {
+  addRole(categoryForm: FormGroup) {
     const { name, description, organisation, environments, users } =
       categoryForm.value;
     return this.http
-      .post(GROUP.ADD, {
+      .post(ROLE.ADD, {
         name,
         description,
         organisation,
@@ -42,9 +40,9 @@ export class GroupService {
       });
   }
 
-  deleteGroup(orgId: string, id: string) {
+  deleteRole(orgId: string, id: string) {
     return this.http
-      .delete(GROUP.DELETE + `${orgId}/${id}`)
+      .delete(ROLE.DELETE + `${orgId}/${id}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -52,9 +50,9 @@ export class GroupService {
       });
   }
 
-  viewGroup(orgId: string, categoryId: string) {
+  viewRole(orgId: string, categoryId: string) {
     return this.http
-      .get(GROUP.VIEW + `${orgId}/${categoryId}`)
+      .get(ROLE.VIEW + `${orgId}/${categoryId}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -62,11 +60,11 @@ export class GroupService {
       });
   }
 
-  editGroup(groupForm: FormGroup) {
+  editRole(groupForm: FormGroup) {
     const { id, name, description, status, users, organisation } =
       groupForm.getRawValue();
     return this.http
-      .put(GROUP.EDIT, {
+      .put(ROLE.UPDATE, {
         id,
         name,
         description,

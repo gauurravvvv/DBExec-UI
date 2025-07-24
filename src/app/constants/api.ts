@@ -145,3 +145,12 @@ export const QUERY = {
   EXPLAIN: '/query/explain',
   EXPORT: '/query/export',
 };
+
+export const ROLE = {
+  ADD: '/role/add',
+  LIST: '/role/list',
+  DELETE: '/role/delete/',
+  VIEW: '/role/get/',
+  UPDATE: '/role/update',
+  LIST_PERMISSIONS: '/role/get-permissions',
+};
