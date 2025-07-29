@@ -78,4 +78,14 @@ export class RoleService {
         return result;
       });
   }
+
+  listPermissions(orgId: string, type: string) {
+    return this.http
+      .get(ROLE.LIST_PERMISSIONS + `${orgId}/${type}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
 }

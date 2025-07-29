@@ -152,5 +152,5 @@ export const ROLE = {
   DELETE: '/role/delete/',
   VIEW: '/role/get/',
   UPDATE: '/role/update',
-  LIST_PERMISSIONS: '/role/get-permissions',
+  LIST_PERMISSIONS: '/role/get-permissions/',
 };

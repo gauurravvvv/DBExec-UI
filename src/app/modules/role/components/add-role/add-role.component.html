@@ -1,1 +1,183 @@
-<p>add-role works!</p>
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" routerLink="/app/role">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Add Role</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-danger"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-outlined"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="roleForm.invalid"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="roleForm" class="admin-form">
+      <!-- Basic Info Section -->
+      <div class="basic-info-section">
+        <!-- Organisation -->
+        <div class="form-field" *ngIf="showOrganisationDropdown">
+          <label for="organisation"
+            >Organisation<span class="required"> *</span></label
+          >
+          <p-dropdown
+            [options]="organisations"
+            optionLabel="name"
+            optionValue="id"
+            formControlName="organisation"
+            [filter]="true"
+            filterBy="name"
+            [style]="{ width: '100%' }"
+            [panelStyle]="{ width: '100%' }"
+            placeholder="Select Organisation"
+            (onChange)="onOrganisationChange($event)"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                roleForm.get('organisation')?.invalid &&
+                roleForm.get('organisation')?.touched
+            }"
+          >
+          </p-dropdown>
+          <small
+            class="error-message"
+            *ngIf="
+              roleForm.get('organisation')?.invalid &&
+              roleForm.get('organisation')?.touched
+            "
+          >
+            Organisation is required
+          </small>
+        </div>
+
+        <!-- Role Type -->
+        <div class="form-field" *ngIf="selectedOrg">
+          <label for="type">Role Type<span class="required"> *</span></label>
+          <div class="role-type-container">
+            <div class="radio-group">
+              <div class="radio-option" *ngFor="let type of roleTypes">
+                <p-radioButton
+                  [value]="type.value"
+                  formControlName="type"
+                  [inputId]="'type_' + type.value"
+                  (onClick)="onRoleTypeChange(type)"
+                ></p-radioButton>
+                <label [for]="'type_' + type.value">{{ type.label }}</label>
+              </div>
+            </div>
+          </div>
+          <small
+            class="error-message"
+            *ngIf="
+              roleForm.get('type')?.invalid && roleForm.get('type')?.touched
+            "
+          >
+            Role Type is required
+          </small>
+        </div>
+
+        <!-- Role Name -->
+        <div class="form-field">
+          <label for="name">Name<span class="required"> *</span></label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-box"></i>
+            <input
+              id="name"
+              type="text"
+              pInputText
+              formControlName="name"
+              placeholder="Enter name"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  roleForm.get('name')?.invalid && roleForm.get('name')?.touched
+              }"
+            />
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              roleForm.get('name')?.invalid && roleForm.get('name')?.touched
+            "
+          >
+            <span *ngIf="roleForm.get('name')?.errors?.['required']"
+              >Name is required</span
+            >
+            <span *ngIf="roleForm.get('name')?.errors?.['pattern']"
+              >Name can only contain letters, spaces and hyphens</span
+            >
+          </small>
+        </div>
+
+        <!-- Description -->
+        <div class="form-field">
+          <label for="description">Description</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-align-left"></i>
+            <input
+              id="description"
+              type="text"
+              pInputText
+              formControlName="description"
+              placeholder="Enter description"
+            />
+          </span>
+        </div>
+      </div>
+
+      <!-- Permissions Section -->
+      <div class="permissions-section" *ngIf="permissions.length > 0">
+        <label class="section-title"
+          >Screen Permissions<span class="required"> *</span></label
+        >
+
+        <div class="permissions-grid">
+          <div class="permission-columns">
+            <div class="column" *ngFor="let permission of permissions">
+              <div class="column-header">{{ permission.label }}</div>
+              <div class="permission-items">
+                <div class="permission-item" *ngIf="!permission.subPermissions">
+                  <span class="item-label">{{ permission.label }}</span>
+                  <p-inputSwitch
+                    [formControl]="getPermissionControl(permission.value)"
+                    (onChange)="onPermissionChange(permission, $event)"
+                  ></p-inputSwitch>
+                </div>
+
+                <ng-container *ngIf="permission.subPermissions">
+                  <div
+                    class="permission-item"
+                    *ngFor="let subPerm of permission.subPermissions"
+                  >
+                    <span class="item-label">{{ subPerm.label }}</span>
+                    <p-inputSwitch
+                      [formControl]="getPermissionControl(subPerm.value)"
+                      (onChange)="onPermissionChange(subPerm, $event)"
+                    ></p-inputSwitch>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

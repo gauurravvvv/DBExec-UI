@@ -1,0 +1,210 @@
+const permissionsForAdmin =[
+    {
+        "id": 1,
+        "parentId": "0",
+        "label": "Dashboard",
+        "value": "dashboard",
+        "icon": "ci ci-home",
+        "status": 1
+    },
+    {
+        "id": 2,
+        "parentId": "0",
+        "label": "Organisation Management",
+        "value": "databaseManagement",
+        "icon": "ci ci-database",
+        "status": 1,
+        "subPermissions": [
+            {
+                "id": 3,
+                "parentId": "2",
+                "label": "Database",
+                "value": "setupDB",
+                "icon": "ci ci-wrench",
+                "status": 1
+            },
+            {
+                "id": 4,
+                "parentId": "2",
+                "label": "Role",
+                "value": "setupRole",
+                "icon": "ci ci-shield-halved",
+                "status": 1
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "parentId": "0",
+        "label": "User Management",
+        "value": "orgManagement",
+        "icon": "ci ci-site-map",
+        "status": 1,
+        "subPermissions": [
+            {
+                "id": 6,
+                "parentId": "5",
+                "label": "Admin",
+                "value": "orgAdmin",
+                "icon": "ci ci-user-tie",
+                "status": 1
+            },
+            {
+                "id": 7,
+                "parentId": "5",
+                "label": "Users",
+                "value": "userManagement",
+                "icon": "ci ci-users",
+                "status": 1
+            },
+            {
+                "id": 8,
+                "parentId": "5",
+                "label": "User Group",
+                "value": "userGroupManagement",
+                "icon": "ci ci-user-group",
+                "status": 1
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "parentId": "0",
+        "label": "Secrets Management",
+        "value": "secretManagement",
+        "icon": "ci ci-lock",
+        "status": 1,
+        "subPermissions": [
+            {
+                "id": 10,
+                "parentId": "9",
+                "label": "Environment",
+                "value": "secretsEnvironment",
+                "icon": "ci ci-globe",
+                "status": 1
+            },
+            {
+                "id": 11,
+                "parentId": "9",
+                "label": "Categories",
+                "value": "secretsCategory",
+                "icon": "ci ci-list",
+                "status": 1
+            },
+            {
+                "id": 12,
+                "parentId": "9",
+                "label": "Secrets",
+                "value": "secretsCredentials",
+                "icon": "ci ci-key",
+                "status": 1
+            }
+        ]
+    },
+    {
+        "id": 13,
+        "parentId": "0",
+        "label": "DBExec Studio",
+        "value": "dbExecStudio",
+        "icon": "ci ci-studio",
+        "status": 1,
+        "subPermissions": [
+            {
+                "id": 14,
+                "parentId": "13",
+                "label": "Dataset",
+                "value": "datasetManager",
+                "icon": "ci ci-dataset",
+                "status": 1
+            },
+            {
+                "id": 15,
+                "parentId": "13",
+                "label": "Query Forge",
+                "value": "queryForge",
+                "icon": "ci ci-bolt",
+                "status": 1,
+                "subPermissions": [
+                    {
+                        "id": 16,
+                        "parentId": "15",
+                        "label": "Query Executor",
+                        "value": "queryExecutor",
+                        "icon": "ci ci-code",
+                        "status": 1
+                    },
+                    {
+                        "id": 17,
+                        "parentId": "15",
+                        "label": "Query Builder",
+                        "value": "queryBuilder",
+                        "icon": "ci ci-query-builder",
+                        "status": 1,
+                        "subPermissions": [
+                            {
+                                "id": 18,
+                                "parentId": "17",
+                                "label": "Tab",
+                                "value": "queryBuilderTab",
+                                "icon": "ci ci-ribbon",
+                                "status": 1
+                            },
+                            {
+                                "id": 19,
+                                "parentId": "17",
+                                "label": "Section",
+                                "value": "queryBuilderSection",
+                                "icon": "ci ci-section",
+                                "status": 1
+                            },
+                            {
+                                "id": 20,
+                                "parentId": "17",
+                                "label": "Prompt",
+                                "value": "queryBuilderPrompt",
+                                "icon": "ci ci-caret-down",
+                                "status": 1
+                            },
+                            {
+                                "id": 21,
+                                "parentId": "17",
+                                "label": "Screen",
+                                "value": "queryBuilderScreen",
+                                "icon": "ci ci-screen",
+                                "status": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+];
+
+
+const permissionForUser =[
+    {
+        "id": 22,
+        "parentId": "0",
+        "label": "Dashboard",
+        "value": "dashboard",
+        "icon": "ci ci-home",
+        "status": 1
+    },
+    {
+        "id": 23,
+        "parentId": "0",
+        "label": "Secrets Management",
+        "value": "secretManagement",
+        "icon": "ci ci-lock",
+        "status": 1
+    },
+    {
+        "id": 25,
+        "parentId": "0",
+        "label": "Query Executer",
+        "value": "qExecutor",
+        "icon": "ci ci-bolt",
+        "status": 1
+    }
+]
