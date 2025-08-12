@@ -26,17 +26,22 @@
 
     <!-- Existing Content -->
     <div class="run-query-container">
-      <!-- Main horizontal splitter -->
-      <p-splitter
-        [style]="{ height: '100%', width: '100%' }"
-        [panelSizes]="horizontalSplitterSizes"
-        [minSizes]="[10, 60]"
-        layout="horizontal"
-        styleClass="main-horizontal-splitter"
-        (onResizeEnd)="onHorizontalSplitterResize($event)"
+      <!-- Main horizontal split -->
+      <as-split 
+        direction="horizontal"
+        [gutterSize]="5"
+        [gutterDblClickDuration]="400"
+        (dragEnd)="onHorizontalSplitterResize($event)"
+        (gutterDblClick)="onHorizontalGutterDblClick($event)"
+        class="main-horizontal-split"
       >
         <!-- Left Panel - Schema Browser -->
-        <ng-template pTemplate>
+        <as-split-area 
+          [size]="horizontalSplitterSizes[0]"
+          [minSize]="10"
+          [maxSize]="40"
+          class="schema-split-area"
+        >
           <div class="schema-panel">
             <div class="panel-header">
               <h3>Databases</h3>
@@ -92,21 +97,31 @@
               </div>
             </div>
           </div>
-        </ng-template>
+        </as-split-area>
 
         <!-- Right Panel - Editor and Results -->
-        <ng-template pTemplate>
-          <!-- Vertical splitter for editor and results -->
-          <p-splitter
-            [style]="{ height: '100%', width: '100%' }"
-            [panelSizes]="verticalSplitterSizes"
-            [minSizes]="[30, 15]"
-            layout="vertical"
-            styleClass="editor-results-splitter"
-            (onResizeEnd)="onVerticalSplitterResize($event)"
+        <as-split-area 
+          [size]="horizontalSplitterSizes[1]"
+          [minSize]="60"
+          [maxSize]="85"
+          class="content-split-area"
+        >
+          <!-- Vertical split for editor and results -->
+          <as-split
+            direction="vertical"
+            [gutterSize]="5"
+            [gutterDblClickDuration]="400"
+            (dragEnd)="onVerticalSplitterResize($event)"
+            (gutterDblClick)="onVerticalGutterDblClick($event)"
+            class="editor-results-split"
           >
             <!-- Top Panel - SQL Editor -->
-            <ng-template pTemplate>
+            <as-split-area 
+              [size]="verticalSplitterSizes[0]"
+              [minSize]="20"
+              [maxSize]="85"
+              class="editor-split-area"
+            >
               <div class="editor-panel">
                 <div class="editor-tabs">
                   <div class="tabs-container">
@@ -239,10 +254,14 @@
                   </div>
                 </div>
               </div>
-            </ng-template>
+            </as-split-area>
 
             <!-- Bottom Panel - Results -->
-            <ng-template pTemplate>
+            <as-split-area 
+              [size]="verticalSplitterSizes[1]"
+              [minSize]="15"
+              class="results-split-area"
+            >
               <div class="results-panel">
                 <div class="panel-header">
                   <div class="header-left">
@@ -965,10 +984,10 @@
                   </div>
                 </div>
               </div>
-            </ng-template>
-          </p-splitter>
-        </ng-template>
-      </p-splitter>
+            </as-split-area>
+          </as-split>
+        </as-split-area>
+      </as-split>
     </div>
   </div>
 </div>

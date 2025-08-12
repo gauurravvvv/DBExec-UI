@@ -7,6 +7,7 @@ import { QueryRoutingModule } from './query-routing.module';
 import { RunQueryComponent } from './components/run-query/run-query.component';
 import { ChartModule } from 'primeng/chart';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { AngularSplitModule } from 'angular-split';
 
 @NgModule({
   declarations: [RunQueryComponent],
@@ -19,6 +20,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     SharedModule,
     ChartModule,
     NgxChartsModule,
+    AngularSplitModule,
   ],
 })
 export class QueryModule {}

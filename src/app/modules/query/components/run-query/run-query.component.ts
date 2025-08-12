@@ -630,7 +630,6 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => {
           this.initializeEditor();
           this.setupThemeObserver();
-          this.setupSplitterDoubleClick();
           this.setupFullscreenListener();
           this.setupWindowResizeListener();
         }, 100); // Small delay to ensure DOM is ready
@@ -4381,18 +4380,30 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleResultsPanel(): void {
     const currentResultsSize = this.verticalSplitterSizes[1];
+    
+    // Get container height for better calculations
+    const container = document.querySelector('.editor-results-splitter');
+    const containerHeight = container ? container.clientHeight : window.innerHeight - 200;
+    
+    // Calculate minimum sizes in percentages
+    const minEditorPercent = (200 / containerHeight) * 100;
+    const minResultsPercent = (100 / containerHeight) * 100;
 
-    if (currentResultsSize <= 10) {
-      // Panel is collapsed, expand to maximum allowed (70%)
-      this.verticalSplitterSizes = [30, 70];
+    if (currentResultsSize <= 20) {
+      // Panel is collapsed/minimized, expand to optimal size
+      // Ensure we respect minimum heights
+      const expandedSize = Math.max(50, 100 - minEditorPercent);
+      this.verticalSplitterSizes = [100 - expandedSize, expandedSize];
       this.isResultsCollapsed = false;
-    } else if (currentResultsSize >= 60) {
-      // Panel is at or near maximum, collapse to a more visible minimum (15%)
-      this.verticalSplitterSizes = [85, 15];
-      this.isResultsCollapsed = false; // Keep false as it's still visible
+    } else if (currentResultsSize >= 50) {
+      // Panel is expanded, collapse to minimum visible size
+      const collapsedSize = Math.max(minResultsPercent, 15);
+      this.verticalSplitterSizes = [100 - collapsedSize, collapsedSize];
+      this.isResultsCollapsed = true;
     } else {
-      // Panel is in between, expand to maximum
-      this.verticalSplitterSizes = [30, 70];
+      // Panel is in between, expand to optimal size
+      const expandedSize = Math.max(50, 100 - minEditorPercent);
+      this.verticalSplitterSizes = [100 - expandedSize, expandedSize];
       this.isResultsCollapsed = false;
     }
 
@@ -4402,7 +4413,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
     // Trigger change detection immediately for instant UI update
     this.cdr.detectChanges();
     
-    // Additional change detection cycle to ensure splitter updates
+    // Additional update cycle to ensure proper layout
     setTimeout(() => {
       this.cdr.detectChanges();
       
@@ -4410,86 +4421,61 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.editor) {
         this.editor.layout();
       }
+      
+      // Dispatch resize event to trigger any responsive listeners
+      window.dispatchEvent(new Event('resize'));
     }, 50);
   }
 
   // Splitter resize event handlers
   onHorizontalSplitterResize(event: any): void {
-    let leftSize = event.sizes[0];
-    let rightSize = event.sizes[1];
-
+    // Angular-split provides sizes as array: [leftSize, rightSize]
+    const sizes = event.sizes || [this.horizontalSplitterSizes[0], this.horizontalSplitterSizes[1]];
+    
     // Mark splitter as manually adjusted
     this.splitterManuallyAdjusted = true;
 
-    // Enforce absolute maximum 40% for schema panel
-    if (leftSize > 40) {
-      leftSize = 40;
-      rightSize = 60;
-      this.horizontalSplitterSizes = [leftSize, rightSize];
-      return;
-    }
-
-    // Enforce absolute minimum 10% for schema panel (no complete hiding)
-    if (leftSize < 10) {
-      leftSize = 10;
-      rightSize = 90;
-      this.horizontalSplitterSizes = [leftSize, rightSize];
-      return;
-    }
-
-    // Enforce minimum 60% for main content area
-    if (rightSize < 60) {
-      leftSize = 40;
-      rightSize = 60;
-      this.horizontalSplitterSizes = [leftSize, rightSize];
-      return;
-    }
-
-    // Update the sizes when user manually resizes
-    this.horizontalSplitterSizes = event.sizes;
-    this.previousHorizontalSizes = [...event.sizes];
+    // Update the sizes
+    this.horizontalSplitterSizes = sizes;
+    this.previousHorizontalSizes = [...sizes];
 
     // Update collapsed state based on size
-    this.isSchemaCollapsed = event.sizes[0] <= 10;
+    this.isSchemaCollapsed = sizes[0] <= 10;
+    
+    // Trigger layout update for Monaco editor
+    if (this.editor) {
+      setTimeout(() => this.editor.layout(), 100);
+    }
+  }
+  
+  onHorizontalGutterDblClick(event: any): void {
+    // Handle double-click on horizontal gutter
+    this.toggleSchemaPanel();
   }
 
   onVerticalSplitterResize(event: any): void {
-    let topSize = event.sizes[0];
-    let bottomSize = event.sizes[1];
+    // Angular-split provides sizes as array: [topSize, bottomSize]
+    const sizes = event.sizes || [this.verticalSplitterSizes[0], this.verticalSplitterSizes[1]];
     
     // Mark splitter as manually adjusted to prevent auto-sizing
     this.splitterManuallyAdjusted = true;
 
-    // Enforce absolute minimum 30% for editor panel
-    if (topSize < 30) {
-      topSize = 30;
-      bottomSize = 70;
-      this.verticalSplitterSizes = [topSize, bottomSize];
-      return;
-    }
-
-    // Enforce absolute maximum 85% for editor panel
-    if (topSize > 85) {
-      topSize = 85;
-      bottomSize = 15;
-      this.verticalSplitterSizes = [topSize, bottomSize];
-      return;
-    }
-
-    // Enforce absolute minimum 15% for results panel (no complete hiding)
-    if (bottomSize < 15) {
-      topSize = 85;
-      bottomSize = 15;
-      this.verticalSplitterSizes = [topSize, bottomSize];
-      return;
-    }
-
-    // Update the sizes when user manually resizes
-    this.verticalSplitterSizes = event.sizes;
-    this.previousVerticalSizes = [...event.sizes];
+    // Update the sizes
+    this.verticalSplitterSizes = sizes;
+    this.previousVerticalSizes = [...sizes];
 
     // Update collapsed state based on size
-    this.isResultsCollapsed = event.sizes[1] <= 15;
+    this.isResultsCollapsed = sizes[1] <= 15;
+    
+    // Trigger layout update for Monaco editor
+    if (this.editor) {
+      setTimeout(() => this.editor.layout(), 100);
+    }
+  }
+  
+  onVerticalGutterDblClick(event: any): void {
+    // Handle double-click on vertical gutter
+    this.toggleResultsPanel();
   }
 
   // Dynamic results panel sizing based on content and viewport
@@ -4702,48 +4688,7 @@ export class RunQueryComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
-  // Setup double-click listeners on splitter gutters
-  setupSplitterDoubleClick(): void {
-    setTimeout(() => {
-      // Horizontal splitter gutter
-      const horizontalGutter = document.querySelector(
-        '.main-horizontal-splitter .p-splitter-gutter'
-      );
-      if (horizontalGutter) {
-        horizontalGutter.addEventListener('dblclick', () => {
-          // Run in Angular zone to ensure proper change detection
-          this.ngZone.run(() => {
-            this.toggleSchemaPanel();
-          });
-        });
-
-        // Add visual indicator
-        horizontalGutter.setAttribute(
-          'title',
-          'Double-click to collapse/expand schema panel'
-        );
-      }
-
-      // Vertical splitter gutter
-      const verticalGutter = document.querySelector(
-        '.editor-results-splitter .p-splitter-gutter'
-      );
-      if (verticalGutter) {
-        verticalGutter.addEventListener('dblclick', () => {
-          // Run in Angular zone to ensure proper change detection
-          this.ngZone.run(() => {
-            this.toggleResultsPanel();
-          });
-        });
-
-        // Add visual indicator
-        verticalGutter.setAttribute(
-          'title',
-          'Double-click to collapse/expand results panel'
-        );
-      }
-    }, 200); // Wait for PrimeNG to render the gutters
-  }
+  // Angular-split handles double-click natively, no need for manual setup
 
   // Fullscreen toggle method - Only for query editor area
   toggleFullscreen(): void {
