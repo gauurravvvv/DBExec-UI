@@ -21,6 +21,9 @@ export class ViewDatabaseComponent implements OnInit {
   dbId!: string;
   dbData: any;
   showDeleteConfirm = false;
+  showTableDetails = false;
+  selectedTable: any = null;
+  selectedSchema: any = null;
   tableSizeChartData: any;
   schemaSizeChartData: any = {
     labels: [],
@@ -98,6 +101,54 @@ export class ViewDatabaseComponent implements OnInit {
     const total = this.dbData.statistics.databaseSizeMB;
     return (schema.totalSizeMB / total) * 100;
   }
+
+  formatDatabaseSize(): string {
+    const sizeMB = this.dbData?.statistics?.databaseSizeMB || 0;
+
+    if (sizeMB >= 1024) {
+      // Convert to GB if size is 1024 MB or more
+      const sizeGB = sizeMB / 1024;
+      return `${sizeGB.toFixed(2)} GB`;
+    } else if (sizeMB < 1) {
+      // Convert to KB if size is less than 1 MB
+      const sizeKB = sizeMB * 1024;
+      return `${sizeKB.toFixed(2)} KB`;
+    } else {
+      // Display in MB
+      return `${sizeMB.toFixed(2)} MB`;
+    }
+  }
+
+  formatTableSize(sizeMB: number): string {
+    if (sizeMB >= 1024) {
+      const sizeGB = sizeMB / 1024;
+      return `${sizeGB.toFixed(2)} GB`;
+    } else if (sizeMB < 1) {
+      const sizeKB = sizeMB * 1024;
+      return `${sizeKB.toFixed(2)} KB`;
+    } else {
+      return `${sizeMB.toFixed(2)} MB`;
+    }
+  }
+
+  onTableClick(event: Event, schema: any, table: any): void {
+    // Stop event propagation to prevent accordion collapse
+    event.stopPropagation();
+    
+    // Set selected table and schema
+    this.selectedTable = table;
+    this.selectedSchema = schema;
+    
+    // Show the dialog
+    this.showTableDetails = true;
+  }
+  
+  closeTableDetails(): void {
+    this.showTableDetails = false;
+    this.selectedTable = null;
+    this.selectedSchema = null;
+  }
+  
 
   getSchemaColor(schema: any): string {
     const colors = this.generateColors(

@@ -1,259 +1,423 @@
 <div class="view-database-wrapper">
-    <div class="view-database-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text" (click)="goBack()">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-                <h2>Database Details</h2>
-            </div>
-            <div class="action-buttons">
-                <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-text"
-                    (click)="loadDatabaseData()"></button>
-                <button pButton class="p-button-outlined" type="button" (click)="onEdit()">
-                    <i class="pi pi-pencil mr-2"></i>Edit
-                </button>
-                <button pButton class="p-button-outlined p-button-danger" type="button" (click)="confirmDelete()">
-                    <i class="pi pi-trash mr-2"></i>Delete
-                </button>
-            </div>
-        </div>
-
-        <!-- Content Section -->
-        <div class="content-section" *ngIf="dbData">
-            <!-- Quick Stats Row -->
-            <div class="quick-stats">
-                <div class="stat-card animated">
-                    <div class="stat-icon">
-                        <i class="pi pi-database"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value">{{ dbData.statistics.databaseSizeMB.toFixed(2) }} MB</span>
-                        <span class="stat-label">Database Size</span>
-                    </div>
-                </div>
-                <div class="stat-card animated">
-                    <div class="stat-icon">
-                        <i class="pi pi-table"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value">{{ dbData.statistics.totalTables }}</span>
-                        <span class="stat-label">Total Tables</span>
-                    </div>
-                </div>
-                <div class="stat-card animated">
-                    <div class="stat-icon">
-                        <i class="pi pi-file"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value">{{ dbData.statistics.totalSchemas }}</span>
-                        <span class="stat-label">Schemas</span>
-                    </div>
-                </div>
-                <div class="stat-card animated">
-                    <div class="stat-icon">
-                        <i class="pi pi-search"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value">{{ dbData.statistics.totalIndexes }}</span>
-                        <span class="stat-label">Indexes</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content Grid -->
-            <div class="main-content">
-                <!-- Left Column -->
-                <div class="left-column">
-                    <!-- Configuration Card -->
-                    <div class="info-card">
-                        <div class="card-header">
-                            <h3><i class="pi pi-cog"></i>Configuration</h3>
-                        </div>
-                        <div class="card-content">
-                            <div class="config-grid">
-                                <div class="config-item">
-                                    <label>Database Type</label>
-                                    <p class="with-badge">
-                                        <span class="config-badge">{{ dbData?.config.dbType }}</span>
-                                    </p>
-                                </div>
-                                <div class="config-item">
-                                    <label>Connection Status</label>
-                                    <p>
-                                        <span class="status-badge" [class.active]="dbData.status === 1">
-                                            {{ dbData.status === 1 ? 'Active' : 'Inactive' }}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="config-item">
-                                    <label>Host</label>
-                                    <p>{{ dbData.config.hostname }}</p>
-                                </div>
-                                <div class="config-item">
-                                    <label>Port</label>
-                                    <p>{{ dbData.config.port }}</p>
-                                </div>
-                                <div class="config-item">
-                                    <label>Database Name</label>
-                                    <p>{{ dbData.config.dbName }}</p>
-                                </div>
-                                <div class="config-item">
-                                    <label>Organization</label>
-                                    <p>{{ dbData.organisationName }}</p>
-                                </div>
-                                <div class="config-item">
-                                    <label>Created On</label>
-                                    <p>{{ dbData.createdOn | date:'medium' }}</p>
-                                </div>
-                                <div class="config-item">
-                                    <label>Last Updated</label>
-                                    <p>{{ dbData.updatedOn | date:'medium' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Storage Analysis -->
-                    <div class="info-card storage-card">
-                        <div class="card-header">
-                            <h3><i class="pi pi-chart-line"></i>Storage Analysis</h3>
-                        </div>
-                        <div class="card-content">
-                            <div class="charts-grid">
-                                <div class="chart-container">
-                                    <h4>Storage Distribution by Schema</h4>
-                                    <div class="chart-wrapper">
-                                        <p-chart type="pie" [data]="schemaSizeChartData" [options]="schemaChartOptions"
-                                            class="schema-chart"></p-chart>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="right-column">
-                    <!-- Schema Analysis -->
-                    <div class="info-card">
-                        <div class="card-header">
-                            <h3><i class="pi pi-file"></i>Schema Analysis</h3>
-                            <div class="search-box">
-                                <span class="p-input-icon-left">
-                                    <i class="pi pi-search"></i>
-                                    <input pInputText type="text" placeholder="Search schema..."
-                                        (input)="onSchemaSearch($event)" />
-                                </span>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="schema-list">
-                                <div class="schema-item" *ngFor="let schema of filteredSchemas"
-                                    (click)="toggleSchemaExpand(schema)"
-                                    [class.expanded]="expandedSchemas.includes(schema.name)">
-                                    <div class="schema-header">
-                                        <i class="pi pi-file"></i>
-                                        <span class="schema-name">{{ schema.name }}</span>
-                                        <span class="schema-size">{{ schema.totalSizeMB.toFixed(2) }} MB</span>
-                                        <i class="expand-icon pi"
-                                            [ngClass]="expandedSchemas.includes(schema.name) ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
-                                    </div>
-                                    <div class="schema-progress">
-                                        <div class="progress-bar" [style.width.%]="getSchemaPercentage(schema)"
-                                            [style.backgroundColor]="getSchemaColor(schema)"></div>
-                                    </div>
-                                    <div class="schema-stats">
-                                        <div class="stat">
-                                            <span class="label">Tables</span>
-                                            <span class="value">{{ schema.tableCount }}</span>
-                                        </div>
-                                        <div class="stat">
-                                            <span class="label">Views</span>
-                                            <span class="value">{{ schema.viewCount }}</span>
-                                        </div>
-                                        <div class="stat">
-                                            <span class="label">Functions</span>
-                                            <span class="value">{{ schema.functionCount }}</span>
-                                        </div>
-                                    </div>
-                                    <!-- Expanded content -->
-                                    <div class="schema-details" *ngIf="expandedSchemas.includes(schema.name)">
-                                        <div class="tables-list">
-                                            <h5>Tables</h5>
-                                            <div class="table-item"
-                                                *ngFor="let table of getTablesForSchema(schema.name)">
-                                                <div class="table-name"><i class="pi pi-table"></i> {{ table.name }}
-                                                </div>
-                                                <div class="table-info">
-                                                    <span class="size">{{ table.sizeMB.total.toFixed(2) }} MB</span>
-                                                    <span class="rows">{{ table.totalColumns }} columns</span>
-                                                    <span class="rows">{{ table.rowCount }} rows</span>
-                                                </div>
-                                            </div>
-                                            <div class="no-tables" *ngIf="(schema.name).length === 0">
-                                                No tables found in this schema
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tables Overview -->
-                    <div class="info-card">
-                        <div class="card-header">
-                            <h3><i class="pi pi-table"></i>Top Storage Tables</h3>
-                        </div>
-                        <div class="card-content">
-                            <div class="top-tables">
-                                <div class="table-item" *ngFor="let table of topStorageTables">
-                                    <div class="table-info">
-                                        <span class="table-name">{{ table.schema }}.{{ table.name }}</span>
-                                        <div class="table-stats">
-                                            <span class="table-size">{{ table.size.toFixed(2) }} MB</span>
-                                            <span class="table-percentage">({{ table.percentage.toFixed(1) }}%)</span>
-                                        </div>
-                                    </div>
-                                    <div class="table-progress">
-                                        <div class="progress-bar" [style.width.%]="table.percentage"
-                                            [style.backgroundColor]="table.color"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="view-database-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Database Details</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-refresh"
+          class="p-button-rounded p-button-text"
+          (click)="loadDatabaseData()"
+        ></button>
+        <button
+          pButton
+          class="p-button-outlined"
+          type="button"
+          (click)="onEdit()"
+        >
+          <i class="pi pi-pencil mr-2"></i>Edit
+        </button>
+        <button
+          pButton
+          class="p-button-outlined p-button-danger"
+          type="button"
+          (click)="confirmDelete()"
+        >
+          <i class="pi pi-trash mr-2"></i>Delete
+        </button>
+      </div>
     </div>
+
+    <!-- Content Section -->
+    <div class="content-section" *ngIf="dbData">
+      <!-- Quick Stats Row -->
+      <div class="quick-stats">
+        <div class="stat-card animated">
+          <div class="stat-icon">
+            <i class="pi pi-database"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ formatDatabaseSize() }}</span>
+            <span class="stat-label">Database Size</span>
+          </div>
+        </div>
+        <div class="stat-card animated">
+          <div class="stat-icon">
+            <i class="pi pi-table"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ dbData.statistics.totalTables }}</span>
+            <span class="stat-label">Total Tables</span>
+          </div>
+        </div>
+        <div class="stat-card animated">
+          <div class="stat-icon">
+            <i class="pi pi-file"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ dbData.statistics.totalSchemas }}</span>
+            <span class="stat-label">Schemas</span>
+          </div>
+        </div>
+        <div class="stat-card animated">
+          <div class="stat-icon">
+            <i class="pi pi-search"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ dbData.statistics.totalIndexes }}</span>
+            <span class="stat-label">Indexes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="main-content">
+        <!-- Left Column -->
+        <div class="left-column">
+          <!-- Configuration Card -->
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="pi pi-cog"></i>Configuration</h3>
+            </div>
+            <div class="card-content">
+              <div class="config-grid">
+                <div class="config-item">
+                  <label>Database Type</label>
+                  <p class="with-badge">
+                    <span class="config-badge">{{
+                      dbData?.config.dbType
+                    }}</span>
+                  </p>
+                </div>
+                <div class="config-item">
+                  <label>Connection Status</label>
+                  <p>
+                    <span
+                      class="status-badge"
+                      [class.active]="dbData.status === 1"
+                    >
+                      {{ dbData.status === 1 ? 'Active' : 'Inactive' }}
+                    </span>
+                  </p>
+                </div>
+                <div class="config-item">
+                  <label>Host</label>
+                  <p>{{ dbData.config.hostname }}</p>
+                </div>
+                <div class="config-item">
+                  <label>Port</label>
+                  <p>{{ dbData.config.port }}</p>
+                </div>
+                <div class="config-item">
+                  <label>Database Name</label>
+                  <p>{{ dbData.config.dbName }}</p>
+                </div>
+                <div class="config-item">
+                  <label>Organization</label>
+                  <p>{{ dbData.organisationName }}</p>
+                </div>
+                <div class="config-item">
+                  <label>Created On</label>
+                  <p>{{ dbData.createdOn | date : 'medium' }}</p>
+                </div>
+                <div class="config-item">
+                  <label>Last Updated</label>
+                  <p>{{ dbData.updatedOn | date : 'medium' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Storage Analysis -->
+          <div class="info-card storage-card">
+            <div class="card-header">
+              <h3><i class="pi pi-chart-line"></i>Storage Analysis</h3>
+            </div>
+            <div class="card-content">
+              <div class="charts-grid">
+                <div class="chart-container">
+                  <h4>Storage Distribution by Schema</h4>
+                  <div class="chart-wrapper">
+                    <p-chart
+                      type="pie"
+                      [data]="schemaSizeChartData"
+                      [options]="schemaChartOptions"
+                      class="schema-chart"
+                    ></p-chart>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-column">
+          <!-- Schema Analysis -->
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="pi pi-file"></i>Schema Analysis</h3>
+              <div class="search-box">
+                <span class="p-input-icon-left">
+                  <i class="pi pi-search"></i>
+                  <input
+                    pInputText
+                    type="text"
+                    placeholder="Search schema..."
+                    (input)="onSchemaSearch($event)"
+                  />
+                </span>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="schema-list">
+                <div
+                  class="schema-item"
+                  *ngFor="let schema of filteredSchemas"
+                  (click)="toggleSchemaExpand(schema)"
+                  [class.expanded]="expandedSchemas.includes(schema.name)"
+                >
+                  <div class="schema-header">
+                    <i class="pi pi-file"></i>
+                    <span class="schema-name">{{ schema.name }}</span>
+                    <span class="schema-size">{{
+                      formatTableSize(schema.totalSizeMB)
+                    }}</span>
+                    <i
+                      class="expand-icon pi"
+                      [ngClass]="
+                        expandedSchemas.includes(schema.name)
+                          ? 'pi-chevron-up'
+                          : 'pi-chevron-down'
+                      "
+                    ></i>
+                  </div>
+                  <div class="schema-progress">
+                    <div
+                      class="progress-bar"
+                      [style.width.%]="getSchemaPercentage(schema)"
+                      [style.backgroundColor]="getSchemaColor(schema)"
+                    ></div>
+                  </div>
+                  <div class="schema-stats">
+                    <div class="stat">
+                      <span class="label">Tables</span>
+                      <span class="value">{{ schema.tableCount }}</span>
+                    </div>
+                    <div class="stat">
+                      <span class="label">Views</span>
+                      <span class="value">{{ schema.viewCount }}</span>
+                    </div>
+                    <div class="stat">
+                      <span class="label">Functions</span>
+                      <span class="value">{{ schema.functionCount }}</span>
+                    </div>
+                  </div>
+                  <!-- Expanded content -->
+                  <div
+                    class="schema-details"
+                    *ngIf="expandedSchemas.includes(schema.name)"
+                  >
+                    <div class="tables-list">
+                      <h5>Tables</h5>
+                      <div
+                        class="table-item"
+                        *ngFor="let table of getTablesForSchema(schema.name)"
+                      >
+                        <div
+                          class="table-name"
+                          (click)="onTableClick($event, schema, table)"
+                          [title]="'Click to view table details'"
+                        >
+                          <i class="pi pi-table"></i>
+                          <span>{{ table.name }}</span>
+                        </div>
+                        <div class="table-info">
+                          <span class="size">{{
+                            formatTableSize(table.sizeMB.total)
+                          }}</span>
+                          <span class="rows"
+                            >{{ table.totalColumns }} columns</span
+                          >
+                          <span class="rows">{{ table.rowCount }} rows</span>
+                        </div>
+                      </div>
+                      <div class="no-tables" *ngIf="schema.name.length === 0">
+                        No tables found in this schema
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tables Overview -->
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="pi pi-table"></i>Top Storage Tables</h3>
+            </div>
+            <div class="card-content">
+              <div class="top-tables">
+                <div class="table-item" *ngFor="let table of topStorageTables">
+                  <div class="table-info">
+                    <span class="table-name"
+                      >{{ table.schema }}.{{ table.name }}</span
+                    >
+                    <div class="table-stats">
+                      <span class="table-size">{{
+                        formatTableSize(table.size)
+                      }}</span>
+                      <span class="table-percentage"
+                        >({{ table.percentage.toFixed(1) }}%)</span
+                      >
+                    </div>
+                  </div>
+                  <div class="table-progress">
+                    <div
+                      class="progress-bar"
+                      [style.width.%]="table.percentage"
+                      [style.backgroundColor]="table.color"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Delete Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-    <div class="popup-content">
-        <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this database?</p>
+  <div class="popup-content">
+    <h3>Confirm Delete</h3>
+    <p>Are you sure you want to delete this database?</p>
 
-        <!-- Special warning for master database -->
-        <div class="warning-container" *ngIf="dbData?.isMasterDB">
-            <div class="warning-message">
-                <div class="warning-header">
-                    <i class="pi pi-exclamation-triangle"></i>
-                    <span class="warning-title">Critical Warning: Master Database</span>
-                </div>
-                <div class="warning-content">
-                    <p><i class="pi pi-circle-fill"></i>You are attempting to delete a master database.</p>
-                    <p><i class="pi pi-circle-fill"></i>This action cannot be undone.</p>
-                    <p><i class="pi pi-circle-fill"></i>All associated data will be permanently lost.</p>
-                </div>
-            </div>
+    <!-- Special warning for master database -->
+    <div class="warning-container" *ngIf="dbData?.isMasterDB">
+      <div class="warning-message">
+        <div class="warning-header">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span class="warning-title">Critical Warning: Master Database</span>
         </div>
-
-        <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">No</button>
-            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        <div class="warning-content">
+          <p>
+            <i class="pi pi-circle-fill"></i>You are attempting to delete a
+            master database.
+          </p>
+          <p><i class="pi pi-circle-fill"></i>This action cannot be undone.</p>
+          <p>
+            <i class="pi pi-circle-fill"></i>All associated data will be
+            permanently lost.
+          </p>
         </div>
+      </div>
     </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">No</button>
+      <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Table Details Dialog -->
+<div class="confirmation-popup" *ngIf="showTableDetails">
+  <div class="popup-content table-details-popup">
+    <div class="popup-header">
+      <h3><i class="pi pi-table"></i> Table Details</h3>
+      <button class="close-btn" (click)="closeTableDetails()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="table-details-content" *ngIf="selectedTable">
+      <!-- Table Name and Schema -->
+      <div class="detail-section">
+        <div class="detail-item">
+          <label>Table Name</label>
+          <p class="with-badge">
+            <span class="config-badge"
+              >{{ selectedSchema?.name }}.{{ selectedTable.name }}</span
+            >
+          </p>
+        </div>
+      </div>
+
+      <!-- Statistics Section -->
+      <div class="detail-section">
+        <h4>Statistics</h4>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <label><i class="pi pi-database"></i> Total Size</label>
+            <p>{{ formatTableSize(selectedTable.sizeMB.total) }}</p>
+          </div>
+          <div class="stat-item">
+            <label><i class="pi pi-list"></i> Columns</label>
+            <p>{{ selectedTable.totalColumns }}</p>
+          </div>
+          <div class="stat-item">
+            <label><i class="pi pi-align-justify"></i> Rows</label>
+            <p>{{ selectedTable.rowCount | number }}</p>
+          </div>
+          <div class="stat-item">
+            <label><i class="pi pi-search"></i> Indexes</label>
+            <p>{{ selectedTable.totalIndexes }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Size Breakdown -->
+      <div class="detail-section">
+        <h4>Size Breakdown</h4>
+        <div class="size-breakdown">
+          <div class="size-item">
+            <span class="size-label">Data Size</span>
+            <span class="size-value">{{
+              formatTableSize(selectedTable.sizeMB.data)
+            }}</span>
+          </div>
+          <div class="size-item">
+            <span class="size-label">Index Size</span>
+            <span class="size-value">{{
+              formatTableSize(selectedTable.sizeMB.index)
+            }}</span>
+          </div>
+          <div class="size-item">
+            <span class="size-label">Unused Space</span>
+            <span class="size-value">{{
+              formatTableSize(selectedTable.sizeMB.unused)
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columns Section -->
+      <div class="detail-section">
+        <h4>Columns ({{ selectedTable.columns?.length || 0 }})</h4>
+        <div class="columns-list">
+          <div class="column-item" *ngFor="let column of selectedTable.columns">
+            <span class="column-name">
+              <i class="pi pi-tag"></i> <span>{{ column.name }}</span>
+            </span>
+            <span class="column-type">{{ column.type }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="closeTableDetails()">Close</button>
+    </div>
+  </div>
 </div>
