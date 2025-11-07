@@ -154,3 +154,8 @@ export const ROLE = {
   UPDATE: '/role/update',
   LIST_PERMISSIONS: '/role/get-permissions/',
 };
+
+export const ACCESS = {
+  GET: '/access/get',
+  GRANT: '/access/grant',
+};

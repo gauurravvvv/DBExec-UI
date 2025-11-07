@@ -142,6 +142,9 @@ $icon-url: '../icons/';
     &.ci-dashboard {
       content: url($icon-url + 'dashboard.svg');
     }
+    &.ci-access-manager {
+      content: url($icon-url + 'access-manager.svg');
+    }
   }
 }
 

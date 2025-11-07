@@ -1,0 +1,167 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" routerLink="/app/group">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Access Manager</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-danger"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-outlined"
+          type="submit"
+          label="Grant Access"
+          (click)="onSubmit()"
+          [disabled]="accessForm.invalid"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="accessForm" class="admin-form">
+      <div class="form-grid">
+        <!-- Organisation Dropdown -->
+        <div class="form-field" *ngIf="showOrganisationDropdown">
+          <label for="organisation"
+            >Organisation<span class="required">*</span></label
+          >
+          <p-dropdown
+            [options]="organisations"
+            optionLabel="name"
+            optionValue="id"
+            formControlName="organisation"
+            [filter]="true"
+            filterBy="name"
+            [style]="{ width: '100%' }"
+            [panelStyle]="{ width: '100%' }"
+            placeholder="Select Organisation"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                accessForm.get('organisation')?.invalid &&
+                accessForm.get('organisation')?.touched
+            }"
+          >
+          </p-dropdown>
+          <small
+            class="error-message"
+            *ngIf="
+              accessForm.get('organisation')?.invalid &&
+              accessForm.get('organisation')?.touched
+            "
+          >
+            Organisation is required
+          </small>
+        </div>
+
+        <!-- Database Dropdown -->
+        <div class="form-field">
+          <label for="database">Database<span class="required">*</span></label>
+          <p-dropdown
+            [options]="databases"
+            optionLabel="name"
+            optionValue="id"
+            formControlName="database"
+            [filter]="true"
+            filterBy="name"
+            [style]="{ width: '100%' }"
+            [panelStyle]="{ width: '100%' }"
+            (onChange)="onDatabaseChange()"
+            placeholder="Select Database"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                accessForm.get('database')?.invalid &&
+                accessForm.get('database')?.touched
+            }"
+          >
+          </p-dropdown>
+          <small
+            class="error-message"
+            *ngIf="
+              accessForm.get('database')?.invalid &&
+              accessForm.get('database')?.touched
+            "
+          >
+            Database is required
+          </small>
+        </div>
+
+        <!-- Groups Multiselect -->
+        <div class="form-field">
+          <label for="groups">Groups</label>
+          <p-multiSelect
+            [options]="groups"
+            formControlName="groups"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            [style]="{ width: '100%' }"
+            [panelStyle]="{ width: '100%' }"
+            placeholder="Select Groups"
+            display="chip"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                accessForm.get('groups')?.invalid &&
+                accessForm.get('groups')?.touched
+            }"
+          >
+          </p-multiSelect>
+          <small
+            class="error-message"
+            *ngIf="
+              accessForm.get('groups')?.invalid &&
+              accessForm.get('groups')?.touched
+            "
+          >
+            Groups are required
+          </small>
+        </div>
+
+        <!-- Users Multiselect -->
+        <div class="form-field">
+          <label for="users">Users</label>
+          <p-multiSelect
+            [options]="users"
+            formControlName="users"
+            optionLabel="username"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            [style]="{ width: '100%' }"
+            [panelStyle]="{ width: '100%' }"
+            placeholder="Select Users"
+            display="chip"
+            [ngClass]="{
+              'ng-invalid ng-dirty':
+                accessForm.get('users')?.invalid &&
+                accessForm.get('users')?.touched
+            }"
+          >
+          </p-multiSelect>
+          <small
+            class="error-message"
+            *ngIf="
+              accessForm.get('users')?.invalid &&
+              accessForm.get('users')?.touched
+            "
+          >
+            Users are required
+          </small>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

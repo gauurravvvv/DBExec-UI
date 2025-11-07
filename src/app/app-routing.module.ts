@@ -74,6 +74,11 @@ const routes: Routes = [
           import('./modules/groups/group.module').then(m => m.GroupModule),
       },
       {
+        path: 'access',
+        loadChildren: () =>
+          import('./modules/access/access.module').then(m => m.AccessModule),
+      },
+      {
         path: 'environment',
         loadChildren: () =>
           import('./modules/environment/environment.module').then(
