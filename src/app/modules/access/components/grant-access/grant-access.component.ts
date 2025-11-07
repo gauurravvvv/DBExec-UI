@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 
 import {
   AbstractControl,
@@ -11,7 +10,6 @@ import {
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
-import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { AccessService } from '../../services/access.service';
@@ -33,10 +31,8 @@ export class GrantAccessComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private groupService: GroupService,
     private userService: UserService,
     private databaseService: DatabaseService,
     private acessService: AccessService
@@ -91,10 +87,50 @@ export class GrantAccessComponent implements OnInit {
       { validators: this.atLeastOneRequired }
     );
 
-    // Subscribe to organisation changes
-    this.accessForm.get('organisation')?.valueChanges.subscribe(value => {
+    // Subscribe to organisation changes (only for SUPER_ADMIN)
+    if (isSuperAdmin) {
+      this.accessForm.get('organisation')?.valueChanges.subscribe(value => {
+        if (value) {
+          // Clear database, groups, and users when organisation changes
+          this.accessForm.patchValue(
+            {
+              database: null,
+              groups: [],
+              users: [],
+            },
+            { emitEvent: false }
+          );
+          // Load databases for new organisation
+          this.loadDatabases();
+          // Clear groups and users arrays
+          this.groups = [];
+          this.users = [];
+        } else {
+          // If organisation is cleared, clear everything
+          this.databases = [];
+          this.groups = [];
+          this.users = [];
+          this.accessForm.patchValue(
+            {
+              database: null,
+              groups: [],
+              users: [],
+            },
+            { emitEvent: false }
+          );
+        }
+      });
+    }
+
+    // Subscribe to database changes (for both roles)
+    this.accessForm.get('database')?.valueChanges.subscribe(value => {
       if (value) {
-        this.loadDatabases();
+        // Load access details when database is selected
+        this.onDatabaseChange();
+      } else {
+        // Clear groups and users when database is cleared
+        this.groups = [];
+        this.users = [];
         this.accessForm.patchValue(
           {
             groups: [],
@@ -102,10 +138,6 @@ export class GrantAccessComponent implements OnInit {
           },
           { emitEvent: false }
         );
-      } else {
-        this.databases = [];
-        this.groups = [];
-        this.users = [];
       }
     });
 
@@ -189,28 +221,69 @@ export class GrantAccessComponent implements OnInit {
 
   onSubmit() {
     if (this.accessForm.valid) {
-      this.acessService.grantAccess(this.accessForm.value).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.onCancel();
-        }
-      });
+      this.acessService
+        .grantAccess(this.accessForm.value)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            // Clear form after successful submission
+            this.onCancel();
+          }
+        })
+        .catch(error => {
+          console.error('Error granting access:', error);
+        });
     }
   }
 
   onCancel() {
     if (!this.accessForm) return;
 
+    const role = this.globalService.getTokenDetails('role');
+    const isSuperAdmin = role === ROLES.SUPER_ADMIN;
+    const isOrgAdmin = role === ROLES.ORG_ADMIN;
+    const organisationId = this.globalService.getTokenDetails('organisationId');
+
+    // Reset the form
     this.accessForm.reset();
-    Object.keys(this.accessForm.controls).forEach(key => {
-      const control = this.accessForm.get(key);
-      if (control) {
-        if (key === 'users' || key === 'groups') {
-          control.setValue([]);
-        } else {
-          control.setValue(null);
-        }
-      }
-    });
+
+    if (isSuperAdmin) {
+      // For SUPER_ADMIN: Keep organisations list, clear everything else
+      this.accessForm.patchValue(
+        {
+          organisation: null,
+          database: null,
+          users: [],
+          groups: [],
+        },
+        { emitEvent: false }
+      );
+
+      // Clear databases, groups, and users arrays
+      this.databases = [];
+      this.groups = [];
+      this.users = [];
+      // Keep organisations array intact (don't clear it)
+    } else if (isOrgAdmin) {
+      // For ORG_ADMIN: Set organisation from token, keep databases list, clear rest
+      this.accessForm.patchValue(
+        {
+          organisation: organisationId,
+          database: null,
+          users: [],
+          groups: [],
+        },
+        { emitEvent: false }
+      );
+
+      // Clear only groups and users arrays
+      this.groups = [];
+      this.users = [];
+      // Keep databases array intact (don't clear it)
+    }
+
+    // Mark form as pristine and untouched
+    this.accessForm.markAsPristine();
+    this.accessForm.markAsUntouched();
   }
 
   onDatabaseChange() {
@@ -253,11 +326,30 @@ export class GrantAccessComponent implements OnInit {
             },
             { emitEvent: false }
           );
+        } else {
+          // Clear data on unsuccessful response
+          this.users = [];
+          this.groups = [];
+          this.accessForm.patchValue(
+            {
+              users: [],
+              groups: [],
+            },
+            { emitEvent: false }
+          );
         }
       })
       .catch(error => {
+        // Clear all data on error
         this.users = [];
         this.groups = [];
+        this.accessForm.patchValue(
+          {
+            users: [],
+            groups: [],
+          },
+          { emitEvent: false }
+        );
       });
   }
 }
