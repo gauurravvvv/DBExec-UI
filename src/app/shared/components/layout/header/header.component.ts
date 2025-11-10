@@ -120,10 +120,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:click', ['$event'])
-  clickout(event: any) {
+  handleClickOutside(event: Event) {
+    const clickedElement = event.target as HTMLElement;
+
+    // Handle profile menu click outside
     const userProfile = document.querySelector('.user-profile');
-    if (!userProfile?.contains(event.target)) {
+    if (!userProfile?.contains(clickedElement)) {
       this.showProfileMenu = false;
+    }
+
+    // Handle notification menu click outside
+    if (
+      !clickedElement.closest('.notification-btn') &&
+      !clickedElement.closest('.notification-menu')
+    ) {
+      this.showNotificationMenu = false;
     }
   }
 
@@ -160,17 +171,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   get hasNotifications(): boolean {
     return this.notifications.length > 0;
-  }
-
-  @HostListener('document:click', ['$event'])
-  handleClickOutside(event: Event) {
-    const notificationBtn = event.target as HTMLElement;
-    if (
-      !notificationBtn.closest('.notification-btn') &&
-      !notificationBtn.closest('.notification-menu')
-    ) {
-      this.showNotificationMenu = false;
-    }
   }
 
   toggleNotificationMenu(event: Event) {
