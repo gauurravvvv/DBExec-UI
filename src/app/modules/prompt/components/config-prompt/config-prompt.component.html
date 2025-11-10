@@ -146,17 +146,27 @@
                     </div>
                     <div class="form-row" *ngIf="showAddPromptValues">
                         <div class="form-field">
-                            <div class="label-with-clear">
-                                <label for="promptValues">
+                            <div class="label-with-clear"
+                                style="display: flex; align-items: center; justify-content: space-between;">
+                                <label for="promptValues" style="margin-bottom: 0;">
                                     Prompt Values<span class="required">*</span>
                                     <i class="pi pi-info-circle info-icon" pTooltip="Press Enter or Comma to add values"
                                         tooltipPosition="right"></i>
                                 </label>
-                                <button type="button" pButton
-                                    class="p-button-text p-button-rounded p-button-plain clear-all-button"
-                                    icon="pi pi-trash" (click)="clearPromptValues()"
-                                    [disabled]="!promptForm.get('promptValues')?.value?.length">
-                                </button>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+                                    <label class="upload-label" style="cursor: pointer; margin-bottom: 0;">
+                                        <i class="pi pi-upload p-button-text p-button-rounded p-button-plain"
+                                            pTooltip="Values must be separated by comma, newline, or by |"
+                                            tooltipPosition="right"></i>
+                                        <input type="file" accept=".csv,.txt" style="display: none;"
+                                            (change)="onPromptFileUpload($event)">
+                                    </label>
+                                    <button type="button" pButton
+                                        class="p-button-text p-button-rounded p-button-plain clear-all-button"
+                                        icon="pi pi-trash" (click)="clearPromptValues()"
+                                        [disabled]="!promptForm.get('promptValues')?.value?.length">
+                                    </button>
+                                </div>
                             </div>
                             <p-chips id="promptValues" formControlName="promptValues" [addOnBlur]="true"
                                 [addOnTab]="true" [allowDuplicate]="false" [separator]="separator"

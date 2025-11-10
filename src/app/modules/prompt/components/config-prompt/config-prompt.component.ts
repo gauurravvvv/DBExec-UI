@@ -323,15 +323,15 @@ export class ConfigPromptComponent implements OnInit {
     this.tableColumns = {};
 
     if (schemaData) {
-      const tables = schemaData.tables.map((table: any, index: number) => {
+      const tables = schemaData.tables.map((table: any) => {
         // Store columns for each table alias
-        this.tableColumns[`t${index + 1}`] = table.columns;
+        this.tableColumns[table.table_alias] = table.columns;
 
         return {
-          name: `${table.table_name}(t${index + 1})`,
+          name: `${table.table_name}(${table.table_alias})`,
           value: {
             tableName: table.table_name,
-            alias: `t${index + 1}`,
+            alias: table.table_alias,
           },
           columns: table.columns,
         };
@@ -524,5 +524,27 @@ export class ConfigPromptComponent implements OnInit {
         }
       });
     }
+  }
+
+  onPromptFileUpload(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      let text = e.target.result as string;
+      // Split by comma, newline, or |
+      let newValues = text
+        .split(/,|\n|\r|\|/)
+        .map(v => v.trim())
+        .filter(v => v.length > 0);
+      // Get current values
+      let currentValues = this.promptForm.get('promptValues')?.value || [];
+      // Merge and keep only unique values
+      let merged = Array.from(new Set([...currentValues, ...newValues]));
+      this.promptForm.patchValue({ promptValues: merged });
+      // Reset file input so user can re-upload same file if needed
+      event.target.value = '';
+    };
+    reader.readAsText(file);
   }
 }
