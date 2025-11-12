@@ -52,7 +52,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            <th>Users</th>
+                            <th>Username</th>
                             <th>
                                 Status
                                 <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
@@ -79,8 +79,8 @@
                                 <td>{{ connection.description }}</td>
                                 <td>
                                     <span class="field-count">
-                                        <i class="pi pi-users"></i>
-                                        2 users
+                                        <i class="pi pi-user"></i>
+                                        {{ connection.dbUsername }}
                                     </span>
                                 </td>
                                 <td>

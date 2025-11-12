@@ -77,19 +77,37 @@
                     </div>
                 </div>
 
-                <!-- Sections -->
+                <!-- Groups -->
                 <div class="info-section">
                     <h3>
                         <i class="pi pi-users mr-2"></i>
-                        Users
-                        <!-- <span class="count-badge">{{ connectionData.sections.length }}</span> -->
+                        Groups
+                        <span class="count-badge">{{ connectionData.groups.length }}</span>
                     </h3>
                     <div class="fields-list">
-                        <div class="field-item" *ngFor="let section of connectionData?.sections">
-                            <i class="pi pi-tag"></i>
-                            <span>{{ section?.name }}</span>
+                        <div class="field-item" *ngFor="let group of connectionData?.groups">
+                            <i class="pi pi-users"></i>
+                            <span>{{ group?.name }}</span>
                         </div>
-                        <div *ngIf="connectionData?.sections?.length === 0" class="no-data">
+                        <div *ngIf="connectionData?.groups?.length === 0" class="no-data">
+                            No groups found
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users -->
+                <div class="info-section">
+                    <h3>
+                        <i class="pi pi-user mr-2"></i>
+                        Users
+                        <span class="count-badge">{{ connectionData.users.length }}</span>
+                    </h3>
+                    <div class="fields-list">
+                        <div class="field-item" *ngFor="let user of connectionData?.users">
+                            <i class="pi pi-user"></i>
+                            <span>{{ user?.username }}</span>
+                        </div>
+                        <div *ngIf="connectionData?.users?.length === 0" class="no-data">
                             No users found
                         </div>
                     </div>
