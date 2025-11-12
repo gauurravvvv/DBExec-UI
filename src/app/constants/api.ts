@@ -159,3 +159,11 @@ export const ACCESS = {
   GET: '/access/get',
   GRANT: '/access/grant',
 };
+
+export const CONNECTIONS = {
+  ADD: '/connections/add',
+  LIST: '/connections/list',
+  DELETE: '/connections/delete/',
+  VIEW: '/connections/get/',
+  UPDATE: '/connections/update',
+};

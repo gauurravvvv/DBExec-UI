@@ -101,6 +101,14 @@ const routes: Routes = [
       },
 
       {
+        path: 'connections',
+        loadChildren: () =>
+          import('./modules/connection/connection.module').then(
+            m => m.ConnectionsModule
+          ),
+      },
+
+      {
         path: 'role',
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),
