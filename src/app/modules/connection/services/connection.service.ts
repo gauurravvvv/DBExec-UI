@@ -45,13 +45,23 @@ export class ConnectionService {
       });
   }
 
-  addTab(tabForm: FormGroup) {
-    const { organisation, database, tabs } = tabForm.value;
+  addConnection(connectionForm: FormGroup) {
+    const {
+      organisation,
+      database,
+      name,
+      description,
+      dbUsername,
+      dbPassword,
+    } = connectionForm.value;
     return this.http
-      .post(TAB.ADD, {
+      .post(CONNECTIONS.ADD, {
         organisation,
         database,
-        tabs,
+        name,
+        description,
+        dbUsername,
+        dbPassword,
       })
       .toPromise()
       .then((response: any) => {

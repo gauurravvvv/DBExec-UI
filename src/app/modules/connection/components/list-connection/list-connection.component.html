@@ -69,14 +69,14 @@
                     </thead>
                     <tbody>
                         <ng-container *ngIf="filteredConnections && filteredConnections.length > 0; else noData">
-                            <tr *ngFor="let tab of filteredConnections">
+                            <tr *ngFor="let connection of filteredConnections">
                                 <td>
                                     <a class="admin-name"
-                                        [routerLink]="['/app/connections/view', selectedOrg.id, tab.id]">
-                                        {{ tab.name }}
+                                        [routerLink]="['/app/connections/view', selectedOrg.id, connection.id]">
+                                        {{ connection.name }}
                                     </a>
                                 </td>
-                                <td>{{ tab.description }}</td>
+                                <td>{{ connection.description }}</td>
                                 <td>
                                     <span class="field-count">
                                         <i class="pi pi-users"></i>
@@ -84,16 +84,17 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="status-badge" [class.active]="tab.status === 1">
-                                        {{ tab.status === 1 ? 'Active' : 'Inactive' }}
+                                    <span class="status-badge" [class.active]="connection.status === 1">
+                                        {{ connection.status === 1 ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
-                                <td>{{ tab.createdOn | date:'mediumDate' }}</td>
+                                <td>{{ connection.createdOn | date:'mediumDate' }}</td>
                                 <td class="actions">
-                                    <button class="action-btn edit" (click)="onEdit(tab.id)" title="Edit">
+                                    <button class="action-btn edit" (click)="onEdit(connection.id)" title="Edit">
                                         <i class="pi pi-pencil"></i>
                                     </button>
-                                    <button class="action-btn delete" (click)="confirmDelete(tab.id)" title="Delete">
+                                    <button class="action-btn delete" (click)="confirmDelete(connection.id)"
+                                        title="Delete">
                                         <i class="pi pi-trash"></i>
                                     </button>
                                 </td>
