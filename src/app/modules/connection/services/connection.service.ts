@@ -1,21 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs';
-import { SECRET } from 'src/app/constants/api';
-import { IParams } from 'src/app/core/interfaces/global.interface';
+import { FormGroup } from '@angular/forms';
+import { CONNECTIONS, TAB } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CredentialService {
+export class ConnectionService {
   constructor(private http: HttpClient) {}
 
-  listCredentials(params: IParams) {
+  listConnection(params: any) {
     return this.http
       .get(
-        SECRET.LIST +
-          `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`
+        CONNECTIONS.LIST +
+          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
       )
       .toPromise()
       .then((response: any) => {
@@ -24,13 +22,36 @@ export class CredentialService {
       });
   }
 
-  addCredential(credentialForm: any) {
-    const { organisation, categoryId, credentials } = credentialForm;
+  listAllTabData(params: any) {
     return this.http
-      .post(SECRET.ADD, {
+      .get(
+        TAB.GET_ALL +
+          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
+      )
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  deleteConnection(orgId: string, databaseId: string, id: string) {
+    return this.http
+      .delete(CONNECTIONS.DELETE + `${orgId}/${databaseId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  addTab(tabForm: FormGroup) {
+    const { organisation, database, tabs } = tabForm.value;
+    return this.http
+      .post(TAB.ADD, {
         organisation,
-        categoryId,
-        credentials,
+        database,
+        tabs,
       })
       .toPromise()
       .then((response: any) => {
@@ -39,9 +60,9 @@ export class CredentialService {
       });
   }
 
-  deleteCredential(orgId: string, credentialId: string) {
+  viewTab(orgId: string, id: string) {
     return this.http
-      .delete(SECRET.DELETE + `${orgId}/${credentialId}`)
+      .get(TAB.VIEW + `${orgId}/${id}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -49,56 +70,18 @@ export class CredentialService {
       });
   }
 
-  deleteAllCredential(orgId: string, categoryId: string) {
+  updateTab(tabForm: FormGroup) {
+    const { id, name, description, organisation, database, status } =
+      tabForm.getRawValue();
     return this.http
-      .delete(SECRET.DELETE_ALL + `${orgId}/${categoryId}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
-  }
-
-  getCredential(orgId: string, categoryId: string) {
-    return this.http
-      .get(SECRET.VIEW + `${orgId}/${categoryId}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
-  }
-
-  editCredential(credentialData: any) {
-    const { credentialId, values, organisationId } = credentialData;
-    return this.http
-      .put(SECRET.EDIT, {
-        credentialId,
-        values,
-        organisationId,
+      .put(TAB.UPDATE, {
+        id,
+        name,
+        description,
+        organisation,
+        database,
+        status: status ? 1 : 0,
       })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
-  }
-
-  downloadCredentials(orgId: string, categoryId: string) {
-    return this.http
-      .get(SECRET.DOWNLOAD + `${orgId}/${categoryId}`, {
-        responseType: 'blob',
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
-  }
-
-  changeVisibility(orgId: string, credentialId: string) {
-    return this.http
-      .get(SECRET.CHANGE_VISIBILITY + `${orgId}/${credentialId}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

@@ -110,3 +110,10 @@ export const ROLE = {
   EDIT: '/app/role/edit',
   VIEW: '/app/role/view',
 };
+
+export const CONNECTION = {
+  ADD: '/app/connections/add',
+  LIST: '/app/connections',
+  EDIT: '/app/connections/edit',
+  VIEW: '/app/connections/view',
+};
