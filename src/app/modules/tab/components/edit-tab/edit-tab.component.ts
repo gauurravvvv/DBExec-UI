@@ -101,8 +101,8 @@ export class EditTabComponent implements OnInit {
         id: this.tabData.id,
         name: this.tabData.name,
         description: this.tabData.description,
-        organisation: this.tabData.organisation,
-        database: this.tabData.database,
+        organisation: this.tabData.organisationId,
+        database: this.tabData.databaseId,
         status: this.tabData.status,
       });
 

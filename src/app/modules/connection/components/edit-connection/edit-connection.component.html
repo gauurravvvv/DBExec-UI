@@ -1,1 +1,115 @@
-<p>update-connection works!</p>
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <!-- Header Section -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" routerLink="/app/connections">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Edit Connection</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()"></button>
+                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    [disabled]="connectionForm.invalid || !isFormDirty">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <form [formGroup]="connectionForm" class="admin-form" #formContainer>
+            <div class="form-grid">
+                <!-- Name and Description fields -->
+                <div class="form-field">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-box"></i>
+                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
+                            [ngClass]="{
+                'ng-invalid ng-dirty':
+                  connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched
+              }" />
+                    </span>
+                    <small class="error-message"
+                        *ngIf="connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched">
+                        <span *ngIf="connectionForm.get('name')?.errors?.['required']">Name is required</span>
+                        <span *ngIf="connectionForm.get('name')?.errors?.['pattern']">Name can only contain letters,
+                            spaces and
+                            hyphens</span>
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <label for="description">Description</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-align-left"></i>
+                        <input id="description" pInputText formControlName="description" rows="3"
+                            placeholder="Enter description" />
+                    </span>
+                </div>
+
+                <!-- Organisation and Database fields (disabled) -->
+                <div class="form-field" *ngIf="showOrganisationDropdown">
+                    <label for="organisation">Organisation</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-building"></i>
+                        <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled />
+                    </span>
+                </div>
+
+                <div class="form-field">
+                    <label for="database">Database</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-database"></i>
+                        <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled />
+                    </span>
+                </div>
+
+                <div class="form-field">
+                    <label for="status">Status</label>
+                    <div class="status-wrapper">
+                        <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
+                        <span class="status-text">{{
+                            connectionForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
+                            }}</span>
+                    </div>
+                </div>
+
+                <!--DB Username-->
+                <div class="form-field">
+                    <label for="dbUsername">Database Username <span class="required">*</span></label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-box"></i>
+                        <input id="username" type="text" pInputText formControlName="dbUsername"
+                            placeholder="Enter Database Username"
+                            [ngClass]="{'ng-invalid ng-dirty': connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched}">
+                    </span>
+                    <small class="error-message"
+                        *ngIf="connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched">
+                        <span *ngIf="connectionForm.get('dbUsername')?.errors?.['required']">Database Username is
+                            required</span>
+                    </small>
+                </div>
+
+                <!--DB password-->
+                <div class="form-field">
+                    <label for="password">Database Password<span class="required"> *</span></label>
+                    <span class="p-input-icon-left p-input-icon-right">
+                        <i class="pi pi-lock"></i>
+                        <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
+                            formControlName="dbPassword" placeholder="Enter password"
+                            [ngClass]="{'ng-invalid ng-dirty': connectionForm.get('dbPassword')?.invalid && connectionForm.get('dbPassword')?.touched}">
+                        <i class="pi pi-eye" style="cursor: pointer;" (click)="togglePassword($event)"></i>
+                    </span>
+                    <small class="error-message"
+                        *ngIf="connectionForm.get('dbPassword')?.invalid && connectionForm.get('dbPassword')?.touched">
+                        <span *ngIf="connectionForm.get('dbPassword')?.errors?.['required']">Database Password is
+                            required</span>
+                    </small>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

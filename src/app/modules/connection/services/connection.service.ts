@@ -80,17 +80,27 @@ export class ConnectionService {
       });
   }
 
-  updateTab(tabForm: FormGroup) {
-    const { id, name, description, organisation, database, status } =
-      tabForm.getRawValue();
+  updateConnection(connectionForm: FormGroup) {
+    const {
+      id,
+      name,
+      description,
+      organisation,
+      database,
+      status,
+      dbUsername,
+      dbPassword,
+    } = connectionForm.getRawValue();
     return this.http
-      .put(TAB.UPDATE, {
+      .put(CONNECTIONS.UPDATE, {
         id,
         name,
         description,
         organisation,
         database,
         status: status ? 1 : 0,
+        dbUsername,
+        dbPassword,
       })
       .toPromise()
       .then((response: any) => {
