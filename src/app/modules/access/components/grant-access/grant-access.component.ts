@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-
 import {
   AbstractControl,
   FormBuilder,
@@ -9,9 +8,9 @@ import {
 } from '@angular/forms';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ConnectionService } from 'src/app/modules/connection/services/connection.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { UserService } from 'src/app/modules/users/services/user.service';
 import { AccessService } from '../../services/access.service';
 
 @Component({
@@ -24,6 +23,7 @@ export class GrantAccessComponent implements OnInit {
   showPassword = false;
   organisations: any[] = [];
   databases: any[] = [];
+  connections: any[] = [];
   groups: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
@@ -33,9 +33,9 @@ export class GrantAccessComponent implements OnInit {
     private fb: FormBuilder,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private userService: UserService,
     private databaseService: DatabaseService,
-    private acessService: AccessService
+    private acessService: AccessService,
+    private connectionService: ConnectionService
   ) {}
 
   get isFormDirty(): boolean {
@@ -81,65 +81,12 @@ export class GrantAccessComponent implements OnInit {
           Validators.required,
         ],
         database: [null, Validators.required],
+        connection: [null, Validators.required],
         users: [[]],
         groups: [[]],
       },
       { validators: this.atLeastOneRequired }
     );
-
-    // Subscribe to organisation changes (only for SUPER_ADMIN)
-    if (isSuperAdmin) {
-      this.accessForm.get('organisation')?.valueChanges.subscribe(value => {
-        if (value) {
-          // Clear database, groups, and users when organisation changes
-          this.accessForm.patchValue(
-            {
-              database: null,
-              groups: [],
-              users: [],
-            },
-            { emitEvent: false }
-          );
-          // Load databases for new organisation
-          this.loadDatabases();
-          // Clear groups and users arrays
-          this.groups = [];
-          this.users = [];
-        } else {
-          // If organisation is cleared, clear everything
-          this.databases = [];
-          this.groups = [];
-          this.users = [];
-          this.accessForm.patchValue(
-            {
-              database: null,
-              groups: [],
-              users: [],
-            },
-            { emitEvent: false }
-          );
-        }
-      });
-    }
-
-    // Subscribe to database changes (for both roles)
-    this.accessForm.get('database')?.valueChanges.subscribe(value => {
-      if (value) {
-        // Load access details when database is selected
-        this.onDatabaseChange();
-      } else {
-        // Clear groups and users when database is cleared
-        this.groups = [];
-        this.users = [];
-        this.accessForm.patchValue(
-          {
-            groups: [],
-            users: [],
-          },
-          { emitEvent: false }
-        );
-      }
-    });
 
     // Trigger validation when groups or users change
     this.accessForm.get('groups')?.valueChanges.subscribe(() => {
@@ -171,27 +118,28 @@ export class GrantAccessComponent implements OnInit {
       });
   }
 
-  loadUsers() {
+  loadConnections() {
     const orgId = this.accessForm.get('organisation')?.value;
-    if (!orgId) return;
-
+    const databaseId = this.accessForm.get('database')?.value;
+    if (!orgId || !databaseId) return;
     const params = {
       orgId,
+      databaseId,
       pageNumber: 1,
       limit: 100,
     };
 
-    this.userService
-      .listUser(params)
+    this.connectionService
+      .listConnection(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.users = [...(response.data.users || [])];
+          this.connections = [...(response.data.connections || [])];
         } else {
-          this.users = [];
+          this.connections = [];
         }
       })
       .catch(error => {
-        this.users = [];
+        this.connections = [];
       });
   }
 
@@ -225,7 +173,6 @@ export class GrantAccessComponent implements OnInit {
         .grantAccess(this.accessForm.value)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            // Clear form after successful submission
             this.onCancel();
           }
         })
@@ -252,6 +199,7 @@ export class GrantAccessComponent implements OnInit {
         {
           organisation: null,
           database: null,
+          connection: null,
           users: [],
           groups: [],
         },
@@ -260,6 +208,7 @@ export class GrantAccessComponent implements OnInit {
 
       // Clear databases, groups, and users arrays
       this.databases = [];
+      this.connections = [];
       this.groups = [];
       this.users = [];
       // Keep organisations array intact (don't clear it)
@@ -269,6 +218,7 @@ export class GrantAccessComponent implements OnInit {
         {
           organisation: organisationId,
           database: null,
+          connection: null,
           users: [],
           groups: [],
         },
@@ -276,6 +226,8 @@ export class GrantAccessComponent implements OnInit {
       );
 
       // Clear only groups and users arrays
+      this.databases = [];
+      this.connections = [];
       this.groups = [];
       this.users = [];
       // Keep databases array intact (don't clear it)
@@ -286,15 +238,15 @@ export class GrantAccessComponent implements OnInit {
     this.accessForm.markAsUntouched();
   }
 
-  onDatabaseChange() {
+  onConnectionChange() {
     const orgId = this.accessForm.get('organisation')?.value;
-    const databaseId = this.accessForm.get('database')?.value;
+    const connectionId = this.accessForm.get('connection')?.value;
 
-    if (!orgId || !databaseId) return;
+    if (!orgId || !connectionId) return;
 
     const params = {
       orgId,
-      databaseId,
+      connectionId,
     };
 
     this.acessService

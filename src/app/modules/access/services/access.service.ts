@@ -10,7 +10,7 @@ export class AccessService {
 
   listAccessDetails(params: any) {
     return this.http
-      .get(ACCESS.GET + `/${params.orgId}/${params.databaseId}`)
+      .get(ACCESS.GET + `/${params.orgId}/${params.connectionId}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -19,12 +19,13 @@ export class AccessService {
   }
 
   grantAccess(payload: any) {
-    const { organisation, database, users, groups } = payload;
+    const { organisation, database, users, groups, connection } = payload;
     const requestBody: any = {
       organisation,
       database,
       users,
       groups,
+      connection,
     };
     return this.http
       .post(ACCESS.GRANT, requestBody)
