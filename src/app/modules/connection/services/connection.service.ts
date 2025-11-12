@@ -35,9 +35,9 @@ export class ConnectionService {
       });
   }
 
-  deleteConnection(orgId: string, databaseId: string, id: string) {
+  deleteConnection(orgId: string, id: string) {
     return this.http
-      .delete(CONNECTIONS.DELETE + `${orgId}/${databaseId}/${id}`)
+      .delete(CONNECTIONS.DELETE + `${orgId}/${id}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -70,9 +70,9 @@ export class ConnectionService {
       });
   }
 
-  viewTab(orgId: string, id: string) {
+  viewConnection(orgId: string, id: string) {
     return this.http
-      .get(TAB.VIEW + `${orgId}/${id}`)
+      .get(CONNECTIONS.VIEW + `${orgId}/${id}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

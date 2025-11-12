@@ -14,7 +14,7 @@ const routes: Routes = [
     path: 'add',
     component: AddConnectionComponent,
   },
-  { path: 'view/:orgId/:categoryId', component: ViewConnectionComponent },
+  { path: 'view/:orgId/:id', component: ViewConnectionComponent },
   { path: 'edit/:orgId/:id', component: EditConnectionComponent },
 ];
 

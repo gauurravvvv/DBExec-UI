@@ -9,28 +9,12 @@
         <h2>Database Details</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          pRipple
-          type="button"
-          icon="pi pi-refresh"
-          class="p-button-rounded p-button-text"
-          (click)="loadDatabaseData()"
-        ></button>
-        <button
-          pButton
-          class="p-button-outlined"
-          type="button"
-          (click)="onEdit()"
-        >
+        <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-text"
+          (click)="loadDatabaseData()"></button>
+        <button pButton class="p-button-outlined" type="button" (click)="onEdit()">
           <i class="pi pi-pencil mr-2"></i>Edit
         </button>
-        <button
-          pButton
-          class="p-button-outlined p-button-danger"
-          type="button"
-          (click)="confirmDelete()"
-        >
+        <button pButton class="p-button-outlined p-button-danger" type="button" (click)="confirmDelete()">
           <i class="pi pi-trash mr-2"></i>Delete
         </button>
       </div>
@@ -94,16 +78,13 @@
                   <p class="with-badge">
                     <span class="config-badge">{{
                       dbData?.config.dbType
-                    }}</span>
+                      }}</span>
                   </p>
                 </div>
                 <div class="config-item">
                   <label>Connection Status</label>
                   <p>
-                    <span
-                      class="status-badge"
-                      [class.active]="dbData.status === 1"
-                    >
+                    <span class="status-badge" [class.active]="dbData.status === 1">
                       {{ dbData.status === 1 ? 'Active' : 'Inactive' }}
                     </span>
                   </p>
@@ -121,7 +102,7 @@
                   <p>{{ dbData.config.dbName }}</p>
                 </div>
                 <div class="config-item">
-                  <label>Organization</label>
+                  <label>Organisation</label>
                   <p>{{ dbData.organisationName }}</p>
                 </div>
                 <div class="config-item">
@@ -145,12 +126,8 @@
                 <div class="chart-container">
                   <h4>Storage Distribution by Schema</h4>
                   <div class="chart-wrapper">
-                    <p-chart
-                      type="pie"
-                      [data]="schemaSizeChartData"
-                      [options]="schemaChartOptions"
-                      class="schema-chart"
-                    ></p-chart>
+                    <p-chart type="pie" [data]="schemaSizeChartData" [options]="schemaChartOptions"
+                      class="schema-chart"></p-chart>
                   </div>
                 </div>
               </div>
@@ -167,44 +144,29 @@
               <div class="search-box">
                 <span class="p-input-icon-left">
                   <i class="pi pi-search"></i>
-                  <input
-                    pInputText
-                    type="text"
-                    placeholder="Search schema..."
-                    (input)="onSchemaSearch($event)"
-                  />
+                  <input pInputText type="text" placeholder="Search schema..." (input)="onSchemaSearch($event)" />
                 </span>
               </div>
             </div>
             <div class="card-content">
               <div class="schema-list">
-                <div
-                  class="schema-item"
-                  *ngFor="let schema of filteredSchemas"
-                  (click)="toggleSchemaExpand(schema)"
-                  [class.expanded]="expandedSchemas.includes(schema.name)"
-                >
+                <div class="schema-item" *ngFor="let schema of filteredSchemas" (click)="toggleSchemaExpand(schema)"
+                  [class.expanded]="expandedSchemas.includes(schema.name)">
                   <div class="schema-header">
                     <i class="pi pi-file"></i>
                     <span class="schema-name">{{ schema.name }}</span>
                     <span class="schema-size">{{
                       formatTableSize(schema.totalSizeMB)
-                    }}</span>
-                    <i
-                      class="expand-icon pi"
-                      [ngClass]="
+                      }}</span>
+                    <i class="expand-icon pi" [ngClass]="
                         expandedSchemas.includes(schema.name)
                           ? 'pi-chevron-up'
                           : 'pi-chevron-down'
-                      "
-                    ></i>
+                      "></i>
                   </div>
                   <div class="schema-progress">
-                    <div
-                      class="progress-bar"
-                      [style.width.%]="getSchemaPercentage(schema)"
-                      [style.backgroundColor]="getSchemaColor(schema)"
-                    ></div>
+                    <div class="progress-bar" [style.width.%]="getSchemaPercentage(schema)"
+                      [style.backgroundColor]="getSchemaColor(schema)"></div>
                   </div>
                   <div class="schema-stats">
                     <div class="stat">
@@ -221,31 +183,20 @@
                     </div>
                   </div>
                   <!-- Expanded content -->
-                  <div
-                    class="schema-details"
-                    *ngIf="expandedSchemas.includes(schema.name)"
-                  >
+                  <div class="schema-details" *ngIf="expandedSchemas.includes(schema.name)">
                     <div class="tables-list">
                       <h5>Tables</h5>
-                      <div
-                        class="table-item"
-                        *ngFor="let table of getTablesForSchema(schema.name)"
-                      >
-                        <div
-                          class="table-name"
-                          (click)="onTableClick($event, schema, table)"
-                          [title]="'Click to view table details'"
-                        >
+                      <div class="table-item" *ngFor="let table of getTablesForSchema(schema.name)">
+                        <div class="table-name" (click)="onTableClick($event, schema, table)"
+                          [title]="'Click to view table details'">
                           <i class="pi pi-table"></i>
                           <span>{{ table.name }}</span>
                         </div>
                         <div class="table-info">
                           <span class="size">{{
                             formatTableSize(table.sizeMB.total)
-                          }}</span>
-                          <span class="rows"
-                            >{{ table.totalColumns }} columns</span
-                          >
+                            }}</span>
+                          <span class="rows">{{ table.totalColumns }} columns</span>
                           <span class="rows">{{ table.rowCount }} rows</span>
                         </div>
                       </div>
@@ -268,24 +219,17 @@
               <div class="top-tables">
                 <div class="table-item" *ngFor="let table of topStorageTables">
                   <div class="table-info">
-                    <span class="table-name"
-                      >{{ table.schema }}.{{ table.name }}</span
-                    >
+                    <span class="table-name">{{ table.schema }}.{{ table.name }}</span>
                     <div class="table-stats">
                       <span class="table-size">{{
                         formatTableSize(table.size)
-                      }}</span>
-                      <span class="table-percentage"
-                        >({{ table.percentage.toFixed(1) }}%)</span
-                      >
+                        }}</span>
+                      <span class="table-percentage">({{ table.percentage.toFixed(1) }}%)</span>
                     </div>
                   </div>
                   <div class="table-progress">
-                    <div
-                      class="progress-bar"
-                      [style.width.%]="table.percentage"
-                      [style.backgroundColor]="table.color"
-                    ></div>
+                    <div class="progress-bar" [style.width.%]="table.percentage" [style.backgroundColor]="table.color">
+                    </div>
                   </div>
                 </div>
               </div>
@@ -347,9 +291,7 @@
         <div class="detail-item">
           <label>Table Name</label>
           <p class="with-badge">
-            <span class="config-badge"
-              >{{ selectedSchema?.name }}.{{ selectedTable.name }}</span
-            >
+            <span class="config-badge">{{ selectedSchema?.name }}.{{ selectedTable.name }}</span>
           </p>
         </div>
       </div>
@@ -385,19 +327,19 @@
             <span class="size-label">Data Size</span>
             <span class="size-value">{{
               formatTableSize(selectedTable.sizeMB.data)
-            }}</span>
+              }}</span>
           </div>
           <div class="size-item">
             <span class="size-label">Index Size</span>
             <span class="size-value">{{
               formatTableSize(selectedTable.sizeMB.index)
-            }}</span>
+              }}</span>
           </div>
           <div class="size-item">
             <span class="size-label">Unused Space</span>
             <span class="size-value">{{
               formatTableSize(selectedTable.sizeMB.unused)
-            }}</span>
+              }}</span>
           </div>
         </div>
       </div>

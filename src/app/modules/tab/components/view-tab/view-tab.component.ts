@@ -37,12 +37,7 @@ export class ViewTabComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([TAB.EDIT, this.orgId, this.tabId], {
-      queryParams: {
-        orgId: this.orgId,
-        adminId: this.tabId,
-      },
-    });
+    this.router.navigate([TAB.EDIT, this.orgId, this.tabId]);
   }
 
   goBack() {

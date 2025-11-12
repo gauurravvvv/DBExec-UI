@@ -196,11 +196,7 @@ export class ListConnectionComponent implements OnInit {
   proceedDelete() {
     if (this.tabToDelete) {
       this.connectionService
-        .deleteConnection(
-          this.selectedOrg.id,
-          this.selectedDatabase.id,
-          this.tabToDelete
-        )
+        .deleteConnection(this.selectedOrg.id, this.tabToDelete)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadConnections();

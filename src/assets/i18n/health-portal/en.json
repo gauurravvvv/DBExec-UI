@@ -54,7 +54,7 @@
       "serious": "Serious",
       "reportingType": "Reporting Type",
       "currentReport": "Current Report",
-      "organizationType": "Organization Type",
+      "organizationType": "Organisation Type",
       "worldCaseId": "World Wide Case Id",
       "addworldWideCaseId": "World Wide Case Id",
       "addactiveSubstanceCombination": "Active Substance Combination",
@@ -63,7 +63,7 @@
       "addactiveSubstanceMlmComb": "Active Subst. MLM Combination",
       "reporter": "Reporter",
       "literatureReference": "Literature Reference",
-      "addNew":"Add New"
+      "addNew": "Add New"
     }
   },
   "caseData": {
@@ -119,7 +119,7 @@
         "required": "Please enter Start and End Date"
       },
       "organisation": {
-        "required": "Please enter Organization Type"
+        "required": "Please enter Organisation Type"
       },
       "serious": {
         "required": "Please enter Seriousness Type"
