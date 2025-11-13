@@ -51,42 +51,18 @@ export class GrantAccessComponent implements OnInit {
     }
   }
 
-  // Custom validator to check if at least one of groups or users has values
-  atLeastOneRequired = (control: AbstractControl): ValidationErrors | null => {
-    if (!control) {
-      return { atLeastOneRequired: true };
-    }
-
-    const groupsControl = control.get('groups');
-    const usersControl = control.get('users');
-
-    const groups = groupsControl?.value ?? [];
-    const users = usersControl?.value ?? [];
-
-    const hasGroups = Array.isArray(groups) && groups.length > 0;
-    const hasUsers = Array.isArray(users) && users.length > 0;
-
-    return hasGroups || hasUsers ? null : { atLeastOneRequired: true };
-  };
-
   initForm() {
     const isSuperAdmin =
       this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
     const organisationId = this.globalService.getTokenDetails('organisationId');
 
-    this.accessForm = this.fb.group(
-      {
-        organisation: [
-          isSuperAdmin ? null : organisationId,
-          Validators.required,
-        ],
-        database: [null, Validators.required],
-        connection: [null, Validators.required],
-        users: [[]],
-        groups: [[]],
-      },
-      { validators: this.atLeastOneRequired }
-    );
+    this.accessForm = this.fb.group({
+      organisation: [isSuperAdmin ? null : organisationId, Validators.required],
+      database: [null, Validators.required],
+      connection: [null, Validators.required],
+      users: [[]],
+      groups: [[]],
+    });
 
     // Trigger validation when groups or users change
     this.accessForm.get('groups')?.valueChanges.subscribe(() => {

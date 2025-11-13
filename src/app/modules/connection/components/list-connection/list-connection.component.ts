@@ -198,10 +198,10 @@ export class ListConnectionComponent implements OnInit {
       this.connectionService
         .deleteConnection(this.selectedOrg.id, this.tabToDelete)
         .then(response => {
+          this.showDeleteConfirm = false;
+          this.tabToDelete = null;
           if (this.globalService.handleSuccessService(response)) {
             this.loadConnections();
-            this.showDeleteConfirm = false;
-            this.tabToDelete = null;
           }
         });
     }
