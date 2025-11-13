@@ -145,6 +145,9 @@ $icon-url: '../icons/';
     &.ci-access-manager {
       content: url($icon-url + 'access-manager.svg');
     }
+    &.ci-audit-logs {
+      content: url($icon-url + 'audit-logs.svg');
+    }
   }
 }
 
