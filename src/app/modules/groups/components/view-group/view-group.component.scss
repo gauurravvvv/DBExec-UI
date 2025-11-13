@@ -185,6 +185,13 @@
               font-size: 13px;
             }
           }
+          .no-data {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-color);
+            opacity: 0.7;
+          }
         }
       }
     }

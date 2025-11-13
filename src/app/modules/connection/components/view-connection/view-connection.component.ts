@@ -58,6 +58,7 @@ export class ViewConnectionComponent implements OnInit {
       this.connectionService
         .deleteConnection(this.orgId, this.connectionData.id)
         .then(response => {
+          this.showDeleteConfirm = false;
           if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([CONNECTION.LIST]);
           }
