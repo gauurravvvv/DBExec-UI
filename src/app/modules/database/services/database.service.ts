@@ -22,9 +22,14 @@ export class DatabaseService {
       });
   }
 
-  deleteDatabase(id: string, deleteConfiguration: boolean) {
+  deleteDatabase(
+    orgId: string,
+    id: string,
+    isMasterDb: string,
+    deleteConfiguration: boolean
+  ) {
     return this.http
-      .post(DATABASE.DELETE + `${id}`, {
+      .post(DATABASE.DELETE + `${orgId}/${id}/${isMasterDb}`, {
         deleteConfiguration,
       })
       .toPromise()
@@ -79,9 +84,9 @@ export class DatabaseService {
       });
   }
 
-  viewDatabase(id: string) {
+  viewDatabase(orgId: string, id: string, isMasterDb: string) {
     return this.http
-      .get(DATABASE.VIEW + `${id}`)
+      .get(DATABASE.VIEW + `${orgId}/${id}/${isMasterDb}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

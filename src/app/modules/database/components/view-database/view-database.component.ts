@@ -19,6 +19,8 @@ interface StorageTable {
 })
 export class ViewDatabaseComponent implements OnInit {
   dbId!: string;
+  orgId!: string;
+  isMasterDb!: string;
   dbData: any;
   showDeleteConfirm = false;
   showTableDetails = false;
@@ -59,22 +61,29 @@ export class ViewDatabaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.dbId = this.route.snapshot.params['id'];
-    if (this.dbId) {
+    this.orgId = this.route.snapshot.params['orgId'];
+    this.isMasterDb = this.route.snapshot.params['isMasterDb'];
+    if (!this.dbId || !this.orgId || !this.isMasterDb) {
+      return;
+    }
+    if (this.dbId && this.orgId && this.isMasterDb) {
       this.loadDatabaseData();
     }
   }
 
   // Changed from private to public
   loadDatabaseData(): void {
-    this.databaseService.viewDatabase(this.dbId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.dbData = response.data;
-        this.prepareChartData();
-        this.updateChartOptions(); // Update options after data is loaded
-        this.filteredSchemas = this.dbData.statistics.schemaStats;
-        this.prepareTopStorageTables();
-      }
-    });
+    this.databaseService
+      .viewDatabase(this.orgId, this.dbId, this.isMasterDb)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.dbData = response.data;
+          this.prepareChartData();
+          this.updateChartOptions(); // Update options after data is loaded
+          this.filteredSchemas = this.dbData.statistics.schemaStats;
+          this.prepareTopStorageTables();
+        }
+      });
   }
 
   onSchemaSearch(event: any): void {
@@ -134,21 +143,20 @@ export class ViewDatabaseComponent implements OnInit {
   onTableClick(event: Event, schema: any, table: any): void {
     // Stop event propagation to prevent accordion collapse
     event.stopPropagation();
-    
+
     // Set selected table and schema
     this.selectedTable = table;
     this.selectedSchema = schema;
-    
+
     // Show the dialog
     this.showTableDetails = true;
   }
-  
+
   closeTableDetails(): void {
     this.showTableDetails = false;
     this.selectedTable = null;
     this.selectedSchema = null;
   }
-  
 
   getSchemaColor(schema: any): string {
     const colors = this.generateColors(
@@ -370,13 +378,13 @@ export class ViewDatabaseComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.dbData) {
-      this.databaseService
-        .deleteDatabase(this.dbData.id, this.deleteConfiguration)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.router.navigate([DATABASE.LIST]);
-          }
-        });
+      // this.databaseService
+      //   .deleteDatabase(this.dbData.id, this.deleteConfiguration)
+      //   .then(response => {
+      //     if (this.globalService.handleSuccessService(response)) {
+      //       this.router.navigate([DATABASE.LIST]);
+      //     }
+      //   });
     }
   }
 }

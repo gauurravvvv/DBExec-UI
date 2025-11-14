@@ -15,7 +15,7 @@ const routes: Routes = [
     component: AddDatabaseComponent,
   },
   { path: 'edit/:id', component: EditDatabaseComponent },
-  { path: 'view/:id', component: ViewDatabaseComponent },
+  { path: 'view/:orgId/:id/:isMasterDb', component: ViewDatabaseComponent },
 ];
 
 @NgModule({

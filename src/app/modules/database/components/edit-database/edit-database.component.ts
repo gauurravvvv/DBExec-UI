@@ -134,35 +134,31 @@ export class EditDatabaseComponent implements OnInit {
   }
 
   loadDatabaseData(): void {
-    this.databaseService.viewDatabase(this.databaseId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.isMasterDatabase = response.data.isMasterDB;
-        this.organisationId = response.data.organisationId;
-
-        const formData = {
-          name: response.data.name,
-          description: response.data.description,
-          type: response.data.config.dbType,
-          host: response.data.config.hostname,
-          port: response.data.config.port,
-          database: response.data.config.dbName,
-          username: response.data.config.username,
-          password: '',
-          status: this.isMasterDatabase ? true : response.data.status === 1,
-        };
-
-        // Set organisation name directly from response
-        this.organisationName = response.data.organisationName;
-
-        if (this.isMasterDatabase) {
-          this.databaseForm.get('status')?.disable();
-        }
-
-        this.initialFormValues = { ...formData };
-        this.databaseForm.patchValue(formData);
-        this.isFormDirty = false;
-      }
-    });
+    // this.databaseService.viewDatabase(this.databaseId).then(response => {
+    //   if (this.globalService.handleSuccessService(response, false)) {
+    //     this.isMasterDatabase = response.data.isMasterDB;
+    //     this.organisationId = response.data.organisationId;
+    //     const formData = {
+    //       name: response.data.name,
+    //       description: response.data.description,
+    //       type: response.data.config.dbType,
+    //       host: response.data.config.hostname,
+    //       port: response.data.config.port,
+    //       database: response.data.config.dbName,
+    //       username: response.data.config.username,
+    //       password: '',
+    //       status: this.isMasterDatabase ? true : response.data.status === 1,
+    //     };
+    //     // Set organisation name directly from response
+    //     this.organisationName = response.data.organisationName;
+    //     if (this.isMasterDatabase) {
+    //       this.databaseForm.get('status')?.disable();
+    //     }
+    //     this.initialFormValues = { ...formData };
+    //     this.databaseForm.patchValue(formData);
+    //     this.isFormDirty = false;
+    //   }
+    // });
   }
 
   onSubmit(): void {

@@ -165,7 +165,12 @@ export class ListDatabaseComponent implements OnInit {
   proceedDelete() {
     if (this.selectedDatabase) {
       this.databaseService
-        .deleteDatabase(this.selectedDatabase.id, this.deleteConfiguration)
+        .deleteDatabase(
+          this.selectedDatabase.organisationId,
+          this.selectedDatabase.id,
+          this.selectedDatabase.isMasterDB ? '1' : '0',
+          this.deleteConfiguration
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loaddbs();
