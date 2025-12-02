@@ -49,7 +49,6 @@ export class EditOrgAdminComponent implements OnInit {
       lastName: ['', Validators.required],
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       organisation: ['', Validators.required],
       status: [],
     });
@@ -67,20 +66,12 @@ export class EditOrgAdminComponent implements OnInit {
             lastName: this.adminData.lastName,
             username: this.adminData.username,
             email: this.adminData.email,
-            mobile: this.adminData.mobile,
             organisation: this.adminData.organisationId,
             status: this.adminData.status,
           });
           this.selectedOrgName = this.adminData.organisationName;
         }
       });
-  }
-
-  onPhoneInput(event: any) {
-    const input = event.target as HTMLInputElement;
-    const value = input.value;
-    input.value = value.replace(/\D/g, '');
-    this.orgForm.patchValue({ mobile: input.value });
   }
 
   onSubmit() {
@@ -100,7 +91,6 @@ export class EditOrgAdminComponent implements OnInit {
       lastName: this.adminData.lastName,
       username: this.adminData.username,
       email: this.adminData.email,
-      mobile: this.adminData.mobile,
       organisation: this.adminData.organisationId,
       status: this.adminData.status,
     });

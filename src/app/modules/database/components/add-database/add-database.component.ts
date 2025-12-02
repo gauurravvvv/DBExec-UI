@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { DATABASE } from 'src/app/constants/routes';
-import { DatabaseService } from '../../services/database.service';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { REGEX } from 'src/app/constants/regex.constant';
+import { DatabaseService } from '../../services/database.service';
 
 @Component({
   selector: 'app-add-database',
@@ -81,7 +80,6 @@ export class AddDatabaseComponent implements OnInit {
       isMasterDB: [false],
       adminPassword: [''],
       adminEmail: [''],
-      adminPhone: [''],
     });
 
     const orgControl = this.databaseForm.get('organisation');
@@ -96,7 +94,6 @@ export class AddDatabaseComponent implements OnInit {
       );
       const adminPasswordControl = this.databaseForm.get('adminPassword');
       const adminEmailControl = this.databaseForm.get('adminEmail');
-      const adminPhoneControl = this.databaseForm.get('adminPhone');
 
       if (isMaster) {
         acknowledgmentControl?.setValidators(Validators.requiredTrue);
@@ -109,27 +106,20 @@ export class AddDatabaseComponent implements OnInit {
           Validators.required,
           Validators.email,
         ]);
-        adminPhoneControl?.setValidators([
-          Validators.required,
-          Validators.pattern(REGEX.mobile),
-        ]);
       } else {
         acknowledgmentControl?.clearValidators();
         schemaAcknowledgmentControl?.clearValidators();
         adminPasswordControl?.clearValidators();
         adminEmailControl?.clearValidators();
-        adminPhoneControl?.clearValidators();
 
         adminPasswordControl?.setValue('');
         adminEmailControl?.setValue('');
-        adminPhoneControl?.setValue('');
       }
 
       acknowledgmentControl?.updateValueAndValidity();
       schemaAcknowledgmentControl?.updateValueAndValidity();
       adminPasswordControl?.updateValueAndValidity();
       adminEmailControl?.updateValueAndValidity();
-      adminPhoneControl?.updateValueAndValidity();
     });
   }
 
@@ -170,7 +160,6 @@ export class AddDatabaseComponent implements OnInit {
       if (formValue.isMasterDB) {
         payload.adminCredentials = {
           email: formValue.adminEmail,
-          phone: formValue.adminPhone,
           password: formValue.adminPassword,
         };
       }
@@ -191,13 +180,10 @@ export class AddDatabaseComponent implements OnInit {
       this.databaseForm.get('schemaAcknowledgment')?.setValue(false);
       this.databaseForm.get('adminPassword')?.setValue('');
       this.databaseForm.get('adminEmail')?.setValue('');
-      this.databaseForm.get('adminPhone')?.setValue('');
       this.databaseForm.get('adminPassword')?.clearValidators();
       this.databaseForm.get('adminEmail')?.clearValidators();
-      this.databaseForm.get('adminPhone')?.clearValidators();
       this.databaseForm.get('adminPassword')?.updateValueAndValidity();
       this.databaseForm.get('adminEmail')?.updateValueAndValidity();
-      this.databaseForm.get('adminPhone')?.updateValueAndValidity();
       this.databaseForm.get('type')?.setValue('postgres');
       this.databaseForm.get('type')?.disable();
       this.databaseForm.markAsPristine();
@@ -259,12 +245,6 @@ export class AddDatabaseComponent implements OnInit {
     } else {
       this.showAdminPassword = !this.showAdminPassword;
     }
-  }
-
-  onPhoneInput(event: any): void {
-    const input = event.target;
-    input.value = input.value.replace(/[^0-9]/g, '');
-    this.databaseForm.get('adminPhone')?.setValue(input.value);
   }
 
   set showOrganisationDropdown(value: boolean) {

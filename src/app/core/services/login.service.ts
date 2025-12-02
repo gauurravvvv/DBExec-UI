@@ -31,12 +31,10 @@ export class LoginService {
           // Then store other details
           StorageService.set(StorageType.ROLE, result.data.user.role);
 
-          if (result.data.user.role !== ROLES.SUPER_ADMIN) {
-            StorageService.setSessionVal(
-              SessionStorageType.ORGANISATION_ID,
-              result.data.user.organisationId
-            );
-          }
+          StorageService.setSessionVal(
+            SessionStorageType.ORGANISATION_ID,
+            result.data.user.organisationId
+          );
 
           StorageService.setSessionVal(
             SessionStorageType.ORGANISATION,

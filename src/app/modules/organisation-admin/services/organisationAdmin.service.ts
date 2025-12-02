@@ -25,15 +25,8 @@ export class OrganisationAdminService {
   }
 
   addOrganisationAdmin(orgAdminForm: FormGroup) {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      organisation,
-      username,
-      mobile,
-    } = orgAdminForm.value;
+    const { firstName, lastName, email, password, organisation, username } =
+      orgAdminForm.value;
     return this.http
       .post(ORG_ADMIN.ADD, {
         firstName,
@@ -42,7 +35,6 @@ export class OrganisationAdminService {
         password,
         organisation,
         username,
-        mobile,
       })
       .toPromise()
       .then((response: any) => {
@@ -72,16 +64,8 @@ export class OrganisationAdminService {
   }
 
   updateOrgAdmin(orgAdminForm: FormGroup) {
-    const {
-      id,
-      firstName,
-      lastName,
-      username,
-      email,
-      mobile,
-      status,
-      organisation,
-    } = orgAdminForm.getRawValue();
+    const { id, firstName, lastName, username, email, status, organisation } =
+      orgAdminForm.getRawValue();
     return this.http
       .put(ORG_ADMIN.UPDATE, {
         id,
@@ -89,7 +73,6 @@ export class OrganisationAdminService {
         lastName,
         username,
         email,
-        mobile,
         organisation,
         status: status ? 1 : 0,
       })

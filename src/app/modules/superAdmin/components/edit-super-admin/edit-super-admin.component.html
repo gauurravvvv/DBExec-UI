@@ -147,42 +147,6 @@
           </small>
         </div>
 
-        <!-- Phone -->
-        <div class="form-field">
-          <label for="phone">Phone <span class="required">*</span></label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-phone"></i>
-            <input
-              id="phone"
-              type="text"
-              pInputText
-              formControlName="mobile"
-              placeholder="Enter phone number"
-              (input)="onPhoneInput($event)"
-              maxlength="10"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  adminForm.get('mobile')?.invalid &&
-                  adminForm.get('mobile')?.touched
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              adminForm.get('mobile')?.invalid &&
-              adminForm.get('mobile')?.touched
-            "
-          >
-            <span *ngIf="adminForm.get('mobile')?.errors?.['required']"
-              >Phone number is required</span
-            >
-            <span *ngIf="adminForm.get('mobile')?.errors?.['pattern']"
-              >Please enter a valid 10-digit phone number</span
-            >
-          </small>
-        </div>
-
         <!-- Status -->
         <div class="form-field">
           <label for="status">Status</label>

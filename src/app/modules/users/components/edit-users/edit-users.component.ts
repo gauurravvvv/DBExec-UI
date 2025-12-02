@@ -73,7 +73,6 @@ export class EditUsersComponent implements OnInit {
           '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'
         ),
       ],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       organisation: ['', Validators.required],
       status: [],
     });
@@ -89,20 +88,12 @@ export class EditUsersComponent implements OnInit {
           lastName: this.userData.lastName,
           username: this.userData.username,
           email: this.userData.email,
-          mobile: this.userData.mobile,
           organisation: this.userData.organisationId,
           status: this.userData.status,
         });
         this.selectedOrgName = this.userData.organisationName;
       }
     });
-  }
-
-  onPhoneInput(event: any) {
-    const input = event.target as HTMLInputElement;
-    const value = input.value;
-    input.value = value.replace(/\D/g, '');
-    this.userForm.patchValue({ mobile: input.value });
   }
 
   onSubmit() {
@@ -122,7 +113,6 @@ export class EditUsersComponent implements OnInit {
       lastName: this.userData.lastName,
       username: this.userData.username,
       email: this.userData.email,
-      mobile: this.userData.mobile,
       organisation: this.userData.organisationId,
       status: this.userData.status,
     });

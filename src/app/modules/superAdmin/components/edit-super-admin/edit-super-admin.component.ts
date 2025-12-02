@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SuperAdminService } from '../../services/superAdmin.service';
-import { MessageService } from 'primeng/api';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { SuperAdminService } from '../../services/superAdmin.service';
 
 @Component({
   selector: 'app-edit-super-admin',
@@ -67,7 +66,6 @@ export class EditSuperAdminComponent implements OnInit {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       status: [false],
     });
 
@@ -88,13 +86,6 @@ export class EditSuperAdminComponent implements OnInit {
           this.adminForm.patchValue(this.adminData);
         }
       });
-  }
-
-  // Method to handle number-only input
-  onPhoneInput(event: any): void {
-    const input = event.target as HTMLInputElement;
-    input.value = input.value.replace(/[^0-9]/g, '');
-    this.adminForm.patchValue({ phone: input.value });
   }
 
   onSubmit(): void {

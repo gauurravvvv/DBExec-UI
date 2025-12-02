@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   HttpEvent,
   HttpInterceptor,
@@ -6,19 +6,20 @@ import {
   HttpRequest,
   HttpErrorResponse,
   HttpResponse,
-} from "@angular/common/http";
+} from '@angular/common/http';
 
-import { Observable, throwError } from "rxjs";
-import { catchError, retry, map, finalize } from "rxjs/operators";
-import { environment } from "src/environments/environment";
-import { LoadingService } from "../services/loading.service";
-import { Router } from "@angular/router";
-import { StorageType } from "src/app/constants/storageType";
-import { StorageService } from "../services/storage.service";
+import { Observable, throwError } from 'rxjs';
+import { catchError, retry, map, finalize } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { LoadingService } from '../services/loading.service';
+import { Router } from '@angular/router';
+import { SessionStorageType, StorageType } from 'src/app/constants/storageType';
+import { StorageService } from '../services/storage.service';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
   accessToken!: string;
+  organisation_id!: string;
   appAccessToken!: string | null;
 
   constructor(private loadingService: LoadingService, private router: Router) {}
@@ -29,14 +30,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     // Check if we should skip the loader for this request
     const skipLoader = req.headers.has('X-Skip-Loader');
-    
+
     if (!skipLoader) {
       this.loadingService.showLoader();
     }
-    
-    this.accessToken = StorageService.get(StorageType.ACCESS_TOKEN) || "";
 
-    if (req.url.includes("assets")) {
+    this.accessToken = StorageService.get(StorageType.ACCESS_TOKEN) || '';
+    this.organisation_id =
+      StorageService.getSessionVal(SessionStorageType.ORGANISATION_ID) || '';
+
+    if (req.url.includes('assets')) {
       if (!skipLoader) {
         this.loadingService.hideLoader();
       }
@@ -46,7 +49,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     // Determine server based on custom header
     const serverType = req.headers.get('X-Server-Type');
     let serverUrl: string;
-    
+
     if (serverType === 'query') {
       serverUrl = environment.queryServer || 'http://localhost:3001/api/v1';
     } else {
@@ -56,7 +59,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     const URL = serverUrl + req.url;
 
     // Remove the custom headers before sending the request
-    let headers = req.headers.set("token", this.accessToken);
+    let headers = req.headers
+      .set('token', this.accessToken)
+      .set('x-organization-id', this.organisation_id);
     if (headers.has('X-Server-Type')) {
       headers = headers.delete('X-Server-Type');
     }
@@ -71,8 +76,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     return next.handle(req).pipe(
       retry(2),
-      map((evt) => this.handleSuccess(req, evt)),
-      catchError((error) => this.handleError(error)),
+      map(evt => this.handleSuccess(req, evt)),
+      catchError(error => this.handleError(error)),
       finalize(() => {
         if (!skipLoader) {
           this.loadingService.hideLoader();
@@ -87,7 +92,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   ): HttpEvent<any> {
     if (evt instanceof HttpResponse) {
       if (evt.body.code === 501 || evt.body.code === 503) {
-        window.location.href = "";
+        window.location.href = '';
         StorageService.remove(StorageType.ACCESS_TOKEN);
         return evt;
       }

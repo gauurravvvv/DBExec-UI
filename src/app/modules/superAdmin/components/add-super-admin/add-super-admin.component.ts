@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { SuperAdminService } from '../../services/superAdmin.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { REGEX } from 'src/app/constants/regex.constant';
+import { SuperAdminService } from '../../services/superAdmin.service';
 
 @Component({
   selector: 'app-add-super-admin',
@@ -24,7 +23,6 @@ export class AddSuperAdminComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private superAdminService: SuperAdminService,
-    private messageService: MessageService,
     private router: Router,
     private globalService: GlobalService
   ) {}
@@ -50,15 +48,7 @@ export class AddSuperAdminComponent implements OnInit {
       ],
       password: ['', [Validators.required, Validators.pattern(REGEX.password)]],
       email: ['', [Validators.required, Validators.email]],
-      mobile: ['', [Validators.required, Validators.pattern(REGEX.mobile)]],
     });
-  }
-
-  // Method to handle number-only input
-  onPhoneInput(event: any): void {
-    const input = event.target as HTMLInputElement;
-    input.value = input.value.replace(/[^0-9]/g, '');
-    this.adminForm.patchValue({ phone: input.value });
   }
 
   togglePassword(event: Event): void {

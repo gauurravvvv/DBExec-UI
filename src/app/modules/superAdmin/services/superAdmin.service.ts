@@ -32,7 +32,7 @@ export class SuperAdminService {
   }
 
   addSuperAdmin(superAdminForm: FormGroup) {
-    const { firstName, lastName, username, password, email, mobile } =
+    const { firstName, lastName, username, password, email } =
       superAdminForm.value;
     return this.http
       .post(SUPER_ADMIN.ADD, {
@@ -41,7 +41,6 @@ export class SuperAdminService {
         username,
         password,
         email,
-        mobile,
       })
       .toPromise()
       .then((response: any) => {
@@ -61,7 +60,7 @@ export class SuperAdminService {
   }
 
   updateSuperAdmin(superAdminForm: FormGroup) {
-    const { id, firstName, lastName, username, email, mobile, status } =
+    const { id, firstName, lastName, username, email, status } =
       superAdminForm.getRawValue();
     return this.http
       .put(SUPER_ADMIN.UPDATE, {
@@ -70,7 +69,6 @@ export class SuperAdminService {
         lastName,
         username,
         email,
-        mobile,
         status: status ? 1 : 0,
       })
       .toPromise()

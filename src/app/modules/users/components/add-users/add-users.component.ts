@@ -58,7 +58,6 @@ export class AddUsersComponent implements OnInit {
       ],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.pattern(REGEX.password)]],
-      mobile: ['', [Validators.required, Validators.pattern(REGEX.mobile)]],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
           ? ''
@@ -102,12 +101,5 @@ export class AddUsersComponent implements OnInit {
     Object.keys(this.userForm.controls).forEach(key => {
       this.userForm.get(key)?.setValue('');
     });
-  }
-
-  onPhoneInput(event: any) {
-    const input = event.target as HTMLInputElement;
-    const value = input.value;
-    input.value = value.replace(/\D/g, ''); // Remove non-digit characters
-    this.userForm.patchValue({ mobile: input.value });
   }
 }
