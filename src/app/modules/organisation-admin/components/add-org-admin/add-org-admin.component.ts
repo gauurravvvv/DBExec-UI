@@ -14,7 +14,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
   styleUrls: ['./add-org-admin.component.scss'],
 })
 export class AddOrgAdminComponent implements OnInit {
-  orgForm!: FormGroup;
+  adminFrom!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
   showOrganisationDropdown =
@@ -32,7 +32,7 @@ export class AddOrgAdminComponent implements OnInit {
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
-    return this.orgForm.dirty;
+    return this.adminFrom.dirty;
   }
 
   ngOnInit() {
@@ -42,17 +42,31 @@ export class AddOrgAdminComponent implements OnInit {
   }
 
   initForm() {
-    this.orgForm = this.fb.group({
+    this.adminFrom = this.fb.group({
       firstName: [
-        '',
-        [Validators.required, Validators.pattern(REGEX.firstName)],
-      ],
-      lastName: ['', [Validators.required, Validators.pattern(REGEX.lastName)]],
-      username: [
         '',
         [
           Validators.required,
           Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.firstName),
+        ],
+      ],
+      lastName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.lastName),
+        ],
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(30),
           Validators.pattern(REGEX.username),
         ],
       ],
@@ -86,20 +100,22 @@ export class AddOrgAdminComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.orgForm.valid) {
-      this.orgAdminService.addOrganisationAdmin(this.orgForm).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([ORGANISATION_ADMIN.LIST]);
-        }
-      });
+    if (this.adminFrom.valid) {
+      this.orgAdminService
+        .addOrganisationAdmin(this.adminFrom)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate([ORGANISATION_ADMIN.LIST]);
+          }
+        });
     }
   }
 
   onCancel() {
-    this.orgForm.reset();
+    this.adminFrom.reset();
     // Reset specific form controls to empty strings
-    Object.keys(this.orgForm.controls).forEach(key => {
-      this.orgForm.get(key)?.setValue('');
+    Object.keys(this.adminFrom.controls).forEach(key => {
+      this.adminFrom.get(key)?.setValue('');
     });
   }
 }

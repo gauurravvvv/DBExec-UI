@@ -60,7 +60,19 @@
               userForm.get('firstName')?.touched
             "
           >
-            First name is required
+            <div *ngIf="userForm.get('firstName')?.errors?.['required']">
+              First name is required
+            </div>
+
+            <div *ngIf="userForm.get('firstName')?.errors?.['minlength']">
+              First name must be at least
+              {{ userForm.get('firstName')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="userForm.get('firstName')?.errors?.['pattern']">
+              First name can only contain letters and hyphens
+            </div>
           </small>
         </div>
 
@@ -91,7 +103,19 @@
               userForm.get('lastName')?.touched
             "
           >
-            Last name is required
+            <div *ngIf="userForm.get('lastName')?.errors?.['required']">
+              last name is required
+            </div>
+
+            <div *ngIf="userForm.get('lastName')?.errors?.['minlength']">
+              Last name must be at least
+              {{ userForm.get('lastName')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="userForm.get('lastName')?.errors?.['pattern']">
+              Last name can only contain letters and hyphens
+            </div>
           </small>
         </div>
 

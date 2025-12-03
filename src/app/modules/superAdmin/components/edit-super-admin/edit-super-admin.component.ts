@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SuperAdminService } from '../../services/superAdmin.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-edit-super-admin',
@@ -47,22 +48,27 @@ export class EditSuperAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+          Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.firstName),
         ],
       ],
       lastName: [
         '',
         [
           Validators.required,
-          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+          Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.lastName),
         ],
       ],
       username: [
         '',
         [
           Validators.required,
-          Validators.minLength(4),
-          Validators.pattern('^[a-zA-Z0-9_]+$'),
+          Validators.minLength(6),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.username),
         ],
       ],
       email: ['', [Validators.required, Validators.email]],

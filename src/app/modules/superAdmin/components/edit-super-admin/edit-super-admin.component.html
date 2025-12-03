@@ -62,7 +62,19 @@
               adminForm.get('firstName')?.touched
             "
           >
-            First name is required
+            <div *ngIf="adminForm.get('firstName')?.errors?.['required']">
+              First name is required
+            </div>
+
+            <div *ngIf="adminForm.get('firstName')?.errors?.['minlength']">
+              First name must be at least
+              {{ adminForm.get('firstName')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="adminForm.get('firstName')?.errors?.['pattern']">
+              First name can only contain letters and hyphens
+            </div>
           </small>
         </div>
 
@@ -93,7 +105,19 @@
               adminForm.get('lastName')?.touched
             "
           >
-            Last name is required
+            <div *ngIf="adminForm.get('lastName')?.errors?.['required']">
+              last name is required
+            </div>
+
+            <div *ngIf="adminForm.get('lastName')?.errors?.['minlength']">
+              Last name must be at least
+              {{ adminForm.get('lastName')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="adminForm.get('lastName')?.errors?.['pattern']">
+              Last name can only contain letters and hyphens
+            </div>
           </small>
         </div>
 

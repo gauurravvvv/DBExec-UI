@@ -5,6 +5,7 @@ import { OrganisationAdminService } from '../../services/organisationAdmin.servi
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-edit-org-admin',
@@ -12,7 +13,7 @@ import { ROLES } from 'src/app/constants/user.constant';
   styleUrls: ['./edit-org-admin.component.scss'],
 })
 export class EditOrgAdminComponent implements OnInit {
-  orgForm!: FormGroup;
+  adminForm!: FormGroup;
   isCancelClicked = false;
   organisations: any[] = [];
   adminId: string = '';
@@ -39,15 +40,39 @@ export class EditOrgAdminComponent implements OnInit {
   }
 
   get isFormDirty(): boolean {
-    return this.orgForm.dirty;
+    return this.adminForm.dirty;
   }
 
   initForm() {
-    this.orgForm = this.fb.group({
+    this.adminForm = this.fb.group({
       id: [''],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      username: ['', Validators.required],
+      firstName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.firstName),
+        ],
+      ],
+      lastName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.lastName),
+        ],
+      ],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.username),
+        ],
+      ],
       email: ['', [Validators.required, Validators.email]],
       organisation: ['', Validators.required],
       status: [],
@@ -60,7 +85,7 @@ export class EditOrgAdminComponent implements OnInit {
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.adminData = response.data;
-          this.orgForm.patchValue({
+          this.adminForm.patchValue({
             id: this.adminData.id,
             firstName: this.adminData.firstName,
             lastName: this.adminData.lastName,
@@ -75,8 +100,8 @@ export class EditOrgAdminComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.orgForm.valid) {
-      this.orgAdminService.updateOrgAdmin(this.orgForm).then(response => {
+    if (this.adminForm.valid) {
+      this.orgAdminService.updateOrgAdmin(this.adminForm).then(response => {
         if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ORGANISATION_ADMIN.LIST]);
         }
@@ -85,7 +110,7 @@ export class EditOrgAdminComponent implements OnInit {
   }
 
   onCancel() {
-    this.orgForm.patchValue({
+    this.adminForm.patchValue({
       id: this.adminData.id,
       firstName: this.adminData.firstName,
       lastName: this.adminData.lastName,
@@ -96,7 +121,7 @@ export class EditOrgAdminComponent implements OnInit {
     });
     this.selectedOrgName = this.adminData.organisationName;
     this.isCancelClicked = true;
-    this.orgForm.markAsPristine();
+    this.adminForm.markAsPristine();
     this.isCancelClicked = true;
   }
 }

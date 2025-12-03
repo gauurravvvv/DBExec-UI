@@ -23,7 +23,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="orgForm.invalid"
+          [disabled]="adminFrom.invalid"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -31,7 +31,7 @@
     </div>
 
     <!-- Form Section -->
-    <form [formGroup]="orgForm" class="admin-form">
+    <form [formGroup]="adminFrom" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
         <div class="form-field">
@@ -48,24 +48,31 @@
               placeholder="Enter first name"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  orgForm.get('firstName')?.invalid &&
-                  orgForm.get('firstName')?.touched
+                  adminFrom.get('firstName')?.invalid &&
+                  adminFrom.get('firstName')?.touched
               }"
             />
           </span>
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('firstName')?.invalid &&
-              orgForm.get('firstName')?.touched
+              adminFrom.get('firstName')?.invalid &&
+              adminFrom.get('firstName')?.touched
             "
           >
-            <span *ngIf="orgForm.get('firstName')?.errors?.['required']"
-              >First name is required</span
-            >
-            <span *ngIf="orgForm.get('firstName')?.errors?.['pattern']"
-              >First name can only contain letters, spaces and hyphens</span
-            >
+            <div *ngIf="adminFrom.get('firstName')?.errors?.['required']">
+              First name is required
+            </div>
+
+            <div *ngIf="adminFrom.get('firstName')?.errors?.['minlength']">
+              First name must be at least
+              {{ adminFrom.get('firstName')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="adminFrom.get('firstName')?.errors?.['pattern']">
+              First name can only contain letters and hyphens
+            </div>
           </small>
         </div>
 
@@ -84,24 +91,31 @@
               placeholder="Enter last name"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  orgForm.get('lastName')?.invalid &&
-                  orgForm.get('lastName')?.touched
+                  adminFrom.get('lastName')?.invalid &&
+                  adminFrom.get('lastName')?.touched
               }"
             />
           </span>
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('lastName')?.invalid &&
-              orgForm.get('lastName')?.touched
+              adminFrom.get('lastName')?.invalid &&
+              adminFrom.get('lastName')?.touched
             "
           >
-            <span *ngIf="orgForm.get('lastName')?.errors?.['required']"
-              >Last name is required</span
-            >
-            <span *ngIf="orgForm.get('lastName')?.errors?.['pattern']"
-              >Last name can only contain letters, spaces and hyphens</span
-            >
+            <div *ngIf="adminFrom.get('lastName')?.errors?.['required']">
+              last name is required
+            </div>
+
+            <div *ngIf="adminFrom.get('lastName')?.errors?.['minlength']">
+              Last name must be at least
+              {{ adminFrom.get('lastName')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="adminFrom.get('lastName')?.errors?.['pattern']">
+              Last name can only contain letters and hyphens
+            </div>
           </small>
         </div>
 
@@ -118,27 +132,38 @@
               placeholder="Enter username"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  orgForm.get('username')?.invalid &&
-                  orgForm.get('username')?.touched
+                  adminFrom.get('username')?.invalid &&
+                  adminFrom.get('username')?.touched
               }"
             />
           </span>
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('username')?.invalid &&
-              orgForm.get('username')?.touched
+              adminFrom.get('username')?.invalid &&
+              adminFrom.get('username')?.touched
             "
           >
-            <span *ngIf="orgForm.get('username')?.errors?.['required']"
-              >Username is required</span
-            >
-            <span *ngIf="orgForm.get('username')?.errors?.['minlength']"
-              >Username must be at least 4 characters</span
-            >
-            <span *ngIf="orgForm.get('username')?.errors?.['pattern']"
-              >Username can only contain letters, numbers and underscores</span
-            >
+            <div *ngIf="adminFrom.get('username')?.errors?.['required']">
+              Username is required
+            </div>
+
+            <div *ngIf="adminFrom.get('username')?.errors?.['minlength']">
+              Username must be at least
+              {{ adminFrom.get('username')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="adminFrom.get('username')?.errors?.['maxlength']">
+              Username cannot exceed
+              {{ adminFrom.get('username')?.errors?.['maxlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="adminFrom.get('username')?.errors?.['pattern']">
+              Username can only contain letters, numbers, dots, hyphens and
+              underscores
+            </div>
           </small>
         </div>
 
@@ -155,20 +180,21 @@
               placeholder="Enter email address"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  orgForm.get('email')?.invalid && orgForm.get('email')?.touched
+                  adminFrom.get('email')?.invalid &&
+                  adminFrom.get('email')?.touched
               }"
             />
           </span>
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('email')?.invalid && orgForm.get('email')?.touched
+              adminFrom.get('email')?.invalid && adminFrom.get('email')?.touched
             "
           >
-            <span *ngIf="orgForm.get('email')?.errors?.['required']"
+            <span *ngIf="adminFrom.get('email')?.errors?.['required']"
               >Email is required</span
             >
-            <span *ngIf="orgForm.get('email')?.errors?.['email']"
+            <span *ngIf="adminFrom.get('email')?.errors?.['email']"
               >Please enter a valid email</span
             >
           </small>
@@ -187,8 +213,8 @@
               placeholder="Enter password"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  orgForm.get('password')?.invalid &&
-                  orgForm.get('password')?.touched
+                  adminFrom.get('password')?.invalid &&
+                  adminFrom.get('password')?.touched
               }"
             />
             <i
@@ -200,8 +226,8 @@
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('password')?.invalid &&
-              orgForm.get('password')?.touched
+              adminFrom.get('password')?.invalid &&
+              adminFrom.get('password')?.touched
             "
           >
             Password must contain at least 8 characters, one uppercase letter,
@@ -226,16 +252,16 @@
             placeholder="Select Organisation"
             [ngClass]="{
               'ng-invalid ng-dirty':
-                orgForm.get('organisation')?.invalid &&
-                orgForm.get('organisation')?.touched
+                adminFrom.get('organisation')?.invalid &&
+                adminFrom.get('organisation')?.touched
             }"
           >
           </p-dropdown>
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('organisation')?.invalid &&
-              orgForm.get('organisation')?.touched
+              adminFrom.get('organisation')?.invalid &&
+              adminFrom.get('organisation')?.touched
             "
           >
             Organisation is required

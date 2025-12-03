@@ -5,6 +5,7 @@ import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from '../../services/user.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-edit-users',
@@ -48,22 +49,27 @@ export class EditUsersComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+          Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.firstName),
         ],
       ],
       lastName: [
         '',
         [
           Validators.required,
-          Validators.pattern('^[a-zA-Z]+([ -][a-zA-Z]+)*$'),
+          Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.lastName),
         ],
       ],
       username: [
         '',
         [
           Validators.required,
-          Validators.minLength(4),
-          Validators.pattern('^[a-zA-Z0-9_]+$'),
+          Validators.minLength(6),
+          Validators.maxLength(30),
+          Validators.pattern(REGEX.username),
         ],
       ],
       email: ['', [Validators.required, Validators.email]],

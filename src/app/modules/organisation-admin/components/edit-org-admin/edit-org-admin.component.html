@@ -23,7 +23,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="orgForm.invalid || !isFormDirty"
+          [disabled]="adminForm.invalid || !isFormDirty"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -31,7 +31,7 @@
     </div>
 
     <!-- Form Section -->
-    <form [formGroup]="orgForm" class="admin-form">
+    <form [formGroup]="adminForm" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
         <div class="form-field">
@@ -48,19 +48,31 @@
               placeholder="Enter first name"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  orgForm.get('firstName')?.invalid &&
-                  orgForm.get('firstName')?.touched
+                  adminForm.get('firstName')?.invalid &&
+                  adminForm.get('firstName')?.touched
               }"
             />
           </span>
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('firstName')?.invalid &&
-              orgForm.get('firstName')?.touched
+              adminForm.get('firstName')?.invalid &&
+              adminForm.get('firstName')?.touched
             "
           >
-            First name is required
+            <div *ngIf="adminForm.get('firstName')?.errors?.['required']">
+              First name is required
+            </div>
+
+            <div *ngIf="adminForm.get('firstName')?.errors?.['minlength']">
+              First name must be at least
+              {{ adminForm.get('firstName')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="adminForm.get('firstName')?.errors?.['pattern']">
+              First name can only contain letters and hyphens
+            </div>
           </small>
         </div>
 
@@ -77,19 +89,31 @@
               placeholder="Enter last name"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  orgForm.get('lastName')?.invalid &&
-                  orgForm.get('lastName')?.touched
+                  adminForm.get('lastName')?.invalid &&
+                  adminForm.get('lastName')?.touched
               }"
             />
           </span>
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('lastName')?.invalid &&
-              orgForm.get('lastName')?.touched
+              adminForm.get('lastName')?.invalid &&
+              adminForm.get('lastName')?.touched
             "
           >
-            Last name is required
+            <div *ngIf="adminForm.get('lastName')?.errors?.['required']">
+              last name is required
+            </div>
+
+            <div *ngIf="adminForm.get('lastName')?.errors?.['minlength']">
+              Last name must be at least
+              {{ adminForm.get('lastName')?.errors?.['minlength'].requiredLength }}
+              characters
+            </div>
+
+            <div *ngIf="adminForm.get('lastName')?.errors?.['pattern']">
+              Last name can only contain letters and hyphens
+            </div>
           </small>
         </div>
 
@@ -123,20 +147,21 @@
               placeholder="Enter email address"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  orgForm.get('email')?.invalid && orgForm.get('email')?.touched
+                  adminForm.get('email')?.invalid &&
+                  adminForm.get('email')?.touched
               }"
             />
           </span>
           <small
             class="error-message"
             *ngIf="
-              orgForm.get('email')?.invalid && orgForm.get('email')?.touched
+              adminForm.get('email')?.invalid && adminForm.get('email')?.touched
             "
           >
-            <span *ngIf="orgForm.get('email')?.errors?.['required']"
+            <span *ngIf="adminForm.get('email')?.errors?.['required']"
               >Email is required</span
             >
-            <span *ngIf="orgForm.get('email')?.errors?.['email']"
+            <span *ngIf="adminForm.get('email')?.errors?.['email']"
               >Please enter a valid email</span
             >
           </small>
@@ -168,7 +193,7 @@
               [falseValue]="0"
             ></p-inputSwitch>
             <span class="status-text">{{
-              orgForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
+              adminForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
             }}</span>
           </div>
         </div>
