@@ -20,12 +20,36 @@
   <app-root></app-root>
   
   <!-- Monaco Editor from CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
   <script>
-    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
-    require(['vs/editor/editor.main'], function() {
-      // Monaco is now available globally
-    });
+    // Set loading flag before script loads
+    window.monacoLoading = true;
+    window.monacoLoaded = false;
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js" 
+          onerror="console.error('Failed to load Monaco loader script'); window.monacoLoading = false;"></script>
+  <script>
+    // Wait for loader to be available
+    (function checkLoader() {
+      if (typeof require !== 'undefined' && typeof require.config === 'function') {
+        console.log('Monaco loader available, configuring...');
+        require.config({ 
+          paths: { 
+            'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' 
+          }
+        });
+        require(['vs/editor/editor.main'], function() {
+          console.log('Monaco Editor loaded successfully from CDN');
+          window.monacoLoaded = true;
+          window.monacoLoading = false;
+        }, function(err) {
+          console.error('Failed to load Monaco editor.main:', err);
+          window.monacoLoading = false;
+        });
+      } else if (window.monacoLoading) {
+        // Retry if still loading
+        setTimeout(checkLoader, 100);
+      }
+    })();
   </script>
 </body>
 

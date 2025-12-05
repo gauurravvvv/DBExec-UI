@@ -1,6485 +1,1189 @@
-@import 'src/variables.scss';
-
-:host {
-  display: block;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px var(--shadow-color);
-}
-
-.run-query-container {
-  height: 100%;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  background: var(--background-color);
-  position: relative;
+// ===================================================================
+// Query Editor Wrapper - Main Container
+// ===================================================================
+.query-editor-wrapper {
   display: flex;
   flex-direction: column;
-  contain: layout;
-  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  background-color: var(--background-color);
+  overflow: hidden;
+     border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-  // Angular-split main container styles
-  ::ng-deep {
-    as-split {
-      width: 100%;
-      height: 100%;
-      display: flex;
+// ===================================================================
+// Toolbar Styles
+// ===================================================================
+.query-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  min-height: 56px;
+  flex-shrink: 0;
 
-      &.main-horizontal-split {
-        flex-direction: row;
-      }
-
-      &.editor-results-split {
-        flex-direction: column;
-      }
-    }
-
-    as-split-area {
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-width: 0; // Important: Allow panels to shrink below content
-      min-height: 0;
-    }
-
-    // Gutter styles - VS Code like appearance
-    .as-split-gutter {
-      background: var(--border-color);
-      transition: background 0.2s ease;
-      position: relative;
-      flex-shrink: 0;
-
-      &:hover {
-        background: var(--primary-color);
-      }
-
-      // Horizontal gutter
-      &.as-split-gutter-horizontal {
-        width: 5px !important;
-        cursor: col-resize;
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 1px;
-          height: 30px;
-          background: var(--secondary-color);
-          opacity: 0;
-          transition: opacity 0.2s ease;
-        }
-
-        &:hover::before {
-          opacity: 0.5;
-        }
-
-        &:active {
-          background: var(--primary-color);
-
-          &::before {
-            opacity: 1;
-            background: white;
-          }
-        }
-      }
-
-      // Vertical gutter
-      &.as-split-gutter-vertical {
-        height: 5px !important;
-        cursor: row-resize;
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 30px;
-          height: 1px;
-          background: var(--secondary-color);
-          opacity: 0;
-          transition: opacity 0.2s ease;
-        }
-
-        &:hover::before {
-          opacity: 0.5;
-        }
-
-        &:active {
-          background: var(--primary-color);
-
-          &::before {
-            opacity: 1;
-            background: white;
-          }
-        }
-      }
-
-      // Icon for gutter (the dots/grip)
-      .as-split-gutter-icon {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
-        height: 100%;
-        background-position: center;
-        background-repeat: no-repeat;
-        opacity: 0.3;
-        transition: opacity 0.2s ease;
-      }
-
-      &:hover .as-split-gutter-icon {
-        opacity: 0.7;
-      }
-    }
-
-    // Split area specific styles with proper constraints to prevent overflow
-    .schema-split-area {
-      min-width: 150px;
-      max-width: 40%; // Use percentage to prevent extreme dragging
-      width: auto;
-      overflow: hidden;
-      contain: layout;
-      box-sizing: border-box;
-    }
-
-    .content-split-area {
-      flex: 1;
-      min-width: 0; // Allow it to shrink properly
-      max-width: calc(100% - 155px); // Account for minimum schema width + gutter
-      overflow: hidden;
-      width: 100%;
-      contain: layout;
-      box-sizing: border-box;
-    }
-
-    .editor-split-area {
-      min-height: 150px;
-      width: 100%;
-      overflow: hidden;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .results-split-area {
-      min-height: 100px;
-      width: 100%;
-      overflow: hidden;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-    }
-  }
-
-  // Common panel styling
-  .schema-panel,
-  .editor-panel,
-  .results-panel {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    flex: 1;
-    min-height: 0;
-    position: relative;
-  }
-
-  // Responsive splitter sizes for different screen sizes
-  @media (max-width: 1400px) {
-    ::ng-deep {
-      .schema-split-area {
-        max-width: 35%; // Reduce max width on smaller screens
-        min-width: 140px;
-      }
-      
-      .content-split-area {
-        min-width: 0; // Allow flexible sizing
-        max-width: calc(100% - 145px); // Account for schema min-width + gutter
-        width: 100%;
-      }
-    }
-  }
-
-  @media (max-width: 1024px) {
-    ::ng-deep {
-      .schema-split-area {
-        max-width: 30%; // Further reduce on tablets
-        min-width: 120px;
-      }
-      
-      .content-split-area {
-        min-width: 0; // Allow flexible sizing
-        max-width: calc(100% - 125px); // Account for schema min-width + gutter
-        width: 100%;
-      }
-      
-      .editor-split-area {
-        min-height: 120px;
-      }
-      
-      .results-split-area {
-        min-height: 80px;
-      }
-    }
-  }
-
-  @media (max-width: 768px) {
-    ::ng-deep {
-      // Update for angular-split areas instead of p-splitter
-      .schema-split-area {
-        max-width: 25%; // Minimal schema panel on mobile
-        min-width: 100px;
-      }
-      
-      .content-split-area {
-        min-width: 0; // Allow flexible sizing
-        max-width: calc(100% - 105px); // Account for schema min-width + gutter
-        width: 100%;
-      }
-      
-      .editor-split-area {
-        min-height: 120px; // Smaller minimum for editor on mobile
-        width: 100%;
-      }
-      
-      .results-split-area {
-        min-height: 80px; // Smaller minimum for results on mobile
-        width: 100%;
-      }
-    }
-    
-    // Fix tab buttons on small screens
-    .editor-panel {
-      .editor-tabs {
-        .tabs-container {
-          width: 100%;
-          max-width: 100%;
-          
-          .editor-tab {
-            min-width: 80px;
-            max-width: 150px;
-            padding: 0.5rem 0.5rem;
-            
-            .tab-title {
-              font-size: 0.75rem;
-            }
-          }
-        }
-        
-        .editor-actions {
-          padding: 0 0.25rem;
-          gap: 0.125rem;
-          
-          ::ng-deep .p-button {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            
-            &.p-button-icon-only {
-              width: 24px;
-              height: 24px;
-              padding: 0;
-            }
-          }
-        }
-      }
-    }
-    
-    // Fix results panel on small screens
-    .results-panel {
-      width: 100%;
-      
-      .panel-header {
-        padding: 0 0.5rem;
-        font-size: 0.875rem;
-        
-        .header-left h3 {
-          font-size: 0.875rem;
-        }
-      }
-      
-      .panel-content {
-        width: 100%;
-        overflow-x: auto;
-      }
-      
-      ::ng-deep .p-tabview {
-        width: 100%;
-        
-        .p-tabview-nav {
-          flex-wrap: nowrap;
-          overflow-x: auto;
-          width: 100%;
-          
-          .p-tabview-nav-link {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.75rem;
-            white-space: nowrap;
-          }
-        }
-        
-        .p-tabview-panels {
-          width: 100%;
-          overflow-x: auto;
-        }
-      }
-    }
-  }
-
-  // Panel header styling
-  .panel-header {
-    flex: 0 0 auto;
-    width: 100%;
-    height: 35px;
-    background: var(--card-background);
-    border-bottom: 1px solid var(--border-color);
+  .toolbar-left {
     display: flex;
     align-items: center;
-    padding: 0 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-color);
+    gap: 16px;
 
-    i {
-      margin-right: 0.5rem;
-      color: var(--primary-color);
+    .toggle-sidebar {
+      padding: 6px 8px;
+      margin-right: 4px;
     }
 
-    .editor-actions,
-    .results-info {
-      margin-left: auto;
+    .toolbar-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-color);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-    }
-
-    .result-count,
-    .execution-time {
-      background: var(--primary-color);
-      color: white;
-      padding: 0.125rem 0.5rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-
-    .execution-time {
-      background: var(--success-color);
-    }
-  }
-
-  // Panel content styling
-  .panel-content {
-    flex: 1;
-    overflow: hidden;
-    background: var(--card-background);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 0; // Important for flexbox scrolling
-    height: 100%;
-  }
-
-  // Schema panel specific - takes full height of parent card
-  .schema-panel {
-    height: 100%;
-    max-height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    .panel-content {
-      flex: 1;
-      overflow: hidden;
-      background: var(--card-background);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      padding: 0;
-      height: calc(100% - 35px); // Subtract header height
-
-      // Ensure loading and empty states are positioned correctly
-      .loading-container,
-      .empty-state {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-
-        .loading-icon,
-        .empty-icon {
-          font-size: 2rem;
-          color: var(--secondary-color);
-        }
-
-        .loading-text {
-          font-size: 0.875rem;
-          color: var(--text-muted-color);
-          margin-top: 0.5rem;
-        }
-      }
-
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: transparent;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: 3px;
-
-        &:hover {
-          background: var(--secondary-color);
-        }
-      }
-
-      ::ng-deep {
-        .schema-tree {
-          height: 100%;
-          border: none;
-          background: transparent;
-          font-size: 0.75rem;
-          overflow-y: auto;
-
-          .p-tree {
-            height: auto;
-            background: transparent;
-            border: none;
-            color: var(--text-color);
-            padding: 0.125rem;
-            overflow-y: visible;
-
-            .p-tree-container {
-              height: auto;
-              overflow-y: visible;
-
-              .p-treenode {
-                padding: 0;
-                margin-bottom: 0.0625rem;
-
-                .p-treenode-content {
-                  padding: 0.125rem 0.25rem;
-                  border-radius: 3px;
-                  transition: all 0.2s;
-                  min-height: 20px;
-
-                  &:hover {
-                    background: var(--hover-background);
-                  }
-
-                  &.p-highlight {
-                    background: color-mix(
-                      in srgb,
-                      var(--primary-color) 10%,
-                      transparent
-                    );
-                    color: var(--primary-color);
-                  }
-
-                  .p-tree-toggler {
-                    width: 1rem;
-                    height: 1rem;
-                    margin-right: 0.125rem;
-
-                    .p-tree-toggler-icon {
-                      font-size: 0.6875rem;
-                    }
-                  }
-                }
-
-                // Database level (root)
-                &[aria-level='1'] {
-                  .p-treenode-content {
-                    background: color-mix(
-                      in srgb,
-                      var(--primary-color) 8%,
-                      var(--card-background)
-                    );
-                    border-left: 3px solid var(--primary-color);
-                    font-weight: 600;
-                  }
-                }
-
-                // Schema level
-                &[aria-level='2'] {
-                  .p-treenode-content {
-                    background: color-mix(
-                      in srgb,
-                      var(--secondary-color) 5%,
-                      var(--card-background)
-                    );
-                    border-left: 2px solid var(--secondary-color);
-                    font-weight: 500;
-                  }
-                }
-
-                // Table level
-                &[aria-level='3'] {
-                  .p-treenode-content {
-                    background: color-mix(
-                      in srgb,
-                      var(--success-color) 3%,
-                      var(--card-background)
-                    );
-                    border-left: 1px solid var(--success-color);
-                  }
-                }
-
-                // Column level
-                &[aria-level='4'] {
-                  .p-treenode-content {
-                    background: transparent;
-                    opacity: 0.9;
-                  }
-                }
-
-                // Reduce spacing for nested items
-                .p-treenode-children {
-                  padding-left: 0.75rem;
-                  margin: 0;
-                  border-left: 1px dotted var(--border-color);
-                  margin-left: 0.375rem;
-
-                  .p-treenode {
-                    margin-bottom: 0.0313rem;
-
-                    .p-treenode-content {
-                      padding: 0.0625rem 0.125rem;
-                      min-height: 18px;
-                    }
-
-                    // Further reduce spacing for deeply nested items (columns)
-                    .p-treenode-children {
-                      padding-left: 0.5rem;
-                      border-left: 1px dotted rgba(var(--border-color-rgb), 0.5);
-
-                      .p-treenode {
-                        margin-bottom: 0.0156rem;
-
-                        .p-treenode-content {
-                          padding: 0.0313rem 0.125rem;
-                          min-height: 16px;
-                          font-size: 0.6875rem;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-
-            .p-tree-filter-container {
-              padding: 0.125rem;
-              position: sticky;
-              top: 0;
-              background: var(--card-background);
-              z-index: 10;
-              border-bottom: 1px solid var(--border-color);
-
-              .p-tree-filter {
-                background: var(--input-background);
-                border: 1px solid var(--border-color);
-                color: var(--text-color);
-                font-size: 0.75rem;
-                height: 24px;
-                padding: 0.125rem 0.25rem;
-                border-radius: 3px;
-
-                &:focus {
-                  border-color: var(--primary-color);
-                  box-shadow: 0 0 0 1px
-                    color-mix(in srgb, var(--primary-color) 20%, transparent);
-                }
-
-                &::placeholder {
-                  color: var(--secondary-color);
-                  font-size: 0.6875rem;
-                }
-              }
-
-              .p-tree-filter-icon {
-                font-size: 0.6875rem;
-                right: 0.25rem;
-                color: var(--secondary-color);
-              }
-            }
-
-            // Custom scrollbar for schema tree
-            .p-tree-container {
-              scrollbar-width: thin;
-              scrollbar-color: var(--border-color) transparent;
-
-              &::-webkit-scrollbar {
-                width: 6px;
-              }
-
-              &::-webkit-scrollbar-track {
-                background: transparent;
-              }
-
-              &::-webkit-scrollbar-thumb {
-                background: var(--border-color);
-                border-radius: 3px;
-
-                &:hover {
-                  background: var(--secondary-color);
-                }
-              }
-            }
-          }
-        }
-
-        .tree-node-content {
-          display: flex;
-          align-items: center;
-          gap: 0.125rem;
-          font-size: 0.875rem;
-          line-height: 1.2;
-
-          i {
-            font-size: 0.6875rem;
-            color: var(--secondary-color);
-            width: 0.75rem;
-            text-align: center;
-            flex-shrink: 0;
-          }
-
-          .node-label {
-            padding: 0 0.125rem;
-            white-space: nowrap;
-            font-weight: 500;
-            color: var(--text-color);
-          }
-
-          .node-type {
-            font-size: 0.625rem;
-            color: var(--secondary-color);
-            background: var(--hover-background);
-            padding: 0.0625rem 0.125rem;
-            border-radius: 2px;
-            margin-left: 0.125rem;
-            flex-shrink: 0;
-            opacity: 0.8;
-            text-transform: none;
-          }
-        }
-      }
-    }
-
-    // Responsive adjustments - only internal content styling
-    @media (max-width: 768px) {
-      .panel-content {
-        ::ng-deep {
-          .schema-tree {
-            font-size: 0.6875rem;
-
-            .p-tree {
-              padding: 0.0625rem;
-            }
-
-            .p-tree-container {
-              .p-treenode {
-                margin-bottom: 0.0313rem;
-
-                .p-treenode-content {
-                  padding: 0.0625rem 0.125rem;
-                  min-height: 18px;
-                }
-
-                .p-treenode-children {
-                  padding-left: 0.5rem;
-                  margin-left: 0.25rem;
-
-                  .p-treenode-children {
-                    padding-left: 0.375rem;
-
-                    .p-treenode-content {
-                      min-height: 14px;
-                      font-size: 0.625rem;
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          .tree-node-content {
-            gap: 0.0625rem;
-
-            i {
-              width: 0.625rem;
-              font-size: 0.625rem;
-            }
-
-            .node-label {
-              padding: 0 0.0625rem;
-            }
-
-            .node-type {
-              font-size: 0.5625rem;
-              padding: 0.0313rem 0.0625rem;
-              margin-left: 0.0625rem;
-            }
-          }
-        }
-      }
-    }
-
-    @media (max-width: 480px) {
-      .panel-content {
-        ::ng-deep {
-          .schema-tree {
-            font-size: 0.625rem;
-
-            .p-tree-filter-container {
-              padding: 0.0625rem;
-
-              .p-tree-filter {
-                height: 20px;
-                font-size: 0.6875rem;
-                padding: 0.0625rem 0.125rem;
-              }
-            }
-
-            .p-tree-container {
-              .p-treenode {
-                margin-bottom: 0.0156rem;
-
-                .p-treenode-content {
-                  padding: 0.0313rem 0.0625rem;
-                  min-height: 16px;
-                }
-
-                .p-treenode-children {
-                  padding-left: 0.375rem;
-                  margin-left: 0.125rem;
-                }
-              }
-            }
-          }
-
-          .tree-node-content {
-            gap: 0.0313rem;
-
-            i {
-              width: 0.5rem;
-              font-size: 0.5625rem;
-            }
-
-            .node-type {
-              display: none; // Hide type on very small screens
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Database list styles
-  .schema-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-
-    .panel-header {
-      padding: 1rem;
-      background: var(--card-background);
-      border-bottom: 1px solid var(--border-color);
-      flex-shrink: 0;
-
-      h3 {
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text-color);
-      }
-    }
-
-    .panel-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0; // Critical for flexbox scrolling
-      overflow: hidden;
-      position: relative;
-    }
-
-    .loading-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      background: var(--card-background);
-
-      .loading-icon {
-        font-size: 1.5rem;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-      }
-
-      .loading-text {
-        color: var(--text-muted-color);
-        font-size: 0.875rem;
-      }
-    }
-
-    // Force remove all padding from PrimeNG tree nodes and adjust text size
-    ::ng-deep .p-tree .p-tree-container .p-treenode .p-treenode-content {
-      border-radius: 4px !important;
-      transition: none !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      border: none !important;
-      font-size: 0.875rem !important;
-      font-weight: normal !important;
-
-      // Target the actual text content
-      .tree-node-content,
-      .node-label,
-      span {
-        font-size: 0.875rem !important;
-        font-weight: normal !important;
-      }
-
-      // Show togglers but style them properly
-      .p-tree-toggler {
-        width: 1.5rem !important;
-        height: 1.5rem !important;
-        margin-right: 0.25rem !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-
-        .p-tree-toggler-icon {
-          font-size: 0.75rem !important;
-          color: var(--text-color) !important;
-        }
-      }
-
-      // Hide PrimeNG's default node icons to prevent duplicates
-      .p-treenode-icon {
-        display: none !important;
-      }
-    }
-
-    // Also hide any other default PrimeNG icons
-    ::ng-deep .database-tree {
-      .p-treenode-icon,
-      .p-tree-node-icon {
-        display: none !important;
-      }
-    }
-
-    // Hide togglers only for leaf nodes (columns/fields - no children)
-    ::ng-deep .database-tree .p-treenode-leaf .p-tree-toggler {
-      display: none !important;
-    }
-
-    // Also target the custom template content
-    ::ng-deep .database-tree .tree-node-content {
-      font-size: 0.875rem !important;
-      font-weight: normal !important;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      .node-label {
-        font-size: 0.875rem !important;
-        font-weight: normal !important;
-      }
-
-      .node-type {
-        font-size: 0.625rem !important;
-        font-weight: normal !important;
-        text-transform: none !important;
-      }
-
-      // Style the node icons and layout
-      .node-main {
-        display: flex;
-        align-items: center;
-        gap: 0.375rem;
-
-        .node-icon {
-          font-size: 0.875rem;
-          flex-shrink: 0;
-          width: 16px;
-          text-align: center;
-
-          &.database-icon {
-            color: var(--primary-color);
-          }
-
-          &.schema-icon {
-            color: var(--secondary-color);
-          }
-
-          &.table-icon {
-            color: var(--success-color);
-          }
-
-          &.collection-icon {
-            color: var(--success-color);
-          }
-
-          &.column-icon {
-            color: var(--text-color);
-            opacity: 0.7;
-          }
-
-          &.tables-icon {
-            color: var(--info-color);
-          }
-
-          &.view-icon {
-            color: var(--warning-color);
-          }
-
-          &.default-icon {
-            color: var(--text-color);
-            opacity: 0.5;
-          }
-        }
-
-        .node-label {
-          white-space: nowrap;
-        }
-
-        .node-type {
-          font-size: 0.625rem;
-          opacity: 0.7;
-          margin-left: auto;
-          text-transform: none;
-        }
-      }
-    }
-
-    ::ng-deep .database-tree {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      overflow-y: auto !important;
-      overflow-x: auto !important;
-      padding: 0.5rem;
-
-      // Enhanced custom scrollbar
-      scrollbar-width: thin;
-      scrollbar-color: var(--shadow-color)
-        color-mix(in srgb, var(--shadow-color) 25%, transparent);
-
-      &::-webkit-scrollbar {
-        width: 10px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
-        border-radius: 5px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--shadow-color);
-        border-radius: 5px;
-        border: 2px solid color-mix(in srgb, var(--text-color) 10%, transparent);
-
-        &:hover {
-          background: color-mix(in srgb, var(--shadow-color) 150%, transparent);
-        }
-
-        &:active {
-          background: color-mix(in srgb, var(--shadow-color) 200%, transparent);
-        }
-      }
-
-      &::-webkit-scrollbar-corner {
-        background: transparent;
-      }
-
-      ::ng-deep {
-        .p-tree {
-          width: 100% !important;
-          height: auto !important;
-          background: transparent !important;
-          border: none !important;
-
-          .p-tree-container {
-            background: transparent !important;
-            border: none !important;
-            overflow: visible !important;
-            max-height: none !important;
-            height: auto !important;
-          }
-        }
-
-        .p-treenode {
-          padding: 0 !important;
-          margin: 0 !important;
-
-          .p-treenode-content {
-            border-radius: 4px !important;
-            transition: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border: none !important;
-
-            &:hover {
-              background: var(--hover-background);
-            }
-
-            .p-tree-toggler {
-              margin-right: 0.5rem;
-              width: 1.5rem;
-              height: 1.5rem;
-
-              .p-tree-toggler-icon {
-                font-size: 0.75rem;
-              }
-            }
-          }
-
-          // Database level styling
-          &[aria-level='1'] .p-treenode-content {
-            background: color-mix(
-              in srgb,
-              var(--primary-color) 8%,
-              var(--card-background)
-            );
-            border-left: 3px solid var(--primary-color);
-            font-weight: 600;
-
-            .tree-node-content {
-              .node-main {
-                .pi-database {
-                  color: var(--primary-color);
-                }
-
-                .node-label {
-                  color: var(--primary-color);
-                }
-              }
-            }
-          }
-
-          // Schema/Tables level styling
-          &[aria-level='2'] .p-treenode-content {
-            background: color-mix(
-              in srgb,
-              var(--secondary-color) 5%,
-              var(--card-background)
-            );
-            border-left: 2px solid var(--secondary-color);
-            margin-left: 1rem;
-          }
-
-          // Table level styling
-          &[aria-level='3'] .p-treenode-content {
-            margin-left: 2rem;
-            border-left: 1px solid var(--border-color);
-          }
-
-          // Column level styling
-          &[aria-level='4'] .p-treenode-content {
-            margin-left: 3rem;
-            font-size: 0.875rem;
-            opacity: 0.9;
-          }
-        }
-      }
-
-      .tree-node-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        transition: background-color 0.2s ease;
-
-        // Ensure database nodes are right-clickable
-        &[data-type='Database'] {
-          position: relative;
-          z-index: 1;
-
-          // Ensure the entire area is clickable
-          &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: -1;
-          }
-        }
-
-        .node-main {
-          display: flex;
-          align-items: center;
-
-          .pi {
-            margin-right: 0.5rem;
-            font-size: 0.875rem;
-
-            &.pi-spin {
-              color: var(--primary-color);
-            }
-          }
-
-          .node-label {
-            font-size: 0.875rem;
-            color: var(--text-color);
-            margin-right: 0.5rem;
-            white-space: nowrap;
-          }
-
-          .node-type {
-            font-size: 0.625rem;
-            color: var(--text-muted-color);
-            background: var(--surface-100);
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            text-transform: none;
-            letter-spacing: normal;
-            margin-right: 0.5rem;
-          }
-
-          .loading-indicator {
-            color: var(--primary-color);
-            font-size: 0.875rem;
-            margin-left: 0.5rem;
-          }
-        }
-      }
-    }
-
-    .empty-state {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      text-align: center;
-      background: var(--card-background);
-
-      .empty-icon {
-        font-size: 2rem;
-        color: var(--text-muted-color);
-        margin-bottom: 1rem;
-        opacity: 0.5;
-      }
-
-      p {
-        margin: 0;
-        color: var(--text-muted-color);
-        font-size: 0.875rem;
-      }
-    }
-
-    // Enhanced tree node styles for better column information display
-    ::ng-deep .p-tree .p-tree-container .p-treenode {
-      .p-treenode-content {
-        .tree-node-content {
-          &.level-3 {
-            // Column level
-            .node-label {
-              font-size: 0.875rem;
-              line-height: 1.4;
-              white-space: nowrap;
-              display: block;
-              padding-right: 0.5rem;
-            }
-          }
-        }
-      }
-
-      // Empty state node styling
-      &.empty-state-node {
-        .p-treenode-content {
-          font-style: italic;
-          color: var(--text-muted-color) !important;
-          opacity: 0.7;
-        }
-      }
-    }
-
-    // Additional scrolling improvements
-    .database-tree {
-      // Ensure smooth scrolling on mobile
-      -webkit-overflow-scrolling: touch;
-
-      // Better spacing for expanded content
-      ::ng-deep .p-tree .p-tree-container .p-treenode {
-        margin-bottom: 2px;
-
-        &:last-child {
-          margin-bottom: 0.5rem;
-        }
-      }
-    }
-  }
-
-  // Editor panel specific
-  .editor-panel {
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    
-    .editor-tabs {
-      display: flex;
-      width: 100%;
-      background: var(--card-background);
-      border-bottom: 1px solid var(--border-color);
-      overflow: hidden;
-      height: 40px;
-      flex-shrink: 0;
-
-      .tabs-container {
-        display: flex;
-        overflow-x: auto;
-        flex: 1;
-        min-width: 0;
-        scrollbar-width: thin;
-        max-width: 100%;
-
-        &::-webkit-scrollbar {
-          height: 4px;
-        }
-
-        &::-webkit-scrollbar-track {
-          background: var(--border-color);
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background: var(--secondary-color);
-          border-radius: 2px;
-        }
-
-        .editor-tab {
-          display: flex;
-          align-items: center;
-          padding: 0.5rem 1rem;
-          background: var(--card-background);
-          border-right: 1px solid var(--border-color);
-          cursor: pointer;
-          max-width: 200px;
-          transition: all 0.2s;
-
-          &:hover {
-            background: var(--hover-background);
-          }
-
-          &.active {
-            background: var(--primary-color);
-            color: white;
-
-            .tab-close {
-              color: white;
-            }
-          }
-
-          .tab-pin-icon {
-            margin-right: 0.25rem;
-            font-size: 0.75rem;
-            color: var(--primary-color);
-            opacity: 0.8;
-          }
-
-          .tab-title {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 0.875rem;
-            user-select: none;
-          }
-
-          .tab-close {
-            margin-left: 0.5rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-
-            &:hover {
-              opacity: 1;
-            }
-          }
-        }
-      }
-
-      .editor-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        padding: 0 0.5rem;
-        border-left: 1px solid var(--border-color);
-        background: var(--card-background);
-
-        ::ng-deep {
-          // Database menu styling with high z-index and scrolling
-          .database-menu {
-            z-index: 99999 !important;
-            background: var(--menu-background) !important;
-            border: 1px solid var(--menu-border-color) !important;
-            border-radius: 8px !important;
-            box-shadow: var(--menu-shadow) !important;
-            min-width: 200px !important;
-            max-width: 400px !important;
-
-            .p-menu-list {
-              z-index: 99999 !important;
-              background: var(--menu-background) !important;
-              border: none !important;
-              padding: 0.5rem 0 !important;
-              max-height: 400px !important;
-              overflow-y: auto !important;
-              overflow-x: hidden !important;
-
-              // Custom scrollbar for database menu
-              &::-webkit-scrollbar {
-                width: 8px;
-              }
-
-              &::-webkit-scrollbar-track {
-                background: color-mix(
-                  in srgb,
-                  var(--shadow-color) 25%,
-                  transparent
-                );
-                border-radius: 4px;
-              }
-
-              &::-webkit-scrollbar-thumb {
-                background: color-mix(
-                  in srgb,
-                  var(--shadow-color) 75%,
-                  transparent
-                );
-                border-radius: 4px;
-
-                &:hover {
-                  background: var(--shadow-color);
-                }
-              }
-            }
-
-            .p-menuitem {
-              .p-menuitem-link {
-                padding: 0.75rem 1rem;
-                transition: all 0.2s ease;
-                border: none !important;
-                color: var(--menu-text-color) !important;
-
-                &:hover {
-                  background: var(--menu-hover-background) !important;
-                }
-
-                .p-menuitem-icon {
-                  color: var(--menu-icon-color) !important;
-                  margin-right: 0.75rem;
-                  font-size: 0.875rem;
-                }
-
-                .p-menuitem-text {
-                  color: var(--menu-text-color) !important;
-                  font-size: 0.875rem;
-                  font-weight: 500;
-                }
-              }
-
-              &.p-disabled {
-                .p-menuitem-link {
-                  opacity: var(--menu-disabled-opacity) !important;
-                  cursor: not-allowed;
-
-                  &:hover {
-                    background: transparent !important;
-                  }
-
-                  .p-menuitem-icon,
-                  .p-menuitem-text {
-                    opacity: var(--menu-disabled-opacity) !important;
-                  }
-                }
-              }
-            }
-          }
-
-          // Save menu styling with high z-index
-          .save-menu {
-            z-index: 99999 !important;
-            background: var(--menu-background) !important;
-            border: 1px solid var(--menu-border-color) !important;
-            border-radius: 8px !important;
-            box-shadow: var(--menu-shadow) !important;
-            min-width: 200px !important;
-
-            .p-menu-list {
-              z-index: 99999 !important;
-              background: var(--menu-background) !important;
-              border: none !important;
-              padding: 0.5rem 0 !important;
-            }
-
-            .p-menuitem {
-              .p-menuitem-link {
-                padding: 0.75rem 1rem;
-                transition: all 0.2s ease;
-                border: none !important;
-                color: var(--menu-text-color) !important;
-
-                &:hover {
-                  background: var(--menu-hover-background) !important;
-                }
-
-                .p-menuitem-icon {
-                  color: var(--menu-icon-color) !important;
-                  margin-right: 0.75rem;
-                  font-size: 0.875rem;
-                }
-
-                .p-menuitem-text {
-                  color: var(--menu-text-color) !important;
-                  font-size: 0.875rem;
-                  font-weight: 500;
-                }
-              }
-
-              &.p-disabled {
-                .p-menuitem-link {
-                  opacity: var(--menu-disabled-opacity) !important;
-                  cursor: not-allowed;
-
-                  &:hover {
-                    background: transparent !important;
-                  }
-
-                  .p-menuitem-icon,
-                  .p-menuitem-text {
-                    opacity: var(--menu-disabled-opacity) !important;
-                  }
-                }
-              }
-            }
-          }
-
-          .p-button {
-            width: 2rem;
-            height: 2rem;
-            padding: 0;
-            border: none;
-            background: transparent;
-            transition: all 0.2s;
-
-            &.add-btn {
-              color: var(--primary-color);
-              &:enabled:hover {
-                background: color-mix(
-                  in srgb,
-                  var(--primary-color) 10%,
-                  transparent
-                );
-              }
-            }
-
-            &.run-btn {
-              color: var(--success-color);
-              &:enabled:hover {
-                background: color-mix(
-                  in srgb,
-                  var(--success-color) 10%,
-                  transparent
-                );
-              }
-              &.executing {
-                animation: pulse 1.5s infinite;
-              }
-            }
-
-            &.format-btn {
-              color: var(--warning-color);
-              &:enabled:hover {
-                background: color-mix(
-                  in srgb,
-                  var(--warning-color) 10%,
-                  transparent
-                );
-              }
-            }
-
-            &.fullscreen-btn {
-              color: var(--secondary-color);
-              &:enabled:hover {
-                background: color-mix(
-                  in srgb,
-                  var(--secondary-color) 10%,
-                  transparent
-                );
-              }
-            }
-
-            // Auto-save button styling
-            &.auto-save-btn {
-              color: var(--secondary-color);
-
-              &:enabled:hover {
-                background: color-mix(
-                  in srgb,
-                  var(--secondary-color) 10%,
-                  transparent
-                );
-              }
-
-              // Enabled state styling
-              &.enabled {
-                color: var(--success-color);
-              }
-
-              // Completed state with animation
-              &.completed {
-                color: var(--success-color);
-                animation: completion-pulse 1.5s ease-in-out;
-              }
-
-              // Icon animations based on auto-save status
-              .p-button-icon {
-                transition: all 0.3s ease;
-
-                &.pi-check {
-                  color: var(--success-color);
-                  animation: check-bounce 0.6s ease-out;
-                }
-
-                &.pi-times {
-                  color: var(--error-color);
-                  animation: shake 0.5s ease-in-out;
-                }
-              }
-            }
-          }
-
-          &.save-btn {
-            color: var(--primary-color);
-            &:enabled:hover {
-              background: color-mix(
-                in srgb,
-                var(--primary-color) 10%,
-                transparent
-              );
-            }
-          }
-
-          &.clear-btn {
-            color: var(--error-color);
-            &:enabled:hover {
-              background: color-mix(
-                in srgb,
-                var(--error-color) 10%,
-                transparent
-              );
-            }
-          }
-
-          &:enabled:active {
-            transform: scale(0.95);
-          }
-
-          &:disabled {
-            opacity: 0.4 !important;
-            cursor: not-allowed;
-            color: var(--disabled-color) !important;
-            background: transparent !important;
-
-            .p-button-icon {
-              color: var(--disabled-color) !important;
-            }
-          }
-
-          .p-button-icon {
-            font-size: 1rem;
-            font-weight: bold;
-          }
-        }
-      }
-    }
-  }
-
-  .panel-content {
-    padding: 0;
-    flex: 1;
-    width: 100%;
-    display: flex;
-
-    .sql-editor-monaco {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-    }
-
-    .no-tabs-message {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted-color);
-      text-align: center;
-      padding: 2rem;
+      gap: 8px;
 
       i {
-        font-size: 4rem;
         color: var(--primary-color);
-        opacity: 0.3;
-        margin-bottom: 1.5rem;
       }
+    }
 
-      h3 {
+    .toolbar-hint {
+      font-size: 12px;
+      color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      kbd {
+        background-color: var(--hover-background);
         color: var(--text-color);
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-      }
-
-      p {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-        color: var(--text-muted-color);
-
-        &.hint {
-          font-size: 0.875rem;
-          margin-top: 1rem;
-          opacity: 0.8;
-
-          i {
-            font-size: 0.875rem;
-            margin: 0 0.25rem;
-            opacity: 1;
-          }
-        }
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-family: monospace;
+        border: 1px solid var(--border-color);
       }
     }
+  }
 
-    ::ng-deep {
-      // Monaco Editor overrides
-      .monaco-editor {
-        height: 100% !important;
-        width: 100% !important;
-
-        .overflow-guard {
-          height: 100% !important;
-        }
-
-        // Custom scrollbar styling
-        .monaco-scrollable-element {
-          .scrollbar {
-            &.vertical {
-              width: 14px !important;
-
-              .slider {
-                width: 10px !important;
-                left: 2px !important;
-                background: var(--secondary-color) !important;
-                border-radius: 5px !important;
-
-                &:hover {
-                  background: var(--primary-color) !important;
-                }
-              }
-            }
-
-            &.horizontal {
-              height: 14px !important;
-
-              .slider {
-                height: 10px !important;
-                top: 2px !important;
-                background: var(--secondary-color) !important;
-                border-radius: 5px !important;
-
-                &:hover {
-                  background: var(--primary-color) !important;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // Line numbers styling
-      .margin-view-overlays {
-        .line-numbers {
-          color: var(--secondary-color) !important;
-          font-size: 12px !important;
-        }
-
-        .current-line ~ .line-numbers {
-          color: var(--text-color) !important;
-          font-weight: bold;
-        }
-      }
-
-      // Minimap styling
-      .minimap {
-        border-left: 1px solid var(--border-color);
-
-        .minimap-slider {
-          background: rgba(var(--primary-color), 0.2) !important;
-
-          &:hover {
-            background: rgba(var(--primary-color), 0.35) !important;
-          }
-        }
-      }
-
-      // Comprehensive suggestion widget styling
-      .suggest-widget {
-        background: var(--card-background) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: 8px !important;
-        box-shadow: 0 4px 12px var(--shadow-color) !important;
-        min-width: 300px !important;
-        max-width: 500px !important;
-
-        // Main container
-        .monaco-list {
-          background: var(--card-background) !important;
-          border-radius: 8px !important;
-
-          .monaco-list-row {
-            background: var(--card-background) !important;
-            color: var(--text-color) !important;
-            border: none !important;
-            padding: 8px 12px !important;
-            transition: all 0.2s ease !important;
-
-            // Default state
-            &:not(.focused) {
-              &:hover {
-                background: var(--hover-background) !important;
-              }
-            }
-
-            // Focused/selected state
-            &.focused {
-              background: var(--primary-color) !important;
-              color: white !important;
-
-              .suggest-icon {
-                color: white !important;
-              }
-
-              .codicon {
-                color: white !important;
-              }
-            }
-
-            // Suggestion content
-            .contents {
-              display: flex !important;
-              align-items: center !important;
-              gap: 8px !important;
-              width: 100% !important;
-
-              // Icon styling
-              .suggest-icon {
-                color: var(--primary-color) !important;
-                font-size: 16px !important;
-                width: 16px !important;
-                text-align: center !important;
-                flex-shrink: 0 !important;
-              }
-
-              // Codicon fallback
-              .codicon {
-                color: var(--primary-color) !important;
-                font-size: 16px !important;
-                width: 16px !important;
-                flex-shrink: 0 !important;
-              }
-
-              // Main label
-              .label {
-                color: inherit !important;
-                font-weight: 500 !important;
-                flex-grow: 1 !important;
-                min-width: 0 !important;
-              }
-
-              // Type/detail info
-              .detail,
-              .type-label {
-                color: var(--secondary-color) !important;
-                font-size: 12px !important;
-                opacity: 0.8 !important;
-                flex-shrink: 0 !important;
-                margin-left: auto !important;
-              }
-            }
-          }
-        }
-
-        // Details widget (documentation popup)
-        .details {
-          background: var(--card-background) !important;
-          border: 1px solid var(--border-color) !important;
-          border-radius: 8px !important;
-          box-shadow: 0 4px 12px var(--shadow-color) !important;
-          color: var(--text-color) !important;
-
-          .monaco-scrollable-element {
-            background: var(--card-background) !important;
-          }
-
-          .body {
-            background: var(--card-background) !important;
-            color: var(--text-color) !important;
-            padding: 12px !important;
-
-            .header {
-              color: var(--text-color) !important;
-              font-weight: 600 !important;
-              margin-bottom: 8px !important;
-            }
-
-            .docs {
-              color: var(--secondary-color) !important;
-              font-size: 13px !important;
-              line-height: 1.4 !important;
-            }
-          }
-        }
-      }
-
-      // Parameter hints widget
-      .parameter-hints-widget {
-        background: var(--card-background) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: 6px !important;
-        box-shadow: 0 2px 8px var(--shadow-color) !important;
-        color: var(--text-color) !important;
-
-        .monaco-scrollable-element {
-          background: var(--card-background) !important;
-        }
-
-        .parameter-hints-widget-content {
-          background: var(--card-background) !important;
-          color: var(--text-color) !important;
-          padding: 8px 12px !important;
-        }
-      }
-
-      // Quick suggestions (inline)
-      .ghost-text {
-        color: var(--secondary-color) !important;
-        opacity: 0.6 !important;
-      }
-    }
+  .toolbar-right {
+    display: flex;
+    gap: 8px;
   }
 }
 
-// Global Monaco editor theming (applies to all instances)
-::ng-deep {
-  // Override Monaco's built-in suggestion theming globally
-  .monaco-editor .suggest-widget {
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px var(--shadow-color) !important;
-
-    .monaco-list {
-      background: var(--card-background) !important;
-
-      .monaco-list-row {
-        background: var(--card-background) !important;
-        color: var(--text-color) !important;
-
-        &:hover:not(.focused) {
-          background: var(--hover-background) !important;
-        }
-
-        &.focused {
-          background: var(--primary-color) !important;
-          color: white !important;
-        }
-
-        .suggest-icon,
-        .codicon {
-          color: var(--primary-color) !important;
-        }
-
-        &.focused .suggest-icon,
-        &.focused .codicon {
-          color: white !important;
-        }
-      }
-    }
-  }
-
-  // Hover widget (documentation)
-  .monaco-editor .hover-widget {
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px var(--shadow-color) !important;
-    color: var(--text-color) !important;
-
-    .monaco-scrollable-element {
-      background: var(--card-background) !important;
-    }
-  }
-
-  // Context menu theming
-  .monaco-menu {
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    box-shadow: 0 4px 12px var(--shadow-color) !important;
-
-    .monaco-action-bar {
-      .action-item {
-        .action-label {
-          color: var(--text-color) !important;
-
-          &:hover {
-            background: var(--hover-background) !important;
-          }
-        }
-      }
-    }
-  }
+// ===================================================================
+// Main Content Area - Sidebar + Editor/Results
+// ===================================================================
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
 }
 
-// Results panel specific
-.results-panel {
-  // Dynamic height management
-  width: 100%;
-  min-height: 150px; // Minimum viable height
-  max-height: calc(100vh - 200px); // Responsive max height based on viewport
+// ===================================================================
+// Database Sidebar (Left Panel)
+// ===================================================================
+.database-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background-color: var(--card-background);
+  border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
+  transition: all 0.3s ease;
   overflow: hidden;
-  box-sizing: border-box;
-  .panel-header {
+  height: 100%;
+
+  &.collapsed {
+    width: 60px;
+    min-width: 60px;
+
+    .sidebar-content {
+      position: relative;
+      padding: 0;
+      height: 100%;
+
+      .sidebar-header,
+      .sidebar-content-inner {
+        display: none;
+      }
+
+      .rotated-title {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(-90deg);
+        white-space: nowrap;
+        color: var(--text-color);
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 2px;
+      }
+    }
+  }
+
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
+    padding: 12px 16px;
+    background-color: var(--hover-background);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
 
-    .header-left {
+    h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-color);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 8px;
 
       i {
         color: var(--primary-color);
       }
-
-      .results-info {
-        margin-left: 0.5rem;
-        display: flex;
-        gap: 0.5rem;
-      }
     }
 
-    .view-toggle {
-      display: flex;
-      gap: 0.25rem;
-      padding: 0.25rem;
-      border-radius: 6px;
-
-      .toggle-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.375rem;
-        padding: 0.375rem 0.75rem;
-        color: var(--text-color-secondary);
-        transition: all 0.2s;
-
-        i,
-        span {
-          color: inherit;
-          font-size: 0.875rem;
-          transition: color 0.2s;
-        }
-
-        &:hover {
-          background: var(--hover-background);
-          color: var(--text-color);
-        }
-
-        &.active {
-          background: var(--primary-color);
-          color: white;
-
-          i,
-          span {
-            color: inherit;
-          }
-        }
-      }
+    .btn-icon {
+      padding: 4px 8px;
     }
   }
 
-  .panel-content {
+  .sidebar-content-inner {
     flex: 1;
-    width: 100%;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    min-height: 0; // Important for flexbox height calculations
-    height: 100%; // Ensure full height usage
 
-    .analytics-view {
-      display: flex;
-      flex-direction: column;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--secondary-color);
+      }
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+  }
+
+  .schema-search {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+
+    .search-input {
       width: 100%;
-      height: 100%;
-      min-height: 0;
-      flex: 1;
-      background: var(--background-color);
-      overflow: hidden;
-      position: relative;
+      padding: 8px 12px;
+      background-color: var(--input-background);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-color);
+      font-size: 13px;
 
-      // Two Column Layout
-      .analytics-layout {
-        display: grid;
-        grid-template-columns: 400px 1fr;
-        height: 100%;
-        gap: 0;
-
-        @media (max-width: 1200px) {
-          grid-template-columns: 350px 1fr;
-        }
-
-        @media (max-width: 768px) {
-          grid-template-columns: 1fr;
-          grid-template-rows: auto 1fr;
-        }
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background-color: var(--card-background);
       }
 
-      // Left Panel - Chart Configuration
-      .chart-config-panel {
-        background: var(--card-background);
-        border-right: 2px solid var(--border-color);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        min-height: 0;
-        max-height: 100%;
-        overflow: hidden;
-        position: relative;
-
-        // Enhanced vertical divider
-        &::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          right: -1px;
-          width: 1px;
-          height: 100%;
-          background: linear-gradient(
-            to bottom,
-            transparent 0%,
-            var(--border-color) 10%,
-            var(--secondary-color) 50%,
-            var(--border-color) 90%,
-            transparent 100%
-          );
-          z-index: 1;
-        }
-
-        .config-header {
-          flex: 0 0 auto;
-          padding: 1rem;
-          border-bottom: 1px solid var(--border-color);
-          background: var(--card-background);
-          color: var(--text-color);
-
-          .header-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-
-            .config-icon {
-              font-size: 1.125rem;
-              color: var(--primary-color);
-            }
-
-            .header-text {
-              h3 {
-                margin: 0 0 0.125rem 0;
-                font-size: 0.95rem;
-                font-weight: 600;
-                color: var(--text-color);
-              }
-
-              p {
-                margin: 0;
-                font-size: 0.75rem;
-                color: var(--secondary-color);
-              }
-            }
-          }
-        }
-
-        .config-content {
-          flex: 1;
-          padding: 1rem;
-          padding-bottom: 2rem;
-          overflow-y: auto;
-          overflow-x: hidden;
-          min-height: 0;
-          max-height: 100%;
-
-          // Custom scrollbar for better aesthetics
-          &::-webkit-scrollbar {
-            width: 6px;
-          }
-
-          &::-webkit-scrollbar-track {
-            background: var(--hover-background);
-            border-radius: 3px;
-          }
-
-          &::-webkit-scrollbar-thumb {
-            background: var(--secondary-color);
-            border-radius: 3px;
-            opacity: 0.7;
-
-            &:hover {
-              background: var(--primary-color);
-              opacity: 1;
-            }
-          }
-
-          // Analytics-specific dropdown and multiselect styling to match app UI
-          ::ng-deep {
-            .custom-dropdown,
-            .custom-multiselect {
-              .p-dropdown,
-              .p-multiselect {
-                width: 100%;
-                border-radius: 4px;
-                border: 1px solid var(--border-color);
-                background: var(--input-background);
-                transition: all 0.2s ease;
-                min-height: 2.25rem;
-                font-size: 0.875rem;
-
-                &:hover {
-                  border-color: var(--primary-color);
-                }
-
-                &.p-focus {
-                  border-color: var(--primary-color);
-                  box-shadow: 0 0 0 1px var(--primary-color);
-                }
-
-                .p-dropdown-label,
-                .p-multiselect-label {
-                  color: var(--text-color);
-                  padding: 0.5rem 0.75rem;
-                  font-size: 0.875rem;
-                  line-height: 1.5;
-
-                  &.p-placeholder {
-                    color: var(--secondary-color);
-                    opacity: 0.7;
-                  }
-                }
-
-                .p-dropdown-trigger,
-                .p-multiselect-trigger {
-                  color: var(--secondary-color);
-                  width: 2.25rem;
-
-                  &:hover {
-                    color: var(--primary-color);
-                  }
-                }
-              }
-            }
-
-            // Analytics dropdown panel styling to match app panels
-            .p-dropdown-panel,
-            .p-multiselect-panel {
-              border-radius: 4px;
-              border: 1px solid var(--border-color);
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-              background: var(--card-background);
-              margin-top: 1px;
-              max-height: 180px;
-
-              .p-dropdown-header {
-                background: var(--card-background);
-                border-bottom: 1px solid var(--border-color);
-                padding: 0.375rem;
-
-                .p-dropdown-filter {
-                  background: var(--input-background);
-                  border: 1px solid var(--border-color);
-                  border-radius: 3px;
-                  color: var(--text-color);
-                  padding: 0.25rem 0.5rem;
-                  font-size: 0.8rem;
-
-                  &::placeholder {
-                    color: var(--secondary-color);
-                    opacity: 0.6;
-                  }
-                }
-              }
-
-              .p-dropdown-items,
-              .p-multiselect-items {
-                .p-dropdown-item,
-                .p-multiselect-item {
-                  padding: 0.5rem 0.75rem;
-                  color: var(--text-color);
-                  transition: all 0.15s ease;
-                  border: none;
-                  font-size: 0.875rem;
-
-                  &:hover {
-                    background: var(--hover-background);
-                    color: var(--text-color);
-                  }
-
-                  &.p-highlight {
-                    background: var(--primary-color);
-                    color: white;
-                  }
-
-                  .column-option {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-
-                    .column-details {
-                      display: flex;
-                      align-items: center;
-                      justify-content: space-between;
-                      width: 100%;
-
-                      .column-name {
-                        font-weight: 500;
-                        color: inherit;
-                        flex: 1;
-                      }
-
-                      .column-type {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 0.25rem;
-                        padding: 0.125rem 0.25rem;
-                        border-radius: 3px;
-                        font-size: 0.6rem;
-                        font-weight: 600;
-                        text-transform: uppercase;
-                        letter-spacing: 0.3px;
-                        background: var(--hover-background);
-                        color: var(--secondary-color);
-                        border: 1px solid var(--border-color);
-
-                        &.type-numeric {
-                          background: rgba(33, 150, 243, 0.1);
-                          color: var(--primary-color);
-                          border-color: rgba(33, 150, 243, 0.2);
-                        }
-
-                        &.type-categorical {
-                          background: rgba(76, 175, 80, 0.1);
-                          color: var(--success-color);
-                          border-color: rgba(76, 175, 80, 0.2);
-                        }
-
-                        &.type-date {
-                          background: rgba(255, 152, 0, 0.1);
-                          color: var(--warning-color);
-                          border-color: rgba(255, 152, 0, 0.2);
-                        }
-
-                        &.type-any {
-                          background: var(--hover-background);
-                          color: var(--secondary-color);
-                          border-color: var(--border-color);
-                        }
-
-                        .pi-tag {
-                          font-size: 0.5rem;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          // Data fields styling
-          .data-fields {
-            display: grid;
-            gap: 1rem;
-            margin-top: 1rem;
-
-            .field-group {
-              display: flex;
-              flex-direction: column;
-              gap: 0.5rem;
-
-              .field-label {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                font-weight: 600;
-                font-size: 0.875rem;
-                color: var(--text-color);
-                margin-bottom: 0.25rem;
-
-                .field-icon {
-                  font-size: 0.875rem;
-                  color: var(--primary-color);
-                }
-
-                .required-star {
-                  color: var(--error-color);
-                  font-weight: bold;
-                }
-              }
-
-              .field-wrapper {
-                position: relative;
-              }
-            }
-          }
-
-          // Config actions styling (inside scrollable content)
-          .config-actions {
-            display: flex !important;
-            gap: 0.75rem;
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-            padding: 1.5rem 0;
-            border-top: 1px solid var(--border-color);
-            background: var(--card-background);
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-            .generate-btn,
-            .reset-btn {
-              flex: 1;
-              height: 2.5rem;
-              border-radius: 6px;
-              font-weight: 600;
-              font-size: 0.875rem;
-              transition: all 0.2s ease;
-              position: relative;
-              z-index: 10;
-
-              &:hover:not(:disabled) {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-              }
-            }
-
-            .generate-btn {
-              background: var(--primary-color);
-              border-color: var(--primary-color);
-
-              &:hover:not(:disabled) {
-                background: var(--primary-color);
-                opacity: 0.9;
-              }
-
-              &:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-              }
-            }
-
-            .reset-btn {
-              background: transparent;
-              color: var(--secondary-color);
-              border: 1px solid var(--border-color);
-
-              &:hover:not(:disabled) {
-                background: var(--hover-background);
-                border-color: var(--secondary-color);
-                color: var(--text-color);
-              }
-            }
-          }
-
-          .config-section {
-            margin-bottom: 1.5rem;
-
-            &:last-child {
-              margin-bottom: 0;
-            }
-
-            .section-header {
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-              margin-bottom: 0.75rem;
-
-              .section-icon {
-                color: var(--primary-color);
-                font-size: 1rem;
-              }
-
-              .section-title {
-                font-weight: 600;
-                color: var(--text-color);
-                font-size: 0.875rem;
-              }
-
-              .required-indicator {
-                color: var(--error-color);
-                font-weight: bold;
-                margin-left: auto;
-                font-size: 0.75rem;
-              }
-            }
-
-            // Chart Type Grid - Small Square Boxes
-            .chart-type-grid {
-              display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-              gap: 0.5rem;
-
-              .chart-type-card {
-                border: 2px solid var(--border-color);
-                border-radius: 6px;
-                padding: 0.5rem;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                background: var(--background-color);
-                aspect-ratio: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                min-height: 60px;
-
-                &:hover {
-                  border-color: var(--primary-color);
-                  transform: translateY(-2px);
-                  box-shadow: var(--shadow-color) 0 6px 16px;
-                  background: var(--hover-background);
-                }
-
-                &.selected {
-                  border-color: var(--primary-color);
-                  background: var(--hover-background);
-                  box-shadow: var(--shadow-color) 0 4px 12px;
-
-                  .chart-icon {
-                    color: var(--primary-color);
-                    transform: scale(1.1);
-                  }
-
-                  .chart-name {
-                    color: var(--primary-color);
-                    font-weight: 700;
-                  }
-                }
-
-                .chart-icon {
-                  font-size: 1.25rem;
-                  color: var(--secondary-color);
-                  transition: all 0.2s ease;
-                  margin-bottom: 0.25rem;
-                }
-
-                .chart-name {
-                  font-weight: 600;
-                  color: var(--text-color);
-                  font-size: 0.65rem;
-                  line-height: 1.1;
-                  transition: all 0.2s ease;
-                }
-
-                // Hide description in square layout
-                .chart-desc {
-                  display: none;
-                }
-              }
-            }
-
-            // Field Configuration
-            .field-config-grid {
-              display: grid;
-              gap: 1rem;
-
-              .field-config-item {
-                .field-header {
-                  display: flex;
-                  align-items: center;
-                  gap: 0.5rem;
-                  margin-bottom: 0.5rem;
-
-                  .field-icon {
-                    color: var(--primary-color);
-                    font-size: 1rem;
-                  }
-
-                  .field-label {
-                    font-weight: 500;
-                    color: var(--text-color);
-                    font-size: 0.875rem;
-                  }
-
-                  .field-required {
-                    color: var(--red-500);
-                    font-size: 0.75rem;
-                  }
-                }
-
-                ::ng-deep {
-                  .p-dropdown,
-                  .p-multiselect {
-                    width: 100%;
-                    border-radius: 6px;
-                    border: 1px solid var(--border-color);
-                    background: var(--input-background);
-
-                    &:hover {
-                      border-color: var(--primary-color);
-                    }
-
-                    &.p-focus {
-                      border-color: var(--primary-color);
-                      box-shadow: 0 0 0 0.2rem var(--shadow-color);
-                    }
-
-                    .p-dropdown-label,
-                    .p-multiselect-label {
-                      color: var(--text-color);
-                    }
-                  }
-                }
-              }
-            }
-
-            // Action Buttons
-            .section-actions {
-              display: flex;
-              gap: 0.75rem;
-              margin-top: 1.5rem;
-
-              .action-btn {
-                flex: 1;
-                height: 2.5rem;
-                border-radius: 6px;
-                font-weight: 500;
-                font-size: 0.875rem;
-
-                &.generate-btn {
-                  background: var(--primary-color);
-                  border-color: var(--primary-color);
-
-                  &:hover:not(:disabled) {
-                    background: var(--primary-600);
-                    border-color: var(--primary-600);
-                    transform: translateY(-1px);
-                  }
-                }
-
-                &.reset-btn {
-                  background: transparent;
-                  color: var(--secondary-color);
-                  border: 1px solid var(--border-color);
-
-                  &:hover {
-                    background: var(--hover-background);
-                    border-color: var(--secondary-color);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // Right Panel - Chart Display
-      .chart-display-panel {
-        background: var(--background-color);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        min-height: 0;
-        overflow: hidden;
-
-        .display-header {
-          padding: 1rem;
-          border-bottom: 1px solid var(--border-color);
-          background: var(--card-background);
-          color: var(--text-color);
-
-          .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            .header-left {
-              display: flex;
-              align-items: center;
-              gap: 0.75rem;
-
-              .display-icon {
-                font-size: 1.125rem;
-                color: var(--primary-color);
-              }
-
-              .header-text {
-                h3 {
-                  margin: 0 0 0.125rem 0;
-                  font-size: 0.95rem;
-                  font-weight: 600;
-                  color: var(--text-color);
-                }
-
-                p {
-                  margin: 0;
-                  font-size: 0.75rem;
-                  color: var(--secondary-color);
-                }
-              }
-            }
-
-            .header-actions {
-              display: flex;
-              gap: 0.5rem;
-
-              .action-btn {
-                width: 2.5rem;
-                height: 2.5rem;
-                border-radius: 6px;
-                border: 1px solid var(--border-color);
-                background: transparent;
-                color: var(--secondary-color);
-                cursor: pointer;
-                transition: all 0.2s ease;
-
-                &:hover {
-                  background: var(--hover-background);
-                  color: var(--text-color);
-                  border-color: var(--primary-color);
-                }
-              }
-            }
-          }
-        }
-
-        .display-content {
-          flex: 1;
-          padding: 1rem;
-          overflow: auto;
-
-          .chart-container {
-            width: 100%;
-            height: 100%;
-            min-height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--card-background);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-          }
-
-          // Chart wrapper with expand button
-          .chart-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            .expand-chart-btn {
-              position: absolute;
-              top: 1rem;
-              right: 1rem;
-              z-index: 10;
-              width: 2.5rem;
-              height: 2.5rem;
-              background: var(--card-background) !important;
-              border: 1px solid var(--border-color) !important;
-              color: var(--secondary-color) !important;
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-              transition: all 0.2s ease;
-
-              &:hover {
-                background: var(--primary-color) !important;
-                color: white !important;
-                border-color: var(--primary-color) !important;
-                transform: scale(1.05);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-              }
-
-              .p-button-icon {
-                font-size: 1rem;
-              }
-            }
-
-            .chart-visualization {
-              width: 100%;
-              height: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              padding: 1rem;
-            }
-          }
-
-          // Popup Open Message
-          .popup-open-message {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            min-height: 400px;
-
-            .popup-message-content {
-              text-align: center;
-
-              .popup-message-icon {
-                font-size: 4rem;
-                color: var(--primary-color);
-                opacity: 0.6;
-                margin-bottom: 1.5rem;
-              }
-
-              h4 {
-                color: var(--text-color);
-                font-size: 1.5rem;
-                margin-bottom: 0.5rem;
-                font-weight: 600;
-              }
-
-              p {
-                color: var(--secondary-color);
-                font-size: 1rem;
-                margin: 0;
-              }
-            }
-          }
-
-          // Empty States
-          .empty-state {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            min-height: 400px;
-
-            .empty-content {
-              text-align: center;
-              max-width: 400px;
-
-              .empty-icon {
-                font-size: 4rem;
-                color: var(--secondary-color);
-                opacity: 0.5;
-                margin-bottom: 1rem;
-              }
-
-              h4 {
-                margin: 0 0 0.5rem 0;
-                font-size: 1.25rem;
-                color: var(--text-color);
-                font-weight: 600;
-              }
-
-              p {
-                margin: 0 0 1.5rem 0;
-                color: var(--secondary-color);
-                line-height: 1.5;
-              }
-
-              .empty-actions {
-                .action-btn {
-                  height: 2.5rem;
-                  padding: 0 1.5rem;
-                  border-radius: 6px;
-                  font-weight: 500;
-                }
-              }
-
-              .empty-tip {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
-                margin-top: 1rem;
-                font-size: 0.875rem;
-                color: var(--secondary-color);
-
-                .pi-lightbulb {
-                  color: var(--warning-color);
-                  font-size: 1rem;
-                }
-              }
-
-              .config-preview {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
-                margin-top: 1rem;
-
-                .preview-label {
-                  font-size: 0.875rem;
-                  color: var(--secondary-color);
-                }
-
-                .preview-chip {
-                  display: flex;
-                  align-items: center;
-                  gap: 0.5rem;
-                  padding: 0.375rem 0.75rem;
-                  background: var(--hover-background);
-                  color: var(--primary-color);
-                  border: 1px solid var(--primary-color);
-                  border-radius: 12px;
-                  font-size: 0.875rem;
-                  font-weight: 500;
-                }
-              }
-            }
-          }
-
-          // Loading State
-          .loading-state {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            min-height: 400px;
-
-            .loading-content {
-              text-align: center;
-
-              .loading-spinner {
-                margin-bottom: 1rem;
-
-                .pi-spinner {
-                  font-size: 2rem;
-                  color: var(--primary-color);
-                }
-              }
-
-              h4 {
-                margin: 0 0 0.5rem 0;
-                font-size: 1.125rem;
-                color: var(--text-color);
-                font-weight: 600;
-              }
-
-              p {
-                margin: 0 0 1.5rem 0;
-                color: var(--secondary-color);
-              }
-
-              .loading-progress {
-                width: 200px;
-                height: 4px;
-                background: var(--border-color);
-                border-radius: 2px;
-                overflow: hidden;
-                margin: 0 auto;
-
-                .progress-bar {
-                  height: 100%;
-                  background: linear-gradient(
-                    90deg,
-                    var(--primary-color),
-                    var(--primary-color)
-                  );
-                  border-radius: 2px;
-                  animation: loading-progress 2s ease-in-out infinite;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // Loading animation
-      @keyframes loading-progress {
-        0% {
-          transform: translateX(-100%);
-        }
-        50% {
-          transform: translateX(0%);
-        }
-        100% {
-          transform: translateX(100%);
-        }
+      &::placeholder {
+        color: var(--secondary-color);
       }
     }
   }
-}
 
-// Angular-split dark theme support
-.dark-theme {
-  .run-query-container {
-    ::ng-deep {
-      .as-split-gutter {
-        background: color-mix(in srgb, var(--text-color) 10%, transparent);
-
-        &:hover {
-          background: var(--primary-color);
-          opacity: 0.8;
-        }
-
-        &:active {
-          background: var(--primary-color);
-          opacity: 1;
-        }
-
-        &.as-split-gutter-horizontal::before,
-        &.as-split-gutter-vertical::before {
-          background: color-mix(in srgb, var(--text-color) 30%, transparent);
-        }
-
-        &:hover::before {
-          background: color-mix(in srgb, var(--primary-color) 70%, transparent);
-        }
-
-        &:active::before {
-          background: white;
-        }
-      }
-    }
+  .databases-list {
+    padding: 8px 0;
   }
-}
 
-// Button styling
-.p-button {
-  &.p-button-sm {
-    font-size: 0.75rem;
-    padding: 0.375rem 0.75rem;
-    height: 28px;
-  }
-}
+  .database-item {
+    .database-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      font-weight: 600;
+      background-color: var(--hover-background);
+      border-bottom: 1px solid var(--border-color);
 
-// Dark theme adjustments
-.dark-theme {
-  .run-query-container {
-    background: var(--card-background);
-
-    .panel-header {
-      background: color-mix(in srgb, var(--text-color) 5%, transparent);
-      border-color: color-mix(in srgb, var(--text-color) 10%, transparent);
-    }
-
-    .panel-content {
-      background: var(--card-background);
-    }
-
-    ::ng-deep .monaco-editor {
-      .monaco-editor-background {
-        background: transparent !important;
+      &:hover {
+        background-color: var(--card-background);
       }
-    }
 
-    // Dark theme for tab editing
-    .editor-tabs {
-      .tab-database-name {
+      i.pi-chevron-right,
+      i.pi-chevron-down {
+        font-size: 10px;
+        color: var(--secondary-color);
+        width: 12px;
+      }
+
+      i.pi-database {
+        font-size: 16px;
+        color: var(--primary-color);
+      }
+
+      .database-name {
+        flex: 1;
+        font-size: 14px;
         color: var(--text-color);
-        font-size: 0.875rem;
-        font-weight: 500;
-        opacity: 0.8;
+        font-weight: 600;
       }
 
-      .tab-title-input {
-        background: linear-gradient(
-          135deg,
-          color-mix(in srgb, var(--text-color) 12%, transparent) 0%,
-          color-mix(in srgb, var(--text-color) 8%, transparent) 100%
-        ) !important;
-        border: 1px solid color-mix(in srgb, var(--text-color) 15%, transparent) !important;
-        color: #ffffff !important;
-        font-weight: 500;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2),
-          inset 0 1px 0 color-mix(in srgb, var(--text-color) 10%, transparent) !important;
-        width: 80px;
-        max-width: 100px;
-        min-width: 35px;
-
-        &:focus {
-          background: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--text-color) 15%, transparent) 0%,
-            color-mix(in srgb, var(--text-color) 10%, transparent) 100%
-          ) !important;
-          border-color: var(--primary-color) !important;
-          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2),
-            0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 color-mix(in srgb, var(--text-color) 15%, transparent) !important;
-          color: #ffffff !important;
-        }
-
-        &::placeholder {
-          color: color-mix(
-            in srgb,
-            var(--text-color) 40%,
-            transparent
-          ) !important;
-        }
-
-        &::selection {
-          background: rgba(99, 102, 241, 0.3) !important;
-        }
-      }
-    }
-
-    // Dark theme for results table
-    .results-panel {
-      ::ng-deep {
-        .p-datatable {
-          background: var(--card-background) !important;
-
-          .p-datatable-thead > tr > th {
-            background: color-mix(
-              in srgb,
-              var(--text-color) 5%,
-              transparent
-            ) !important;
-            color: var(--text-color) !important;
-            border-color: color-mix(
-              in srgb,
-              var(--text-color) 10%,
-              transparent
-            ) !important;
-
-            .p-sortable-column-icon {
-              color: color-mix(
-                in srgb,
-                var(--text-color) 50%,
-                transparent
-              ) !important;
-            }
-          }
-
-          .p-datatable-tbody > tr {
-            background: var(--card-background) !important;
-            color: var(--text-color) !important;
-
-            &:hover {
-              background: color-mix(
-                in srgb,
-                var(--text-color) 8%,
-                transparent
-              ) !important;
-            }
-
-            > td {
-              border-color: color-mix(
-                in srgb,
-                var(--text-color) 10%,
-                transparent
-              ) !important;
-              color: var(--text-color) !important;
-            }
-          }
-
-          .p-paginator {
-            background: color-mix(
-              in srgb,
-              var(--text-color) 5%,
-              transparent
-            ) !important;
-            border-color: color-mix(
-              in srgb,
-              var(--text-color) 10%,
-              transparent
-            ) !important;
-            color: var(--text-color) !important;
-
-            .p-paginator-current {
-              color: color-mix(
-                in srgb,
-                var(--text-color) 60%,
-                transparent
-              ) !important;
-            }
-
-            .p-paginator-pages {
-              .p-paginator-page {
-                color: var(--text-color) !important;
-                border-color: transparent !important;
-
-                &:hover {
-                  background: color-mix(
-                    in srgb,
-                    var(--text-color) 8%,
-                    transparent
-                  ) !important;
-                }
-
-                &.p-highlight {
-                  background: var(--primary-color) !important;
-                  color: white !important;
-                }
-              }
-            }
-
-            // Dropdown in paginator
-            .p-dropdown {
-              background: var(--card-background) !important;
-              border-color: color-mix(
-                in srgb,
-                var(--text-color) 10%,
-                transparent
-              ) !important;
-
-              .p-dropdown-label {
-                color: var(--text-color) !important;
-              }
-
-              .p-dropdown-trigger {
-                color: var(--text-color) !important;
-              }
-            }
-          }
-        }
-
-        // Dropdown panel
-        .p-dropdown-panel {
-          background: var(--card-background) !important;
-          border-color: color-mix(
-            in srgb,
-            var(--text-color) 10%,
-            transparent
-          ) !important;
-
-          .p-dropdown-items {
-            .p-dropdown-item {
-              color: var(--text-color) !important;
-
-              &:hover {
-                background: color-mix(
-                  in srgb,
-                  var(--text-color) 8%,
-                  transparent
-                ) !important;
-              }
-
-              &.p-highlight {
-                background: var(--primary-color) !important;
-                color: white !important;
-              }
-            }
-          }
-        }
-
-        // Empty state in dark theme
-        .empty-state {
-          i {
-            color: color-mix(
-              in srgb,
-              var(--text-color) 30%,
-              transparent
-            ) !important;
-          }
-
-          p {
-            color: var(--text-color) !important;
-          }
-
-          small {
-            color: color-mix(
-              in srgb,
-              var(--text-color) 50%,
-              transparent
-            ) !important;
-          }
-        }
+      .schema-count {
+        font-size: 11px;
+        color: var(--secondary-color);
       }
     }
   }
 
-  ::ng-deep {
-    .p-splitter {
-      .p-splitter-gutter {
-        background: color-mix(in srgb, var(--text-color) 10%, transparent);
+  .schemas-list {
+    background-color: var(--background-color);
+  }
+
+  .schema-item {
+    .schema-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px 8px 24px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: var(--hover-background);
+      }
+
+      i.pi-chevron-right,
+      i.pi-chevron-down {
+        font-size: 10px;
+        color: var(--secondary-color);
+        width: 12px;
+      }
+
+      i.pi-folder {
+        font-size: 14px;
+        color: #ff9800;
+      }
+
+      .schema-name {
+        flex: 1;
+        font-size: 13px;
+        color: var(--text-color);
+        font-weight: 500;
+      }
+
+      .table-count {
+        font-size: 11px;
+        color: var(--secondary-color);
+      }
+    }
+  }
+
+  .tables-list {
+    padding-left: 12px;
+  }
+
+  .table-item {
+    .table-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px 8px 24px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: var(--hover-background);
+      }
+
+      i.pi-chevron-right,
+      i.pi-chevron-down {
+        font-size: 10px;
+        color: var(--secondary-color);
+        width: 12px;
+      }
+
+      i.pi-table {
+        font-size: 14px;
+        color: var(--primary-color);
+      }
+
+      .table-name {
+        flex: 1;
+        font-size: 13px;
+        color: var(--text-color);
+        font-weight: 500;
+      }
+
+      .column-count {
+        font-size: 11px;
+        color: var(--secondary-color);
+      }
+    }
+
+    &.expanded .table-header {
+      background-color: var(--hover-background);
+    }
+  }
+
+  .columns-list {
+    padding-left: 48px;
+    background-color: var(--background-color);
+  }
+
+  .column-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: var(--hover-background);
+
+      .column-name {
+        color: var(--primary-color);
+      }
+    }
+
+    i {
+      font-size: 12px;
+      width: 14px;
+    }
+
+    .column-name {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-color);
+      font-family: 'Courier New', monospace;
+    }
+
+    .column-type {
+      font-size: 11px;
+      color: var(--secondary-color);
+      font-family: 'Courier New', monospace;
+    }
+  }
+
+  .schema-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--secondary-color);
+
+    i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: var(--primary-color);
+      opacity: 0.5;
+    }
+
+    p {
+      font-size: 13px;
+      margin: 0 0 16px 0;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+  }
+}
+
+// ===================================================================
+// Separator with Toggle Button
+// ===================================================================
+.separator {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  background: var(--card-background);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+
+  .toggle-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    transition: color 0.2s ease;
+    padding: 8px 4px;
+    height: 40px;
+
+    &:hover {
+      color: var(--secondary-color);
+      background: var(--hover-background);
+    }
+
+    i {
+      font-size: 14px;
+    }
+  }
+}
+
+// ===================================================================
+// Editor and Results Area (Right Panel)
+// ===================================================================
+.editor-results-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// ===================================================================
+// Button Styles
+// ===================================================================
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 14px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(0);
+  }
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--button-text-color);
+
+  &:not(:disabled):hover {
+    background-color: var(--primary-hover-color);
+  }
+}
+
+.btn-secondary {
+  background-color: var(--border-color);
+  color: var(--text-color);
+
+  &:not(:disabled):hover {
+    background-color: var(--hover-background);
+  }
+}
+
+.btn-icon {
+  padding: 8px;
+  background-color: transparent;
+  color: var(--text-color);
+
+  &:not(:disabled):hover {
+    background-color: var(--border-color);
+    transform: none;
+  }
+}
+
+// ===================================================================
+// Editor Section
+// ===================================================================
+.editor-section {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-color);
+}
+
+.editor-container {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+
+// Loading State
+.editor-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--secondary-color);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--background-color);
+  z-index: 10;
+
+  i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: var(--primary-color);
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .loading-hint {
+    font-size: 13px;
+    color: var(--secondary-color);
+    margin-top: 8px;
+  }
+}
+
+// Error State
+.editor-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-color);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--background-color);
+  z-index: 10;
+  padding: 32px;
+  text-align: center;
+
+  i {
+    font-size: 64px;
+    margin-bottom: 24px;
+    color: var(--error-color);
+  }
+
+  h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: var(--error-color);
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0 0 16px 0;
+    color: var(--text-color);
+  }
+
+  ul {
+    text-align: left;
+    margin: 0 0 24px 0;
+    padding: 0;
+    list-style: none;
+    max-width: 400px;
+
+    li {
+      padding: 6px 0;
+      font-size: 13px;
+      color: var(--secondary-color);
+
+      &:before {
+        content: '•';
+        color: var(--error-color);
+        margin-right: 8px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .btn {
+    margin-top: 8px;
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--secondary-color);
+  padding: 48px 32px;
+  text-align: center;
+
+  i {
+    font-size: 72px;
+    margin-bottom: 24px;
+    color: var(--primary-color);
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: var(--text-color);
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0;
+    color: var(--secondary-color);
+    max-width: 400px;
+    line-height: 1.6;
+  }
+}
+
+// ===================================================================
+// Results Section
+// ===================================================================
+.results-section {
+  display: flex;
+  flex-direction: column;
+  max-height: 50vh;
+  min-height: 200px;
+  background-color: var(--card-background);
+  border-top: 2px solid var(--primary-color);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--hover-background);
+  border-bottom: 1px solid var(--border-color);
+
+  .results-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .results-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: var(--primary-color);
+      }
+    }
+
+    .results-meta {
+      font-size: 12px;
+      color: var(--secondary-color);
+      padding: 4px 8px;
+      background-color: var(--border-color);
+      border-radius: 3px;
+    }
+  }
+
+  .results-actions {
+    display: flex;
+    gap: 4px;
+  }
+}
+
+// Error Message
+.results-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--error-background);
+  border-left: 4px solid var(--error-color);
+  margin: 16px;
+  border-radius: 4px;
+
+  i {
+    font-size: 24px;
+    color: var(--error-color);
+    flex-shrink: 0;
+  }
+
+  .error-content {
+    h4 {
+      margin: 0 0 8px 0;
+      color: var(--error-color);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: var(--text-color);
+      font-size: 13px;
+      line-height: 1.5;
+      font-family: 'Courier New', monospace;
+    }
+  }
+}
+
+// Results Table
+.results-table-wrapper {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--background-color);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+
+    &:hover {
+      background: var(--secondary-color);
+    }
+  }
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--hover-background);
+
+    th {
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-color);
+      border-bottom: 2px solid var(--primary-color);
+      border-right: 1px solid var(--border-color);
+      white-space: nowrap;
+      background-color: var(--hover-background);
+
+      &:last-child {
+        border-right: none;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color 0.1s ease;
+
+      &:hover {
+        background-color: var(--hover-background);
+      }
+
+      &:nth-child(even) {
+        background-color: var(--card-background);
 
         &:hover {
-          background: var(--primary-color);
+          background-color: var(--hover-background);
         }
       }
     }
 
-    // Global dropdown panel styles for dark theme
-    .p-dropdown-panel {
-      background: #1e1e1e !important;
-      border: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+    td {
+      padding: 8px 12px;
+      color: var(--text-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
-      .p-dropdown-header {
-        background: color-mix(
-          in srgb,
-          var(--text-color) 5%,
-          transparent
-        ) !important;
-        border-color: color-mix(
-          in srgb,
-          var(--text-color) 10%,
-          transparent
-        ) !important;
-
-        .p-dropdown-filter {
-          background: color-mix(
-            in srgb,
-            var(--text-color) 10%,
-            transparent
-          ) !important;
-          border-color: color-mix(
-            in srgb,
-            var(--text-color) 20%,
-            transparent
-          ) !important;
-          color: var(--text-color) !important;
-
-          &::placeholder {
-            color: color-mix(
-              in srgb,
-              var(--text-color) 50%,
-              transparent
-            ) !important;
-          }
-        }
-      }
-
-      .p-dropdown-items-wrapper {
-        .p-dropdown-items {
-          .p-dropdown-item {
-            color: #e0e0e0 !important;
-            background: transparent !important;
-
-            &:hover {
-              background: color-mix(
-                in srgb,
-                var(--text-color) 10%,
-                transparent
-              ) !important;
-              color: white !important;
-            }
-
-            &.p-highlight {
-              background: var(--primary-color) !important;
-              color: white !important;
-            }
-
-            &.p-disabled {
-              color: color-mix(
-                in srgb,
-                var(--text-color) 30%,
-                transparent
-              ) !important;
-            }
-          }
-
-          .p-dropdown-empty-message {
-            color: color-mix(
-              in srgb,
-              var(--text-color) 50%,
-              transparent
-            ) !important;
-          }
-        }
-      }
-    }
-
-    // Scrollbar in dropdown for dark theme
-    .p-dropdown-items-wrapper {
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: color-mix(in srgb, var(--text-color) 5%, transparent);
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: color-mix(in srgb, var(--text-color) 20%, transparent);
-        border-radius: 4px;
-
-        &:hover {
-          background: color-mix(in srgb, var(--text-color) 30%, transparent);
-        }
+      &:last-child {
+        border-right: none;
       }
     }
   }
 }
 
-// Splitter Double-Click Enhancement
-::ng-deep {
-  .p-splitter {
-    .p-splitter-gutter {
-      position: relative;
-      cursor: col-resize;
+.row-number-header,
+.row-number {
+  width: 50px;
+  text-align: center;
+  color: var(--secondary-color);
+  font-weight: 600;
+  background-color: var(--hover-background);
+  position: sticky;
+  left: 0;
+  z-index: 5;
+}
 
-      &::after {
-        content: '';
-        position: absolute;
-        background: transparent;
-        transition: all 0.2s ease;
-        opacity: 0;
+.row-number {
+  font-size: 11px;
+  background-color: var(--card-background);
+}
+
+tbody tr:hover .row-number {
+  background-color: var(--hover-background);
+}
+
+// Empty Results
+.results-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  color: var(--secondary-color);
+
+  i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: var(--primary-color);
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// ===================================================================
+// Responsive Design
+// ===================================================================
+@media (max-width: 768px) {
+  .query-toolbar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+
+    .toolbar-left {
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toolbar-right {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .toolbar-hint {
+      display: none;
+    }
+  }
+
+  .database-sidebar {
+    position: absolute;
+    z-index: 100;
+    height: 100%;
+
+    &.collapsed {
+      position: relative;
+    }
+  }
+
+  .results-table {
+    font-size: 11px;
+
+    thead th,
+    tbody td {
+      padding: 6px 8px;
+    }
+  }
+
+  .results-section {
+    max-height: 40vh;
+  }
+}
+
+// ===================================================================
+// Dark Theme Enhancements
+// ===================================================================
+::selection {
+  background-color: #264f78;
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 5px;
+
+  &:hover {
+    background: #4e4e4e;
+  }
+}
+
+// ===================================================================
+// Animation Utilities
+// ===================================================================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.results-section {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// ===================================================================
+// Print Styles
+// ===================================================================
+@media print {
+  .query-toolbar,
+  .results-header,
+  .help-panel {
+    display: none;
+  }
+
+  .query-editor-wrapper {
+    background-color: white;
+  }
+
+  .results-table {
+    thead th {
+      background-color: #f5f5f5;
+      color: black;
+    }
+
+    tbody td {
+      color: black;
+      border: 1px solid #ddd;
+    }
+  }
+}
+
+// ===================================================================
+// Tab Bar Styles
+// ===================================================================
+.tab-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 8px;
+  min-height: 42px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .tabs-container {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+  }
+
+  .tab-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    color: var(--text-secondary-color);
+    font-size: 13px;
+    min-width: fit-content;
+
+    .tab-icon {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-title {
+      font-weight: 500;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tab-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      background: transparent;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.2s ease;
+      color: var(--text-secondary-color);
+
+      i {
+        font-size: 12px;
       }
 
-      // Visual indicator on hover for horizontal splitter
-      &:hover::after {
+      &:hover {
+        background-color: var(--hover-color);
+        color: var(--text-color);
+      }
+    }
+
+    &:hover {
+      background-color: var(--hover-color);
+      color: var(--text-color);
+
+      .tab-close {
         opacity: 1;
       }
     }
 
-    &.main-horizontal-splitter {
-      .p-splitter-gutter {
-        &::after {
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 3px;
-          height: 20px;
-          background: var(--primary-color);
-          border-radius: 2px;
-        }
+    &.active {
+      background-color: var(--background-color);
+      border-bottom-color: var(--primary-color);
+      color: var(--primary-color);
 
-        &:hover {
-          background: color-mix(
-            in srgb,
-            var(--primary-color) 15%,
-            transparent
-          ) !important;
-        }
-      }
-    }
-
-    &.editor-results-splitter {
-      .p-splitter-gutter {
-        cursor: row-resize;
-
-        &::after {
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 20px;
-          height: 3px;
-          background: var(--primary-color);
-          border-radius: 2px;
-        }
-
-        &:hover {
-          background: color-mix(
-            in srgb,
-            var(--primary-color) 15%,
-            transparent
-          ) !important;
-        }
+      .tab-close {
+        opacity: 1;
       }
     }
   }
-}
 
-// Enhanced gutter styling for better UX
-::ng-deep .p-splitter {
-  .p-splitter-gutter {
-    transition: background-color 0.15s ease;
+  .btn-new-tab {
+    margin-left: 8px;
+    padding: 6px;
+    min-width: 32px;
+    height: 32px;
+    flex-shrink: 0;
 
-    &:hover {
-      background: var(--primary-color) !important;
-    }
-
-    &:active {
-      background: var(--primary-color) !important;
+    i {
+      font-size: 14px;
     }
   }
 }
 
-// Light theme specific adjustments
-:host:not(.dark-theme) {
-  ::ng-deep .p-splitter {
-    background: var(--card-background);
-
-    .p-splitter-panel {
-      background: var(--card-background);
-    }
-
-    .p-splitter-gutter {
-      background: var(--border-color);
-    }
-  }
-}
-
-// Tab Context Menu Styles
-.tab-context-menu {
+// ===================================================================
+// Context Menu Styles
+// ===================================================================
+.context-menu {
   position: fixed;
-  background: var(--card-background);
+  background-color: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: 0 4px 12px var(--shadow-color);
-  padding: 0.25rem 0;
-  z-index: 9999;
-  min-width: 160px;
-  font-size: 0.875rem;
-  animation: contextMenuSlideIn 0.15s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  min-width: 180px;
+  padding: 4px 0;
+  animation: contextMenuFadeIn 0.15s ease;
 
   .context-menu-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    gap: 12px;
+    padding: 10px 16px;
     cursor: pointer;
     transition: all 0.2s ease;
     color: var(--text-color);
+    font-size: 14px;
 
     i {
-      font-size: 0.875rem;
-      color: var(--text-color);
-      opacity: 0.7;
-      width: 16px;
+      font-size: 16px;
+      color: var(--text-secondary-color);
+      width: 20px;
       text-align: center;
     }
 
-    span {
-      flex: 1;
-      white-space: nowrap;
-    }
-
-    &:hover {
-      background: var(--hover-background);
-      color: var(--text-color);
+    &:hover:not(.disabled) {
+      background-color: var(--hover-color);
+      color: var(--primary-color);
 
       i {
-        opacity: 1;
         color: var(--primary-color);
       }
     }
 
     &.disabled {
-      opacity: 0.4;
+      opacity: 0.5;
       cursor: not-allowed;
-      pointer-events: none;
-      color: var(--disabled-color) !important;
-
-      i {
-        color: var(--disabled-color) !important;
-      }
     }
-
-    &:first-child {
-      i {
-        color: var(--error-color);
-      }
-      &:hover i {
-        color: var(--error-color);
-      }
-    }
-  }
-
-  .context-menu-separator {
-    height: 1px;
-    background: var(--border-color);
-    margin: 0.25rem 0;
-    opacity: 0.5;
   }
 }
 
-.context-menu-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 9998;
-  background: transparent;
-}
-
-@keyframes contextMenuSlideIn {
+@keyframes contextMenuFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-4px) scale(0.96);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-// Database Context Menu Styles
-.database-context-menu {
-  position: fixed;
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px var(--shadow-color);
-  padding: 0.25rem 0;
-  z-index: 9999;
-  min-width: 160px;
-  font-size: 0.875rem;
-  animation: contextMenuSlideIn 0.15s ease-out;
-
-  .context-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: var(--text-color);
-
-    i {
-      font-size: 0.875rem;
-      color: var(--text-color);
-      opacity: 0.7;
-      width: 16px;
-      text-align: center;
-    }
-
-    span {
-      flex: 1;
-      white-space: nowrap;
-    }
-
-    &:hover {
-      background: var(--hover-background);
-      color: var(--text-color);
-
-      i {
-        opacity: 1;
-        color: var(--primary-color);
-      }
-    }
-
-    &:first-child {
-      i {
-        color: var(--success-color);
-      }
-      &:hover i {
-        color: var(--success-color);
-      }
-    }
-
-    &:last-child {
-      i {
-        color: var(--warning-color);
-      }
-      &:hover i {
-        color: var(--warning-color);
-      }
-    }
-  }
-}
-
-// Dark theme adjustments for context menu (database menu now uses CSS variables)
-.dark-theme {
-  .tab-context-menu,
-  .database-context-menu {
-    background: var(--card-background);
-    border-color: color-mix(in srgb, var(--text-color) 10%, transparent);
-    box-shadow: 0 4px 12px
-      color-mix(in srgb, var(--shadow-color) 200%, transparent);
-
-    .context-menu-item {
-      color: var(--text-color);
-
-      &:hover {
-        background: color-mix(in srgb, var(--text-color) 8%, transparent);
-      }
-    }
-  }
-}
-
-// Responsive adjustments
-@media (max-width: 768px) {
-  .run-query-container {
-    .panel-header {
-      padding: 0 0.5rem;
-      font-size: 0.8125rem;
-
-      .editor-actions {
-        gap: 0.25rem;
-      }
-    }
-  }
-
-  ::ng-deep {
-    .p-button-label {
-      display: none;
-    }
-
-    .p-button.p-button-icon-only {
-      width: 28px;
-    }
-  }
-}
-
-// Pulse animation for executing state
-@keyframes pulse {
-  0% {
     transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-// Global z-index fix for database menu dropdown
-::ng-deep {
-  .p-menu.p-menu-overlay {
-    z-index: 99999 !important;
-    position: fixed !important;
-  }
-
-  .p-menu.database-menu {
-    z-index: 99999 !important;
-    position: absolute !important;
-    display: block !important;
-  }
-
-  .p-menu-list {
-    z-index: 99999 !important;
-  }
-
-  // Fix for menus appearing behind results table
-  .results-panel {
-    .p-datatable {
-      z-index: 1 !important;
-    }
-  }
-
-  // Style save and auto-save menu items to match context menu spacing
-  .p-menu.database-menu {
-    .p-menu-list {
-      padding: 0.25rem 0;
-      max-height: 400px !important;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-
-      // Custom scrollbar styling
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
-        border-radius: 4px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: color-mix(in srgb, var(--shadow-color) 75%, transparent);
-        border-radius: 4px;
-
-        &:hover {
-          background: var(--shadow-color);
-        }
-      }
-
-      .p-menuitem {
-        margin: 0;
-
-        .p-menuitem-link {
-          padding: 0.5rem 0.75rem;
-          gap: 0.5rem;
-          font-size: 0.875rem;
-          transition: all 0.2s ease;
-          color: var(--text-color);
-
-          .p-menuitem-icon {
-            font-size: 0.875rem;
-            color: var(--text-color);
-            opacity: 0.7;
-            width: 16px;
-            text-align: center;
-          }
-
-          .p-menuitem-text {
-            flex: 1;
-            white-space: nowrap;
-          }
-
-          &:hover {
-            background: var(--hover-background);
-            color: var(--text-color);
-
-            .p-menuitem-icon {
-              opacity: 1;
-              color: var(--primary-color);
-            }
-          }
-
-          &:focus {
-            box-shadow: none;
-            background: var(--hover-background);
-          }
-        }
-
-        &.p-menuitem-separator {
-          height: 1px;
-          background: var(--border-color);
-          margin: 0.25rem 0;
-          opacity: 0.5;
-        }
-      }
-    }
-  }
-
-  .p-menuitem {
-    z-index: 99999 !important;
-  }
-
-  // Ensure all menu overlays have proper z-index
-  .p-component-overlay {
-    z-index: 99999 !important;
-  }
-
-  // Ensure all p-menu elements have proper z-index
-  .p-menu {
-    z-index: 99999 !important;
-  }
-
-  // Fix for any overlapping issues with splitter and table
-  .p-splitter-panel {
-    .p-datatable {
-      z-index: 1 !important;
-    }
-  }
-}
-
-// Add super-admin wrapper styles at the top
-.super-admin-wrapper {
-  background-color: var(--card-background);
-  display: flex;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px var(--shadow-color);
-
-  .super-admin-container {
-    width: 100%;
-    @media (min-width: 1400px) {
-      margin: 0 auto;
-    }
-  }
-}
-
-// Add filter container styles
-.filter-container {
-  display: grid;
-  gap: 1rem;
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 1rem 1.5rem 0;
-
-  // Full width layout (2 columns for dropdowns)
-  @media screen and (min-width: 1024px) {
-    .dropdowns-wrapper {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-  }
-
-  // Medium width layout (2 rows, 2 columns in second row)
-  @media screen and (min-width: 768px) and (max-width: 1023px) {
-    .dropdowns-wrapper {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-  }
-
-  // Small width layout (stacked)
-  @media screen and (max-width: 767px) {
-    .dropdowns-wrapper {
-      display: grid;
-      grid-template-rows: auto auto;
-      gap: 1rem;
-    }
-  }
-
-  .dropdown-field {
-    width: 100%;
-  }
-}
-
-// Fullscreen mode styles - Query Editor Only
-.super-admin-wrapper {
-  transition: all 0.3s ease;
-
-  &.fullscreen-mode {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1050; // Below header's z-index but above content
-    background: var(--card-background);
-    overflow: hidden;
-
-    // Hide filter container in fullscreen
-    .filter-container {
-      display: none;
-    }
-
-    // Adjust container for fullscreen
-    .super-admin-container {
-      height: 100vh;
-      width: 100vw;
-      margin: 0;
-      padding: 0;
-    }
-
-    .run-query-container {
-      height: 100vh;
-      width: 100vw;
-      border-radius: 0;
-      box-shadow: none;
-      margin: 0;
-    }
-
-    // Ensure panels take full height
-    ::ng-deep .p-splitter {
-      height: 100vh !important;
-    }
-  }
-}
-
-// When application is in fullscreen AND query editor is in fullscreen
-:host-context(.fullscreen) {
-  .super-admin-wrapper.fullscreen-mode {
-    z-index: 1100; // Higher z-index when app is in fullscreen
-  }
-}
-
-// Fullscreen button styling
-::ng-deep {
-  .editor-actions {
-    .p-button.fullscreen-btn {
-      color: var(--text-color) !important;
-      opacity: 0.7;
-
-      .p-button-icon {
-        color: var(--text-color) !important;
-        font-size: 1rem !important;
-      }
-
-      &:enabled:hover {
-        background: var(--hover-background) !important;
-        opacity: 1;
-
-        .p-button-icon {
-          color: var(--text-color) !important;
-        }
-      }
-
-      &:enabled:active {
-        transform: scale(0.95);
-      }
-
-      &:focus {
-        box-shadow: none !important;
-        outline: none !important;
-      }
-    }
-  }
-}
-
-// Add PrimeNG dropdown customization
-::ng-deep {
-  .p-dropdown-panel {
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
-    margin-top: 2px;
-
-    .p-dropdown-header {
-      background: var(--hover-background) !important;
-      border-bottom: 1px solid var(--border-color) !important;
-      padding: 0.5rem !important;
-
-      .p-dropdown-filter {
-        background: var(--card-background) !important;
-        border: 1px solid var(--border-color) !important;
-        color: var(--text-color) !important;
-
-        &::placeholder {
-          color: var(--text-color) !important;
-          opacity: 0.4;
-        }
-      }
-
-      .p-dropdown-filter-icon {
-        color: var(--text-color) !important;
-        opacity: 0.7;
-      }
-    }
-
-    .p-dropdown-items {
-      padding: 0.5rem 0;
-      background: var(--card-background) !important;
-
-      .p-dropdown-item {
-        color: var(--text-color) !important;
-        padding: 0.75rem 1rem;
-
-        &:hover {
-          background: var(--hover-background) !important;
-          color: var(--text-color) !important;
-        }
-
-        &.p-highlight {
-          background: var(--hover-background) !important;
-          color: var(--primary-color) !important;
-        }
-      }
-
-      .p-dropdown-empty-message {
-        color: var(--text-color) !important;
-        padding: 0.75rem 1rem;
-        opacity: 0.4;
-      }
-    }
-  }
-
-  .p-float-label {
-    position: relative;
-    display: block;
-
-    label {
-      position: absolute;
-      pointer-events: none;
-      top: 50%;
-      margin-top: -0.5rem;
-      transition: all 0.2s ease;
-      color: var(--text-color-secondary);
-      left: 0.75rem;
-      z-index: 1;
-      padding: 0 4px;
-      margin-left: -4px;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        transparent 45%,
-        var(--card-background) 45%,
-        var(--card-background) 55%,
-        transparent 55%,
-        transparent 100%
-      );
-    }
-
-    input:focus ~ label,
-    input.p-filled ~ label,
-    textarea:focus ~ label,
-    textarea.p-filled ~ label,
-    .p-inputwrapper-focus ~ label,
-    .p-inputwrapper-filled ~ label,
-    .p-dropdown:focus ~ label,
-    .p-dropdown.p-focus ~ label,
-    .p-dropdown.p-filled ~ label {
-      top: -0.75rem;
-      font-size: 12px;
-      color: var(--primary-color);
-      background: var(--card-background);
-      padding: 0 4px;
-    }
-
-    .p-dropdown {
-      width: 100%;
-      background: var(--card-background);
-      border-color: var(--border-color);
-
-      .p-dropdown-label {
-        color: var(--text-color);
-      }
-
-      &:hover {
-        border-color: var(--primary-color);
-      }
-
-      &.p-focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 1px var(--primary-color-transparent);
-      }
-
-      .p-dropdown-trigger {
-        color: var(--text-color);
-        opacity: 0.7;
-
-        &:hover {
-          color: var(--primary-color);
-        }
-      }
-
-      &.p-focus {
-        .p-dropdown-trigger {
-          color: var(--primary-color);
-          opacity: 1;
-        }
-      }
-
-      &:hover {
-        .p-dropdown-trigger {
-          opacity: 1;
-        }
-      }
-    }
-  }
-}
-
-// Duplicate name confirmation popup - matches list-tab delete dialog
-.confirmation-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: color-mix(in srgb, var(--shadow-color) 125%, transparent);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-
-  .popup-content {
-    background: var(--card-background);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px var(--shadow-color);
-    width: 400px;
-    max-width: 90%;
-
-    h3 {
-      margin-top: 0;
-      margin-bottom: 15px;
-      color: var(--text-color);
-    }
-
-    p {
-      margin-bottom: 20px;
-      color: var(--text-color);
-    }
-
-    .popup-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-
-      button {
-        padding: 8px 20px;
-        border-radius: 4px;
-        border: none;
-        cursor: pointer;
-
-        &.btn-cancel {
-          background-color: var(--secondary-color);
-          color: white;
-        }
-
-        &.btn-confirm {
-          background-color: var(--error-color);
-          color: white;
-        }
-      }
-    }
-  }
-}
-
-// Auto-save button animations
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes bounce-check {
-  0%,
-  20%,
-  60%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  40% {
-    transform: translateY(-3px) scale(1.1);
-  }
-  80% {
-    transform: translateY(-1px) scale(1.05);
-  }
-}
-
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  10%,
-  30%,
-  50%,
-  70%,
-  90% {
-    transform: translateX(-2px);
-  }
-  20%,
-  40%,
-  60%,
-  80% {
-    transform: translateX(2px);
-  }
-}
-
-@keyframes pulse-dot {
-  0%,
-  100% {
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-}
-
-@keyframes completion-pulse {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(1.1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  75% {
-    transform: scale(1.08);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes completion-dot {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 1px var(--success-color);
-  }
-  25% {
-    transform: scale(1.3);
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.6);
-  }
-  50% {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.4);
-  }
-  75% {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.3);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 1px var(--success-color);
-  }
-}
-
-@keyframes check-bounce {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.3);
-    opacity: 1;
-  }
-  75% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-// Enhanced Monaco Editor Autocomplete Styling
-:host ::ng-deep {
-  // Monaco Editor suggestion widget styling
-  .monaco-editor .suggest-widget {
-    background: var(--card-background) !important;
-    border: 2px solid var(--border-color) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 8px 32px var(--shadow-color),
-      0 4px 16px color-mix(in srgb, var(--shadow-color) 75%, transparent) !important;
-    overflow: visible !important;
-    min-width: 350px !important;
-    max-width: 500px !important;
-    width: auto !important;
-    backdrop-filter: blur(10px) !important;
-    z-index: 999999 !important;
-
-    .monaco-list {
-      overflow: visible !important;
-
-      .monaco-scrollable-element {
-        overflow: visible !important;
-
-        .scrollbar {
-          .slider {
-            background: var(--primary-color-20) !important;
-            border-radius: 4px !important;
-
-            &:hover {
-              background: var(--primary-color-30) !important;
-            }
-          }
-        }
-      }
-    }
-
-    .monaco-list .monaco-list-row {
-      background: var(--card-background) !important;
-      border: none !important;
-      padding: 8px 12px !important;
-      color: var(--text-color) !important;
-      font-size: 13px !important;
-      line-height: 1.5 !important;
-      min-height: 28px !important;
-      display: flex !important;
-      align-items: center !important;
-      white-space: nowrap !important;
-      overflow: visible !important;
-      border-bottom: 1px solid
-        color-mix(in srgb, var(--border-color) 30%, transparent) !important;
-
-      &:hover {
-        background: var(--hover-background) !important;
-        margin: 0 4px !important;
-        border-radius: 4px !important;
-        padding: 8px 8px !important;
-        border-bottom: 1px solid transparent !important;
-      }
-
-      &.focused {
-        background: color-mix(
-          in srgb,
-          var(--primary-color) 15%,
-          var(--card-background)
-        ) !important;
-        outline: none !important;
-        margin: 0 4px !important;
-        border-radius: 4px !important;
-        padding: 8px 8px !important;
-        border-bottom: 1px solid transparent !important;
-
-        .suggest-icon {
-          opacity: 1 !important;
-        }
-      }
-
-      .monaco-highlighted-label {
-        color: var(--text-color) !important;
-        font-weight: 500 !important;
-        flex: 1 !important;
-        overflow: visible !important;
-        white-space: nowrap !important;
-
-        .highlight {
-          background: color-mix(
-            in srgb,
-            var(--primary-color) 25%,
-            transparent
-          ) !important;
-          color: var(--primary-color) !important;
-          font-weight: 700 !important;
-          border-radius: 3px !important;
-          padding: 1px 3px !important;
-        }
-      }
-
-      .suggest-icon {
-        opacity: 0.9 !important;
-        margin-right: 8px !important;
-        flex-shrink: 0 !important;
-        width: 16px !important;
-        height: 16px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-
-        // Enhanced icon colors for better distinction using theme variables
-        &.codicon-symbol-field::before {
-          color: var(--error-color) !important; // Red for columns
-          font-weight: 600 !important;
-        }
-
-        &.codicon-symbol-class::before {
-          color: var(--primary-color) !important; // Blue for tables
-          font-weight: 600 !important;
-        }
-
-        &.codicon-symbol-module::before {
-          color: var(--primary-color) !important; // Blue for schemas
-          font-weight: 600 !important;
-        }
-
-        &.codicon-symbol-keyword::before {
-          color: var(--success-color) !important; // Green for keywords
-          font-weight: 600 !important;
-        }
-
-        &.codicon-symbol-function::before {
-          color: var(--warning-color) !important; // Orange for functions
-          font-weight: 600 !important;
-        }
-      }
-
-      .suggest-label {
-        flex: 1 !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-        margin-right: 8px !important;
-      }
-
-      .suggest-details {
-        color: var(--secondary-color) !important;
-        font-size: 12px !important;
-        opacity: 0.9 !important;
-        flex-shrink: 0 !important;
-        white-space: nowrap !important;
-        max-width: 150px !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        font-weight: 400 !important;
-      }
-    }
-
-    .details {
-      background: var(--card-background) !important;
-      border-left: 1px solid var(--border-color) !important;
-      color: var(--text-color) !important;
-      padding: 12px !important;
-      max-width: 300px !important;
-      word-wrap: break-word !important;
-      overflow-wrap: break-word !important;
-
-      .header .type {
-        color: var(--text-muted-color) !important;
-        font-size: 0.75rem !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
-        font-weight: 600 !important;
-        margin-bottom: 0.5rem !important;
-      }
-
-      .docs {
-        color: var(--text-color) !important;
-        font-size: 0.875rem !important;
-        line-height: 1.4 !important;
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
-
-        .markdown-docs {
-          code {
-            background: var(--surface-d) !important;
-            color: var(--primary-color) !important;
-            padding: 0.125rem 0.25rem !important;
-            border-radius: 3px !important;
-            font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
-            word-break: break-all !important;
-          }
-        }
-      }
-    }
-  }
-
-  // Monaco Editor parameter hints styling
-  .monaco-editor .parameter-hints-widget {
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    box-shadow: 0 4px 16px
-      color-mix(in srgb, var(--shadow-color) 50%, transparent) !important;
-    color: var(--text-color) !important;
-
-    .parameter-hints-next,
-    .parameter-hints-previous {
-      background: transparent !important;
-      color: var(--primary-color) !important;
-
-      &:hover {
-        background: var(--hover-background) !important;
-      }
-    }
-  }
-
-  // Monaco Editor hover widget styling
-  .monaco-editor .monaco-hover {
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    box-shadow: 0 4px 16px
-      color-mix(in srgb, var(--shadow-color) 50%, transparent) !important;
-    color: var(--text-color) !important;
-
-    .hover-contents {
-      color: var(--text-color) !important;
-
-      code {
-        background: var(--surface-d) !important;
-        color: var(--primary-color) !important;
-      }
-    }
-  }
-
-  // Additional Monaco Editor fixes for text cutting
-  .monaco-editor {
-    .suggest-widget {
-      .monaco-list {
-        .monaco-list-row {
-          // Ensure proper content sizing
-          .contents {
-            display: flex !important;
-            align-items: center !important;
-            width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            overflow: visible !important;
-
-            .icon {
-              margin-right: 8px !important;
-              flex-shrink: 0 !important;
-            }
-
-            .main {
-              flex: 1 !important;
-              overflow: visible !important;
-
-              .codicon {
-                margin-right: 8px !important;
-              }
-            }
-
-            .readMore {
-              opacity: 0.7 !important;
-              font-size: 11px !important;
-              margin-left: 8px !important;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Enhanced scrollbar for suggestion list
-  .monaco-editor
-    .suggest-widget
-    .monaco-list
-    .monaco-scrollable-element
-    .scrollbar {
-    .slider {
-      background: var(--primary-color-20) !important;
-      border-radius: 4px !important;
-
-      &:hover {
-        background: var(--primary-color-30) !important;
-      }
-    }
-  }
-
-  // Fade in animation for suggestion widget
-  .monaco-editor .suggest-widget {
-    animation: suggestion-fade-in 0.15s ease-out !important;
-  }
-}
-
-@keyframes suggestion-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-// Dark theme comprehensive fixes for database section and query results
-::ng-deep {
-  // PrimeNG Table dark theme fixes
-  .p-datatable {
-    background: var(--card-background) !important;
-    color: var(--text-color) !important;
-    border: 1px solid var(--border-color) !important;
-
-    .p-datatable-thead > tr > th {
-      background: var(--card-background) !important;
-      color: var(--text-color) !important;
-      border-bottom: 1px solid var(--border-color) !important;
-      border-right: 1px solid var(--border-color) !important;
-      padding: 0.75rem !important;
-
-      &:last-child {
-        border-right: none !important;
-      }
-
-      .p-sortable-column-icon {
-        color: var(--text-color) !important;
-        opacity: 0.6;
-      }
-
-      &.p-highlight {
-        background: color-mix(
-          in srgb,
-          var(--primary-color) 10%,
-          var(--card-background)
-        ) !important;
-        color: var(--primary-color) !important;
-
-        .p-sortable-column-icon {
-          color: var(--primary-color) !important;
-          opacity: 1;
-        }
-      }
-
-      &:hover {
-        background: var(--hover-background) !important;
-        color: var(--text-color) !important;
-      }
-    }
-
-    .p-datatable-tbody > tr {
-      background: var(--card-background) !important;
-      color: var(--text-color) !important;
-      border-bottom: 1px solid var(--border-color) !important;
-
-      > td {
-        border-right: 1px solid var(--border-color) !important;
-        padding: 0.75rem !important;
-        color: var(--text-color) !important;
-
-        &:last-child {
-          border-right: none !important;
-        }
-
-        .cell-content {
-          color: var(--text-color) !important;
-        }
-      }
-
-      &:nth-child(even) {
-        background: color-mix(
-          in srgb,
-          var(--border-color) 20%,
-          var(--card-background)
-        ) !important;
-      }
-
-      &:hover {
-        background: var(--hover-background) !important;
-        color: var(--text-color) !important;
-
-        > td {
-          color: var(--text-color) !important;
-        }
-      }
-
-      &.p-highlight {
-        background: color-mix(
-          in srgb,
-          var(--primary-color) 15%,
-          var(--card-background)
-        ) !important;
-        color: var(--text-color) !important;
-
-        > td {
-          color: var(--text-color) !important;
-        }
-      }
-    }
-
-    .p-datatable-emptymessage > td {
-      background: var(--card-background) !important;
-      color: var(--text-color) !important;
-      text-align: center !important;
-      padding: 2rem !important;
-
-      .empty-state {
-        color: var(--secondary-color) !important;
-
-        i {
-          color: var(--secondary-color) !important;
-          font-size: 2rem !important;
-          margin-bottom: 1rem !important;
-        }
-
-        p {
-          color: var(--text-color) !important;
-          margin: 0.5rem 0 !important;
-          font-weight: 500 !important;
-        }
-
-        small {
-          color: var(--secondary-color) !important;
-          font-size: 0.875rem !important;
-        }
-      }
-    }
-  }
-
-  // PrimeNG Paginator dark theme fixes
-  .p-paginator {
-    background: var(--card-background) !important;
-    color: var(--text-color) !important;
-    border: 1px solid var(--border-color) !important;
-    border-top: none !important;
-    padding: 0.5rem 1rem !important;
-
-    .p-paginator-first,
-    .p-paginator-prev,
-    .p-paginator-next,
-    .p-paginator-last {
-      color: var(--text-color) !important;
-      background: transparent !important;
-      border: 1px solid var(--border-color) !important;
-      margin: 0 0.125rem !important;
-
-      &:not(.p-disabled):hover {
-        background: var(--hover-background) !important;
-        color: var(--text-color) !important;
-        border-color: var(--primary-color) !important;
-      }
-
-      &.p-disabled {
-        color: var(--disabled-color) !important;
-        background: transparent !important;
-        border-color: var(--border-color) !important;
-      }
-    }
-
-    .p-paginator-pages {
-      .p-paginator-page {
-        color: var(--text-color) !important;
-        background: transparent !important;
-        border: 1px solid var(--border-color) !important;
-        margin: 0 0.125rem !important;
-
-        &:hover {
-          background: var(--hover-background) !important;
-          color: var(--text-color) !important;
-          border-color: var(--primary-color) !important;
-        }
-
-        &.p-highlight {
-          background: var(--primary-color) !important;
-          color: white !important;
-          border-color: var(--primary-color) !important;
-        }
-      }
-    }
-
-    .p-dropdown {
-      background: var(--card-background) !important;
-      color: var(--text-color) !important;
-      border: 1px solid var(--border-color) !important;
-
-      .p-dropdown-label {
-        color: var(--text-color) !important;
-      }
-
-      .p-dropdown-trigger {
-        color: var(--text-color) !important;
-      }
-
-      &:hover {
-        border-color: var(--primary-color) !important;
-      }
-    }
-  }
-
-  // PrimeNG Tree dark theme enhancements
-  .p-tree {
-    background: var(--card-background) !important;
-    color: var(--text-color) !important;
-    border: none !important;
-
-    .p-tree-container {
-      background: var(--card-background) !important;
-
-      .p-treenode {
-        .p-treenode-content {
-          color: var(--text-color) !important;
-          padding: 0.25rem 0.5rem !important;
-          border-radius: 4px !important;
-          transition: all 0.2s ease !important;
-
-          &:hover {
-            background: var(--hover-background) !important;
-            color: var(--text-color) !important;
-          }
-
-          &.p-highlight {
-            background: color-mix(
-              in srgb,
-              var(--primary-color) 15%,
-              var(--card-background)
-            ) !important;
-            color: var(--primary-color) !important;
-          }
-
-          .p-tree-toggler {
-            color: var(--text-color) !important;
-            opacity: 0.7 !important;
-
-            &:hover {
-              color: var(--primary-color) !important;
-              opacity: 1 !important;
-            }
-          }
-
-          .p-treenode-label {
-            color: var(--text-color) !important;
-          }
-
-          .p-treenode-icon {
-            color: var(--secondary-color) !important;
-            margin-right: 0.5rem !important;
-          }
-        }
-      }
-    }
-
-    .p-tree-filter-container {
-      background: var(--card-background) !important;
-      border-bottom: 1px solid var(--border-color) !important;
-      padding: 0.5rem !important;
-
-      .p-tree-filter {
-        background: var(--input-background) !important;
-        color: var(--text-color) !important;
-        border: 1px solid var(--border-color) !important;
-
-        &:focus {
-          border-color: var(--primary-color) !important;
-          box-shadow: 0 0 0 1px
-            color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
-        }
-
-        &::placeholder {
-          color: var(--secondary-color) !important;
-        }
-      }
-
-      .p-tree-filter-icon {
-        color: var(--secondary-color) !important;
-      }
-    }
-  }
-
-  // Comprehensive disabled state fixes for dark theme compatibility
-  .p-button:disabled,
-  .p-button.p-disabled {
-    opacity: 0.4 !important;
-    color: var(--disabled-color) !important;
-    background: transparent !important;
-    border-color: var(--disabled-color) !important;
-    cursor: not-allowed !important;
-
-    .p-button-icon {
-      color: var(--disabled-color) !important;
-    }
-
-    .p-button-label {
-      color: var(--disabled-color) !important;
-    }
-
-    &:hover {
-      color: var(--disabled-color) !important;
-      background: transparent !important;
-      border-color: var(--disabled-color) !important;
-    }
-  }
-
-  // Disabled dropdown styling
-  .p-dropdown:disabled,
-  .p-dropdown.p-disabled {
-    opacity: 0.4 !important;
-    background: color-mix(
-      in srgb,
-      var(--disabled-color) 10%,
-      var(--card-background)
-    ) !important;
-    color: var(--disabled-color) !important;
-    border-color: var(--disabled-color) !important;
-    cursor: not-allowed !important;
-
-    .p-dropdown-label {
-      color: var(--disabled-color) !important;
-    }
-
-    .p-dropdown-trigger {
-      color: var(--disabled-color) !important;
-    }
-
-    &:hover {
-      border-color: var(--disabled-color) !important;
-    }
-  }
-
-  // Disabled input styling
-  input:disabled,
-  textarea:disabled,
-  .p-inputtext:disabled {
-    opacity: 0.4 !important;
-    background: color-mix(
-      in srgb,
-      var(--disabled-color) 10%,
-      var(--card-background)
-    ) !important;
-    color: var(--disabled-color) !important;
-    border-color: var(--disabled-color) !important;
-    cursor: not-allowed !important;
-
-    &::placeholder {
-      color: var(--disabled-color) !important;
-      opacity: 0.6 !important;
-    }
-  }
-
-  // Disabled tree node styling
-  .p-tree .p-treenode.p-disabled {
-    .p-treenode-content {
-      opacity: 0.4 !important;
-      color: var(--disabled-color) !important;
-      cursor: not-allowed !important;
-
-      .p-treenode-label {
-        color: var(--disabled-color) !important;
-      }
-
-      .p-treenode-icon {
-        color: var(--disabled-color) !important;
-      }
-
-      .p-tree-toggler {
-        color: var(--disabled-color) !important;
-        cursor: not-allowed !important;
-      }
-
-      &:hover {
-        background: transparent !important;
-        color: var(--disabled-color) !important;
-      }
-    }
-  }
-
-  // Disabled menu item styling
-  .p-menu .p-menuitem.p-disabled {
-    .p-menuitem-link {
-      opacity: 0.4 !important;
-      color: var(--disabled-color) !important;
-      cursor: not-allowed !important;
-
-      .p-menuitem-icon {
-        color: var(--disabled-color) !important;
-      }
-
-      .p-menuitem-text {
-        color: var(--disabled-color) !important;
-      }
-
-      &:hover {
-        background: transparent !important;
-        color: var(--disabled-color) !important;
-      }
-    }
-  }
-
-  // Disabled paginator controls
-  .p-paginator {
-    .p-paginator-first.p-disabled,
-    .p-paginator-prev.p-disabled,
-    .p-paginator-next.p-disabled,
-    .p-paginator-last.p-disabled {
-      opacity: 0.4 !important;
-      color: var(--disabled-color) !important;
-      background: transparent !important;
-      border-color: var(--disabled-color) !important;
-      cursor: not-allowed !important;
-
-      &:hover {
-        color: var(--disabled-color) !important;
-        background: transparent !important;
-        border-color: var(--disabled-color) !important;
-      }
-    }
-  }
-
-  // Disabled chart controls
-  .filter-container .p-button:disabled {
-    opacity: 0.4 !important;
-    color: var(--disabled-color) !important;
-    background: transparent !important;
-    border-color: var(--disabled-color) !important;
-
-    .p-button-icon {
-      color: var(--disabled-color) !important;
-    }
-
-    .p-button-label {
-      color: var(--disabled-color) !important;
-    }
-  }
-
-  // Comprehensive menu theming for all menu types (database, save, auto-save menus)
-  .p-menu {
-    background: var(--menu-background) !important;
-    border: 1px solid var(--menu-border-color) !important;
-    box-shadow: var(--menu-shadow) !important;
-    border-radius: 8px !important;
-
-    .p-menu-list {
-      background: var(--menu-background) !important;
-      border: none !important;
-      padding: 0.5rem 0 !important;
-
-      .p-menuitem {
-        margin: 0 !important;
-
-        .p-menuitem-link {
-          color: var(--menu-text-color) !important;
-          transition: all 0.2s ease !important;
-          padding: 0.75rem 1rem !important;
-          border-radius: 0 !important;
-          border: none !important;
-          background: transparent !important;
-
-          &:hover {
-            background: var(--menu-hover-background) !important;
-            color: var(--menu-text-color) !important;
-          }
-
-          &:focus {
-            background: var(--menu-hover-background) !important;
-            color: var(--menu-text-color) !important;
-            box-shadow: none !important;
-            outline: none !important;
-          }
-
-          .p-menuitem-icon {
-            color: var(--menu-icon-color) !important;
-            margin-right: 0.75rem !important;
-            font-size: 0.875rem !important;
-            width: 16px !important;
-            text-align: center !important;
-          }
-
-          .p-menuitem-text {
-            color: var(--menu-text-color) !important;
-            font-size: 0.875rem !important;
-            font-weight: 400 !important;
-          }
-        }
-
-        &.p-disabled {
-          .p-menuitem-link {
-            opacity: var(--menu-disabled-opacity) !important;
-            cursor: not-allowed !important;
-
-            &:hover {
-              background: transparent !important;
-            }
-
-            .p-menuitem-icon {
-              color: var(--disabled-color) !important;
-            }
-
-            .p-menuitem-text {
-              color: var(--disabled-color) !important;
-            }
-          }
-        }
-
-        &.p-menuitem-separator {
-          height: 1px !important;
-          background: var(--menu-border-color) !important;
-          margin: 0.5rem 0 !important;
-          opacity: 0.6 !important;
-        }
-      }
-    }
-  }
-
-  // Specific styling for database menu to match existing behavior
-  .p-menu.database-menu {
-    .p-menu-list {
-      max-height: 400px !important;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-
-      // Custom scrollbar for database menu
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: color-mix(in srgb, var(--shadow-color) 25%, transparent);
-        border-radius: 4px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: color-mix(in srgb, var(--shadow-color) 75%, transparent);
-        border-radius: 4px;
-
-        &:hover {
-          background: var(--shadow-color);
-        }
-      }
-
-      .p-menuitem {
-        .p-menuitem-link {
-          padding: 0.5rem 0.75rem !important;
-          font-size: 0.875rem !important;
-
-          .p-menuitem-icon {
-            font-size: 0.875rem !important;
-            opacity: 0.7;
-
-            &:hover {
-              opacity: 1;
-            }
-          }
-
-          &:hover {
-            .p-menuitem-icon {
-              color: var(--primary-color) !important;
-              opacity: 1;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Comprehensive Monaco editor suggestions theme override
-  .monaco-editor .suggest-widget {
-    // Force theme colors regardless of Monaco theme
-    background: var(--card-background) !important;
-    color: var(--text-color) !important;
-
-    // Override all possible Monaco theme variations
-    &,
-    &.vs,
-    &.vs-dark,
-    &.hc-black {
-      background: var(--card-background) !important;
-      color: var(--text-color) !important;
-      border: 2px solid var(--border-color) !important;
-    }
-
-    .monaco-list {
-      background: var(--card-background) !important;
-      color: var(--text-color) !important;
-
-      .monaco-list-row {
-        background: var(--card-background) !important;
-        color: var(--text-color) !important;
-
-        // Force all text elements to use theme colors
-        * {
-          color: var(--text-color) !important;
-        }
-
-        .monaco-highlighted-label {
-          color: var(--text-color) !important;
-
-          .highlight {
-            background: color-mix(
-              in srgb,
-              var(--primary-color) 30%,
-              transparent
-            ) !important;
-            color: var(--primary-color) !important;
-          }
-        }
-
-        .suggest-details {
-          color: var(--secondary-color) !important;
-        }
-
-        &.focused,
-        &:focus,
-        &.selected {
-          background: color-mix(
-            in srgb,
-            var(--primary-color) 15%,
-            var(--card-background)
-          ) !important;
-          color: var(--text-color) !important;
-
-          * {
-            color: var(--text-color) !important;
-          }
-
-          .suggest-details {
-            color: var(--text-color) !important;
-            opacity: 0.8 !important;
-          }
-        }
-
-        &:hover {
-          background: var(--hover-background) !important;
-          color: var(--text-color) !important;
-
-          * {
-            color: var(--text-color) !important;
-          }
-        }
-      }
-    }
-
-    // Details panel theming
-    .details {
-      background: var(--card-background) !important;
-      color: var(--text-color) !important;
-      border-left-color: var(--border-color) !important;
-
-      * {
-        color: var(--text-color) !important;
-      }
-
-      .header .type {
-        color: var(--secondary-color) !important;
-      }
-    }
-  }
-
-  // Force override for all Monaco themes
-  .monaco-editor {
-    &.vs,
-    &.vs-dark,
-    &.hc-black {
-      .suggest-widget {
-        background: var(--card-background) !important;
-        color: var(--text-color) !important;
-        border-color: var(--border-color) !important;
-
-        .monaco-list {
-          background: var(--card-background) !important;
-
-          .monaco-list-row {
-            background: var(--card-background) !important;
-            color: var(--text-color) !important;
-
-            &.focused,
-            &:focus,
-            &.selected {
-              background: color-mix(
-                in srgb,
-                var(--primary-color) 15%,
-                var(--card-background)
-              ) !important;
-              color: var(--text-color) !important;
-            }
-
-            &:hover {
-              background: var(--hover-background) !important;
-              color: var(--text-color) !important;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Ultimate fallback - target any possible Monaco suggestion element
-  .suggest-widget,
-  [class*='suggest'],
-  [class*='monaco-list'],
-  [class*='monaco-highlighted'] {
-    background: var(--card-background) !important;
-    color: var(--text-color) !important;
-
-    &[style*='background'] {
-      background: var(--card-background) !important;
-    }
-
-    &[style*='color'] {
-      color: var(--text-color) !important;
-    }
-  }
-}
-
-// Scroll indicator animation
-@keyframes pulse-scroll {
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: translateY(-50%) scaleY(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: translateY(-50%) scaleY(1.2);
-  }
-}
-
-// Table View Wrapper - proper height management for scrolling
-.table-view {
-  display: flex;
-  flex-direction: column;
-  width: 100%; // Use full width
-  height: 100%; // Use full height from parent
-  flex: 1; // Use flex to fill available space
-  overflow: hidden; // Contain scrolling to child containers
-  min-height: 0; // Allow shrinking below content size
-}
-
-// Modern Custom Table Styling
-.custom-table-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%; // Use full width
-  height: 100%; // Use full height from parent
-  flex: 1; // Fill available space
-  background: var(--card-background);
-  border-radius: 8px;
-  overflow: hidden; // Contain scrolling to child containers
-
-  .table-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: var(--background-color);
-    border-bottom: 1px solid var(--border-color);
-    gap: 1rem;
-
-    .table-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.875rem;
-      color: var(--text-color);
-
-      .result-count {
-        font-weight: 600;
-        color: var(--primary-color);
-      }
-
-      .column-count {
-        color: var(--secondary-color);
-      }
-    }
-
-    .table-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-
-      .rows-per-page {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-        color: var(--text-color);
-
-        label {
-          font-weight: 500;
-        }
-
-        select {
-          padding: 0.375rem 0.75rem;
-          border: 1px solid var(--border-color);
-          border-radius: 6px;
-          background: var(--input-background);
-          color: var(--text-color);
-          font-size: 0.875rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-
-          &:hover {
-            border-color: var(--primary-color);
-          }
-
-          &:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px
-              color-mix(in srgb, var(--primary-color) 20%, transparent);
-          }
-        }
-      }
-
-      .table-action-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.25rem;
-        height: 2.25rem;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        background: var(--card-background);
-        color: var(--text-color);
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: var(--hover-background);
-          border-color: var(--primary-color);
-          color: var(--primary-color);
-        }
-
-        &:active {
-          transform: translateY(1px);
-        }
-
-        i {
-          font-size: 0.875rem;
-        }
-      }
-    }
-  }
-
-  .table-wrapper {
-    flex: 1; // Use flex to fill available space properly
-    width: 100%;
-    overflow: hidden; // Contain scrolling to child container
-    display: flex;
-    flex-direction: column;
-    min-height: 0; // Allow shrinking below content size
-
-    .table-scroll-container {
-      flex: 1; // Use flex to fill available space
-      overflow: hidden; // Hide overflow on container
-      background: var(--card-background);
-      position: relative;
-      min-height: 0; // Allow shrinking below content size
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      height: 100%; // Ensure full height usage
-
-      // Enhanced scrollbar styling
-      scrollbar-width: thin;
-      scrollbar-color: var(--border-color) transparent;
-
-      // Webkit scrollbar styling
-      &::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: color-mix(in srgb, var(--border-color) 20%, transparent);
-        border-radius: 4px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: 4px;
-
-        &:hover {
-          background: var(--primary-color);
-        }
-      }
-
-      // Enhanced styling on hover
-      &:hover {
-        box-shadow: 0 4px 12px var(--shadow-color);
-        border-color: var(--primary-color);
-      }
-
-      // Enhanced styling when focused (for keyboard navigation)
-      &:focus-within {
-        box-shadow: 0 4px 12px var(--shadow-color);
-        border-color: var(--primary-color);
-      }
-
-      // Clean table container without scroll indicators
-
-      // Focus outline for accessibility
-      &:focus {
-        outline: 2px solid var(--primary-color);
-        outline-offset: -2px;
-      }
-
-      // Smooth scroll behavior
-      scroll-behavior: smooth;
-
-      // Enhanced scrollbar styling
-      &::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: var(--background-color);
-        border-radius: 5px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: 5px;
-        border: 2px solid var(--background-color);
-
-        &:hover {
-          background: var(--secondary-color);
-        }
-
-        &:active {
-          background: var(--primary-color);
-        }
-      }
-
-      &::-webkit-scrollbar-corner {
-        background: var(--background-color);
-      }
-
-      // Firefox scrollbar styling
-      scrollbar-width: thin;
-      scrollbar-color: var(--border-color) var(--background-color);
-
-      // Subtle scroll shadow for horizontal overflow
-      &::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 20px;
-        background: linear-gradient(
-          to left,
-          color-mix(in srgb, var(--shadow-color) 20%, transparent),
-          transparent
-        );
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-        z-index: 15;
-      }
-
-      // Show shadow when scrolling horizontally
-      &:hover::after {
-        opacity: 1;
-      }
-
-      // Separate table header from scrollable body
-      .table-header-wrapper {
-        flex: 0 0 auto;
-        background: var(--background-color);
-        border-bottom: 2px solid var(--border-color);
-        overflow: hidden;
-
-        .table-header-table {
-          width: 100%;
-          min-width: max-content;
-          border-collapse: collapse;
-          font-size: 0.875rem;
-          background: var(--background-color);
-          table-layout: fixed; // Fixed layout for column alignment
-          margin: 0;
-
-          .table-header-cell {
-            padding: 1rem 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-color);
-            background: var(--background-color);
-            border-right: 1px solid var(--border-color);
-            position: relative;
-            white-space: nowrap;
-            user-select: none;
-            min-width: 120px;
-            width: auto;
-
-            &:last-child {
-              border-right: none;
-            }
-
-            &.sortable {
-              cursor: pointer;
-              transition: all 0.2s ease;
-
-              &:hover {
-                background: var(--hover-background);
-                color: var(--primary-color);
-              }
-            }
-
-            .header-content {
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              gap: 0.5rem;
-
-              .column-name {
-                font-weight: 600;
-                flex: 1;
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
-
-              .sort-icon {
-                font-size: 0.75rem;
-                color: var(--primary-color);
-                flex-shrink: 0;
-              }
-            }
-          }
-        }
-      }
-
-      // Scrollable table body container
-      .table-body-wrapper {
-        flex: 1;
-        overflow: auto;
-        min-height: 0;
-        max-height: min(400px, 50vh); // Responsive max height based on viewport
-        position: relative;
-        padding-bottom: 1rem; // Additional padding to prevent last row cut-off
-
-        // Scrollbar styling
-        scrollbar-width: thin;
-        scrollbar-color: var(--border-color) transparent;
-
-        &::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-
-        &::-webkit-scrollbar-track {
-          background: color-mix(in srgb, var(--border-color) 20%, transparent);
-          border-radius: 4px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background: var(--border-color);
-          border-radius: 4px;
-
-          &:hover {
-            background: var(--primary-color);
-          }
-        }
-
-        // Add bottom padding to the wrapper instead of table
-        &::after {
-          content: '';
-          display: block;
-          height: 3rem; // Increased padding to ensure last row is fully visible
-          width: 100%;
-        }
-
-        .table-body-table {
-          width: 100%;
-          min-width: max-content;
-          border-collapse: collapse;
-          font-size: 0.875rem;
-          background: var(--card-background);
-          table-layout: fixed; // Fixed layout to match header
-          height: auto;
-          display: table;
-          margin: 0;
-          padding: 0; // Remove padding from table
-
-          .table-body {
-            margin: 0; // Ensure no margin on tbody
-            padding: 0; // Ensure no padding on tbody
-
-            .table-row {
-              transition: background-color 0.15s ease;
-              border-bottom: 1px solid var(--border-color);
-              margin: 0; // Ensure no margin
-              padding: 0; // Ensure no padding
-
-              &:hover {
-                background: var(--hover-background);
-              }
-
-              &.even {
-                background: var(--card-background);
-              }
-
-              &.odd {
-                background: color-mix(
-                  in srgb,
-                  var(--border-color) 3%,
-                  var(--card-background)
-                );
-              }
-
-              &:hover.even,
-              &:hover.odd {
-                background: var(--hover-background);
-              }
-
-              // Ensure last row doesn't have bottom margin/padding issues
-              &:last-child {
-                border-bottom: none;
-                margin-bottom: 0.5rem; // Extra margin for last row visibility
-              }
-
-              .table-cell {
-                padding: 0.75rem 1rem; // Reduced padding for better height usage
-                border-right: 1px solid
-                  color-mix(in srgb, var(--border-color) 50%, transparent);
-                vertical-align: top;
-                position: relative;
-                min-width: 120px; // Match header min-width
-                width: auto;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                margin: 0; // Ensure no margin
-
-                &:last-child {
-                  border-right: none;
-                }
-
-                .cell-content {
-                  display: flex;
-                  align-items: center;
-                  min-height: 1.5rem;
-                  line-height: 1.4;
-                  color: var(--text-color);
-                  font-weight: 400;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-
-                  &.null-value {
-                    .null-text {
-                      color: var(--text-muted-color);
-                      font-style: italic;
-                      opacity: 0.7;
-                    }
-                  }
-
-                  &.number-value {
-                    color: var(--info-color);
-                    font-weight: 500;
-                    text-align: right;
-                    justify-content: flex-end;
-                  }
-
-                  &.boolean-value {
-                    color: var(--warning-color);
-                    font-weight: 500;
-                  }
-
-                  &.date-value {
-                    color: var(--success-color);
-                    font-family: monospace;
-                    font-size: 0.8125rem;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      .modern-table {
-        width: 100%;
-        min-width: max-content; // Ensure table expands for many columns
-        border-collapse: collapse;
-        font-size: 0.875rem;
-        background: var(--card-background);
-        table-layout: auto; // Allow dynamic column sizing
-        height: auto; // Let table grow with content
-        display: table;
-        // Add padding to ensure last row is fully visible when scrolled
-        padding-bottom: 2rem;
-
-        .table-header {
-          background: var(--background-color);
-          border-bottom: 2px solid var(--border-color);
-
-          .table-header-cell {
-            padding: 1rem 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-color);
-            background: var(--background-color);
-            border-right: 1px solid var(--border-color);
-            position: relative;
-            white-space: nowrap;
-            user-select: none;
-            min-width: 120px; // Ensure minimum column width
-            max-width: 300px; // Prevent columns from becoming too wide
-            height: auto; // Let header height adjust dynamically
-            min-height: 60px; // Match row height for consistency
-
-            &:last-child {
-              border-right: none;
-            }
-
-            &.sortable {
-              cursor: pointer;
-              transition: all 0.2s ease;
-
-              &:hover {
-                background: var(--hover-background);
-                color: var(--primary-color);
-              }
-            }
-
-            .header-content {
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              gap: 0.5rem;
-
-              .column-name {
-                font-weight: 600;
-                flex: 1;
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
-
-              .sort-icon {
-                font-size: 0.75rem;
-                color: var(--primary-color);
-                flex-shrink: 0;
-              }
-            }
-          }
-        }
-
-        .table-body {
-          .table-row {
-            transition: background-color 0.15s ease;
-            border-bottom: 1px solid var(--border-color);
-
-            &:hover {
-              background: var(--hover-background);
-            }
-
-            &.even {
-              background: var(--card-background);
-            }
-
-            &.odd {
-              background: color-mix(
-                in srgb,
-                var(--border-color) 3%,
-                var(--card-background)
-              );
-            }
-
-            &:hover.even,
-            &:hover.odd {
-              background: var(--hover-background);
-            }
-
-            .table-cell {
-              padding: 1rem 1rem; // Increase padding for more height per row
-              border-right: 1px solid
-                color-mix(in srgb, var(--border-color) 50%, transparent);
-              color: var(--text-color);
-              vertical-align: top;
-              position: relative;
-              min-width: 120px; // Ensure minimum column width
-              max-width: 300px; // Prevent columns from becoming too wide
-              white-space: nowrap; // Prevent text wrapping for better scrolling
-              overflow: hidden;
-              text-overflow: ellipsis;
-              height: auto; // Let row height adjust dynamically
-              min-height: 50px; // Optimized row height for better scrolling
-
-              &:last-child {
-                border-right: none;
-              }
-
-              .cell-content {
-                line-height: 1.4;
-                display: block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-
-                // Value type specific styling
-                &.null-value {
-                  .null-text {
-                    color: var(--secondary-color);
-                    font-style: italic;
-                    opacity: 0.7;
-                    font-size: 0.8125rem;
-                  }
-                }
-
-                &.number-value {
-                  text-align: right;
-                  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-                  color: var(--primary-color);
-                  font-weight: 500;
-                }
-
-                &.boolean-value {
-                  text-align: center;
-                  font-weight: 600;
-                  text-transform: uppercase;
-                  font-size: 0.8125rem;
-
-                  span {
-                    padding: 0.125rem 0.375rem;
-                    border-radius: 4px;
-                    background: var(--hover-background);
-                    border: 1px solid var(--border-color);
-                  }
-                }
-
-                &.date-value {
-                  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-                  color: var(--success-color);
-                  font-size: 0.8125rem;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .table-pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: var(--background-color);
-    border-top: 1px solid var(--border-color);
-    gap: 1rem;
-
-    .pagination-info {
-      font-size: 0.875rem;
-      color: var(--text-color);
-      font-weight: 500;
-    }
-
-    .pagination-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      .pagination-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
-        height: 2rem;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        background: var(--card-background);
-        color: var(--text-color);
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover:not(:disabled) {
-          background: var(--hover-background);
-          border-color: var(--primary-color);
-          color: var(--primary-color);
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        i {
-          font-size: 0.75rem;
-        }
-      }
-
-      .page-numbers {
-        display: flex;
-        gap: 0.25rem;
-        margin: 0 0.5rem;
-
-        .page-number-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 2rem;
-          height: 2rem;
-          border: 1px solid var(--border-color);
-          border-radius: 6px;
-          background: var(--card-background);
-          color: var(--text-color);
-          cursor: pointer;
-          transition: all 0.2s ease;
-          font-size: 0.875rem;
-          font-weight: 500;
-
-          &:hover {
-            background: var(--hover-background);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-          }
-
-          &.active {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-          }
-        }
-      }
-    }
-  }
-
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
-    text-align: center;
-    color: var(--secondary-color);
-    background: var(--card-background);
-
-    .empty-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      opacity: 0.6;
-    }
-
-    h3 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--text-color);
-    }
-
-    p {
-      margin: 0;
-      font-size: 0.875rem;
-      opacity: 0.8;
-    }
-  }
-}
-
-// Responsive design for smaller screens
-@media (max-width: 768px) {
-  .custom-table-container {
-    .table-controls {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.75rem;
-
-      .table-info {
-        justify-content: center;
-      }
-
-      .table-actions {
-        justify-content: center;
-      }
-    }
-
-    .table-pagination {
-      flex-direction: column;
-      gap: 0.75rem;
-
-      .pagination-controls {
-        justify-content: center;
-      }
-    }
-
-    .table-wrapper {
-      .table-scroll-container {
-        height: 100%; // Use full available height from splitter
-        min-height: 300px; // Adequate minimum height for mobile
-        // Remove max-height to allow full content display on mobile
-
-        // Better touch scrolling on mobile
-        -webkit-overflow-scrolling: touch;
-
-        // Larger scrollbars for touch devices
-        &::-webkit-scrollbar {
-          width: 12px;
-          height: 12px;
-        }
-
-        .modern-table {
-          .table-header .table-header-cell {
-            padding: 0.625rem 0.75rem;
-            font-size: 0.8125rem;
-            min-width: 100px; // Smaller min-width on mobile
-          }
-
-          .table-body .table-cell {
-            padding: 0.625rem 0.75rem;
-            font-size: 0.8125rem;
-            min-width: 100px; // Smaller min-width on mobile
-          }
-        }
-      }
-    }
-  }
-}
-
-// For very small screens
-@media (max-width: 480px) {
-  .custom-table-container {
-    .table-wrapper {
-      .table-scroll-container {
-        height: 100%; // Use full available height from splitter
-        min-height: 200px; // Minimum height for small screens
-
-        .modern-table {
-          .table-header .table-header-cell,
-          .table-body .table-cell {
-            padding: 0.5rem;
-            font-size: 0.75rem;
-            min-width: 80px;
-          }
-        }
-      }
-    }
-  }
-  
-  // Fix angular-split areas on mobile
-  ::ng-deep {
-    .schema-split-area {
-      max-width: 100px !important;
-      min-width: 80px !important;
-    }
-    
-    .content-split-area {
-      min-width: 0 !important;
-      max-width: calc(100% - 85px) !important;
-      width: 100% !important;
-    }
-    
-    // Ensure editor and results don't overflow
-    .editor-split-area,
-    .results-split-area {
-      width: 100% !important;
-      overflow: hidden !important;
-    }
-  }
-  
-  // Fix editor tabs on mobile
-  .editor-panel {
-    width: 100% !important;
-    
-    .editor-tabs {
-      width: 100% !important;
-      
-      .tabs-container {
-        width: 100% !important;
-        
-        .editor-tab {
-          min-width: 60px !important;
-          max-width: 120px !important;
-          padding: 0.25rem !important;
-          
-          .tab-title {
-            font-size: 0.625rem !important;
-          }
-        }
-      }
-      
-      .editor-actions {
-        display: none !important; // Hide action buttons on very small screens
-      }
-    }
-  }
-  
-  // Fix results panel on mobile
-  .results-panel {
-    width: 100% !important;
-    
-    ::ng-deep .p-tabview {
-      width: 100% !important;
-      
-      .p-tabview-nav {
-        width: 100% !important;
-        
-        .p-tabview-nav-link {
-          padding: 0.25rem 0.5rem !important;
-          font-size: 0.625rem !important;
-          min-width: 50px !important;
-        }
-      }
-      
-      .p-tabview-panels {
-        width: 100% !important;
-        padding: 0.5rem !important;
-      }
-    }
-  }
-}
-
-// Chart Popup Dialog Styling
-::ng-deep .chart-popup-dialog {
-  .p-dialog-header {
-    background: var(--card-background);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-weight: 600;
-
-    .p-dialog-title {
-      font-size: 1.25rem;
-      color: var(--primary-color);
-    }
-
-    .p-dialog-header-icons {
-      .p-dialog-header-icon {
-        color: var(--secondary-color);
-
-        &:hover {
-          color: var(--primary-color);
-          background: var(--hover-background);
-        }
-      }
-    }
-  }
-
-  .p-dialog-content {
-    background: var(--background-color);
-    padding: 0;
-    border: none;
-  }
-
-  .chart-popup-content {
-    display: flex;
-    height: 100%;
-    min-height: 500px;
-
-    // Left Panel - Chart Options Only
-    .popup-chart-config-panel {
-      width: 320px;
-      min-width: 320px;
-      background: var(--card-background);
-      border-right: 2px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-
-      .config-content {
-        flex: 1;
-        padding: 1.5rem;
-        overflow-y: auto;
-
-        &::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        &::-webkit-scrollbar-track {
-          background: var(--hover-background);
-          border-radius: 3px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background: var(--secondary-color);
-          border-radius: 3px;
-          opacity: 0.7;
-
-          &:hover {
-            background: var(--primary-color);
-            opacity: 1;
-          }
-        }
-
-        .config-section {
-          margin-bottom: 1rem;
-
-          .config-label {
-            display: block;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 1rem;
-            font-size: 1rem;
-          }
-
-          // Chart options
-          .chart-options {
-            .option-group {
-              margin-bottom: 1.5rem;
-              padding: 1rem;
-              background: var(--background-color);
-              border-radius: 6px;
-              border: 1px solid var(--border-color);
-
-              .option-group-title {
-                margin: 0 0 1rem 0;
-                font-size: 0.875rem;
-                font-weight: 600;
-                color: var(--primary-color);
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-              }
-
-              .option-item {
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                margin-bottom: 0.75rem;
-
-                &:last-child {
-                  margin-bottom: 0;
-                }
-
-                label {
-                  font-size: 0.875rem;
-                  color: var(--text-color);
-                  cursor: pointer;
-                }
-              }
-
-              .input-item {
-                margin-bottom: 1rem;
-
-                &:last-child {
-                  margin-bottom: 0;
-                }
-
-                .input-label {
-                  display: block;
-                  font-size: 0.875rem;
-                  font-weight: 500;
-                  color: var(--text-color);
-                  margin-bottom: 0.5rem;
-                }
-
-                .chart-input {
-                  width: 100%;
-                  padding: 0.5rem;
-                  border: 1px solid var(--border-color);
-                  border-radius: 4px;
-                  background: var(--input-background);
-                  color: var(--text-color);
-                  font-size: 0.875rem;
-
-                  &:focus {
-                    outline: none;
-                    border-color: var(--primary-color);
-                    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
-                  }
-                }
-
-                .legend-note {
-                  display: block;
-                  margin-top: 0.25rem;
-                  font-size: 0.75rem;
-                  color: var(--secondary-color);
-                  font-style: italic;
-                }
-
-                ::ng-deep .chart-dropdown {
-                  width: 100%;
-
-                  .p-dropdown {
-                    width: 100%;
-                    border: 1px solid var(--border-color);
-                    background: var(--input-background);
-
-                    &:not(.p-disabled):hover {
-                      border-color: var(--primary-color);
-                    }
-
-                    &:not(.p-disabled).p-focus {
-                      border-color: var(--primary-color);
-                      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
-                    }
-                  }
-                }
-
-                // Theme selector styles
-                ::ng-deep .chart-dropdown .p-dropdown-panel {
-                  .theme-option {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.75rem;
-                    padding: 0.5rem;
-
-                    &.selected {
-                      background: var(--hover-background);
-                    }
-
-                    .theme-colors {
-                      display: flex;
-                      gap: 2px;
-
-                      .color-preview {
-                        width: 12px;
-                        height: 12px;
-                        border-radius: 50%;
-                        border: 1px solid rgba(255, 255, 255, 0.2);
-                        display: inline-block;
-                      }
-                    }
-
-                    .theme-name {
-                      font-size: 0.875rem;
-                      color: var(--text-color);
-                      font-weight: 500;
-                    }
-                  }
-                }
-              }
-
-              .size-controls {
-                display: flex;
-                gap: 1rem;
-
-                .size-input {
-                  flex: 1;
-
-                  .input-label {
-                    display: block;
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                    color: var(--text-color);
-                    margin-bottom: 0.5rem;
-                  }
-
-                  ::ng-deep .chart-number-input {
-                    width: 100%;
-
-                    .p-inputnumber-input {
-                      width: 100%;
-                      border: 1px solid var(--border-color);
-                      background: var(--input-background);
-                      color: var(--text-color);
-
-                      &:focus {
-                        border-color: var(--primary-color);
-                        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Right Panel - Chart Display (larger)
-    .popup-chart-display-panel {
-      flex: 1;
-      background: var(--background-color);
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-
-      .popup-chart-container {
-        flex: 1;
-        padding: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .popup-chart-wrapper {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: var(--card-background);
-          border-radius: 12px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          min-height: 500px;
-
-          .popup-chart-visualization {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-          }
-        }
-
-        .popup-empty-state {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 500px;
-
-          .empty-content {
-            text-align: center;
-
-            .empty-icon {
-              font-size: 4rem;
-              color: var(--primary-color);
-              opacity: 0.3;
-              margin-bottom: 1.5rem;
-            }
-
-            h4 {
-              color: var(--text-color);
-              font-size: 1.5rem;
-              margin-bottom: 0.5rem;
-              font-weight: 600;
-            }
-
-            p {
-              color: var(--secondary-color);
-              font-size: 1rem;
-              margin: 0;
-            }
-          }
-        }
-      }
-    }
   }
 }

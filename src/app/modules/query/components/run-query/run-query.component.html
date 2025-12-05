@@ -1,1577 +1,323 @@
-<div class="super-admin-wrapper" [class.fullscreen-mode]="isFullscreen">
-  <div class="super-admin-container">
-    <!-- Filter Container -->
-    <div class="filter-container" *ngIf="showOrganisationDropdown">
-      <div class="dropdowns-wrapper">
-        <!-- Organisation Dropdown -->
-        <div class="dropdown-field">
-          <span class="p-float-label">
-            <p-dropdown
-              [options]="organisations"
-              [(ngModel)]="selectedOrg"
-              optionLabel="name"
-              [filter]="true"
-              filterBy="name"
-              [style]="{ width: '100%' }"
-              [panelStyle]="{ width: '100%' }"
-              (onChange)="onOrgChange($event)"
-              inputId="org-dropdown"
-            >
-            </p-dropdown>
-            <label for="org-dropdown">Organisation</label>
-          </span>
+<div class="query-editor-wrapper">
+  <!-- Header Toolbar -->
+  <div class="query-toolbar">
+    <div class="toolbar-left">
+      <span class="toolbar-hint" *ngIf="databaseId">
+        <i class="pi pi-info-circle"></i>
+        Press <kbd>Ctrl+Enter</kbd> to execute
+      </span>
+    </div>
+    <div class="toolbar-right">
+      <button 
+        class="btn btn-secondary" 
+        (click)="formatQuery()"
+        [disabled]="isLoadingEditor"
+        title="Format Query (Shift+Alt+F)">
+        <i class="pi pi-align-justify"></i>
+        Format
+      </button>
+      <button 
+        class="btn btn-secondary" 
+        (click)="clearEditor()"
+        [disabled]="isLoadingEditor"
+        title="Clear Editor">
+        <i class="pi pi-trash"></i>
+        Clear
+      </button>
+      <button 
+        class="btn btn-primary" 
+        (click)="executeQuery()"
+        [disabled]="isLoadingEditor || isExecutingQuery || !databaseId"
+        title="Execute Query (Ctrl+Enter)">
+        <i class="pi" [ngClass]="isExecutingQuery ? 'pi-spin pi-spinner' : 'pi-play'"></i>
+        {{ isExecutingQuery ? 'Executing...' : 'Execute' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Area with Sidebar and Editor -->
+  <div class="main-content">
+    <!-- Left Sidebar - Database Explorer -->
+    <div class="database-sidebar" [class.collapsed]="!showDatabaseSidebar">
+      <div class="sidebar-content">
+        <div class="sidebar-header">
+          <h4>
+            <i class="pi pi-sitemap"></i>
+            Database Explorer
+          </h4>
+          <button 
+            class="btn btn-icon" 
+            (click)="refreshSchema()"
+            [disabled]="!databaseId"
+            title="Refresh Schema">
+            <i class="pi pi-refresh" [class.pi-spin]="isLoadingSchema"></i>
+          </button>
+        </div>
+
+        <div class="sidebar-content-inner" *ngIf="databases && databases.length > 0">
+          <div class="schema-search">
+            <input 
+              type="text" 
+              placeholder="Search databases, schemas, tables..." 
+              [(ngModel)]="schemaSearchText"
+              class="search-input">
+          </div>
+
+          <div class="databases-list">
+            <!-- Loop through databases -->
+            <div 
+              *ngFor="let database of filteredDatabases" 
+              class="database-item">
+              
+              <!-- Database Header with Context Menu -->
+              <div class="database-header" 
+                   (click)="toggleDatabase(database.name)"
+                   (contextmenu)="onDatabaseContextMenu($event, database.name)">
+                <i class="pi" [ngClass]="expandedDatabases[database.name] ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                <i class="pi pi-database"></i>
+                <span class="database-name">{{ database.name }}</span>
+                <span class="schema-count">{{ database.schemas.length }} schemas</span>
+              </div>
+
+              <!-- Schemas List -->
+              <div class="schemas-list" *ngIf="expandedDatabases[database.name]">
+                <div 
+                  *ngFor="let schema of database.schemas" 
+                  class="schema-item">
+                  
+                  <!-- Schema Header -->
+                  <div class="schema-header" (click)="toggleSchema(database.name, schema.name)">
+                    <i class="pi" [ngClass]="expandedSchemas[database.name + '.' + schema.name] ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                    <i class="pi pi-folder"></i>
+                    <span class="schema-name">{{ schema.name }}</span>
+                    <span class="table-count">{{ schema.tables.length }} tables</span>
+                  </div>
+
+                  <!-- Tables List -->
+                  <div class="tables-list" *ngIf="expandedSchemas[database.name + '.' + schema.name]">
+                    <div 
+                      *ngFor="let table of schema.tables" 
+                      class="table-item"
+                      [class.expanded]="isTableExpanded(database.name, schema.name, table.name)">
+                      
+                      <!-- Table Header -->
+                      <div class="table-header" (click)="toggleTable(database.name, schema.name, table.name)">
+                        <i class="pi" [ngClass]="isTableExpanded(database.name, schema.name, table.name) ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                        <i class="pi pi-table"></i>
+                        <span class="table-name">{{ table.name }}</span>
+                        <span class="column-count">{{ table.columns.length }} cols</span>
+                      </div>
+
+                      <!-- Columns List -->
+                      <div class="columns-list" *ngIf="isTableExpanded(database.name, schema.name, table.name)">
+                        <div 
+                          *ngFor="let column of table.columns" 
+                          class="column-item"
+                          (click)="insertColumnName(database.name, schema.name, table.name, column.name)"
+                          [title]="'Click to insert ' + table.name + '.' + column.name">
+                          <i class="pi" 
+                             [ngClass]="{
+                               'pi-key': column.isPrimaryKey,
+                               'pi-link': column.isForeignKey && !column.isPrimaryKey,
+                               'pi-circle': !column.isPrimaryKey && !column.isForeignKey
+                             }"
+                             [style.color]="column.isPrimaryKey ? '#ffc107' : (column.isForeignKey ? '#2196f3' : '')"></i>
+                          <span class="column-name">{{ column.name }}</span>
+                          <span class="column-type">{{ column.type }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="schema-empty" *ngIf="!databases || databases.length === 0">
+          <i class="pi pi-database"></i>
+          <p>No database schema available</p>
+          <button 
+            class="btn btn-small btn-primary" 
+            (click)="refreshSchema()"
+            [disabled]="!databaseId">
+            <i class="pi pi-refresh"></i>
+            Load Schema
+          </button>
+        </div>
+
+        <!-- Rotated Title (When Collapsed) -->
+        <div class="rotated-title" *ngIf="!showDatabaseSidebar">
+          DATABASE EXPLORER
         </div>
       </div>
     </div>
 
-    <!-- Existing Content -->
-    <div class="run-query-container">
-      <!-- Main horizontal split -->
-      <as-split 
-        direction="horizontal"
-        [gutterSize]="5"
-        [gutterDblClickDuration]="400"
-        (dragEnd)="onHorizontalSplitterResize($event)"
-        (gutterDblClick)="onHorizontalGutterDblClick($event)"
-        class="main-horizontal-split"
-      >
-        <!-- Left Panel - Schema Browser -->
-        <as-split-area 
-          [size]="horizontalSplitterSizes[0]"
-          [minSize]="10"
-          [maxSize]="40"
-          class="schema-split-area"
-        >
-          <div class="schema-panel">
-            <div class="panel-header">
-              <h3>Databases</h3>
-            </div>
-            <div class="panel-content">
-              <!-- Loading indicator -->
-              <div class="loading-container" *ngIf="isDatabasesLoading">
-                <i class="pi pi-spin pi-spinner loading-icon"></i>
-                <span class="loading-text">Loading databases...</span>
-              </div>
+    <!-- Separator with Toggle Button -->
+    <div class="separator">
+      <button class="toggle-btn" (click)="toggleDatabaseSidebar()" title="Toggle Database Sidebar">
+        <i class="pi" [ngClass]="showDatabaseSidebar ? 'pi-chevron-left' : 'pi-chevron-right'"></i>
+      </button>
+    </div>
 
-              <!-- Database Tree -->
-              <p-tree
-                [value]="databaseTree"
-                [filter]="true"
-                filterMode="lenient"
-                filterPlaceholder="Search databases..."
-                styleClass="database-tree"
-                (onNodeExpand)="onDatabaseNodeExpand($event)"
-              >
-                <ng-template let-node pTemplate="default">
-                  <div
-                    class="tree-node-content"
-                    [class]="'level-' + node.data?.level"
-                    [attr.data-type]="node.data?.type"
-                    (contextmenu)="onDatabaseNodeRightClick($event, node)"
-                  >
-                    <div class="node-main">
-                      <i
-                        class="node-icon"
-                        [class]="getNodeIcon(node.data?.type)"
-                      ></i>
-                      <span class="node-label">{{ node.label }}</span>
-                      <span class="node-type" *ngIf="node.data?.type">{{
-                        node.data.type
-                      }}</span>
-                      <i
-                        class="pi pi-spin pi-spinner loading-indicator"
-                        *ngIf="node.data?.loading"
-                      ></i>
-                    </div>
-                  </div>
-                </ng-template>
-              </p-tree>
-
-              <!-- Empty state -->
-              <div
-                class="empty-state"
-                *ngIf="!isDatabasesLoading && databases.length === 0"
-              >
-                <i class="pi pi-database empty-icon"></i>
-                <p>No databases available</p>
-              </div>
-            </div>
+    <!-- Right Content Area - Editor and Results -->
+    <div class="editor-results-area">
+      
+      <!-- Tab Bar -->
+      <div class="tab-bar" *ngIf="queryTabs && queryTabs.length > 0">
+        <div class="tabs-container">
+          <div *ngFor="let tab of queryTabs" 
+               class="tab-item" 
+               [class.active]="tab.isActive"
+               (click)="switchTab(tab.id)"
+               (contextmenu)="onTabContextMenu($event, tab.id)"
+               [title]="'Database: ' + tab.databaseName + '\nConnection: ' + (databaseId || 'Not connected')">
+            <span class="tab-icon">
+              <i class="pi pi-file"></i>
+            </span>
+            <span class="tab-title">{{ tab.title }}</span>
+            <button class="tab-close" 
+                    (click)="closeTab(tab.id, $event)"
+                    title="Close Tab">
+              <i class="pi pi-times"></i>
+            </button>
           </div>
-        </as-split-area>
+        </div>
+      </div>
 
-        <!-- Right Panel - Editor and Results -->
-        <as-split-area 
-          [size]="horizontalSplitterSizes[1]"
-          [minSize]="60"
-          [maxSize]="85"
-          class="content-split-area"
-        >
-          <!-- Vertical split for editor and results -->
-          <as-split
-            direction="vertical"
-            [gutterSize]="5"
-            [gutterDblClickDuration]="400"
-            (dragEnd)="onVerticalSplitterResize($event)"
-            (gutterDblClick)="onVerticalGutterDblClick($event)"
-            class="editor-results-split"
-          >
-            <!-- Top Panel - SQL Editor -->
-            <as-split-area 
-              [size]="verticalSplitterSizes[0]"
-              [minSize]="20"
-              [maxSize]="85"
-              class="editor-split-area"
-            >
-              <div class="editor-panel">
-                <div class="editor-tabs">
-                  <div class="tabs-container">
-                    <div
-                      *ngFor="let tab of tabs; let i = index"
-                      class="editor-tab"
-                      [class.active]="tab.id === activeTabId"
-                      [attr.data-tab-id]="tab.id"
-                      [pTooltip]="tab.database?.name"
-                      tooltipPosition="top"
-                      [showDelay]="0"
-                      [hideDelay]="0"
-                      (click)="!tab.isEditing && switchTab(tab.id)"
-                      (dblclick)="startEditingTab(tab, $event)"
-                      (contextmenu)="onTabRightClick($event, tab, i)"
-                    >
-                      <ng-container *ngIf="!tab.isEditing">
-                        <i
-                          class="pi pi-bookmark-fill tab-pin-icon"
-                          *ngIf="tab.isPinned"
-                        ></i>
-                        <span class="tab-title">{{
-                          getQueryNumberFromTitle(tab.title)
-                        }}</span>
-                      </ng-container>
-                      <ng-container *ngIf="tab.isEditing">
-                        <input
-                          #tabInput
-                          type="text"
-                          class="tab-title-input"
-                          [value]="getQueryNumberFromTitle(tab.title)"
-                          [attr.data-tab-id]="tab.id"
-                          (blur)="finishEditingTab(tab, tabInput.value)"
-                          (keydown)="onTabInputKeydown($event, tab, tabInput)"
-                          (click)="$event.stopPropagation()"
-                        />
-                      </ng-container>
-                      <i
-                        class="pi pi-times tab-close"
-                        *ngIf="tabs.length > 1 && !tab.isEditing"
-                        (click)="closeTab(tab.id, $event)"
-                      ></i>
-                    </div>
-                  </div>
-                  <div class="editor-actions">
-                    <button
-                      pButton
-                      pRipple
-                      type="button"
-                      icon="pi pi-plus"
-                      class="p-button-text p-button-rounded add-btn"
-                      [disabled]="isMaxScriptsReached"
-                      (mouseenter)="showDatabaseMenu($event)"
-                      (mouseleave)="hideDatabaseMenuDelayed()"
-                      #addBtn
-                    ></button>
-                    <button
-                      pButton
-                      pRipple
-                      type="button"
-                      icon="pi pi-align-left"
-                      class="p-button-text p-button-rounded format-btn"
-                      [disabled]="tabs.length === 0"
-                      (click)="formatSQL()"
-                    ></button>
-                    <button
-                      pButton
-                      pRipple
-                      type="button"
-                      icon="pi pi-play"
-                      class="p-button-text p-button-rounded run-btn"
-                      [class.executing]="isExecuting"
-                      (click)="executeQuery()"
-                      [disabled]="isExecuting || tabs.length === 0"
-                    ></button>
-                    <button
-                      pButton
-                      pRipple
-                      type="button"
-                      icon="pi pi-save"
-                      class="p-button-text p-button-rounded save-btn"
-                      [disabled]="tabs.length === 0"
-                      (mouseenter)="tabs.length > 0 && showSaveMenu($event)"
-                      (mouseleave)="tabs.length > 0 && hideSaveMenuDelayed()"
-                      #saveBtn
-                    ></button>
-                    <button
-                      pButton
-                      pRipple
-                      type="button"
-                      [icon]="getAutoSaveIconClass()"
-                      class="p-button-text p-button-rounded auto-save-btn"
-                      [class.enabled]="isAutoSaveEnabled"
-                      [class.completed]="autoSaveStatus === 'completed'"
-                      [disabled]="tabs.length === 0"
-                      (mouseenter)="tabs.length > 0 && showAutoSaveMenu($event)"
-                      (mouseleave)="
-                        tabs.length > 0 && hideAutoSaveMenuDelayed()
-                      "
-                      #autoSaveBtn
-                    ></button>
-                    <button
-                      pButton
-                      pRipple
-                      type="button"
-                      [icon]="
-                        isFullscreen
-                          ? 'pi pi-window-minimize'
-                          : 'pi pi-window-maximize'
-                      "
-                      class="p-button-text p-button-rounded fullscreen-btn"
-                      (click)="toggleFullscreen()"
-                    ></button>
-                  </div>
-                </div>
-                <div class="panel-content">
-                  <div
-                    #monacoEditor
-                    class="sql-editor-monaco"
-                    *ngIf="tabs.length > 0"
-                  ></div>
-                  <div class="no-tabs-message" *ngIf="tabs.length === 0">
-                    <i class="pi pi-database"></i>
-                    <h3>No Query Tab Open</h3>
-                    <p>Select a database to run query</p>
-                    <p class="hint">
-                      Hover over the <i class="pi pi-plus"></i> button above and
-                      select a database to get started
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </as-split-area>
+      <!-- Monaco Editor Section -->
+      <div class="editor-section" *ngIf="queryTabs.length === 0">
+        <div class="empty-state">
+          <i class="pi pi-file"></i>
+          <h3>No Query Tab Open</h3>
+          <p>Right-click on a database and select "New Script" to create a query tab</p>
+        </div>
+      </div>
+      
+      <div class="editor-section" *ngIf="getActiveTab() as activeTab">
+        <div class="editor-container" [hidden]="isLoadingEditor || monacoLoadFailed" #editorContainer></div>
+        
+        <!-- Loading State -->
+        <div class="editor-loading" *ngIf="isLoadingEditor && !monacoLoadFailed">
+          <i class="pi pi-spin pi-spinner"></i>
+          <p>Loading Monaco Editor...</p>
+          <p class="loading-hint">This may take a few seconds on first load</p>
+        </div>
 
-            <!-- Bottom Panel - Results -->
-            <as-split-area 
-              [size]="verticalSplitterSizes[1]"
-              [minSize]="15"
-              class="results-split-area"
-            >
-              <div class="results-panel">
-                <div class="panel-header">
-                  <div class="header-left">
-                    <i class="pi pi-table"></i>
-                    <span>Query Results</span>
-                    <div class="results-info" *ngIf="queryResults.length > 0">
-                      <span class="result-count"
-                        >{{ queryResults.length }} rows</span
-                      >
-                      <span class="execution-time" *ngIf="executionTime"
-                        >{{ executionTime }}ms</span
-                      >
-                    </div>
-                  </div>
-                  <div class="view-toggle">
-                    <button
-                      pButton
-                      [class.active]="viewMode === 'table'"
-                      class="p-button-text p-button-rounded toggle-btn"
-                      (click)="viewMode = 'table'"
-                    >
-                      <i class="pi pi-table"></i>
-                      <span>Table</span>
-                    </button>
-                    <button
-                      pButton
-                      [class.active]="viewMode === 'analytics'"
-                      class="p-button-text p-button-rounded toggle-btn"
-                      (click)="viewMode = 'analytics'"
-                    >
-                      <i class="pi pi-chart-line"></i>
-                      <span>Analytics</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="panel-content">
-                  <!-- Table View -->
-                  <div class="table-view" *ngIf="viewMode === 'table'">
-                    <div class="custom-table-container">
-                      <!-- Table Controls -->
-                      <div
-                        class="table-controls"
-                        *ngIf="queryResults.length > 0"
-                      >
-                        <div class="table-info">
-                          <span class="result-count"
-                            >{{ getDisplayedRowCount() }} of
-                            {{ queryResults.length }} rows</span
-                          >
-                          <span class="column-count"
-                            >{{ resultColumns.length }} columns</span
-                          >
-                        </div>
-                        <div class="table-actions">
-                          <div class="rows-per-page">
-                            <label>Rows per page:</label>
-                            <select
-                              [(ngModel)]="tableRowsPerPage"
-                              (change)="onRowsPerPageChange()"
-                            >
-                              <option [value]="10">10</option>
-                              <option [value]="25">25</option>
-                              <option [value]="50">50</option>
-                              <option [value]="100">100</option>
-                              <option [value]="200">200</option>
-                              <option [value]="999999">All</option>
-                            </select>
-                          </div>
-                          <button
-                            class="table-action-btn"
-                            (click)="exportToCSV()"
-                            title="Export to CSV"
-                          >
-                            <i class="pi pi-download"></i>
-                          </button>
-                        </div>
-                      </div>
+        <!-- Error State -->
+        <div class="editor-error" *ngIf="monacoLoadFailed">
+          <i class="pi pi-exclamation-triangle"></i>
+          <h4>Failed to Load Editor</h4>
+          <p>Monaco Editor could not be loaded from CDN.</p>
+          <ul>
+            <li>Check your internet connection</li>
+            <li>Disable ad blockers or security extensions</li>
+            <li>Check browser console for network errors</li>
+          </ul>
+          <button class="btn btn-primary" (click)="retryLoadMonaco()">
+            <i class="pi pi-refresh"></i>
+            Retry
+          </button>
+        </div>
+      </div>
 
-                      <!-- Custom Table -->
-                      <div
-                        class="table-wrapper"
-                        *ngIf="queryResults.length > 0"
-                      >
-                        <div
-                          class="table-scroll-container"
-                          #tableContainer
-                          tabindex="0"
-                          role="region"
-                          aria-label="Query results table"
-                          (mouseenter)="onTableMouseEnter()"
-                          (mouseleave)="onTableMouseLeave()"
-                          (keydown)="onTableKeydown($event)"
-                        >
-                          <!-- Fixed Table Header -->
-                          <div class="table-header-wrapper">
-                            <table class="table-header-table">
-                              <thead>
-                                <tr>
-                                  <th
-                                    *ngFor="
-                                      let col of resultColumns;
-                                      trackBy: trackByColumn
-                                    "
-                                    class="table-header-cell"
-                                    [class.sortable]="true"
-                                    (click)="sortByColumn(col)"
-                                  >
-                                    <div class="header-content">
-                                      <span class="column-name">{{ col }}</span>
-                                      <i
-                                        class="sort-icon pi"
-                                        [ngClass]="getSortIcon(col)"
-                                        *ngIf="getSortIcon(col)"
-                                      ></i>
-                                    </div>
-                                  </th>
-                                </tr>
-                              </thead>
-                            </table>
-                          </div>
+      <!-- Results Section -->
+      <div class="results-section" *ngIf="getActiveTab() as activeTab">
+        <div *ngIf="activeTab.result" class="results-content">
+        <!-- Results Header -->
+        <div class="results-header">
+          <div class="results-info">
+            <span class="results-title">
+              <i class="pi pi-table"></i>
+              Query Results
+            </span>
+            <span class="results-meta" *ngIf="!activeTab.result.error">
+              {{ activeTab.result.rowCount }} row(s) in {{ activeTab.result.executionTime }}ms
+            </span>
+          </div>
+          <div class="results-actions">
+            <button 
+              class="btn btn-icon" 
+              *ngIf="!activeTab.result.error"
+              title="Export Results">
+              <i class="pi pi-download"></i>
+            </button>
+            <button 
+              class="btn btn-icon" 
+              (click)="activeTab.result = null"
+              title="Close Results">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+        </div>
 
-                          <!-- Scrollable Table Body -->
-                          <div class="table-body-wrapper">
-                            <table class="table-body-table">
-                              <tbody class="table-body">
-                                <tr
-                                  *ngFor="
-                                    let row of getPaginatedData();
-                                    trackBy: trackByRow;
-                                    let i = index
-                                  "
-                                  class="table-row"
-                                  [class.even]="i % 2 === 0"
-                                  [class.odd]="i % 2 !== 0"
-                                >
-                                  <td
-                                    *ngFor="
-                                      let col of resultColumns;
-                                      trackBy: trackByColumn
-                                    "
-                                    class="table-cell"
-                                    [title]="getCellValue(row, col)"
-                                  >
-                                    <div
-                                      class="cell-content"
-                                      [class.null-value]="
-                                        isNullValue(getCellValue(row, col))
-                                      "
-                                      [class.number-value]="
-                                        isNumberValue(getCellValue(row, col))
-                                      "
-                                      [class.boolean-value]="
-                                        isBooleanValue(getCellValue(row, col))
-                                      "
-                                      [class.date-value]="
-                                        isDateValue(getCellValue(row, col))
-                                      "
-                                    >
-                                      <span
-                                        *ngIf="
-                                          isNullValue(getCellValue(row, col))
-                                        "
-                                        class="null-text"
-                                        >NULL</span
-                                      >
-                                      <span
-                                        *ngIf="
-                                          !isNullValue(getCellValue(row, col))
-                                        "
-                                        >{{
-                                          formatCellValue(getCellValue(row, col))
-                                        }}</span
-                                      >
-                                    </div>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
+        <!-- Error Message -->
+        <div class="results-error" *ngIf="activeTab.result.error">
+          <i class="pi pi-exclamation-triangle"></i>
+          <div class="error-content">
+            <h4>Query Execution Failed</h4>
+            <p>{{ activeTab.result.error }}</p>
+          </div>
+        </div>
 
-                      <!-- Pagination -->
-                      <div class="table-pagination" *ngIf="getTotalPages() > 1">
-                        <div class="pagination-info">
-                          <span
-                            >Page {{ currentPage + 1 }} of
-                            {{ getTotalPages() }}</span
-                          >
-                        </div>
-                        <div class="pagination-controls">
-                          <button
-                            class="pagination-btn"
-                            [disabled]="currentPage === 0"
-                            (click)="goToFirstPage()"
-                            title="First page"
-                          >
-                            <i class="pi pi-angle-double-left"></i>
-                          </button>
-                          <button
-                            class="pagination-btn"
-                            [disabled]="currentPage === 0"
-                            (click)="goToPreviousPage()"
-                            title="Previous page"
-                          >
-                            <i class="pi pi-angle-left"></i>
-                          </button>
+        <!-- Results Table -->
+        <div class="results-table-wrapper" *ngIf="!activeTab.result.error && activeTab.result.rows.length > 0">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th class="row-number-header">#</th>
+                <th *ngFor="let column of activeTab.result.columns">{{ column }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of activeTab.result.rows; let i = index">
+                <td class="row-number">{{ i + 1 }}</td>
+                <td *ngFor="let column of activeTab.result.columns" [title]="row[column]">
+                  {{ row[column] !== null && row[column] !== undefined ? row[column] : 'NULL' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-                          <div class="page-numbers">
-                            <button
-                              *ngFor="let page of getVisiblePageNumbers()"
-                              class="page-number-btn"
-                              [class.active]="page === currentPage"
-                              (click)="goToPage(page)"
-                            >
-                              {{ page + 1 }}
-                            </button>
-                          </div>
-
-                          <button
-                            class="pagination-btn"
-                            [disabled]="currentPage >= getTotalPages() - 1"
-                            (click)="goToNextPage()"
-                            title="Next page"
-                          >
-                            <i class="pi pi-angle-right"></i>
-                          </button>
-                          <button
-                            class="pagination-btn"
-                            [disabled]="currentPage >= getTotalPages() - 1"
-                            (click)="goToLastPage()"
-                            title="Last page"
-                          >
-                            <i class="pi pi-angle-double-right"></i>
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- Empty State -->
-                      <div
-                        class="empty-state"
-                        *ngIf="queryResults.length === 0"
-                      >
-                        <i class="pi pi-inbox empty-icon"></i>
-                        <h3>No results to display</h3>
-                        <p>Execute a query to see results</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Analytics View -->
-                  <div class="analytics-view" *ngIf="viewMode === 'analytics'">
-                    <!-- Two Column Layout -->
-                    <div class="analytics-layout">
-                      
-                      <!-- Left Panel - Chart Configuration -->
-                      <div class="chart-config-panel">
-                        <div class="config-header">
-                          <div class="header-content">
-                            <i class="pi pi-cog config-icon"></i>
-                            <div class="header-text">
-                              <h3>Chart Configuration</h3>
-                              <p>Configure your visualization settings</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="config-content" [formGroup]="chartForm">
-                          <!-- Chart Type Selection -->
-                          <div class="config-section">
-                            <div class="section-header">
-                              <i class="pi pi-chart-line section-icon"></i>
-                              <span class="section-title">Chart Type</span>
-                              <span class="required-indicator">*</span>
-                            </div>
-                            
-                            <div class="chart-type-grid">
-                              <div 
-                                *ngFor="let chartType of chartTypes" 
-                                class="chart-type-card"
-                                [class.selected]="chartForm.get('chartType')?.value === chartType.value"
-                                (click)="selectChartType(chartType)"
-                                [title]="chartType.description"
-                              >
-                                <i [class]="chartType.icon" class="chart-icon"></i>
-                                <span class="chart-name">{{ chartType.label }}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Data Configuration -->
-                          <div class="config-section" *ngIf="selectedChartType">
-                            <div class="section-header">
-                              <i class="pi pi-database section-icon"></i>
-                              <span class="section-title">Data Mapping</span>
-                              <span class="required-indicator">*</span>
-                            </div>
-
-                            <div class="data-fields">
-                              <div 
-                                *ngFor="let input of selectedChartType.inputs" 
-                                class="field-group"
-                              >
-                                <label class="field-label">
-                                  <i [class]="getFieldIcon(input.type)" class="field-icon"></i>
-                                  {{ input.label }}
-                                  <span *ngIf="input.required" class="required-star">*</span>
-                                </label>
-
-                                <!-- Single Selection -->
-                                <div *ngIf="!input.multiple" class="field-wrapper">
-                                  <p-dropdown
-                                    [options]="getOptionsForInput(input)"
-                                    [formControlName]="input.name"
-                                    optionLabel="label"
-                                    optionValue="value"
-                                    [filter]="true"
-                                    filterBy="label"
-                                    [style]="{ width: '100%' }"
-                                    [showClear]="!input.required"
-                                    [placeholder]="'Choose ' + input.label.toLowerCase() + '...'"
-                                    styleClass="custom-dropdown"
-                                  >
-                                    <ng-template let-column pTemplate="item">
-                                      <div class="column-option">
-                                        <div class="column-details">
-                                          <span class="column-name">{{ column.label }}</span>
-                                          <span class="column-type" [ngClass]="'type-' + column.type">
-                                            <i class="pi pi-tag"></i>
-                                            {{ column.type }}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </ng-template>
-                                  </p-dropdown>
-                                </div>
-
-                                <!-- Multiple Selection -->
-                                <div *ngIf="input.multiple" class="field-wrapper">
-                                  <p-multiSelect
-                                    [options]="getOptionsForInput(input)"
-                                    [ngModel]="getFormArrayValue(input.name)"
-                                    (ngModelChange)="updateFormArray(input.name, $event)"
-                                    optionLabel="label"
-                                    optionValue="value"
-                                    [filter]="true"
-                                    filterBy="label"
-                                    [style]="{ width: '100%' }"
-                                    [placeholder]="'Choose ' + input.label.toLowerCase() + '...'"
-                                    [showToggleAll]="false"
-                                    [maxSelectedLabels]="3"
-                                    styleClass="custom-multiselect"
-                                  >
-                                    <ng-template let-column pTemplate="item">
-                                      <div class="column-option">
-                                        <div class="column-details">
-                                          <span class="column-name">{{ column.label }}</span>
-                                          <span class="column-type" [ngClass]="'type-' + column.type">
-                                            <i class="pi pi-tag"></i>
-                                            {{ column.type }}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </ng-template>
-                                  </p-multiSelect>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Action Buttons -->
-                          <div class="config-actions" *ngIf="selectedChartType">
-                            <button
-                              pButton
-                              class="p-button-primary generate-btn"
-                              icon="pi pi-play"
-                              label="Generate Visualization"
-                              [loading]="isGeneratingChart"
-                              [disabled]="!canGenerateChart()"
-                              (click)="generateChart()"
-                            ></button>
-                            
-                            <button
-                              pButton
-                              class="p-button-outlined reset-btn"
-                              icon="pi pi-refresh"
-                              label="Reset"
-                              [disabled]="isGeneratingChart"
-                              (click)="resetChartConfig()"
-                            ></button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Right Panel - Chart Display -->
-                      <div class="chart-display-panel">
-                        <div class="display-header">
-                          <div class="header-content">
-                            <div class="header-left">
-                              <i class="pi pi-chart-bar display-icon"></i>
-                              <div class="header-text">
-                                <h3>Visualization</h3>
-                                <p>Your generated chart will appear here</p>
-                              </div>
-                            </div>
-                            <div class="header-actions" *ngIf="showChart && ngxChartData.length > 0">
-                              <button
-                                pButton
-                                class="p-button-text action-btn"
-                                icon="pi pi-expand"
-                                pTooltip="Fullscreen"
-                                (click)="openChartPopup()"
-                              ></button>
-                              <button
-                                pButton
-                                class="p-button-text action-btn"
-                                icon="pi pi-download"
-                                pTooltip="Export Chart"
-                                (click)="exportChart()"
-                              ></button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="display-content">
-                          <!-- Chart Container -->
-                          <div class="chart-wrapper" *ngIf="showChart && ngxChartData.length > 0 && !showChartPopup">
-                            <!-- Expand Button -->
-                            <button 
-                              pButton 
-                              class="expand-chart-btn p-button-rounded p-button-text"
-                              icon="pi pi-external-link"
-                              (click)="openChartPopup()"
-                              pTooltip="Expand Chart"
-                              tooltipPosition="left">
-                            </button>
-                            <div class="chart-visualization">
-                              <!-- Bar Charts -->
-                      <ngx-charts-bar-vertical
-                        *ngIf="selectedChartType?.value === 'bar-vertical'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [xAxis]="showXAxis"
-                        [yAxis]="showYAxis"
-                        [legend]="showLegend"
-                        [showXAxisLabel]="showXAxisLabel"
-                        [showYAxisLabel]="showYAxisLabel"
-                        [xAxisLabel]="xAxisLabel"
-                        [yAxisLabel]="yAxisLabel"
-                        [animations]="animations"
-                        [showGridLines]="showGridLines"
-                        [roundDomains]="roundDomains"
-                        [showDataLabel]="showDataLabel"
-                        [gradient]="gradient"
-                      >
-                      </ngx-charts-bar-vertical>
-
-                      <ngx-charts-bar-horizontal
-                        *ngIf="selectedChartType?.value === 'bar-horizontal'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [xAxis]="showXAxis"
-                        [yAxis]="showYAxis"
-                        [legend]="showLegend"
-                        [showXAxisLabel]="showXAxisLabel"
-                        [showYAxisLabel]="showYAxisLabel"
-                        [xAxisLabel]="yAxisLabel"
-                        [yAxisLabel]="xAxisLabel"
-                        [animations]="animations"
-                        [showGridLines]="showGridLines"
-                        [roundDomains]="roundDomains"
-                        [showDataLabel]="showDataLabel"
-                        [gradient]="gradient"
-                      >
-                      </ngx-charts-bar-horizontal>
-
-                      <ngx-charts-bar-vertical-2d
-                        *ngIf="selectedChartType?.value === 'bar-vertical-grouped'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [xAxis]="showXAxis"
-                        [yAxis]="showYAxis"
-                        [legend]="showLegend"
-                        [showXAxisLabel]="showXAxisLabel"
-                        [showYAxisLabel]="showYAxisLabel"
-                        [xAxisLabel]="xAxisLabel"
-                        [yAxisLabel]="yAxisLabel"
-                        [animations]="animations"
-                        [showGridLines]="showGridLines"
-                        [roundDomains]="roundDomains"
-                        [showDataLabel]="showDataLabel"
-                        [gradient]="gradient"
-                      >
-                      </ngx-charts-bar-vertical-2d>
-
-                      <!-- Line & Area Charts -->
-                      <ngx-charts-line-chart
-                        *ngIf="selectedChartType?.value === 'line-chart'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [xAxis]="showXAxis"
-                        [yAxis]="showYAxis"
-                        [legend]="showLegend"
-                        [showXAxisLabel]="showXAxisLabel"
-                        [showYAxisLabel]="showYAxisLabel"
-                        [xAxisLabel]="xAxisLabel"
-                        [yAxisLabel]="yAxisLabel"
-                        [animations]="animations"
-                        [showGridLines]="showGridLines"
-                        [roundDomains]="roundDomains"
-                      >
-                      </ngx-charts-line-chart>
-
-                      <ngx-charts-area-chart
-                        *ngIf="selectedChartType?.value === 'area-chart'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [xAxis]="showXAxis"
-                        [yAxis]="showYAxis"
-                        [legend]="showLegend"
-                        [showXAxisLabel]="showXAxisLabel"
-                        [showYAxisLabel]="showYAxisLabel"
-                        [xAxisLabel]="xAxisLabel"
-                        [yAxisLabel]="yAxisLabel"
-                        [animations]="animations"
-                        [showGridLines]="showGridLines"
-                        [roundDomains]="roundDomains"
-                      >
-                      </ngx-charts-area-chart>
-
-                      <!-- Pie Charts -->
-                      <ngx-charts-pie-chart
-                        *ngIf="selectedChartType?.value === 'pie-chart'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [legend]="showLegend"
-                        [animations]="animations"
-                        [labels]="true"
-                        [doughnut]="false"
-                      >
-                      </ngx-charts-pie-chart>
-
-                      <ngx-charts-advanced-pie-chart
-                        *ngIf="selectedChartType?.value === 'pie-chart-advanced'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [animations]="animations"
-                      >
-                      </ngx-charts-advanced-pie-chart>
-
-                      <ngx-charts-pie-grid
-                        *ngIf="selectedChartType?.value === 'pie-chart-grid'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [animations]="animations"
-                      >
-                      </ngx-charts-pie-grid>
-
-                      <!-- Other Charts -->
-                      <ngx-charts-bubble-chart
-                        *ngIf="selectedChartType?.value === 'bubble-chart'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [xAxis]="showXAxis"
-                        [yAxis]="showYAxis"
-                        [legend]="showLegend"
-                        [showXAxisLabel]="showXAxisLabel"
-                        [showYAxisLabel]="showYAxisLabel"
-                        [xAxisLabel]="xAxisLabel"
-                        [yAxisLabel]="yAxisLabel"
-                        [animations]="animations"
-                        [showGridLines]="showGridLines"
-                        [roundDomains]="roundDomains"
-                      >
-                      </ngx-charts-bubble-chart>
-
-                      <ngx-charts-heat-map
-                        *ngIf="selectedChartType?.value === 'heat-map'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [xAxis]="showXAxis"
-                        [yAxis]="showYAxis"
-                        [legend]="showLegend"
-                        [showXAxisLabel]="showXAxisLabel"
-                        [showYAxisLabel]="showYAxisLabel"
-                        [xAxisLabel]="xAxisLabel"
-                        [yAxisLabel]="yAxisLabel"
-                        [animations]="animations"
-                      >
-                      </ngx-charts-heat-map>
-
-                      <ngx-charts-tree-map
-                        *ngIf="selectedChartType?.value === 'tree-map'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [animations]="animations"
-                      >
-                      </ngx-charts-tree-map>
-
-                      <ngx-charts-number-card
-                        *ngIf="selectedChartType?.value === 'number-card'"
-                        [results]="ngxChartData"
-                        [view]="ngxChartView"
-                        [scheme]="ngxChartScheme"
-                        [animations]="animations"
-                      >
-                      </ngx-charts-number-card>
-
-                      <ngx-charts-gauge
-                        *ngIf="selectedChartType?.value === 'gauge'"
-                        [results]="ngxChartData"
-                        [view]="[400, 400]"
-                        [scheme]="ngxChartScheme"
-                        [animations]="animations"
-                        [legend]="false"
-                        [min]="0"
-                        [max]="100"
-                        [angleSpan]="240"
-                        [startAngle]="-120"
-                        [units]="'%'"
-                        [showAxis]="true"
-                      >
-                      </ngx-charts-gauge>
-
-                      <ngx-charts-linear-gauge
-                        *ngIf="selectedChartType?.value === 'linear-gauge'"
-                        [results]="ngxChartData"
-                        [view]="[700, 100]"
-                        [scheme]="ngxChartScheme"
-                        [animations]="animations"
-                        [min]="0"
-                        [max]="100"
-                        [units]="'units'"
-                      >
-                              </ngx-charts-linear-gauge>
-                            </div>
-                          </div>
-
-                          <!-- Popup Open Message -->
-                          <div class="popup-open-message" *ngIf="showChart && ngxChartData.length > 0 && showChartPopup">
-                            <div class="popup-message-content">
-                              <i class="pi pi-external-link popup-message-icon"></i>
-                              <h4>Chart in Popup View</h4>
-                              <p>Your chart is currently displayed in the popup window</p>
-                            </div>
-                          </div>
-
-                          <!-- Empty States -->
-                          <div class="empty-state" *ngIf="!queryResults.length">
-                            <div class="empty-content">
-                              <i class="pi pi-database empty-icon"></i>
-                              <h4>No Data Available</h4>
-                              <p>Execute a query first to generate visualizations</p>
-                              <div class="empty-actions">
-                                <button 
-                                  pButton 
-                                  class="p-button-outlined" 
-                                  icon="pi pi-arrow-left" 
-                                  label="Go to Table View"
-                                  (click)="viewMode = 'table'"
-                                ></button>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="empty-state" *ngIf="queryResults.length && !selectedChartType">
-                            <div class="empty-content">
-                              <i class="pi pi-chart-line empty-icon"></i>
-                              <h4>Select Chart Type</h4>
-                              <p>Choose a visualization type from the configuration panel</p>
-                              <div class="empty-tip">
-                                <i class="pi pi-lightbulb"></i>
-                                <span>Tip: Start with a simple bar or line chart for best results</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="empty-state" *ngIf="queryResults.length && selectedChartType && !showChart && !isGeneratingChart">
-                            <div class="empty-content">
-                              <i class="pi pi-sliders-h empty-icon"></i>
-                              <h4>Configure Data Mapping</h4>
-                              <p>Map your data columns to chart properties and generate visualization</p>
-                              <div class="config-preview" *ngIf="selectedChartType">
-                                <span class="preview-label">Selected: </span>
-                                <div class="preview-chip">
-                                  <i [class]="selectedChartType.icon"></i>
-                                  {{ selectedChartType.label }}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Loading State -->
-                          <div class="loading-state" *ngIf="isGeneratingChart">
-                            <div class="loading-content">
-                              <div class="loading-spinner">
-                                <i class="pi pi-spin pi-spinner"></i>
-                              </div>
-                              <h4>Generating Visualization</h4>
-                              <p>Processing your data and creating the chart...</p>
-                              <div class="loading-progress">
-                                <div class="progress-bar"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </as-split-area>
-          </as-split>
-        </as-split-area>
-      </as-split>
+        <!-- No Results Message -->
+        <div class="results-empty" *ngIf="!activeTab.result.error && activeTab.result.rows.length === 0">
+          <i class="pi pi-inbox"></i>
+          <p>Query executed successfully but returned no rows.</p>
+        </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-
-<!-- Chart Popup Dialog -->
-<p-dialog 
-  header="Chart Visualization" 
-  [(visible)]="showChartPopup"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="true"
-  [maximizable]="false"
-  [style]="{width: '90vw', height: '80vh', 'min-width': '800px', 'min-height': '600px'}"
-  styleClass="chart-popup-dialog"
-  (onHide)="closeChartPopup()">
-  
-  <div class="chart-popup-content">
-    <!-- Left Panel - Chart Options Only -->
-    <div class="popup-chart-config-panel">
-      <div class="config-content">
-        <!-- Chart Appearance Options -->
-        <div class="config-section" *ngIf="selectedChartType">
-          <label class="config-label">Chart Options</label>
-          <div class="chart-options">
-            
-            <!-- Axis Options - Only for charts with axes -->
-            <div class="option-group" *ngIf="chartHasAxes()">
-              <h5 class="option-group-title">Axes</h5>
-              <div class="option-item">
-                <p-checkbox
-                  [(ngModel)]="showXAxis"
-                  [binary]="true"
-                  inputId="popup-show-x-axis"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-show-x-axis">Show X-Axis</label>
-              </div>
-              <div class="option-item">
-                <p-checkbox
-                  [(ngModel)]="showYAxis"
-                  [binary]="true"
-                  inputId="popup-show-y-axis"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-show-y-axis">Show Y-Axis</label>
-              </div>
-              <div class="option-item">
-                <p-checkbox
-                  [(ngModel)]="showXAxisLabel"
-                  [binary]="true"
-                  inputId="popup-show-x-axis-label"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-show-x-axis-label">Show X-Axis Label</label>
-              </div>
-              <div class="option-item">
-                <p-checkbox
-                  [(ngModel)]="showYAxisLabel"
-                  [binary]="true"
-                  inputId="popup-show-y-axis-label"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-show-y-axis-label">Show Y-Axis Label</label>
-              </div>
-            </div>
-
-            <!-- Axis Labels - Only for charts with axes -->
-            <div class="option-group" *ngIf="chartHasAxes()">
-              <h5 class="option-group-title">Axis Labels</h5>
-              <div class="input-item">
-                <label class="input-label">X-Axis Label</label>
-                <input 
-                  pInputText 
-                  [(ngModel)]="customXAxisLabel" 
-                  placeholder="Enter X-axis label"
-                  (ngModelChange)="onXAxisLabelChange($event)"
-                  class="chart-input"
-                />
-              </div>
-              <div class="input-item">
-                <label class="input-label">Y-Axis Label</label>
-                <input 
-                  pInputText 
-                  [(ngModel)]="customYAxisLabel" 
-                  placeholder="Enter Y-axis label"
-                  (ngModelChange)="onYAxisLabelChange($event)"
-                  class="chart-input"
-                />
-              </div>
-            </div>
-
-            <!-- Legend Options - Only for charts that support legends -->
-            <div class="option-group" *ngIf="chartSupportsLegend()">
-              <h5 class="option-group-title">Legend</h5>
-              <div class="option-item">
-                <p-checkbox
-                  [(ngModel)]="showLegend"
-                  [binary]="true"
-                  inputId="popup-show-legend"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-show-legend">Show Legend</label>
-              </div>
-              <div class="input-item" *ngIf="showLegend">
-                <label class="input-label">Legend Position</label>
-                <p-dropdown
-                  [(ngModel)]="legendPosition"
-                  [options]="[
-                    {label: 'Below', value: 'below'},
-                    {label: 'Right', value: 'right'}
-                  ]"
-                  optionLabel="label"
-                  optionValue="value"
-                  (onChange)="onAppearanceChange()"
-                  styleClass="chart-dropdown"
-                ></p-dropdown>
-              </div>
-              <div class="option-item" *ngIf="showLegend">
-                <p-checkbox
-                  [(ngModel)]="showLegendTitle"
-                  [binary]="true"
-                  inputId="popup-show-legend-title"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-show-legend-title">Show Legend Title</label>
-                <small class="legend-note">*Legend shows series names from data</small>
-              </div>
-            </div>
-
-            <!-- Display Options -->
-            <div class="option-group">
-              <h5 class="option-group-title">Display</h5>
-              <!-- Grid Lines - Only for charts with axes -->
-              <div class="option-item" *ngIf="chartHasGridLines()">
-                <p-checkbox
-                  [(ngModel)]="showGridLines"
-                  [binary]="true"
-                  inputId="popup-show-grid"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-show-grid">Show Grid Lines</label>
-              </div>
-              <!-- Gradient - Only for charts that support it -->
-              <div class="option-item" *ngIf="chartSupportsGradient()">
-                <p-checkbox
-                  [(ngModel)]="gradient"
-                  [binary]="true"
-                  inputId="popup-gradient"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-gradient">Gradient Fill</label>
-              </div>
-              <!-- Data Labels - Only for charts that support it -->
-              <div class="option-item" *ngIf="chartSupportsDataLabels()">
-                <p-checkbox
-                  [(ngModel)]="showDataLabel"
-                  [binary]="true"
-                  inputId="popup-show-data-label"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-show-data-label">Show Data Labels</label>
-              </div>
-              <!-- Round Domains - Only for charts with axes -->
-              <div class="option-item" *ngIf="chartHasAxes()">
-                <p-checkbox
-                  [(ngModel)]="roundDomains"
-                  [binary]="true"
-                  inputId="popup-round-domains"
-                  (onChange)="updateChartData()"
-                ></p-checkbox>
-                <label for="popup-round-domains">Round Domains</label>
-              </div>
-              <!-- Animations - Available for all charts -->
-              <div class="option-item">
-                <p-checkbox
-                  [(ngModel)]="animations"
-                  [binary]="true"
-                  inputId="popup-animations"
-                  (onChange)="onAppearanceChange()"
-                ></p-checkbox>
-                <label for="popup-animations">Animations</label>
-              </div>
-            </div>
-
-            <!-- Chart Theme -->
-            <div class="option-group">
-              <h5 class="option-group-title">Theme</h5>
-              <div class="input-item">
-                <label class="input-label">Color Theme</label>
-                <p-dropdown
-                  [(ngModel)]="selectedChartTheme"
-                  [options]="chartThemes"
-                  optionLabel="label"
-                  optionValue="name"
-                  (onChange)="onChartThemeChange($event.value)"
-                  styleClass="chart-dropdown"
-                >
-                  <ng-template let-theme pTemplate="item">
-                    <div class="theme-option">
-                      <div class="theme-colors">
-                        <span 
-                          *ngFor="let color of theme.domain.slice(0, 5)" 
-                          class="color-preview"
-                          [style.background-color]="color">
-                        </span>
-                      </div>
-                      <span class="theme-name">{{ theme.label }}</span>
-                    </div>
-                  </ng-template>
-                  <ng-template let-theme pTemplate="selectedItem">
-                    <div class="theme-option selected">
-                      <div class="theme-colors">
-                        <span 
-                          *ngFor="let color of theme.domain.slice(0, 5)" 
-                          class="color-preview"
-                          [style.background-color]="color">
-                        </span>
-                      </div>
-                      <span class="theme-name">{{ theme.label }}</span>
-                    </div>
-                  </ng-template>
-                </p-dropdown>
-              </div>
-            </div>
-
-
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Panel - Chart Display (larger) -->
-    <div class="popup-chart-display-panel">
-      <div class="popup-chart-container">
-        <div class="popup-chart-wrapper" *ngIf="showChart && ngxChartData.length > 0">
-          <div class="popup-chart-visualization">
-            <!-- All chart types (same as Analytics) -->
-            <!-- Bar Charts -->
-            <ngx-charts-bar-vertical
-              *ngIf="selectedChartType?.value === 'bar-vertical'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="showLegend"
-              [showXAxisLabel]="showXAxisLabel"
-              [showYAxisLabel]="showYAxisLabel"
-              [xAxisLabel]="xAxisLabel"
-              [yAxisLabel]="yAxisLabel"
-              [animations]="animations"
-              [showGridLines]="showGridLines"
-              [roundDomains]="roundDomains"
-              [showDataLabel]="showDataLabel"
-              [gradient]="gradient">
-            </ngx-charts-bar-vertical>
-
-            <ngx-charts-bar-horizontal
-              *ngIf="selectedChartType?.value === 'bar-horizontal'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="showLegend"
-              [showXAxisLabel]="showXAxisLabel"
-              [showYAxisLabel]="showYAxisLabel"
-              [xAxisLabel]="yAxisLabel"
-              [yAxisLabel]="xAxisLabel"
-              [animations]="animations"
-              [showGridLines]="showGridLines"
-              [roundDomains]="roundDomains"
-              [showDataLabel]="showDataLabel"
-              [gradient]="gradient">
-            </ngx-charts-bar-horizontal>
-
-            <ngx-charts-bar-vertical-2d
-              *ngIf="selectedChartType?.value === 'bar-vertical-grouped'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="showLegend"
-              [showXAxisLabel]="showXAxisLabel"
-              [showYAxisLabel]="showYAxisLabel"
-              [xAxisLabel]="xAxisLabel"
-              [yAxisLabel]="yAxisLabel"
-              [animations]="animations"
-              [showGridLines]="showGridLines"
-              [roundDomains]="roundDomains"
-              [showDataLabel]="showDataLabel"
-              [gradient]="gradient">
-            </ngx-charts-bar-vertical-2d>
-
-            <!-- Line & Area Charts -->
-            <ngx-charts-line-chart
-              *ngIf="selectedChartType?.value === 'line-chart'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="showLegend"
-              [showXAxisLabel]="showXAxisLabel"
-              [showYAxisLabel]="showYAxisLabel"
-              [xAxisLabel]="xAxisLabel"
-              [yAxisLabel]="yAxisLabel"
-              [animations]="animations"
-              [showGridLines]="showGridLines"
-              [roundDomains]="roundDomains"
-              [gradient]="gradient">
-            </ngx-charts-line-chart>
-
-            <ngx-charts-area-chart
-              *ngIf="selectedChartType?.value === 'area-chart'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="showLegend"
-              [showXAxisLabel]="showXAxisLabel"
-              [showYAxisLabel]="showYAxisLabel"
-              [xAxisLabel]="xAxisLabel"
-              [yAxisLabel]="yAxisLabel"
-              [animations]="animations"
-              [showGridLines]="showGridLines"
-              [roundDomains]="roundDomains"
-              [gradient]="gradient">
-            </ngx-charts-area-chart>
-
-            <!-- Pie Charts -->
-            <ngx-charts-pie-chart
-              *ngIf="selectedChartType?.value === 'pie-chart'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [legend]="showLegend"
-              [animations]="animations"
-              [labels]="true"
-              [doughnut]="false">
-            </ngx-charts-pie-chart>
-
-            <ngx-charts-advanced-pie-chart
-              *ngIf="selectedChartType?.value === 'pie-chart-advanced'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [animations]="animations">
-            </ngx-charts-advanced-pie-chart>
-
-            <ngx-charts-pie-grid
-              *ngIf="selectedChartType?.value === 'pie-chart-grid'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [animations]="animations">
-            </ngx-charts-pie-grid>
-
-            <!-- Other Charts -->
-            <ngx-charts-bubble-chart
-              *ngIf="selectedChartType?.value === 'bubble-chart'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="showLegend"
-              [showXAxisLabel]="showXAxisLabel"
-              [showYAxisLabel]="showYAxisLabel"
-              [xAxisLabel]="xAxisLabel"
-              [yAxisLabel]="yAxisLabel"
-              [animations]="animations"
-              [showGridLines]="showGridLines"
-              [roundDomains]="roundDomains">
-            </ngx-charts-bubble-chart>
-
-            <ngx-charts-heat-map
-              *ngIf="selectedChartType?.value === 'heat-map'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="showLegend"
-              [showXAxisLabel]="showXAxisLabel"
-              [showYAxisLabel]="showYAxisLabel"
-              [xAxisLabel]="xAxisLabel"
-              [yAxisLabel]="yAxisLabel"
-              [animations]="animations">
-            </ngx-charts-heat-map>
-
-            <ngx-charts-tree-map
-              *ngIf="selectedChartType?.value === 'tree-map'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [animations]="animations">
-            </ngx-charts-tree-map>
-
-            <ngx-charts-number-card
-              *ngIf="selectedChartType?.value === 'number-card'"
-              [results]="ngxChartData"
-              [view]="ngxChartView"
-              [scheme]="ngxChartScheme"
-              [animations]="animations">
-            </ngx-charts-number-card>
-
-            <ngx-charts-gauge
-              *ngIf="selectedChartType?.value === 'gauge'"
-              [results]="ngxChartData"
-              [view]="[500, 500]"
-              [scheme]="ngxChartScheme"
-              [animations]="animations"
-              [legend]="false"
-              [min]="0"
-              [max]="100"
-              [angleSpan]="240"
-              [startAngle]="-120"
-              [units]="'%'"
-              [showAxis]="true">
-            </ngx-charts-gauge>
-
-            <ngx-charts-linear-gauge
-              *ngIf="selectedChartType?.value === 'linear-gauge'"
-              [results]="ngxChartData"
-              [view]="[800, 150]"
-              [scheme]="ngxChartScheme"
-              [animations]="animations"
-              [min]="0"
-              [max]="100"
-              [units]="'units'">
-            </ngx-charts-linear-gauge>
-          </div>
-        </div>
-
-        <!-- Empty state for popup -->
-        <div class="popup-empty-state" *ngIf="!showChart || !ngxChartData.length">
-          <div class="empty-content">
-            <i class="pi pi-chart-line empty-icon"></i>
-            <h4>Configure Chart</h4>
-            <p>Select chart type and configure data mapping to generate visualization</p>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- Context Menu -->
+<div class="context-menu" 
+     *ngIf="showContextMenu" 
+     [style.left.px]="contextMenuPosition.x" 
+     [style.top.px]="contextMenuPosition.y">
+  <div class="context-menu-item" 
+       *ngFor="let item of contextMenuItems"
+       (click)="item.command()"
+       [class.disabled]="item.disabled">
+    <i class="pi" [ngClass]="item.icon"></i>
+    <span>{{ item.label }}</span>
   </div>
-</p-dialog>
+</div>
 
 <!-- Tab Context Menu -->
-<div
-  class="tab-context-menu"
-  *ngIf="showTabContextMenu"
-  [style.left.px]="contextMenuPosition.x"
-  [style.top.px]="contextMenuPosition.y"
-  (click)="$event.stopPropagation()"
->
-  <div
-    class="context-menu-item"
-    (click)="
-      selectedTabForContext && closeTabFromContext(selectedTabForContext.id)
-    "
-  >
-    <i class="pi pi-times"></i>
-    <span>Close This Tab</span>
-  </div>
-  <div
-    class="context-menu-item"
-    (click)="selectedTabForContext && closeOtherTabs(selectedTabForContext.id)"
-    [class.disabled]="tabs.length <= 1"
-  >
-    <i class="pi pi-minus-circle"></i>
-    <span>Close Others</span>
-  </div>
-  <div
-    class="context-menu-item"
-    (click)="closeTabsToRight(selectedTabIndexForContext)"
-    [class.disabled]="!hasTabsToRight(selectedTabIndexForContext)"
-  >
-    <i class="pi pi-angle-right"></i>
-    <span>Close All to Right</span>
-  </div>
-  <div
-    class="context-menu-item"
-    (click)="closeTabsToLeft(selectedTabIndexForContext)"
-    [class.disabled]="!hasTabsToLeft(selectedTabIndexForContext)"
-  >
-    <i class="pi pi-angle-left"></i>
-    <span>Close All to Left</span>
-  </div>
-  <div class="context-menu-separator"></div>
-  <div class="context-menu-item" (click)="renameTabFromContextMenu()">
-    <i class="pi pi-pencil"></i>
-    <span>Rename Tab</span>
-  </div>
-  <div class="context-menu-item" (click)="togglePinTabFromContextMenu()">
-    <i
-      class="pi"
-      [class.pi-bookmark]="!selectedTabForContext?.isPinned"
-      [class.pi-bookmark-fill]="selectedTabForContext?.isPinned"
-    ></i>
-    <span>{{ selectedTabForContext?.isPinned ? 'Unpin Tab' : 'Pin Tab' }}</span>
-  </div>
-  <div class="context-menu-separator"></div>
-  <div
-    class="context-menu-item"
-    (click)="closeAllTabs()"
-    [class.disabled]="tabs.length <= 1"
-  >
-    <i class="pi pi-times-circle"></i>
-    <span>Close All Tabs</span>
-  </div>
-</div>
-
-<!-- Backdrop to close context menu -->
-<div
-  class="context-menu-backdrop"
-  *ngIf="showTabContextMenu"
-  (click)="hideTabContextMenu()"
-></div>
-
-<!-- Database Menu -->
-<p-menu
-  #databaseMenu
-  [model]="databaseMenuItems"
-  [popup]="true"
-  styleClass="database-menu"
-  (mouseenter)="cancelMenuHide('database')"
-  (mouseleave)="hideMenuDelayed('database')"
-></p-menu>
-
-<!-- Save Menu -->
-<p-menu
-  #saveMenu
-  [model]="saveMenuItems"
-  [popup]="true"
-  styleClass="database-menu"
-  (mouseenter)="cancelMenuHide('save')"
-  (mouseleave)="hideMenuDelayed('save')"
-></p-menu>
-
-<!-- Auto Save Menu -->
-<p-menu
-  #autoSaveMenu
-  [model]="autoSaveMenuItems"
-  [popup]="true"
-  styleClass="database-menu"
-  (mouseenter)="cancelMenuHide('autoSave')"
-  (mouseleave)="hideMenuDelayed('autoSave')"
-></p-menu>
-
-<!-- Database Context Menu -->
-<div
-  class="database-context-menu"
-  *ngIf="showDatabaseContextMenu"
-  [style.left.px]="databaseContextMenuPosition.x"
-  [style.top.px]="databaseContextMenuPosition.y"
-  (click)="$event.stopPropagation()"
->
-  <div class="context-menu-item" (click)="addNewScriptFromContextMenu()">
-    <i class="pi pi-plus"></i>
-    <span>New Script</span>
-  </div>
-  <div class="context-menu-item" (click)="refreshDatabaseFromContextMenu()">
-    <i class="pi pi-refresh"></i>
-    <span>Refresh</span>
-  </div>
-</div>
-
-<!-- Backdrop to close database context menu -->
-<div
-  class="context-menu-backdrop"
-  *ngIf="showDatabaseContextMenu"
-  (click)="hideDatabaseContextMenu()"
-></div>
-
-<!-- Duplicate Name Confirmation Dialog -->
-<div class="confirmation-popup" *ngIf="showDuplicateConfirm">
-  <div class="popup-content">
-    <h3>Duplicacy Found</h3>
-    <p>Script name already exists.</p>
-    <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDuplicate()">OK</button>
-    </div>
+<div class="context-menu-overlay" 
+     *ngIf="showTabContextMenu" 
+     (click)="closeTabContextMenu()"></div>
+<div class="context-menu" 
+     *ngIf="showTabContextMenu" 
+     [style.left.px]="tabContextMenuPosition.x" 
+     [style.top.px]="tabContextMenuPosition.y">
+  <div class="context-menu-item" 
+       *ngFor="let item of tabContextMenuItems"
+       (click)="item.command()"
+       [class.disabled]="item.disabled">
+    <i class="pi" [ngClass]="item.icon"></i>
+    <span>{{ item.label }}</span>
   </div>
 </div>
