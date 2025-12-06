@@ -9,7 +9,10 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
+import { ROLES } from 'src/app/constants/user.constant';
+import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from '../../../database/services/database.service';
+import { OrganisationService } from '../../../organisation/services/organisation.service';
 import {
   EDITOR_LOADING_CONFIG,
   MONACO_EDITOR_OPTIONS
@@ -17,9 +20,9 @@ import {
 import { DatabaseSchemaHelper } from '../../helpers/database-schema.helper';
 import {
   DatabaseSchema,
-  DummyDataHelper,
   QueryResult
 } from '../../helpers/dummy-data.helper';
+import { EditorCustomizationHelper } from '../../helpers/editor-customization.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import { TabManagementHelper } from '../../helpers/tab-management.helper';
 import { ContextMenuItem, ContextMenuPosition, QueryTab } from '../../models/query-tab.model';
@@ -36,7 +39,7 @@ declare const window: any;
   styleUrls: ['./run-query.component.scss'],
 })
 export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
-  @ViewChild('editorContainer', { static: false }) editorContainer!: ElementRef;
+  // Removed ViewChild as we now use dynamic containers per tab
   @Input() databaseId?: number;
   @Input() orgId?: number;
   @Input() initialQuery?: string;
@@ -72,7 +75,7 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
   showContextMenu = false;
   contextMenuPosition: ContextMenuPosition = { x: 0, y: 0 };
   contextMenuItems: ContextMenuItem[] = [];
-  contextMenuDatabase: string | null = null;
+  contextMenuDatabase: any | null = null;
   
   // Tab Context Menu
   showTabContextMenu = false;
@@ -90,6 +93,19 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
   private completionProviderDisposable: any = null;
   private hoverProviderDisposable: any = null;
 
+  // Organisation Management
+  organisations: any[] = [];
+  selectedOrg: any = {};
+  userRole: string = '';
+  showOrganisationDropdown: boolean = false;
+  availableDatabases: any[] = [];
+  selectedDatabaseObj: any = null;
+  
+  // Database Schema Management
+  databaseSchemas: { [dbId: string]: DatabaseSchema } = {};
+  loadingDatabases: { [dbId: string]: boolean } = {};
+  isLoadingDatabases: boolean = false;
+
   get filteredDatabases(): DatabaseSchema[] {
     return DatabaseSchemaHelper.filterDatabases(
       this.databases,
@@ -99,30 +115,144 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     );
   }
 
+  get filteredAvailableDatabases(): any[] {
+    if (!this.schemaSearchText) {
+      return this.availableDatabases;
+    }
+    const search = this.schemaSearchText.toLowerCase();
+    return this.availableDatabases.filter(db => 
+      db.name.toLowerCase().includes(search)
+    );
+  }
+
   constructor(
     private queryService: QueryService,
     private databaseService: DatabaseService,
-    private monacoIntelliSenseService: MonacoIntelliSenseService
-  ) {}
+    private monacoIntelliSenseService: MonacoIntelliSenseService,
+    private organisationService: OrganisationService,
+    private globalService: GlobalService
+  ) {
+    this.userRole = this.globalService.getTokenDetails('role') || '';
+    this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  }
 
   ngOnInit(): void {
-    // Load database schema for IntelliSense
-    if (this.databaseId && this.orgId) {
-      this.loadDatabaseSchema();
+    // Load organisations if super admin
+    if (this.showOrganisationDropdown) {
+      this.loadOrganisations();
     } else {
-      // Load dummy schema for testing/demo
-      this.loadDummySchema();
+      this.selectedOrg = {
+        id: this.globalService.getTokenDetails('organisationId')
+      };
+      this.loadDatabases();
+      this.initializeComponent();
     }
-    
+  }
+
+  private initializeComponent(): void {
     // Setup theme monitoring
     this.setupThemeObserver();
-    
-    // Load dummy results for testing
-    this.loadDummyResults();
 
     // Close context menus on click outside
     document.addEventListener('click', this.closeContextMenu.bind(this));
     document.addEventListener('click', this.closeTabContextMenu.bind(this));
+  }
+
+  loadOrganisations(): void {
+    const params = {
+      pageNumber: 1,
+      limit: 100,
+    };
+
+    this.organisationService.listOrganisation(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.organisations = [...response.data.orgs];
+        if (this.organisations.length > 0) {
+          this.selectedOrg = this.organisations[0];
+          this.loadDatabases();
+          this.initializeComponent();
+        }
+      }
+    });
+  }
+
+  loadDatabases(): void {
+    if (!this.selectedOrg || !this.selectedOrg.id) return;
+
+    this.isLoadingDatabases = true;
+    const params = {
+      orgId: this.selectedOrg.id,
+      pageNumber: 1,
+      limit: 100,
+    };
+
+    this.databaseService.listDatabase(params).then(response => {
+      this.isLoadingDatabases = false;
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.availableDatabases = response.data || [];
+      }
+    }).catch(() => {
+      this.isLoadingDatabases = false;
+    });
+  }
+
+  refreshDatabases(): void {
+    // Collapse all expanded databases
+    this.expandedDatabases = {};
+    this.expandedSchemas = {};
+    this.expandedTables = {};
+    
+    // Clear all cached schema data
+    this.databaseSchemas = {};
+    this.loadingDatabases = {};
+    
+    // Clear the databases array for IntelliSense
+    this.databases = [];
+    
+    // Reload the database list
+    this.loadDatabases();
+  }
+
+  refreshSingleDatabase(dbId: number): void {
+    if (!dbId) return;
+
+    // Clear cached schema for this specific database
+    delete this.databaseSchemas[dbId];
+    delete this.loadingDatabases[dbId];
+    
+    // Collapse this database's tree (schemas and tables)
+    Object.keys(this.expandedSchemas).forEach(key => {
+      if (key.startsWith(`${dbId}.`)) {
+        delete this.expandedSchemas[key];
+      }
+    });
+    Object.keys(this.expandedTables).forEach(key => {
+      if (key.startsWith(`${dbId}.`)) {
+        delete this.expandedTables[key];
+      }
+    });
+    
+    // Collapse the database itself
+    delete this.expandedDatabases[dbId];
+    
+    // Remove from IntelliSense databases array
+    this.databases = this.databases.filter(db => db.name !== dbId.toString());
+    
+    // Re-fetch schema for this database
+    this.loadDatabaseSchema(dbId);
+  }
+
+  onOrgChange(event: any): void {
+    this.selectedOrg = event.value;
+    this.orgId = this.selectedOrg.id;
+    
+    // Clear existing data
+    this.availableDatabases = [];
+    this.databaseSchemas = {};
+    this.expandedDatabases = {};
+    
+    // Reload databases for the new organisation
+    this.loadDatabases();
   }
 
   /**
@@ -175,11 +305,6 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     // Update editor content if initialQuery changes
     if (changes['initialQuery'] && this.editor && changes['initialQuery'].currentValue) {
       this.editor.setValue(changes['initialQuery'].currentValue);
-    }
-
-    // Reload schema if database changes
-    if (changes['databaseId'] && this.databaseId && this.orgId) {
-      this.loadDatabaseSchema();
     }
   }
 
@@ -235,10 +360,6 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     
     const checkMonaco = setInterval(() => {
       attempts++;
-      
-      // Log every 20 attempts (every second) to avoid console spam
-      if (attempts % 20 === 0) {
-      }
 
       if (typeof monaco !== 'undefined') {
         clearInterval(checkMonaco);
@@ -284,78 +405,73 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
   }
 
   private initMonaco(): void {
-    if (!this.editorContainer || !this.editorContainer.nativeElement) {
+    const activeTab = this.getActiveTab();
+    if (!activeTab) {
       this.isLoadingEditor = false;
-      // Retry after a short delay
-      setTimeout(() => {
-        if (this.editorContainer && this.editorContainer.nativeElement) {
-          this.isLoadingEditor = true;
-          this.initMonaco();
-        }
-      }, 100);
       return;
     }
 
-    try {
-      const activeTab = this.getActiveTab();
-      if (!activeTab) return;
-
-      // Dispose previous editor if exists
-      if (activeTab.editor) {
-        activeTab.editor.dispose();
+    // Wait for the DOM to be ready
+    setTimeout(() => {
+      const container = document.getElementById('editor-' + activeTab.id);
+      if (!container) {
+        this.isLoadingEditor = false;
+        return;
       }
 
-      // Create Monaco Editor instance for active tab
-      activeTab.editor = monaco.editor.create(this.editorContainer.nativeElement, {
-        ...MONACO_EDITOR_OPTIONS,
-        value: this.initialQuery || activeTab.query,
-        theme: this.currentTheme
-      });
-
-      // Keep reference for backward compatibility
-      this.editor = activeTab.editor;
-
-      // Prevent arrow keys from moving cursor when suggestions are visible
-      activeTab.editor.onKeyDown((e: any) => {
-        const suggestWidget = (activeTab.editor as any)._contentWidgets['editor.widget.suggestWidget'];
-        const isSuggestWidgetVisible = suggestWidget && suggestWidget.widget && suggestWidget.widget._isVisible;
-        
-        // If suggestions are visible and arrow keys are pressed, let Monaco handle it
-        if (isSuggestWidgetVisible && (e.keyCode === monaco.KeyCode.UpArrow || e.keyCode === monaco.KeyCode.DownArrow)) {
-          // Monaco will handle navigation, do nothing
-          return;
-        }
-      });
-
-      // Focus the editor to ensure keyboard events work
-      setTimeout(() => {
+      try {
+        // Dispose previous editor if exists
         if (activeTab.editor) {
-          activeTab.editor.focus();
+          activeTab.editor.dispose();
         }
-      }, 100);
 
-      // Listen to content changes
-      activeTab.editor.onDidChangeModelContent(() => {
-        activeTab.query = activeTab.editor.getValue();
-        this.currentQuery = activeTab.query; // Keep for backward compatibility
-      });
+        // Create Monaco Editor instance for active tab
+        activeTab.editor = monaco.editor.create(container, {
+          ...MONACO_EDITOR_OPTIONS,
+          value: this.initialQuery || activeTab.query,
+          theme: this.currentTheme
+        });
 
-      // Register IntelliSense only once
-      this.registerIntelliSenseProviders();
+        // Keep reference for backward compatibility
+        this.editor = activeTab.editor;
 
-      // Add keyboard shortcuts via service
-      this.monacoIntelliSenseService.registerKeyboardShortcuts(activeTab.editor, () => this.executeQuery());
+        // Setup keyboard handlers
+        EditorCustomizationHelper.setupKeyboardHandlers(activeTab.editor);
 
-      this.isLoadingEditor = false;
-    } catch (error) {
-      this.isLoadingEditor = false;
-    }
+        // Focus the editor
+        EditorCustomizationHelper.focusEditor(activeTab.editor);
+
+        // Setup content change listener
+        EditorCustomizationHelper.setupContentChangeListener(activeTab.editor, (value) => {
+          activeTab.query = value;
+          this.currentQuery = value; // Keep for backward compatibility
+        });
+
+        // Register IntelliSense only once
+        this.registerIntelliSenseProviders();
+
+        // Add keyboard shortcuts via service
+        this.monacoIntelliSenseService.registerKeyboardShortcuts(activeTab.editor, () => this.executeQuery());
+
+        // Customize context menu for SQL editor
+        EditorCustomizationHelper.customizeEditorContextMenu(
+          activeTab.editor,
+          () => this.executeCompleteQuery(),
+          (selectedText: string) => this.executeSelectedQuery(selectedText)
+        );
+
+        this.isLoadingEditor = false;
+      } catch (error) {
+        this.isLoadingEditor = false;
+      }
+    }, 100);
   }
 
   /**
    * Register IntelliSense providers only once to avoid duplicates
    */
   private registerIntelliSenseProviders(): void {
+    
     // Dispose previous providers if they exist
     if (this.completionProviderDisposable) {
       this.completionProviderDisposable.dispose();
@@ -366,38 +482,102 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
 
     // Register new providers and store disposables
     const activeTab = this.getActiveTab();
-    if (activeTab && activeTab.editor) {
+    if (activeTab && activeTab.editor) { 
       this.completionProviderDisposable = this.monacoIntelliSenseService.registerSQLCompletions(this.databases, activeTab.editor);
-      this.hoverProviderDisposable = this.monacoIntelliSenseService.registerHoverProvider(this.databases);
+      this.hoverProviderDisposable = this.monacoIntelliSenseService.registerHoverProvider(this.databases); 
     }
   }
 
-  private async loadDatabaseSchema(): Promise<void> {
-    if (!this.databaseId || !this.orgId) return;
+  private async loadDatabaseSchema(dbId: number): Promise<void> {
+    if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
 
-    try {
-      // Use the getDatabaseStructure method from QueryService
-      this.queryService.getDatabaseStructure(this.databaseId, this.orgId).subscribe({
-        next: (response: any) => {
-          this.databases = SchemaTransformerHelper.transformSchemaResponse(response);
-          
-          // Re-register completions with new schema
-          this.registerIntelliSenseProviders();
-        },
-        error: (error: any) => {
-        }
-      });
-    } catch (error) {
-    }
+    this.loadingDatabases[dbId] = true;
+
+    return new Promise((resolve, reject) => {
+      try {
+        this.queryService.getDatabaseStructure(dbId, this.selectedOrg.id).subscribe({
+          next: (response: any) => {
+            const schemaData = SchemaTransformerHelper.transformSchemaResponse(response);
+            
+            // Store schema data by database ID
+            if (schemaData.length > 0) {
+              this.databaseSchemas[dbId] = schemaData[0];
+            }
+            
+            // Update databases array for IntelliSense
+            this.databases = Object.values(this.databaseSchemas);
+            
+            // Re-register completions with new schema
+            this.registerIntelliSenseProviders();
+            
+            this.loadingDatabases[dbId] = false;
+            resolve();
+          },
+          error: (error: any) => {
+            this.loadingDatabases[dbId] = false;
+            reject(error);
+          }
+        });
+      } catch (error) {
+        this.loadingDatabases[dbId] = false;
+        reject(error);
+      }
+    });
   }
 
 
 
+  /**
+   * Execute query - Smart execution based on selection
+   * If text is selected, runs selected SQL
+   * If no selection, runs current statement at cursor
+   */
   executeQuery(): void {
+    const activeTab = this.getActiveTab();
+    if (!activeTab || !activeTab.editor) return;
+
+    const selection = activeTab.editor.getSelection();
+    const hasSelection = selection && !selection.isEmpty();
+    
+    if (hasSelection) {
+      // Execute selected text
+      const selectedText = activeTab.editor.getModel().getValueInRange(selection);
+      if (selectedText.trim()) {
+        this.executeSelectedQuery(selectedText);
+        return;
+      }
+    }
+    
+    // No selection, execute current statement at cursor
+    const currentStatement = EditorCustomizationHelper.getCurrentStatement(activeTab.editor);
+    if (currentStatement) {
+      this.executeSelectedQuery(currentStatement);
+    } else {
+      // Fallback to complete query
+      this.executeCompleteQuery();
+    }
+  }
+
+  /**
+   * Execute complete SQL query from editor
+   */
+  executeCompleteQuery(): void {
     const activeTab = this.getActiveTab();
     if (!activeTab) return;
 
     this.executeQueryForTab(activeTab);
+  }
+
+  /**
+   * Execute selected SQL text from editor
+   * @param selectedText The selected SQL text to execute
+   */
+  executeSelectedQuery(selectedText: string): void {
+    const activeTab = this.getActiveTab();
+    if (!activeTab) return;
+    
+    // Execute the selected query directly
+    this.executeQueryForTab(activeTab, selectedText);
   }
 
 
@@ -413,7 +593,6 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     if (!activeTab) return;
 
     // TODO: Implement save to database
-    console.log('Save script to database:', activeTab.title);
   }
 
   exportCurrentScript(): void {
@@ -434,6 +613,13 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     window.URL.revokeObjectURL(url);
   }
 
+  saveAsDataset(): void {
+    const activeTab = this.getActiveTab();
+    if (!activeTab) return;
+
+    // TODO: Implement save as dataset logic
+  }
+
   toggleDatabaseSidebar(): void {
     this.showDatabaseSidebar = !this.showDatabaseSidebar;
     // Trigger Monaco editor resize after sidebar animation
@@ -444,56 +630,69 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     }, 300);
   }
 
-  toggleDatabase(dbName: string): void {
-    this.expandedDatabases[dbName] = !this.expandedDatabases[dbName];
-  }
-
-  toggleSchema(dbName: string, schemaName: string): void {
-    // Ensure parent database is expanded
-    this.expandedDatabases[dbName] = true;
+  toggleDatabase(db: any): void {
+    const isExpanded = this.expandedDatabases[db.id];
     
-    const key = DatabaseSchemaHelper.buildSchemaKey(dbName, schemaName);
-    this.expandedSchemas[key] = !this.expandedSchemas[key];
-  }
-
-  toggleTable(dbName: string, schemaName: string, tableName: string): void {
-    // Ensure parent hierarchy is expanded
-    DatabaseSchemaHelper.ensureParentExpanded(
-      dbName,
-      this.expandedDatabases,
-      this.expandedSchemas,
-      this.expandedTables,
-      schemaName
-    );
-    
-    const key = DatabaseSchemaHelper.buildTableKey(dbName, schemaName, tableName);
-    this.expandedTables[key] = !this.expandedTables[key];
-  }
-
-  isTableExpanded(dbName: string, schemaName: string, tableName: string): boolean {
-    const key = DatabaseSchemaHelper.buildTableKey(dbName, schemaName, tableName);
-    return this.expandedTables[key] || false;
-  }
-
-  refreshSchema(): void {
-    if (this.databaseId && this.orgId) {
-      this.loadDatabaseSchema();
+    if (isExpanded) {
+      // Collapse - also collapse all child schemas and tables
+      this.expandedDatabases[db.id] = false;
+      
+      // Collapse all schemas under this database
+      Object.keys(this.expandedSchemas).forEach(key => {
+        if (key.startsWith(`${db.id}.`)) {
+          delete this.expandedSchemas[key];
+        }
+      });
+      
+      // Collapse all tables under this database
+      Object.keys(this.expandedTables).forEach(key => {
+        if (key.startsWith(`${db.id}.`)) {
+          delete this.expandedTables[key];
+        }
+      });
+    } else {
+      // Expand - fetch schema if not already loaded
+      this.expandedDatabases[db.id] = true;
+      
+      if (!this.databaseSchemas[db.id]) {
+        this.loadDatabaseSchema(db.id);
+      }
     }
   }
 
-  insertColumnName(dbName: string, schemaName: string, tableName: string, columnName: string): void {
+  toggleSchema(dbId: string, schemaName: string): void {
+    const key = DatabaseSchemaHelper.buildSchemaKey(dbId, schemaName);
+    const isExpanded = this.expandedSchemas[key];
+    
+    if (isExpanded) {
+      // Collapse - also collapse all child tables
+      delete this.expandedSchemas[key];
+      
+      // Collapse all tables under this schema
+      Object.keys(this.expandedTables).forEach(tableKey => {
+        if (tableKey.startsWith(`${dbId}.${schemaName}.`)) {
+          delete this.expandedTables[tableKey];
+        }
+      });
+    } else {
+      // Expand
+      this.expandedSchemas[key] = true;
+    }
+  }
+
+  toggleTable(dbId: string, schemaName: string, tableName: string): void {
+    const key = DatabaseSchemaHelper.buildTableKey(dbId, schemaName, tableName);
+    this.expandedTables[key] = !this.expandedTables[key];
+  }
+
+  isTableExpanded(dbId: string, schemaName: string, tableName: string): boolean {
+    const key = DatabaseSchemaHelper.buildTableKey(dbId, schemaName, tableName);
+    return this.expandedTables[key] || false;
+  }
+
+  insertColumnName(dbId: string, schemaName: string, tableName: string, columnName: string): void {
     const activeTab = this.getActiveTab();
     if (!activeTab || !activeTab.editor) return;
-    
-    // Ensure parent hierarchy is expanded
-    DatabaseSchemaHelper.ensureParentExpanded(
-      dbName,
-      this.expandedDatabases,
-      this.expandedSchemas,
-      this.expandedTables,
-      schemaName,
-      tableName
-    );
     
     const selection = activeTab.editor.getSelection();
     const text = DatabaseSchemaHelper.generateColumnReference(schemaName, tableName, columnName);
@@ -507,9 +706,27 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     activeTab.editor.focus();
   }
 
-  // ===================================================================
-  // Tab Management Methods
-  // ===================================================================
+  getDatabaseTooltip(tab: QueryTab): string {
+    if (!tab.databaseId) {
+      return 'No database connected';
+    }
+    
+    const database = this.availableDatabases.find(db => db.id === tab.databaseId);
+    if (!database) {
+      return `Database: ${tab.databaseName}`;
+    }
+    
+    const lines = [];
+    lines.push(`Database: ${database.name}`);
+    if (database.config) {
+      lines.push(`Username: ${database.config.username}`);
+      lines.push(`Host: ${database.config.hostname}`);
+      lines.push(`Port: ${database.config.port}`);
+    }
+    
+    return lines.join('\n');
+  }
+
 
   createNewTab(title: string, databaseId?: number, databaseName: string = 'database'): QueryTab | null {
     // Check maximum tab limit
@@ -553,6 +770,11 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
   switchTab(tabId: string): void {
     const previousTab = this.getActiveTab();
     
+    // Save current editor content to the previous tab before switching
+    if (previousTab && previousTab.editor) {
+      previousTab.query = previousTab.editor.getValue();
+    }
+    
     this.queryTabs.forEach(tab => {
       tab.isActive = tab.id === tabId;
     });
@@ -566,7 +788,7 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     // Re-create editor for active tab after a short delay
     setTimeout(() => {
       const activeTab = this.getActiveTab();
-      if (activeTab && this.editorContainer) {
+      if (activeTab) {
         this.initMonacoForTab(activeTab);
       }
     }, 100);
@@ -603,9 +825,11 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     return this.queryTabs.find(tab => tab.isActive);
   }
 
-  // ===================================================================
+  isAnyQueryExecuting(): boolean {
+    return this.queryTabs.some(tab => tab.isExecuting);
+  }
+
   // Tab Context Menu Methods
-  // ===================================================================
 
   onTabContextMenu(event: MouseEvent, tabId: string): void {
     event.preventDefault();
@@ -773,15 +997,11 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     this.closeTabContextMenu();
   }
 
-  // ===================================================================
-  // Context Menu Methods
-  // ===================================================================
-
-  onDatabaseContextMenu(event: MouseEvent, databaseName: string): void {
+  onDatabaseContextMenu(event: MouseEvent, database: any): void {
     event.preventDefault();
     event.stopPropagation();
 
-    this.contextMenuDatabase = databaseName;
+    this.contextMenuDatabase = database;
     this.contextMenuPosition = { x: event.clientX, y: event.clientY };
     
     this.contextMenuItems = TabManagementHelper.getDatabaseContextMenuItems(
@@ -801,20 +1021,8 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
   refreshDatabaseFromContext(): void {
     if (!this.contextMenuDatabase) return;
 
-    // Collapse the database
-    DatabaseSchemaHelper.collapseDatabase(
-      this.contextMenuDatabase,
-      this.expandedDatabases,
-      this.expandedSchemas,
-      this.expandedTables
-    );
-
-    // Refresh schema
-    if (this.databaseId && this.orgId) {
-      this.loadDatabaseSchema();
-    } else {
-      this.loadDummySchema();
-    }
+    // Refresh schema for this specific database
+    this.refreshSingleDatabase(this.contextMenuDatabase.id);
 
     this.closeContextMenu();
   }
@@ -828,11 +1036,36 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
       return;
     }
 
-    const database = this.databases.find(db => db.name === this.contextMenuDatabase);
+    // Store reference to database before closing context menu
+    const database = this.contextMenuDatabase;
+
+    // Check if database schema is already loaded
+    const schemaLoaded = this.databaseSchemas[database.id];
+    
+    this.closeContextMenu();
+
+    if (!schemaLoaded) {
+      // Schema not loaded, fetch it first
+      this.loadDatabaseSchema(database.id).then(() => {
+        this.createScriptTab(database);
+      })
+    } else {
+      // Schema already loaded, create tab immediately
+      this.createScriptTab(database);
+    }
+  }
+
+  private createScriptTab(database: any): void {
+    // Save current editor content before creating new tab
+    const currentTab = this.getActiveTab();
+    if (currentTab && currentTab.editor) {
+      currentTab.query = currentTab.editor.getValue();
+    }
+
     const newTab = this.createNewTab(
       `Script ${this.tabCounter + 1}`,
-      this.databaseId,
-      this.contextMenuDatabase
+      database.id,
+      database.name
     );
 
     // Initialize editor for new tab after a short delay if created
@@ -841,22 +1074,31 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
         this.initMonacoForTab(newTab);
       }, 100);
     }
-
-    this.closeContextMenu();
   }
 
   private initMonacoForTab(tab: QueryTab): void {
-    if (!this.editorContainer || !this.editorContainer.nativeElement) return;
     if (typeof monaco === 'undefined') return;
+
+    // Get the tab-specific container
+    const container = document.getElementById('editor-' + tab.id);
+    if (!container) {
+      return;
+    }
 
     try {
       // Dispose previous editor if exists
       if (tab.editor) {
         tab.editor.dispose();
+        tab.editor = null as any;
+      }
+
+      // Clear the container completely before creating new editor
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
       }
 
       // Create Monaco Editor instance for this tab
-      tab.editor = monaco.editor.create(this.editorContainer.nativeElement, {
+      tab.editor = monaco.editor.create(container, {
         ...MONACO_EDITOR_OPTIONS,
         value: tab.query,
         theme: this.currentTheme
@@ -865,28 +1107,15 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
       // Keep reference for backward compatibility
       this.editor = tab.editor;
 
-      // Prevent arrow keys from moving cursor when suggestions are visible
-      tab.editor.onKeyDown((e: any) => {
-        const suggestWidget = (tab.editor as any)._contentWidgets['editor.widget.suggestWidget'];
-        const isSuggestWidgetVisible = suggestWidget && suggestWidget.widget && suggestWidget.widget._isVisible;
-        
-        // If suggestions are visible and arrow keys are pressed, let Monaco handle it
-        if (isSuggestWidgetVisible && (e.keyCode === monaco.KeyCode.UpArrow || e.keyCode === monaco.KeyCode.DownArrow)) {
-          // Monaco will handle navigation, do nothing
-          return;
-        }
-      });
+      // Setup keyboard handlers
+      EditorCustomizationHelper.setupKeyboardHandlers(tab.editor);
 
-      // Focus the editor to ensure keyboard events work
-      setTimeout(() => {
-        if (tab.editor) {
-          tab.editor.focus();
-        }
-      }, 100);
+      // Focus the editor
+      EditorCustomizationHelper.focusEditor(tab.editor);
 
-      // Listen to content changes
-      tab.editor.onDidChangeModelContent(() => {
-        tab.query = tab.editor.getValue();
+      // Setup content change listener
+      EditorCustomizationHelper.setupContentChangeListener(tab.editor, (value) => {
+        tab.query = value;
       });
 
       // Register IntelliSense providers (only once globally)
@@ -895,22 +1124,26 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
       // Register keyboard shortcuts
       this.monacoIntelliSenseService.registerKeyboardShortcuts(tab.editor, () => this.executeQueryForTab(tab));
 
-      console.log(`Monaco Editor initialized for tab: ${tab.id}`);
+      // Customize context menu for SQL editor
+      EditorCustomizationHelper.customizeEditorContextMenu(
+        tab.editor,
+        () => this.executeCompleteQuery(),
+        (selectedText: string) => this.executeSelectedQuery(selectedText)
+      );
+
     } catch (error) {
       console.error(`Error initializing Monaco Editor for tab ${tab.id}:`, error);
     }
   }
 
-  private executeQueryForTab(tab: QueryTab): void {
-    const query = tab.editor?.getValue() || tab.query;
+  private executeQueryForTab(tab: QueryTab, customQuery?: string): void {
+    const query = customQuery || tab.editor?.getValue() || tab.query;
     
     if (!query.trim()) {
-      console.warn('No query to execute');
       return;
     }
 
-    if (!tab.databaseId || !this.orgId) {
-      console.error('Database ID or Org ID not set');
+    if (!tab.databaseId || !this.selectedOrg?.id) {
       return;
     }
 
@@ -920,61 +1153,95 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     const startTime = Date.now();
 
     this.queryService.executeQuery({
-      orgId: this.orgId,
+      orgId: this.selectedOrg.id,
       databaseId: tab.databaseId,
       query: query
     }).subscribe({
       next: (response: any) => {
-        const executionTime = Date.now() - startTime;
-        console.log('Query executed successfully:', response);
+        // Check if response indicates an error (status: false)
+        if (response.status === false) {
+          const executionTime = `${Date.now() - startTime}ms`;
+          tab.result = {
+            columns: [],
+            rows: [],
+            rowCount: 0,
+            executionTime: executionTime,
+            error: response.message || 'Query execution failed'
+          };
+          tab.isExecuting = false;
+          return;
+        }
+        
+        // Handle string-based response (e.g., "Query executed successfully")
+        if (typeof response === 'string') {
+          tab.result = {
+            columns: [],
+            rows: [],
+            rowCount: 0,
+            executionTime: `${Date.now() - startTime}ms`,
+            message: response
+          };
+          tab.isExecuting = false;
+          return;
+        }
+
+        // Extract the actual data object from response
+        const dataObj = response.data || response;
+
+        // Extract execution time - check both response.data and response levels
+        let executionTime = dataObj.executionTime || response.executionTime;
+        
+        if (executionTime && typeof executionTime === 'string') {
+          // Already in "8ms" format, use as is
+          executionTime = executionTime;
+        } else if (executionTime && typeof executionTime === 'number') {
+          // Convert number to "Xms" format
+          executionTime = `${executionTime}ms`;
+        } else {
+          // Fallback to client-side calculation
+          const calculatedTime = Date.now() - startTime;
+          executionTime = `${calculatedTime}ms`;
+        }
+
+        // Extract columns and rows from API response
+        // Data could be in dataObj.data (nested) or dataObj itself
+        const data = dataObj.data || dataObj.rows || [];
+        const columns = dataObj.columns || (Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []);
+        const rowCount = dataObj.rowCount !== undefined ? dataObj.rowCount : (Array.isArray(data) ? data.length : 0);
 
         tab.result = {
-          columns: response.columns || (response.data && response.data.length > 0 ? Object.keys(response.data[0]) : []),
-          rows: response.data || response.rows || [],
-          rowCount: response.rowCount || (response.data ? response.data.length : 0),
-          executionTime: executionTime
+          columns: columns,
+          rows: Array.isArray(data) ? data : [],
+          rowCount: rowCount,
+          executionTime: executionTime,
+          query: dataObj.query || response.query
         };
 
         tab.isExecuting = false;
       },
       error: (error: any) => {
-        const executionTime = Date.now() - startTime;
-        console.error('Query execution error:', error);
+        const executionTime = `${Date.now() - startTime}ms`;
+        
+        // Extract error message from different possible locations
+        let errorMessage = 'Query execution failed';
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        }
         
         tab.result = {
           columns: [],
           rows: [],
           rowCount: 0,
           executionTime: executionTime,
-          error: error.error?.message || error.message || 'Query execution failed'
+          error: errorMessage
         };
 
         tab.isExecuting = false;
       }
     });
-  }
-
-  // ===================================================================
-  // Dummy Data Methods for Testing/Demo
-  // ===================================================================
-
-  private loadDummySchema(): void {
-    this.databases = DummyDataHelper.getDummyDatabaseSchemas();
-
-    // Set selected database/schema but don't auto-expand
-    if (this.databases.length > 0) {
-      this.selectedDatabase = this.databases[0].name;
-      if (this.databases[0].schemas.length > 0) {
-        this.selectedSchema = this.databases[0].schemas[0].name;
-      }
-    }
-
-
-    // Re-register completions with dummy schema
-    this.registerIntelliSenseProviders();
-  }
-
-  private loadDummyResults(): void {
-    this.queryResult = DummyDataHelper.getDummyQueryResults();
   }
 }

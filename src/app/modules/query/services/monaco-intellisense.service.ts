@@ -20,13 +20,24 @@ export class MonacoIntelliSenseService {
    * @returns Disposable to unregister the provider
    */
   registerSQLCompletions(databases: any[], editor: any): any {
+    
     // Get all tables from all databases and schemas
     const tables: TableSchema[] = [];
     const tableColumns: { [key: string]: TableColumn[] } = {};
 
     if (databases && databases.length > 0) {
       for (const db of databases) {
+        
+        if (!db.schemas || db.schemas.length === 0) {
+          continue;
+        }
+        
         for (const schema of db.schemas) {
+          
+          if (!schema.tables || schema.tables.length === 0) {
+            continue;
+          }
+          
           for (const table of schema.tables) {
             tables.push(table);
             const fullTableName = schema.name === 'public' ? table.name : `${schema.name}.${table.name}`;
@@ -37,7 +48,11 @@ export class MonacoIntelliSenseService {
       }
     }
 
-    if (tables.length === 0) return null;
+
+    if (tables.length === 0) {
+      return null;
+    }
+
 
     return monaco.languages.registerCompletionItemProvider('sql', {
       triggerCharacters: ['.', ' ', ',', '('],
@@ -57,12 +72,14 @@ export class MonacoIntelliSenseService {
           endColumn: word.endColumn
         };
 
-        // Check for table.column pattern (e.g., "users.")
+        // Check for schema.table or table.column pattern (e.g., "users." or "public.")
         const dotMatch = textUntilPosition.match(/(\w+)\.$/);
         if (dotMatch) {
-          const tableName = dotMatch[1];
-          const table = tables.find(t => t.name.toLowerCase() === tableName.toLowerCase());
-
+          const name = dotMatch[1];
+          
+          // First, check if it's a table name (for column completion)
+          const table = tables.find(t => t.name.toLowerCase() === name.toLowerCase());
+          
           if (table) {
             const columnSuggestions = table.columns.map(col => ({
               label: col.name,
@@ -74,6 +91,25 @@ export class MonacoIntelliSenseService {
             }));
 
             return { suggestions: columnSuggestions };
+          } else {
+            // Check if it's a schema name (for table completion)
+            const schema = databases.find(db => 
+              db.schemas.some((s: any) => s.name.toLowerCase() === name.toLowerCase())
+            )?.schemas.find((s: any) => s.name.toLowerCase() === name.toLowerCase());
+            
+            if (schema) {
+              const tableSuggestions = schema.tables.map((tbl: any) => ({
+                label: tbl.name,
+                kind: monaco.languages.CompletionItemKind.Class,
+                detail: `Table (${tbl.columns.length} columns)`,
+                documentation: this.getTableDocumentation(tbl),
+                insertText: `${tbl.name} `,
+                range: range
+              }));
+              
+              return { suggestions: tableSuggestions };
+            } else {
+            }
           }
         }
 
@@ -81,20 +117,102 @@ export class MonacoIntelliSenseService {
         const context = this.analyzeContext(textUntilPosition);
         let suggestions: any[] = [];
 
-        // Table name suggestions
-        if (context.expectingTableName) {
+        // Always include table suggestions after FROM, JOIN, INTO, UPDATE
+        if (/\b(from|join|into|update)\s+\w*$/i.test(textUntilPosition)) {
+          
+          // Add table suggestions
           suggestions = tables.map(table => ({
             label: table.name,
             kind: monaco.languages.CompletionItemKind.Class,
             detail: `Table (${table.columns.length} columns)`,
             documentation: this.getTableDocumentation(table),
-            insertText: table.name,
+            insertText: `${table.name} `,
+            range: range
+          }));
+          
+          // Add schema suggestions
+          if (databases && databases.length > 0) {
+            databases.forEach((db: any) => {
+              if (db.schemas) {
+                db.schemas.forEach((schema: any) => {
+                  suggestions.push({
+                    label: schema.name,
+                    kind: monaco.languages.CompletionItemKind.Module,
+                    detail: `Schema (${schema.tables?.length || 0} tables)`,
+                    documentation: `Schema: ${schema.name}`,
+                    insertText: schema.name,
+                    range: range
+                  });
+                });
+              }
+            });
+          }
+          
+        } else if (context.expectingTableName) {
+          suggestions = tables.map(table => ({
+            label: table.name,
+            kind: monaco.languages.CompletionItemKind.Class,
+            detail: `Table (${table.columns.length} columns)`,
+            documentation: this.getTableDocumentation(table),
+            insertText: `${table.name} `,
             range: range
           }));
         }
 
-        // Column suggestions
-        if (context.expectingColumnName && context.currentTable) {
+        // Column suggestions - Extract table name from query
+        // Support patterns like: FROM table WHERE, FROM schema.table WHERE, JOIN table ON, etc.
+        const tableNameMatch = textUntilPosition.match(/\b(?:from|join|update)\s+(?:(\w+)\.)?(\w+)(?:\s+(?:as\s+)?(\w+))?\s+(?:where|on|set|and|or|having|order|group)\s+\w*$/i);
+        if (tableNameMatch) {
+          const schemaName = tableNameMatch[1];
+          const tableName = tableNameMatch[2];
+          
+          let table = tables.find(t => t.name.toLowerCase() === tableName.toLowerCase());
+          
+          if (table) {
+            const columnSuggestions = table.columns.map(col => ({
+              label: col.name,
+              kind: monaco.languages.CompletionItemKind.Field,
+              detail: `${col.type}${col.isPrimaryKey ? ' PK' : ''}${col.isForeignKey ? ' FK' : ''}`,
+              documentation: this.getColumnDocumentation(col),
+              insertText: col.name,
+              range: range
+            }));
+            
+            
+            // Return columns + keywords for WHERE/ON clauses
+            const keywordSuggestions = SQL_KEYWORDS.filter(kw => 
+              ['AND', 'OR', 'NOT', 'IN', 'LIKE', 'BETWEEN', 'IS', 'NULL'].includes(kw)
+            ).map(kw => ({
+              label: kw,
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              detail: 'SQL Keyword',
+              insertText: kw,
+              range: range
+            }));
+            
+            return { 
+              suggestions: [...columnSuggestions, ...keywordSuggestions] 
+            };
+          }
+        }
+
+        // Column suggestions in SELECT clause
+        if (/\bselect\s+\w*$/i.test(textUntilPosition) || /\bselect\s+.*,\s*\w*$/i.test(textUntilPosition)) {
+          const allColumns: any[] = [];
+          tables.forEach((table: TableSchema) => {
+            table.columns.forEach((col: TableColumn) => {
+              allColumns.push({
+                label: `${table.name}.${col.name}`,
+                kind: monaco.languages.CompletionItemKind.Field,
+                detail: `${col.type} (from ${table.name})`,
+                documentation: this.getColumnDocumentation(col),
+                insertText: `${table.name}.${col.name}`,
+                range: range
+              });
+            });
+          });
+          suggestions = allColumns;
+        } else if (context.expectingColumnName && context.currentTable) {
           const table = tables.find(t => t.name.toLowerCase() === context.currentTable!.toLowerCase());
           if (table) {
             suggestions = table.columns.map(col => ({
@@ -105,6 +223,7 @@ export class MonacoIntelliSenseService {
               insertText: col.name,
               range: range
             }));
+          } else {
           }
         }
 
@@ -142,14 +261,17 @@ export class MonacoIntelliSenseService {
         // Dynamic snippets based on schema (smart JOINs)
         const dynamicSnippets = this.generateDynamicSnippets(tables, range);
 
+        const allSuggestions = [
+          ...suggestions,
+          ...keywordSuggestions,
+          ...functionSuggestions,
+          ...snippetSuggestions,
+          ...dynamicSnippets
+        ];
+
+
         return {
-          suggestions: [
-            ...suggestions,
-            ...keywordSuggestions,
-            ...functionSuggestions,
-            ...snippetSuggestions,
-            ...dynamicSnippets
-          ]
+          suggestions: allSuggestions
         };
       }
     });

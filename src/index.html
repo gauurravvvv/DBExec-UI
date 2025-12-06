@@ -31,14 +31,12 @@
     // Wait for loader to be available
     (function checkLoader() {
       if (typeof require !== 'undefined' && typeof require.config === 'function') {
-        console.log('Monaco loader available, configuring...');
         require.config({ 
           paths: { 
             'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' 
           }
         });
         require(['vs/editor/editor.main'], function() {
-          console.log('Monaco Editor loaded successfully from CDN');
           window.monacoLoaded = true;
           window.monacoLoading = false;
         }, function(err) {

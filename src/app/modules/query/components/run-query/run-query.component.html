@@ -2,39 +2,65 @@
   <!-- Header Toolbar -->
   <div class="query-toolbar">
     <div class="toolbar-left">
-      <span class="toolbar-hint" *ngIf="databaseId">
-        <i class="pi pi-info-circle"></i>
-        Press <kbd>Ctrl+Enter</kbd> to execute
-      </span>
+      <!-- Organisation Dropdown -->
+      <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+        <span class="p-float-label">
+          <p-dropdown
+            [options]="organisations"
+            [(ngModel)]="selectedOrg"
+            optionLabel="name"
+            [filter]="true"
+            filterBy="name"
+            [style]="{'width':'100%'}"
+            [panelStyle]="{'width':'100%'}"
+            (onChange)="onOrgChange($event)"
+            inputId="org-dropdown">
+          </p-dropdown>
+          <label for="org-dropdown">Organisation</label>
+        </span>
+      </div>
+      
     </div>
     <div class="toolbar-right">
       <button 
-        class="btn btn-icon btn-secondary" 
+        pButton
+        class="p-button-text btn-save" 
         (click)="saveCurrentScript()"
         [disabled]="isLoadingEditor || !getActiveTab()"
-        title="Save Current Script (Ctrl+S)">
+        title="Save Script">
         <i class="pi pi-save"></i>
       </button>
       <button 
-        class="btn btn-icon btn-secondary" 
+        pButton
+        class="p-button-text btn-dataset" 
+        (click)="saveAsDataset()"
+        [disabled]="isLoadingEditor || !getActiveTab()"
+        title="Save as Dataset">
+        <i class="pi pi-database"></i>
+      </button>
+      <button 
+        pButton
+        class="p-button-text btn-export" 
         (click)="exportCurrentScript()"
         [disabled]="isLoadingEditor || !getActiveTab()"
         title="Export Script">
         <i class="pi pi-download"></i>
       </button>
       <button 
-        class="btn btn-icon btn-secondary" 
+        pButton
+        class="p-button-text btn-danger" 
         (click)="clearEditor()"
-        [disabled]="isLoadingEditor"
+        [disabled]="isLoadingEditor || !getActiveTab()"
         title="Clear Editor">
         <i class="pi pi-trash"></i>
       </button>
       <button 
-        class="btn btn-icon btn-primary" 
+        pButton
+        class="p-button-text btn-primary" 
         (click)="executeQuery()"
-        [disabled]="isLoadingEditor || isExecutingQuery || !databaseId"
+        [disabled]="isLoadingEditor || !getActiveTab() || isAnyQueryExecuting()"
         title="Execute Query (Ctrl+Enter)">
-        <i class="pi" [ngClass]="isExecutingQuery ? 'pi-spin pi-spinner' : 'pi-play'"></i>
+        <i class="pi" [ngClass]="isAnyQueryExecuting() ? 'pi-spin pi-spinner' : 'pi-play'"></i>
       </button>
     </div>
   </div>
@@ -50,74 +76,75 @@
             Database Explorer
           </h4>
           <button 
-            class="btn btn-icon" 
-            (click)="refreshSchema()"
-            [disabled]="!databaseId"
-            title="Refresh Schema">
-            <i class="pi pi-refresh" [class.pi-spin]="isLoadingSchema"></i>
+            pButton
+            class="p-button-text p-button-sm" 
+            (click)="refreshDatabases()"
+            [disabled]="isLoadingDatabases"
+            title="Refresh Databases">
+            <i class="pi pi-refresh" [class.pi-spin]="isLoadingDatabases"></i>
           </button>
         </div>
 
-        <div class="sidebar-content-inner" *ngIf="databases && databases.length > 0">
+        <div class="sidebar-content-inner">
           <div class="schema-search">
             <input 
               type="text" 
-              placeholder="Search databases, schemas, tables..." 
+              placeholder="Search databases..." 
               [(ngModel)]="schemaSearchText"
               class="search-input">
           </div>
 
           <div class="databases-list">
-            <!-- Loop through databases -->
+            <!-- Loop through available databases -->
             <div 
-              *ngFor="let database of filteredDatabases" 
+              *ngFor="let db of filteredAvailableDatabases" 
               class="database-item">
               
               <!-- Database Header with Context Menu -->
               <div class="database-header" 
-                   (click)="toggleDatabase(database.name)"
-                   (contextmenu)="onDatabaseContextMenu($event, database.name)">
-                <i class="pi" [ngClass]="expandedDatabases[database.name] ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                   (click)="toggleDatabase(db)"
+                   (contextmenu)="onDatabaseContextMenu($event, db)">
+                <i class="pi" [ngClass]="expandedDatabases[db.id] ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
                 <i class="pi pi-database"></i>
-                <span class="database-name">{{ database.name }}</span>
-                <span class="schema-count">{{ database.schemas.length }} schemas</span>
+                <span class="database-name">{{ db.name }}</span>
+                <i class="pi pi-spin pi-spinner" *ngIf="loadingDatabases[db.id]" style="margin-left: auto; font-size: 0.875rem;"></i>
               </div>
 
-              <!-- Schemas List -->
-              <div class="schemas-list" *ngIf="expandedDatabases[database.name]">
+              <!-- Schemas List (loaded from API) -->
+              <div class="schemas-list" *ngIf="expandedDatabases[db.id] && databaseSchemas[db.id]">
                 <div 
-                  *ngFor="let schema of database.schemas" 
+                  *ngFor="let schema of databaseSchemas[db.id]?.schemas" 
                   class="schema-item">
                   
                   <!-- Schema Header -->
-                  <div class="schema-header" (click)="toggleSchema(database.name, schema.name)">
-                    <i class="pi" [ngClass]="expandedSchemas[database.name + '.' + schema.name] ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                  <div class="schema-header" (click)="toggleSchema(db.id, schema.name)">
+                    <i class="pi" [ngClass]="expandedSchemas[db.id + '.' + schema.name] ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
                     <i class="pi pi-folder"></i>
                     <span class="schema-name">{{ schema.name }}</span>
                     <span class="table-count">{{ schema.tables.length }} tables</span>
                   </div>
 
                   <!-- Tables List -->
-                  <div class="tables-list" *ngIf="expandedSchemas[database.name + '.' + schema.name]">
+                  <div class="tables-list" *ngIf="expandedSchemas[db.id + '.' + schema.name]">
                     <div 
                       *ngFor="let table of schema.tables" 
                       class="table-item"
-                      [class.expanded]="isTableExpanded(database.name, schema.name, table.name)">
+                      [class.expanded]="isTableExpanded(db.id, schema.name, table.name)">
                       
                       <!-- Table Header -->
-                      <div class="table-header" (click)="toggleTable(database.name, schema.name, table.name)">
-                        <i class="pi" [ngClass]="isTableExpanded(database.name, schema.name, table.name) ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                      <div class="table-header" (click)="toggleTable(db.id, schema.name, table.name)">
+                        <i class="pi" [ngClass]="isTableExpanded(db.id, schema.name, table.name) ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
                         <i class="pi pi-table"></i>
                         <span class="table-name">{{ table.name }}</span>
                         <span class="column-count">{{ table.columns.length }} cols</span>
                       </div>
 
                       <!-- Columns List -->
-                      <div class="columns-list" *ngIf="isTableExpanded(database.name, schema.name, table.name)">
+                      <div class="columns-list" *ngIf="isTableExpanded(db.id, schema.name, table.name)">
                         <div 
                           *ngFor="let column of table.columns" 
                           class="column-item"
-                          (click)="insertColumnName(database.name, schema.name, table.name, column.name)"
+                          (click)="insertColumnName(db.id, schema.name, table.name, column.name)"
                           [title]="'Click to insert ' + table.name + '.' + column.name">
                           <i class="pi" 
                              [ngClass]="{
@@ -127,7 +154,7 @@
                              }"
                              [style.color]="column.isPrimaryKey ? '#ffc107' : (column.isForeignKey ? '#2196f3' : '')"></i>
                           <span class="column-name">{{ column.name }}</span>
-                          <span class="column-type">{{ column.type }}</span>
+                          <span class="column-type">({{ column.type }})</span>
                         </div>
                       </div>
                     </div>
@@ -139,15 +166,14 @@
         </div>
 
         <!-- Empty State -->
-        <div class="schema-empty" *ngIf="!databases || databases.length === 0">
+        <div class="schema-empty" *ngIf="!availableDatabases || availableDatabases.length === 0">
           <i class="pi pi-database"></i>
-          <p>No database schema available</p>
+          <p>No databases available</p>
           <button 
             class="btn btn-small btn-primary" 
-            (click)="refreshSchema()"
-            [disabled]="!databaseId">
+            (click)="loadDatabases()">
             <i class="pi pi-refresh"></i>
-            Load Schema
+            Load Databases
           </button>
         </div>
 
@@ -176,7 +202,7 @@
                [class.active]="tab.isActive"
                (click)="switchTab(tab.id)"
                (contextmenu)="onTabContextMenu($event, tab.id)"
-               [title]="'Database: ' + tab.databaseName + '\nConnection: ' + (databaseId || 'Not connected')">
+               [title]="getDatabaseTooltip(tab)">
             <span class="tab-icon">
               <i class="pi pi-file"></i>
             </span>
@@ -214,7 +240,12 @@
       </div>
       
       <div class="editor-section" *ngIf="getActiveTab() as activeTab">
-        <div class="editor-container" [hidden]="isLoadingEditor || monacoLoadFailed" #editorContainer></div>
+        <div class="editor-container" [hidden]="isLoadingEditor || monacoLoadFailed">
+          <div *ngFor="let tab of queryTabs" 
+               [id]="'editor-' + tab.id" 
+               [style.display]="tab.id === activeTab.id ? 'block' : 'none'"
+               class="tab-editor-container"></div>
+        </div>
         
         <!-- Loading State -->
         <div class="editor-loading" *ngIf="isLoadingEditor && !monacoLoadFailed">
@@ -251,7 +282,7 @@
               Query Results
             </span>
             <span class="results-meta" *ngIf="!activeTab.result.error">
-              {{ activeTab.result.rowCount }} row(s) in {{ activeTab.result.executionTime }}ms
+              {{ activeTab.result.rowCount }} row(s) in {{ activeTab.result.executionTime }}
             </span>
           </div>
           <div class="results-actions">
@@ -276,6 +307,18 @@
           <div class="error-content">
             <h4>Query Execution Failed</h4>
             <p>{{ activeTab.result.error }}</p>
+          </div>
+        </div>
+
+        <!-- Success Message (for non-SELECT queries) -->
+        <div class="results-success" *ngIf="activeTab.result.message && !activeTab.result.error">
+          <i class="pi pi-check-circle"></i>
+          <div class="success-content">
+            <h4>Query Executed Successfully</h4>
+            <p>{{ activeTab.result.message }}</p>
+            <p *ngIf="activeTab.result.executionTime" class="execution-time">
+              Execution Time: {{ activeTab.result.executionTime }}
+            </p>
           </div>
         </div>
 

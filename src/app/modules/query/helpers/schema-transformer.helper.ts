@@ -14,46 +14,64 @@ export class SchemaTransformerHelper {
     // Transform the API response to match our DatabaseSchema interface
     const schemas: SchemaGroup[] = [];
 
-    if (response && response.data && Array.isArray(response.data)) {
-      for (const schemaData of response.data) {
+    // Handle different API response formats:
+    // 1. { data: { schemas: [...] } } - wrapped response
+    // 2. { schemas: [...] } - direct response
+    // 3. { data: [...] } - legacy format
+    let schemasData = response?.data?.schemas || response?.schemas || response?.data;
+    
+    // If schemasData is an object with schemas property (nested), unwrap it
+    if (schemasData && !Array.isArray(schemasData) && schemasData.schemas) {
+      schemasData = schemasData.schemas;
+    }
+    
+    if (schemasData && Array.isArray(schemasData)) {
+      for (const schemaData of schemasData) {
         const tables: TableSchema[] = [];
         
-        if (Array.isArray(schemaData.tables)) {
-          for (const tableData of schemaData.tables) {
+        // Handle tables array
+        const tablesData = schemaData.tables || [];
+        if (Array.isArray(tablesData)) {
+          for (const tableData of tablesData) {
             const columns: TableColumn[] = [];
             
-            if (Array.isArray(tableData.columns)) {
-              for (const col of tableData.columns) {
+            // Handle columns array
+            const columnsData = tableData.columns || [];
+            
+            if (Array.isArray(columnsData)) {
+              for (const col of columnsData) {
                 columns.push({
-                  name: col.column_name || col.name,
-                  type: col.data_type || col.type,
-                  nullable: col.is_nullable === 'YES' || col.nullable === true,
-                  isPrimaryKey: col.is_primary_key || col.isPrimaryKey || false,
-                  isForeignKey: col.is_foreign_key || col.isForeignKey || false,
-                  foreignKeyTable: col.foreign_key_table || col.foreignKeyTable,
-                  foreignKeyColumn: col.foreign_key_column || col.foreignKeyColumn
+                  name: col.name || col.column_name,
+                  type: col.type || col.data_type,
+                  nullable: col.nullable === true || col.is_nullable === 'YES',
+                  isPrimaryKey: col.isPrimaryKey || col.is_primary_key || false,
+                  isForeignKey: col.isForeignKey || col.is_foreign_key || false,
+                  foreignKeyTable: col.foreignKeyTable || col.foreign_key_table,
+                  foreignKeyColumn: col.foreignKeyColumn || col.foreign_key_column
                 });
               }
             }
 
             tables.push({
-              name: tableData.table_name || tableData.name,
+              name: tableData.table || tableData.table_name || tableData.name,
               columns: columns
             });
           }
         }
 
+        const schemaName = schemaData.schema || schemaData.schema_name || schemaData.name || 'public';
         schemas.push({
-          name: schemaData.schema_name || schemaData.name || 'public',
+          name: schemaName,
           tables: tables
         });
       }
     }
 
-    return [{
-      name: response.database_name || 'database',
+    const result = [{
+      name: response.database_name || response?.data?.database_name || response.name || 'database',
       schemas: schemas
     }];
+    return result;
   }
 
   /**

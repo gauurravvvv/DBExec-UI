@@ -32,8 +32,10 @@ export interface QueryResult {
   columns: string[];
   rows: any[];
   rowCount: number;
-  executionTime?: number;
+  executionTime?: string | number;
   error?: string;
+  message?: string;
+  query?: string;
 }
 
 export class DummyDataHelper {

@@ -61,6 +61,9 @@ export const MONACO_EDITOR_OPTIONS = {
   autoIndent: 'full' as const,
   multiCursorModifier: 'alt' as const,
 
+  // Context Menu - Hide unnecessary items for SQL editor
+  contextmenu: true,
+
   // Scrollbar
   scrollbar: {
     vertical: 'visible' as const,
@@ -376,3 +379,43 @@ export const EDITOR_LOADING_CONFIG = {
   CHECK_INTERVAL_MS: 50,
   TIMEOUT_MS: 20000
 };
+
+/**
+ * SQL Editor Context Menu Actions Configuration
+ * Defines custom context menu items for SQL editing
+ */
+export const SQL_CONTEXT_MENU_ACTIONS = [
+  {
+    id: 'sql.executeQuery',
+    label: 'Run SQL',
+    contextMenuGroupId: 'navigation',
+    contextMenuOrder: 1,
+    keybindings: ['CtrlCmd+Enter'],
+    description: 'Smart execution: runs selected SQL if text is selected, otherwise runs the current statement at cursor (between semicolons)'
+  },
+  {
+    id: 'sql.executeCompleteQuery',
+    label: 'Run Complete SQL',
+    contextMenuGroupId: 'navigation',
+    contextMenuOrder: 2,
+    keybindings: ['CtrlCmd+Shift+Enter'],
+    description: 'Always execute the entire SQL content in the editor'
+  },
+  {
+    id: 'sql.executeSelectedQuery',
+    label: 'Run Selected SQL',
+    contextMenuGroupId: 'navigation',
+    contextMenuOrder: 3,
+    precondition: 'editorHasSelection',
+    description: 'Execute only the selected SQL text (visible only when text is selected)'
+  }
+];
+
+/**
+ * Hidden/Disabled Context Menu Items
+ * Items from default Monaco menu that should be hidden for SQL editor
+ */
+export const HIDDEN_CONTEXT_MENU_ITEMS = [
+  'editor.action.quickCommand',  // Command Palette
+  'editor.action.formatDocument' // Format Document (we handle SQL formatting separately)
+];
