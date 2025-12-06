@@ -1074,6 +1074,42 @@ tbody tr:hover .row-number {
       text-overflow: ellipsis;
     }
 
+    .tab-title-edit-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-title-input {
+      font-weight: 500;
+      max-width: 150px;
+      border: 1px solid var(--primary-color);
+      border-radius: 3px;
+      padding: 2px 6px;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      font-size: 13px;
+      outline: none;
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+      }
+
+      &.error {
+        border-color: #ef4444;
+        animation: shake 0.3s ease;
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
     .tab-close {
       display: flex;
       align-items: center;

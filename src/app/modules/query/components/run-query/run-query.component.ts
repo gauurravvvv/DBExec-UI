@@ -14,15 +14,17 @@ import {
   EDITOR_LOADING_CONFIG,
   MONACO_EDITOR_OPTIONS
 } from '../../config/sql-editor.config';
+import { DatabaseSchemaHelper } from '../../helpers/database-schema.helper';
 import {
   DatabaseSchema,
   DummyDataHelper,
   QueryResult
 } from '../../helpers/dummy-data.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
+import { TabManagementHelper } from '../../helpers/tab-management.helper';
+import { ContextMenuItem, ContextMenuPosition, QueryTab } from '../../models/query-tab.model';
 import { MonacoIntelliSenseService } from '../../services/monaco-intellisense.service';
 import { QueryService } from '../../services/query.service';
-import { QueryTab, ContextMenuItem, ContextMenuPosition } from '../../models/query-tab.model';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -77,39 +79,24 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
   tabContextMenuPosition: ContextMenuPosition = { x: 0, y: 0 };
   tabContextMenuItems: ContextMenuItem[] = [];
   contextMenuTabId: string | null = null;
+  
+  // Tab Editing
+  editingTabId: string | null = null;
+  editingTabTitle: string = '';
+  editingTabError: boolean = false;
+  @ViewChild('tabTitleInput') tabTitleInput!: ElementRef;
 
   // IntelliSense provider disposables
   private completionProviderDisposable: any = null;
   private hoverProviderDisposable: any = null;
 
   get filteredDatabases(): DatabaseSchema[] {
-    if (!this.databases || this.databases.length === 0) {
-      return [];
-    }
-    if (!this.schemaSearchText.trim()) {
-      return this.databases;
-    }
-    const search = this.schemaSearchText.toLowerCase();
-    const filtered = this.databases.map(db => ({
-      ...db,
-      schemas: db.schemas.map(schema => ({
-        ...schema,
-        tables: schema.tables.filter(table => 
-          table.name.toLowerCase().includes(search) ||
-          table.columns.some(col => col.name.toLowerCase().includes(search))
-        )
-      })).filter(schema => schema.tables.length > 0)
-    })).filter(db => db.schemas.length > 0);
-
-    // Auto-expand databases and schemas that have matching results
-    filtered.forEach(db => {
-      this.expandedDatabases[db.name] = true;
-      db.schemas.forEach(schema => {
-        this.expandedSchemas[`${db.name}.${schema.name}`] = true;
-      });
-    });
-
-    return filtered;
+    return DatabaseSchemaHelper.filterDatabases(
+      this.databases,
+      this.schemaSearchText,
+      this.expandedDatabases,
+      this.expandedSchemas
+    );
   }
 
   constructor(
@@ -133,8 +120,9 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     // Load dummy results for testing
     this.loadDummyResults();
 
-    // Close context menu on click outside
+    // Close context menus on click outside
     document.addEventListener('click', this.closeContextMenu.bind(this));
+    document.addEventListener('click', this.closeTabContextMenu.bind(this));
   }
 
   /**
@@ -412,18 +400,38 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     this.executeQueryForTab(activeTab);
   }
 
-  formatQuery(): void {
-    const activeTab = this.getActiveTab();
-    if (activeTab && activeTab.editor) {
-      activeTab.editor.getAction('editor.action.formatDocument').run();
-    }
-  }
 
   clearEditor(): void {
     const activeTab = this.getActiveTab();
     if (activeTab && activeTab.editor) {
       activeTab.editor.setValue('');
     }
+  }
+
+  saveCurrentScript(): void {
+    const activeTab = this.getActiveTab();
+    if (!activeTab) return;
+
+    // TODO: Implement save to database
+    console.log('Save script to database:', activeTab.title);
+  }
+
+  exportCurrentScript(): void {
+    const activeTab = this.getActiveTab();
+    if (!activeTab) return;
+
+    const query = activeTab.editor?.getValue() || activeTab.query;
+    const databaseName = activeTab.databaseName || 'database';
+    const scriptName = activeTab.title.replace(/\s+/g, '_');
+    const fileName = `${databaseName}_${scriptName}.txt`;
+    
+    const blob = new Blob([query], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
   }
 
   toggleDatabaseSidebar(): void {
@@ -444,36 +452,26 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     // Ensure parent database is expanded
     this.expandedDatabases[dbName] = true;
     
-    const key = `${dbName}.${schemaName}`;
+    const key = DatabaseSchemaHelper.buildSchemaKey(dbName, schemaName);
     this.expandedSchemas[key] = !this.expandedSchemas[key];
   }
 
   toggleTable(dbName: string, schemaName: string, tableName: string): void {
     // Ensure parent hierarchy is expanded
-    this.expandedDatabases[dbName] = true;
-    this.expandedSchemas[`${dbName}.${schemaName}`] = true;
+    DatabaseSchemaHelper.ensureParentExpanded(
+      dbName,
+      this.expandedDatabases,
+      this.expandedSchemas,
+      this.expandedTables,
+      schemaName
+    );
     
-    const key = `${dbName}.${schemaName}.${tableName}`;
+    const key = DatabaseSchemaHelper.buildTableKey(dbName, schemaName, tableName);
     this.expandedTables[key] = !this.expandedTables[key];
   }
 
-  /**
-   * Ensure the entire parent hierarchy is expanded for a given item
-   */
-  private ensureParentExpanded(dbName: string, schemaName?: string, tableName?: string): void {
-    this.expandedDatabases[dbName] = true;
-    
-    if (schemaName) {
-      this.expandedSchemas[`${dbName}.${schemaName}`] = true;
-    }
-    
-    if (tableName && schemaName) {
-      this.expandedTables[`${dbName}.${schemaName}.${tableName}`] = true;
-    }
-  }
-
   isTableExpanded(dbName: string, schemaName: string, tableName: string): boolean {
-    const key = `${dbName}.${schemaName}.${tableName}`;
+    const key = DatabaseSchemaHelper.buildTableKey(dbName, schemaName, tableName);
     return this.expandedTables[key] || false;
   }
 
@@ -488,12 +486,17 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     if (!activeTab || !activeTab.editor) return;
     
     // Ensure parent hierarchy is expanded
-    this.ensureParentExpanded(dbName, schemaName, tableName);
+    DatabaseSchemaHelper.ensureParentExpanded(
+      dbName,
+      this.expandedDatabases,
+      this.expandedSchemas,
+      this.expandedTables,
+      schemaName,
+      tableName
+    );
     
     const selection = activeTab.editor.getSelection();
-    const text = schemaName === 'public' 
-      ? `${tableName}.${columnName}` 
-      : `${schemaName}.${tableName}.${columnName}`;
+    const text = DatabaseSchemaHelper.generateColumnReference(schemaName, tableName, columnName);
     
     activeTab.editor.executeEdits('insert-column', [{
       range: selection,
@@ -510,30 +513,41 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
 
   createNewTab(title: string, databaseId?: number, databaseName: string = 'database'): QueryTab | null {
     // Check maximum tab limit
-    if (this.queryTabs.length >= 10) {
+    if (TabManagementHelper.isMaxTabsReached(this.queryTabs.length)) {
       return null;
     }
 
-    const tabId = `tab_${++this.tabCounter}`;
-    const newTab: QueryTab = {
-      id: tabId,
-      title: title,
-      databaseId: databaseId,
-      databaseName: databaseName,
-      query: '-- Write your SQL query here\nSELECT * FROM your_table LIMIT 10;',
-      result: null,
-      isActive: true,
-      isExecuting: false
-    };
+    // Check for duplicate name in same database
+    let finalTitle = title;
+    let counter = 1;
+    while (this.isDuplicateTabName(finalTitle, databaseName)) {
+      finalTitle = `${title} (${counter})`;
+      counter++;
+    }
+
+    const newTab = TabManagementHelper.createQueryTab(
+      ++this.tabCounter,
+      finalTitle,
+      databaseId,
+      databaseName
+    );
 
     // Deactivate all other tabs
-    this.queryTabs.forEach(tab => tab.isActive = false);
+    TabManagementHelper.deactivateAllTabs(this.queryTabs);
 
     // Add new tab
     this.queryTabs.push(newTab);
-    this.activeTabId = tabId;
+    this.activeTabId = newTab.id;
 
     return newTab;
+  }
+
+  isDuplicateTabName(title: string, databaseName: string, excludeTabId?: string): boolean {
+    return this.queryTabs.some(tab => 
+      tab.title === title && 
+      tab.databaseName === databaseName && 
+      tab.id !== excludeTabId
+    );
   }
 
   switchTab(tabId: string): void {
@@ -545,9 +559,8 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     this.activeTabId = tabId;
 
     // Dispose previous editor's DOM
-    if (previousTab && previousTab.editor) {
-      previousTab.editor.dispose();
-      previousTab.editor = null;
+    if (previousTab) {
+      TabManagementHelper.disposeTabEditor(previousTab);
     }
 
     // Re-create editor for active tab after a short delay
@@ -569,9 +582,7 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
 
     // Dispose editor if exists
     const tab = this.queryTabs[index];
-    if (tab.editor) {
-      tab.editor.dispose();
-    }
+    TabManagementHelper.disposeTabEditor(tab);
 
     // Remove tab
     this.queryTabs.splice(index, 1);
@@ -581,9 +592,8 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
       const newActiveIndex = Math.min(index, this.queryTabs.length - 1);
       this.switchTab(this.queryTabs[newActiveIndex].id);
     } else if (this.queryTabs.length === 0) {
-      // Create a new default tab if all tabs are closed
-      this.createNewTab('Main Query', this.databaseId, 'database');
-      setTimeout(() => this.initMonaco(), 100);
+      // No tabs left, clear active tab ID
+      this.activeTabId = null;
     }
 
     this.activeTabId = this.queryTabs.find(t => t.isActive)?.id || null;
@@ -606,31 +616,15 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     
     const tabIndex = this.queryTabs.findIndex(tab => tab.id === tabId);
     
-    this.tabContextMenuItems = [
-      {
-        label: 'Close',
-        icon: 'pi-times',
-        command: () => this.closeTabFromContext()
-      },
-      {
-        label: 'Close Others',
-        icon: 'pi-times-circle',
-        command: () => this.closeOtherTabs(),
-        disabled: this.queryTabs.length <= 1
-      },
-      {
-        label: 'Close to the Right',
-        icon: 'pi-arrow-right',
-        command: () => this.closeTabsToRight(),
-        disabled: tabIndex === this.queryTabs.length - 1
-      },
-      {
-        label: 'Close to the Left',
-        icon: 'pi-arrow-left',
-        command: () => this.closeTabsToLeft(),
-        disabled: tabIndex === 0
-      }
-    ];
+    this.tabContextMenuItems = TabManagementHelper.getTabContextMenuItems(
+      tabIndex,
+      this.queryTabs.length,
+      () => this.renameTab(),
+      () => this.closeTabFromContext(),
+      () => this.closeOtherTabs(),
+      () => this.closeTabsToRight(),
+      () => this.closeTabsToLeft()
+    );
 
     this.showTabContextMenu = true;
   }
@@ -638,6 +632,61 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
   closeTabContextMenu(): void {
     this.showTabContextMenu = false;
     this.contextMenuTabId = null;
+  }
+
+  renameTab(): void {
+    if (!this.contextMenuTabId) return;
+    
+    const tab = this.queryTabs.find(t => t.id === this.contextMenuTabId);
+    if (!tab) return;
+
+    this.editingTabId = tab.id;
+    this.editingTabTitle = tab.title;
+    this.editingTabError = false;
+    
+    this.closeTabContextMenu();
+    
+    // Focus input after view update
+    setTimeout(() => {
+      if (this.tabTitleInput && this.tabTitleInput.nativeElement) {
+        this.tabTitleInput.nativeElement.focus();
+        this.tabTitleInput.nativeElement.select();
+      }
+    }, 0);
+  }
+
+  finishRenameTab(): void {
+    if (!this.editingTabId) return;
+    
+    const tab = this.queryTabs.find(t => t.id === this.editingTabId);
+    if (tab && this.editingTabTitle.trim()) {
+      const newTitle = this.editingTabTitle.trim();
+      
+      // Check if name already exists for same database (excluding current tab)
+      if (this.isDuplicateTabName(newTitle, tab.databaseName, tab.id)) {
+        // Set error state and keep editing mode
+        this.editingTabError = true;
+        // Refocus the input
+        setTimeout(() => {
+          if (this.tabTitleInput && this.tabTitleInput.nativeElement) {
+            this.tabTitleInput.nativeElement.focus();
+          }
+        }, 0);
+        return;
+      }
+      
+      tab.title = newTitle;
+    }
+    
+    this.editingTabId = null;
+    this.editingTabTitle = '';
+    this.editingTabError = false;
+  }
+
+  cancelRenameTab(): void {
+    this.editingTabId = null;
+    this.editingTabTitle = '';
+    this.editingTabError = false;
   }
 
   closeTabFromContext(): void {
@@ -649,14 +698,10 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
   closeOtherTabs(): void {
     if (!this.contextMenuTabId) return;
     
-    const tabsToClose = this.queryTabs.filter(tab => tab.id !== this.contextMenuTabId);
+    const tabsToClose = TabManagementHelper.getOtherTabs(this.queryTabs, this.contextMenuTabId);
     
     // Dispose and remove all other tabs
-    tabsToClose.forEach(tab => {
-      if (tab.editor) {
-        tab.editor.dispose();
-      }
-    });
+    TabManagementHelper.disposeTabEditors(tabsToClose);
     
     // Keep only the context menu tab
     const keepTab = this.queryTabs.find(tab => tab.id === this.contextMenuTabId);
@@ -683,14 +728,10 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     if (tabIndex === -1 || tabIndex === this.queryTabs.length - 1) return;
     
     // Get tabs to the right
-    const tabsToClose = this.queryTabs.slice(tabIndex + 1);
+    const tabsToClose = TabManagementHelper.getTabsToRight(this.queryTabs, tabIndex);
     
     // Dispose editors
-    tabsToClose.forEach(tab => {
-      if (tab.editor) {
-        tab.editor.dispose();
-      }
-    });
+    TabManagementHelper.disposeTabEditors(tabsToClose);
     
     // Remove tabs to the right
     this.queryTabs = this.queryTabs.slice(0, tabIndex + 1);
@@ -713,14 +754,10 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     if (tabIndex === -1 || tabIndex === 0) return;
     
     // Get tabs to the left
-    const tabsToClose = this.queryTabs.slice(0, tabIndex);
+    const tabsToClose = TabManagementHelper.getTabsToLeft(this.queryTabs, tabIndex);
     
     // Dispose editors
-    tabsToClose.forEach(tab => {
-      if (tab.editor) {
-        tab.editor.dispose();
-      }
-    });
+    TabManagementHelper.disposeTabEditors(tabsToClose);
     
     // Remove tabs to the left
     this.queryTabs = this.queryTabs.slice(tabIndex);
@@ -747,19 +784,11 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     this.contextMenuDatabase = databaseName;
     this.contextMenuPosition = { x: event.clientX, y: event.clientY };
     
-    this.contextMenuItems = [
-      {
-        label: 'New Script',
-        icon: 'pi-plus',
-        command: () => this.createNewScriptFromContext(),
-        disabled: this.queryTabs.length >= 10
-      },
-      {
-        label: 'Refresh',
-        icon: 'pi-refresh',
-        command: () => this.refreshDatabaseFromContext()
-      }
-    ];
+    this.contextMenuItems = TabManagementHelper.getDatabaseContextMenuItems(
+      () => this.createNewScriptFromContext(),
+      () => this.refreshDatabaseFromContext(),
+      TabManagementHelper.isMaxTabsReached(this.queryTabs.length)
+    );
 
     this.showContextMenu = true;
   }
@@ -773,21 +802,12 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     if (!this.contextMenuDatabase) return;
 
     // Collapse the database
-    this.expandedDatabases[this.contextMenuDatabase] = false;
-
-    // Collapse all schemas under this database
-    Object.keys(this.expandedSchemas).forEach(key => {
-      if (key.startsWith(this.contextMenuDatabase + '.')) {
-        this.expandedSchemas[key] = false;
-      }
-    });
-
-    // Collapse all tables under this database
-    Object.keys(this.expandedTables).forEach(key => {
-      if (key.startsWith(this.contextMenuDatabase + '.')) {
-        this.expandedTables[key] = false;
-      }
-    });
+    DatabaseSchemaHelper.collapseDatabase(
+      this.contextMenuDatabase,
+      this.expandedDatabases,
+      this.expandedSchemas,
+      this.expandedTables
+    );
 
     // Refresh schema
     if (this.databaseId && this.orgId) {
@@ -803,7 +823,7 @@ export class RunQueryComponent implements OnInit, OnDestroy, AfterViewInit, OnCh
     if (!this.contextMenuDatabase) return;
 
     // Check maximum tab limit - silently return if limit reached
-    if (this.queryTabs.length >= 10) {
+    if (TabManagementHelper.isMaxTabsReached(this.queryTabs.length)) {
       this.closeContextMenu();
       return;
     }

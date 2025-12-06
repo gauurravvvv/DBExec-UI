@@ -9,28 +9,32 @@
     </div>
     <div class="toolbar-right">
       <button 
-        class="btn btn-secondary" 
-        (click)="formatQuery()"
-        [disabled]="isLoadingEditor"
-        title="Format Query (Shift+Alt+F)">
-        <i class="pi pi-align-justify"></i>
-        Format
+        class="btn btn-icon btn-secondary" 
+        (click)="saveCurrentScript()"
+        [disabled]="isLoadingEditor || !getActiveTab()"
+        title="Save Current Script (Ctrl+S)">
+        <i class="pi pi-save"></i>
       </button>
       <button 
-        class="btn btn-secondary" 
+        class="btn btn-icon btn-secondary" 
+        (click)="exportCurrentScript()"
+        [disabled]="isLoadingEditor || !getActiveTab()"
+        title="Export Script">
+        <i class="pi pi-download"></i>
+      </button>
+      <button 
+        class="btn btn-icon btn-secondary" 
         (click)="clearEditor()"
         [disabled]="isLoadingEditor"
         title="Clear Editor">
         <i class="pi pi-trash"></i>
-        Clear
       </button>
       <button 
-        class="btn btn-primary" 
+        class="btn btn-icon btn-primary" 
         (click)="executeQuery()"
         [disabled]="isLoadingEditor || isExecutingQuery || !databaseId"
         title="Execute Query (Ctrl+Enter)">
         <i class="pi" [ngClass]="isExecutingQuery ? 'pi-spin pi-spinner' : 'pi-play'"></i>
-        {{ isExecutingQuery ? 'Executing...' : 'Execute' }}
       </button>
     </div>
   </div>
@@ -176,7 +180,21 @@
             <span class="tab-icon">
               <i class="pi pi-file"></i>
             </span>
-            <span class="tab-title">{{ tab.title }}</span>
+            <div *ngIf="editingTabId === tab.id" class="tab-title-edit-wrapper">
+              <input 
+                class="tab-title-input"
+                [class.error]="editingTabError"
+                [(ngModel)]="editingTabTitle"
+                [maxlength]="30"
+                (blur)="finishRenameTab()"
+                (keydown.enter)="finishRenameTab()"
+                (keydown.escape)="cancelRenameTab()"
+                (input)="editingTabError = false"
+                (click)="$event.stopPropagation()"
+                [title]="editingTabError ? 'Name already exists for this database' : ''"
+                #tabTitleInput>
+            </div>
+            <span *ngIf="editingTabId !== tab.id" class="tab-title">{{ tab.title }}</span>
             <button class="tab-close" 
                     (click)="closeTab(tab.id, $event)"
                     title="Close Tab">
