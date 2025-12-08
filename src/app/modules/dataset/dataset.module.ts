@@ -9,6 +9,7 @@ import { EditDatasetComponent } from './components/edit-dataset/edit-dataset.com
 import { ListDatasetComponent } from './components/list-dataset/list-dataset.component';
 import { ViewDatasetComponent } from './components/view-dataset/view-dataset.component';
 import { DatasetRoutingModule } from './dataset-routing.module';
+import { SaveDatasetDialogComponent } from './components/save-dataset-dialog/save-dataset-dialog.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { DatasetRoutingModule } from './dataset-routing.module';
     EditDatasetComponent,
     ViewDatasetComponent,
     ListDatasetComponent,
+    SaveDatasetDialogComponent,
   ],
   imports: [
     CommonModule,
