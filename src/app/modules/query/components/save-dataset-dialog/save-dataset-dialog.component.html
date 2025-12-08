@@ -1,0 +1,45 @@
+<div class="save-dataset-popup" *ngIf="visible">
+    <div class="popup-content">
+        <h3>Save as Dataset</h3>
+        <form [formGroup]="datasetForm" class="dataset-form">
+            <!-- Dataset Name -->
+            <div class="form-field">
+                <label for="datasetName">Name <span class="required">*</span></label>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-database"></i>
+                    <input id="datasetName" type="text" pInputText formControlName="name"
+                        placeholder="Enter dataset name" maxlength="100"
+                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched}">
+                </span>
+                <small class="error-message"
+                    *ngIf="datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched">
+                    Dataset name is required
+                </small>
+            </div>
+
+            <!-- Description -->
+            <div class="form-field">
+                <label for="datasetDescription">Description</label>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-align-left"></i>
+                    <input id="datasetDescription" type="text" pInputText formControlName="description"
+                        placeholder="Enter dataset description (optional)" maxlength="500"
+                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('description')?.invalid && datasetForm.get('description')?.touched}">
+                </span>
+                <small class="char-count">
+                    {{ datasetForm.get('description')?.value?.length || 0 }}/500 characters
+                </small>
+            </div>
+
+            <div class="popup-actions">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    (click)="onCancel()">
+                </button>
+                <button pButton type="submit" label="Save Dataset" class="p-button-outlined"
+                    [disabled]="datasetForm.invalid" (click)="onSubmit()">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

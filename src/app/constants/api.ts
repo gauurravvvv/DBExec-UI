@@ -45,6 +45,7 @@ export const USER = {
 
 export const DATABASE = {
   LIST: '/database/list',
+  LIST_ALL: '/database/listAll',
   DELETE: '/database/delete/',
   ADD: '/database/add',
   VIEW: '/database/get/',

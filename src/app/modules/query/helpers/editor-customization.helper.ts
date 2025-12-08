@@ -9,7 +9,7 @@ export class EditorCustomizationHelper {
   /**
    * Get the SQL statement at the cursor position
    * Extracts the statement between semicolons where the cursor is located
-   * 
+   *
    * @param editor Monaco editor instance
    * @returns The SQL statement at cursor position, or entire content if no semicolons found
    */
@@ -19,17 +19,18 @@ export class EditorCustomizationHelper {
     const model = editor.getModel();
     const position = editor.getPosition();
     const fullText = model.getValue();
-    
+
     // Get cursor offset in the full text
     const cursorOffset = model.getOffsetAt(position);
-    
+
     // Check if cursor is right after a semicolon
-    const charBeforeCursor = cursorOffset > 0 ? fullText.charAt(cursorOffset - 1) : '';
+    const charBeforeCursor =
+      cursorOffset > 0 ? fullText.charAt(cursorOffset - 1) : '';
     const isAfterSemicolon = charBeforeCursor === ';';
-    
+
     let startOffset: number;
     let endOffset: number;
-    
+
     if (isAfterSemicolon) {
       // Cursor is right after semicolon - get the statement that just ended
       // Find the semicolon before the one at cursor
@@ -41,15 +42,15 @@ export class EditorCustomizationHelper {
       // Find the start of current statement (last semicolon before cursor or start of text)
       startOffset = fullText.lastIndexOf(';', cursorOffset - 1);
       startOffset = startOffset === -1 ? 0 : startOffset + 1;
-      
+
       // Find the end of current statement (next semicolon after cursor or end of text)
       endOffset = fullText.indexOf(';', cursorOffset);
       endOffset = endOffset === -1 ? fullText.length : endOffset + 1;
     }
-    
+
     // Extract the statement
     const statement = fullText.substring(startOffset, endOffset).trim();
-    
+
     // If no statement found or empty, return the entire text
     return statement || fullText.trim();
   }
@@ -57,7 +58,7 @@ export class EditorCustomizationHelper {
   /**
    * Customize Monaco Editor context menu for SQL editing
    * Adds useful SQL-specific actions
-   * 
+   *
    * @param editor Monaco editor instance
    * @param executeCompleteQueryCallback Callback function to execute the complete query
    * @param executeSelectedQueryCallback Callback function to execute selected query
@@ -79,7 +80,7 @@ export class EditorCustomizationHelper {
       run: (ed: any) => {
         const selection = ed.getSelection();
         const hasSelection = selection && !selection.isEmpty();
-        
+
         if (hasSelection) {
           // Execute selected text
           const selectedText = ed.getModel().getValueInRange(selection);
@@ -88,11 +89,12 @@ export class EditorCustomizationHelper {
             return;
           }
         }
-        
+
         // No selection, execute current statement at cursor
-        const currentStatement = EditorCustomizationHelper.getCurrentStatement(ed);
+        const currentStatement =
+          EditorCustomizationHelper.getCurrentStatement(ed);
         executeSelectedQueryCallback(currentStatement);
-      }
+      },
     });
 
     // Run Complete SQL (always runs full query)
@@ -101,11 +103,13 @@ export class EditorCustomizationHelper {
       label: 'Run Complete SQL',
       contextMenuGroupId: 'navigation',
       contextMenuOrder: 2,
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+      ],
       run: (ed: any) => {
         const completeQuery = ed.getValue();
         executeCompleteQueryCallback();
-      }
+      },
     });
 
     // Run Selected SQL (only shows when text is selected)
@@ -123,14 +127,14 @@ export class EditorCustomizationHelper {
             executeSelectedQueryCallback(selectedText);
           }
         }
-      }
+      },
     });
   }
 
   /**
    * Setup keyboard event handlers for Monaco Editor
    * Handles arrow key navigation when suggestion widget is visible
-   * 
+   *
    * @param editor Monaco editor instance
    */
   static setupKeyboardHandlers(editor: any): void {
@@ -138,11 +142,20 @@ export class EditorCustomizationHelper {
 
     // Prevent arrow keys from moving cursor when suggestions are visible
     editor.onKeyDown((e: any) => {
-      const suggestWidget = (editor as any)._contentWidgets['editor.widget.suggestWidget'];
-      const isSuggestWidgetVisible = suggestWidget && suggestWidget.widget && suggestWidget.widget._isVisible;
-      
+      const suggestWidget = (editor as any)._contentWidgets[
+        'editor.widget.suggestWidget'
+      ];
+      const isSuggestWidgetVisible =
+        suggestWidget &&
+        suggestWidget.widget &&
+        suggestWidget.widget._isVisible;
+
       // If suggestions are visible and arrow keys are pressed, let Monaco handle it
-      if (isSuggestWidgetVisible && (e.keyCode === monaco.KeyCode.UpArrow || e.keyCode === monaco.KeyCode.DownArrow)) {
+      if (
+        isSuggestWidgetVisible &&
+        (e.keyCode === monaco.KeyCode.UpArrow ||
+          e.keyCode === monaco.KeyCode.DownArrow)
+      ) {
         // Monaco will handle navigation, do nothing
         return;
       }
@@ -152,11 +165,14 @@ export class EditorCustomizationHelper {
   /**
    * Setup content change listener for Monaco Editor
    * Updates the tab query when editor content changes
-   * 
+   *
    * @param editor Monaco editor instance
    * @param onChangeCallback Callback function when content changes
    */
-  static setupContentChangeListener(editor: any, onChangeCallback: (value: string) => void): void {
+  static setupContentChangeListener(
+    editor: any,
+    onChangeCallback: (value: string) => void
+  ): void {
     if (!editor) return;
 
     editor.onDidChangeModelContent(() => {
@@ -167,7 +183,7 @@ export class EditorCustomizationHelper {
 
   /**
    * Focus the editor after a short delay
-   * 
+   *
    * @param editor Monaco editor instance
    * @param delay Delay in milliseconds (default: 100)
    */
@@ -184,7 +200,7 @@ export class EditorCustomizationHelper {
   /**
    * Clear the container completely before creating new editor
    * Removes all child nodes to prevent Monaco context conflicts
-   * 
+   *
    * @param container DOM container element
    */
   static clearEditorContainer(container: HTMLElement): void {
@@ -195,12 +211,28 @@ export class EditorCustomizationHelper {
 
   /**
    * Dispose an editor instance safely
-   * 
+   *
    * @param editor Monaco editor instance
    */
   static disposeEditor(editor: any): void {
     if (editor) {
       editor.dispose();
     }
+  }
+
+  static exportScript(activeTab: any): void {
+    const query = activeTab.editor?.getValue() || activeTab.query;
+    const databaseName = activeTab.databaseName || 'database';
+    const scriptName = activeTab.title.replace(/\s+/g, '_');
+    const fileName = `${databaseName}_${scriptName}.txt`;
+
+    const blob = new Blob([query], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
   }
 }

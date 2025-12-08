@@ -8,8 +8,8 @@
   width: 100%;
   background-color: var(--background-color);
   overflow: hidden;
-     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 // ===================================================================
@@ -42,30 +42,30 @@
 
       .p-float-label {
         width: 100%;
-        
+
         ::ng-deep {
           .p-dropdown {
             background: var(--card-background);
             border-color: var(--border-color);
-            
+
             &:not(.p-disabled):hover {
               border-color: var(--primary-color);
             }
-            
+
             &:not(.p-disabled).p-focus {
               border-color: var(--primary-color);
               box-shadow: 0 0 0 1px var(--primary-color-transparent);
             }
-            
+
             .p-dropdown-label {
               color: var(--text-color);
             }
-            
+
             .p-dropdown-trigger {
               color: var(--text-color);
             }
           }
-          
+
           label {
             color: var(--text-color);
             opacity: 0.7;
@@ -303,7 +303,7 @@
       min-width: auto !important;
       background: transparent !important;
       border: none !important;
-      
+
       &:enabled:hover {
         background: var(--hover-background) !important;
       }
@@ -1311,9 +1311,16 @@ tbody tr:hover .row-number {
     }
 
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-4px); }
-      75% { transform: translateX(4px); }
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-4px);
+      }
+      75% {
+        transform: translateX(4px);
+      }
     }
 
     .tab-close {

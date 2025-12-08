@@ -22,6 +22,20 @@ export class DatabaseService {
       });
   }
 
+  listAllDatabase(params: any) {
+    return this.http
+      .get(
+        DATABASE.LIST_ALL +
+          `/${params.orgId}` +
+          `/${params.pageNumber}/${params.limit}`
+      )
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   deleteDatabase(
     orgId: string,
     id: string,

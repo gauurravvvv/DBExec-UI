@@ -97,7 +97,7 @@ export class ListDatabaseComponent implements OnInit {
       limit: this.pageSize,
     };
 
-    this.databaseService.listDatabase(params).then(response => {
+    this.databaseService.listAllDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.dbs = response.data;
         this.filteredDBs = [...this.dbs];

@@ -35,8 +35,7 @@ export class DatasetService {
   }
 
   addDataset(payload: any) {
-    const { name, description, organisation, database, columnMappings } =
-      payload;
+    const { name, description, organisation, database, sql } = payload;
 
     return this.http
       .post(DATASET.ADD, {
@@ -44,7 +43,7 @@ export class DatasetService {
         description,
         organisation,
         database,
-        columnMappings,
+        sql,
       })
       .toPromise()
       .then((response: any) => {
