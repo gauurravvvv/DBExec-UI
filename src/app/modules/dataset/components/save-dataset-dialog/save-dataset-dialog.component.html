@@ -1,6 +1,6 @@
 <div class="save-dataset-popup" *ngIf="visible">
     <div class="popup-content">
-        <h3>Save as Dataset</h3>
+        <h3>{{ dialogTitle }}</h3>
         <form [formGroup]="datasetForm" class="dataset-form">
             <!-- Dataset Name -->
             <div class="form-field">

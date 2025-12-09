@@ -181,15 +181,7 @@ export class DatasetService {
   }
 
   updateDataset(payload: any) {
-    const {
-      id,
-      name,
-      description,
-      organisation,
-      database,
-      columnMappings,
-      status,
-    } = payload;
+    const { id, name, description, organisation, database, sql } = payload;
 
     return this.http
       .put(DATASET.UPDATE, {
@@ -198,8 +190,7 @@ export class DatasetService {
         description,
         organisation,
         database,
-        columnMappings,
-        status: status ? 1 : 0,
+        sql,
       })
       .toPromise()
       .then((response: any) => {

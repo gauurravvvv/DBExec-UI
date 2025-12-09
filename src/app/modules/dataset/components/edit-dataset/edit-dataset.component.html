@@ -1,173 +1,284 @@
-<div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/dataset">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-                <h2>Edit Dataset</h2>
+<div class="query-editor-wrapper">
+    <!-- Header Toolbar -->
+    <div class="query-toolbar">
+        <div class="toolbar-left">
+            <!-- Organisation Input (readonly) -->
+            <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+                <label for="org-input">Organisation</label>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-building"></i>
+                    <input id="org-input" type="text" pInputText [value]="selectedOrgName" placeholder="Organisation"
+                        readonly [ngClass]="{ readonly: true }" />
+                </span>
             </div>
-            <div class="warning-section" *ngIf="hasDuplicates">
-                <div class="duplicate-warning">
-                    <i class="pi pi-exclamation-triangle"></i>
-                    <span>Duplicate column selection found. Please remove duplicates to continue.</span>
-                </div>
+
+            <!-- Database Input (readonly) -->
+            <div class="dropdown-field">
+                <label for="db-input">Database</label>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-database"></i>
+                    <input id="db-input" type="text" pInputText [value]="selectedDatabaseName" placeholder="Database"
+                        readonly [ngClass]="{ readonly: true }" />
+                </span>
             </div>
-            <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
-                    [disabled]="!isFormDirty" (click)="onCancel()">
-                </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="datasetForm.invalid || hasDuplicates">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
+
         </div>
+        <div class="toolbar-right">
+            <button pButton class="p-button-text btn-dataset" (click)="saveAsDataset()"
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isQueryEmpty || !hasQueryChanged"
+                title="Update Dataset">
+                <i class="pi pi-save"></i>
+            </button>
+            <button pButton class="p-button-text btn-export" (click)="resetToOriginal()"
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || !hasQueryChanged"
+                title="Reset to Original">
+                <i class="pi pi-undo"></i>
+            </button>
+            <button pButton class="p-button-text btn-export" (click)="triggerFileInput()"
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor" title="Import SQL File">
+                <i class="pi pi-upload"></i>
+            </button>
+            <button pButton class="p-button-text btn-export" (click)="exportCurrentScript()"
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isQueryEmpty" title="Export Script">
+                <i class="pi pi-download"></i>
+            </button>
+            <button pButton class="p-button-text btn-danger" (click)="clearEditor()"
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isQueryEmpty" title="Clear Editor">
+                <i class="pi pi-trash"></i>
+            </button>
+            <button pButton class="p-button-text btn-primary" (click)="executeQuery()"
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isExecutingQuery || isQueryEmpty"
+                title="Execute Query (Ctrl+Enter)">
+                <i class="pi" [ngClass]="isExecutingQuery ? 'pi-spin pi-spinner' : 'pi-play'"></i>
+            </button>
+        </div>
+    </div>
 
-        <!-- Form Section -->
-        <form [formGroup]="datasetForm" class="admin-form" #formContainer>
-            <div class="form-grid">
-                <!-- Name and Description fields -->
-                <div class="form-field">
-                    <label for="name">Name <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-box"></i>
-                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
-                            [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched">
-                        <span *ngIf="datasetForm.get('name')?.errors?.['required']">Name is required</span>
-                        <span *ngIf="datasetForm.get('name')?.errors?.['pattern']">Name can only contain
-                            letters, spaces and hyphens</span>
-                    </small>
+    <!-- Main Content Area with Sidebar and Editor -->
+    <div class="main-content">
+        <!-- Left Sidebar - Database Explorer -->
+        <div class="database-sidebar" [class.collapsed]="!showDatabaseSidebar">
+            <div class="sidebar-content">
+                <div class="sidebar-header">
+                    <h4>
+                        <i class="pi pi-sitemap"></i>
+                        Schema Explorer
+                    </h4>
+                    <button pButton class="p-button-text p-button-sm" (click)="refreshSelectedDatabase()"
+                        [disabled]="!selectedDatabaseObj || loadingDatabases[selectedDatabaseObj?.id]"
+                        title="Refresh Schema">
+                        <i class="pi pi-refresh"
+                            [class.pi-spin]="selectedDatabaseObj && loadingDatabases[selectedDatabaseObj.id]"></i>
+                    </button>
                 </div>
 
-                <div class="form-field">
-                    <label for="description">Description</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-align-left"></i>
-                        <input id="description" pInputText formControlName="description" rows="3"
-                            placeholder="Enter description">
-                    </span>
-                </div>
-
-                <!-- Organisation and Database fields (disabled) -->
-                <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-building"></i>
-                        <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled>
-                    </span>
-                </div>
-
-                <div class="form-field">
-                    <label for="database">Database</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-database"></i>
-                        <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled>
-                    </span>
-                </div>
-
-                <div class="form-field">
-                    <label for="status">Status</label>
-                    <div class="status-wrapper">
-                        <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
-                        <span class="status-text">{{ datasetForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
-                            }}</span>
-                    </div>
-                </div>
-
-                <!-- Column Mappings -->
-                <div class="form-field fields-container" *ngIf="schemas.length > 0">
-                    <div class="fields-header">
-                        <label>Column Mappings<span class="required">*</span></label>
-                        <div class="button-group">
-                            <button pButton type="button" icon="pi pi-times"
-                                class="p-button-rounded p-button-text p-button-danger clear-btn mr-1"
-                                (click)="clearAllMappings()">
-                            </button>
-                            <button pButton type="button" icon="pi pi-plus"
-                                class="p-button-rounded p-button-text add-btn"
-                                (click)="addSchemaGroup(); scrollToBottom()" [style]="{'color': '#2196f3'}">
-                            </button>
-                        </div>
+                <div class="sidebar-content-inner">
+                    <div class="schema-search">
+                        <input type="text" placeholder="Search tables..." [(ngModel)]="schemaSearchText"
+                            class="search-input">
                     </div>
 
-                    <div class="fields-list">
-                        <div *ngFor="let schemaGroup of schemaGroups.controls; let groupIndex=index"
-                            [formGroup]="$any(schemaGroup)" class="schema-group"
-                            [class.highlight-animation]="groupIndex === lastAddedSchemaIndex && isNewlyAdded">
+                    <!-- No Database Selected Message -->
+                    <div class="empty-state" *ngIf="!selectedDatabaseObj && !isLoadingDataset">
+                        <i class="pi pi-database" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p>Loading dataset information...</p>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="empty-state" *ngIf="selectedDatabaseObj && loadingDatabases[selectedDatabaseObj.id]">
+                        <i class="pi pi-spin pi-spinner" style="font-size: 3rem;"></i>
+                        <p>Loading schema...</p>
+                    </div>
+
+                    <!-- Schema Structure (only for selected database) -->
+                    <div class="databases-list"
+                        *ngIf="selectedDatabaseObj && databaseSchemas[selectedDatabaseObj.id] && !loadingDatabases[selectedDatabaseObj.id]">
+                        <div *ngFor="let schema of getFilteredSchemas(databaseSchemas[selectedDatabaseObj.id]?.schemas || [])"
+                            class="schema-item">
+
                             <!-- Schema Header -->
-                            <div class="schema-header">
-                                <p-dropdown [options]="getAvailableSchemas(groupIndex)" optionLabel="name"
-                                    optionValue="name" formControlName="schema" [filter]="true" filterBy="name"
-                                    [style]="{'width':'300px'}" placeholder="Select Schema">
-                                </p-dropdown>
-                                <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
-                                    (click)="addMappingToSchema(groupIndex); scrollToNewMapping(groupIndex)"
-                                    [disabled]="!schemaGroup.get('schema')?.value" [style]="{'color': '#2196f3'}">
-                                </button>
-                                <button pButton type="button" icon="pi pi-trash"
-                                    class="p-button-rounded p-button-text p-button-danger"
-                                    (click)="removeSchemaGroup(groupIndex)" [disabled]="schemaGroups.length === 1">
-                                </button>
+                            <div class="schema-header" (click)="toggleSchema(selectedDatabaseObj.id, schema.name)">
+                                <i class="pi"
+                                    [ngClass]="expandedSchemas[selectedDatabaseObj.id + '.' + schema.name] ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                                <i class="pi pi-folder"></i>
+                                <span class="schema-name">{{ schema.name }}</span>
+                                <span class="table-count">{{ schema.tables.length }} tables</span>
                             </div>
 
-                            <!-- Mappings for this schema -->
-                            <div class="mappings-list" formArrayName="mappings">
-                                <div *ngFor="let mapping of getSchemaGroupMappings(groupIndex).controls; let mappingIndex=index"
-                                    [formGroupName]="mappingIndex" class="mapping-row" [ngClass]="{
-                                        'duplicate': isDuplicateRow(groupIndex, mappingIndex),
-                                        'highlight-animation': groupIndex === lastAddedMappingGroupIndex && 
-                                                            mappingIndex === lastAddedMappingIndex && 
-                                                            isNewlyAddedMapping
-                                    }" [id]="'mapping-' + groupIndex + '-' + mappingIndex">
-                                    <span class="index-number">{{mappingIndex + 1}}</span>
-                                    <div class="mapping-inputs">
-                                        <!-- Table Dropdown -->
-                                        <div class="dropdown-container">
-                                            <p-dropdown [options]="getAvailableTables(schemaGroup.get('schema')?.value)"
-                                                optionLabel="name" optionValue="name" formControlName="table"
-                                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                                placeholder="Select Table">
-                                            </p-dropdown>
-                                        </div>
+                            <!-- Tables List -->
+                            <div class="tables-list"
+                                *ngIf="expandedSchemas[selectedDatabaseObj.id + '.' + schema.name]">
+                                <div *ngFor="let table of getFilteredTables(schema.tables)" class="table-item"
+                                    [class.expanded]="isTableExpanded(selectedDatabaseObj.id, schema.name, table.name)">
 
-                                        <!-- Column Dropdown -->
-                                        <div class="dropdown-container">
-                                            <p-dropdown
-                                                [options]="getAvailableColumns(schemaGroup.get('schema')?.value, mapping.get('table')?.value)"
-                                                optionLabel="name" optionValue="name" formControlName="column"
-                                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                                placeholder="Select Column">
-                                            </p-dropdown>
-                                        </div>
+                                    <!-- Table Header -->
+                                    <div class="table-header"
+                                        (click)="toggleTable(selectedDatabaseObj.id, schema.name, table.name)">
+                                        <i class="pi"
+                                            [ngClass]="isTableExpanded(selectedDatabaseObj.id, schema.name, table.name) ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                                        <i class="pi pi-table"></i>
+                                        <span class="table-name">{{ table.name }}</span>
+                                        <span class="column-count">{{ table.columns.length }} cols</span>
+                                    </div>
 
-                                        <!-- Value Input -->
-                                        <div class="input-container">
-                                            <span class="p-input-icon-left">
-                                                <i class="pi pi-pencil"></i>
-                                                <input pInputText formControlName="value" placeholder="Enter value">
-                                            </span>
+                                    <!-- Columns List -->
+                                    <div class="columns-list"
+                                        *ngIf="isTableExpanded(selectedDatabaseObj.id, schema.name, table.name)">
+                                        <div *ngFor="let column of table.columns" class="column-item"
+                                            (click)="insertColumnName(selectedDatabaseObj.id, schema.name, table.name, column.name)"
+                                            [title]="'Click to insert ' + table.name + '.' + column.name">
+                                            <i class="pi" [ngClass]="{
+                           'pi-key': column.isPrimaryKey,
+                           'pi-link': column.isForeignKey && !column.isPrimaryKey,
+                           'pi-circle': !column.isPrimaryKey && !column.isForeignKey
+                         }" [style.color]="column.isPrimaryKey ? '#ffc107' : (column.isForeignKey ? '#2196f3' : '')"></i>
+                                            <span class="column-name">{{ column.name }}</span>
+                                            <span class="column-type">({{ column.type }})</span>
                                         </div>
-
-                                        <button pButton type="button" icon="pi pi-minus"
-                                            class="p-button-rounded p-button-text p-button-danger"
-                                            (click)="removeMappingFromSchema(groupIndex, mappingIndex)"
-                                            [disabled]="getSchemaGroupMappings(groupIndex).length === 1">
-                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Rotated Title (When Collapsed) -->
+                <div class="rotated-title" *ngIf="!showDatabaseSidebar">
+                    SCHEMA EXPLORER
+                </div>
             </div>
-        </form>
+        </div>
+
+        <!-- Separator with Toggle Button -->
+        <div class="separator">
+            <button class="toggle-btn" (click)="toggleDatabaseSidebar()" title="Toggle Database Sidebar">
+                <i class="pi" [ngClass]="showDatabaseSidebar ? 'pi-chevron-left' : 'pi-chevron-right'"></i>
+            </button>
+        </div>
+
+        <!-- Right Content Area - Editor and Results -->
+        <div class="editor-results-area">
+
+            <!-- Monaco Editor Section -->
+            <div class="editor-section">
+                <div class="editor-container" [hidden]="isLoadingEditor || monacoLoadFailed">
+                    <div id="sql-editor-container" class="single-editor-container"></div>
+                </div>
+
+                <!-- No Database Selected State -->
+                <div class="empty-state" *ngIf="!selectedDatabaseObj && !isLoadingEditor && !isLoadingDataset">
+                    <i class="pi pi-database"></i>
+                    <h3>Loading Dataset</h3>
+                    <p>Please wait while we load your dataset information...</p>
+                </div>
+
+                <!-- Loading State -->
+                <div class="editor-loading" *ngIf="isLoadingEditor && !monacoLoadFailed">
+                    <i class="pi pi-spin pi-spinner"></i>
+                    <p>Loading Monaco Editor...</p>
+                    <p class="loading-hint">This may take a few seconds on first load</p>
+                </div>
+
+                <!-- Error State -->
+                <div class="editor-error" *ngIf="monacoLoadFailed">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <h4>Failed to Load Editor</h4>
+                    <p>Monaco Editor could not be loaded from CDN.</p>
+                    <ul>
+                        <li>Check your internet connection</li>
+                        <li>Disable ad blockers or security extensions</li>
+                        <li>Check browser console for network errors</li>
+                    </ul>
+                    <button class="btn btn-primary" (click)="retryLoadMonaco()">
+                        <i class="pi pi-refresh"></i>
+                        Retry
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" *ngIf="selectedDatabaseObj && queryResult">
+                <div class="results-content">
+                    <!-- Results Header -->
+                    <div class="results-header">
+                        <div class="results-info">
+                            <span class="results-title">
+                                <i class="pi pi-table"></i>
+                                Query Results
+                            </span>
+                            <span class="results-meta" *ngIf="!queryResult.error">
+                                {{ queryResult.rowCount }} row(s) in {{ queryResult.executionTime }}
+                            </span>
+                        </div>
+                        <div class="results-actions">
+                            <button class="btn btn-icon" *ngIf="!queryResult.error" title="Export Results">
+                                <i class="pi pi-download"></i>
+                            </button>
+                            <button class="btn btn-icon" (click)="queryResult = null" title="Close Results">
+                                <i class="pi pi-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div class="results-error" *ngIf="queryResult.error">
+                        <i class="pi pi-exclamation-triangle"></i>
+                        <div class="error-content">
+                            <h4>Query Execution Failed</h4>
+                            <p>{{ queryResult.error }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Success Message (for non-SELECT queries) -->
+                    <div class="results-success" *ngIf="queryResult.message && !queryResult.error">
+                        <i class="pi pi-check-circle"></i>
+                        <div class="success-content">
+                            <h4>Query Executed Successfully</h4>
+                            <p>{{ queryResult.message }}</p>
+                            <p *ngIf="queryResult.executionTime" class="execution-time">
+                                Execution Time: {{ queryResult.executionTime }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Results Table -->
+                    <div class="results-table-wrapper" *ngIf="!queryResult.error && queryResult.rows.length > 0">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th class="row-number-header">#</th>
+                                    <th *ngFor="let column of queryResult.columns">{{ column }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of queryResult.rows; let i = index">
+                                    <td class="row-number">{{ i + 1 }}</td>
+                                    <td *ngFor="let column of queryResult.columns" [title]="row[column]">
+                                        {{ row[column] !== null && row[column] !== undefined ? row[column] : 'NULL' }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- No Results Message -->
+                    <div class="results-empty" *ngIf="!queryResult.error && queryResult.rows.length === 0">
+                        <i class="pi pi-inbox"></i>
+                        <p>Query executed successfully but returned no rows.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Toast for messages -->
-<p-toast></p-toast>
+<!-- Save as Dataset Dialog -->
+<app-save-dataset-dialog [visible]="showDatasetDialog" [initialName]="datasetName"
+    [initialDescription]="datasetDescription" [dialogTitle]="'Update Dataset'" (close)="onDatasetDialogClose($event)">
+</app-save-dataset-dialog>
+
+<!-- Hidden File Input for SQL Import -->
+<input type="file" #fileInput style="display: none;" (change)="onFileSelected($event)" />
+
+
+<p-toast key="topRight" position="top-right"></p-toast>

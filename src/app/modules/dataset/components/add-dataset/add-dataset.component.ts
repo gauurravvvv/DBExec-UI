@@ -1,11 +1,13 @@
 import {
   AfterViewInit,
   Component,
+  ElementRef,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -27,6 +29,7 @@ import { QueryService } from '../../services copy/query.service';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 import { DATASET } from 'src/app/constants/routes';
+import { MessageService } from 'primeng/api';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -40,6 +43,9 @@ declare const window: any;
 export class AddDatasetComponent
   implements OnInit, OnDestroy, AfterViewInit, OnChanges
 {
+  // ViewChild for file input
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   // Removed ViewChild as we now use dynamic containers per tab
   @Input() databaseId?: number;
   @Input() orgId?: number;
@@ -108,12 +114,33 @@ export class AddDatasetComponent
     );
   }
 
+  get isQueryEmpty(): boolean {
+    const query = this.currentQuery.trim();
+    const defaultQuery = '-- Write your SQL query here';
+    return !query || query === defaultQuery;
+  }
+
   getFilteredTables(tables: any[]): any[] {
     if (!this.schemaSearchText) {
       return tables;
     }
     const search = this.schemaSearchText.toLowerCase();
     return tables.filter(table => table.name.toLowerCase().includes(search));
+  }
+
+  getFilteredSchemas(schemas: any[]): any[] {
+    if (!schemas || !this.schemaSearchText) {
+      return schemas || [];
+    }
+    const search = this.schemaSearchText.toLowerCase();
+    return schemas.filter(schema => {
+      // Show schema if its name matches or if any of its tables match
+      const schemaNameMatches = schema.name.toLowerCase().includes(search);
+      const hasMatchingTable = schema.tables.some((table: any) =>
+        table.name.toLowerCase().includes(search)
+      );
+      return schemaNameMatches || hasMatchingTable;
+    });
   }
 
   constructor(
@@ -123,7 +150,8 @@ export class AddDatasetComponent
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private datasetService: DatasetService,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -683,6 +711,76 @@ export class AddDatasetComponent
     link.download = fileName;
     link.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  triggerFileInput(): void {
+    if (this.fileInput) {
+      this.fileInput.nativeElement.click();
+    }
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file extension
+    const fileName = file.name.toLowerCase();
+    if (!fileName.endsWith('.sql') && !fileName.endsWith('.txt')) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Invalid File Format',
+        detail: 'Please upload a valid SQL file (.sql or .txt)',
+        key: 'topRight',
+        life: 3000,
+        styleClass: 'custom-toast',
+      });
+      // Reset the file input
+      event.target.value = '';
+      return;
+    }
+
+    // Validate file size (e.g., max 2MB)
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'File Too Large',
+        detail: `File size must be less than ${maxSizeInMB}MB`,
+        key: 'topRight',
+        life: 3000,
+        styleClass: 'custom-toast',
+      });
+      event.target.value = '';
+      return;
+    }
+
+    // Read file content
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const content = e.target.result;
+      if (this.editor) {
+        // Set the content to the editor
+        this.editor.setValue(content);
+        this.currentQuery = content;
+      }
+      // Reset the file input so the same file can be selected again if needed
+      event.target.value = '';
+    };
+
+    reader.onerror = () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Import Failed',
+        detail: 'Failed to read the file. Please try again.',
+        key: 'topRight',
+        life: 3000,
+        styleClass: 'custom-toast',
+      });
+      event.target.value = '';
+    };
+
+    reader.readAsText(file);
   }
 
   saveAsDataset(): void {

@@ -28,19 +28,23 @@
         </div>
         <div class="toolbar-right">
             <button pButton class="p-button-text btn-dataset" (click)="saveAsDataset()"
-                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor" title="Save as Dataset">
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isQueryEmpty" title="Save as Dataset">
                 <i class="pi pi-save"></i>
             </button>
+            <button pButton class="p-button-text btn-export" (click)="triggerFileInput()"
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor" title="Import SQL File">
+                <i class="pi pi-upload"></i>
+            </button>
             <button pButton class="p-button-text btn-export" (click)="exportCurrentScript()"
-                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor" title="Export Script">
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isQueryEmpty" title="Export Script">
                 <i class="pi pi-download"></i>
             </button>
             <button pButton class="p-button-text btn-danger" (click)="clearEditor()"
-                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor" title="Clear Editor">
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isQueryEmpty" title="Clear Editor">
                 <i class="pi pi-trash"></i>
             </button>
             <button pButton class="p-button-text btn-primary" (click)="executeQuery()"
-                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isExecutingQuery"
+                [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor || isExecutingQuery || isQueryEmpty"
                 title="Execute Query (Ctrl+Enter)">
                 <i class="pi" [ngClass]="isExecutingQuery ? 'pi-spin pi-spinner' : 'pi-play'"></i>
             </button>
@@ -86,7 +90,7 @@
                     <!-- Schema Structure (only for selected database) -->
                     <div class="databases-list"
                         *ngIf="selectedDatabaseObj && databaseSchemas[selectedDatabaseObj.id] && !loadingDatabases[selectedDatabaseObj.id]">
-                        <div *ngFor="let schema of databaseSchemas[selectedDatabaseObj.id]?.schemas"
+                        <div *ngFor="let schema of getFilteredSchemas(databaseSchemas[selectedDatabaseObj.id]?.schemas || [])"
                             class="schema-item">
 
                             <!-- Schema Header -->
@@ -101,7 +105,7 @@
                             <!-- Tables List -->
                             <div class="tables-list"
                                 *ngIf="expandedSchemas[selectedDatabaseObj.id + '.' + schema.name]">
-                                <div *ngFor="let table of schema.tables" class="table-item"
+                                <div *ngFor="let table of getFilteredTables(schema.tables)" class="table-item"
                                     [class.expanded]="isTableExpanded(selectedDatabaseObj.id, schema.name, table.name)">
 
                                     <!-- Table Header -->
@@ -133,16 +137,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Empty State -->
-                <div class="schema-empty" *ngIf="!availableDatabases || availableDatabases.length === 0">
-                    <i class="pi pi-database"></i>
-                    <p>No databases available</p>
-                    <button class="btn btn-small btn-primary" (click)="loadDatabases()">
-                        <i class="pi pi-refresh"></i>
-                        Load Databases
-                    </button>
                 </div>
 
                 <!-- Rotated Title (When Collapsed) -->
@@ -302,3 +296,8 @@
 <!-- Save as Dataset Dialog -->
 <app-save-dataset-dialog [visible]="showDatasetDialog" (close)="onDatasetDialogClose($event)">
 </app-save-dataset-dialog>
+
+<!-- Hidden File Input for SQL Import -->
+<input type="file" #fileInput style="display: none;" (change)="onFileSelected($event)" />
+
+<p-toast key="topRight" position="top-right"></p-toast>

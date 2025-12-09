@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnChanges,
   Output,
   EventEmitter,
   Input,
@@ -18,8 +19,11 @@ export interface DatasetFormData {
   templateUrl: './save-dataset-dialog.component.html',
   styleUrls: ['./save-dataset-dialog.component.scss'],
 })
-export class SaveDatasetDialogComponent implements OnInit {
+export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   @Input() visible = false;
+  @Input() initialName = '';
+  @Input() initialDescription = '';
+  @Input() dialogTitle = 'Save as Dataset';
   @Output() close = new EventEmitter<DatasetFormData | null>();
 
   datasetForm!: FormGroup;
@@ -35,6 +39,15 @@ export class SaveDatasetDialogComponent implements OnInit {
 
   ngOnInit() {
     this.initForm();
+  }
+
+  ngOnChanges() {
+    if (this.visible && this.datasetForm) {
+      this.datasetForm.patchValue({
+        name: this.initialName,
+        description: this.initialDescription,
+      });
+    }
   }
 
   initForm() {

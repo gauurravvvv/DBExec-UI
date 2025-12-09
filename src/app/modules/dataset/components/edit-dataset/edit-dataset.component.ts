@@ -1,563 +1,976 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import {
+  EDITOR_LOADING_CONFIG,
+  MONACO_EDITOR_OPTIONS,
+} from '../../config/sql-editor.config';
+import { DatabaseSchema, QueryResult } from '../../helpers/dummy-data.helper';
+import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
+import {
+  ContextMenuItem,
+  ContextMenuPosition,
+} from '../../models/query-tab.model';
+import { MonacoIntelliSenseService } from '../../services copy/monaco-intellisense.service';
+import { QueryService } from '../../services copy/query.service';
 import { DatasetService } from '../../services/dataset.service';
+import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
+// Declare Monaco and window for TypeScript
+declare const monaco: any;
+declare const window: any;
 @Component({
   selector: 'app-edit-dataset',
   templateUrl: './edit-dataset.component.html',
   styleUrls: ['./edit-dataset.component.scss'],
 })
-export class EditDatasetComponent implements OnInit {
-  datasetForm!: FormGroup;
-  organisations: any[] = [];
-  schemas: any[] = [];
-  tables: { [key: string]: any[] } = {};
-  columns: { [key: string]: any[] } = {};
-  databases: any[] = [];
-  isFormDirty: boolean = false;
-  userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
-  selectedOrg: any = null;
-  selectedDatabase: any = null;
-  orgId: string = '';
-  datasetId: string = '';
-  originalFormValue: any;
-  staticSchemaData: any[] = [];
-  duplicateRows: { [key: string]: Array<[number, number]> } = {};
+export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
+  // ViewChild for file input
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
+  // Dataset ID from route
+  datasetId?: number;
+  orgId?: number;
+  isLoadingDataset = false;
+  datasetName: string = '';
+  datasetDescription: string = '';
+  datasetStatus: number = 1;
+  initialQuery?: string;
+  originalQuery: string = ''; // Store original query from dataset
+
+  editor: any;
+  isLoadingEditor = true;
+  isLoadingSchema = false;
+  isExecutingQuery = false;
+  monacoLoadFailed = false;
+  queryResult: QueryResult | null = null;
+  databases: DatabaseSchema[] = [];
+  currentQuery = '';
+
+  // Theme monitoring
+  private themeObserver: MutationObserver | null = null;
+  private currentTheme: string = 'vs-dark';
+
+  // Database sidebar
+  showDatabaseSidebar = true;
+  expandedDatabases: { [key: string]: boolean } = {};
+  expandedSchemas: { [key: string]: boolean } = {};
+  expandedTables: { [key: string]: boolean } = {};
+  schemaSearchText = '';
+
+  // Context Menu
+  showContextMenu = false;
+  contextMenuPosition: ContextMenuPosition = { x: 0, y: 0 };
+  contextMenuItems: ContextMenuItem[] = [];
+  contextMenuDatabase: any | null = null;
+
+  // Save as Dataset Dialog
+  showDatasetDialog = false;
+
+  // IntelliSense provider disposables
+  private completionProviderDisposable: any = null;
+  private hoverProviderDisposable: any = null;
+
+  // Organisation Management
+  selectedOrg: any = {};
   selectedOrgName: string = '';
+  userRole: string = '';
+  showOrganisationDropdown: boolean = false;
+  selectedDatabaseObj: any = null;
   selectedDatabaseName: string = '';
-  isNewlyAdded: boolean = false;
-  isNewlyAddedMapping: boolean = false;
-  lastAddedSchemaIndex: number = -1;
-  lastAddedMappingGroupIndex: number = -1;
-  lastAddedMappingIndex: number = -1;
 
-  @ViewChild('formContainer') formContainer!: ElementRef;
+  // Database Schema Management
+  databaseSchemas: { [dbId: string]: DatabaseSchema } = {};
+  loadingDatabases: { [dbId: string]: boolean } = {};
 
+  get isQueryEmpty(): boolean {
+    const query = this.currentQuery.trim();
+    const defaultQuery = '-- Write your SQL query here';
+    return !query || query === defaultQuery;
+  }
+
+  get hasQueryChanged(): boolean {
+    if (!this.editor) return false;
+    const currentQuery = this.editor.getValue().trim();
+    const originalQuery = this.originalQuery.trim();
+    return currentQuery !== originalQuery;
+  }
+
+  getFilteredTables(tables: any[]): any[] {
+    if (!this.schemaSearchText) {
+      return tables;
+    }
+    const search = this.schemaSearchText.toLowerCase();
+    return tables.filter(table => table.name.toLowerCase().includes(search));
+  }
+
+  getFilteredSchemas(schemas: any[] | undefined): any[] {
+    if (!schemas || !this.schemaSearchText) {
+      return schemas || [];
+    }
+    const search = this.schemaSearchText.toLowerCase();
+    return schemas.filter(schema => {
+      // Show schema if its name matches or if any of its tables match
+      const schemaNameMatches = schema.name.toLowerCase().includes(search);
+      const hasMatchingTable = schema.tables.some((table: any) =>
+        table.name.toLowerCase().includes(search)
+      );
+      return schemaNameMatches || hasMatchingTable;
+    });
+  }
   constructor(
-    private fb: FormBuilder,
+    private queryService: QueryService,
+    private monacoIntelliSenseService: MonacoIntelliSenseService,
+    private globalService: GlobalService,
+    private datasetService: DatasetService,
     private router: Router,
     private route: ActivatedRoute,
-    private globalService: GlobalService,
-    private databaseService: DatabaseService,
-    private datasetService: DatasetService,
     private messageService: MessageService
-  ) {}
+  ) {
+    this.userRole = this.globalService.getTokenDetails('role') || '';
+    this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  }
 
   ngOnInit(): void {
-    this.initForm();
+    // Fetch orgId and datasetId from route params
+    this.route.params.subscribe(params => {
+      this.datasetId = params['id'] ? +params['id'] : undefined;
+      this.orgId = params['orgId']
+        ? +params['orgId']
+        : this.globalService.getTokenDetails('organisationId');
 
-    this.datasetId = this.route.snapshot.params['id'];
-    this.orgId = this.route.snapshot.params['orgId'];
-
-    if (this.datasetId) {
-      this.loadDatasetData();
-    }
-  }
-
-  initForm(): void {
-    this.datasetForm = this.fb.group({
-      id: [''],
-      name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s-]+$')]],
-      description: [''],
-      organisation: [''],
-      database: [''],
-      status: [false],
-      schemaGroups: this.fb.array([]),
-    });
-
-    this.datasetForm.valueChanges.subscribe(() => {
-      this.checkFormDirty();
-    });
-  }
-
-  get schemaGroups(): FormArray {
-    return this.datasetForm.get('schemaGroups') as FormArray;
-  }
-
-  loadDatasetData(): void {
-    this.datasetService
-      .getDataset(this.orgId, this.datasetId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const datasetData = response.data;
-          this.selectedOrg = { id: datasetData.organisationId };
-          this.selectedDatabase = { id: datasetData.databaseId };
-          this.selectedOrgName = datasetData.organisationName || '';
-          this.selectedDatabaseName = datasetData.databaseName || '';
-
-          this.loadDatabaseSchemas(() => {
-            this.datasetForm.patchValue({
-              id: datasetData.id,
-              name: datasetData.name,
-              description: datasetData.description,
-              organisation: datasetData.organisationId,
-              database: datasetData.databaseId,
-              status: datasetData.status,
-            });
-
-            while (this.schemaGroups.length) {
-              this.schemaGroups.removeAt(0);
-            }
-
-            // Process the mapping data
-            if (Array.isArray(datasetData.datasetMapping)) {
-              datasetData.datasetMapping.forEach((schemaMapping: any) => {
-                const schemaGroup = this.fb.group({
-                  schema: [schemaMapping.schema, Validators.required],
-                  mappings: this.fb.array([]),
-                });
-
-                this.loadTablesForSchema(schemaMapping.schema);
-
-                // Process tables and their columns
-                if (Array.isArray(schemaMapping.tables)) {
-                  schemaMapping.tables.forEach((tableData: any) => {
-                    const tableName = tableData.table;
-                    this.loadColumnsForMapping(schemaMapping.schema, tableName);
-
-                    if (Array.isArray(tableData.columns)) {
-                      tableData.columns.forEach((columnData: any) => {
-                        const mappingsArray = schemaGroup.get(
-                          'mappings'
-                        ) as FormArray;
-                        mappingsArray.push(
-                          this.fb.group({
-                            table: [tableName, Validators.required],
-                            column: [columnData.column, Validators.required],
-                            value: [columnData.value, Validators.required],
-                          })
-                        );
-                      });
-                    }
-                  });
-                }
-
-                this.schemaGroups.push(schemaGroup);
-              });
-            }
-
-            if (this.schemaGroups.length === 0) {
-              this.addSchemaGroup();
-            }
-
-            // Set up subscriptions for all schema groups
-            this.schemaGroups.controls.forEach((group, index) => {
-              group.get('schema')?.valueChanges.subscribe(schemaName => {
-                if (schemaName) {
-                  this.loadTablesForSchema(schemaName);
-                }
-                this.checkDuplicateMappings();
-              });
-
-              const mappings = this.getSchemaGroupMappings(index);
-              mappings.controls.forEach(mapping => {
-                mapping.get('table')?.valueChanges.subscribe(tableName => {
-                  const schemaName = group.get('schema')?.value;
-                  if (schemaName && tableName) {
-                    this.loadColumnsForMapping(schemaName, tableName);
-                  }
-                  this.checkDuplicateMappings();
-                });
-
-                mapping.get('column')?.valueChanges.subscribe(() => {
-                  this.checkDuplicateMappings();
-                });
-              });
-            });
-
-            this.originalFormValue = this.datasetForm.value;
-            this.isFormDirty = false;
-            this.datasetForm.markAsPristine();
-          });
-        }
-      });
-  }
-
-  loadDatabaseSchemas(callback?: () => void): void {
-    const params = {
-      orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
-    };
-
-    this.databaseService.listDatabaseSchemas(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.staticSchemaData = response.data;
-        this.schemas = this.staticSchemaData.map(schema => ({
-          name: schema.schema_name,
-        }));
-        if (callback) callback();
+      // If datasetId is present, fetch dataset data first
+      if (this.datasetId && this.orgId) {
+        this.fetchDatasetData();
       }
     });
   }
 
-  loadTablesForSchema(schemaName: string): void {
-    const schemaData = this.staticSchemaData.find(
-      schema => schema.schema_name === schemaName
-    );
+  private initializeComponent(): void {
+    // Setup theme monitoring
+    this.setupThemeObserver();
 
-    if (schemaData) {
-      const tables = schemaData.tables.map((table: any) => ({
-        name: table.table_name,
-        columns: table.columns,
-      }));
+    // Close context menus on click outside
+    document.addEventListener('click', this.closeContextMenu.bind(this));
+  }
 
-      this.tables[schemaName] = tables;
-    } else {
-      this.tables[schemaName] = [];
+  refreshSingleDatabase(dbId: number): void {
+    if (!dbId) return;
+
+    // Clear cached schema for this specific database
+    delete this.databaseSchemas[dbId];
+    delete this.loadingDatabases[dbId];
+
+    // Collapse this database's tree (schemas and tables)
+    Object.keys(this.expandedSchemas).forEach(key => {
+      if (key.startsWith(`${dbId}.`)) {
+        delete this.expandedSchemas[key];
+      }
+    });
+    Object.keys(this.expandedTables).forEach(key => {
+      if (key.startsWith(`${dbId}.`)) {
+        delete this.expandedTables[key];
+      }
+    });
+
+    // Collapse the database itself
+    delete this.expandedDatabases[dbId];
+
+    // Remove from IntelliSense databases array
+    this.databases = this.databases.filter(db => db.name !== dbId.toString());
+
+    // Re-fetch schema for this database
+    this.loadDatabaseSchema(dbId);
+  }
+
+  refreshSelectedDatabase(): void {
+    if (!this.selectedDatabaseObj || !this.selectedDatabaseObj.id) return;
+    this.refreshSingleDatabase(this.selectedDatabaseObj.id);
+  }
+
+  /**
+   * Get current theme based on body class
+   */
+  private getCurrentTheme(): string {
+    const isDarkTheme = document.body.classList.contains('dark-theme');
+    return isDarkTheme ? 'vs-dark' : 'vs';
+  }
+
+  /**
+   * Setup MutationObserver to watch for theme changes
+   */
+  private setupThemeObserver(): void {
+    this.currentTheme = this.getCurrentTheme();
+
+    // Watch for theme changes on body element
+    this.themeObserver = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'class'
+        ) {
+          const newTheme = this.getCurrentTheme();
+          if (newTheme !== this.currentTheme) {
+            this.currentTheme = newTheme;
+            this.updateEditorTheme();
+          }
+        }
+      });
+    });
+
+    this.themeObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  }
+
+  /**
+   * Update Monaco Editor theme
+   */
+  private updateEditorTheme(): void {
+    if (this.editor) {
+      monaco.editor.setTheme(this.currentTheme);
     }
   }
 
-  loadColumnsForMapping(schemaName: string, tableName: string): void {
-    const schemaData = this.staticSchemaData.find(
-      schema => schema.schema_name === schemaName
-    );
+  ngAfterViewInit(): void {
+    this.loadMonacoEditor();
+  }
 
-    if (!schemaData) {
-      this.columns[`${schemaName}.${tableName}`] = [];
+  ngOnDestroy(): void {
+    if (this.editor) {
+      this.editor.dispose();
+    }
+
+    // Dispose IntelliSense providers
+    if (this.completionProviderDisposable) {
+      this.completionProviderDisposable.dispose();
+    }
+    if (this.hoverProviderDisposable) {
+      this.hoverProviderDisposable.dispose();
+    }
+
+    // Cleanup theme observer
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+      this.themeObserver = null;
+    }
+
+    // Remove context menu listener
+    document.removeEventListener('click', this.closeContextMenu.bind(this));
+  }
+
+  private loadMonacoEditor(): void {
+    // Check if Monaco is already loaded
+    if (typeof monaco !== 'undefined') {
+      setTimeout(() => this.initMonaco(), 0);
       return;
     }
 
-    const tableData = schemaData.tables.find(
-      (t: any) => t.table_name === tableName
-    );
+    // Check if loading failed during script load
+    if (window.monacoLoading === false && typeof monaco === 'undefined') {
+      this.isLoadingEditor = false;
+      this.monacoLoadFailed = true;
+      this.showMonacoLoadError();
+      return;
+    }
 
-    if (tableData) {
-      this.columns[`${schemaName}.${tableName}`] = tableData.columns.map(
-        (col: any) => ({
-          name: col.name,
-          type: col.type,
-          nullable: col.nullable,
-        })
-      );
-    } else {
-      this.columns[`${schemaName}.${tableName}`] = [];
+    let attempts = 0;
+    const maxAttempts = EDITOR_LOADING_CONFIG.MAX_ATTEMPTS;
+    const checkInterval = EDITOR_LOADING_CONFIG.CHECK_INTERVAL_MS;
+
+    const checkMonaco = setInterval(() => {
+      attempts++;
+
+      if (typeof monaco !== 'undefined') {
+        clearInterval(checkMonaco);
+        this.initMonaco();
+        return;
+      }
+
+      // Check if loading explicitly failed
+      if (window.monacoLoading === false) {
+        clearInterval(checkMonaco);
+        this.isLoadingEditor = false;
+        this.monacoLoadFailed = true;
+        this.showMonacoLoadError();
+        return;
+      }
+
+      if (attempts >= maxAttempts) {
+        clearInterval(checkMonaco);
+        this.isLoadingEditor = false;
+        this.monacoLoadFailed = true;
+        this.showMonacoLoadError();
+      }
+    }, checkInterval);
+
+    // Extended timeout fallback - 20 seconds instead of 10
+    setTimeout(() => {
+      clearInterval(checkMonaco);
+      if (typeof monaco === 'undefined') {
+        this.isLoadingEditor = false;
+        this.monacoLoadFailed = true;
+        this.showMonacoLoadError();
+      }
+    }, 20000);
+  }
+
+  private showMonacoLoadError(): void {}
+
+  retryLoadMonaco(): void {
+    this.monacoLoadFailed = false;
+    this.isLoadingEditor = true;
+    this.loadMonacoEditor();
+  }
+
+  private initMonaco(): void {
+    if (!this.selectedDatabaseObj) {
+      this.isLoadingEditor = false;
+      return;
+    }
+
+    // Wait for the DOM to be ready
+    setTimeout(() => {
+      const container = document.getElementById('sql-editor-container');
+      if (!container) {
+        this.isLoadingEditor = false;
+        return;
+      }
+
+      try {
+        // Dispose previous editor if exists
+        if (this.editor) {
+          this.editor.dispose();
+        }
+
+        // Create Monaco Editor instance
+        this.editor = monaco.editor.create(container, {
+          ...MONACO_EDITOR_OPTIONS,
+          value: this.initialQuery || '-- Write your SQL query here',
+          theme: this.currentTheme,
+        });
+
+        // Add Ctrl+Enter handler for query execution
+        this.editor.addCommand(
+          monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+          () => {
+            this.executeQuery();
+          }
+        );
+
+        // Focus the editor
+        this.editor.focus();
+
+        // Setup content change listener
+        this.editor.onDidChangeModelContent(() => {
+          this.currentQuery = this.editor.getValue();
+        });
+
+        // Register IntelliSense
+        this.registerIntelliSenseProviders();
+
+        // Add keyboard shortcuts via service
+        this.monacoIntelliSenseService.registerKeyboardShortcuts(
+          this.editor,
+          () => this.executeQuery()
+        );
+
+        // Add custom context menu items
+        this.editor.addAction({
+          id: 'execute-complete-query',
+          label: 'Execute Complete Query',
+          contextMenuGroupId: 'navigation',
+          contextMenuOrder: 1.5,
+          run: () => {
+            this.executeCompleteQuery();
+          },
+        });
+
+        this.editor.addAction({
+          id: 'execute-selection',
+          label: 'Execute Selected Query',
+          contextMenuGroupId: 'navigation',
+          contextMenuOrder: 1.6,
+          precondition: 'editorHasSelection',
+          run: () => {
+            const selection = this.editor.getSelection();
+            const selectedText = this.editor
+              .getModel()
+              .getValueInRange(selection);
+            if (selectedText.trim()) {
+              this.executeSelectedQuery(selectedText);
+            }
+          },
+        });
+
+        this.isLoadingEditor = false;
+      } catch (error) {
+        this.isLoadingEditor = false;
+      }
+    }, 100);
+  }
+
+  /**
+   * Register IntelliSense providers
+   */
+  private registerIntelliSenseProviders(): void {
+    // Dispose previous providers if they exist
+    if (this.completionProviderDisposable) {
+      this.completionProviderDisposable.dispose();
+    }
+    if (this.hoverProviderDisposable) {
+      this.hoverProviderDisposable.dispose();
+    }
+
+    // Register new providers and store disposables
+    if (this.editor) {
+      this.completionProviderDisposable =
+        this.monacoIntelliSenseService.registerSQLCompletions(
+          this.databases,
+          this.editor
+        );
+      this.hoverProviderDisposable =
+        this.monacoIntelliSenseService.registerHoverProvider(this.databases);
     }
   }
 
-  onSubmit(): void {
-    if (this.datasetForm.valid && !this.hasDuplicates) {
-      const formValue = this.datasetForm.value;
+  private async loadDatabaseSchema(dbId: number): Promise<void> {
+    if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
 
-      // Transform the form data into flat structure
-      const datasetMapping = formValue.schemaGroups.reduce(
-        (acc: any[], group: any) => {
-          const schema = group.schema;
-          const mappings = group.mappings.map((mapping: any) => ({
-            schema,
-            table: mapping.table,
-            column: mapping.column,
-            value: mapping.value,
-          }));
-          return [...acc, ...mappings];
+    this.loadingDatabases[dbId] = true;
+
+    return new Promise((resolve, reject) => {
+      try {
+        this.queryService
+          .getDatabaseStructure(dbId, this.selectedOrg.id)
+          .subscribe({
+            next: (response: any) => {
+              const schemaData =
+                SchemaTransformerHelper.transformSchemaResponse(response);
+
+              // Store schema data by database ID
+              if (schemaData.length > 0) {
+                this.databaseSchemas[dbId] = schemaData[0];
+              }
+
+              // Update databases array for IntelliSense
+              this.databases = Object.values(this.databaseSchemas);
+
+              // Re-register completions with new schema
+              this.registerIntelliSenseProviders();
+
+              this.loadingDatabases[dbId] = false;
+              resolve();
+            },
+            error: (error: any) => {
+              this.loadingDatabases[dbId] = false;
+              reject(error);
+            },
+          });
+      } catch (error) {
+        this.loadingDatabases[dbId] = false;
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * Execute query - Smart execution based on selection
+   * If text is selected, runs selected SQL
+   * If no selection, runs current statement at cursor
+   */
+  executeQuery(): void {
+    if (!this.editor) return;
+
+    const selection = this.editor.getSelection();
+    const hasSelection = selection && !selection.isEmpty();
+
+    if (hasSelection) {
+      // Execute selected text
+      const selectedText = this.editor.getModel().getValueInRange(selection);
+      if (selectedText.trim()) {
+        this.executeSelectedQuery(selectedText);
+        return;
+      }
+    }
+
+    // No selection, execute complete query
+    this.executeCompleteQuery();
+  }
+
+  /**
+   * Execute complete SQL query from editor
+   */
+  executeCompleteQuery(): void {
+    const query = this.editor?.getValue() || this.currentQuery;
+    this.executeQueryForDatabase(query);
+  }
+
+  /**
+   * Execute selected SQL text from editor
+   * @param selectedText The selected SQL text to execute
+   */
+  executeSelectedQuery(selectedText: string): void {
+    this.executeQueryForDatabase(selectedText);
+  }
+
+  clearEditor(): void {
+    if (this.editor) {
+      this.editor.setValue('');
+    }
+  }
+
+  exportCurrentScript(): void {
+    if (!this.editor || !this.selectedDatabaseObj) return;
+
+    const query = this.editor.getValue();
+    const databaseName = this.selectedDatabaseObj.name || 'database';
+    const fileName = `${databaseName}_script.sql`;
+
+    const blob = new Blob([query], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  resetToOriginal(): void {
+    if (!this.editor) return;
+
+    // Reset editor to original query
+    this.editor.setValue(this.originalQuery);
+    this.currentQuery = this.originalQuery;
+  }
+
+  triggerFileInput(): void {
+    if (this.fileInput) {
+      this.fileInput.nativeElement.click();
+    }
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file extension
+    const fileName = file.name.toLowerCase();
+    if (!fileName.endsWith('.sql') && !fileName.endsWith('.txt')) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Invalid File Format',
+        detail: 'Please upload a valid SQL file (.sql or .txt)',
+        key: 'topRight',
+        life: 3000,
+        styleClass: 'custom-toast',
+      });
+      // Reset the file input
+      event.target.value = '';
+      return;
+    }
+
+    // Validate file size (e.g., max 2MB)
+    const maxSizeInMB = 22;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'File Too Large',
+        detail: `File size must be less than ${maxSizeInMB}MB`,
+        key: 'topRight',
+        life: 3000,
+        styleClass: 'custom-toast',
+      });
+      event.target.value = '';
+      return;
+    }
+
+    // Read file content
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const content = e.target.result;
+      if (this.editor) {
+        // Set the content to the editor
+        this.editor.setValue(content);
+        this.currentQuery = content;
+      }
+      // Reset the file input so the same file can be selected again if needed
+      event.target.value = '';
+    };
+
+    reader.onerror = () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Import Failed',
+        detail: 'Failed to read the file. Please try again.',
+        key: 'topRight',
+        life: 3000,
+        styleClass: 'custom-toast',
+      });
+      event.target.value = '';
+    };
+
+    reader.readAsText(file);
+  }
+
+  saveAsDataset(): void {
+    if (!this.selectedDatabaseObj) return;
+
+    // Show dialog
+    this.showDatasetDialog = true;
+  }
+
+  private resetEditor(): void {
+    // Clear query result
+    this.queryResult = null;
+
+    // Reset editor content if it exists
+    if (this.editor) {
+      this.editor.setValue('-- Write your SQL query here');
+    }
+
+    // Reset current query
+    this.currentQuery = '';
+  }
+
+  private executeQueryForDatabase(query: string): void {
+    if (!query.trim()) {
+      return;
+    }
+
+    if (!this.selectedDatabaseObj?.id || !this.selectedOrg?.id) {
+      return;
+    }
+
+    this.isExecutingQuery = true;
+    this.queryResult = null;
+
+    const startTime = Date.now();
+
+    this.queryService
+      .executeQuery({
+        orgId: this.selectedOrg.id,
+        databaseId: this.selectedDatabaseObj.id,
+        query: query,
+      })
+      .subscribe({
+        next: (response: any) => {
+          // Check if response indicates an error (status: false)
+          if (response.status === false) {
+            const executionTime = `${Date.now() - startTime}ms`;
+            this.queryResult = {
+              columns: [],
+              rows: [],
+              rowCount: 0,
+              executionTime: executionTime,
+              error: response.message || 'Query execution failed',
+            };
+            this.isExecutingQuery = false;
+            return;
+          }
+
+          // Handle string-based response
+          if (typeof response === 'string') {
+            this.queryResult = {
+              columns: [],
+              rows: [],
+              rowCount: 0,
+              executionTime: `${Date.now() - startTime}ms`,
+              message: response,
+            };
+            this.isExecutingQuery = false;
+            return;
+          }
+
+          // Extract the actual data object from response
+          const dataObj = response.data || response;
+
+          // Extract execution time
+          let executionTime = dataObj.executionTime || response.executionTime;
+
+          if (executionTime && typeof executionTime === 'string') {
+            executionTime = executionTime;
+          } else if (executionTime && typeof executionTime === 'number') {
+            executionTime = `${executionTime}ms`;
+          } else {
+            const calculatedTime = Date.now() - startTime;
+            executionTime = `${calculatedTime}ms`;
+          }
+
+          // Extract columns and rows from API response
+          const data = dataObj.data || dataObj.rows || [];
+          const columns =
+            dataObj.columns ||
+            (Array.isArray(data) && data.length > 0
+              ? Object.keys(data[0])
+              : []);
+          const rowCount =
+            dataObj.rowCount !== undefined
+              ? dataObj.rowCount
+              : Array.isArray(data)
+              ? data.length
+              : 0;
+
+          this.queryResult = {
+            columns: columns,
+            rows: Array.isArray(data) ? data : [],
+            rowCount: rowCount,
+            executionTime: executionTime,
+            query: dataObj.query || response.query,
+          };
+
+          this.isExecutingQuery = false;
         },
-        []
-      );
+        error: (error: any) => {
+          const executionTime = `${Date.now() - startTime}ms`;
+
+          // Extract error message
+          let errorMessage = 'Query execution failed';
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          } else if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          }
+
+          this.queryResult = {
+            columns: [],
+            rows: [],
+            rowCount: 0,
+            executionTime: executionTime,
+            error: errorMessage,
+          };
+
+          this.isExecutingQuery = false;
+        },
+      });
+  }
+
+  onDatasetDialogClose(formData: DatasetFormData | null): void {
+    this.showDatasetDialog = false;
+
+    if (formData) {
+      if (!this.selectedDatabaseObj || !this.datasetId) return;
+
+      // Get the SQL query
+      const sql = this.editor?.getValue() || this.currentQuery;
 
       const payload = {
         id: this.datasetId,
-        name: formValue.name,
-        description: formValue.description,
-        organisation: this.selectedOrg.id,
-        database: this.selectedDatabase.id,
-        status: formValue.status,
-        columnMappings: datasetMapping,
+        name: formData.name,
+        description: formData.description,
+        organisation: this.selectedOrg?.id,
+        database: this.selectedDatabaseObj.id,
+        sql,
       };
 
       this.datasetService.updateDataset(payload).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
+        if (this.globalService.handleSuccessService(response, true)) {
           this.router.navigate([DATASET.LIST]);
         }
       });
     }
   }
 
-  onCancel(): void {
-    if (this.isFormDirty) {
-      // Clear existing schema groups
-      while (this.schemaGroups.length) {
-        this.schemaGroups.removeAt(0);
+  toggleDatabaseSidebar(): void {
+    this.showDatabaseSidebar = !this.showDatabaseSidebar;
+    // Trigger Monaco editor resize after sidebar animation
+    setTimeout(() => {
+      if (this.editor) {
+        this.editor.layout();
       }
-
-      // Restore basic form values
-      this.datasetForm.patchValue({
-        id: this.originalFormValue.id,
-        name: this.originalFormValue.name,
-        description: this.originalFormValue.description,
-        organisation: this.originalFormValue.organisation,
-        database: this.originalFormValue.database,
-      });
-
-      // Restore schema groups and their mappings
-      this.originalFormValue.schemaGroups.forEach((originalGroup: any) => {
-        const schemaGroup = this.fb.group({
-          schema: [originalGroup.schema, Validators.required],
-          mappings: this.fb.array([]),
-        });
-
-        // Load tables for this schema
-        this.loadTablesForSchema(originalGroup.schema);
-
-        // Restore mappings
-        originalGroup.mappings.forEach((originalMapping: any) => {
-          // Load columns for this table
-          this.loadColumnsForMapping(
-            originalGroup.schema,
-            originalMapping.table
-          );
-
-          const mappingsArray = schemaGroup.get('mappings') as FormArray;
-          mappingsArray.push(
-            this.fb.group({
-              table: [originalMapping.table, Validators.required],
-              column: [originalMapping.column, Validators.required],
-              value: [originalMapping.value, Validators.required],
-            })
-          );
-        });
-
-        this.schemaGroups.push(schemaGroup);
-      });
-
-      // Set up subscriptions for restored schema groups
-      this.schemaGroups.controls.forEach((group, index) => {
-        group.get('schema')?.valueChanges.subscribe(schemaName => {
-          if (schemaName) {
-            this.loadTablesForSchema(schemaName);
-          }
-          this.checkDuplicateMappings();
-        });
-
-        const mappings = this.getSchemaGroupMappings(index);
-        mappings.controls.forEach(mapping => {
-          mapping.get('table')?.valueChanges.subscribe(tableName => {
-            const schemaName = group.get('schema')?.value;
-            if (schemaName && tableName) {
-              this.loadColumnsForMapping(schemaName, tableName);
-            }
-            this.checkDuplicateMappings();
-          });
-
-          mapping.get('column')?.valueChanges.subscribe(() => {
-            this.checkDuplicateMappings();
-          });
-        });
-      });
-
-      this.isFormDirty = false;
-      this.datasetForm.markAsPristine();
-    } else {
-      this.router.navigate([DATASET.LIST]);
-    }
+    }, 300);
   }
 
-  checkFormDirty(): void {
-    if (!this.originalFormValue) return;
-    const currentValue = this.datasetForm.value;
-    this.isFormDirty =
-      JSON.stringify(this.originalFormValue) !== JSON.stringify(currentValue);
-  }
+  toggleDatabase(db: any): void {
+    const isExpanded = this.expandedDatabases[db.id];
 
-  get hasDuplicates(): boolean {
-    return Object.keys(this.duplicateRows).length > 0;
-  }
+    if (isExpanded) {
+      // Collapse - also collapse all child schemas and tables
+      this.expandedDatabases[db.id] = false;
 
-  checkDuplicateMappings() {
-    this.duplicateRows = {};
-
-    const columnSelections = new Map<string, Array<[number, number]>>();
-
-    this.schemaGroups.controls.forEach((schemaGroup, groupIndex) => {
-      const schemaName = schemaGroup.get('schema')?.value;
-      if (!schemaName) return;
-
-      const mappings = this.getSchemaGroupMappings(groupIndex).controls;
-      mappings.forEach((mapping, mappingIndex) => {
-        const tableName = mapping.get('table')?.value;
-        const columnName = mapping.get('column')?.value;
-
-        if (tableName && columnName) {
-          const key = `${schemaName}.${tableName}.${columnName}`;
-          if (!columnSelections.has(key)) {
-            columnSelections.set(key, []);
-          }
-          columnSelections.get(key)?.push([groupIndex, mappingIndex]);
+      // Collapse all schemas under this database
+      Object.keys(this.expandedSchemas).forEach(key => {
+        if (key.startsWith(`${db.id}.`)) {
+          delete this.expandedSchemas[key];
         }
       });
-    });
 
-    columnSelections.forEach((positions, key) => {
-      if (positions.length > 1) {
-        this.duplicateRows[key] = positions;
-      }
-    });
-  }
+      // Collapse all tables under this database
+      Object.keys(this.expandedTables).forEach(key => {
+        if (key.startsWith(`${db.id}.`)) {
+          delete this.expandedTables[key];
+        }
+      });
+    } else {
+      // Expand - fetch schema if not already loaded
+      this.expandedDatabases[db.id] = true;
 
-  getSchemaGroupMappings(groupIndex: number): FormArray {
-    const group = this.schemaGroups.at(groupIndex) as FormGroup;
-    return group.get('mappings') as FormArray;
-  }
-
-  isDuplicateRow(groupIndex: number, mappingIndex: number): boolean {
-    return Object.values(this.duplicateRows).some(positions =>
-      positions.some(([g, m]) => g === groupIndex && m === mappingIndex)
-    );
-  }
-
-  getDuplicateMessage(groupIndex: number, mappingIndex: number): string {
-    for (const [key, indexes] of Object.entries(this.duplicateRows)) {
-      if (indexes.some(([g, m]) => g === groupIndex && m === mappingIndex)) {
-        return `Duplicate mapping found: ${key}`;
+      if (!this.databaseSchemas[db.id]) {
+        this.loadDatabaseSchema(db.id);
       }
     }
-    return '';
   }
 
-  addSchemaGroup() {
-    const schemaGroup = this.fb.group({
-      schema: ['', Validators.required],
-      mappings: this.fb.array([]),
-    });
+  toggleSchema(dbId: string, schemaName: string): void {
+    const key = `${dbId}.${schemaName}`;
+    const isExpanded = this.expandedSchemas[key];
 
-    schemaGroup.get('schema')?.valueChanges.subscribe(schemaName => {
-      if (schemaName) {
-        this.loadTablesForSchema(schemaName);
-      }
-      this.checkDuplicateMappings();
-    });
+    if (isExpanded) {
+      // Collapse - also collapse all child tables
+      delete this.expandedSchemas[key];
 
-    this.schemaGroups.push(schemaGroup);
-    this.lastAddedSchemaIndex = this.schemaGroups.length - 1;
-    this.addMappingToSchema(this.lastAddedSchemaIndex);
-
-    // First scroll, then highlight
-    this.scrollToBottom();
-    setTimeout(() => {
-      this.isNewlyAdded = true;
-      setTimeout(() => {
-        this.isNewlyAdded = false;
-        this.lastAddedSchemaIndex = -1;
-      }, 500);
-    }, 300); // Wait for scroll to complete
-  }
-
-  removeSchemaGroup(groupIndex: number) {
-    if (this.schemaGroups.length > 1) {
-      this.schemaGroups.removeAt(groupIndex);
-      this.checkDuplicateMappings();
+      // Collapse all tables under this schema
+      Object.keys(this.expandedTables).forEach(tableKey => {
+        if (tableKey.startsWith(`${dbId}.${schemaName}.`)) {
+          delete this.expandedTables[tableKey];
+        }
+      });
+    } else {
+      // Expand
+      this.expandedSchemas[key] = true;
     }
   }
 
-  addMappingToSchema(groupIndex: number) {
-    const mapping = this.fb.group({
-      table: ['', Validators.required],
-      column: ['', Validators.required],
-      value: ['', Validators.required],
-    });
-
-    mapping.get('table')?.valueChanges.subscribe(tableName => {
-      const schemaName = this.schemaGroups.at(groupIndex).get('schema')?.value;
-      if (schemaName && tableName) {
-        this.loadColumnsForMapping(schemaName, tableName);
-      }
-      this.checkDuplicateMappings();
-    });
-
-    mapping.get('column')?.valueChanges.subscribe(() => {
-      this.checkDuplicateMappings();
-    });
-
-    const mappingsArray = this.getSchemaGroupMappings(groupIndex);
-    mappingsArray.push(mapping);
-
-    this.lastAddedMappingGroupIndex = groupIndex;
-    this.lastAddedMappingIndex = mappingsArray.length - 1;
-
-    // First scroll, then highlight
-    this.scrollToNewMapping(groupIndex);
-    setTimeout(() => {
-      this.isNewlyAddedMapping = true;
-      setTimeout(() => {
-        this.isNewlyAddedMapping = false;
-        this.lastAddedMappingGroupIndex = -1;
-        this.lastAddedMappingIndex = -1;
-      }, 500);
-    }, 300); // Wait for scroll to complete
+  toggleTable(dbId: string, schemaName: string, tableName: string): void {
+    const key = `${dbId}.${schemaName}.${tableName}`;
+    this.expandedTables[key] = !this.expandedTables[key];
   }
 
-  removeMappingFromSchema(groupIndex: number, mappingIndex: number) {
-    const mappings = this.getSchemaGroupMappings(groupIndex);
-    if (mappings.length > 1) {
-      mappings.removeAt(mappingIndex);
-      this.checkDuplicateMappings();
-    }
+  isTableExpanded(
+    dbId: string,
+    schemaName: string,
+    tableName: string
+  ): boolean {
+    const key = `${dbId}.${schemaName}.${tableName}`;
+    return this.expandedTables[key] || false;
   }
 
-  clearAllMappings() {
-    while (this.schemaGroups.length) {
-      this.schemaGroups.removeAt(0);
-    }
-    this.addSchemaGroup();
-    this.checkDuplicateMappings();
+  insertColumnName(
+    dbId: string,
+    schemaName: string,
+    tableName: string,
+    columnName: string
+  ): void {
+    if (!this.editor) return;
+
+    const selection = this.editor.getSelection();
+    const text = `${schemaName}.${tableName}.${columnName}`;
+
+    this.editor.executeEdits('insert-column', [
+      {
+        range: selection,
+        text: text,
+        forceMoveMarkers: true,
+      },
+    ]);
+
+    this.editor.focus();
   }
 
-  getAvailableSchemas(currentGroupIndex: number): any[] {
-    const selectedSchemas = this.schemaGroups.controls
-      .map((group, index) =>
-        index !== currentGroupIndex ? group.get('schema')?.value : null
-      )
-      .filter(schema => schema !== null);
+  onDatabaseContextMenu(event: MouseEvent, database: any): void {
+    event.preventDefault();
+    event.stopPropagation();
 
-    return this.schemas.filter(
-      schema => !selectedSchemas.includes(schema.name)
-    );
+    this.contextMenuDatabase = database;
+    this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+
+    this.contextMenuItems = [
+      {
+        label: 'Refresh Schema',
+        icon: 'pi pi-refresh',
+        command: () => this.refreshDatabaseFromContext(),
+      },
+    ];
+
+    this.showContextMenu = true;
   }
 
-  getAvailableTables(schemaName: string): any[] {
-    return this.tables[schemaName] || [];
+  closeContextMenu(): void {
+    this.showContextMenu = false;
+    this.contextMenuDatabase = null;
   }
 
-  getAvailableColumns(schemaName: string, tableName: string): any[] {
-    const key = `${schemaName}.${tableName}`;
-    return this.columns[key] || [];
+  refreshDatabaseFromContext(): void {
+    if (!this.contextMenuDatabase) return;
+
+    // Refresh schema for this specific database
+    this.refreshSingleDatabase(this.contextMenuDatabase.id);
+
+    this.closeContextMenu();
   }
 
-  scrollToBottom(): void {
-    setTimeout(() => {
-      const formElement = document.querySelector('.admin-form');
-      if (formElement) {
-        formElement.scrollTo({
-          top: formElement.scrollHeight,
-          behavior: 'smooth',
-        });
-      }
-    }, 100);
-  }
+  /**
+   * Fetch dataset data by ID and populate the form
+   */
+  private fetchDatasetData(): void {
+    if (!this.datasetId || !this.orgId) return;
 
-  scrollToNewMapping(groupIndex: number): void {
-    setTimeout(() => {
-      const formElement = document.querySelector('.admin-form');
-      const mappingsLength = this.getSchemaGroupMappings(groupIndex).length;
-      const newMapping = document.getElementById(
-        `mapping-${groupIndex}-${mappingsLength - 1}`
-      );
+    this.isLoadingDataset = true;
 
-      if (formElement && newMapping) {
-        const formRect = formElement.getBoundingClientRect();
-        const newMappingRect = newMapping.getBoundingClientRect();
+    this.datasetService
+      .getDataset(this.orgId.toString(), this.datasetId.toString())
+      .then(response => {
+        this.isLoadingDataset = false;
 
-        formElement.scrollTo({
-          top:
-            formElement.scrollTop + (newMappingRect.top - formRect.top) - 100, // 100px offset for better visibility
-          behavior: 'smooth',
-        });
-      }
-    }, 100);
+        if (this.globalService.handleSuccessService(response, false)) {
+          const dataset = response.data;
+
+          // Store dataset details
+          this.datasetName = dataset.name || '';
+          this.datasetDescription = dataset.description || '';
+          this.datasetStatus = dataset.status || 1;
+
+          // Set organisation from API response
+          this.selectedOrg = {
+            id: dataset.organisationId,
+          };
+          this.selectedOrgName = dataset.organisationName || '';
+
+          // Set database from API response
+          this.selectedDatabaseObj = {
+            id: dataset.databaseId,
+            name: dataset.databaseName,
+          };
+          this.selectedDatabaseName = dataset.databaseName || '';
+          this.expandedDatabases[dataset.databaseId] = true;
+
+          // Load schema for the selected database
+          this.loadDatabaseSchema(dataset.databaseId).then(() => {
+            // Set the SQL query in editor
+            const sqlQuery = dataset.sql || '-- Write your SQL query here';
+            this.initialQuery = sqlQuery;
+            this.currentQuery = sqlQuery;
+            this.originalQuery = sqlQuery; // Store original query for reset
+
+            // Initialize editor with the query
+            if (!this.editor) {
+              setTimeout(() => this.loadMonacoEditor(), 100);
+            } else {
+              this.editor.setValue(sqlQuery);
+            }
+
+            // Initialize component setup
+            this.initializeComponent();
+          });
+        }
+      })
+      .catch(error => {
+        this.isLoadingDataset = false;
+        console.error('Error fetching dataset:', error);
+      });
   }
 }
