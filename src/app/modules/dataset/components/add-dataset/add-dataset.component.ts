@@ -7,6 +7,7 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
@@ -25,6 +26,7 @@ import { MonacoIntelliSenseService } from '../../services copy/monaco-intellisen
 import { QueryService } from '../../services copy/query.service';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
+import { DATASET } from 'src/app/constants/routes';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -120,7 +122,8 @@ export class AddDatasetComponent
     private monacoIntelliSenseService: MonacoIntelliSenseService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private datasetService: DatasetService
+    private datasetService: DatasetService,
+    private router: Router
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -172,8 +175,7 @@ export class AddDatasetComponent
     // Check if editor has unsaved content
     const editorValue = this.editor ? this.editor.getValue().trim() : '';
     const hasContent = editorValue.length > 0;
-    const defaultContent =
-      '-- Write your SQL query here\nSELECT * FROM your_table LIMIT 10;';
+    const defaultContent = '-- Write your SQL query here';
     const isDefaultContent = editorValue === defaultContent.trim();
 
     // Only show confirmation if there's actual user content (not empty and not default)
@@ -288,8 +290,7 @@ export class AddDatasetComponent
     // Check if editor has unsaved content
     const editorValue = this.editor ? this.editor.getValue().trim() : '';
     const hasContent = editorValue.length > 0;
-    const defaultContent =
-      '-- Write your SQL query here\nSELECT * FROM your_table LIMIT 10;';
+    const defaultContent = '-- Write your SQL query here';
     const isDefaultContent = editorValue === defaultContent.trim();
 
     // Only show confirmation if there's actual user content (not empty and not default)
@@ -494,9 +495,7 @@ export class AddDatasetComponent
         // Create Monaco Editor instance
         this.editor = monaco.editor.create(container, {
           ...MONACO_EDITOR_OPTIONS,
-          value:
-            this.initialQuery ||
-            '-- Write your SQL query here\nSELECT * FROM your_table LIMIT 10;',
+          value: this.initialQuery || '-- Write your SQL query here',
           theme: this.currentTheme,
         });
 
@@ -727,9 +726,7 @@ export class AddDatasetComponent
 
     // Reset editor content if it exists
     if (this.editor) {
-      this.editor.setValue(
-        '-- Write your SQL query here\nSELECT * FROM your_table LIMIT 10;'
-      );
+      this.editor.setValue('-- Write your SQL query here');
     }
 
     // Reset current query
@@ -869,6 +866,9 @@ export class AddDatasetComponent
 
       this.datasetService.addDataset(payload).then(response => {
         if (this.globalService.handleSuccessService(response, true)) {
+          console.log('Dataset saved successfully:', response);
+          // Navigate to dataset list
+          this.router.navigate([DATASET.LIST]);
           // Dataset saved successfully
           // Now proceed with pending change if any
           if (this.pendingDatabaseChange) {

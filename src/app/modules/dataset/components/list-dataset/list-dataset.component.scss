@@ -829,6 +829,23 @@
       }
     }
   }
+
+  // Split button outlined styles
+  .p-splitbutton.p-button-outlined {
+    .p-splitbutton-defaultbutton,
+    .p-splitbutton-menubutton {
+      background: transparent !important;
+      border: 1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .p-splitbutton-defaultbutton:disabled,
+    .p-splitbutton-menubutton:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
 }
 
 .database-chip {

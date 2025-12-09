@@ -49,6 +49,14 @@ export class ListDatasetComponent implements OnInit {
     },
   ];
 
+  addDatasetItems: MenuItem[] = [
+    {
+      label: 'via Prompts',
+      icon: 'pi pi-comments',
+      command: () => this.onAddViaPrompts(),
+    },
+  ];
+
   constructor(
     private organisationService: OrganisationService,
     private router: Router,
@@ -127,7 +135,7 @@ export class ListDatasetComponent implements OnInit {
 
     this.datasetService.listDatasets(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.datasets = [...response.data];
+        this.datasets = [...response.data.datasets];
         this.filteredDatasets = [...this.datasets];
         this.totalItems = this.datasets.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
@@ -177,6 +185,10 @@ export class ListDatasetComponent implements OnInit {
 
   onAddNewAdmin() {
     this.router.navigate([DATASET.ADD]);
+  }
+
+  onAddViaPrompts() {
+    console.log('Add Dataset via Prompts clicked');
   }
 
   onEdit(id: string) {

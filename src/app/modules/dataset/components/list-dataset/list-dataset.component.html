@@ -2,9 +2,9 @@
     <div class="super-admin-container">
         <div class="page-header">
             <h2>Datasets</h2>
-            <button pButton class="p-button-outlined" (click)="onAddNewAdmin()">
-                + Add Dataset
-            </button>
+            <p-splitButton outlined label="Add Dataset" icon="pi pi-plus" (onClick)="onAddNewAdmin()"
+                [model]="addDatasetItems" styleClass="p-button-outlined" class="p-button-outlined">
+            </p-splitButton>
         </div>
         <div class="table-section">
             <!-- Search and Page Size -->

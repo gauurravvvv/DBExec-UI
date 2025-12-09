@@ -6,7 +6,6 @@
 import { QueryTab, ContextMenuItem } from '../models/query-tab.model';
 
 export class TabManagementHelper {
-  
   /**
    * Get tab context menu items
    */
@@ -23,31 +22,31 @@ export class TabManagementHelper {
       {
         label: 'Rename',
         icon: 'pi-pencil',
-        command: renameCallback
+        command: renameCallback,
       },
       {
         label: 'Close',
         icon: 'pi-times',
-        command: closeCallback
+        command: closeCallback,
       },
       {
         label: 'Close Others',
         icon: 'pi-times-circle',
         command: closeOthersCallback,
-        disabled: totalTabs <= 1
+        disabled: totalTabs <= 1,
       },
       {
         label: 'Close to the Right',
         icon: 'pi-arrow-right',
         command: closeToRightCallback,
-        disabled: tabIndex === totalTabs - 1
+        disabled: tabIndex === totalTabs - 1,
       },
       {
         label: 'Close to the Left',
         icon: 'pi-arrow-left',
         command: closeToLeftCallback,
-        disabled: tabIndex === 0
-      }
+        disabled: tabIndex === 0,
+      },
     ];
   }
 
@@ -64,13 +63,13 @@ export class TabManagementHelper {
         label: 'New Script',
         icon: 'pi-plus',
         command: newScriptCallback,
-        disabled: isNewScriptDisabled
+        disabled: isNewScriptDisabled,
       },
       {
         label: 'Refresh',
         icon: 'pi-refresh',
-        command: refreshCallback
-      }
+        command: refreshCallback,
+      },
     ];
   }
 
@@ -89,10 +88,10 @@ export class TabManagementHelper {
       title: title,
       databaseId: databaseId,
       databaseName: databaseName,
-      query: '-- Write your SQL query here\nSELECT * FROM your_table LIMIT 10;',
+      query: '-- Write your SQL query here',
       result: null,
       isActive: true,
-      isExecuting: false
+      isExecuting: false,
     };
   }
 
@@ -117,7 +116,7 @@ export class TabManagementHelper {
    * Deactivate all tabs
    */
   static deactivateAllTabs(tabs: QueryTab[]): void {
-    tabs.forEach(tab => tab.isActive = false);
+    tabs.forEach(tab => (tab.isActive = false));
   }
 
   /**
