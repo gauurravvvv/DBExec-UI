@@ -1,0 +1,29 @@
+<div class="edit-fields-popup" *ngIf="visible">
+    <div class="popup-content">
+        <h3>{{ dialogTitle }}</h3>
+        <div class="fields-form">
+            <div class="form-field" *ngIf="editableField">
+                <div class="input-group">
+                    <label>Field name to use</label>
+                    <input type="text" pInputText [(ngModel)]="editableField.columnToUse" placeholder="Column name"
+                        autocomplete="off" disabled />
+                </div>
+                <div class="input-group">
+                    <label>Field name to show</label>
+                    <input type="text" pInputText [(ngModel)]="editableField.columnToView" placeholder="Display name"
+                        autocomplete="off" (ngModelChange)="onFieldChange()" />
+                </div>
+            </div>
+
+            <div class="popup-actions">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    (click)="onCancel()" [disabled]="isSubmitting">
+                </button>
+                <button pButton type="button" label="Save" class="p-button-outlined" (click)="onSubmit()"
+                    [disabled]="!isSaveEnabled || isSubmitting">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

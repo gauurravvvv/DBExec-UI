@@ -92,6 +92,23 @@ export class DatasetService {
       });
   }
 
+  updateDatasetMapping(payload: any) {
+    const { mappingId, datasetId, organisation, columnNameToView } = payload;
+
+    return this.http
+      .put(DATASET.UPDATE_MAPPING, {
+        mappingId,
+        datasetId,
+        organisation,
+        columnNameToView,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   updateDatabase(payload: any) {
     const {
       id,

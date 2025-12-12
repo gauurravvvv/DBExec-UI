@@ -13,6 +13,9 @@ import { DatasetService } from '../../services/dataset.service';
 export class ViewDatasetComponent implements OnInit {
   datasetData: any;
   showDeleteConfirm = false;
+  showEditFieldsDialog = false;
+  selectedField: any = null;
+  selectedFieldIndex: number = -1;
 
   constructor(
     private route: ActivatedRoute,
@@ -68,40 +71,7 @@ export class ViewDatasetComponent implements OnInit {
   }
 
   copySQLToClipboard(): void {
-    if (!this.datasetData?.sql) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'No SQL',
-        detail: 'No SQL query available to copy',
-        key: 'topRight',
-        life: 3000,
-        styleClass: 'custom-toast',
-      });
-      return;
-    }
-
-    navigator.clipboard
-      .writeText(this.datasetData.sql)
-      .then(() => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Copied',
-          detail: 'SQL query copied to clipboard',
-          key: 'topRight',
-          life: 3000,
-          styleClass: 'custom-toast',
-        });
-      })
-      .catch(() => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Copy Failed',
-          detail: 'Failed to copy SQL query',
-          key: 'topRight',
-          life: 3000,
-          styleClass: 'custom-toast',
-        });
-      });
+    navigator.clipboard.writeText(this.datasetData.sql);
   }
 
   downloadSQL(): void {
@@ -115,5 +85,29 @@ export class ViewDatasetComponent implements OnInit {
     link.download = fileName;
     link.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  openEditFieldDialog(field: any, index: number): void {
+    this.selectedField = { ...field };
+    this.selectedFieldIndex = index;
+    this.showEditFieldsDialog = true;
+  }
+
+  onEditFieldDialogClose(data: any): void {
+    this.showEditFieldsDialog = false;
+    if (data && this.selectedFieldIndex >= 0) {
+      // Update the specific field in the array
+      this.datasetData.datasetEntities[this.selectedFieldIndex] = data.field;
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Field updated successfully',
+        key: 'topRight',
+        life: 3000,
+        styleClass: 'custom-toast',
+      });
+    }
+    this.selectedField = null;
+    this.selectedFieldIndex = -1;
   }
 }

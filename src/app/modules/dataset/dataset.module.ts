@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MenuModule } from 'primeng/menu';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -10,6 +10,7 @@ import { ListDatasetComponent } from './components/list-dataset/list-dataset.com
 import { ViewDatasetComponent } from './components/view-dataset/view-dataset.component';
 import { DatasetRoutingModule } from './dataset-routing.module';
 import { SaveDatasetDialogComponent } from './components/save-dataset-dialog/save-dataset-dialog.component';
+import { EditDatasetFieldsDialogComponent } from './components/edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
 
 @NgModule({
   declarations: [
@@ -18,9 +19,11 @@ import { SaveDatasetDialogComponent } from './components/save-dataset-dialog/sav
     ViewDatasetComponent,
     ListDatasetComponent,
     SaveDatasetDialogComponent,
+    EditDatasetFieldsDialogComponent,
   ],
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     AppPrimeNGModule,
     DatasetRoutingModule,

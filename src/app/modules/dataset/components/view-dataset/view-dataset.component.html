@@ -99,6 +99,41 @@
                     </div>
                 </div>
 
+                <!-- Fields -->
+                <div class="info-section full-width">
+                    <h3>
+                        <i class="pi pi-list mr-2"></i>
+                        Fields
+                        <span class="count-badge">{{ datasetData.datasetEntities?.length || 0 }}</span>
+                    </h3>
+                    <div class="column-mapping-container">
+                        <div
+                            *ngIf="datasetData?.datasetEntities && datasetData?.datasetEntities.length > 0; else noMappings">
+                            <div class="mapping-list">
+                                <div class="mapping-item"
+                                    *ngFor="let entity of datasetData.datasetEntities; let i = index">
+                                    <span class="field-number">{{ i + 1 }}</span>
+                                    <div class="field-content">
+                                        <span class="column-view">{{ entity.columnToView }}</span>
+                                        <span class="column-use">{{ entity.columnToUse }}</span>
+                                    </div>
+                                    <button pButton class="p-button-text p-button-sm btn-edit"
+                                        (click)="openEditFieldDialog(entity, i)" pTooltip="Edit field"
+                                        tooltipPosition="top">
+                                        <i class="pi pi-pencil"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <ng-template #noMappings>
+                            <div class="no-data">
+                                <i class="pi pi-info-circle"></i>
+                                <span>No fields found</span>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+
                 <!-- Analyses -->
                 <div class="info-section full-width">
                     <h3>
@@ -120,6 +155,11 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Fields Dialog -->
+<app-edit-dataset-fields-dialog [visible]="showEditFieldsDialog" [field]="selectedField"
+    [fieldIndex]="selectedFieldIndex" (close)="onEditFieldDialogClose($event)">
+</app-edit-dataset-fields-dialog>
 
 <!-- Delete Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
