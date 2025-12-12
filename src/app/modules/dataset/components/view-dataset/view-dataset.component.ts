@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { DATASET } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../services/dataset.service';
@@ -12,16 +13,13 @@ import { DatasetService } from '../../services/dataset.service';
 export class ViewDatasetComponent implements OnInit {
   datasetData: any;
   showDeleteConfirm = false;
-  expandedSchemas: string[] = [];
-  filteredMappings: any[] = [];
-  originalMappings: any[] = [];
-  currentSchemaFilter: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private datasetService: DatasetService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -35,110 +33,8 @@ export class ViewDatasetComponent implements OnInit {
     this.datasetService.viewDataset(orgId, datasetId).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasetData = response.data;
-        this.originalMappings = this.datasetData.datasetMapping;
-        this.filteredMappings = [...this.originalMappings];
       }
     });
-  }
-
-  getTotalTables(): number {
-    return (
-      this.datasetData?.datasetMapping.reduce(
-        (acc: number, schema: any) => acc + schema.tables.length,
-        0
-      ) || 0
-    );
-  }
-
-  getTotalMappings(): number {
-    return (
-      this.datasetData?.datasetMapping.reduce(
-        (acc: number, schema: any) =>
-          acc +
-          schema.tables.reduce(
-            (tableAcc: number, table: any) => tableAcc + table.columns.length,
-            0
-          ),
-        0
-      ) || 0
-    );
-  }
-
-  getSchemaCount(): number {
-    return this.datasetData?.datasetMapping.length || 0;
-  }
-
-  toggleSchemaExpand(schemaName: string) {
-    const index = this.expandedSchemas.indexOf(schemaName);
-    if (index === -1) {
-      this.expandedSchemas.push(schemaName);
-    } else {
-      this.expandedSchemas.splice(index, 1);
-    }
-  }
-
-  onSchemaSearch(event: any) {
-    const searchTerm = event.target.value.toLowerCase();
-    this.currentSchemaFilter = searchTerm;
-
-    this.filteredMappings = this.originalMappings.filter(mapping =>
-      mapping.schema.toLowerCase().includes(searchTerm)
-    );
-
-    // Auto expand/collapse based on search
-    if (searchTerm) {
-      // Expand all filtered schemas
-      this.expandedSchemas = this.filteredMappings.map(
-        mapping => mapping.schema
-      );
-    } else {
-      // Clear expansions when search is empty
-      this.expandedSchemas = [];
-    }
-  }
-
-  onMappingSearch(event: any) {
-    const searchTerm = event.target.value.toLowerCase();
-
-    if (!searchTerm && !this.currentSchemaFilter) {
-      this.filteredMappings = [...this.originalMappings];
-      this.expandedSchemas = []; // Collapse all when no search
-      return;
-    }
-
-    let baseData = this.currentSchemaFilter
-      ? this.originalMappings.filter(mapping =>
-          mapping.schema.toLowerCase().includes(this.currentSchemaFilter)
-        )
-      : this.originalMappings;
-
-    if (searchTerm) {
-      this.filteredMappings = baseData
-        .map(schema => ({
-          ...schema,
-          tables: schema.tables.filter(
-            (table: any) =>
-              table.table.toLowerCase().includes(searchTerm) ||
-              table.columns.some(
-                (col: any) =>
-                  col.column.toLowerCase().includes(searchTerm) ||
-                  col.value.toLowerCase().includes(searchTerm)
-              )
-          ),
-        }))
-        .filter(schema => schema.tables.length > 0);
-
-      // Auto expand schemas with matching results
-      this.expandedSchemas = this.filteredMappings.map(
-        mapping => mapping.schema
-      );
-    } else {
-      this.filteredMappings = baseData;
-      // Keep schemas expanded if there's still a schema filter
-      if (!this.currentSchemaFilter) {
-        this.expandedSchemas = [];
-      }
-    }
   }
 
   goBack() {
@@ -169,5 +65,55 @@ export class ViewDatasetComponent implements OnInit {
           this.router.navigate([DATASET.LIST]);
         }
       });
+  }
+
+  copySQLToClipboard(): void {
+    if (!this.datasetData?.sql) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No SQL',
+        detail: 'No SQL query available to copy',
+        key: 'topRight',
+        life: 3000,
+        styleClass: 'custom-toast',
+      });
+      return;
+    }
+
+    navigator.clipboard
+      .writeText(this.datasetData.sql)
+      .then(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Copied',
+          detail: 'SQL query copied to clipboard',
+          key: 'topRight',
+          life: 3000,
+          styleClass: 'custom-toast',
+        });
+      })
+      .catch(() => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Copy Failed',
+          detail: 'Failed to copy SQL query',
+          key: 'topRight',
+          life: 3000,
+          styleClass: 'custom-toast',
+        });
+      });
+  }
+
+  downloadSQL(): void {
+    const datasetName = this.datasetData.name || 'dataset';
+    const fileName = `${datasetName}_query.sql`;
+
+    const blob = new Blob([this.datasetData.sql], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
   }
 }
