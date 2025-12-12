@@ -52,6 +52,10 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/dataset',
   },
   {
+    value: 'analyses',
+    route: '/app/analyses',
+  },
+  {
     value: 'datasetBinder',
     route: '/app/datasetBinder',
   },

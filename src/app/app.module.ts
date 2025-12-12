@@ -1,4 +1,8 @@
-import { HTTP_INTERCEPTORS, HttpClientModule, HttpClient } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  HttpClientModule,
+  HttpClient,
+} from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -17,7 +21,10 @@ import { AppPrimeNGModule } from './shared/modules/app-primeng.module';
 import { LoginComponent } from './modules/auth/components/login/login.component';
 import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
 import { HttpRequestInterceptor } from './core/interceptor/HttpRequestInterceptor';
-import { API_HTTP_CLIENT, QUERY_HTTP_CLIENT } from './core/tokens/http-client.tokens';
+import {
+  API_HTTP_CLIENT,
+  QUERY_HTTP_CLIENT,
+} from './core/tokens/http-client.tokens';
 import { FooterComponent } from './shared/components/layout/footer/footer.component';
 import { HeaderComponent } from './shared/components/layout/header/header.component';
 import { HomeComponent } from './shared/components/layout/home/home.component';
@@ -57,21 +64,21 @@ import { ResetPasswordComponent } from './modules/auth/components/reset-password
     {
       provide: API_HTTP_CLIENT,
       useFactory: (httpClient: HttpClient) => httpClient,
-      deps: [HttpClient]
+      deps: [HttpClient],
     },
     {
       provide: QUERY_HTTP_CLIENT,
       useFactory: (httpClient: HttpClient) => httpClient,
-      deps: [HttpClient]
+      deps: [HttpClient],
     },
-    
+
     // Default interceptor - will be used for determining routing
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpRequestInterceptor,
       multi: true,
     },
-    
+
     MessageService,
   ],
   bootstrap: [AppComponent],
