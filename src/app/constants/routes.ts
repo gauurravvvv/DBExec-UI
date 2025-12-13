@@ -74,6 +74,13 @@ export const DATASET = {
   VIEW: '/app/dataset/view',
 };
 
+export const ANALYSES = {
+  ADD: '/app/analyses/add',
+  LIST: '/app/analyses',
+  EDIT: '/app/analyses/edit',
+  VIEW: '/app/analyses/view',
+};
+
 export const TAB = {
   ADD: '/app/tab/add',
   LIST: '/app/tab',

@@ -1,0 +1,395 @@
+// ===================================================================
+// Query Editor Wrapper - Main Container
+// ===================================================================
+.query-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: var(--background-color);
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+// ===================================================================
+// Toolbar Styles
+// ===================================================================
+.query-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  min-height: 56px;
+  flex-shrink: 0;
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .toolbar-title {
+      margin: 0;
+      margin-left: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  .toolbar-right {
+    display: flex;
+    gap: 8px !important;
+
+    .p-button,
+    button {
+      padding: 0.5rem !important;
+      margin: 0 !important;
+      min-width: auto !important;
+    }
+
+    .btn-primary {
+      background-color: transparent;
+      border: none;
+      color: var(--primary-color);
+
+      &:hover:not(:disabled) {
+        background-color: transparent;
+        border: none;
+        color: var(--primary-color);
+        opacity: 0.8;
+      }
+
+      &:disabled {
+        color: var(--primary-color);
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// ===================================================================
+// Sub Header with Toggle Buttons
+// ===================================================================
+.sub-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  gap: 4px !important;
+
+  .p-button {
+    margin: 0 !important;
+    padding: 0.5rem !important;
+    min-width: auto !important;
+    border-radius: 0 !important;
+    transition: all 0.3s ease;
+
+    &.active {
+      background-color: rgba(var(--primary-color-rgb), 0.1) !important;
+      color: var(--primary-color) !important;
+
+      &:hover:not(:disabled) {
+        background-color: rgba(var(--primary-color-rgb), 0.15) !important;
+        color: var(--primary-color) !important;
+      }
+    }
+  }
+}
+
+// ===================================================================
+// Main Content Area - Sidebar + Editor/Results
+// ===================================================================
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+// ===================================================================
+// Database Sidebar (Left Panel)
+// ===================================================================
+.database-sidebar {
+  width: 200px;
+  min-width: 200px;
+  background-color: var(--card-background);
+  border-right: 2px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+
+  &.collapsed {
+    width: 0;
+    min-width: 0;
+    border-right: none;
+    overflow: hidden;
+  }
+}
+
+// ===================================================================
+// Visuals Sidebar (Left Panel 2)
+// ===================================================================
+.visuals-sidebar {
+  width: 200px;
+  min-width: 200px;
+  background-color: var(--card-background);
+  border-right: 2px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+
+  &.collapsed {
+    width: 0;
+    min-width: 0;
+    border-right: none;
+    overflow: hidden;
+  }
+}
+
+// ===================================================================
+// Shared Sidebar Styles
+// ===================================================================
+.database-sidebar,
+.visuals-sidebar {
+  overflow: hidden;
+
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .sidebar-header-info {
+    padding: 12px 16px;
+    background-color: var(--hover-background);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+
+    .dataset-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    .dataset-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin: 0;
+    }
+  }
+
+  .sidebar-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    flex-shrink: 0;
+  }
+
+  .sidebar-content-inner {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--secondary-color);
+      }
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+  }
+
+  // Dataset Name Section with Dividers
+  .dataset-name-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .dataset-name-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    position: relative;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    &::before {
+      margin-right: 12px;
+    }
+
+    &::after {
+      margin-left: 12px;
+    }
+  }
+
+  .dataset-name-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    padding: 0 4px;
+  }
+
+  // Fields List
+  .fields-list {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--hover-background);
+      border-color: var(--primary-color);
+      transform: translateX(2px);
+
+      .field-menu {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  }
+
+  .field-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: var(--secondary-color);
+    font-size: 14px;
+  }
+
+  .field-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .field-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .field-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: var(--secondary-color);
+    font-size: 14px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+}
+
+// ===================================================================
+// Editor Container (Center Panel)
+// ===================================================================
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--background-color);
+  position: relative;
+}
+
+// ===================================================================
+// Responsive Design
+// ===================================================================
+@media (max-width: 1200px) {
+  .database-sidebar,
+  .visuals-sidebar {
+    width: 200px;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .query-toolbar {
+    padding: 8px 12px;
+
+    .toolbar-left {
+      gap: 8px;
+
+      .toolbar-title {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .database-sidebar,
+  .visuals-sidebar {
+    width: 200px;
+    min-width: 200px;
+  }
+}

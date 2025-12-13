@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { DATABASE, DATASET } from 'src/app/constants/routes';
+import { ANALYSES, DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -193,6 +193,10 @@ export class ListDatasetComponent implements OnInit {
 
   onEdit(id: string) {
     this.router.navigate([DATASET.EDIT, this.selectedOrg.id, id]);
+  }
+
+  useAsAnalysis(id: string) {
+    this.router.navigate([ANALYSES.ADD, this.selectedOrg.id, id]);
   }
 
   confirmDelete(id: string) {

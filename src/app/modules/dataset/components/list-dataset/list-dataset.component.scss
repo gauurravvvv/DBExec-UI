@@ -216,6 +216,13 @@
               justify-content: center;
               flex-shrink: 0;
 
+              &.analytics {
+                color: var(--primary-color);
+                &:hover {
+                  background-color: rgba(var(--primary-rgb), 0.1);
+                }
+              }
+
               &.edit {
                 color: var(--primary-color);
                 &:hover {

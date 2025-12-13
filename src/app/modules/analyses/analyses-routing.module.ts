@@ -11,7 +11,7 @@ const routes: Routes = [
     component: ListAnalysesComponent,
   },
   {
-    path: 'add',
+    path: 'add/:orgId/:datasetId',
     component: AddAnalysesComponent,
   },
   { path: 'edit/:orgId/:id', component: EditAnalysesComponent },

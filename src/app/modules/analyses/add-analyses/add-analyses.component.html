@@ -1,1 +1,87 @@
-<p>add-analyses works!</p>
+<div class="query-editor-wrapper">
+    <!-- Header Toolbar -->
+    <div class="query-toolbar">
+        <div class="toolbar-left">
+            <h3 class="toolbar-title">
+                Create Analysis
+            </h3>
+        </div>
+        <div class="toolbar-right">
+            <button pButton class="p-button-text btn-primary" title="Save Analysis">
+                <i class="pi pi-save"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sub Header with Toggle Buttons -->
+    <div class="sub-header">
+        <button pButton class="p-button-text btn-primary field-btn" [class.active]="isFieldsPanelOpen"
+            (click)="toggleFieldsPanel()" title="Toggle Fields Pane">
+            <i class="pi pi-database"></i>
+        </button>
+        <button pButton class="p-button-text btn-primary visual-btn" [class.active]="isVisualsPanelOpen"
+            (click)="toggleVisualsPanel()" title="Toggle Visuals Pane">
+            <i class="pi pi-chart-bar"></i>
+        </button>
+    </div>
+
+    <!-- Main Content Area with Sidebar and Center -->
+    <div class="main-content">
+
+        <!-- Left Sidebar - Fields Panel -->
+        <div class="database-sidebar" [class.collapsed]="!isFieldsPanelOpen">
+            <div class="sidebar-content">
+                <div class="sidebar-header-info">
+                    <div class="dataset-label">Dataset</div>
+                </div>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-content-inner">
+                    <!-- Dataset Name Section -->
+                    <div class="dataset-name-section">
+                        <div class="dataset-name-divider">
+                            <span class="dataset-name-text">{{ datasetDetails?.name }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Fields List -->
+                    <div class="fields-list">
+                        <div class="field-card" *ngFor="let field of datasetDetails?.datasetEntities">
+                            <div class="field-icon">
+                                <i class="pi pi-bars"></i>
+                            </div>
+                            <div class="field-info">
+                                <div class="field-name">{{ field.columnToView }}</div>
+                            </div>
+                            <div class="field-menu">
+                                <i class="pi pi-ellipsis-v"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Sidebar 2 - Visuals Panel -->
+        <div class="visuals-sidebar" [class.collapsed]="!isVisualsPanelOpen">
+            <div class="sidebar-content">
+                <div class="sidebar-header-info">
+                    <div class="dataset-label">Select Visual</div>
+                </div>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-content-inner">
+                    <!-- Visuals content will go here -->
+                    <p style="padding: 16px; color: var(--text-color-secondary);">Visuals content here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Container -->
+        <div class="editor-container">
+            <!-- Main content will go here -->
+            <div style="padding: 24px; color: var(--text-color);">
+                <h3>Canvas Area</h3>
+                <p>Drag fields and visuals here to build your analysis</p>
+            </div>
+        </div>
+    </div>
+</div>
