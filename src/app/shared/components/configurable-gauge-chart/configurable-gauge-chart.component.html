@@ -1,0 +1,25 @@
+<div class="gauge-chart-container">
+    <div class="chart-wrapper">
+        <div class="chart-section">
+            <!-- Standard Gauge Chart -->
+            <ng-container *ngIf="chartType === 'gauge'">
+                <ngx-charts-gauge [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"
+                    [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [min]="config.min"
+                    [max]="config.max" [units]="config.units" [bigSegments]="config.bigSegments"
+                    [smallSegments]="config.smallSegments" [showAxis]="config.showAxis" [angleSpan]="config.angleSpan"
+                    [startAngle]="config.startAngle" [showText]="config.showText" [animations]="config.animations"
+                    [tooltipDisabled]="config.tooltipDisabled" (select)="onChartSelect($event)"
+                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
+                </ngx-charts-gauge>
+            </ng-container>
+
+            <!-- Linear Gauge Chart -->
+            <ng-container *ngIf="chartType === 'linear-gauge'">
+                <ngx-charts-linear-gauge [view]="view!" [scheme]="colorSchemeObj" [value]="linearValue"
+                    [min]="config.min" [max]="config.max" [units]="config.units" [animations]="config.animations"
+                    (select)="onChartSelect($event)">
+                </ngx-charts-linear-gauge>
+            </ng-container>
+        </div>
+    </div>
+</div>

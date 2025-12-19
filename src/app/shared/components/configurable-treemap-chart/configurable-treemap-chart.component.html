@@ -1,0 +1,10 @@
+<div class="treemap-chart-container">
+    <div class="chart-wrapper">
+        <div class="chart-section">
+            <ngx-charts-tree-map [results]="data" [view]="view!" [scheme]="colorSchemeObj" [gradient]="config.gradient"
+                [animations]="config.animations" [tooltipDisabled]="config.tooltipDisabled"
+                (select)="onChartSelect($event)">
+            </ngx-charts-tree-map>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 // Barrel exports for shared module
 export * from './components/change-password-dialog/change-password-dialog.component';
+export * from './components/configurable-bar-chart/configurable-bar-chart.component';
 export * from './components/layout/footer/footer.component';
 export * from './components/layout/header/header.component';
 export * from './components/layout/home/home.component';

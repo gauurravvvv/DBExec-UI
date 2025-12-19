@@ -1,0 +1,215 @@
+<div class="bar-chart-container">
+    <!-- Configuration Panel Toggle -->
+    <div class="config-toggle" *ngIf="showConfigPanel">
+        <button pButton type="button" [icon]="isConfigPanelCollapsed ? 'pi pi-cog' : 'pi pi-times'"
+            class="p-button-rounded p-button-text p-button-secondary" (click)="toggleConfigPanel()"
+            [pTooltip]="isConfigPanelCollapsed ? 'Show Settings' : 'Hide Settings'" tooltipPosition="left">
+        </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="chart-wrapper" [class.with-config]="showConfigPanel && !isConfigPanelCollapsed">
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <!-- Bar Vertical -->
+            <ng-container *ngIf="chartType === 'bar-vertical'">
+                <ngx-charts-bar-vertical [results]="data" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [legendPosition]="getLegendPosition()" [legendTitle]="config.legendTitle"
+                    [xAxis]="config.xAxis" [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
+                    [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
+                    [animations]="config.animations" [barPadding]="config.barPadding" [roundEdges]="config.roundEdges"
+                    [noBarWhenZero]="config.noBarWhenZero" [tooltipDisabled]="config.tooltipDisabled"
+                    (select)="handleSelect($event)" (activate)="handleActivate($event)"
+                    (deactivate)="handleDeactivate($event)">
+                </ngx-charts-bar-vertical>
+            </ng-container>
+
+            <!-- Bar Horizontal -->
+            <ng-container *ngIf="chartType === 'bar-horizontal'">
+                <ngx-charts-bar-horizontal [results]="data" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [legendPosition]="getLegendPosition()" [legendTitle]="config.legendTitle"
+                    [xAxis]="config.xAxis" [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
+                    [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
+                    [animations]="config.animations" [barPadding]="config.barPadding" [roundEdges]="config.roundEdges"
+                    [noBarWhenZero]="config.noBarWhenZero" [tooltipDisabled]="config.tooltipDisabled"
+                    (select)="handleSelect($event)" (activate)="handleActivate($event)"
+                    (deactivate)="handleDeactivate($event)">
+                </ngx-charts-bar-horizontal>
+            </ng-container>
+
+            <!-- Bar Vertical Grouped (2D) -->
+            <ng-container *ngIf="chartType === 'bar-vertical-2d'">
+                <ngx-charts-bar-vertical-2d [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
+                    [animations]="config.animations" [barPadding]="config.barPadding" [groupPadding]="16"
+                    (select)="handleSelect($event)" (activate)="handleActivate($event)"
+                    (deactivate)="handleDeactivate($event)">
+                </ngx-charts-bar-vertical-2d>
+            </ng-container>
+
+            <!-- Bar Horizontal Grouped (2D) -->
+            <ng-container *ngIf="chartType === 'bar-horizontal-2d'">
+                <ngx-charts-bar-horizontal-2d [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
+                    [animations]="config.animations" [barPadding]="config.barPadding" [groupPadding]="16"
+                    (select)="handleSelect($event)" (activate)="handleActivate($event)"
+                    (deactivate)="handleDeactivate($event)">
+                </ngx-charts-bar-horizontal-2d>
+            </ng-container>
+
+            <!-- Bar Vertical Stacked -->
+            <ng-container *ngIf="chartType === 'bar-vertical-stacked'">
+                <ngx-charts-bar-vertical-stacked [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
+                    [animations]="config.animations" [barPadding]="config.barPadding" (select)="handleSelect($event)"
+                    (activate)="handleActivate($event)" (deactivate)="handleDeactivate($event)">
+                </ngx-charts-bar-vertical-stacked>
+            </ng-container>
+
+            <!-- Bar Horizontal Stacked -->
+            <ng-container *ngIf="chartType === 'bar-horizontal-stacked'">
+                <ngx-charts-bar-horizontal-stacked [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
+                    [animations]="config.animations" [barPadding]="config.barPadding" (select)="handleSelect($event)"
+                    (activate)="handleActivate($event)" (deactivate)="handleDeactivate($event)">
+                </ngx-charts-bar-horizontal-stacked>
+            </ng-container>
+
+            <!-- Bar Vertical Normalized -->
+            <ng-container *ngIf="chartType === 'bar-vertical-normalized'">
+                <ngx-charts-bar-vertical-normalized [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [gradient]="config.gradient" [animations]="config.animations"
+                    [barPadding]="config.barPadding" (select)="handleSelect($event)" (activate)="handleActivate($event)"
+                    (deactivate)="handleDeactivate($event)">
+                </ngx-charts-bar-vertical-normalized>
+            </ng-container>
+
+            <!-- Bar Horizontal Normalized -->
+            <ng-container *ngIf="chartType === 'bar-horizontal-normalized'">
+                <ngx-charts-bar-horizontal-normalized [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [gradient]="config.gradient" [animations]="config.animations"
+                    [barPadding]="config.barPadding" (select)="handleSelect($event)" (activate)="handleActivate($event)"
+                    (deactivate)="handleDeactivate($event)">
+                </ngx-charts-bar-horizontal-normalized>
+            </ng-container>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div class="config-panel" *ngIf="showConfigPanel && !isConfigPanelCollapsed">
+            <div class="config-header">
+                <i class="pi pi-sliders-h"></i>
+                <span>Chart Settings</span>
+            </div>
+
+            <div class="config-content">
+                <!-- Color Scheme -->
+                <div class="config-group">
+                    <label>Color Scheme</label>
+                    <p-dropdown [options]="colorSchemes" [(ngModel)]="config.colorScheme"
+                        (onChange)="onColorSchemeChange()" optionLabel="label" optionValue="value"
+                        [style]="{'width': '100%'}">
+                    </p-dropdown>
+                </div>
+
+                <!-- Axis Options -->
+                <div class="config-section">
+                    <div class="section-title">Axis Options</div>
+
+                    <div class="config-row">
+                        <label>Show X Axis</label>
+                        <p-inputSwitch [(ngModel)]="config.xAxis"></p-inputSwitch>
+                    </div>
+
+                    <div class="config-row">
+                        <label>Show Y Axis</label>
+                        <p-inputSwitch [(ngModel)]="config.yAxis"></p-inputSwitch>
+                    </div>
+
+                    <div class="config-row">
+                        <label>Show Grid Lines</label>
+                        <p-inputSwitch [(ngModel)]="config.showGridLines"></p-inputSwitch>
+                    </div>
+                </div>
+
+                <!-- Labels -->
+                <div class="config-section">
+                    <div class="section-title">Labels</div>
+
+                    <div class="config-row">
+                        <label>Show X Axis Label</label>
+                        <p-inputSwitch [(ngModel)]="config.showXAxisLabel"></p-inputSwitch>
+                    </div>
+
+                    <div class="config-group" *ngIf="config.showXAxisLabel">
+                        <label>X Axis Label</label>
+                        <input type="text" pInputText [(ngModel)]="config.xAxisLabel" />
+                    </div>
+
+                    <div class="config-row">
+                        <label>Show Y Axis Label</label>
+                        <p-inputSwitch [(ngModel)]="config.showYAxisLabel"></p-inputSwitch>
+                    </div>
+
+                    <div class="config-group" *ngIf="config.showYAxisLabel">
+                        <label>Y Axis Label</label>
+                        <input type="text" pInputText [(ngModel)]="config.yAxisLabel" />
+                    </div>
+
+                    <div class="config-row">
+                        <label>Show Data Labels</label>
+                        <p-inputSwitch [(ngModel)]="config.showDataLabel"></p-inputSwitch>
+                    </div>
+                </div>
+
+                <!-- Display Options -->
+                <div class="config-section">
+                    <div class="section-title">Display Options</div>
+
+                    <div class="config-row">
+                        <label>Show Legend</label>
+                        <p-inputSwitch [(ngModel)]="config.legend"></p-inputSwitch>
+                    </div>
+
+                    <div class="config-row">
+                        <label>Gradient Fill</label>
+                        <p-inputSwitch [(ngModel)]="config.gradient"></p-inputSwitch>
+                    </div>
+
+                    <div class="config-row">
+                        <label>Animations</label>
+                        <p-inputSwitch [(ngModel)]="config.animations"></p-inputSwitch>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Bar Padding</label>
+                        <p-inputNumber [(ngModel)]="config.barPadding" [min]="0" [max]="50" [showButtons]="true"
+                            [style]="{'width': '100%'}">
+                        </p-inputNumber>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+:host {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.treemap-chart-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.chart-wrapper {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.chart-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  min-height: 150px;
+  min-width: 200px;
+  contain: layout style;
+
+  ngx-charts-tree-map {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    display: block;
+  }
+
+  ::ng-deep {
+    .ngx-charts-outer {
+      overflow: visible !important;
+    }
+    
+    .treemap .cell .label {
+      fill: white !important;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+  }
+}

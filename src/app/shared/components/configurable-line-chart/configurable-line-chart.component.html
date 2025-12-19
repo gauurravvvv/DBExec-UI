@@ -1,0 +1,31 @@
+<div class="line-chart-container">
+    <!-- Chart Section -->
+    <div class="chart-wrapper">
+        <div class="chart-section">
+            <ngx-charts-line-chart *ngIf="view; else autoSizeChart" [view]="view" [results]="data"
+                [scheme]="colorSchemeObj" [legend]="config.legend" [legendTitle]="config.legendTitle"
+                [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
+                [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [autoScale]="config.autoScale"
+                [timeline]="config.timeline" [gradient]="config.gradient" [animations]="config.animations"
+                [rangeFillOpacity]="config.rangeFillOpacity" [tooltipDisabled]="config.tooltipDisabled"
+                [curve]="getCurve()" (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
+                (deactivate)="onChartDeactivate($event)">
+            </ngx-charts-line-chart>
+
+            <ng-template #autoSizeChart>
+                <ngx-charts-line-chart [results]="data" [scheme]="colorSchemeObj" [legend]="config.legend"
+                    [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis"
+                    [yAxis]="config.yAxis" [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
+                    [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [autoScale]="config.autoScale"
+                    [timeline]="config.timeline" [gradient]="config.gradient" [animations]="config.animations"
+                    [rangeFillOpacity]="config.rangeFillOpacity" [tooltipDisabled]="config.tooltipDisabled"
+                    [curve]="getCurve()" (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
+                    (deactivate)="onChartDeactivate($event)">
+                </ngx-charts-line-chart>
+            </ng-template>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+<div class="area-chart-container">
+    <div class="chart-wrapper">
+        <div class="chart-section">
+            <!-- Standard Area Chart -->
+            <ng-container *ngIf="chartType === 'area'">
+                <ngx-charts-area-chart *ngIf="view; else autoSizeArea" [view]="view" [results]="data"
+                    [scheme]="colorSchemeObj" [legend]="config.legend" [legendTitle]="config.legendTitle"
+                    [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
+                    [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [autoScale]="config.autoScale"
+                    [timeline]="config.timeline" [gradient]="config.gradient" [animations]="config.animations"
+                    [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
+                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
+                </ngx-charts-area-chart>
+                <ng-template #autoSizeArea>
+                    <ngx-charts-area-chart [results]="data" [scheme]="colorSchemeObj" [legend]="config.legend"
+                        [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis"
+                        [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
+                        [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
+                        [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                        [yAxisLabel]="config.yAxisLabel" [autoScale]="config.autoScale" [timeline]="config.timeline"
+                        [gradient]="config.gradient" [animations]="config.animations"
+                        [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
+                        (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
+                    </ngx-charts-area-chart>
+                </ng-template>
+            </ng-container>
+
+            <!-- Stacked Area Chart -->
+            <ng-container *ngIf="chartType === 'area-stacked'">
+                <ngx-charts-area-chart-stacked *ngIf="view; else autoSizeStacked" [view]="view" [results]="data"
+                    [scheme]="colorSchemeObj" [legend]="config.legend" [legendTitle]="config.legendTitle"
+                    [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
+                    [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [timeline]="config.timeline"
+                    [gradient]="config.gradient" [animations]="config.animations"
+                    [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
+                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
+                </ngx-charts-area-chart-stacked>
+                <ng-template #autoSizeStacked>
+                    <ngx-charts-area-chart-stacked [results]="data" [scheme]="colorSchemeObj" [legend]="config.legend"
+                        [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis"
+                        [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
+                        [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
+                        [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                        [yAxisLabel]="config.yAxisLabel" [timeline]="config.timeline" [gradient]="config.gradient"
+                        [animations]="config.animations" [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()"
+                        (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
+                        (deactivate)="onChartDeactivate($event)">
+                    </ngx-charts-area-chart-stacked>
+                </ng-template>
+            </ng-container>
+
+            <!-- Normalized Area Chart -->
+            <ng-container *ngIf="chartType === 'area-normalized'">
+                <ngx-charts-area-chart-normalized *ngIf="view; else autoSizeNormalized" [view]="view" [results]="data"
+                    [scheme]="colorSchemeObj" [legend]="config.legend" [legendTitle]="config.legendTitle"
+                    [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                    [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
+                    [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [timeline]="config.timeline"
+                    [gradient]="config.gradient" [animations]="config.animations"
+                    [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
+                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
+                </ngx-charts-area-chart-normalized>
+                <ng-template #autoSizeNormalized>
+                    <ngx-charts-area-chart-normalized [results]="data" [scheme]="colorSchemeObj"
+                        [legend]="config.legend" [legendTitle]="config.legendTitle"
+                        [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
+                        [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
+                        [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                        [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [timeline]="config.timeline"
+                        [gradient]="config.gradient" [animations]="config.animations"
+                        [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
+                        (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
+                    </ngx-charts-area-chart-normalized>
+                </ng-template>
+            </ng-container>
+        </div>
+    </div>
+</div>

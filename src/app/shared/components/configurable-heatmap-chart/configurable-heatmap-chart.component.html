@@ -1,0 +1,16 @@
+<div class="heatmap-chart-container">
+    <div class="chart-wrapper">
+        <div class="chart-section">
+            <ngx-charts-heat-map [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"
+                [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis"
+                [yAxis]="config.yAxis" [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel"
+                [trimXAxisTicks]="config.trimXAxisTicks" [trimYAxisTicks]="config.trimYAxisTicks"
+                [rotateXAxisTicks]="config.rotateXAxisTicks" [maxXAxisTickLength]="config.maxXAxisTickLength"
+                [maxYAxisTickLength]="config.maxYAxisTickLength" [gradient]="config.gradient"
+                [innerPadding]="config.innerPadding" [animations]="config.animations"
+                [tooltipDisabled]="config.tooltipDisabled" (select)="onChartSelect($event)">
+            </ngx-charts-heat-map>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+<div class="card-chart-container">
+    <div class="chart-wrapper">
+        <div class="chart-section">
+            <ngx-charts-number-card [results]="data" [view]="view!" [scheme]="colorSchemeObj"
+                [cardColor]="config.cardColor" [bandColor]="config.bandColor" [textColor]="config.textColor"
+                [emptyColor]="config.emptyColor" [innerPadding]="config.innerPadding" [animations]="config.animations"
+                (select)="onChartSelect($event)">
+            </ngx-charts-number-card>
+        </div>
+    </div>
+</div>
