@@ -28,6 +28,7 @@ export class AddAnalysesComponent implements OnInit {
   resizeStartHeight: number = 0;
   resizeDirection: string = '';
   isResizing: boolean = false; // Flag to prevent click during resize
+  isConfigSidebarOpen: boolean = false; // Right-click opens config sidebar
 
   // Available chart types from ngx-charts
   chartTypes = [
@@ -123,6 +124,49 @@ export class AddAnalysesComponent implements OnInit {
         this.loadDatasetInfo();
       }
     });
+    
+    // Load test data for development
+    this.loadTestData();
+  }
+
+  /**
+   * Load visuals from saved configuration (for testing)
+   */
+  loadTestData(): void {
+    const savedConfig = {
+      "visuals": [
+        { "id": 1, "title": "Bar Chart", "x": 0, "y": 0, "width": 613, "height": 406, "chartType": "bar-vertical", "config": { "colorScheme": "vivid", "xAxis": true, "yAxis": true, "showGridLines": true, "legend": false, "legendPosition": "right" } },
+        { "id": 2, "title": "Horizontal Bar", "x": 620, "y": 0, "width": 689, "height": 486, "chartType": "bar-horizontal", "config": { "colorScheme": "cool", "xAxis": true, "yAxis": true, "showGridLines": true, "legend": false } },
+        { "id": 3, "title": "Normalized Area", "x": 0, "y": 420, "width": 702, "height": 350, "chartType": "area-normalized", "config": { "colorScheme": "fire", "xAxis": true, "yAxis": true } },
+        { "id": 4, "title": "Line Chart", "x": 710, "y": 500, "width": 602, "height": 344, "chartType": "line", "config": { "colorScheme": "ocean", "xAxis": true, "yAxis": true } },
+        { "id": 5, "title": "Gauge", "x": 1320, "y": 0, "width": 301, "height": 351, "chartType": "gauge", "config": { "colorScheme": "forest", "min": 0, "max": 100, "units": "%" } },
+        { "id": 6, "title": "Pie Chart", "x": 1320, "y": 360, "width": 400, "height": 350, "chartType": "pie", "config": { "colorScheme": "neons", "labels": true, "doughnut": false } }
+      ]
+    };
+
+    // Clear existing visuals
+    this.visuals = [];
+    this.visualCounter = 0;
+
+    // Load visuals from saved config
+    savedConfig.visuals.forEach((savedVisual: any) => {
+      const visual = {
+        id: savedVisual.id,
+        title: savedVisual.title,
+        x: savedVisual.x || 0,
+        y: savedVisual.y || 0,
+        width: savedVisual.width || 400,
+        height: savedVisual.height || 300,
+        chartType: savedVisual.chartType || '',
+        xAxisColumn: savedVisual.xAxisColumn || '',
+        yAxisColumn: savedVisual.yAxisColumn || '',
+        config: savedVisual.config ? { ...this.getDefaultChartConfig(), ...savedVisual.config } : this.getDefaultChartConfig()
+      };
+      this.visuals.push(visual);
+      this.visualCounter = Math.max(this.visualCounter, visual.id);
+    });
+
+    console.log('Loaded test data:', this.visuals);
   }
 
   loadDatasetInfo(): void {
@@ -320,6 +364,21 @@ export class AddAnalysesComponent implements OnInit {
     }
   }
 
+  getSelectedChartIcon(): string {
+    const visual = this.getFocusedVisual();
+    if (!visual?.chartType) return 'pi pi-chart-bar';
+    const chartType = this.chartTypes.find(c => c.id === visual.chartType);
+    return chartType?.icon || 'pi pi-chart-bar';
+  }
+
+  clearChartType(): void {
+    const visual = this.getFocusedVisual();
+    if (visual) {
+      visual.chartType = null;
+      visual.title = `Visual ${visual.id}`;
+    }
+  }
+
   // Left-click: Focus visual for chart type selection
   onVisualClick(event: MouseEvent, id: number): void {
     // Prevent click from firing during/after resize
@@ -338,16 +397,22 @@ export class AddAnalysesComponent implements OnInit {
   onVisualRightClick(event: MouseEvent, id: number): void {
     event.preventDefault(); // Prevent default context menu
     event.stopPropagation();
-    // Focus the visual and open config (config sidebar shows when focused + has chartType)
+    // Focus the visual and open config sidebar
     this.focusedVisualId = id;
+    this.isConfigSidebarOpen = true;
   }
 
   toggleFocusVisual(id: number): void {
     if (this.focusedVisualId === id) {
       this.focusedVisualId = null;
+      this.isConfigSidebarOpen = false;
     } else {
       this.focusedVisualId = id;
     }
+  }
+
+  closeConfigSidebar(): void {
+    this.isConfigSidebarOpen = false;
   }
 
   startResize(event: MouseEvent, visual: any, direction: string): void {
@@ -455,5 +520,33 @@ export class AddAnalysesComponent implements OnInit {
     }
   }
 
-  saveAnalysis(): void {}
+  saveAnalysis(): void {
+    // Build canvas configuration JSON
+    const canvasConfig = {
+      datasetId: this.datasetId,
+      orgId: this.orgId,
+      datasetName: this.datasetDetails?.name,
+      createdAt: new Date().toISOString(),
+      visuals: this.visuals.map(visual => ({
+        id: visual.id,
+        title: visual.title,
+        // Position and Size
+        x: visual.x || 0,
+        y: visual.y || 0,
+        width: visual.width,
+        height: visual.height,
+        // Chart Type
+        chartType: visual.chartType,
+        // Data Mapping
+        xAxisColumn: visual.xAxisColumn || null,
+        yAxisColumn: visual.yAxisColumn || null,
+        // Configuration
+        config: visual.config ? { ...visual.config } : null
+      }))
+    };
+
+    console.log('=== ANALYSIS CONFIGURATION ===');
+    console.log(JSON.stringify(canvasConfig, null, 2));
+    console.log('==============================');
+  }
 }

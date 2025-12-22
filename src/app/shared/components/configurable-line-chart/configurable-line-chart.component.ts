@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
 import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
+import { COLOR_PALETTES, DUMMY_SINGLE_SERIES, DUMMY_MULTI_SERIES, createColorScheme, getLegendPositionEnum } from '../../helpers/chart-config.helper';
 import { curveLinear, curveMonotoneX, curveStep, curveBasis, curveCardinal } from 'd3-shape';
 
 export interface LineChartSeries {
@@ -106,23 +107,8 @@ export class ConfigurableLineChartComponent implements OnInit, OnChanges, DoChec
     domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
   };
 
-  // Available color palettes
-  colorPalettes: { [key: string]: string[] } = {
-    vivid: ['#647c8a', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39'],
-    natural: ['#bf9d76', '#e99450', '#d89f59', '#f2dfa7', '#a5d7c6', '#7794b1', '#afafaf', '#707160'],
-    cool: ['#a8385d', '#7aa3e5', '#a27ea8', '#aae3f5', '#adcded', '#a95963', '#8796c0', '#7ed3ed'],
-    fire: ['#ff3d00', '#bf360c', '#ff6e40', '#ff9e80', '#ffab40', '#ffcc80', '#ffecb3', '#fff3e0'],
-    solar: ['#fff8e1', '#ffecb3', '#ffe082', '#ffd54f', '#ffca28', '#ffc107', '#ffb300', '#ffa000'],
-    air: ['#e1f5fe', '#b3e5fc', '#81d4fa', '#4fc3f7', '#29b6f6', '#03a9f4', '#039be5', '#0288d1'],
-    aqua: ['#e0f7fa', '#b2ebf2', '#80deea', '#4dd0e1', '#26c6da', '#00bcd4', '#00acc1', '#0097a7'],
-    flame: ['#e3f2fd', '#bbdefb', '#90caf9', '#64b5f6', '#42a5f5', '#2196f3', '#1e88e5', '#1976d2'],
-    ocean: ['#1abc9c', '#16a085', '#3498db', '#2980b9', '#9b59b6', '#8e44ad', '#34495e', '#2c3e50'],
-    forest: ['#27ae60', '#2ecc71', '#1abc9c', '#16a085', '#f39c12', '#f1c40f', '#e67e22', '#d35400'],
-    horizon: ['#2c3e50', '#34495e', '#7f8c8d', '#95a5a6', '#bdc3c7', '#ecf0f1', '#3498db', '#2980b9'],
-    neons: ['#ff00ff', '#00ffff', '#ffff00', '#ff6600', '#ff0066', '#00ff66', '#6600ff', '#66ff00'],
-    picnic: ['#fad0c3', '#fdd5b1', '#f0e6ce', '#d5e8d4', '#b6d7a8', '#a4c2f4', '#b4a7d6', '#d5a6bd'],
-    nightLights: ['#4fc3f7', '#4dd0e1', '#4db6ac', '#81c784', '#aed581', '#dce775', '#fff176', '#ffb74d'],
-  };
+  // Available color palettes (using imported constants)
+  colorPalettes = COLOR_PALETTES;
 
   // Curve types
   curveTypes = [

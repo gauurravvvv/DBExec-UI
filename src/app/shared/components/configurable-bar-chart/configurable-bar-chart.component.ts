@@ -1,40 +1,21 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
 import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
+import { 
+  COLOR_PALETTES, 
+  DUMMY_SINGLE_SERIES, 
+  DUMMY_MULTI_SERIES, 
+  DEFAULT_BAR_CHART_CONFIG,
+  BarChartConfig,
+  createColorScheme,
+  getLegendPositionEnum
+} from '../../helpers/chart-config.helper';
 
 export interface BarChartData {
   name: string;
   value: number;
 }
 
-export interface BarChartConfig {
-  // Legend options
-  legend: boolean;
-  legendTitle: string;
-  legendPosition: string;
-  // Axis options
-  xAxis: boolean;
-  yAxis: boolean;
-  showGridLines: boolean;
-  roundDomains: boolean;
-  // Axis labels
-  showXAxisLabel: boolean;
-  showYAxisLabel: boolean;
-  xAxisLabel: string;
-  yAxisLabel: string;
-  // Data display
-  showDataLabel: boolean;
-  // Styling
-  gradient: boolean;
-  animations: boolean;
-  roundEdges: boolean;
-  // Bar specific
-  barPadding: number;
-  noBarWhenZero: boolean;
-  // Tooltip
-  tooltipDisabled: boolean;
-  // Color
-  colorScheme: string;
-}
+// BarChartConfig is imported from chart-config.helper.ts
 
 @Component({
   selector: 'app-configurable-bar-chart',
@@ -68,28 +49,8 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
   @Output() onActivate = new EventEmitter<any>();
   @Output() onDeactivate = new EventEmitter<any>();
 
-  // Internal configuration state (used when chartConfig not provided)
-  private defaultConfig: BarChartConfig = {
-    legend: false,
-    legendTitle: 'Legend',
-    legendPosition: 'right',
-    xAxis: true,
-    yAxis: true,
-    showGridLines: true,
-    roundDomains: false,
-    showXAxisLabel: true,
-    showYAxisLabel: true,
-    xAxisLabel: 'Category',
-    yAxisLabel: 'Value',
-    showDataLabel: false,
-    gradient: false,
-    animations: false,
-    roundEdges: false,
-    barPadding: 8,
-    noBarWhenZero: true,
-    tooltipDisabled: false,
-    colorScheme: 'vivid',
-  };
+  // Internal configuration state (uses imported default from helper)
+  private defaultConfig: BarChartConfig = { ...DEFAULT_BAR_CHART_CONFIG };
 
   // Active config - use input if provided, else use default
   get config(): BarChartConfig {
@@ -126,62 +87,14 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
     { label: 'Night Lights', value: 'nightLights' },
   ];
 
-  // Color scheme palettes
-  private colorPalettes: { [key: string]: string[] } = {
-    vivid: ['#647c8a', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39'],
-    natural: ['#bf9d76', '#e99450', '#d89f59', '#f2dfa7', '#a5d7c6', '#7794b1', '#afafaf', '#707160'],
-    cool: ['#a8385d', '#7aa3e5', '#a27ea8', '#aae3f5', '#adcded', '#a95963', '#8796c0', '#7ed3ed'],
-    fire: ['#ff3d00', '#bf360c', '#ff6e40', '#ff9e80', '#ffccbc', '#d84315', '#ff5722', '#e64a19'],
-    solar: ['#fff8e1', '#ffecb3', '#ffe082', '#ffd54f', '#ffca28', '#ffc107', '#ffb300', '#ffa000'],
-    air: ['#e1f5fe', '#b3e5fc', '#81d4fa', '#4fc3f7', '#29b6f6', '#03a9f4', '#039be5', '#0288d1'],
-    aqua: ['#e0f7fa', '#b2ebf2', '#80deea', '#4dd0e1', '#26c6da', '#00bcd4', '#00acc1', '#0097a7'],
-    flame: ['#a10a28', '#d3342d', '#ef6d49', '#faad67', '#fdde90', '#dbed91', '#a9d770', '#6cba67'],
-    ocean: ['#1a237e', '#283593', '#303f9f', '#3949ab', '#3f51b5', '#5c6bc0', '#7986cb', '#9fa8da'],
-    forest: ['#1b5e20', '#2e7d32', '#388e3c', '#43a047', '#4caf50', '#66bb6a', '#81c784', '#a5d6a7'],
-    horizon: ['#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b'],
-    neons: ['#ff00ff', '#00ffff', '#ff0066', '#00ff00', '#ffff00', '#ff3300', '#00ff99', '#9900ff'],
-    picnic: ['#ffc6ff', '#bdb2ff', '#a0c4ff', '#9bf6ff', '#caffbf', '#fdffb6', '#ffd6a5', '#ffadad'],
-    night: ['#2c3e50', '#34495e', '#7f8c8d', '#95a5a6', '#bdc3c7', '#ecf0f1', '#1abc9c', '#16a085'],
-    nightLights: ['#4a266a', '#8e44ad', '#9b59b6', '#e74c3c', '#f39c12', '#f1c40f', '#2ecc71', '#1abc9c'],
-  };
+  // Color scheme palettes (using imported constants)
+  private colorPalettes = COLOR_PALETTES;
 
-  // Dummy data for initial rendering (single series)
-  private dummyData: BarChartData[] = [
-    { name: 'Germany', value: 8940000 },
-    { name: 'USA', value: 5000000 },
-    { name: 'France', value: 7200000 },
-    { name: 'UK', value: 6200000 },
-    { name: 'Italy', value: 4900000 },
-    { name: 'Spain', value: 4100000 },
-  ];
+  // Dummy data for initial rendering (using imported constants)
+  private dummyData = DUMMY_SINGLE_SERIES;
 
   // Multi-series data for grouped/stacked/normalized charts
-  multiData: any[] = [
-    {
-      name: 'Germany',
-      series: [
-        { name: '2020', value: 8940000 },
-        { name: '2021', value: 9200000 },
-        { name: '2022', value: 9500000 },
-      ]
-    },
-    {
-      name: 'USA',
-      series: [
-        { name: '2020', value: 5000000 },
-        { name: '2021', value: 5300000 },
-        { name: '2022', value: 5600000 },
-      ]
-    },
-    {
-      name: 'France',
-      series: [
-        { name: '2020', value: 7200000 },
-        { name: '2021', value: 7500000 },
-        { name: '2022', value: 7800000 },
-      ]
-    },
-  ];
+  multiData = DUMMY_MULTI_SERIES;
 
   ngOnInit(): void {
     // Use dummy data if no data is provided
@@ -203,11 +116,20 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
     }
   }
 
+  private previousLegend: boolean = false;
+  private previousLegendPosition: string = 'right';
+
   ngDoCheck(): void {
     // Detect changes to colorScheme within the config object
     if (this.config && this.config.colorScheme !== this.previousColorScheme) {
       this.previousColorScheme = this.config.colorScheme;
       this.updateColorScheme();
+    }
+    // Detect changes to legend settings and recalculate dimensions
+    if (this.config && (this.config.legend !== this.previousLegend || this.config.legendPosition !== this.previousLegendPosition)) {
+      this.previousLegend = this.config.legend;
+      this.previousLegendPosition = this.config.legendPosition;
+      this.updateViewDimensions();
     }
   }
 
@@ -216,8 +138,18 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
       // Account for header (~45px) and some padding
       const headerHeight = 45;
       const padding = 20;
-      const width = this.chartWidth - padding;
-      const height = this.chartHeight - headerHeight - padding;
+      let width = this.chartWidth - padding;
+      let height = this.chartHeight - headerHeight - padding;
+      
+      // Account for legend space when legend is enabled
+      if (this.config.legend) {
+        if (this.config.legendPosition === 'below') {
+          height -= 60; // Reserve space for legend below
+        } else {
+          width -= 120; // Reserve space for legend on right
+        }
+      }
+      
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       // Let ngx-charts auto-size
@@ -256,6 +188,6 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
   }
 
   getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below' ? LegendPosition.Below : LegendPosition.Right;
+    return getLegendPositionEnum(this.config.legendPosition);
   }
 }

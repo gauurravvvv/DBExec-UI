@@ -7,7 +7,7 @@
             </h3>
         </div>
         <div class="toolbar-right">
-            <button pButton class="p-button-text btn-primary" title="Save Analysis">
+            <button pButton class="p-button-text btn-primary" title="Save Analysis" (click)="saveAnalysis()">
                 <i class="pi pi-save"></i>
             </button>
         </div>
@@ -65,18 +65,21 @@
         <div class="visuals-sidebar" [class.collapsed]="!isVisualsPanelOpen">
             <div class="sidebar-content">
                 <div class="sidebar-header-info">
-                    <div class="dataset-label">{{ focusedVisualId ? 'Select Chart Type' : 'Visuals' }}</div>
+                    <div class="dataset-label">
+                        {{ focusedVisualId && !getFocusedVisual()?.chartType ? 'Select Chart Type' :
+                        focusedVisualId && getFocusedVisual()?.chartType ? 'Data Mapping' : 'Visuals' }}
+                    </div>
                 </div>
                 <div class="sidebar-divider"></div>
                 <div class="sidebar-content-inner">
-                    <!-- Add Visual Button (when no visual is focused) -->
-                    <div class="add-visual-section" *ngIf="!focusedVisualId">
+                    <!-- Add Visual Button (always visible) -->
+                    <div class="add-visual-section">
                         <button pButton label="Add Visual" icon="pi pi-plus" class="p-button-outlined add-visual-button"
                             (click)="addVisual()"></button>
                     </div>
 
-                    <!-- Chart Type Grid (when visual is focused) -->
-                    <div class="chart-type-section" *ngIf="focusedVisualId">
+                    <!-- Chart Type Grid (when visual is focused but no chart type selected) -->
+                    <div class="chart-type-section" *ngIf="focusedVisualId && !getFocusedVisual()?.chartType">
                         <div class="chart-type-hint">
                             <i class="pi pi-info-circle"></i>
                             <span>Select a chart type for this visual</span>
@@ -98,6 +101,51 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Data Mapping Section (when chart type is already selected) -->
+                    <div class="chart-type-section" *ngIf="focusedVisualId && getFocusedVisual()?.chartType">
+                        <!-- Axis Column Selection (show when chart type is selected) -->
+                        <div class="axis-selection-section"
+                            *ngIf="getFocusedVisual()?.chartType && hasAxisLabels(getFocusedVisual()?.chartType)">
+                            <div class="section-divider"></div>
+                            <div class="axis-selection-title">Data Mapping</div>
+                            <div class="axis-group">
+                                <label>X-Axis Column</label>
+                                <p-dropdown [options]="datasetDetails?.datasetEntities"
+                                    [(ngModel)]="getFocusedVisual().xAxisColumn" optionLabel="columnToView"
+                                    optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
+                                </p-dropdown>
+                            </div>
+                            <div class="axis-group">
+                                <label>Y-Axis Column</label>
+                                <p-dropdown [options]="datasetDetails?.datasetEntities"
+                                    [(ngModel)]="getFocusedVisual().yAxisColumn" optionLabel="columnToView"
+                                    optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
+                                </p-dropdown>
+                            </div>
+                        </div>
+
+                        <!-- Value/Category for non-axis charts (pie, gauge, cards) -->
+                        <div class="axis-selection-section"
+                            *ngIf="getFocusedVisual()?.chartType && !hasAxisLabels(getFocusedVisual()?.chartType)">
+                            <div class="section-divider"></div>
+                            <div class="axis-selection-title">Data Mapping</div>
+                            <div class="axis-group">
+                                <label>Category Column</label>
+                                <p-dropdown [options]="datasetDetails?.datasetEntities"
+                                    [(ngModel)]="getFocusedVisual().xAxisColumn" optionLabel="columnToView"
+                                    optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
+                                </p-dropdown>
+                            </div>
+                            <div class="axis-group">
+                                <label>Value Column</label>
+                                <p-dropdown [options]="datasetDetails?.datasetEntities"
+                                    [(ngModel)]="getFocusedVisual().yAxisColumn" optionLabel="columnToView"
+                                    optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
+                                </p-dropdown>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -113,18 +161,24 @@
                     (dragover)="onDragOver($event, visual)" (drop)="onDrop($event, visual)"
                     (dragend)="onDragEnd($event)" (click)="onVisualClick($event, visual.id)"
                     (contextmenu)="onVisualRightClick($event, visual.id)">
-                    <div class="visual-header">
-                        <div class="visual-title-section">
-                            <i class="pi pi-chart-bar" style="margin-right: 8px; color: var(--primary-color);"></i>
-                            <input *ngIf="editingTitleId === visual.id" type="text" [(ngModel)]="visual.title"
-                                (blur)="finishEditTitle()" (keydown)="onTitleKeydown($event)" class="title-input"
-                                [attr.autofocus]="true">
-                            <span *ngIf="editingTitleId !== visual.id" (click)="startEditTitle(visual.id, $event)"
-                                class="title-text">{{visual.title}}</span>
+                    <!-- Inline Title (shown above chart) -->
+                    <div class="visual-inline-title">
+                        <span *ngIf="editingTitleId !== visual.id" (click)="startEditTitle(visual.id, $event)"
+                            class="inline-title-text">{{visual.title}}</span>
+                        <div *ngIf="editingTitleId === visual.id" class="title-edit-container">
+                            <input type="text" [(ngModel)]="visual.title" maxlength="100" (blur)="finishEditTitle()"
+                                (keydown)="onTitleKeydown($event)" class="title-input">
+                            <span class="char-counter">{{100 - (visual.title?.length || 0)}} chars left</span>
                         </div>
-                        <div class="visual-actions">
-                            <button pButton icon="pi pi-times" class="p-button-text p-button-sm"
-                                (click)="removeVisual(visual.id)" title="Remove"></button>
+                        <!-- Chart type and action buttons -->
+                        <div class="visual-action-buttons">
+                            <button *ngIf="visual.chartType" pButton icon="pi pi-refresh"
+                                class="p-button-text p-button-sm action-btn" (click)="clearChartType()"
+                                pTooltip="Change chart type" tooltipPosition="top">
+                            </button>
+                            <button pButton icon="pi pi-times" class="p-button-text p-button-sm action-btn close-btn"
+                                (click)="removeVisual(visual.id)" pTooltip="Remove" tooltipPosition="top">
+                            </button>
                         </div>
                     </div>
                     <div class="visual-body">
@@ -221,13 +275,13 @@
             </div>
         </div>
 
-        <!-- Right Configuration Sidebar -->
-        <div class="config-sidebar" *ngIf="focusedVisualId && getFocusedVisual()?.chartType">
+        <!-- Right Configuration Sidebar (opens on right-click only) -->
+        <div class="config-sidebar" *ngIf="isConfigSidebarOpen && focusedVisualId && getFocusedVisual()?.chartType">
             <div class="sidebar-content">
                 <div class="sidebar-header-info">
                     <div class="dataset-label">Chart Configuration</div>
                     <button pButton icon="pi pi-times" class="p-button-text p-button-sm close-btn"
-                        (click)="toggleFocusVisual(focusedVisualId)" title="Close"></button>
+                        (click)="closeConfigSidebar()" title="Close"></button>
                 </div>
                 <div class="sidebar-divider"></div>
                 <div class="sidebar-content-inner config-form">

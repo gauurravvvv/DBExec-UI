@@ -60,7 +60,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     // Remove the custom headers before sending the request
     let headers = req.headers
-      .set('token', this.accessToken)
+      .set('x-auth-token', this.accessToken)
       .set('x-organization-id', this.organisation_id);
     if (headers.has('X-Server-Type')) {
       headers = headers.delete('X-Server-Type');

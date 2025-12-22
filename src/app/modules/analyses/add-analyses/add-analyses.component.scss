@@ -273,6 +273,10 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    display: block;
     padding: 0 4px;
   }
 
@@ -375,6 +379,38 @@
     flex-direction: column;
   }
 
+  // Selected Chart Header (when chart type already selected)
+  .selected-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background-color: rgba(var(--primary-color-rgb), 0.08);
+    border-bottom: 1px solid var(--border-color);
+
+    .selected-chart-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-color);
+
+      i {
+        color: var(--primary-color);
+        font-size: 16px;
+      }
+    }
+
+    button {
+      color: var(--secondary-color);
+      
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+  }
+
   .chart-type-hint {
     display: flex;
     align-items: center;
@@ -464,6 +500,47 @@
         color: var(--primary-color);
         font-weight: 600;
         opacity: 1;
+      }
+    }
+  }
+
+  // Axis Selection Section
+  .axis-selection-section {
+    padding: 0 10px 16px 10px;
+
+    .section-divider {
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 12px 0;
+    }
+
+    .axis-selection-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .axis-group {
+      margin-bottom: 12px;
+
+      label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-color-secondary);
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+
+      ::ng-deep .p-dropdown {
+        width: 100% !important;
+        
+        .p-dropdown-label {
+          font-size: 12px;
+          padding: 8px 12px;
+        }
       }
     }
   }
@@ -689,7 +766,7 @@
   background-color: var(--card-background);
   border: 2px solid var(--border-color);
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden; // Keep content inside the box
   display: flex;
   flex-direction: column;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -808,36 +885,92 @@
   }
 }
 
-.visual-header {
+// Inline Title (replaces visual-header)
+.visual-inline-title {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background-color: var(--hover-background);
-  border-bottom: 1px solid var(--border-color);
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--text-color);
-  cursor: move;
-  user-select: none;
-}
-
-.visual-title-section {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-}
-
-.title-text {
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: rgba(var(--primary-color-rgb), 0.1);
+  justify-content: center;
+  padding: 10px 14px 5px;
+  position: relative;
+  
+  .inline-title-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 4px 60px; // Extra padding for action buttons (refresh + close)
+    border-radius: 4px;
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    max-width: calc(100% - 20px); // Prevent overflow into buttons area
+    line-height: 1.4;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(var(--primary-color-rgb), 0.1);
+    }
   }
+  
+  .title-input {
+    border: 1px solid var(--primary-color);
+    background-color: var(--card-background);
+    color: var(--text-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    width: 250px;
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+    }
+  }
+  
+  .title-edit-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .char-counter {
+    font-size: 11px;
+    color: var(--text-color-secondary);
+    opacity: 0.7;
+  }
+  
+  .visual-action-buttons {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    
+    .action-btn {
+      color: var(--text-color-secondary);
+      padding: 4px;
+      
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+    
+    .close-btn:hover {
+      color: var(--danger-color, #ff5252) !important;
+    }
+  }
+}
+
+// Show action buttons on visual hover
+.visual-box:hover .visual-inline-title .visual-action-buttons {
+  opacity: 1;
 }
 
 .title-input {
@@ -888,7 +1021,7 @@
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  overflow: hidden;
+  overflow: hidden; // Keep content inside
   min-height: 0;
   min-width: 0;
 
