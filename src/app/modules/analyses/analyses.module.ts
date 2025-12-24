@@ -4,11 +4,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MenuModule } from 'primeng/menu';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { AddAnalysesComponent } from './add-analyses/add-analyses.component';
+import { AddAnalysesComponent } from './components/add-analyses/add-analyses.component';
 import { AnalysesRoutingModule } from './analyses-routing.module';
-import { EditAnalysesComponent } from './edit-analyses/edit-analyses.component';
-import { ListAnalysesComponent } from './list-analyses/list-analyses.component';
+import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
+import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
 import { ViewAnalysesComponent } from './view-analyses/view-analyses.component';
+import { SaveAnalysesDialogComponent } from './components/save-analyses-dialog/save-analyses-dialog.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { ViewAnalysesComponent } from './view-analyses/view-analyses.component';
     EditAnalysesComponent,
     ViewAnalysesComponent,
     ListAnalysesComponent,
+    SaveAnalysesDialogComponent,
   ],
   imports: [
     CommonModule,

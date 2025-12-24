@@ -7,7 +7,8 @@
             </h3>
         </div>
         <div class="toolbar-right">
-            <button pButton class="p-button-text btn-primary" title="Save Analysis" (click)="saveAnalysis()">
+            <button pButton class="p-button-text btn-primary" title="Save Analysis" (click)="saveAnalysis()"
+                [disabled]="!canSave">
                 <i class="pi pi-save"></i>
             </button>
         </div>
@@ -153,7 +154,7 @@
 
         <!-- Center Container -->
         <div class="editor-container">
-            <div class="canvas-area" *ngIf="visuals.length > 0">
+            <div class="canvas-area" *ngIf="visuals.length > 0" (click)="clearFocus()">
                 <div class="visual-box" *ngFor="let visual of visuals" [class.focused]="focusedVisualId === visual.id"
                     [class.disabled]="focusedVisualId !== null && focusedVisualId !== visual.id"
                     [class.dragging]="draggingVisual === visual" [style.width.px]="visual.width"
@@ -568,3 +569,7 @@
         </div>
     </div>
 </div>
+
+<!-- Save Analysis Dialog -->
+<app-save-analyses-dialog [visible]="showSaveDialog" (close)="handleSaveDialogClose($event)">
+</app-save-analyses-dialog>

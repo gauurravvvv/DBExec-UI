@@ -1,0 +1,45 @@
+<div class="save-analysis-popup" *ngIf="visible">
+    <div class="popup-content">
+        <h3>{{ dialogTitle }}</h3>
+        <form [formGroup]="analysisForm" class="analysis-form">
+            <!-- Analysis Name -->
+            <div class="form-field">
+                <label for="analysisName">Name <span class="required">*</span></label>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-chart-bar"></i>
+                    <input id="analysisName" type="text" pInputText formControlName="name"
+                        placeholder="Enter analysis name" maxlength="100"
+                        [ngClass]="{'ng-invalid ng-dirty': analysisForm.get('name')?.invalid && analysisForm.get('name')?.touched}">
+                </span>
+                <small class="error-message"
+                    *ngIf="analysisForm.get('name')?.invalid && analysisForm.get('name')?.touched">
+                    Analysis name is required
+                </small>
+            </div>
+
+            <!-- Description -->
+            <div class="form-field">
+                <label for="analysisDescription">Description</label>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-align-left"></i>
+                    <input id="analysisDescription" type="text" pInputText formControlName="description"
+                        placeholder="Enter analysis description (optional)" maxlength="500"
+                        [ngClass]="{'ng-invalid ng-dirty': analysisForm.get('description')?.invalid && analysisForm.get('description')?.touched}">
+                </span>
+                <small class="char-count">
+                    {{ analysisForm.get('description')?.value?.length || 0 }}/500 characters
+                </small>
+            </div>
+
+            <div class="popup-actions">
+                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    (click)="onCancel()">
+                </button>
+                <button pButton type="submit" label="Save Analysis" class="p-button-outlined"
+                    [disabled]="analysisForm.invalid" (click)="onSubmit()">
+                    <i class="pi pi-save mr-2"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

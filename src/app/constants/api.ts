@@ -169,3 +169,11 @@ export const CONNECTIONS = {
   VIEW: '/connections/get/',
   UPDATE: '/connections/update',
 };
+
+export const ANALYSES = {
+  ADD: '/analyses/add',
+  LIST: '/analyses/list',
+  DELETE: '/analyses/delete/',
+  VIEW: '/analyses/get/',
+  UPDATE: '/analyses/update',
+};

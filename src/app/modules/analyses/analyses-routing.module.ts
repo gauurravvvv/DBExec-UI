@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AddAnalysesComponent } from './add-analyses/add-analyses.component';
-import { EditAnalysesComponent } from './edit-analyses/edit-analyses.component';
-import { ListAnalysesComponent } from './list-analyses/list-analyses.component';
+import { AddAnalysesComponent } from './components/add-analyses/add-analyses.component';
+import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
+import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
 import { ViewAnalysesComponent } from './view-analyses/view-analyses.component';
 
 const routes: Routes = [
