@@ -8,7 +8,7 @@ import { AddAnalysesComponent } from './components/add-analyses/add-analyses.com
 import { AnalysesRoutingModule } from './analyses-routing.module';
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
-import { ViewAnalysesComponent } from './view-analyses/view-analyses.component';
+import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
 import { SaveAnalysesDialogComponent } from './components/save-analyses-dialog/save-analyses-dialog.component';
 
 @NgModule({

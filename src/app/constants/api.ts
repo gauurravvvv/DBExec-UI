@@ -176,4 +176,5 @@ export const ANALYSES = {
   DELETE: '/analyses/delete/',
   VIEW: '/analyses/get/',
   UPDATE: '/analyses/update',
+  VIEW_VISUAL: '/analyses/visual/',
 };

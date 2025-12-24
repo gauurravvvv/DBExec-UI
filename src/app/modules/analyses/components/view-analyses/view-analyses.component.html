@@ -1,0 +1,162 @@
+<div class="query-editor-wrapper">
+    <!-- Header Toolbar -->
+    <div class="query-toolbar">
+        <div class="toolbar-left">
+            <div class="left-section">
+                <button pButton class="p-button-text" (click)="goBack()">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h3 class="toolbar-title">View Analysis</h3>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <div class="action-buttons">
+                <button pButton class="p-button-outlined" type="button" label="Edit"
+                    [routerLink]="['/app/analyses/edit', orgId, analysisId]">
+                    <i class="pi pi-pencil mr-2"></i>
+                </button>
+                <button pButton class="p-button-outlined p-button-success" type="button" label="Publish"
+                    (click)="onPublish()">
+                    <i class="pi pi-send mr-2"></i>
+                </button>
+                <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
+                    (click)="onDelete()">
+                    <i class="pi pi-trash mr-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sub Header with Toggle Buttons -->
+    <div class="sub-header">
+        <button pButton class="p-button-text btn-primary field-btn" [class.active]="isFieldsPanelOpen"
+            (click)="toggleFieldsPanel()" title="Toggle Fields Pane">
+            <i class="pi pi-database"></i>
+        </button>
+        <div class="analysis-name" style="margin-left: 16px; display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 500;">{{ analysisDetails?.name }}</span>
+        </div>
+    </div>
+
+    <!-- Main Content Area with Sidebar and Center -->
+    <div class="main-content">
+
+        <!-- Left Sidebar - Fields Panel (Read-only) -->
+        <div class="database-sidebar" [class.collapsed]="!isFieldsPanelOpen">
+            <div class="sidebar-content">
+                <div class="sidebar-header-info">
+                    <div class="dataset-label">Dataset</div>
+                </div>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-content-inner">
+                    <!-- Dataset Name Section -->
+                    <div class="dataset-name-section">
+                        <div class="dataset-name-divider">
+                            <span class="dataset-name-text">{{ datasetDetails?.name }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Fields List -->
+                    <div class="fields-list">
+                        <div class="field-card" *ngFor="let field of datasetDetails?.datasetEntities">
+                            <div class="field-icon">
+                                <i class="pi pi-bars"></i>
+                            </div>
+                            <div class="field-info">
+                                <div class="field-name">{{ field.columnToView }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Container - Canvas (Read-only)-->
+        <div class="editor-container">
+            <div class="canvas-area read-only" *ngIf="visuals.length > 0">
+                <div class="visual-box" *ngFor="let visual of visuals" [style.width.px]="visual.width"
+                    [style.height.px]="visual.height" [style.left.px]="visual.x" [style.top.px]="visual.y">
+
+                    <!-- Visual Title (Read-only) -->
+                    <div class="visual-inline-title">
+                        <span class="inline-title-text">{{visual.title}}</span>
+                    </div>
+
+                    <div class="visual-body">
+                        <!-- Bar Chart Types -->
+                        <app-configurable-bar-chart *ngIf="isBarChartType(visual.chartType)" [showConfigPanel]="false"
+                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
+                            [chartType]="visual.chartType" [data]="visual.chartData">
+                        </app-configurable-bar-chart>
+
+                        <!-- Line Chart -->
+                        <app-configurable-line-chart *ngIf="visual.chartType === 'line'" [showConfigPanel]="false"
+                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
+                            [data]="visual.chartData">
+                        </app-configurable-line-chart>
+
+                        <!-- Area Chart Types -->
+                        <app-configurable-area-chart *ngIf="isAreaChartType(visual.chartType)" [showConfigPanel]="false"
+                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
+                            [chartType]="visual.chartType" [data]="visual.chartData">
+                        </app-configurable-area-chart>
+
+                        <!-- Polar/Radar Chart -->
+                        <app-configurable-polar-chart *ngIf="visual.chartType === 'polar'" [showConfigPanel]="false"
+                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
+                            [data]="visual.chartData">
+                        </app-configurable-polar-chart>
+
+                        <!-- Pie Chart Types -->
+                        <app-configurable-pie-chart *ngIf="isPieChartType(visual.chartType)" [showConfigPanel]="false"
+                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
+                            [chartType]="visual.chartType" [data]="visual.chartData">
+                        </app-configurable-pie-chart>
+
+                        <!-- Gauge Chart Types -->
+                        <app-configurable-gauge-chart *ngIf="isGaugeChartType(visual.chartType)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [chartType]="visual.chartType" [data]="visual.chartData">
+                        </app-configurable-gauge-chart>
+
+                        <!-- Number Card Chart -->
+                        <app-configurable-card-chart *ngIf="isCardChartType(visual.chartType)" [showConfigPanel]="false"
+                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
+                            [data]="visual.chartData">
+                        </app-configurable-card-chart>
+
+                        <!-- Heat Map Chart -->
+                        <app-configurable-heatmap-chart *ngIf="isHeatMapChartType(visual.chartType)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [data]="visual.chartData">
+                        </app-configurable-heatmap-chart>
+
+                        <!-- Tree Map Chart -->
+                        <app-configurable-treemap-chart *ngIf="isTreeMapChartType(visual.chartType)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [data]="visual.chartData">
+                        </app-configurable-treemap-chart>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" *ngIf="visuals.length === 0">
+                <i class="pi pi-chart-bar"></i>
+                <h3>No Visuals Available</h3>
+                <p>This analysis doesn't contain any visualizations</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+    <div class="popup-content">
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this analysis?</p>
+        <div class="popup-actions">
+            <button class="btn-cancel" (click)="cancelDelete()">No</button>
+            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        </div>
+    </div>
+</div>

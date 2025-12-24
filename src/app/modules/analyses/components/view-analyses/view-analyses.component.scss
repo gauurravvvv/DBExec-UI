@@ -30,10 +30,34 @@
     align-items: center;
     gap: 8px;
 
+    .left-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      button {
+        min-width: 0;
+        background: transparent !important;
+        border: none !important;
+        color: var(--text-color) !important;
+        padding: 0.5rem !important;
+
+        &:hover {
+          background: var(--hover-background) !important;
+          border-radius: 4px;
+        }
+
+        i {
+          font-size: 1.2rem;
+          color: var(--text-color) !important;
+        }
+      }
+    }
+
     .toolbar-title {
       margin: 0;
-      margin-left: 8px;
-      font-size: 16px;
+      margin-left: 0;
+      font-size: 20px;
       font-weight: 600;
       color: var(--text-color);
       display: flex;
@@ -49,6 +73,12 @@
   .toolbar-right {
     display: flex;
     gap: 8px !important;
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
 
     .p-button,
     button {
@@ -404,7 +434,7 @@
 
     button {
       color: var(--secondary-color);
-      
+
       &:hover {
         color: var(--primary-color);
       }
@@ -491,7 +521,7 @@
     &.selected {
       background-color: rgba(var(--primary-color-rgb), 0.15);
       border-color: var(--primary-color);
-      
+
       .chart-icon {
         color: var(--primary-color);
       }
@@ -536,7 +566,7 @@
 
       ::ng-deep .p-dropdown {
         width: 100% !important;
-        
+
         .p-dropdown-label {
           font-size: 12px;
           padding: 8px 12px;
@@ -706,7 +736,7 @@
       color: var(--text-color);
     }
 
-    input[type="text"] {
+    input[type='text'] {
       width: 100%;
     }
   }
@@ -892,7 +922,7 @@
   justify-content: center;
   padding: 10px 14px 5px;
   position: relative;
-  
+
   .inline-title-text {
     font-size: 14px;
     font-weight: 600;
@@ -907,12 +937,12 @@
     max-width: calc(100% - 20px); // Prevent overflow into buttons area
     line-height: 1.4;
     transition: background-color 0.2s ease;
-    
+
     &:hover {
       background-color: rgba(var(--primary-color-rgb), 0.1);
     }
   }
-  
+
   .title-input {
     border: 1px solid var(--primary-color);
     background-color: var(--card-background);
@@ -924,25 +954,25 @@
     text-align: center;
     outline: none;
     width: 250px;
-    
+
     &:focus {
       box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
     }
   }
-  
+
   .title-edit-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
   }
-  
+
   .char-counter {
     font-size: 11px;
     color: var(--text-color-secondary);
     opacity: 0.7;
   }
-  
+
   .visual-action-buttons {
     position: absolute;
     right: 8px;
@@ -952,16 +982,16 @@
     gap: 2px;
     opacity: 0;
     transition: opacity 0.2s ease;
-    
+
     .action-btn {
       color: var(--text-color-secondary);
       padding: 4px;
-      
+
       &:hover {
         color: var(--primary-color);
       }
     }
-    
+
     .close-btn:hover {
       color: var(--danger-color, #ff5252) !important;
     }
@@ -1065,7 +1095,6 @@
     .ngx-charts-outer {
       width: 100% !important;
       height: 100% !important;
-     
     }
 
     svg.ngx-charts {
@@ -1241,5 +1270,64 @@
   .visuals-sidebar {
     width: 200px;
     min-width: 200px;
+  }
+}
+
+// ===================================================================
+// Confirmation Popup
+// ===================================================================
+.confirmation-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  .popup-content {
+    background: var(--card-background);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: var(--text-color);
+    }
+
+    p {
+      margin-bottom: 20px;
+      color: var(--text-color);
+    }
+
+    .popup-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+
+      button {
+        padding: 8px 20px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+
+        &.btn-cancel {
+          background-color: var(--secondary-color);
+          color: white;
+        }
+
+        &.btn-confirm {
+          background-color: var(--error-color);
+          color: white;
+        }
+      }
+    }
   }
 }

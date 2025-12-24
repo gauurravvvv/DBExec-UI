@@ -59,6 +59,74 @@ export class AnalysesService {
       });
   }
 
+  listAnalyses(params: any) {
+    return this.http
+      .get(ANALYSES.LIST + `/${params.orgId}` + `/${params.databaseId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  deleteAnalyses(orgId: string, analysisId: string) {
+    return this.http
+      .delete(ANALYSES.DELETE + `${orgId}` + `/${analysisId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  viewAnalyses(orgId: string, analysisId: string) {
+    return this.http
+      .get(ANALYSES.VIEW + `${orgId}/${analysisId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  viewVisuals(orgId: string, analysisId: string) {
+    return this.http
+      .get(ANALYSES.VIEW_VISUAL + `${orgId}/${analysisId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  updateAnalyses(payload: any) {
+    const {
+      id,
+      name,
+      description,
+      datasetId,
+      organisation,
+      database,
+      visuals,
+    } = payload;
+
+    return this.http
+      .put(ANALYSES.UPDATE, {
+        id,
+        name,
+        description,
+        datasetId,
+        organisation,
+        database,
+        visuals,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   viewSuperAdmin(id: string) {
     return this.http
       .get(SUPER_ADMIN.VIEW + `${id}`)

@@ -1,1 +1,159 @@
-<p>list-analyses works!</p>
+<div class="super-admin-wrapper">
+    <div class="super-admin-container">
+        <div class="page-header">
+            <h2>Analyses</h2>
+        </div>
+        <div class="table-section">
+            <!-- Search and Page Size -->
+            <div class="table-controls">
+                <div class="filter-container">
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" placeholder="Search..." (input)="onSearch($event)"
+                                [value]="searchTerm">
+                        </span>
+                    </div>
+
+                    <div class="dropdowns-wrapper">
+                        <!-- Organisation Dropdown -->
+                        <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+                            <span class="p-float-label">
+                                <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
+                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                    [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)"
+                                    inputId="org-dropdown">
+                                </p-dropdown>
+                                <label for="org-dropdown">Organisation</label>
+                            </span>
+                        </div>
+
+                        <!-- Database Dropdown -->
+                        <div class="dropdown-field">
+                            <span class="p-float-label">
+                                <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
+                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
+                                    [panelStyle]="{'width':'100%'}" (onChange)="onDBChange($event)"
+                                    inputId="db-dropdown">
+                                </p-dropdown>
+                                <label for="db-dropdown">Database</label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Database Name</th>
+                            <th>Visuals Count</th>
+                            <th>
+                                Status
+                                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
+                                    [style]="{'width': '150px'}" appendTo="body">
+                                </p-menu>
+                                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
+                                    [ngClass]="{'active-filter': selectedStatus !== null}"
+                                    style="margin-left: 5px; cursor: pointer;">
+                                </i>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="filteredAnalyses && filteredAnalyses.length > 0; else noData">
+                            <tr *ngFor="let analysis of filteredAnalyses">
+                                <td>
+                                    <a class="admin-name"
+                                        [routerLink]="['/app/analyses/view', selectedOrg.id, analysis.id]">
+                                        {{ analysis.name }}
+                                    </a>
+                                </td>
+                                <td>{{ analysis.description }}</td>
+                                <td>
+                                    <span class="database-chip">
+                                        <span class="chip-content">
+                                            <i class="pi pi-database"></i>
+                                            {{ analysis.databaseName }}
+                                        </span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="field-count">
+                                        <i class="pi pi-chart-bar"></i>
+                                        {{ analysis.visuals?.length || 0 }} Visuals
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge" [class.active]="analysis.status === 1">
+                                        {{ analysis.status === 1 ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td class="actions">
+                                    <button class="action-btn edit" (click)="onEdit(analysis.id)" title="Edit">
+                                        <i class="pi pi-pencil"></i>
+                                    </button>
+                                    <button class="action-btn delete" (click)="confirmDelete(analysis.id)"
+                                        title="Delete">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <ng-template #noData>
+                            <tr style="height: 100%;">
+                                <td colspan="6">
+                                    <div class="no-data">
+                                        <i class="pi pi-inbox"></i>
+                                        <p>No records found</p>
+                                        <span class="sub-text">No analyses available at the moment</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </table>
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-info">
+                        <ng-container *ngIf="totalItems > 0; else noEntries">
+                            Showing {{ (currentPage - 1) * pageSize + 1 }} to
+                            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
+                        </ng-container>
+                        <ng-template #noEntries>
+                            Showing 0 to 0 of 0 entries
+                        </ng-template>
+                    </div>
+                    <div class="pagination-controls">
+                        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
+                            <i class="pi pi-chevron-left"></i>
+                        </button>
+                        <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
+                            [class.active]="page === currentPage">
+                            {{ page }}
+                        </button>
+                        <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)"
+                            class="page-btn">
+                            <i class="pi pi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+    <div class="popup-content">
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this analysis?</p>
+        <div class="popup-actions">
+            <button class="btn-cancel" (click)="cancelDelete()">No</button>
+            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        </div>
+    </div>
+</div>
