@@ -18,6 +18,8 @@ import {
   FORMULA_EDITOR_OPTIONS,
   FORMULA_EDITOR_LOADING_CONFIG,
 } from '../../config/formula-editor.config';
+import { DatasetService } from '../../services/dataset.service';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 // Declare Monaco for TypeScript
 declare const monaco: any;
@@ -77,7 +79,10 @@ export class AddCustomFieldDialogComponent
   private themeObserver: MutationObserver | null = null;
   private languageRegistered = false;
 
-  constructor() {}
+  constructor(
+    private datasetService: DatasetService,
+    private globalService: GlobalService
+  ) {}
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscapeKey(event: KeyboardEvent) {
@@ -461,14 +466,38 @@ export class AddCustomFieldDialogComponent
 
     this.isSubmitting = true;
 
-    this.close.emit({
-      field: {
-        columnToView: this.customField.columnToView,
-        columnToUse: this.customField.columnToUse,
-        formula: this.customField.formula,
-        isCustom: true,
-      },
-    });
+    if (this.editMode && this.editFieldData) {
+      // Edit mode - call update API
+      const payload = {
+        fieldId: this.editFieldData.id,
+        datasetId: this.editFieldData.datasetId,
+        organisation: this.editFieldData.organisationId,
+        columnNameToView: this.customField.columnToView,
+        customLogic: this.customField.columnToUse,
+      };
+
+      this.datasetService
+        .updateDatasetMapping(payload)
+        .then((response: any) => {
+          this.isSubmitting = false;
+          if (this.globalService.handleSuccessService(response, true)) {
+            this.close.emit({ field: response.data });
+          }
+        })
+        .catch(() => {
+          this.isSubmitting = false;
+        });
+    } else {
+      // Add mode - emit data for parent to handle
+      this.close.emit({
+        field: {
+          columnToView: this.customField.columnToView,
+          columnToUse: this.customField.columnToUse,
+          formula: this.customField.formula,
+          isCustom: true,
+        },
+      });
+    }
   }
 
   onCancel() {

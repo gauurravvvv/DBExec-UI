@@ -103,15 +103,23 @@ export class DatasetService {
   }
 
   updateDatasetMapping(payload: any) {
-    const { fieldId, datasetId, organisation, columnNameToView } = payload;
+    const { fieldId, datasetId, organisation, columnNameToView, customLogic } =
+      payload;
+
+    const requestBody: any = {
+      fieldId,
+      datasetId,
+      organisation,
+      columnNameToView,
+    };
+
+    // Include customLogic only if provided (for custom fields)
+    if (customLogic !== undefined) {
+      requestBody.customLogic = customLogic;
+    }
 
     return this.http
-      .put(DATASET.UPDATE_FIELD, {
-        fieldId,
-        datasetId,
-        organisation,
-        columnNameToView,
-      })
+      .put(DATASET.UPDATE_FIELD, requestBody)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
