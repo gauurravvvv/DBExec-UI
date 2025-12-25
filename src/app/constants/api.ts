@@ -95,8 +95,9 @@ export const DATASET = {
   LIST: '/dataset/list',
   DELETE: '/dataset/delete/',
   VIEW: '/dataset/get/',
+  VIEW_FIELD: '/dataset/get/field/',
   UPDATE: '/dataset/update',
-  UPDATE_MAPPING: '/dataset/update/mapping',
+  UPDATE_FIELD: '/dataset/update/field',
 };
 
 export const TAB = {

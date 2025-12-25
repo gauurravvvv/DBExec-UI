@@ -291,10 +291,40 @@
                 display: flex;
                 flex-direction: column;
                 gap: 2px;
+                overflow: hidden;
+
+                .field-header {
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                }
 
                 .column-view {
                   font-weight: 500;
                   color: var(--text-color);
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
+
+                .field-type-badge {
+                  font-size: 9px;
+                  font-weight: 600;
+                  padding: 2px 6px;
+                  border-radius: 4px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.3px;
+                  flex-shrink: 0;
+
+                  &.default {
+                    background: rgba(100, 116, 139, 0.15);
+                    color: #64748b;
+                  }
+
+                  &.custom {
+                    background: rgba(255, 152, 0, 0.15);
+                    color: var(--warning-color);
+                  }
                 }
 
                 .column-use {
@@ -302,7 +332,14 @@
                   color: var(--text-color);
                   opacity: 0.6;
                   font-family: monospace;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
+              }
+
+              &.custom-field {
+                border-left: 3px solid var(--warning-color);
               }
 
               .btn-edit {

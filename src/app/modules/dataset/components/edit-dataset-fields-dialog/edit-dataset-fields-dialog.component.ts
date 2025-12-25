@@ -1,15 +1,14 @@
 import {
   Component,
-  Input,
-  Output,
   EventEmitter,
   HostListener,
+  Input,
   OnChanges,
+  Output,
   SimpleChanges,
 } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { DatasetService } from '../../services/dataset.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasetService } from '../../services/dataset.service';
 
 export interface DatasetFieldsData {
   fields: any[];
@@ -22,7 +21,7 @@ export interface DatasetFieldsData {
 })
 export class EditDatasetFieldsDialogComponent implements OnChanges {
   @Input() visible = false;
-  @Input() field: any = null;
+  @Input() field: any = null; // Now receives the full field data from API
   @Input() fieldIndex: number = -1;
   @Input() dialogTitle = 'Edit Field';
   @Output() close = new EventEmitter<any>();
@@ -34,7 +33,6 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
 
   constructor(
     private datasetService: DatasetService,
-    private messageService: MessageService,
     private globalService: GlobalService
   ) {}
 
@@ -47,7 +45,7 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['visible'] && this.visible && this.field) {
-      // Create copies for editing and comparison
+      // Patch the form with the already-loaded field data
       this.editableField = { ...this.field };
       this.originalField = { ...this.field };
       this.isSaveEnabled = false;
@@ -62,8 +60,8 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
   onFieldChange() {
     // Enable save button if columnToView has changed
     this.isSaveEnabled =
-      this.editableField.columnToView?.trim() !==
-      this.originalField.columnToView?.trim();
+      this.editableField?.columnToView?.trim() !==
+      this.originalField?.columnToView?.trim();
   }
 
   onSubmit() {
@@ -74,7 +72,7 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
     this.isSubmitting = true;
 
     const payload = {
-      mappingId: this.editableField.id,
+      fieldId: this.editableField.id,
       datasetId: this.editableField.datasetId,
       columnNameToView: this.editableField.columnToView,
       organisation: this.editableField.organisationId,
@@ -83,9 +81,9 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
     this.datasetService.updateDatasetMapping(payload).then(response => {
       if (this.globalService.handleSuccessService(response, true)) {
         this.isSubmitting = false;
+        this.close.emit({ field: this.editableField });
       }
     });
-    this.close.emit({ field: this.editableField });
   }
 
   onCancel() {

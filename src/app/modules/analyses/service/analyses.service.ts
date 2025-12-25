@@ -171,7 +171,7 @@ export class AnalysesService {
     const { mappingId, datasetId, organisation, columnNameToView } = payload;
 
     return this.http
-      .put(DATASET.UPDATE_MAPPING, {
+      .put(DATASET.UPDATE_FIELD, {
         mappingId,
         datasetId,
         organisation,

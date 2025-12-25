@@ -101,20 +101,32 @@
 
                 <!-- Fields -->
                 <div class="info-section full-width">
-                    <h3>
-                        <i class="pi pi-list mr-2"></i>
-                        Fields
-                        <span class="count-badge">{{ datasetData.datasetEntities?.length || 0 }}</span>
-                    </h3>
+                    <div class="section-header">
+                        <h3>
+                            <i class="pi pi-list mr-2"></i>
+                            Fields
+                            <span class="count-badge">{{ datasetData.datasetFields?.length || 0 }}</span>
+                        </h3>
+                        <button pButton class="p-button-outlined p-button-sm" (click)="openAddCustomFieldDialog()">
+                            <i class="pi pi-plus mr-2"></i>Add Custom Field
+                        </button>
+                    </div>
                     <div class="column-mapping-container">
                         <div
-                            *ngIf="datasetData?.datasetEntities && datasetData?.datasetEntities.length > 0; else noMappings">
+                            *ngIf="datasetData?.datasetFields && datasetData?.datasetFields.length > 0; else noMappings">
                             <div class="mapping-list">
                                 <div class="mapping-item"
-                                    *ngFor="let entity of datasetData.datasetEntities; let i = index">
+                                    *ngFor="let entity of datasetData.datasetFields; let i = index"
+                                    [class.custom-field]="entity.type === 2">
                                     <span class="field-number">{{ i + 1 }}</span>
                                     <div class="field-content">
-                                        <span class="column-view">{{ entity.columnToView }}</span>
+                                        <div class="field-header">
+                                            <span class="column-view">{{ entity.columnToView }}</span>
+                                            <span class="field-type-badge" [class.default]="entity.type === 1"
+                                                [class.custom]="entity.type === 2">
+                                                {{ entity.type === 2 ? 'Custom' : 'Default' }}
+                                            </span>
+                                        </div>
                                         <span class="column-use">{{ entity.columnToUse }}</span>
                                     </div>
                                     <button pButton class="p-button-text p-button-sm btn-edit"
@@ -160,6 +172,18 @@
 <app-edit-dataset-fields-dialog [visible]="showEditFieldsDialog" [field]="selectedField"
     [fieldIndex]="selectedFieldIndex" (close)="onEditFieldDialogClose($event)">
 </app-edit-dataset-fields-dialog>
+
+<!-- Add Custom Field Dialog -->
+<app-add-custom-field-dialog [visible]="showAddCustomFieldDialog" [datasetId]="datasetData?.id"
+    [organisationId]="datasetData?.organisationId" [datasetFields]="datasetData?.datasetFields || []"
+    (close)="onAddCustomFieldDialogClose($event)">
+</app-add-custom-field-dialog>
+
+<!-- Edit Custom Field Dialog -->
+<app-add-custom-field-dialog [visible]="showEditCustomFieldDialog" [datasetId]="datasetData?.id"
+    [organisationId]="datasetData?.organisationId" [datasetFields]="datasetData?.datasetFields || []" [editMode]="true"
+    [editFieldData]="selectedField" (close)="onEditCustomFieldDialogClose($event)">
+</app-add-custom-field-dialog>
 
 <!-- Delete Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">

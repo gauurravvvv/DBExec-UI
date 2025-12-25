@@ -92,12 +92,22 @@ export class DatasetService {
       });
   }
 
+  viewDatasetField(orgId: string, datasetId: string, fieldId: string) {
+    return this.http
+      .get(DATASET.VIEW_FIELD + `${orgId}` + `/${datasetId}` + `/${fieldId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   updateDatasetMapping(payload: any) {
-    const { mappingId, datasetId, organisation, columnNameToView } = payload;
+    const { fieldId, datasetId, organisation, columnNameToView } = payload;
 
     return this.http
-      .put(DATASET.UPDATE_MAPPING, {
-        mappingId,
+      .put(DATASET.UPDATE_FIELD, {
+        fieldId,
         datasetId,
         organisation,
         columnNameToView,

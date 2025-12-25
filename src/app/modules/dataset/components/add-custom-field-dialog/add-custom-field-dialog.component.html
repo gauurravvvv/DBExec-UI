@@ -1,0 +1,176 @@
+<div class="add-custom-field-popup" *ngIf="visible">
+    <div class="popup-content">
+        <!-- Header -->
+        <div class="dialog-header">
+            <div class="header-left">
+                <i class="pi pi-code"></i>
+                <h2>{{ editMode ? 'Edit Custom Field' : 'Add Custom Field' }}</h2>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="dialog-body">
+            <!-- Left Side - Dataset Fields Panel -->
+            <div class="fields-panel">
+                <div class="panel-header">
+                    <h4>
+                        <i class="pi pi-database mr-2"></i>
+                        Dataset Fields
+                    </h4>
+                    <span class="field-count">{{ filteredFields.length }} fields</span>
+                </div>
+
+                <div class="search-box">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input type="text" pInputText [(ngModel)]="fieldSearchQuery" placeholder="Search fields..."
+                            (ngModelChange)="onFieldSearch()" />
+                    </span>
+                </div>
+
+                <div class="fields-list">
+                    <div class="field-item" *ngFor="let field of filteredFields" (click)="selectDatasetField(field)"
+                        (dblclick)="insertField(field)"
+                        [class.selected]="selectedField?.columnToUse === field.columnToUse">
+                        <span class="field-name">{{ field.columnToView }}</span>
+                        <code class="field-column">{{ field.columnToUse }}</code>
+                    </div>
+
+                    <div class="no-results" *ngIf="filteredFields.length === 0">
+                        <i class="pi pi-database"></i>
+                        <p>No fields found</p>
+                    </div>
+                </div>
+
+                <!-- Field Description Section -->
+                <div class="description-section" *ngIf="selectedField">
+                    <div class="description-header">
+                        <span class="selected-fn-name">{{ selectedField.columnToView }}</span>
+                    </div>
+                    <code class="selected-fn-usage">{{ '{' }}{{ selectedField.columnToUse }}{{ '}' }}</code>
+                    <p class="selected-fn-desc">Column: {{ selectedField.columnToUse }}</p>
+                </div>
+                <div class="description-section empty" *ngIf="!selectedField">
+                    <p>Click to view, double-click to insert</p>
+                </div>
+            </div>
+
+            <!-- Center - Form Section -->
+            <div class="form-section">
+                <div class="form-field">
+                    <label>Field Name to Display <span class="required">*</span></label>
+                    <input type="text" pInputText [(ngModel)]="customField.columnToView"
+                        placeholder="Enter the display name for this field" autocomplete="off"
+                        (ngModelChange)="onFieldChange()" />
+                </div>
+
+                <div class="form-field custom-logic-field">
+                    <label>Custom Logic <span class="required">*</span></label>
+
+                    <!-- Monaco Editor Container -->
+                    <div class="editor-wrapper" [hidden]="isLoadingEditor || monacoLoadFailed">
+                        <div id="formula-editor-container" class="formula-editor"></div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="editor-loading" *ngIf="isLoadingEditor && !monacoLoadFailed">
+                        <i class="pi pi-spin pi-spinner"></i>
+                        <span>Loading editor...</span>
+                    </div>
+
+                    <!-- Error Fallback -->
+                    <div class="editor-fallback" *ngIf="monacoLoadFailed">
+                        <textarea [(ngModel)]="customField.columnToUse" placeholder="Enter your formula here..."
+                            (ngModelChange)="onFieldChange()"></textarea>
+                    </div>
+
+                    <small class="hint">
+                        <i class="pi pi-lightbulb"></i>
+                        Type {{ '{' }} to insert fields, start typing for function suggestions
+                    </small>
+
+                    <!-- Validation Result -->
+                    <div class="validation-result" *ngIf="validationResult" [class.valid]="validationResult.valid"
+                        [class.invalid]="!validationResult.valid">
+                        <i class="pi" [ngClass]="validationResult.valid ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                        <span>{{ validationResult.message }}</span>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="popup-actions">
+                    <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                        (click)="onCancel()" [disabled]="isSubmitting">
+                    </button>
+                    <button pButton type="button" label="Validate" class="p-button-outlined p-button-secondary"
+                        (click)="onValidate()" [disabled]="!customField.columnToUse || isValidating">
+                        <i class="pi mr-2" [ngClass]="isValidating ? 'pi-spin pi-spinner' : 'pi-check-circle'"></i>
+                    </button>
+                    <button pButton type="button" [label]="editMode ? 'Save Changes' : 'Add Field'"
+                        class="p-button-outlined" (click)="onSubmit()" [disabled]="!isSaveEnabled || isSubmitting">
+                        <i class="pi mr-2" [ngClass]="editMode ? 'pi-save' : 'pi-plus'"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Side - Functions Reference Panel -->
+            <div class="functions-panel">
+                <div class="panel-header">
+                    <h4>
+                        <i class="pi pi-book mr-2"></i>
+                        Functions Reference
+                    </h4>
+                    <span class="function-count">{{ getTotalFunctionCount() }} functions</span>
+                </div>
+
+                <div class="search-box">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input type="text" pInputText [(ngModel)]="functionSearchQuery"
+                            placeholder="Search functions..." (ngModelChange)="onFunctionSearch()" />
+                    </span>
+                </div>
+
+                <div class="categories-list">
+                    <div class="category-section" *ngFor="let category of filteredCategories">
+                        <div class="category-header" (click)="toggleCategory(category.id)">
+                            <div class="category-info">
+                                <i [class]="category.icon"></i>
+                                <span class="category-name">{{ category.name }}</span>
+                                <span class="count-badge">{{ category.functions.length }}</span>
+                            </div>
+                            <i class="pi"
+                                [ngClass]="isCategoryExpanded(category.id) ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+                        </div>
+
+                        <div class="functions-list" *ngIf="isCategoryExpanded(category.id)">
+                            <div class="function-item" *ngFor="let fn of category.functions"
+                                (click)="selectFunction(fn)" (dblclick)="insertFunction(fn)"
+                                [class.selected]="selectedFunction?.name === fn.name">
+                                <span class="function-name">{{ fn.name }}</span>
+                                <code class="function-usage">{{ fn.usage }}</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="no-results" *ngIf="filteredCategories.length === 0">
+                        <i class="pi pi-search"></i>
+                        <p>No functions found</p>
+                    </div>
+                </div>
+
+                <!-- Description Section -->
+                <div class="description-section" *ngIf="selectedFunction">
+                    <div class="description-header">
+                        <span class="selected-fn-name">{{ selectedFunction.name }}()</span>
+                    </div>
+                    <code class="selected-fn-usage">{{ selectedFunction.usage }}</code>
+                    <p class="selected-fn-desc">{{ selectedFunction.description }}</p>
+                </div>
+                <div class="description-section empty" *ngIf="!selectedFunction">
+                    <p>Click to view description, double-click to insert</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

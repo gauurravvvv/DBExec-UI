@@ -11,6 +11,7 @@ import { ViewDatasetComponent } from './components/view-dataset/view-dataset.com
 import { DatasetRoutingModule } from './dataset-routing.module';
 import { SaveDatasetDialogComponent } from './components/save-dataset-dialog/save-dataset-dialog.component';
 import { EditDatasetFieldsDialogComponent } from './components/edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
+import { AddCustomFieldDialogComponent } from './components/add-custom-field-dialog/add-custom-field-dialog.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { EditDatasetFieldsDialogComponent } from './components/edit-dataset-fiel
     ListDatasetComponent,
     SaveDatasetDialogComponent,
     EditDatasetFieldsDialogComponent,
+    AddCustomFieldDialogComponent,
   ],
   imports: [
     CommonModule,

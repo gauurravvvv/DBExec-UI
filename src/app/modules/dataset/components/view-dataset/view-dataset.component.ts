@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
 import { DATASET } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../services/dataset.service';
@@ -14,15 +13,17 @@ export class ViewDatasetComponent implements OnInit {
   datasetData: any;
   showDeleteConfirm = false;
   showEditFieldsDialog = false;
+  showEditCustomFieldDialog = false;
+  showAddCustomFieldDialog = false;
   selectedField: any = null;
   selectedFieldIndex: number = -1;
+  isLoadingField = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private datasetService: DatasetService,
-    private globalService: GlobalService,
-    private messageService: MessageService
+    private globalService: GlobalService
   ) {}
 
   ngOnInit() {
@@ -88,26 +89,67 @@ export class ViewDatasetComponent implements OnInit {
   }
 
   openEditFieldDialog(field: any, index: number): void {
-    this.selectedField = { ...field };
+    if (this.isLoadingField) return;
+
+    this.isLoadingField = true;
     this.selectedFieldIndex = index;
-    this.showEditFieldsDialog = true;
+
+    // Call API to get field details first
+    this.datasetService
+      .viewDatasetField(
+        this.datasetData.organisationId,
+        this.datasetData.id,
+        field.id
+      )
+      .then((response: any) => {
+        this.isLoadingField = false;
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.selectedField = response.data;
+
+          // Open appropriate dialog based on field type
+          if (response.data.type === 2) {
+            // CUSTOM field - open custom field dialog in edit mode
+            this.showEditCustomFieldDialog = true;
+          } else {
+            // DEFAULT field (type === 1) - open regular edit dialog
+            this.showEditFieldsDialog = true;
+          }
+        }
+      })
+      .catch(() => {
+        this.isLoadingField = false;
+      });
   }
 
   onEditFieldDialogClose(data: any): void {
     this.showEditFieldsDialog = false;
-    if (data && this.selectedFieldIndex >= 0) {
-      // Update the specific field in the array
-      this.datasetData.datasetEntities[this.selectedFieldIndex] = data.field;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Field updated successfully',
-        key: 'topRight',
-        life: 3000,
-        styleClass: 'custom-toast',
-      });
+    if (data) {
+      // Reload dataset data from API
+      this.loadDatasetData();
     }
     this.selectedField = null;
     this.selectedFieldIndex = -1;
+  }
+
+  onEditCustomFieldDialogClose(data: any): void {
+    this.showEditCustomFieldDialog = false;
+    if (data) {
+      // Reload dataset data from API
+      this.loadDatasetData();
+    }
+    this.selectedField = null;
+    this.selectedFieldIndex = -1;
+  }
+
+  openAddCustomFieldDialog(): void {
+    this.showAddCustomFieldDialog = true;
+  }
+
+  onAddCustomFieldDialogClose(data: any): void {
+    this.showAddCustomFieldDialog = false;
+    if (data?.field) {
+      // Reload dataset data from API
+      this.loadDatasetData();
+    }
   }
 }
