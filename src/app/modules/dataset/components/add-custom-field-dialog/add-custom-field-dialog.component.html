@@ -61,7 +61,7 @@
                     <label>Field Name to Display <span class="required">*</span></label>
                     <input type="text" pInputText [(ngModel)]="customField.columnToView"
                         placeholder="Enter the display name for this field" autocomplete="off"
-                        (ngModelChange)="onFieldChange()" />
+                        (ngModelChange)="onFieldNameChange()" />
                 </div>
 
                 <div class="form-field custom-logic-field">
@@ -81,7 +81,7 @@
                     <!-- Error Fallback -->
                     <div class="editor-fallback" *ngIf="monacoLoadFailed">
                         <textarea [(ngModel)]="customField.columnToUse" placeholder="Enter your formula here..."
-                            (ngModelChange)="onFieldChange()"></textarea>
+                            (ngModelChange)="onFormulaChange()"></textarea>
                     </div>
 
                     <small class="hint">
@@ -104,7 +104,6 @@
                     </button>
                     <button pButton type="button" label="Validate" class="p-button-outlined p-button-secondary"
                         (click)="onValidate()" [disabled]="!customField.columnToUse || isValidating">
-                        <i class="pi mr-2" [ngClass]="isValidating ? 'pi-spin pi-spinner' : 'pi-check-circle'"></i>
                     </button>
                     <button pButton type="button" [label]="editMode ? 'Save Changes' : 'Add Field'"
                         class="p-button-outlined" (click)="onSubmit()" [disabled]="!isSaveEnabled || isSubmitting">

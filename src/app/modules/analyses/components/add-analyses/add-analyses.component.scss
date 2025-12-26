@@ -326,13 +326,8 @@
     min-width: 0;
   }
 
-  .field-name {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .field-card.custom-field {
+    border-left: 3px solid var(--primary-color);
   }
 
   .field-menu {
@@ -404,7 +399,7 @@
 
     button {
       color: var(--secondary-color);
-      
+
       &:hover {
         color: var(--primary-color);
       }
@@ -491,7 +486,7 @@
     &.selected {
       background-color: rgba(var(--primary-color-rgb), 0.15);
       border-color: var(--primary-color);
-      
+
       .chart-icon {
         color: var(--primary-color);
       }
@@ -536,7 +531,7 @@
 
       ::ng-deep .p-dropdown {
         width: 100% !important;
-        
+
         .p-dropdown-label {
           font-size: 12px;
           padding: 8px 12px;
@@ -706,7 +701,7 @@
       color: var(--text-color);
     }
 
-    input[type="text"] {
+    input[type='text'] {
       width: 100%;
     }
   }
@@ -892,7 +887,7 @@
   justify-content: center;
   padding: 10px 14px 5px;
   position: relative;
-  
+
   .inline-title-text {
     font-size: 14px;
     font-weight: 600;
@@ -907,12 +902,12 @@
     max-width: calc(100% - 20px); // Prevent overflow into buttons area
     line-height: 1.4;
     transition: background-color 0.2s ease;
-    
+
     &:hover {
       background-color: rgba(var(--primary-color-rgb), 0.1);
     }
   }
-  
+
   .title-input {
     border: 1px solid var(--primary-color);
     background-color: var(--card-background);
@@ -924,25 +919,25 @@
     text-align: center;
     outline: none;
     width: 250px;
-    
+
     &:focus {
       box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
     }
   }
-  
+
   .title-edit-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
   }
-  
+
   .char-counter {
     font-size: 11px;
     color: var(--text-color-secondary);
     opacity: 0.7;
   }
-  
+
   .visual-action-buttons {
     position: absolute;
     right: 8px;
@@ -952,16 +947,16 @@
     gap: 2px;
     opacity: 0;
     transition: opacity 0.2s ease;
-    
+
     .action-btn {
       color: var(--text-color-secondary);
       padding: 4px;
-      
+
       &:hover {
         color: var(--primary-color);
       }
     }
-    
+
     .close-btn:hover {
       color: var(--danger-color, #ff5252) !important;
     }
@@ -1065,7 +1060,6 @@
     .ngx-charts-outer {
       width: 100% !important;
       height: 100% !important;
-     
     }
 
     svg.ngx-charts {

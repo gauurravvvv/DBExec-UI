@@ -56,6 +56,7 @@ export class AddCustomFieldDialogComponent
   isSaveEnabled = false;
   isSubmitting = false;
   isValidating = false;
+  isValidated = false;
   validationResult: { valid: boolean; message: string } | null = null;
 
   // Functions Reference
@@ -128,6 +129,7 @@ export class AddCustomFieldDialogComponent
 
         this.isSaveEnabled = false;
         this.isSubmitting = false;
+        this.isValidated = false;
         this.validationResult = null;
         this.functionSearchQuery = '';
         this.filteredCategories = [...this.functionCategories];
@@ -308,7 +310,7 @@ export class AddCustomFieldDialogComponent
       // Setup content change listener
       this.editor.onDidChangeModelContent(() => {
         this.customField.columnToUse = this.editor.getValue();
-        this.onFieldChange();
+        this.onFormulaChange();
       });
 
       // Register IntelliSense
@@ -453,10 +455,21 @@ export class AddCustomFieldDialogComponent
     this.editor.focus();
   }
 
-  onFieldChange() {
+  onFieldNameChange() {
+    // Field name changed - update save button but DON'T reset validation
     this.isSaveEnabled =
       this.customField.columnToView?.trim() !== '' &&
-      this.customField.columnToUse?.trim() !== '';
+      this.customField.columnToUse?.trim() !== '' &&
+      this.isValidated;
+  }
+
+  onFormulaChange() {
+    // Formula changed - reset validation
+    this.isValidated = false;
+    this.validationResult = null;
+
+    // Save button requires: field name, custom logic, AND successful validation
+    this.isSaveEnabled = false;
   }
 
   onSubmit() {
@@ -488,15 +501,25 @@ export class AddCustomFieldDialogComponent
           this.isSubmitting = false;
         });
     } else {
-      // Add mode - emit data for parent to handle
-      this.close.emit({
-        field: {
-          columnToView: this.customField.columnToView,
-          columnToUse: this.customField.columnToUse,
-          formula: this.customField.formula,
-          isCustom: true,
-        },
-      });
+      // Add mode - call add API
+      const payload = {
+        organisation: this.organisationId,
+        datasetId: this.datasetId,
+        name: this.customField.columnToView,
+        customLogic: this.customField.columnToUse,
+      };
+
+      this.datasetService
+        .addCustomField(payload)
+        .then((response: any) => {
+          this.isSubmitting = false;
+          if (this.globalService.handleSuccessService(response, true)) {
+            this.close.emit({ field: response.data });
+          }
+        })
+        .catch(() => {
+          this.isSubmitting = false;
+        });
     }
   }
 
@@ -511,81 +534,48 @@ export class AddCustomFieldDialogComponent
 
     this.isValidating = true;
     this.validationResult = null;
+    this.isValidated = false;
 
-    // Simulate validation delay for UX
-    setTimeout(() => {
-      const formula = this.customField.columnToUse;
-      const errors: string[] = [];
+    const payload = {
+      datasetId: this.editMode ? this.editFieldData?.datasetId : this.datasetId,
+      organisation: this.editMode
+        ? this.editFieldData?.organisationId
+        : this.organisationId,
+      customLogic: this.customField.columnToUse,
+    };
 
-      // Check for balanced parentheses
-      let parenCount = 0;
-      for (const char of formula) {
-        if (char === '(') parenCount++;
-        if (char === ')') parenCount--;
-        if (parenCount < 0) {
-          errors.push('Unmatched closing parenthesis');
-          break;
+    this.datasetService
+      .validateCustomField(payload)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.isValidating = false;
+          this.isValidated = true;
+          this.validationResult = {
+            valid: true,
+            message: response.message || 'Formula validated successfully!',
+          };
+          // Update save button state - we just set isValidated to true above
+          this.isSaveEnabled =
+            this.customField.columnToView?.trim() !== '' &&
+            this.customField.columnToUse?.trim() !== '';
+        } else {
+          this.isValidating = false;
+          this.isValidated = false;
+          this.validationResult = {
+            valid: false,
+            message: response.message || 'Validation failed',
+          };
         }
-      }
-      if (parenCount > 0) {
-        errors.push('Unclosed parenthesis');
-      }
-
-      // Check for balanced curly braces (field references)
-      let braceCount = 0;
-      for (const char of formula) {
-        if (char === '{') braceCount++;
-        if (char === '}') braceCount--;
-        if (braceCount < 0) {
-          errors.push('Unmatched closing brace');
-          break;
-        }
-      }
-      if (braceCount > 0) {
-        errors.push('Unclosed field reference (missing })');
-      }
-
-      // Check field references exist
-      const fieldRefs = formula.match(/\{([^}]+)\}/g) || [];
-      const availableFields = (this.datasetFields || []).map(
-        (f: any) => f.columnToUse || f.columnToView
-      );
-      for (const ref of fieldRefs) {
-        const fieldName = ref.slice(1, -1); // Remove { and }
-        if (!availableFields.includes(fieldName)) {
-          errors.push(`Unknown field: ${fieldName}`);
-        }
-      }
-
-      // Check function names are valid
-      const allFunctions = this.getAllFunctions();
-      const functionNames = allFunctions.map(fn => fn.name.toUpperCase());
-      const usedFunctions = formula.match(/[a-zA-Z_]\w*(?=\s*\()/g) || [];
-      for (const fn of usedFunctions) {
-        if (!functionNames.includes(fn.toUpperCase())) {
-          errors.push(`Unknown function: ${fn}`);
-        }
-      }
-
-      // Check for empty parentheses on required functions
-      const emptyCallPattern = /[a-zA-Z_]\w*\s*\(\s*\)/g;
-      const emptyCalls = formula.match(emptyCallPattern) || [];
-      // Some functions like NOW() can have empty params, but flag potential issues
-      // This is a soft check
-
-      this.isValidating = false;
-      if (errors.length === 0) {
-        this.validationResult = {
-          valid: true,
-          message: 'Formula syntax is valid!',
-        };
-      } else {
+      })
+      .catch((error: any) => {
+        this.isValidating = false;
+        this.isValidated = false;
         this.validationResult = {
           valid: false,
-          message: errors.join('. '),
+          message:
+            error?.error?.message || 'Validation failed. Please try again.',
         };
-      }
-    }, 300);
+      });
   }
 
   // Functions Panel Methods
@@ -630,7 +620,7 @@ export class AddCustomFieldDialogComponent
 
   insertFunction(fn: FunctionDefinition) {
     this.insertTextAtCursor(fn.usage);
-    this.onFieldChange();
+    this.onFormulaChange();
   }
 
   selectFunction(fn: FunctionDefinition) {
@@ -660,6 +650,6 @@ export class AddCustomFieldDialogComponent
   insertField(field: any) {
     const fieldRef = '{' + (field.columnToUse || field.columnToView) + '}';
     this.insertTextAtCursor(fieldRef);
-    this.onFieldChange();
+    this.onFormulaChange();
   }
 }

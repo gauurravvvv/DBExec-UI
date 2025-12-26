@@ -120,13 +120,7 @@
                                     [class.custom-field]="entity.type === 2">
                                     <span class="field-number">{{ i + 1 }}</span>
                                     <div class="field-content">
-                                        <div class="field-header">
-                                            <span class="column-view">{{ entity.columnToView }}</span>
-                                            <span class="field-type-badge" [class.default]="entity.type === 1"
-                                                [class.custom]="entity.type === 2">
-                                                {{ entity.type === 2 ? 'Custom' : 'Default' }}
-                                            </span>
-                                        </div>
+                                        <span class="column-view">{{ entity.columnToView }}</span>
                                         <span class="column-use">{{ entity.columnToUse }}</span>
                                     </div>
                                     <button pButton class="p-button-text p-button-sm btn-edit"

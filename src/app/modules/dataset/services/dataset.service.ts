@@ -233,4 +233,35 @@ export class DatasetService {
         return result;
       });
   }
+
+  validateCustomField(payload: any) {
+    const { datasetId, organisation, customLogic } = payload;
+    return this.http
+      .post(DATASET.VALIDATE_FIELD, {
+        organisation,
+        datasetId,
+        customLogic,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  addCustomField(payload: any) {
+    const { organisation, datasetId, name, customLogic } = payload;
+    return this.http
+      .post(DATASET.ADD_FIELD, {
+        organisation,
+        datasetId,
+        name,
+        customLogic,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
 }
