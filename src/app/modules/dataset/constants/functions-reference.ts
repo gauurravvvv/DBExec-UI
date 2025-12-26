@@ -43,19 +43,19 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'left',
-        usage: 'left({name}, 3)',
+        usage: 'left({productCode}, 5)',
         description:
           'Extracts a specified number of characters from the beginning (left side) of a text string. The second parameter specifies how many characters to return. Great for getting prefixes or codes from longer strings.',
       },
       {
         name: 'right',
-        usage: 'right({name}, 3)',
+        usage: 'right({fileName}, 4)',
         description:
           'Extracts a specified number of characters from the end (right side) of a text string. The second parameter specifies how many characters to return. Perfect for suffixes, extensions, or trailing codes.',
       },
       {
         name: 'substring',
-        usage: 'substring({text}, 1, 5)',
+        usage: 'substring({description}, 1, 50)',
         description:
           'Extracts a portion of text starting at a specific position for a given length. First number is the start position (1-indexed), second is the number of characters to extract. Powerful for parsing structured text data.',
       },
@@ -133,13 +133,13 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'parseDecimal',
-        usage: "parseDecimal('$1,234.56')",
+        usage: 'parseDecimal({priceText})',
         description:
           'Extracts a decimal number from a text string that may contain currency symbols, commas, or other non-numeric characters. Returns the numeric value 1234.56 from "$1,234.56". Essential for imported financial data.',
       },
       {
         name: 'parseInt',
-        usage: "parseInt('42 items')",
+        usage: 'parseInt({quantityText})',
         description:
           'Extracts a whole number (integer) from text, ignoring non-numeric characters. Returns 42 from "42 items". Use when you need integer values from mixed text/number fields.',
       },
@@ -170,13 +170,13 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'addDateTime',
-        usage: "addDateTime(30, 'DD', {startDate})",
+        usage: "addDateTime(7, 'DD', {orderDate})",
         description:
           'Adds a specified number of time units to a date. Units include: YY (years), MM (months), WK (weeks), DD (days), HH (hours), MI (minutes), SS (seconds). Use negative numbers to subtract.',
       },
       {
         name: 'addWorkDays',
-        usage: 'addWorkDays(5, {startDate})',
+        usage: 'addWorkDays(10, {submissionDate})',
         description:
           'Adds business days to a date, automatically skipping Saturdays and Sundays. Perfect for calculating due dates, SLA deadlines, or delivery estimates that exclude weekends.',
       },
@@ -206,7 +206,7 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'epochDate',
-        usage: 'epochDate(1704067200)',
+        usage: 'epochDate({timestamp})',
         description:
           'Converts a Unix timestamp (seconds since January 1, 1970) to a readable date. Many systems store dates as epoch numbers. This function makes them human-readable and usable in date calculations.',
       },
@@ -224,7 +224,7 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'parseDate',
-        usage: "parseDate('2024-01-15')",
+        usage: 'parseDate({dateText})',
         description:
           'Interprets a text string as a date value. Recognizes various date formats automatically. Use when importing data where dates are stored as text rather than proper date values.',
       },
@@ -237,7 +237,7 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
     functions: [
       {
         name: 'abs',
-        usage: 'abs({value})',
+        usage: 'abs({profitLoss})',
         description:
           'Returns the absolute (positive) value of a number. Converts -5 to 5, while 5 remains 5. Essential when you need the magnitude without regard to positive/negative sign.',
       },
@@ -255,49 +255,49 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'round',
-        usage: 'round({value}, 2)',
+        usage: 'round({unitPrice}, 2)',
         description:
           'Rounds a number to a specified number of decimal places using standard rounding (0.5 rounds up). round(3.456, 2) returns 3.46. Second parameter specifies decimal places.',
       },
       {
         name: 'trunc',
-        usage: 'trunc({value}, 2)',
+        usage: 'trunc({percentage}, 1)',
         description:
           'Truncates (cuts off) decimal places without rounding. trunc(3.789, 2) returns 3.78, not 3.79. Use when you need to simply remove decimal places rather than round.',
       },
       {
         name: 'sqrt',
-        usage: 'sqrt({value})',
+        usage: 'sqrt({area})',
         description:
           'Calculates the square root of a number. sqrt(16) returns 4, sqrt(2) returns approximately 1.414. Used in statistical calculations, geometry, and various mathematical formulas.',
       },
       {
         name: 'power',
-        usage: 'power({base}, {exponent})',
+        usage: 'power({principal}, {years})',
         description:
           'Raises a number to a power. power(2, 3) returns 8 (2³). Use for compound interest, exponential growth calculations, or any formula requiring exponents.',
       },
       {
         name: 'exp',
-        usage: 'exp({value})',
+        usage: 'exp({growthRate})',
         description:
           "Returns e (Euler's number, approximately 2.718) raised to the specified power. exp(1) returns 2.718. Used in natural logarithm inversions, growth models, and scientific calculations.",
       },
       {
         name: 'ln',
-        usage: 'ln({value})',
+        usage: 'ln({population})',
         description:
           'Calculates the natural logarithm (base e) of a number. ln(2.718) returns approximately 1. Used in growth rate analysis, statistical models, and converting exponential relationships.',
       },
       {
         name: 'log',
-        usage: 'log({value})',
+        usage: 'log({magnitude})',
         description:
           'Calculates the base-10 logarithm of a number. log(100) returns 2, log(1000) returns 3. Useful for handling numbers spanning many orders of magnitude or pH-type scales.',
       },
       {
         name: 'mod',
-        usage: 'mod({dividend}, {divisor})',
+        usage: 'mod({rowNumber}, 2)',
         description:
           'Returns the remainder after division. mod(17, 5) returns 2 because 17 ÷ 5 = 3 remainder 2. Useful for alternating row colors, cyclic patterns, or checking divisibility.',
       },
@@ -352,7 +352,7 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'percentile',
-        usage: 'percentile({scores}, 75)',
+        usage: 'percentile({responseTime}, 95)',
         description:
           'Returns the value at a given percentile rank. percentile({scores}, 75) returns the value where 75% of scores fall below. Use for performance benchmarks, SLA thresholds, or distribution analysis.',
       },
@@ -474,7 +474,7 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
     functions: [
       {
         name: 'ifelse',
-        usage: "ifelse({age} > 18, 'Adult', 'Minor')",
+        usage: "ifelse({quantity} > 100, 'Bulk', 'Standard')",
         description:
           'The fundamental if-then-else logic. If the condition is TRUE, returns the second parameter; if FALSE, returns the third. Can be nested for multiple conditions: ifelse(A, X, ifelse(B, Y, Z)).',
       },
@@ -517,7 +517,7 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
     functions: [
       {
         name: 'between',
-        usage: 'between({age}, 18, 65)',
+        usage: 'between({age}, 25, 55)',
         description:
           'Returns TRUE if a value falls within a range (inclusive of both endpoints). between({age}, 18, 65) is TRUE for 18, 40, and 65. Cleaner than combining >= and <= comparisons.',
       },

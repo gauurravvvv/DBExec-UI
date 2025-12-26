@@ -49,7 +49,7 @@
 
                     <!-- Fields List -->
                     <div class="fields-list">
-                        <div class="field-card" *ngFor="let field of datasetDetails?.datasetEntities">
+                        <div class="field-card" *ngFor="let field of datasetDetails?.datasetFields">
                             <div class="field-icon">
                                 <i class="pi pi-bars"></i>
                             </div>
@@ -115,14 +115,14 @@
                             <div class="axis-selection-title">Data Mapping</div>
                             <div class="axis-group">
                                 <label>X-Axis Column</label>
-                                <p-dropdown [options]="datasetDetails?.datasetEntities"
+                                <p-dropdown [options]="datasetDetails?.datasetFields"
                                     [(ngModel)]="getFocusedVisual().xAxisColumn" optionLabel="columnToView"
                                     optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
                                 </p-dropdown>
                             </div>
                             <div class="axis-group">
                                 <label>Y-Axis Column</label>
-                                <p-dropdown [options]="datasetDetails?.datasetEntities"
+                                <p-dropdown [options]="datasetDetails?.datasetFields"
                                     [(ngModel)]="getFocusedVisual().yAxisColumn" optionLabel="columnToView"
                                     optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
                                 </p-dropdown>
@@ -136,14 +136,14 @@
                             <div class="axis-selection-title">Data Mapping</div>
                             <div class="axis-group">
                                 <label>Category Column</label>
-                                <p-dropdown [options]="datasetDetails?.datasetEntities"
+                                <p-dropdown [options]="datasetDetails?.datasetFields"
                                     [(ngModel)]="getFocusedVisual().xAxisColumn" optionLabel="columnToView"
                                     optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
                                 </p-dropdown>
                             </div>
                             <div class="axis-group">
                                 <label>Value Column</label>
-                                <p-dropdown [options]="datasetDetails?.datasetEntities"
+                                <p-dropdown [options]="datasetDetails?.datasetFields"
                                     [(ngModel)]="getFocusedVisual().yAxisColumn" optionLabel="columnToView"
                                     optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
                                 </p-dropdown>

@@ -326,6 +326,15 @@
     min-width: 0;
   }
 
+  .field-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .field-card.custom-field {
     border-left: 3px solid var(--primary-color);
   }

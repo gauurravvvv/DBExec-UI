@@ -20,16 +20,20 @@ import {
 } from '../../config/formula-editor.config';
 import { DatasetService } from '../../services/dataset.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import {
+  CustomFieldData,
+  DEFAULT_CUSTOM_FIELD,
+  FORMULA_LANGUAGE_CONFIG,
+  FORMULA_TOKENIZER,
+  getCurrentMonacoTheme,
+  createThemeObserver,
+  createFunctionCompletionItem,
+  createFieldCompletionItem,
+} from './add-custom-field-dialog.helper';
 
 // Declare Monaco for TypeScript
 declare const monaco: any;
 declare const window: any;
-
-export interface CustomFieldData {
-  columnToView: string;
-  columnToUse: string;
-  formula: string;
-}
 
 @Component({
   selector: 'app-add-custom-field-dialog',
@@ -148,38 +152,20 @@ export class AddCustomFieldDialogComponent
     }
   }
 
-  private getCurrentTheme(): string {
-    const isDarkTheme = document.body.classList.contains('dark-theme');
-    return isDarkTheme ? 'vs-dark' : 'vs';
-  }
-
   private setupThemeObserver(): void {
-    this.currentTheme = this.getCurrentTheme();
+    this.currentTheme = getCurrentMonacoTheme();
 
     if (this.themeObserver) {
       this.themeObserver.disconnect();
     }
 
-    this.themeObserver = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        if (
-          mutation.type === 'attributes' &&
-          mutation.attributeName === 'class'
-        ) {
-          const newTheme = this.getCurrentTheme();
-          if (newTheme !== this.currentTheme) {
-            this.currentTheme = newTheme;
-            if (this.editor) {
-              monaco.editor.setTheme(this.currentTheme);
-            }
-          }
+    this.themeObserver = createThemeObserver((newTheme: string) => {
+      if (newTheme !== this.currentTheme) {
+        this.currentTheme = newTheme;
+        if (this.editor) {
+          monaco.editor.setTheme(this.currentTheme);
         }
-      });
-    });
-
-    this.themeObserver.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['class'],
+      }
     });
   }
 
@@ -233,50 +219,14 @@ export class AddCustomFieldDialogComponent
     // Register custom language
     monaco.languages.register({ id: 'formulaLang' });
 
-    // Set language configuration
-    monaco.languages.setLanguageConfiguration('formulaLang', {
-      brackets: [
-        ['(', ')'],
-        ['{', '}'],
-        ['[', ']'],
-      ],
-      autoClosingPairs: [
-        { open: '(', close: ')' },
-        { open: '{', close: '}' },
-        { open: '[', close: ']' },
-        { open: "'", close: "'" },
-        { open: '"', close: '"' },
-      ],
-      surroundingPairs: [
-        { open: '(', close: ')' },
-        { open: '{', close: '}' },
-        { open: "'", close: "'" },
-        { open: '"', close: '"' },
-      ],
-    });
+    // Set language configuration from helper
+    monaco.languages.setLanguageConfiguration(
+      'formulaLang',
+      FORMULA_LANGUAGE_CONFIG
+    );
 
-    // Set token provider for syntax highlighting
-    monaco.languages.setMonarchTokensProvider('formulaLang', {
-      tokenizer: {
-        root: [
-          // Field references like {field_name}
-          [/\{[^}]+\}/, 'variable'],
-          // Function names followed by (
-          [/[a-zA-Z_]\w*(?=\s*\()/, 'function'],
-          // String literals
-          [/'[^']*'/, 'string'],
-          [/"[^"]*"/, 'string'],
-          // Numbers
-          [/\d+(\.\d+)?/, 'number'],
-          // Operators
-          [/[+\-*/%=<>!&|,]/, 'operator'],
-          // Brackets
-          [/[(){}[\]]/, 'bracket'],
-          // Keywords
-          [/\b(if|else|then|and|or|not|true|false|null)\b/i, 'keyword'],
-        ],
-      },
-    });
+    // Set token provider for syntax highlighting from helper
+    monaco.languages.setMonarchTokensProvider('formulaLang', FORMULA_TOKENIZER);
 
     this.languageRegistered = true;
   }
@@ -360,50 +310,25 @@ export class AddCustomFieldDialogComponent
           // Check if we're inside a { for field reference
           const openBraceMatch = textUntilPosition.match(/\{([^}]*)$/);
           if (openBraceMatch) {
-            // Suggest dataset fields
+            // Suggest dataset fields using helper
             datasetFields.forEach((field: any) => {
-              suggestions.push({
-                label: field.columnToView || field.columnToUse,
-                kind: monaco.languages.CompletionItemKind.Variable,
-                detail: 'Dataset Field',
-                documentation: `Column: ${field.columnToUse}\nDisplay: ${field.columnToView}`,
-                insertText: (field.columnToUse || field.columnToView) + '}',
-                range: {
-                  ...range,
-                  startColumn: range.startColumn,
-                },
-              });
+              suggestions.push(
+                createFieldCompletionItem(field, range, monaco, true)
+              );
             });
             return { suggestions };
           }
 
-          // Add function suggestions
+          // Add function suggestions using helper
           allFunctions.forEach((fn: FunctionDefinition) => {
-            suggestions.push({
-              label: fn.name,
-              kind: monaco.languages.CompletionItemKind.Function,
-              detail: `Function: ${fn.name}()`,
-              documentation: {
-                value: `**${fn.name}**\n\n\`\`\`\n${fn.usage}\n\`\`\`\n\n${fn.description}`,
-                isTrusted: true,
-              },
-              insertText: fn.usage,
-              insertTextRules:
-                monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-              range: range,
-            });
+            suggestions.push(createFunctionCompletionItem(fn, range, monaco));
           });
 
-          // Add field suggestions with { wrapper
+          // Add field suggestions with { wrapper using helper
           datasetFields.forEach((field: any) => {
-            suggestions.push({
-              label: `{${field.columnToUse || field.columnToView}}`,
-              kind: monaco.languages.CompletionItemKind.Variable,
-              detail: 'Dataset Field',
-              documentation: `Column: ${field.columnToUse}\nDisplay: ${field.columnToView}`,
-              insertText: `{${field.columnToUse || field.columnToView}}`,
-              range: range,
-            });
+            suggestions.push(
+              createFieldCompletionItem(field, range, monaco, false)
+            );
           });
 
           return { suggestions };
@@ -547,7 +472,7 @@ export class AddCustomFieldDialogComponent
     this.datasetService
       .validateCustomField(payload)
       .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
+        if (this.globalService.handleSuccessService(response, false, false)) {
           this.isValidating = false;
           this.isValidated = true;
           this.validationResult = {
@@ -598,6 +523,8 @@ export class AddCustomFieldDialogComponent
     const query = this.functionSearchQuery.toLowerCase().trim();
     if (!query) {
       this.filteredCategories = [...this.functionCategories];
+      // Collapse all accordions when search is cleared
+      this.expandedCategories = {};
       return;
     }
 
