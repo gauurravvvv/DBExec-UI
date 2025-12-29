@@ -10,6 +10,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
@@ -30,6 +33,15 @@ import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 import { DATASET } from 'src/app/constants/routes';
 import { MessageService } from 'primeng/api';
+import {
+  AddDatasetActions,
+  SchemaLoadingStatus,
+  selectSchemaData,
+  selectSchemaStatus,
+  selectIsSchemaStale,
+  selectSchemaByKey,
+  selectIsSchemaLoaded,
+} from './store';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -104,6 +116,14 @@ export class AddDatasetComponent
   loadingDatabases: { [dbId: string]: boolean } = {};
   isLoadingDatabases: boolean = false;
 
+  // NgRx Store Observables for schema caching
+  private schemaDataObservables: Map<string, Observable<any | null>> =
+    new Map();
+  private schemaStatusObservables: Map<
+    string,
+    Observable<SchemaLoadingStatus>
+  > = new Map();
+
   get filteredAvailableDatabases(): any[] {
     if (!this.schemaSearchText) {
       return this.availableDatabases;
@@ -151,7 +171,8 @@ export class AddDatasetComponent
     private globalService: GlobalService,
     private datasetService: DatasetService,
     private router: Router,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private store: Store
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -279,11 +300,18 @@ export class AddDatasetComponent
   }
 
   refreshSingleDatabase(dbId: number): void {
-    if (!dbId) return;
+    if (!dbId || !this.selectedOrg?.id) return;
 
-    // Clear cached schema for this specific database
-    delete this.databaseSchemas[dbId];
-    delete this.loadingDatabases[dbId];
+    const orgId = this.selectedOrg.id.toString();
+    const dbIdStr = dbId.toString();
+
+    // Dispatch refresh action to clear cache and reload
+    this.store.dispatch(
+      AddDatasetActions.refreshSchemaData({
+        orgId,
+        dbId: dbIdStr,
+      })
+    );
 
     // Collapse this database's tree (schemas and tables)
     Object.keys(this.expandedSchemas).forEach(key => {
@@ -300,11 +328,15 @@ export class AddDatasetComponent
     // Collapse the database itself
     delete this.expandedDatabases[dbId];
 
+    // Clear local cache
+    delete this.databaseSchemas[dbId];
+    delete this.loadingDatabases[dbId];
+
     // Remove from IntelliSense databases array
     this.databases = this.databases.filter(db => db.name !== dbId.toString());
 
-    // Re-fetch schema for this database
-    this.loadDatabaseSchema(dbId);
+    // Re-fetch schema for this database from API
+    this.loadDatabaseSchemaFromAPI(dbId);
   }
 
   refreshSelectedDatabase(): void {
@@ -614,7 +646,74 @@ export class AddDatasetComponent
   private async loadDatabaseSchema(dbId: number): Promise<void> {
     if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
 
+    const orgId = this.selectedOrg.id.toString();
+    const dbIdStr = dbId.toString();
+
+    // Check if we have cached data in the store
+    return new Promise((resolve, reject) => {
+      this.store
+        .select(selectSchemaByKey(orgId, dbIdStr))
+        .pipe(first())
+        .subscribe(cachedEntry => {
+          if (!cachedEntry || !cachedEntry.data) {
+            // No cached data, load from API
+            this.loadDatabaseSchemaFromAPI(dbId).then(resolve).catch(reject);
+          } else {
+            // Check if data is stale
+            this.store
+              .select(selectIsSchemaStale(orgId, dbIdStr))
+              .pipe(first())
+              .subscribe(isStale => {
+                if (isStale) {
+                  // Data is stale, refresh from API
+                  this.loadDatabaseSchemaFromAPI(dbId)
+                    .then(resolve)
+                    .catch(reject);
+                } else {
+                  // Use cached data
+                  this.applyCachedSchemaData(dbId, cachedEntry.data);
+                  resolve();
+                }
+              });
+          }
+        });
+    });
+  }
+
+  /**
+   * Apply cached schema data from store to component state
+   */
+  private applyCachedSchemaData(dbId: number, schemaData: any): void {
+    // Store schema data by database ID
+    this.databaseSchemas[dbId] = schemaData;
+
+    // Update databases array for IntelliSense
+    this.databases = Object.values(this.databaseSchemas);
+
+    // Re-register completions with new schema
+    this.registerIntelliSenseProviders();
+
+    this.loadingDatabases[dbId] = false;
+  }
+
+  /**
+   * Load database schema from API and update store
+   */
+  private async loadDatabaseSchemaFromAPI(dbId: number): Promise<void> {
+    if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
+
+    const orgId = this.selectedOrg.id.toString();
+    const dbIdStr = dbId.toString();
+
     this.loadingDatabases[dbId] = true;
+
+    // Dispatch loading action
+    this.store.dispatch(
+      AddDatasetActions.loadSchemaData({
+        orgId,
+        dbId: dbIdStr,
+      })
+    );
 
     return new Promise((resolve, reject) => {
       try {
@@ -625,8 +724,17 @@ export class AddDatasetComponent
               const schemaData =
                 SchemaTransformerHelper.transformSchemaResponse(response);
 
-              // Store schema data by database ID
+              // Dispatch success action with schema data
               if (schemaData.length > 0) {
+                this.store.dispatch(
+                  AddDatasetActions.loadSchemaDataSuccess({
+                    orgId,
+                    dbId: dbIdStr,
+                    data: schemaData[0],
+                  })
+                );
+
+                // Store schema data by database ID
                 this.databaseSchemas[dbId] = schemaData[0];
               }
 
@@ -640,11 +748,29 @@ export class AddDatasetComponent
               resolve();
             },
             error: (error: any) => {
+              // Dispatch failure action
+              this.store.dispatch(
+                AddDatasetActions.loadSchemaDataFailure({
+                  orgId,
+                  dbId: dbIdStr,
+                  error: error.message || 'Failed to load schema',
+                })
+              );
+
               this.loadingDatabases[dbId] = false;
               reject(error);
             },
           });
-      } catch (error) {
+      } catch (error: any) {
+        // Dispatch failure action
+        this.store.dispatch(
+          AddDatasetActions.loadSchemaDataFailure({
+            orgId,
+            dbId: dbIdStr,
+            error: error.message || 'Failed to load schema',
+          })
+        );
+
         this.loadingDatabases[dbId] = false;
         reject(error);
       }
@@ -964,7 +1090,6 @@ export class AddDatasetComponent
 
       this.datasetService.addDataset(payload).then(response => {
         if (this.globalService.handleSuccessService(response, true)) {
-          console.log('Dataset saved successfully:', response);
           // Navigate to dataset list
           this.router.navigate([DATASET.LIST]);
           // Dataset saved successfully

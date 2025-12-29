@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MenuModule } from 'primeng/menu';
+import { StoreModule } from '@ngrx/store';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddDatasetComponent } from './components/add-dataset/add-dataset.component';
@@ -12,6 +13,10 @@ import { DatasetRoutingModule } from './dataset-routing.module';
 import { SaveDatasetDialogComponent } from './components/save-dataset-dialog/save-dataset-dialog.component';
 import { EditDatasetFieldsDialogComponent } from './components/edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
 import { AddCustomFieldDialogComponent } from './components/add-custom-field-dialog/add-custom-field-dialog.component';
+import {
+  ADD_DATASET_FEATURE_KEY,
+  addDatasetReducer,
+} from './components/add-dataset/store';
 
 @NgModule({
   declarations: [
@@ -31,6 +36,8 @@ import { AddCustomFieldDialogComponent } from './components/add-custom-field-dia
     DatasetRoutingModule,
     SharedModule,
     MenuModule,
+    // NgRx Feature Store
+    StoreModule.forFeature(ADD_DATASET_FEATURE_KEY, addDatasetReducer),
   ],
 })
 export class DatasetModule {}
