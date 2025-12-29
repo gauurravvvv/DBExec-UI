@@ -7,9 +7,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { interval, Subscription } from 'rxjs';
 import { Renderer2 } from '@angular/core';
+import { AddAnalysesActions } from 'src/app/modules/analyses/components/add-analyses/store';
 
 @Component({
   selector: 'app-header',
@@ -24,7 +26,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userRole: string = '';
   private timeSubscription?: Subscription;
   showProfileMenu: boolean = false;
-  isDarkMode = true;
+  isDarkMode = false; // Default to light mode
   isAnimating = false;
   isFullscreen = false;
   @ViewChild('notificationMenu') notificationMenu!: ElementRef;
@@ -81,11 +83,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private globalService: GlobalService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private store: Store
   ) {
-    // Check for saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    this.isDarkMode = savedTheme === 'dark';
+    // Always use light mode (theming disabled)
+    this.isDarkMode = false;
     this.applyTheme();
   }
 
@@ -115,6 +117,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout() {
+    // Clear NgRx store data
+    this.store.dispatch(AddAnalysesActions.clearAllDatasets());
+
     localStorage.clear();
     sessionStorage.clear();
     this.router.navigate(['/login']);

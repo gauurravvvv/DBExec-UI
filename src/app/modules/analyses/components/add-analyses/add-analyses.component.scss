@@ -107,6 +107,85 @@
       }
     }
   }
+
+  // Dataset Loading Status Indicator
+  .dataset-status-indicator {
+    margin-left: auto;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+
+    .status-loading,
+    .status-loaded,
+    .status-error {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      i {
+        font-size: 14px;
+      }
+    }
+
+    .status-loading {
+      color: var(--primary-color);
+      background-color: rgba(var(--primary-color-rgb), 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+
+      i {
+        animation: spin 1s linear infinite;
+      }
+    }
+
+    .status-loaded {
+      color: #22c55e;
+      background-color: rgba(34, 197, 94, 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+
+    .status-error {
+      color: #ef4444;
+      background-color: rgba(239, 68, 68, 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+
+    .refresh-btn {
+      margin-left: 8px;
+      padding: 6px !important;
+      min-width: auto !important;
+      color: var(--secondary-color);
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        color: var(--primary-color);
+        background-color: rgba(var(--primary-color-rgb), 0.1);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ===================================================================

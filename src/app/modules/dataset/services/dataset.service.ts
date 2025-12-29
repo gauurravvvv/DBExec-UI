@@ -264,4 +264,18 @@ export class DatasetService {
         return result;
       });
   }
+
+  runDatasetQuery(payload: any) {
+    const { datasetId, organisation } = payload;
+    return this.http
+      .post(DATASET.RUN_QUERY, {
+        organisation,
+        datasetId,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
 }

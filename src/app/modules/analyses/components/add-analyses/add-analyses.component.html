@@ -7,6 +7,10 @@
             </h3>
         </div>
         <div class="toolbar-right">
+            <button pButton class="p-button-text btn-primary" title="Refresh Data" (click)="refreshData()"
+                [disabled]="(datasetStatus$ | async) === 'loading'">
+                <i class="pi pi-refresh" [class.pi-spin]="(datasetStatus$ | async) === 'loading'"></i>
+            </button>
             <button pButton class="p-button-text btn-primary" title="Save Analysis" (click)="saveAnalysis()"
                 [disabled]="!canSave">
                 <i class="pi pi-save"></i>
@@ -24,6 +28,24 @@
             (click)="toggleVisualsPanel()" title="Toggle Visuals Pane">
             <i class="pi pi-chart-bar"></i>
         </button>
+
+        <!-- Dataset Loading Status Indicator -->
+        <div class="dataset-status-indicator" *ngIf="datasetStatus$ | async as status">
+            <ng-container [ngSwitch]="status">
+                <div *ngSwitchCase="'loading'" class="status-loading">
+                    <i class="pi pi-spin pi-spinner"></i>
+                    <span>Retrieving data...</span>
+                </div>
+                <div *ngSwitchCase="'loaded'" class="status-loaded">
+                    <i class="pi pi-check-circle"></i>
+                    <span>Data loaded</span>
+                </div>
+                <div *ngSwitchCase="'error'" class="status-error">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>Error loading data</span>
+                </div>
+            </ng-container>
+        </div>
     </div>
 
     <!-- Main Content Area with Sidebar and Center -->
@@ -74,10 +96,12 @@
                 </div>
                 <div class="sidebar-divider"></div>
                 <div class="sidebar-content-inner">
-                    <!-- Add Visual Button (always visible) -->
+                    <!-- Add Visual Button (enabled only when data is loaded) -->
                     <div class="add-visual-section">
                         <button pButton label="Add Visual" icon="pi pi-plus" class="p-button-outlined add-visual-button"
-                            (click)="addVisual()"></button>
+                            (click)="addVisual()" [disabled]="!(isDataLoaded$ | async)"
+                            [pTooltip]="(isDataLoaded$ | async) ? '' : 'Load data first to add visuals'"
+                            tooltipPosition="bottom"></button>
                     </div>
 
                     <!-- Chart Type Grid (when visual is focused but no chart type selected) -->

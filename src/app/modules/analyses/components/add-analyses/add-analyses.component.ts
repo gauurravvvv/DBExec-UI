@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
@@ -20,6 +23,15 @@ import {
 } from '../../constants/charts.constants';
 import { AnalysesService } from '../../service/analyses.service';
 import { ANALYSES } from 'src/app/constants/routes';
+import {
+  AddAnalysesActions,
+  DatasetLoadingStatus,
+  selectDatasetData,
+  selectDatasetStatus,
+  selectIsDatasetStale,
+  selectDatasetByKey,
+  selectIsDatasetLoaded,
+} from './store';
 
 @Component({
   selector: 'app-add-analyses',
@@ -31,6 +43,11 @@ export class AddAnalysesComponent implements OnInit {
   orgId: string = '';
   databaseId: string = '';
   datasetDetails: any = null;
+
+  // NgRx Store Observables - will be initialized after params are loaded
+  graphData$!: Observable<any[] | null>;
+  datasetStatus$!: Observable<DatasetLoadingStatus>;
+  isDataLoaded$!: Observable<boolean>;
 
   // Sidebar toggle states
   isFieldsPanelOpen: boolean = true;
@@ -73,17 +90,78 @@ export class AddAnalysesComponent implements OnInit {
     private router: Router,
     private datasetService: DatasetService,
     private globalService: GlobalService,
-    private analysesService: AnalysesService
+    private analysesService: AnalysesService,
+    private store: Store
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.orgId = params['orgId'];
       this.datasetId = params['datasetId'];
-      if (this.datasetId) {
-        this.loadDatasetInfo();
+      if (this.datasetId && this.orgId) {
+        // Initialize selectors with dynamic keys
+        this.graphData$ = this.store.select(
+          selectDatasetData(this.orgId, this.datasetId)
+        );
+        this.datasetStatus$ = this.store.select(
+          selectDatasetStatus(this.orgId, this.datasetId)
+        );
+        this.isDataLoaded$ = this.store.select(
+          selectIsDatasetLoaded(this.orgId, this.datasetId)
+        );
+
+        // Check if we have cached data and if it's stale
+        this.checkCachedDataAndLoad();
       }
     });
+  }
+
+  /**
+   * Check cached data and decide whether to use it or refresh
+   * - If no cached data: load fresh
+   * - If cached but stale (>10 min old): show cached, then refresh in background
+   * - If cached and fresh: use cached data
+   */
+  private checkCachedDataAndLoad(): void {
+    this.store
+      .select(selectDatasetByKey(this.orgId, this.datasetId))
+      .pipe(first())
+      .subscribe(cachedEntry => {
+        if (!cachedEntry || !cachedEntry.data) {
+          // No cached data, load fresh
+          this.loadDatasetInfo();
+        } else {
+          // Check if data is stale
+          this.store
+            .select(selectIsDatasetStale(this.orgId, this.datasetId))
+            .pipe(first())
+            .subscribe(isStale => {
+              if (isStale) {
+                // Show stale data immediately, but refresh
+                this.loadDatasetInfo();
+              } else {
+                // Data is fresh, just load dataset info for UI
+                this.loadDatasetInfoOnly();
+              }
+            });
+        }
+      });
+  }
+
+  /**
+   * Load only dataset info without refreshing graph data
+   * Used when cached graph data is still fresh
+   */
+  private loadDatasetInfoOnly(): void {
+    this.datasetService
+      .getDataset(this.orgId, this.datasetId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasetDetails = response.data;
+          this.databaseId = response.data.databaseId;
+          // Don't load graph data - using cache
+        }
+      });
   }
 
   loadDatasetInfo(): void {
@@ -93,8 +171,62 @@ export class AddAnalysesComponent implements OnInit {
         if (this.globalService.handleSuccessService(response, false)) {
           this.datasetDetails = response.data;
           this.databaseId = response.data.databaseId;
+
+          // After loading dataset info, fetch graph data
+          this.loadGraphData();
         }
       });
+  }
+
+  loadGraphData(): void {
+    // Dispatch loading action with orgId and datasetId
+    this.store.dispatch(
+      AddAnalysesActions.loadDatasetData({
+        orgId: this.orgId,
+        datasetId: this.datasetId,
+      })
+    );
+
+    this.datasetService
+      .runDatasetQuery({
+        datasetId: this.datasetId,
+        organisation: this.orgId,
+      })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          // Dispatch success action with graph data
+          this.store.dispatch(
+            AddAnalysesActions.loadDatasetDataSuccess({
+              orgId: this.orgId,
+              datasetId: this.datasetId,
+              data: response.data,
+            })
+          );
+        } else {
+          // Dispatch failure action
+          this.store.dispatch(
+            AddAnalysesActions.loadDatasetDataFailure({
+              orgId: this.orgId,
+              datasetId: this.datasetId,
+              error: response?.message || 'Failed to load graph data',
+            })
+          );
+        }
+      })
+      .catch(error => {
+        this.store.dispatch(
+          AddAnalysesActions.loadDatasetDataFailure({
+            orgId: this.orgId,
+            datasetId: this.datasetId,
+            error: error.message || 'Failed to load graph data',
+          })
+        );
+      });
+  }
+
+  refreshData(): void {
+    // Simply call loadGraphData again to refresh the data
+    this.loadGraphData();
   }
 
   goBack(): void {

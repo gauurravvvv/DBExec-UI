@@ -100,6 +100,7 @@ export const DATASET = {
   UPDATE_FIELD: '/dataset/update/field',
   VALIDATE_FIELD: '/dataset/validate/field',
   ADD_FIELD: '/dataset/add/field',
+  RUN_QUERY: '/dataset/run',
 };
 
 export const TAB = {
