@@ -243,11 +243,19 @@
                 &:hover {
                   background: rgba(var(--red-500), 0.04);
                 }
+
+                i {
+                  color: var(--error-color) !important;
+                }
               }
 
               .add-btn {
                 z-index: 1;
                 color: var(--primary-color) !important;
+
+                i {
+                  color: var(--primary-color) !important;
+                }
               }
             }
 
@@ -1001,6 +1009,22 @@
 
       .pi {
         opacity: 0.6;
+      }
+    }
+
+    &.add-btn {
+      color: var(--primary-color) !important;
+
+      .pi {
+        color: var(--primary-color) !important;
+      }
+    }
+
+    &.clear-btn {
+      color: var(--error-color) !important;
+
+      .pi {
+        color: var(--error-color) !important;
       }
     }
   }

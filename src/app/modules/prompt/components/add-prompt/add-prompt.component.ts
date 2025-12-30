@@ -115,7 +115,7 @@ export class AddPromptComponent implements OnInit {
   createPrompt(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: [''],
+      description: ['', [Validators.pattern(REGEX.lastName)]],
       type: ['', Validators.required],
     });
   }
@@ -369,13 +369,14 @@ export class AddPromptComponent implements OnInit {
     });
   }
 
-  onSectionChange(event: any) {
+  onSectionChange(event: any, groupIndex: number) {
     if (event.value) {
-      this.selectedSection = {
-        id: event.value,
-      };
-      this.clearAllSectionGroups();
-      this.addSectionGroup();
+      // Only reset prompts within this specific section group, not all groups
+      const prompts = this.getPrompts(groupIndex);
+      while (prompts.length > 0) {
+        prompts.removeAt(0);
+      }
+      prompts.push(this.createPrompt());
     }
   }
 

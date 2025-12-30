@@ -96,18 +96,20 @@
                                 <p-dropdown [options]="getAvailableSections(groupIndex)" optionLabel="name"
                                     optionValue="id" formControlName="sectionId" [filter]="true" filterBy="name"
                                     [style]="{'width':'300px'}" placeholder="Select Section"
+                                    (onChange)="onSectionChange($event, groupIndex)"
                                     [ngClass]="{'ng-invalid ng-dirty': sectionGroup.get('sectionId')?.invalid && sectionGroup.get('sectionId')?.touched}">
                                 </p-dropdown>
                                 <small class="error-message"
                                     *ngIf="sectionGroup.get('sectionId')?.invalid && sectionGroup.get('sectionId')?.touched">
                                     Section is required
                                 </small>
-                                <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
+                                <button pButton type="button" icon="pi pi-plus"
+                                    class="p-button-rounded p-button-text add-btn"
                                     (click)="addPromptToSection(groupIndex)"
-                                    [disabled]="!sectionGroup.get('sectionId')?.value" [style]="{'color': '#2196f3'}">
+                                    [disabled]="!sectionGroup.get('sectionId')?.value">
                                 </button>
                                 <button pButton type="button" icon="pi pi-trash"
-                                    class="p-button-rounded p-button-text p-button-danger"
+                                    class="p-button-rounded p-button-text clear-btn"
                                     (click)="removeSectionGroup(groupIndex)" [disabled]="sectionGroups.length === 1">
                                 </button>
                             </div>
@@ -135,17 +137,24 @@
                                             </span>
                                             <small class="error-message"
                                                 *ngIf="prompt.get('name')?.invalid && prompt.get('name')?.touched">
-                                                Name is required
+                                                <span *ngIf="prompt.get('name')?.errors?.['required']">Prompt name is
+                                                    required</span>
+                                                <span *ngIf="prompt.get('name')?.errors?.['pattern']">Prompt name can
+                                                    only contain letters, spaces and hyphens</span>
                                             </small>
                                         </div>
 
-                                        <!-- Description field -->
                                         <div class="form-field">
                                             <span class="p-input-icon-left">
                                                 <i class="pi pi-align-left"></i>
                                                 <input pInputText formControlName="description"
-                                                    placeholder="Enter description">
+                                                    placeholder="Enter description"
+                                                    [ngClass]="{'ng-invalid ng-dirty': prompt.get('description')?.errors?.['pattern']}">
                                             </span>
+                                            <small class="error-message"
+                                                *ngIf="prompt.get('description')?.errors?.['pattern']">
+                                                Description can only contain letters, spaces and hyphens
+                                            </small>
                                         </div>
 
                                         <!-- Type field -->

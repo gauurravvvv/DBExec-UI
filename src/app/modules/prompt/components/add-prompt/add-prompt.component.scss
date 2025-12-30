@@ -1022,6 +1022,22 @@
         opacity: 0.6;
       }
     }
+
+    &.add-btn {
+      color: var(--primary-color) !important;
+
+      .pi {
+        color: var(--primary-color) !important;
+      }
+    }
+
+    &.clear-btn {
+      color: var(--error-color) !important;
+
+      .pi {
+        color: var(--error-color) !important;
+      }
+    }
   }
 
   .error-message {

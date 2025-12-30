@@ -87,11 +87,12 @@
                                     *ngIf="tabGroup.get('tab')?.invalid && tabGroup.get('tab')?.touched">
                                     Tab is required
                                 </small>
-                                <button pButton type="button" icon="pi pi-plus" class="p-button-rounded p-button-text"
-                                    (click)="addSectionToTab(groupIndex)" [style]="{'color': '#2196f3'}">
+                                <button pButton type="button" icon="pi pi-plus"
+                                    class="p-button-rounded p-button-text add-btn"
+                                    (click)="addSectionToTab(groupIndex)">
                                 </button>
                                 <button pButton type="button" icon="pi pi-trash"
-                                    class="p-button-rounded p-button-text p-button-danger"
+                                    class="p-button-rounded p-button-text clear-btn"
                                     (click)="removeTabGroup(groupIndex)">
                                 </button>
                             </div>
@@ -118,7 +119,10 @@
                                             </span>
                                             <small class="error-message"
                                                 *ngIf="section.get('name')?.invalid && section.get('name')?.touched">
-                                                Name is required
+                                                <span *ngIf="section.get('name')?.errors?.['required']">Section name is
+                                                    required</span>
+                                                <span *ngIf="section.get('name')?.errors?.['pattern']">Section name can
+                                                    only contain letters, spaces and hyphens</span>
                                             </small>
                                         </div>
 
@@ -127,8 +131,13 @@
                                             <span class="p-input-icon-left">
                                                 <i class="pi pi-align-left"></i>
                                                 <input pInputText formControlName="description"
-                                                    placeholder="Enter description">
+                                                    placeholder="Enter description"
+                                                    [ngClass]="{'ng-invalid ng-dirty': section.get('description')?.errors?.['pattern']}">
                                             </span>
+                                            <small class="error-message"
+                                                *ngIf="section.get('description')?.errors?.['pattern']">
+                                                Description can only contain letters, spaces and hyphens
+                                            </small>
                                         </div>
                                     </div>
 

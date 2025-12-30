@@ -181,21 +181,8 @@ export class AddTabComponent implements OnInit {
         id: event.value,
       };
 
-      // Clear existing tabs and add a default one
-      if (this.tabGroups.length === 0) {
-        this.tabGroups.push(this.createTabGroup());
-        this.lastAddedTabIndex = this.tabGroups.length - 1;
-
-        // First scroll, then highlight (same pattern as addTabGroup)
-        this.scrollToBottom();
-        setTimeout(() => {
-          this.isNewlyAdded = true;
-          setTimeout(() => {
-            this.isNewlyAdded = false;
-            this.lastAddedTabIndex = -1;
-          }, 500);
-        }, 300);
-      }
+      // Clear existing tabs and add a default one (same as org change)
+      this.clearAllTabs();
     }
   }
 

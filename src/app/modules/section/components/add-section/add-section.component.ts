@@ -98,7 +98,7 @@ export class AddSectionComponent implements OnInit {
   createSection(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: [''],
+      description: ['', [Validators.pattern(REGEX.lastName)]],
     });
   }
 

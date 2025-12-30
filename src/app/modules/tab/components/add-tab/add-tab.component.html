@@ -47,7 +47,7 @@
                     <label for="database">Database<span class="required"> *</span></label>
                     <p-dropdown [options]="databases" optionLabel="name" optionValue="id" formControlName="database"
                         [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        placeholder="Select Database"
+                        placeholder="Select Database" (onChange)="onDatabaseChange($event)"
                         [ngClass]="{'ng-invalid ng-dirty': tabForm.get('database')?.invalid && tabForm.get('database')?.touched}">
                     </p-dropdown>
                     <small class="error-message"
@@ -97,8 +97,13 @@
                                     <label for="description">Description</label>
                                     <span class="p-input-icon-left">
                                         <i class="pi pi-align-left"></i>
-                                        <input pInputText formControlName="description" placeholder="Enter description">
+                                        <input pInputText formControlName="description" placeholder="Enter description"
+                                            [ngClass]="{'ng-invalid ng-dirty': tabGroup.get('description')?.errors?.['pattern']}">
                                     </span>
+                                    <small class="error-message"
+                                        *ngIf="tabGroup.get('description')?.errors?.['pattern']">
+                                        Description can only contain letters, spaces and hyphens
+                                    </small>
                                 </div>
                             </div>
 
