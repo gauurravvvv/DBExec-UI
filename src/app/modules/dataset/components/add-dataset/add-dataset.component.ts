@@ -41,7 +41,7 @@ import {
   selectIsSchemaStale,
   selectSchemaByKey,
   selectIsSchemaLoaded,
-} from './store';
+} from '../../store';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;

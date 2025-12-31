@@ -11,10 +11,7 @@ import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
 import { SaveAnalysesDialogComponent } from './components/save-analyses-dialog/save-analyses-dialog.component';
-import {
-  ADD_ANALYSES_FEATURE_KEY,
-  addAnalysesReducer,
-} from './components/add-analyses/store';
+import { ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer } from './store';
 
 @NgModule({
   declarations: [

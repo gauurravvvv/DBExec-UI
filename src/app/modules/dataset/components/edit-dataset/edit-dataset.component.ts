@@ -36,7 +36,7 @@ import {
   selectIsSchemaStale,
   selectSchemaByKey,
   selectIsSchemaLoaded,
-} from '../add-dataset/store';
+} from '../../store';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;

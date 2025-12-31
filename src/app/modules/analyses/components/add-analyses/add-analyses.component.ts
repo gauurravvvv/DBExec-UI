@@ -31,7 +31,7 @@ import {
   selectIsDatasetStale,
   selectDatasetByKey,
   selectIsDatasetLoaded,
-} from './store';
+} from '../../store';
 
 @Component({
   selector: 'app-add-analyses',

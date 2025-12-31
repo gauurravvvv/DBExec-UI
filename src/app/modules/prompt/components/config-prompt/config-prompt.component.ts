@@ -6,11 +6,18 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { first } from 'rxjs/operators';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { PromptService } from '../../services/prompt.service';
+import {
+  ConfigPromptActions,
+  selectSchemaByKey,
+  selectIsSchemaStale,
+} from '../../store';
 
 @Component({
   selector: 'app-config-prompt',
@@ -44,6 +51,7 @@ export class ConfigPromptComponent implements OnInit {
   filteredColumns: any[] = [];
   selectedSuggestionIndex = -1;
   tableColumns: { [key: string]: any[] } = {};
+  isLoadingSchema = false;
 
   constructor(
     private fb: FormBuilder,
@@ -51,7 +59,8 @@ export class ConfigPromptComponent implements OnInit {
     private route: ActivatedRoute,
     private globalService: GlobalService,
     private promptService: PromptService,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private store: Store
   ) {
     this.initForm();
     this.setupColumnNameSync();
@@ -204,22 +213,123 @@ export class ConfigPromptComponent implements OnInit {
   }
 
   loadSchemaData() {
+    const orgId = this.sectionData.organisationId.toString();
+    const dbId = this.sectionData.databaseId.toString();
+
+    this.isLoadingSchema = true;
+
+    // Check if we have cached data in the store
+    this.store
+      .select(selectSchemaByKey(orgId, dbId))
+      .pipe(first())
+      .subscribe(cachedEntry => {
+        if (cachedEntry && cachedEntry.data) {
+          // Check if data is stale
+          this.store
+            .select(selectIsSchemaStale(orgId, dbId))
+            .pipe(first())
+            .subscribe(isStale => {
+              if (isStale) {
+                // Data is stale, refresh from API
+                this.loadSchemaDataFromAPI(orgId, dbId);
+              } else {
+                // Use cached data
+                this.applyCachedSchemaData(cachedEntry.data);
+              }
+            });
+        } else {
+          // No cached data, load from API
+          this.loadSchemaDataFromAPI(orgId, dbId);
+        }
+      });
+  }
+
+  /**
+   * Apply cached schema data from store
+   */
+  private applyCachedSchemaData(schemaData: any): void {
+    // The store contains transformed DatabaseSchema format
+    // We need to extract the schemas array from it
+    if (schemaData && schemaData.schemas) {
+      this.staticSchemaData = schemaData.schemas;
+    } else if (Array.isArray(schemaData)) {
+      this.staticSchemaData = schemaData;
+    } else {
+      this.staticSchemaData = [];
+    }
+
+    this.schemas = this.staticSchemaData.map((schema: any) => ({
+      name: schema.schema_name,
+    }));
+
+    this.isLoadingSchema = false;
+
+    // After schema data is loaded, load config data
+    this.loadConfigData();
+  }
+
+  /**
+   * Load schema data from API and update store
+   */
+  private loadSchemaDataFromAPI(orgId: string, dbId: string): void {
+    // Dispatch loading action
+    this.store.dispatch(
+      ConfigPromptActions.loadSchemaData({
+        orgId,
+        dbId,
+      })
+    );
+
     const params = {
       orgId: this.sectionData.organisationId,
       databaseId: this.sectionData.databaseId,
     };
 
-    this.databaseService.listDatabaseSchemas(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.staticSchemaData = response.data;
-        this.schemas = this.staticSchemaData.map(schema => ({
-          name: schema.schema_name,
-        }));
+    this.databaseService
+      .listDatabaseSchemas(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.staticSchemaData = response.data;
+          this.schemas = this.staticSchemaData.map((schema: any) => ({
+            name: schema.schema_name,
+          }));
 
-        // After schema data is loaded, load config data
-        this.loadConfigData();
-      }
-    });
+          // Dispatch success action to cache in store
+          this.store.dispatch(
+            ConfigPromptActions.loadSchemaDataSuccess({
+              orgId,
+              dbId,
+              data: { schemas: response.data },
+            })
+          );
+
+          this.isLoadingSchema = false;
+
+          // After schema data is loaded, load config data
+          this.loadConfigData();
+        } else {
+          // Dispatch failure action
+          this.store.dispatch(
+            ConfigPromptActions.loadSchemaDataFailure({
+              orgId,
+              dbId,
+              error: 'Failed to load schema data',
+            })
+          );
+          this.isLoadingSchema = false;
+        }
+      })
+      .catch((error: any) => {
+        // Dispatch failure action
+        this.store.dispatch(
+          ConfigPromptActions.loadSchemaDataFailure({
+            orgId,
+            dbId,
+            error: error.message || 'Failed to load schema data',
+          })
+        );
+        this.isLoadingSchema = false;
+      });
   }
 
   loadConfigData() {

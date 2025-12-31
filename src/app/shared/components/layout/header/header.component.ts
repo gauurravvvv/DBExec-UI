@@ -11,7 +11,7 @@ import { Store } from '@ngrx/store';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { interval, Subscription } from 'rxjs';
 import { Renderer2 } from '@angular/core';
-import { AddAnalysesActions } from 'src/app/modules/analyses/components/add-analyses/store';
+import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 
 @Component({
   selector: 'app-header',
