@@ -95,17 +95,77 @@
                             </small>
                         </div>
                     </div>
+                    <div class="form-row" *ngIf="promptForm.get('tables')?.value?.length > 0">
+                        <div class="form-field full-width">
+                            <label for="promptColumns">
+                                Column(s)<span class="required">*</span>
+                                <i class="pi pi-info-circle info-icon"
+                                    pTooltip="Select one or more columns to include in your query"
+                                    tooltipPosition="right"></i>
+                            </label>
+                            <p-multiSelect id="promptColumns" [options]="availableColumns" formControlName="columns"
+                                optionLabel="displayName" [filter]="true" filterBy="displayName,columnName"
+                                [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}" placeholder="Select Columns"
+                                display="chip" [showToggleAll]="true"
+                                [ngClass]="{'ng-invalid ng-dirty': promptForm.get('columns')?.invalid && promptForm.get('columns')?.touched}">
+                            </p-multiSelect>
+                            <small class="error-message"
+                                *ngIf="promptForm.get('columns')?.invalid && promptForm.get('columns')?.touched">
+                                At least one column is required
+                            </small>
+                        </div>
+                    </div>
                     <div class="form-row" *ngIf="promptForm.get('tables')?.value?.length > 1">
                         <div class="form-field full-width">
                             <label for="promptJoin">
                                 Prompt Join Condition<span class="required">*</span>
+                                <i class="pi pi-info-circle info-icon"
+                                    pTooltip="Define how tables are related. Type alias followed by '.' for suggestions"
+                                    tooltipPosition="right"></i>
                             </label>
-                            <span class="p-input-icon-left">
-                                <i class="pi pi-link"></i>
-                                <input id="promptJoin" type="text" pInputText formControlName="promptJoin"
-                                    placeholder="Enter join conditions"
-                                    [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptJoin')?.invalid && promptForm.get('promptJoin')?.touched}">
-                            </span>
+                            <div class="autocomplete-container">
+                                <span class="p-input-icon-left full-width">
+                                    <i class="pi pi-link"></i>
+                                    <input id="promptJoin" type="text" pInputText formControlName="promptJoin"
+                                        (input)="onJoinConditionInput($event)" (keydown)="onJoinKeydown($event)"
+                                        (blur)="hideJoinSuggestionsDelayed()" (focus)="onJoinFocus($event)"
+                                        placeholder="Example: o.user_id = u.id" autocomplete="off"
+                                        [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptJoin')?.invalid && promptForm.get('promptJoin')?.touched}">
+                                </span>
+
+                                <!-- Enhanced Autocomplete Dropdown for Join -->
+                                <div class="column-suggestions"
+                                    *ngIf="showJoinSuggestions && filteredJoinColumns.length > 0">
+                                    <div class="suggestions-header">
+                                        <span>{{ filteredJoinColumns.length }} column(s) found</span>
+                                        <span class="keyboard-hint">↑↓ Navigate • Enter Select • Esc Close</span>
+                                    </div>
+                                    <div class="suggestions-list">
+                                        <div class="suggestion-item"
+                                            *ngFor="let column of filteredJoinColumns.slice(0, maxSuggestions); let i = index"
+                                            [class.selected]="i === selectedJoinSuggestionIndex"
+                                            (mousedown)="selectJoinSuggestion(column)"
+                                            (mouseenter)="selectedJoinSuggestionIndex = i">
+                                            <i class="pi pi-hashtag column-icon"></i>
+                                            <span class="column-name">{{ column.name }}</span>
+                                            <span class="column-type">{{ column.type }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="suggestions-footer" *ngIf="filteredJoinColumns.length > maxSuggestions">
+                                        <span>Showing {{ maxSuggestions }} of {{ filteredJoinColumns.length }} results.
+                                            Type more to filter.</span>
+                                    </div>
+                                </div>
+
+                                <!-- No Results Message -->
+                                <div class="column-suggestions no-results"
+                                    *ngIf="showJoinSuggestions && filteredJoinColumns.length === 0 && currentJoinAlias">
+                                    <div class="no-results-content">
+                                        <i class="pi pi-search"></i>
+                                        <span>No columns found for "{{ currentJoinAlias }}"</span>
+                                    </div>
+                                </div>
+                            </div>
                             <small class="error-message"
                                 *ngIf="promptForm.get('promptJoin')?.invalid && promptForm.get('promptJoin')?.touched">
                                 Join condition is required
@@ -116,25 +176,75 @@
                         <div class="form-field full-width">
                             <label for="promptWhere">
                                 Prompt Where Condition<span class="required">*</span>
+                                <i class="pi pi-info-circle info-icon"
+                                    pTooltip="Specify the filter condition. Type alias.column followed by operator"
+                                    tooltipPosition="right"></i>
                             </label>
-                            <span class="p-input-icon-left">
-                                <i class="pi pi-filter"></i>
-                                <input id="promptWhere" type="text" pInputText formControlName="promptWhere"
-                                    (input)="onWhereConditionInput($event)" (keydown)="onWhereKeydown($event)"
-                                    [placeholder]="getWhereTemplate()"
-                                    [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched}">
+                            <div class="autocomplete-container">
+                                <span class="p-input-icon-left full-width">
+                                    <i class="pi pi-filter"></i>
+                                    <input id="promptWhere" type="text" pInputText formControlName="promptWhere"
+                                        (input)="onWhereConditionInput($event)" (keydown)="onWhereKeydown($event)"
+                                        (blur)="hideSuggestionsDelayed()" (focus)="onWhereFocus($event)"
+                                        [placeholder]="getWhereTemplate()" autocomplete="off"
+                                        [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched}">
+                                </span>
+
+                                <!-- Enhanced Autocomplete Dropdown -->
                                 <div class="column-suggestions" *ngIf="showSuggestions && filteredColumns.length > 0">
-                                    <div class="suggestion-item" *ngFor="let column of filteredColumns; let i = index"
-                                        [class.selected]="i === selectedSuggestionIndex"
-                                        (click)="selectSuggestion(column)">
-                                        {{column.name}} <span class="column-type">({{column.type}})</span>
+                                    <div class="suggestions-header">
+                                        <span>{{ filteredColumns.length }} column(s) found</span>
+                                        <span class="keyboard-hint">↑↓ Navigate • Enter Select • Esc Close</span>
+                                    </div>
+                                    <div class="suggestions-list">
+                                        <div class="suggestion-item"
+                                            *ngFor="let column of filteredColumns.slice(0, maxSuggestions); let i = index"
+                                            [class.selected]="i === selectedSuggestionIndex"
+                                            (mousedown)="selectSuggestion(column)"
+                                            (mouseenter)="selectedSuggestionIndex = i">
+                                            <i class="pi pi-hashtag column-icon"></i>
+                                            <span class="column-name">{{ column.name }}</span>
+                                            <span class="column-type">{{ column.type }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="suggestions-footer" *ngIf="filteredColumns.length > maxSuggestions">
+                                        <span>Showing {{ maxSuggestions }} of {{ filteredColumns.length }} results. Type
+                                            more to filter.</span>
                                     </div>
                                 </div>
-                            </span>
+
+                                <!-- No Results Message -->
+                                <div class="column-suggestions no-results"
+                                    *ngIf="showSuggestions && filteredColumns.length === 0 && currentAlias">
+                                    <div class="no-results-content">
+                                        <i class="pi pi-search"></i>
+                                        <span>No columns found for "{{ currentAlias }}"</span>
+                                    </div>
+                                </div>
+                            </div>
                             <small class="error-message"
                                 *ngIf="promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched">
                                 Where condition is required
                             </small>
+                        </div>
+                    </div>
+
+                    <!-- Live SQL Preview Section -->
+                    <div class="form-row" *ngIf="promptForm.get('tables')?.value?.length > 0">
+                        <div class="form-field full-width">
+                            <div class="section-header sql-preview-header">
+                                <h3>
+                                    <i class="pi pi-code mr-2"></i>
+                                    SQL Preview
+                                </h3>
+                                <button type="button" pButton class="p-button-text p-button-rounded p-button-sm"
+                                    icon="pi pi-copy" pTooltip="Copy SQL" tooltipPosition="left"
+                                    (click)="copySqlToClipboard()">
+                                </button>
+                            </div>
+                            <div class="sql-preview-container">
+                                <pre class="sql-preview-code"><code>{{ generateSqlPreview() }}</code></pre>
+                            </div>
                         </div>
                     </div>
 
@@ -150,20 +260,26 @@
                                 style="display: flex; align-items: center; justify-content: space-between;">
                                 <label for="promptValues" style="margin-bottom: 0;">
                                     Prompt Values<span class="required">*</span>
-                                    <i class="pi pi-info-circle info-icon" pTooltip="Press Enter or Comma to add values"
+                                    <i class="pi pi-info-circle info-icon"
+                                        pTooltip="Add selectable options. Press Enter or Comma to add each value"
                                         tooltipPosition="right"></i>
                                 </label>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+                                    <button type="button" pButton class="p-button-text p-button-rounded p-button-plain"
+                                        icon="pi pi-database" pTooltip="Load values from SQL query"
+                                        tooltipPosition="left" (click)="openSqlDialog()">
+                                    </button>
                                     <label class="upload-label" style="cursor: pointer; margin-bottom: 0;">
                                         <i class="pi pi-upload p-button-text p-button-rounded p-button-plain"
-                                            pTooltip="Values must be separated by comma, newline, or by |"
-                                            tooltipPosition="right"></i>
+                                            pTooltip="Upload values from file (CSV/TXT). Values can be separated by comma, newline, or pipe"
+                                            tooltipPosition="left"></i>
                                         <input type="file" accept=".csv,.txt" style="display: none;"
                                             (change)="onPromptFileUpload($event)">
                                     </label>
                                     <button type="button" pButton
                                         class="p-button-text p-button-rounded p-button-plain clear-all-button"
-                                        icon="pi pi-trash" (click)="clearPromptValues()"
+                                        icon="pi pi-trash" pTooltip="Clear all values" tooltipPosition="left"
+                                        (click)="clearPromptValues()"
                                         [disabled]="!promptForm.get('promptValues')?.value?.length">
                                     </button>
                                 </div>
@@ -199,3 +315,9 @@
         </form>
     </div>
 </div>
+
+<!-- SQL Query Dialog Component -->
+<app-sql-query-dialog [visible]="showSqlDialog" [schemaData]="staticSchemaData"
+    [currentSchema]="promptForm.get('schema')?.value?.name" (close)="closeSqlDialog()"
+    (execute)="executeSqlQuery($event)">
+</app-sql-query-dialog>

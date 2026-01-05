@@ -30,6 +30,8 @@ import {
 import { MonacoIntelliSenseService } from '../../services copy/monaco-intellisense.service';
 import { QueryService } from '../../services copy/query.service';
 import { DatasetService } from '../../services/dataset.service';
+import { SqlFormatterService } from '../../services/sql-formatter.service';
+import { SqlValidatorService } from '../../services/sql-validator.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 import { DATASET } from 'src/app/constants/routes';
 import { MessageService } from 'primeng/api';
@@ -167,6 +169,8 @@ export class AddDatasetComponent
     private queryService: QueryService,
     private databaseService: DatabaseService,
     private monacoIntelliSenseService: MonacoIntelliSenseService,
+    private sqlFormatterService: SqlFormatterService,
+    private sqlValidatorService: SqlValidatorService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private datasetService: DatasetService,
@@ -458,6 +462,10 @@ export class AddDatasetComponent
       this.hoverProviderDisposable.dispose();
     }
 
+    // Dispose formatter and validator
+    this.sqlFormatterService.dispose();
+    this.sqlValidatorService.dispose();
+
     // Cleanup theme observer
     if (this.themeObserver) {
       this.themeObserver.disconnect();
@@ -570,13 +578,22 @@ export class AddDatasetComponent
         // Focus the editor
         this.editor.focus();
 
-        // Setup content change listener
-        this.editor.onDidChangeModelContent(() => {
-          this.currentQuery = this.editor.getValue();
-        });
-
         // Register IntelliSense
         this.registerIntelliSenseProviders();
+
+        // Register SQL Formatter
+        this.sqlFormatterService.registerFormattingProvider();
+        this.sqlFormatterService.registerContextMenuActions(this.editor);
+
+        // Setup SQL Validator with real-time validation
+        this.editor.onDidChangeModelContent(() => {
+          this.currentQuery = this.editor.getValue();
+          // Validate SQL with debouncing
+          this.sqlValidatorService.validateDebounced(this.editor.getModel());
+        });
+
+        // Initial validation
+        this.sqlValidatorService.validate(this.editor.getModel());
 
         // Add keyboard shortcuts via service
         this.monacoIntelliSenseService.registerKeyboardShortcuts(

@@ -1,0 +1,53 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '800px'}" [draggable]="false" [resizable]="false"
+    header="Load Values from SQL Query" styleClass="sql-query-dialog" (onHide)="onCancel()">
+
+    <div class="dialog-content">
+        <div class="info-message">
+            <i class="pi pi-info-circle"></i>
+            <span>Enter a SQL query that returns values in the first column. These values will be added to your prompt
+                options.</span>
+        </div>
+
+        <div class="form-field">
+            <label for="sqlQuery">SQL Query<span class="required">*</span></label>
+
+            <!-- Monaco Editor Container -->
+            <div class="editor-wrapper" [hidden]="isLoadingEditor || monacoLoadFailed">
+                <div id="sql-query-editor-container" class="sql-editor"></div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="editor-loading" *ngIf="isLoadingEditor && !monacoLoadFailed">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Loading editor...</span>
+            </div>
+
+            <!-- Error Fallback -->
+            <div class="editor-fallback" *ngIf="monacoLoadFailed">
+                <textarea [(ngModel)]="sqlQuery"
+                    placeholder="SELECT DISTINCT column_name FROM schema.table_name WHERE condition"
+                    [disabled]="isSqlLoading" rows="12" class="fallback-textarea">
+                </textarea>
+            </div>
+
+            <small class="hint">
+                <i class="pi pi-lightbulb"></i>
+                Type schema/table names for suggestions, or table.column for column suggestions
+            </small>
+        </div>
+
+        <div class="error-message-container" *ngIf="sqlError">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>{{ sqlError }}</span>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onCancel()"
+            [disabled]="isSqlLoading">
+        </button>
+        <button pButton type="button" label="Execute & Load" (click)="onExecute()" [loading]="isSqlLoading"
+            [disabled]="!sqlQuery.trim()">
+        </button>
+    </ng-template>
+</p-dialog>

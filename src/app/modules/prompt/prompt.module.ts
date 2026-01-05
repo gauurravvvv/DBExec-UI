@@ -16,6 +16,7 @@ import { EditPromptComponent } from './components/edit-prompt/edit-prompt.compon
 import { ListPromptComponent } from './components/list-prompt/list-prompt.component';
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
 import { PromptRoutingModule } from './prompt-routing.module';
+import { SqlQueryDialogComponent } from './components/sql-query-dialog/sql-query-dialog.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { PromptRoutingModule } from './prompt-routing.module';
     ListPromptComponent,
     ViewPromptComponent,
     ConfigPromptComponent,
+    SqlQueryDialogComponent,
   ],
   imports: [
     CommonModule,

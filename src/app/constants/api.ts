@@ -53,6 +53,7 @@ export const DATABASE = {
   LIST_SCHEMAS: '/database/schema/list/',
   LIST_SCHEMA_TABLES: '/database/table/list/',
   LIST_TABLE_COLUMNS: '/database/table/columns/list/',
+  RUN_QUERY: '/database/runQuery',
 };
 
 export const ENVIRONMENT = {

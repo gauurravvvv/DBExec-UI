@@ -185,4 +185,18 @@ export class DatabaseService {
         return result;
       });
   }
+
+  runQuery(params: any) {
+    return this.http
+      .post(DATABASE.RUN_QUERY, {
+        orgId: params.orgId,
+        databaseId: params.databaseId,
+        query: params.query,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
 }

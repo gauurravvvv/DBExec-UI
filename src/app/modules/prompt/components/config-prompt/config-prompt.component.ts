@@ -18,6 +18,7 @@ import {
   selectSchemaByKey,
   selectIsSchemaStale,
 } from '../../store';
+import { SqlQueryDialogComponent } from '../sql-query-dialog/sql-query-dialog.component';
 
 @Component({
   selector: 'app-config-prompt',
@@ -41,7 +42,7 @@ export class ConfigPromptComponent implements OnInit {
   isCancelClicked = false;
   schemas: any[] = [];
   tables: { [key: string]: any[] } = {};
-  private staticSchemaData: any[] = [];
+  staticSchemaData: any[] = [];
   separator: string = ','; // Use comma as separator
   editingChipIndex: number = -1;
   @ViewChild('chipInput') chipInput!: ElementRef;
@@ -52,6 +53,24 @@ export class ConfigPromptComponent implements OnInit {
   selectedSuggestionIndex = -1;
   tableColumns: { [key: string]: any[] } = {};
   isLoadingSchema = false;
+  availableColumns: any[] = [];
+
+  // Enhanced autocomplete properties (WHERE)
+  maxSuggestions = 50;
+  currentAlias = '';
+  private hideDelay: any = null;
+
+  // Enhanced autocomplete properties (JOIN)
+  showJoinSuggestions = false;
+  filteredJoinColumns: any[] = [];
+  selectedJoinSuggestionIndex = -1;
+  currentJoinAlias = '';
+  private hideJoinDelay: any = null;
+
+  // SQL Query Dialog
+  showSqlDialog = false;
+  @ViewChild(SqlQueryDialogComponent)
+  sqlDialogComponent?: SqlQueryDialogComponent;
 
   constructor(
     private fb: FormBuilder,
@@ -95,6 +114,7 @@ export class ConfigPromptComponent implements OnInit {
       section: [''],
       schema: ['', Validators.required],
       tables: [[], Validators.required],
+      columns: [[], Validators.required],
       promptJoin: [''],
       promptWhere: ['', Validators.required],
       promptValues: [[]], // Initially no validation
@@ -127,6 +147,12 @@ export class ConfigPromptComponent implements OnInit {
 
       // Update table columns mapping for selected tables
       this.updateTableColumns(tables);
+
+      // Update available columns for the multiselect
+      this.updateAvailableColumns(tables);
+
+      // Handle selected columns when tables change
+      this.handleColumnsOnTableChange(tables);
 
       // Update join validation
       const promptJoinControl = this.promptForm.get('promptJoin');
@@ -366,6 +392,17 @@ export class ConfigPromptComponent implements OnInit {
               promptWhere: config.prompt_where,
               promptValues: values.map((v: any) => v.value),
             });
+
+            // Set selected columns if available
+            if (config.prompt_columns) {
+              const columnArray = config.prompt_columns
+                .split(',')
+                .map((col: string) => {
+                  const [alias, columnName] = col.trim().split('.');
+                  return { alias, columnName, fullName: col.trim() };
+                });
+              this.promptForm.patchValue({ columns: columnArray });
+            }
           });
         }
       }
@@ -380,10 +417,20 @@ export class ConfigPromptComponent implements OnInit {
         .map((table: any) => `${table.tableName}(${table.alias})`)
         .join(',');
 
+      // Transform columns to alias.columnName format
+      const transformedColumns = formValues.columns
+        .map((col: any) => col.fullName)
+        .join(',');
+
+      // Auto-append value placeholder to WHERE condition if needed
+      const formattedWhere = this.formatWhereCondition(formValues.promptWhere);
+
       const submitData = {
         ...formValues,
         tables: transformedTables,
+        columns: transformedColumns,
         schema: formValues.schema.name,
+        promptWhere: formattedWhere,
       };
 
       this.promptService.configPrompt(submitData).then(response => {
@@ -392,6 +439,47 @@ export class ConfigPromptComponent implements OnInit {
         }
       });
     }
+  }
+
+  /**
+   * Format WHERE condition by auto-appending value placeholder if needed
+   * User types: o.status = → Stored as: o.status = '{value}'
+   * User types: o.status in → Stored as: o.status in ('{value}')
+   */
+  formatWhereCondition(condition: string): string {
+    if (!condition) return condition;
+
+    const trimmed = condition.trim();
+
+    // Check if already has {value} placeholder
+    if (trimmed.includes('{value}')) {
+      return trimmed;
+    }
+
+    // Detect operator and append appropriate placeholder
+    if (trimmed.endsWith('=')) {
+      return `${trimmed} '{value}'`;
+    } else if (trimmed.toLowerCase().endsWith(' in')) {
+      return `${trimmed} ('{value}')`;
+    } else if (trimmed.toLowerCase().endsWith(' like')) {
+      return `${trimmed} '%{value}%'`;
+    } else if (
+      trimmed.endsWith('>') ||
+      trimmed.endsWith('<') ||
+      trimmed.endsWith('>=') ||
+      trimmed.endsWith('<=')
+    ) {
+      return `${trimmed} '{value}'`;
+    }
+
+    // If no operator detected, append based on prompt type
+    if (this.selectedPromptType === 'dropdown') {
+      return `${trimmed} = '{value}'`;
+    } else if (this.selectedPromptType === 'multiselect') {
+      return `${trimmed} in ('{value}')`;
+    }
+
+    return trimmed;
   }
 
   onCancel(): void {
@@ -405,6 +493,7 @@ export class ConfigPromptComponent implements OnInit {
         section: this.sectionData.section.id,
         schema: '',
         tables: [],
+        columns: [],
         promptJoin: '',
         promptWhere: '',
         promptValues: [], // Reset to empty array
@@ -528,15 +617,35 @@ export class ConfigPromptComponent implements OnInit {
     const lastDotIndex = value.lastIndexOf('.');
     const selectedTables = this.promptForm.get('tables')?.value || [];
 
+    // Clear any pending hide delay
+    if (this.hideDelay) {
+      clearTimeout(this.hideDelay);
+      this.hideDelay = null;
+    }
+
     if (lastDotIndex !== -1) {
       const beforeDot = value.substring(0, lastDotIndex).trim();
-      const afterDot = value.substring(lastDotIndex + 1).toLowerCase();
+      const afterDot = value.substring(lastDotIndex + 1);
+
+      // Close suggestions if afterDot contains space, operator, or quote
+      // (meaning user has completed the column name)
+      if (/[\s=<>!(),'"]+/.test(afterDot)) {
+        this.showSuggestions = false;
+        this.currentAlias = '';
+        return;
+      }
+
+      const filterText = afterDot.toLowerCase();
+
+      // Track current alias for no-results message
+      this.currentAlias = beforeDot;
 
       // For single table, force the current table's alias
       if (selectedTables.length === 1) {
         const currentAlias = selectedTables[0].alias;
         if (beforeDot !== currentAlias) {
           event.target.value = `${currentAlias}.${afterDot}`;
+          this.currentAlias = currentAlias;
           return;
         }
       }
@@ -545,8 +654,9 @@ export class ConfigPromptComponent implements OnInit {
       if (selectedTables.length > 1) {
         const validAliases = selectedTables.map((t: any) => t.alias);
         if (!validAliases.includes(beforeDot)) {
-          // If invalid alias, prevent input
-          event.preventDefault();
+          // Show no-results state for invalid alias
+          this.filteredColumns = [];
+          this.showSuggestions = true;
           return;
         }
       }
@@ -554,13 +664,17 @@ export class ConfigPromptComponent implements OnInit {
       // Show column suggestions for valid alias
       if (this.tableColumns[beforeDot]) {
         this.filteredColumns = this.tableColumns[beforeDot].filter(column =>
-          column.name.toLowerCase().includes(afterDot)
+          column.name.toLowerCase().includes(filterText)
         );
         this.showSuggestions = true;
-        this.selectedSuggestionIndex = -1;
+        this.selectedSuggestionIndex = this.filteredColumns.length > 0 ? 0 : -1;
+      } else {
+        this.filteredColumns = [];
+        this.showSuggestions = true;
       }
     } else {
       this.showSuggestions = false;
+      this.currentAlias = '';
     }
   }
 
@@ -603,14 +717,213 @@ export class ConfigPromptComponent implements OnInit {
     const value = this.promptForm.get('promptWhere')?.value || '';
     const lastDotIndex = value.lastIndexOf('.');
     const beforeDot = value.substring(0, lastDotIndex);
-    const operator =
-      this.selectedPromptType === 'dropdown'
-        ? ` = '{value}'`
-        : ` in ('{value}')`;
-    const newValue = `${beforeDot}.${column.name}${operator}`;
+
+    // Only insert the column name - user will add operator, {value} added on submit
+    const newValue = `${beforeDot}.${column.name} `;
 
     this.promptForm.patchValue({ promptWhere: newValue });
     this.showSuggestions = false;
+    this.currentAlias = '';
+  }
+
+  /**
+   * Hide suggestions with a small delay to allow click events to fire
+   */
+  hideSuggestionsDelayed(): void {
+    this.hideDelay = setTimeout(() => {
+      this.showSuggestions = false;
+      this.currentAlias = '';
+    }, 150);
+  }
+
+  /**
+   * Handle focus on WHERE input - reshow suggestions if alias is present
+   */
+  onWhereFocus(event: any): void {
+    // Clear any pending hide
+    if (this.hideDelay) {
+      clearTimeout(this.hideDelay);
+      this.hideDelay = null;
+    }
+
+    // Trigger re-check for suggestions
+    const value = event.target.value;
+    if (value.includes('.')) {
+      this.onWhereConditionInput(event);
+    }
+  }
+
+  // ===== JOIN Autocomplete Methods =====
+
+  /**
+   * Handle input in JOIN condition field
+   */
+  onJoinConditionInput(event: any): void {
+    const value = event.target.value;
+    const cursorPosition = event.target.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+
+    // Find the last alias.column pattern before cursor
+    const lastDotIndex = textBeforeCursor.lastIndexOf('.');
+
+    // Clear any pending hide delay
+    if (this.hideJoinDelay) {
+      clearTimeout(this.hideJoinDelay);
+      this.hideJoinDelay = null;
+    }
+
+    if (lastDotIndex !== -1) {
+      // Find start of the alias (look back from dot for word characters)
+      let aliasStart = lastDotIndex - 1;
+      while (aliasStart >= 0 && /\w/.test(textBeforeCursor[aliasStart])) {
+        aliasStart--;
+      }
+      aliasStart++;
+
+      const alias = textBeforeCursor.substring(aliasStart, lastDotIndex);
+      const afterDot = textBeforeCursor.substring(lastDotIndex + 1);
+
+      // Close suggestions if afterDot contains space, operator, or quote
+      // (meaning user has completed the column name)
+      if (/[\s=<>!(),'"]+/.test(afterDot)) {
+        this.showJoinSuggestions = false;
+        this.currentJoinAlias = '';
+        return;
+      }
+
+      const filterText = afterDot.toLowerCase();
+
+      // Track current alias for no-results message
+      this.currentJoinAlias = alias;
+
+      // Check if alias is from selected tables
+      const selectedTables = this.promptForm.get('tables')?.value || [];
+      const validAliases = selectedTables.map((t: any) => t.alias);
+
+      if (validAliases.includes(alias)) {
+        // Show column suggestions for valid alias
+        if (this.tableColumns[alias]) {
+          this.filteredJoinColumns = this.tableColumns[alias].filter(column =>
+            column.name.toLowerCase().includes(filterText)
+          );
+          this.showJoinSuggestions = true;
+          this.selectedJoinSuggestionIndex =
+            this.filteredJoinColumns.length > 0 ? 0 : -1;
+        } else {
+          this.filteredJoinColumns = [];
+          this.showJoinSuggestions = true;
+        }
+      } else {
+        // Show no-results state for invalid alias
+        this.filteredJoinColumns = [];
+        this.showJoinSuggestions = true;
+      }
+    } else {
+      this.showJoinSuggestions = false;
+      this.currentJoinAlias = '';
+    }
+  }
+
+  /**
+   * Handle keyboard navigation for JOIN suggestions
+   */
+  onJoinKeydown(event: KeyboardEvent): void {
+    if (!this.showJoinSuggestions) return;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.selectedJoinSuggestionIndex = Math.min(
+          this.selectedJoinSuggestionIndex + 1,
+          Math.min(this.filteredJoinColumns.length - 1, this.maxSuggestions - 1)
+        );
+        break;
+
+      case 'ArrowUp':
+        event.preventDefault();
+        this.selectedJoinSuggestionIndex = Math.max(
+          this.selectedJoinSuggestionIndex - 1,
+          0
+        );
+        break;
+
+      case 'Enter':
+        if (this.selectedJoinSuggestionIndex >= 0) {
+          event.preventDefault();
+          this.selectJoinSuggestion(
+            this.filteredJoinColumns[this.selectedJoinSuggestionIndex]
+          );
+        }
+        break;
+
+      case 'Escape':
+        this.showJoinSuggestions = false;
+        break;
+    }
+  }
+
+  /**
+   * Select a column for JOIN condition
+   */
+  selectJoinSuggestion(column: any): void {
+    const input = document.getElementById('promptJoin') as HTMLInputElement;
+    if (!input) return;
+
+    const value = input.value;
+    const cursorPosition = input.selectionStart || 0;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    const textAfterCursor = value.substring(cursorPosition);
+
+    // Find the alias before the dot
+    const lastDotIndex = textBeforeCursor.lastIndexOf('.');
+    let aliasStart = lastDotIndex - 1;
+    while (aliasStart >= 0 && /\w/.test(textBeforeCursor[aliasStart])) {
+      aliasStart--;
+    }
+    aliasStart++;
+
+    const beforeAlias = textBeforeCursor.substring(0, aliasStart);
+    const alias = textBeforeCursor.substring(aliasStart, lastDotIndex);
+
+    // Build new value with selected column
+    const newValue = `${beforeAlias}${alias}.${column.name}${textAfterCursor}`;
+
+    this.promptForm.patchValue({ promptJoin: newValue });
+    this.showJoinSuggestions = false;
+    this.currentJoinAlias = '';
+
+    // Set cursor position after the inserted column
+    setTimeout(() => {
+      const newCursorPos =
+        beforeAlias.length + alias.length + 1 + column.name.length;
+      input.setSelectionRange(newCursorPos, newCursorPos);
+      input.focus();
+    }, 0);
+  }
+
+  /**
+   * Hide JOIN suggestions with delay
+   */
+  hideJoinSuggestionsDelayed(): void {
+    this.hideJoinDelay = setTimeout(() => {
+      this.showJoinSuggestions = false;
+      this.currentJoinAlias = '';
+    }, 150);
+  }
+
+  /**
+   * Handle focus on JOIN input
+   */
+  onJoinFocus(event: any): void {
+    if (this.hideJoinDelay) {
+      clearTimeout(this.hideJoinDelay);
+      this.hideJoinDelay = null;
+    }
+
+    const value = event.target.value;
+    if (value.includes('.')) {
+      this.onJoinConditionInput(event);
+    }
   }
 
   private updateTableColumns(selectedTables: any[]) {
@@ -636,6 +949,71 @@ export class ConfigPromptComponent implements OnInit {
     }
   }
 
+  /**
+   * Update available columns based on selected tables
+   */
+  private updateAvailableColumns(selectedTables: any[]) {
+    this.availableColumns = [];
+
+    if (!selectedTables || selectedTables.length === 0) {
+      return;
+    }
+
+    // Get current schema
+    const currentSchema = this.promptForm.get('schema')?.value?.name;
+    const schemaData = this.staticSchemaData.find(
+      schema => schema.schema_name === currentSchema
+    );
+
+    if (schemaData) {
+      selectedTables.forEach((selectedTable: any) => {
+        const table = schemaData.tables.find(
+          (t: any) => t.table_name === selectedTable.tableName
+        );
+        if (table && table.columns) {
+          // Add columns with alias prefix
+          table.columns.forEach((column: any) => {
+            this.availableColumns.push({
+              alias: selectedTable.alias,
+              columnName: column.name,
+              columnType: column.type,
+              fullName: `${selectedTable.alias}.${column.name}`,
+              displayName: `${selectedTable.alias}.${column.name}`,
+            });
+          });
+        }
+      });
+    }
+  }
+
+  /**
+   * Handle column selection when tables change
+   * Remove columns that belong to deselected tables
+   */
+  private handleColumnsOnTableChange(selectedTables: any[]) {
+    const currentSelectedColumns = this.promptForm.get('columns')?.value || [];
+
+    if (currentSelectedColumns.length === 0) {
+      return;
+    }
+
+    // Get aliases of currently selected tables
+    const currentAliases = selectedTables.map((t: any) => t.alias);
+
+    // Filter out columns that belong to deselected tables
+    const validColumns = currentSelectedColumns.filter((col: any) =>
+      currentAliases.includes(col.alias)
+    );
+
+    // Update form only if columns were removed
+    if (validColumns.length !== currentSelectedColumns.length) {
+      this.promptForm.patchValue(
+        { columns: validColumns },
+        { emitEvent: false }
+      );
+    }
+  }
+
   onPromptFileUpload(event: any): void {
     const file = event.target.files[0];
     if (!file) return;
@@ -656,5 +1034,182 @@ export class ConfigPromptComponent implements OnInit {
       event.target.value = '';
     };
     reader.readAsText(file);
+  }
+
+  /**
+   * Open SQL query dialog
+   */
+  openSqlDialog(): void {
+    this.showSqlDialog = true;
+  }
+
+  /**
+   * Close SQL query dialog
+   */
+  closeSqlDialog(): void {
+    this.showSqlDialog = false;
+  }
+
+  /**
+   * Execute SQL query to fetch prompt values
+   */
+  executeSqlQuery(query: string): void {
+    if (!query.trim()) {
+      return;
+    }
+
+    if (this.sqlDialogComponent) {
+      this.sqlDialogComponent.setError('');
+    }
+
+    const params = {
+      orgId: this.sectionData.organisationId,
+      databaseId: this.sectionData.databaseId,
+      query: query.trim(),
+    };
+
+    this.databaseService.runQuery(params).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        const results = response.data;
+
+        // API returns array of strings directly
+        const newValues: string[] = [];
+        if (results && Array.isArray(results) && results.length > 0) {
+          results.forEach((value: any) => {
+            // Handle both string values and potential objects
+            if (typeof value === 'string' || typeof value === 'number') {
+              newValues.push(String(value));
+            } else if (typeof value === 'object' && value !== null) {
+              // Fallback: if it's an object, get first column value
+              const firstKey = Object.keys(value)[0];
+              if (firstKey && value[firstKey] != null) {
+                newValues.push(String(value[firstKey]));
+              }
+            }
+          });
+        }
+
+        if (newValues.length > 0) {
+          // Replace previous values with new values from query
+          this.promptForm.patchValue({ promptValues: newValues });
+
+          this.closeSqlDialog();
+        } else {
+          if (this.sqlDialogComponent) {
+            this.sqlDialogComponent.setError('Query returned no results');
+          }
+        }
+      }
+    });
+  }
+
+  // ===== Live SQL Preview Methods =====
+
+  /**
+   * Generate SQL preview based on form values
+   */
+  generateSqlPreview(): string {
+    const selectedTables = this.promptForm.get('tables')?.value || [];
+    const selectedColumns = this.promptForm.get('columns')?.value || [];
+    const schema = this.promptForm.get('schema')?.value?.name || 'schema';
+    const joinCondition = this.promptForm.get('promptJoin')?.value || '';
+    const whereCondition = this.promptForm.get('promptWhere')?.value || '';
+
+    if (selectedTables.length === 0) {
+      return '-- Select tables to see preview';
+    }
+
+    // Build SELECT clause with selected columns or *
+    let sql = '';
+    if (selectedColumns.length > 0) {
+      const columnList = selectedColumns
+        .map((col: any) => col.fullName)
+        .join(', ');
+      sql = `SELECT ${columnList}\n`;
+    } else {
+      sql = 'SELECT *\n';
+    }
+
+    // FROM clause with first table
+    const firstTable = selectedTables[0];
+    sql += `FROM ${schema}.${firstTable.tableName} ${firstTable.alias}`;
+
+    // JOIN clauses for additional tables
+    if (selectedTables.length > 1) {
+      for (let i = 1; i < selectedTables.length; i++) {
+        const table = selectedTables[i];
+        sql += `\nJOIN ${schema}.${table.tableName} ${table.alias}`;
+      }
+
+      // Add ON clause if join condition exists
+      if (joinCondition) {
+        sql += `\n  ON ${joinCondition}`;
+      } else {
+        sql += '\n  ON <join_condition>';
+      }
+    }
+
+    // WHERE clause - format with value placeholder for preview
+    // Apply formatting in real-time as user types operator
+    if (whereCondition) {
+      const formattedWhere =
+        this.formatWhereConditionForPreview(whereCondition);
+      sql += `\nWHERE ${formattedWhere}`;
+    } else if (selectedTables.length > 0) {
+      sql += '\nWHERE <where_condition>';
+    }
+
+    return sql;
+  }
+
+  /**
+   * Format WHERE condition for live preview - auto-appends {value} placeholder as user types
+   */
+  formatWhereConditionForPreview(condition: string): string {
+    if (!condition) return condition;
+
+    const trimmed = condition.trim();
+
+    // Check if already has {value} placeholder - if yes, return as-is
+    if (trimmed.includes('{value}')) {
+      return trimmed;
+    }
+
+    // Detect operator and append appropriate placeholder for preview
+    if (trimmed.endsWith('=')) {
+      return `${trimmed} '{value}'`;
+    } else if (trimmed.toLowerCase().endsWith(' in')) {
+      return `${trimmed} ('{value}')`;
+    } else if (trimmed.toLowerCase().endsWith(' like')) {
+      return `${trimmed} '%{value}%'`;
+    } else if (
+      trimmed.endsWith('>') ||
+      trimmed.endsWith('<') ||
+      trimmed.endsWith('>=') ||
+      trimmed.endsWith('<=') ||
+      trimmed.endsWith('!=') ||
+      trimmed.endsWith('<>')
+    ) {
+      return `${trimmed} '{value}'`;
+    }
+
+    // Return as-is if no operator detected yet
+    return trimmed;
+  }
+
+  /**
+   * Copy SQL preview to clipboard
+   */
+  copySqlToClipboard(): void {
+    const sql = this.generateSqlPreview();
+    navigator.clipboard
+      .writeText(sql)
+      .then(() => {
+        // Show success message (you can use MessageService if available)
+        console.log('SQL copied to clipboard');
+      })
+      .catch(err => {
+        console.error('Failed to copy SQL:', err);
+      });
   }
 }
