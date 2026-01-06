@@ -163,6 +163,30 @@
               font-size: 12px;
             }
 
+            .hint-text {
+              color: var(--text-color);
+              opacity: 0.6;
+              font-size: 12px;
+              margin-top: 4px;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+
+              i {
+                color: var(--warning-color, #f59e0b);
+                font-size: 14px;
+              }
+
+              code {
+                background: var(--hover-background);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: 'Fira Code', monospace;
+                font-size: 11px;
+                color: var(--primary-color);
+              }
+            }
+
             input.readonly {
               background: var(--hover-background) !important;
               cursor: not-allowed;
@@ -257,6 +281,47 @@
 
       i {
         color: var(--text-color) !important;
+      }
+
+      // Color variants for text buttons
+      &.p-button-warning {
+        color: var(--warning-color, #f59e0b) !important;
+
+        i {
+          color: var(--warning-color, #f59e0b) !important;
+        }
+
+        &:hover {
+          background: transparent !important;
+        }
+      }
+
+      &.p-button-info {
+        color: var(--primary-color) !important;
+
+        i {
+          color: var(--primary-color) !important;
+        }
+
+        &:hover {
+          background: transparent !important;
+        }
+      }
+
+      &.p-button-danger {
+        color: var(--error-color) !important;
+
+        i {
+          color: var(--error-color) !important;
+        }
+
+        &:hover {
+          background: transparent !important;
+        }
+
+        &:disabled {
+          opacity: 0.4;
+        }
       }
     }
 

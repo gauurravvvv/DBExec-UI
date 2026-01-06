@@ -9,6 +9,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import { MonacoIntelliSenseService } from '../../../dataset/services copy/monaco-intellisense.service';
 
 declare const monaco: any;
 declare const window: any;
@@ -112,12 +113,13 @@ export class SqlQueryDialogComponent
   // Monaco Editor
   editor: any = null;
   private completionProviderDisposable: any = null;
+  private hoverProviderDisposable: any = null;
   isLoadingEditor = true;
   monacoLoadFailed = false;
   private currentTheme: string = 'vs-dark';
   private themeObserver: MutationObserver | null = null;
 
-  constructor() {}
+  constructor(private monacoIntelliSenseService: MonacoIntelliSenseService) {}
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscapeKey(event: KeyboardEvent) {
@@ -138,6 +140,9 @@ export class SqlQueryDialogComponent
     // Dispose IntelliSense providers
     if (this.completionProviderDisposable) {
       this.completionProviderDisposable.dispose();
+    }
+    if (this.hoverProviderDisposable) {
+      this.hoverProviderDisposable.dispose();
     }
 
     // Cleanup theme observer
@@ -317,158 +322,74 @@ export class SqlQueryDialogComponent
   }
 
   /**
-   * Register IntelliSense providers
+   * Register IntelliSense providers using MonacoIntelliSenseService
    */
   private registerIntelliSenseProviders(): void {
     // Dispose previous providers if they exist
     if (this.completionProviderDisposable) {
       this.completionProviderDisposable.dispose();
     }
+    if (this.hoverProviderDisposable) {
+      this.hoverProviderDisposable.dispose();
+    }
 
-    // Register completion provider
+    // Transform schema data to the format expected by MonacoIntelliSenseService
+    const databases = this.transformSchemaData();
+
+    if (databases.length === 0 || !this.editor) {
+      return;
+    }
+
+    // Register completion provider using the service
     this.completionProviderDisposable =
-      monaco.languages.registerCompletionItemProvider('sql', {
-        triggerCharacters: ['.', ' '],
-        provideCompletionItems: (model: any, position: any) => {
-          const textUntilPosition = model.getValueInRange({
-            startLineNumber: 1,
-            startColumn: 1,
-            endLineNumber: position.lineNumber,
-            endColumn: position.column,
-          });
+      this.monacoIntelliSenseService.registerSQLCompletions(
+        databases,
+        this.editor
+      );
 
-          const word = model.getWordUntilPosition(position);
-          const range = {
-            startLineNumber: position.lineNumber,
-            endLineNumber: position.lineNumber,
-            startColumn: word.startColumn,
-            endColumn: word.endColumn,
-          };
+    // Register hover provider using the service
+    this.hoverProviderDisposable =
+      this.monacoIntelliSenseService.registerHoverProvider(databases);
+  }
 
-          const suggestions: any[] = [];
+  /**
+   * Transform schemaData from config-prompt format to MonacoIntelliSenseService format
+   *
+   * Input format (staticSchemaData from config-prompt):
+   * [{ schema_name: string, tables: [{ table_name, table_alias, columns: [{ name, type }] }] }]
+   *
+   * Output format (DatabaseSchema for MonacoIntelliSenseService):
+   * [{ name: string, schemas: [{ name, tables: [{ name, columns: [{ name, type, nullable, isPrimaryKey, isForeignKey }] }] }] }]
+   */
+  private transformSchemaData(): any[] {
+    if (!this.schemaData || this.schemaData.length === 0) {
+      return [];
+    }
 
-          // Check if user is typing after a dot (for table.column suggestions)
-          const lastDotIndex = textUntilPosition.lastIndexOf('.');
-          if (lastDotIndex > 0) {
-            const beforeDot = textUntilPosition.substring(0, lastDotIndex);
-            const words = beforeDot.trim().split(/\s+/);
-            const tableName = words[words.length - 1];
+    // Group all schemas under a single database structure
+    const schemas = this.schemaData.map((schema: any) => ({
+      name: schema.schema_name,
+      tables: (schema.tables || []).map((table: any) => ({
+        name: table.table_name,
+        columns: (table.columns || []).map((col: any) => ({
+          name: col.name,
+          type: col.type || 'unknown',
+          nullable: col.nullable ?? true,
+          isPrimaryKey: col.isPrimaryKey ?? false,
+          isForeignKey: col.isForeignKey ?? false,
+          foreignKeyTable: col.foreignKeyTable,
+          foreignKeyColumn: col.foreignKeyColumn,
+        })),
+      })),
+    }));
 
-            // Find columns for this table
-            this.schemaData.forEach((schema: any) => {
-              const table = schema.tables?.find(
-                (t: any) =>
-                  t.table_name?.toLowerCase() === tableName.toLowerCase() ||
-                  t.table_alias?.toLowerCase() === tableName.toLowerCase()
-              );
-
-              if (table && table.columns) {
-                table.columns.forEach((column: any) => {
-                  suggestions.push({
-                    label: column.name,
-                    kind: monaco.languages.CompletionItemKind.Field,
-                    detail: column.type,
-                    insertText: column.name,
-                    range: range,
-                    documentation: `Column: ${column.name} (${column.type})`,
-                  });
-                });
-              }
-            });
-          } else {
-            // Schema suggestions
-            this.schemaData.forEach((schema: any) => {
-              suggestions.push({
-                label: schema.schema_name,
-                kind: monaco.languages.CompletionItemKind.Module,
-                detail: 'Schema',
-                insertText: schema.schema_name,
-                range: range,
-                documentation: `Schema: ${schema.schema_name}`,
-              });
-
-              // Table suggestions
-              if (schema.tables) {
-                schema.tables.forEach((table: any) => {
-                  suggestions.push({
-                    label: table.table_name,
-                    kind: monaco.languages.CompletionItemKind.Class,
-                    detail: `Table in ${schema.schema_name}`,
-                    insertText: table.table_name,
-                    range: range,
-                    documentation: `${schema.schema_name}.${table.table_name}`,
-                  });
-
-                  // Add schema.table format suggestion
-                  suggestions.push({
-                    label: `${schema.schema_name}.${table.table_name}`,
-                    kind: monaco.languages.CompletionItemKind.Class,
-                    detail: 'Qualified table name',
-                    insertText: `${schema.schema_name}.${table.table_name}`,
-                    range: range,
-                    documentation: `Fully qualified: ${schema.schema_name}.${table.table_name}`,
-                  });
-                });
-              }
-            });
-
-            // Add SQL keywords
-            const sqlKeywords = [
-              'SELECT',
-              'FROM',
-              'WHERE',
-              'JOIN',
-              'LEFT JOIN',
-              'RIGHT JOIN',
-              'INNER JOIN',
-              'OUTER JOIN',
-              'ON',
-              'AND',
-              'OR',
-              'NOT',
-              'IN',
-              'BETWEEN',
-              'LIKE',
-              'IS NULL',
-              'IS NOT NULL',
-              'ORDER BY',
-              'GROUP BY',
-              'HAVING',
-              'LIMIT',
-              'OFFSET',
-              'DISTINCT',
-              'COUNT',
-              'SUM',
-              'AVG',
-              'MIN',
-              'MAX',
-              'AS',
-              'INSERT',
-              'UPDATE',
-              'DELETE',
-              'CREATE',
-              'ALTER',
-              'DROP',
-              'TRUNCATE',
-              'UNION',
-              'EXCEPT',
-              'INTERSECT',
-            ];
-
-            sqlKeywords.forEach(keyword => {
-              suggestions.push({
-                label: keyword,
-                kind: monaco.languages.CompletionItemKind.Keyword,
-                detail: 'SQL Keyword',
-                insertText: keyword,
-                range: range,
-              });
-            });
-          }
-
-          return { suggestions };
-        },
-      });
+    // Return as a database structure expected by the service
+    return [
+      {
+        name: 'database',
+        schemas: schemas,
+      },
+    ];
   }
 
   onCancel(): void {

@@ -20,12 +20,21 @@
         <form [formGroup]="promptForm" class="admin-form" #formContainer>
             <div class="form-container">
                 <div class="form-grid left-column">
-                    <div class="form-row">
+                    <div class="form-row full-width">
                         <div class="form-field half-width">
                             <label for="name">Name</label>
                             <span class="p-input-icon-left">
                                 <i class="pi pi-tag"></i>
                                 <input id="name" type="text" pInputText [value]="promptForm.get('name')?.value"
+                                    disabled>
+                            </span>
+                        </div>
+
+                        <div class="form-field half-width">
+                            <label for="name">Type</label>
+                            <span class="p-input-icon-left">
+                                <i class="pi pi-tag"></i>
+                                <input id="name" type="text" pInputText [value]="promptForm.get('type')?.value"
                                     disabled>
                             </span>
                         </div>
@@ -120,7 +129,7 @@
                             <label for="promptJoin">
                                 Prompt Join Condition<span class="required">*</span>
                                 <i class="pi pi-info-circle info-icon"
-                                    pTooltip="Define how tables are related. Type alias followed by '.' for suggestions"
+                                    pTooltip="Type alias followed by '.' for column suggestions."
                                     tooltipPosition="right"></i>
                             </label>
                             <div class="autocomplete-container">
@@ -169,6 +178,10 @@
                             <small class="error-message"
                                 *ngIf="promptForm.get('promptJoin')?.invalid && promptForm.get('promptJoin')?.touched">
                                 Join condition is required
+                            </small>
+                            <small class="hint-text">
+                                <i class="pi pi-lightbulb"></i>
+                                Use <code>1=1</code> if no specific join condition is required.
                             </small>
                         </div>
                     </div>
@@ -226,6 +239,14 @@
                                 *ngIf="promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched">
                                 Where condition is required
                             </small>
+                            <small class="hint-text" *ngIf="promptForm.get('tables')?.value?.length > 0">
+                                <i class="pi pi-lightbulb"></i>
+                                Use <code>{{'{'}}value{{'}'}}</code> as placeholder for user input.
+                                <span *ngIf="selectedPromptType === 'dropdown'">Example:
+                                    <code>alias.column = '{{'{'}}value{{'}'}}'</code></span>
+                                <span *ngIf="selectedPromptType === 'multiselect'">Example:
+                                    <code>alias.column in ('{{'{'}}value{{'}'}}')</code></span>
+                            </small>
                         </div>
                     </div>
 
@@ -265,19 +286,20 @@
                                         tooltipPosition="right"></i>
                                 </label>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
-                                    <button type="button" pButton class="p-button-text p-button-rounded p-button-plain"
-                                        icon="pi pi-database" pTooltip="Load values from SQL query"
-                                        tooltipPosition="left" (click)="openSqlDialog()">
+                                    <button type="button" pButton
+                                        class="p-button-text p-button-rounded p-button-warning" icon="pi pi-bolt"
+                                        pTooltip="Load values from SQL query" tooltipPosition="left"
+                                        (click)="openSqlDialog()">
                                     </button>
                                     <label class="upload-label" style="cursor: pointer; margin-bottom: 0;">
-                                        <i class="pi pi-upload p-button-text p-button-rounded p-button-plain"
+                                        <i class="pi pi-upload p-button-text p-button-rounded p-button-info"
                                             pTooltip="Upload values from file (CSV/TXT). Values can be separated by comma, newline, or pipe"
                                             tooltipPosition="left"></i>
                                         <input type="file" accept=".csv,.txt" style="display: none;"
                                             (change)="onPromptFileUpload($event)">
                                     </label>
                                     <button type="button" pButton
-                                        class="p-button-text p-button-rounded p-button-plain clear-all-button"
+                                        class="p-button-text p-button-rounded p-button-danger clear-all-button"
                                         icon="pi pi-trash" pTooltip="Clear all values" tooltipPosition="left"
                                         (click)="clearPromptValues()"
                                         [disabled]="!promptForm.get('promptValues')?.value?.length">

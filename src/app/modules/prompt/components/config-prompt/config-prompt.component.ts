@@ -1,4 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -7,7 +13,8 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { first } from 'rxjs/operators';
+import { first, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -19,13 +26,17 @@ import {
   selectIsSchemaStale,
 } from '../../store';
 import { SqlQueryDialogComponent } from '../sql-query-dialog/sql-query-dialog.component';
+import { PROMPT_TYPES } from '../../constants/prompt.constant';
 
 @Component({
   selector: 'app-config-prompt',
   templateUrl: './config-prompt.component.html',
   styleUrls: ['./config-prompt.component.scss'],
 })
-export class ConfigPromptComponent implements OnInit {
+export class ConfigPromptComponent implements OnInit, OnDestroy {
+  // Subscription cleanup
+  private destroy$ = new Subject<void>();
+
   promptForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -93,11 +104,18 @@ export class ConfigPromptComponent implements OnInit {
       this.loadPromptData();
     }
 
-    this.promptForm.valueChanges.subscribe(() => {
-      if (this.isCancelClicked) {
-        this.isCancelClicked = false;
-      }
-    });
+    this.promptForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get isFormDirty(): boolean {
@@ -118,51 +136,79 @@ export class ConfigPromptComponent implements OnInit {
       promptJoin: [''],
       promptWhere: ['', Validators.required],
       promptValues: [[]], // Initially no validation
+      type: [''],
     });
 
-    this.promptForm.get('schema')?.valueChanges.subscribe(schema => {
-      if (schema) {
-        this.promptForm.get('tables')?.setValue([]);
-        this.loadTablesForSchema(schema.name);
-      }
-    });
+    this.promptForm
+      .get('schema')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe(schema => {
+        if (schema) {
+          // Cascading reset: clear all dependent fields when schema changes
+          this.promptForm.patchValue(
+            {
+              tables: [],
+              columns: [],
+              promptJoin: '',
+              promptWhere: '',
+            },
+            { emitEvent: false }
+          );
 
-    this.promptForm.get('promptType')?.valueChanges.subscribe(type => {
-      const promptValuesControl = this.promptForm.get('promptValues');
-      if (['dropdown', 'multiselect', 'checkbox'].includes(type)) {
-        promptValuesControl?.setValidators([Validators.required]);
-      } else {
-        promptValuesControl?.clearValidators();
-      }
-      promptValuesControl?.updateValueAndValidity();
-    });
+          // Reset available columns and table columns
+          this.availableColumns = [];
+          this.tableColumns = {};
 
-    this.promptForm.get('tables')?.valueChanges.subscribe(tables => {
-      // Clear where condition when tables change
-      this.promptForm.get('promptWhere')?.setValue('');
+          // Load tables for the new schema
+          this.loadTablesForSchema(schema.name);
+        }
+      });
 
-      // Reset suggestions
-      this.showSuggestions = false;
-      this.filteredColumns = [];
+    // Fix #5: Changed from 'promptType' to 'type' (correct form control name)
+    // Fix #8: Also sync selectedPromptType when type changes
+    this.promptForm
+      .get('type')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe(type => {
+        this.selectedPromptType = type;
+        const promptValuesControl = this.promptForm.get('promptValues');
+        if (['dropdown', 'multiselect', 'checkbox'].includes(type)) {
+          promptValuesControl?.setValidators([Validators.required]);
+        } else {
+          promptValuesControl?.clearValidators();
+        }
+        promptValuesControl?.updateValueAndValidity();
+      });
 
-      // Update table columns mapping for selected tables
-      this.updateTableColumns(tables);
+    this.promptForm
+      .get('tables')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe(tables => {
+        // Clear where condition when tables change
+        this.promptForm.get('promptWhere')?.setValue('');
 
-      // Update available columns for the multiselect
-      this.updateAvailableColumns(tables);
+        // Reset suggestions
+        this.showSuggestions = false;
+        this.filteredColumns = [];
 
-      // Handle selected columns when tables change
-      this.handleColumnsOnTableChange(tables);
+        // Update table columns mapping for selected tables
+        this.updateTableColumns(tables);
 
-      // Update join validation
-      const promptJoinControl = this.promptForm.get('promptJoin');
-      if (tables?.length > 1) {
-        promptJoinControl?.setValidators([Validators.required]);
-      } else {
-        promptJoinControl?.clearValidators();
-      }
-      promptJoinControl?.updateValueAndValidity();
-    });
+        // Update available columns for the multiselect
+        this.updateAvailableColumns(tables);
+
+        // Handle selected columns when tables change
+        this.handleColumnsOnTableChange(tables);
+
+        // Update join validation
+        const promptJoinControl = this.promptForm.get('promptJoin');
+        if (tables?.length > 1) {
+          promptJoinControl?.setValidators([Validators.required]);
+        } else {
+          promptJoinControl?.clearValidators();
+        }
+        promptJoinControl?.updateValueAndValidity();
+      });
 
     // Add validator for promptValues based on promptType
     if (this.showAddPromptValues) {
@@ -208,6 +254,8 @@ export class ConfigPromptComponent implements OnInit {
           database: this.sectionData.databaseId,
           tab: this.sectionData.section.tab.id,
           section: this.sectionData.section.id,
+          type: PROMPT_TYPES.find(type => type.value === this.sectionData.type)
+            ?.label,
         });
 
         // Set display names
@@ -361,49 +409,94 @@ export class ConfigPromptComponent implements OnInit {
   loadConfigData() {
     this.promptService.getConfig(this.orgId, this.promptId).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        const config = response.data.configuration[0];
-        const values = response.data.values;
+        // Fix #1: Add null check for configuration
+        const config = response.data.configuration?.[0];
+        if (!config) {
+          console.warn('No configuration found for this prompt');
+          return;
+        }
+
+        const values = response.data.values || [];
         this.configData = config;
 
         // First set the schema
         const schemaControl = this.promptForm.get('schema');
         schemaControl?.patchValue({ name: config.prompt_schema });
 
-        // Parse and set table
-        const tableMatch = config.prompt_table.match(/(.+?)\((.+?)\)/);
-        if (tableMatch) {
-          const tableName = tableMatch[1];
-          const alias = tableMatch[2];
+        // Parse and set tables - handles multiple tables like "departments(dep_d22),employee_projects(emp_178)"
+        const tableStrings = config.prompt_table.split(',');
+        const parsedTables: { tableName: string; alias: string }[] = [];
 
-          // Set tables after schema is set
-          setTimeout(() => {
-            this.promptForm.patchValue({
-              tables: [
-                {
-                  tableName: tableName,
-                  alias: alias,
-                },
-              ],
+        tableStrings.forEach((tableStr: string) => {
+          const tableMatch = tableStr.trim().match(/(.+?)\((.+?)\)/);
+          if (tableMatch) {
+            parsedTables.push({
+              tableName: tableMatch[1],
+              alias: tableMatch[2],
             });
+          }
+        });
 
-            // Finally set the remaining config
-            this.promptForm.patchValue({
+        if (parsedTables.length > 0) {
+          // Fix #9: Use synchronous reactive approach instead of timeout
+          // Ensure schema data is loaded before proceeding
+          if (!this.staticSchemaData || this.staticSchemaData.length === 0) {
+            console.error(
+              'Schema data not loaded. Cannot populate table columns.'
+            );
+            return;
+          }
+
+          // Manually populate tableColumns and availableColumns before patching form
+          this.updateTableColumns(parsedTables);
+          this.updateAvailableColumns(parsedTables);
+
+          // Now patch all form values synchronously
+          this.promptForm.patchValue(
+            {
+              tables: parsedTables,
               promptJoin: config.prompt_join,
               promptWhere: config.prompt_where,
               promptValues: values.map((v: any) => v.value),
-            });
+            },
+            { emitEvent: false } // Prevent triggering valueChanges that would clear data
+          );
 
-            // Set selected columns if available
-            if (config.prompt_columns) {
-              const columnArray = config.prompt_columns
-                .split(',')
-                .map((col: string) => {
-                  const [alias, columnName] = col.trim().split('.');
-                  return { alias, columnName, fullName: col.trim() };
-                });
-              this.promptForm.patchValue({ columns: columnArray });
+          // Set selected columns now that availableColumns is populated
+          if (config.prompt_column) {
+            const columnStrings = config.prompt_column
+              .split(',')
+              .map((c: string) => c.trim());
+            const matchedColumns = this.availableColumns.filter((col: any) =>
+              columnStrings.includes(col.fullName)
+            );
+
+            // If we found matches, use them; otherwise create column objects
+            if (matchedColumns.length > 0) {
+              this.promptForm.patchValue(
+                { columns: matchedColumns },
+                { emitEvent: false }
+              );
+            } else {
+              // Fallback: create column objects manually
+              const columnArray = columnStrings.map((col: string) => {
+                const [alias, columnName] = col.split('.');
+                return {
+                  alias,
+                  columnName,
+                  fullName: col,
+                  displayName: `${alias}.${columnName}`,
+                };
+              });
+              this.promptForm.patchValue(
+                { columns: columnArray },
+                { emitEvent: false }
+              );
             }
-          });
+          }
+
+          // Mark form as pristine since we just loaded saved data
+          this.promptForm.markAsPristine();
         }
       }
     });
@@ -431,6 +524,7 @@ export class ConfigPromptComponent implements OnInit {
         columns: transformedColumns,
         schema: formValues.schema.name,
         promptWhere: formattedWhere,
+        promptSql: this.generateSqlPreview(),
       };
 
       this.promptService.configPrompt(submitData).then(response => {
@@ -442,48 +536,18 @@ export class ConfigPromptComponent implements OnInit {
   }
 
   /**
-   * Format WHERE condition by auto-appending value placeholder if needed
-   * User types: o.status = → Stored as: o.status = '{value}'
-   * User types: o.status in → Stored as: o.status in ('{value}')
+   * Format WHERE condition - returns as-is
+   * User manually types the complete condition including {value} placeholder
+   * Example: o.status = '{value}' or o.status in ('{value}')
    */
   formatWhereCondition(condition: string): string {
     if (!condition) return condition;
-
-    const trimmed = condition.trim();
-
-    // Check if already has {value} placeholder
-    if (trimmed.includes('{value}')) {
-      return trimmed;
-    }
-
-    // Detect operator and append appropriate placeholder
-    if (trimmed.endsWith('=')) {
-      return `${trimmed} '{value}'`;
-    } else if (trimmed.toLowerCase().endsWith(' in')) {
-      return `${trimmed} ('{value}')`;
-    } else if (trimmed.toLowerCase().endsWith(' like')) {
-      return `${trimmed} '%{value}%'`;
-    } else if (
-      trimmed.endsWith('>') ||
-      trimmed.endsWith('<') ||
-      trimmed.endsWith('>=') ||
-      trimmed.endsWith('<=')
-    ) {
-      return `${trimmed} '{value}'`;
-    }
-
-    // If no operator detected, append based on prompt type
-    if (this.selectedPromptType === 'dropdown') {
-      return `${trimmed} = '{value}'`;
-    } else if (this.selectedPromptType === 'multiselect') {
-      return `${trimmed} in ('{value}')`;
-    }
-
-    return trimmed;
+    return condition.trim();
   }
 
   onCancel(): void {
     if (this.isFormDirty) {
+      // Fix #6: Reset schema to null instead of empty string
       this.promptForm.patchValue({
         id: this.sectionData.id,
         name: this.sectionData.name,
@@ -491,12 +555,12 @@ export class ConfigPromptComponent implements OnInit {
         database: this.sectionData.databaseId,
         tab: this.sectionData.section.tab.id,
         section: this.sectionData.section.id,
-        schema: '',
+        schema: null,
         tables: [],
         columns: [],
         promptJoin: '',
         promptWhere: '',
-        promptValues: [], // Reset to empty array
+        promptValues: [],
       });
 
       this.selectedOrgName = this.sectionData.organisationName || '';
@@ -932,9 +996,21 @@ export class ConfigPromptComponent implements OnInit {
 
     // Get current schema
     const currentSchema = this.promptForm.get('schema')?.value?.name;
+    if (!currentSchema) {
+      console.warn('updateTableColumns: No schema selected');
+      return;
+    }
+
     const schemaData = this.staticSchemaData.find(
       schema => schema.schema_name === currentSchema
     );
+
+    if (!schemaData) {
+      console.warn(
+        `updateTableColumns: Schema '${currentSchema}' not found in staticSchemaData`
+      );
+      return;
+    }
 
     if (schemaData) {
       selectedTables.forEach((selectedTable: any) => {
@@ -942,8 +1018,13 @@ export class ConfigPromptComponent implements OnInit {
           (t: any) => t.table_name === selectedTable.tableName
         );
         if (table) {
-          // Store columns for the selected table's alias
+          // Fix #10: Store columns for the selected table's custom alias
+          // This ensures autocomplete works with user-defined aliases from saved configs
           this.tableColumns[selectedTable.alias] = table.columns;
+        } else {
+          console.warn(
+            `updateTableColumns: Table '${selectedTable.tableName}' not found in schema '${currentSchema}'`
+          );
         }
       });
     }
@@ -961,9 +1042,21 @@ export class ConfigPromptComponent implements OnInit {
 
     // Get current schema
     const currentSchema = this.promptForm.get('schema')?.value?.name;
+    if (!currentSchema) {
+      console.warn('updateAvailableColumns: No schema selected');
+      return;
+    }
+
     const schemaData = this.staticSchemaData.find(
       schema => schema.schema_name === currentSchema
     );
+
+    if (!schemaData) {
+      console.warn(
+        `updateAvailableColumns: Schema '${currentSchema}' not found in staticSchemaData`
+      );
+      return;
+    }
 
     if (schemaData) {
       selectedTables.forEach((selectedTable: any) => {
@@ -971,7 +1064,7 @@ export class ConfigPromptComponent implements OnInit {
           (t: any) => t.table_name === selectedTable.tableName
         );
         if (table && table.columns) {
-          // Add columns with alias prefix
+          // Add columns with custom alias prefix for proper column selection
           table.columns.forEach((column: any) => {
             this.availableColumns.push({
               alias: selectedTable.alias,
@@ -981,6 +1074,10 @@ export class ConfigPromptComponent implements OnInit {
               displayName: `${selectedTable.alias}.${column.name}`,
             });
           });
+        } else if (!table) {
+          console.warn(
+            `updateAvailableColumns: Table '${selectedTable.tableName}' not found in schema '${currentSchema}'`
+          );
         }
       });
     }
@@ -1163,38 +1260,12 @@ export class ConfigPromptComponent implements OnInit {
   }
 
   /**
-   * Format WHERE condition for live preview - auto-appends {value} placeholder as user types
+   * Format WHERE condition for live preview - returns as-is
+   * User types the complete condition including {value} placeholder
    */
   formatWhereConditionForPreview(condition: string): string {
     if (!condition) return condition;
-
-    const trimmed = condition.trim();
-
-    // Check if already has {value} placeholder - if yes, return as-is
-    if (trimmed.includes('{value}')) {
-      return trimmed;
-    }
-
-    // Detect operator and append appropriate placeholder for preview
-    if (trimmed.endsWith('=')) {
-      return `${trimmed} '{value}'`;
-    } else if (trimmed.toLowerCase().endsWith(' in')) {
-      return `${trimmed} ('{value}')`;
-    } else if (trimmed.toLowerCase().endsWith(' like')) {
-      return `${trimmed} '%{value}%'`;
-    } else if (
-      trimmed.endsWith('>') ||
-      trimmed.endsWith('<') ||
-      trimmed.endsWith('>=') ||
-      trimmed.endsWith('<=') ||
-      trimmed.endsWith('!=') ||
-      trimmed.endsWith('<>')
-    ) {
-      return `${trimmed} '{value}'`;
-    }
-
-    // Return as-is if no operator detected yet
-    return trimmed;
+    return condition.trim();
   }
 
   /**

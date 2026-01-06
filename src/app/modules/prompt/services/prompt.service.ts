@@ -90,9 +90,11 @@ export class PromptService {
       organisation,
       schema,
       tables,
+      columns,
       promptJoin,
       promptWhere,
       promptValues,
+      promptSql,
     } = promptConfigData;
     return this.http
       .post(PROMPT.CONFIG, {
@@ -100,9 +102,11 @@ export class PromptService {
         organisation,
         schema,
         tables,
+        columns,
         promptJoin,
         promptWhere,
         promptValues,
+        promptSql,
       })
       .toPromise()
       .then(response => {
