@@ -1,74 +1,62 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SCREEN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { ScreenService } from '../../services/screen.service';
 
-interface TabData {
-  id: string | number;
-  name: string;
-  description: string;
-  sections: Section[];
-  sequence?: number;
-  [key: string]: any;
-}
+// Import models (using direct path to avoid barrel export issues)
+import {
+  ConfigPrompt,
+  GROUP_COLORS,
+  Prompt,
+  Section,
+  TabData,
+} from './models/configure-screen.models';
 
-interface Section {
-  id: string | number;
-  name: string;
-  prompts: Prompt[];
-  selectAll?: boolean;
-  expanded?: boolean;
-  sequence: number;
-  currentGroupId?: number;
-  selectedGroupId?: number | null;
-  [key: string]: any;
-}
+// Import drag-drop helpers
+import {
+  reorderTabs,
+  reorderSections,
+  reorderPrompts,
+} from './helpers/drag-drop.helper';
 
-interface Prompt {
-  id: string | number;
-  name: string;
-  type: string;
-  selected?: boolean;
-  sequence?: number;
-  groupId?: number;
-  colorIndex?: number;
-  isMandatory?: boolean;
-  [key: string]: any;
-}
+// Import group helpers
+import {
+  canGroupPrompts as canGroupPromptsHelper,
+  isPromptSelected as isPromptSelectedHelper,
+  isGroupActiveInSection as isGroupActiveInSectionHelper,
+  hasSectionGroups as hasSectionGroupsHelper,
+  hasAnyGroups as hasAnyGroupsHelper,
+  validateAndCleanupGroup as validateAndCleanupGroupHelper,
+  clearAllGroupsFromTabs,
+  clearSectionGroups as clearSectionGroupsHelper,
+  getNextAvailableColorIndex as getNextAvailableColorIndexHelper,
+  getColorIndexForGroup as getColorIndexForGroupHelper,
+  isColorInUse as isColorInUseHelper,
+  toggleMandatoryInGroup,
+  findSectionContainingPrompt as findSectionContainingPromptHelper,
+  groupPrompts as groupPromptsHelper,
+  addPromptToGroup as addPromptToGroupHelper,
+  assignColorToGroup as assignColorToGroupHelper,
+} from './helpers/group.helper';
 
-interface GroupData {
-  [key: number]: number;
-}
-
-interface ConfigPrompt {
-  id: string | number;
-  sequence: number;
-  isGrouped: boolean;
-  groupId: number;
-  color: string | null;
-  isMandatory?: boolean;
-}
-
-interface SectionGroupColor {
-  groupId: number;
-  colorIndex: number;
-  sectionId: number | string;
-}
-
-interface SectionGroupData {
-  sectionId: number | string;
-  groupId: number;
-  color: string;
-}
+// Import style helpers
+import {
+  getPromptMandatoryStyle as getPromptMandatoryStyleHelper,
+  getGroupBulletStyle as getGroupBulletStyleHelper,
+  getPromptGroupStyle as getPromptGroupStyleHelper,
+  getPromptGroupDotStyle as getPromptGroupDotStyleHelper,
+  getSectionGroupColor as getSectionGroupColorHelper,
+  getGroupedPromptsCount as getGroupedPromptsCountHelper,
+} from './helpers/style.helper';
 
 @Component({
   selector: 'app-configure-screen',
   templateUrl: './configure-screen.component.html',
   styleUrls: ['./configure-screen.component.scss'],
 })
-export class ConfigureScreenComponent implements OnInit {
+export class ConfigureScreenComponent implements OnInit, OnDestroy {
   orgId: string = '';
   screenId: string = '';
   databaseId: string = '';
@@ -92,24 +80,7 @@ export class ConfigureScreenComponent implements OnInit {
   draggedPromptTabId: string | number | null = null;
   draggedPromptSectionId: string | number | null = null;
   currentGroupId: number = 0;
-  groupColors: string[] = [
-    '#8BB9DD', // Soft blue
-    '#98D4BB', // Mint green
-    '#F2B6B6', // Soft pink
-    '#B6CCF2', // Light periwinkle
-    '#E2C799', // Warm sand
-    '#C3B1E1', // Soft purple
-    '#9DDBAD', // Sage green
-    '#F2D4C2', // Peach
-    '#FFB6C1', // Light pink
-    '#87CEEB', // Sky blue
-    '#DDA0DD', // Plum
-    '#F0E68C', // Khaki
-    '#B0E0E6', // Powder blue
-    '#FFDAB9', // Peach puff
-    '#C9E4CA', // Pale green
-    '#E6E6FA', // Lavender
-  ];
+  groupColors: string[] = GROUP_COLORS; // Use constant from models
   selectedGroupId: number | null = null;
   activeGroupId: number | null = null;
   activeGroupSectionId: string | number | null = null;
@@ -131,6 +102,34 @@ export class ConfigureScreenComponent implements OnInit {
     this.databaseId = this.route.snapshot.params['dbId'];
     this.initializeSections();
     this.getTabsData();
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup - reset any active drag states
+    this.resetAllDragStates();
+  }
+
+  // Fix #3: Reset drag states on Escape key
+  @HostListener('document:keydown.escape')
+  onEscapeKeydown(): void {
+    this.resetAllDragStates();
+  }
+
+  // Fix #3: Reset drag states on window blur
+  @HostListener('window:blur')
+  onWindowBlur(): void {
+    this.resetAllDragStates();
+  }
+
+  // Helper method to reset all drag states
+  private resetAllDragStates(): void {
+    this.draggedTabIndex = null;
+    this.dragOverIndex = null;
+    this.draggedSectionIndex = null;
+    this.draggedTabId = null;
+    this.draggedPromptIndex = null;
+    this.draggedPromptTabId = null;
+    this.draggedPromptSectionId = null;
   }
 
   initializeSections() {
@@ -726,7 +725,8 @@ export class ConfigureScreenComponent implements OnInit {
     );
   }
 
-  closeDialig() {
+  // Fix #9: Fixed typo (was closeDialig)
+  closeDialog() {
     this.showDeleteConfirm = false;
     this.showClearConfirm = false;
   }
@@ -934,41 +934,15 @@ export class ConfigureScreenComponent implements OnInit {
       this.draggedTabIndex === dropIndex
     )
       return;
-
-    // Create a new array to trigger change detection
-    const updatedTabs = [...this.openTabs];
-    const draggedTab = updatedTabs[this.draggedTabIndex];
-
-    // Remove tab from original position
-    updatedTabs.splice(this.draggedTabIndex, 1);
-    // Insert at new position
-    updatedTabs.splice(dropIndex, 0, draggedTab);
-
-    // Update the dragged index
-    this.draggedTabIndex = dropIndex;
-
-    // Update the tabs array
-    this.openTabs = updatedTabs;
-
-    // Update sequences
-    this.openTabs.forEach((tab, idx) => {
-      tab.sequence = idx + 1;
-    });
-
-    // Update active tab index
-    if (this.activeTabIndex === this.draggedTabIndex) {
-      this.activeTabIndex = dropIndex;
-    } else if (
-      this.activeTabIndex > this.draggedTabIndex &&
-      this.activeTabIndex <= dropIndex
-    ) {
-      this.activeTabIndex--;
-    } else if (
-      this.activeTabIndex < this.draggedTabIndex &&
-      this.activeTabIndex >= dropIndex
-    ) {
-      this.activeTabIndex++;
-    }
+    const result = reorderTabs(
+      this.openTabs,
+      this.draggedTabIndex,
+      dropIndex,
+      this.activeTabIndex
+    );
+    this.openTabs = result.tabs;
+    this.draggedTabIndex = result.newDragIndex;
+    this.activeTabIndex = result.newActiveIndex;
   }
 
   onTabDragLeave(index: number) {
@@ -1017,25 +991,13 @@ export class ConfigureScreenComponent implements OnInit {
     const tab = this.openTabs.find(t => t.id === tabId);
     if (!tab) return;
 
-    // Create a new array to trigger change detection
-    const updatedSections = [...tab.sections];
-    const draggedSection = updatedSections[this.draggedSectionIndex];
-
-    // Remove section from original position
-    updatedSections.splice(this.draggedSectionIndex, 1);
-    // Insert at new position
-    updatedSections.splice(dropIndex, 0, draggedSection);
-
-    // Update the dragged index to match new position
-    this.draggedSectionIndex = dropIndex;
-
-    // Update the sections array
-    tab.sections = updatedSections;
-
-    // Update section sequences
-    tab.sections.forEach((section, idx) => {
-      section.sequence = idx + 1;
-    });
+    const result = reorderSections(
+      tab.sections,
+      this.draggedSectionIndex,
+      dropIndex
+    );
+    tab.sections = result.sections;
+    this.draggedSectionIndex = result.newDragIndex;
   }
 
   onSectionDragLeave(sectionIndex: number) {
@@ -1085,7 +1047,7 @@ export class ConfigureScreenComponent implements OnInit {
       this.draggedPromptIndex === null ||
       this.draggedPromptTabId === null ||
       this.draggedPromptSectionId === null ||
-      this.draggedPromptSectionId !== sectionId || // Prevent dropping in different sections
+      this.draggedPromptSectionId !== sectionId ||
       this.draggedPromptIndex === dropIndex
     )
       return;
@@ -1096,25 +1058,11 @@ export class ConfigureScreenComponent implements OnInit {
     const section = tab.sections.find(s => s.id === sectionId);
     if (!section) return;
 
-    // Same section reordering
-    const updatedPrompts = [...section.prompts];
-    const draggedPrompt = updatedPrompts[this.draggedPromptIndex];
-
-    // Remove prompt from original position
-    updatedPrompts.splice(this.draggedPromptIndex, 1);
-    // Insert at new position
-    updatedPrompts.splice(dropIndex, 0, draggedPrompt);
-
-    // Update the dragged index
-    this.draggedPromptIndex = dropIndex;
-
-    // Update the prompts array
-    section.prompts = updatedPrompts;
-
-    // Update prompt sequences
-    section.prompts.forEach((prompt, idx) => {
-      prompt.sequence = idx + 1;
-    });
+    this.draggedPromptIndex = reorderPrompts(
+      section,
+      this.draggedPromptIndex,
+      dropIndex
+    );
   }
 
   onPromptDragLeave(promptIndex: number) {
@@ -1143,13 +1091,11 @@ export class ConfigureScreenComponent implements OnInit {
   }
 
   isGroupActiveInSection(section: Section, groupId: number): boolean {
-    return section.prompts.some(p => p.groupId === groupId);
+    return isGroupActiveInSectionHelper(section, groupId);
   }
 
   hasSectionGroups(section: Section): boolean {
-    return section.prompts.some(
-      p => p.groupId !== undefined && p.groupId !== null
-    );
+    return hasSectionGroupsHelper(section);
   }
 
   handlePromptSelection(event: MouseEvent, prompt: Prompt, section: Section) {
@@ -1191,12 +1137,23 @@ export class ConfigureScreenComponent implements OnInit {
           const oldGroupId = prompt.groupId;
 
           // Find the color index used by the active group in this section
-          const activeGroupColorIndex = section.prompts.find(
+          const activeGroupPrompt = section.prompts.find(
             p => p.groupId === this.activeGroupId && p.colorIndex !== undefined
-          )?.colorIndex;
+          );
+          const activeGroupColorIndex = activeGroupPrompt?.colorIndex;
+
+          // Check if the active group has mandatory prompts
+          const isActiveGroupMandatory = section.prompts.some(
+            p => p.groupId === this.activeGroupId && p.isMandatory
+          );
 
           prompt.groupId = this.activeGroupId;
           prompt.colorIndex = activeGroupColorIndex;
+
+          // Inherit mandatory status from the group
+          if (isActiveGroupMandatory) {
+            prompt.isMandatory = true;
+          }
 
           // If prompt was removed from another group, check if that group still has enough prompts
           if (oldGroupId !== undefined && oldGroupId !== null) {
@@ -1208,24 +1165,14 @@ export class ConfigureScreenComponent implements OnInit {
   }
 
   validateAndCleanupGroup(section: Section, groupId: number) {
-    // Count prompts in the group
-    const promptsInGroup = section.prompts.filter(p => p.groupId === groupId);
-
-    // If less than 2 prompts, remove the group
-    if (promptsInGroup.length < 2) {
-      // Remove group from all prompts in this group
-      section.prompts.forEach(prompt => {
-        if (prompt.groupId === groupId) {
-          prompt.groupId = undefined;
-          prompt.colorIndex = undefined;
-        }
-      });
-
-      // If this was the active group, deactivate it
-      if (this.activeGroupId === groupId) {
-        this.activeGroupId = null;
-    this.activeGroupSectionId = null;
-      }
+    const result = validateAndCleanupGroupHelper(
+      section,
+      groupId,
+      this.activeGroupId
+    );
+    if (result.cleanedGroupId !== null) {
+      this.activeGroupId = null;
+      this.activeGroupSectionId = null;
     }
   }
 
@@ -1233,9 +1180,11 @@ export class ConfigureScreenComponent implements OnInit {
     if (!this.isFreeze) return;
 
     // If clicking the same group in the same section, deactivate
-    if (this.activeGroupId === groupId && this.activeGroupSectionId === section.id) {
+    if (
+      this.activeGroupId === groupId &&
+      this.activeGroupSectionId === section.id
+    ) {
       this.activeGroupId = null;
-    this.activeGroupSectionId = null;
       this.activeGroupSectionId = null;
     } else {
       // Only activate if the group belongs to this section
@@ -1250,187 +1199,66 @@ export class ConfigureScreenComponent implements OnInit {
   }
 
   isPromptSelected(prompt: Prompt, section: Section): boolean {
-    return (
-      this.selectedPrompts[section.id]?.some(p => p.id === prompt.id) || false
-    );
+    return isPromptSelectedHelper(prompt, section, this.selectedPrompts);
   }
 
   canGroupPrompts(section: Section): boolean {
-    return this.selectedPrompts[section.id]?.length >= 2 || false;
+    return canGroupPromptsHelper(this.selectedPrompts, section.id);
   }
 
   groupSelectedPrompts(section: Section) {
     if (!this.canGroupPrompts(section)) return;
-
     const nextColorIndex = this.getNextAvailableColorIndex();
-    if (nextColorIndex === null) {
-      return;
-    }
-
+    if (nextColorIndex === null) return;
     const newGroupId = this.currentGroupId++;
-
-    this.selectedPrompts[section.id].forEach(prompt => {
-      prompt.groupId = newGroupId;
-      prompt.colorIndex = nextColorIndex;
-    });
-
-    // Clear selection after grouping
+    groupPromptsHelper(
+      this.selectedPrompts[section.id],
+      newGroupId,
+      nextColorIndex
+    );
     this.selectedPrompts[section.id] = [];
   }
 
   getPromptMandatoryStyle(prompt: Prompt): any {
-    if (!prompt.isMandatory) {
-      return {};
-    }
-
-    const color = '#ff4444'; // Red color for mandatory
-    return {
-      'border-color': color,
-      'border-width': '2px',
-      'border-style': 'solid',
-      'box-shadow': `0 0 0 1px ${color}33`,
-      'background-color': `${color}10`,
-    };
+    return getPromptMandatoryStyleHelper(prompt);
   }
 
   getGroupBulletStyle(groupId: number, section?: Section): any {
-    // For section-specific dots, find the prompt in this section
-    if (section) {
-      // ONLY use prompts from this specific section and group
-      const sectionPrompts = section.prompts.filter(p => {
-        const matches = p.selected && p.groupId === groupId;
-        return matches;
-      });
-
-      if (sectionPrompts.length > 0) {
-        const prompt = sectionPrompts[0];
-        if (prompt.colorIndex !== undefined) {
-          const color = this.groupColors[prompt.colorIndex];
-          const isActive = this.activeGroupId === groupId && this.activeGroupSectionId === section.id;
-
-          return {
-            'background-color': color,
-            opacity: isActive ? '1' : '0.7',
-            animation: isActive
-              ? 'quickPulse 0.4s ease-in-out infinite'
-              : 'none',
-          };
-        }
-      }
-
-      // If we have a section but couldn't find a color, return empty style
-      return {};
-    }
-
-    // For accordion header dots (when no section is provided)
-    // Find the section in the current tab that contains this group
-    const currentTab = this.openTabs[this.activeTabIndex];
-    if (!currentTab) {
-      return {};
-    }
-
-    // Find the section that contains this group in the current tab
-    const sectionWithGroup = currentTab.sections.find(s =>
-      s.prompts.some(p => p.selected && p.groupId === groupId)
+    return getGroupBulletStyleHelper(
+      groupId,
+      section,
+      this.activeGroupId,
+      this.activeGroupSectionId
     );
-
-    if (sectionWithGroup) {
-      // Recursively call with the found section to get the correct color
-      return this.getGroupBulletStyle(groupId, sectionWithGroup);
-    }
-
-    return {};
   }
 
   getPromptGroupStyle(prompt: Prompt, section: Section): any {
-    if (prompt.groupId === undefined || prompt.groupId === null) {
-      return {};
-    }
-
-    const colorIndex = this.getColorIndexForGroup(prompt.groupId, section);
-    if (colorIndex === null) return {};
-
-    const color = this.groupColors[colorIndex];
-    const isActive = this.activeGroupId === prompt.groupId && 
-                     this.activeGroupSectionId === section.id;
-
-    return {
-      'border-color': color,
-      'border-width': '2px',
-      'border-style': 'solid',
-      'box-shadow': `0 0 0 1px ${color}33`,
-      'background-color': `${color}10`,
-      opacity: isActive ? '1' : '0.7',
-    };
+    return getPromptGroupStyleHelper(
+      prompt,
+      section,
+      this.activeGroupId,
+      this.activeGroupSectionId
+    );
   }
 
   getPromptGroupDotStyle(prompt: Prompt, section: Section): any {
-    if (prompt.groupId === undefined || prompt.groupId === null) {
-      return { display: 'none' };
-    }
-
-    const colorIndex = this.getColorIndexForGroup(prompt.groupId, section);
-    if (colorIndex === null) return { display: 'none' };
-
-    const color = this.groupColors[colorIndex];
-    const isActive = this.activeGroupId === prompt.groupId && 
-                     this.activeGroupSectionId === section.id;
-
-    return {
-      display: 'block',
-      'background-color': color,
-      opacity: isActive ? '1' : '0.7',
-      animation: isActive
-        ? 'groupDotGlow 1.5s ease-in-out infinite'
-        : 'none',
-      'box-shadow': isActive
-        ? `0 0 8px ${color}, 0 0 16px ${color}66, 0 0 24px ${color}33`
-        : 'none',
-    };
-  }
-
-  // Helper method to get section-specific color
-  private getSectionGroupColor(
-    sectionId: string | number,
-    groupId: number
-  ): string | null {
-    // Find the section in the current tab
-    const currentTab = this.openTabs[this.activeTabIndex];
-    if (!currentTab) return null;
-
-    const section = currentTab.sections.find(s => s.id === sectionId);
-    if (!section) return null;
-
-    // Find the prompt in this specific section with this group ID
-    const prompt = section.prompts.find(
-      p => p.selected && p.groupId === groupId
+    return getPromptGroupDotStyleHelper(
+      prompt,
+      section,
+      this.activeGroupId,
+      this.activeGroupSectionId
     );
-    if (!prompt || prompt.colorIndex === undefined) return null;
-
-    return this.groupColors[prompt.colorIndex];
   }
+
+  // getSectionGroupColor removed - using helper directly
 
   getGroupedPromptsCount(section: Section): { [key: number]: number } {
-    const groups: { [key: number]: number } = {};
-    section.prompts.forEach(prompt => {
-      if (prompt.groupId !== undefined && prompt.groupId !== null) {
-        groups[prompt.groupId] = (groups[prompt.groupId] || 0) + 1;
-      }
-    });
-    return groups;
+    return getGroupedPromptsCountHelper(section);
   }
 
   clearAllGroups() {
     if (!this.isFreeze) return;
-
-    this.openTabs.forEach(tab => {
-      tab.sections.forEach(section => {
-        section.prompts.forEach(prompt => {
-          prompt.groupId = undefined;
-          prompt.colorIndex = undefined;
-        });
-      });
-    });
+    clearAllGroupsFromTabs(this.openTabs);
     this.selectedPrompts = {};
     this.activeGroupId = null;
     this.activeGroupSectionId = null;
@@ -1438,135 +1266,37 @@ export class ConfigureScreenComponent implements OnInit {
 
   clearSectionGroups(section: Section) {
     if (!this.isFreeze) return;
-
-    // Clear all groups in this section
-    section.prompts.forEach(prompt => {
-      if (prompt.groupId !== undefined && prompt.groupId !== null) {
-        prompt.groupId = undefined;
-        prompt.colorIndex = undefined;
-      }
-    });
-
+    clearSectionGroupsHelper(section);
     // Reset active group if it was in this section
-    if (this.activeGroupId !== null) {
-      const isGroupInSection = section.prompts.some(
-        p => p.groupId === this.activeGroupId
-      );
-      if (isGroupInSection) {
-        this.activeGroupId = null;
-    this.activeGroupSectionId = null;
-      }
+    if (
+      this.activeGroupId !== null &&
+      !this.isGroupActiveInSection(section, this.activeGroupId)
+    ) {
+      // Group no longer exists in this section after cleanup
     }
   }
 
   hasAnyGroups(): boolean {
-    return this.openTabs.some(tab =>
-      tab.sections.some(section =>
-        section.prompts.some(
-          prompt => prompt.groupId !== undefined && prompt.groupId !== null
-        )
-      )
-    );
+    return hasAnyGroupsHelper(this.openTabs);
   }
 
   getNextAvailableColorIndex(): number | null {
-    // Get all currently used color indices across all groups
-    const currentlyUsedIndices = new Set<number>();
-
-    this.openTabs.forEach(tab => {
-      tab.sections.forEach(section => {
-        section.prompts.forEach(prompt => {
-          if (
-            prompt.colorIndex !== undefined &&
-            prompt.groupId !== undefined &&
-            prompt.groupId !== null
-          ) {
-            currentlyUsedIndices.add(prompt.colorIndex);
-          }
-        });
-      });
-    });
-
-    // Find the first unused color index
-    for (let i = 0; i < this.groupColors.length; i++) {
-      if (!currentlyUsedIndices.has(i)) {
-        return i;
-      }
-    }
-
-    // If all colors are used, find the least used color
-    const colorUsageCount = new Map<number, number>();
-    for (let i = 0; i < this.groupColors.length; i++) {
-      colorUsageCount.set(i, 0);
-    }
-
-    this.openTabs.forEach(tab => {
-      tab.sections.forEach(section => {
-        section.prompts.forEach(prompt => {
-          if (
-            prompt.colorIndex !== undefined &&
-            prompt.groupId !== undefined &&
-            prompt.groupId !== null
-          ) {
-            const count = colorUsageCount.get(prompt.colorIndex) || 0;
-            colorUsageCount.set(prompt.colorIndex, count + 1);
-          }
-        });
-      });
-    });
-
-    // Find the color with minimum usage
-    let minUsage = Infinity;
-    let minUsageIndex = 0;
-    colorUsageCount.forEach((count, index) => {
-      if (count < minUsage) {
-        minUsage = count;
-        minUsageIndex = index;
-      }
-    });
-
-    return minUsageIndex;
+    return getNextAvailableColorIndexHelper(this.openTabs);
   }
 
   getColorIndexForGroup(groupId: number, section?: Section): number | null {
-    // If section is provided, only look for color index within that section
-    if (section) {
-      // First try to find an existing prompt in this section with this group ID
-      const existingPrompt = section.prompts.find(
-        prompt => prompt.groupId === groupId && prompt.colorIndex !== undefined
-      );
-      if (existingPrompt && existingPrompt.colorIndex !== undefined) {
-        return existingPrompt.colorIndex;
-      }
-    }
-
-    // If no section provided or no color found in section, get next available
-    const nextIndex = this.getNextAvailableColorIndex();
-    return nextIndex;
+    return getColorIndexForGroupHelper(groupId, section, this.openTabs);
   }
 
   assignColorToGroup(groupId: number): void {
     const colorIndex = this.getNextAvailableColorIndex();
     if (colorIndex !== null) {
-      // Assign this color index to all prompts in the group
-      this.openTabs.forEach(tab => {
-        tab.sections.forEach(section => {
-          section.prompts.forEach(prompt => {
-            if (prompt.groupId === groupId) {
-              prompt.colorIndex = colorIndex;
-            }
-          });
-        });
-      });
+      assignColorToGroupHelper(this.openTabs, groupId, colorIndex);
     }
   }
 
   isColorInUse(colorIndex: number): boolean {
-    return this.openTabs.some(tab =>
-      tab.sections.some(section =>
-        section.prompts.some(prompt => prompt.colorIndex === colorIndex)
-      )
-    );
+    return isColorInUseHelper(this.openTabs, colorIndex);
   }
 
   toggleMandatory(prompt: Prompt, event: MouseEvent) {
@@ -1596,22 +1326,15 @@ export class ConfigureScreenComponent implements OnInit {
   onPromptRightClick(event: MouseEvent, prompt: Prompt) {
     event.preventDefault(); // Prevent context menu
     event.stopPropagation();
-    
+
     // Only allow right-click toggle if screen is frozen
     if (!this.isFreeze) return;
-    
+
     this.toggleMandatory(prompt, event);
   }
 
   // Helper method to find the section containing a prompt
   private findSectionContainingPrompt(prompt: Prompt): Section | null {
-    for (const tab of this.openTabs) {
-      for (const section of tab.sections) {
-        if (section.prompts.some(p => p.id === prompt.id)) {
-          return section;
-        }
-      }
-    }
-    return null;
+    return findSectionContainingPromptHelper(this.openTabs, prompt);
   }
 }

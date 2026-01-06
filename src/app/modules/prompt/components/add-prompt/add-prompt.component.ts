@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -17,7 +19,10 @@ import { PROMPT_TYPES } from '../../constants/prompt.constant';
   templateUrl: './add-prompt.component.html',
   styleUrls: ['./add-prompt.component.scss'],
 })
-export class AddPromptComponent implements OnInit {
+export class AddPromptComponent implements OnInit, OnDestroy {
+  // Subscription cleanup
+  private destroy$ = new Subject<void>();
+
   sectionForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
@@ -66,9 +71,16 @@ export class AddPromptComponent implements OnInit {
       this.loadDatabases();
     }
 
-    this.sectionForm.valueChanges.subscribe(() => {
-      this.checkForDuplicates();
-    });
+    this.sectionForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.checkForDuplicates();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   initForm() {
@@ -272,10 +284,31 @@ export class AddPromptComponent implements OnInit {
   }
 
   onCancel() {
+    // Fix #4: Properly reset form, FormArray, and component states
     this.sectionForm.reset();
-    Object.keys(this.sectionForm.controls).forEach(key => {
-      this.sectionForm.get(key)?.setValue('');
-    });
+    this.clearAllSectionGroups();
+
+    // Reset component state
+    this.selectedOrg = this.showOrganisationDropdown
+      ? null
+      : { id: this.globalService.getTokenDetails('organisationId') };
+    this.selectedDatabase = null;
+    this.selectedTab = null;
+    this.databases = [];
+    this.tabs = [];
+    this.sections = [];
+    this.hasDuplicates = false;
+    this.duplicateRows = {};
+
+    // Re-disable dependent controls
+    this.sectionForm.get('database')?.disable();
+    this.sectionForm.get('tab')?.disable();
+
+    // Re-enable database for non-super-admin
+    if (!this.showOrganisationDropdown) {
+      this.sectionForm.get('database')?.enable();
+      this.loadDatabases();
+    }
   }
 
   onOrganisationChange(event: any) {
@@ -338,6 +371,12 @@ export class AddPromptComponent implements OnInit {
   }
 
   loadTabs() {
+    // Fix #2: Add null check to prevent crash
+    if (!this.selectedOrg || !this.selectedDatabase) {
+      console.warn('loadTabs: selectedOrg or selectedDatabase is null');
+      return;
+    }
+
     const param = {
       orgId: this.selectedOrg.id,
       databaseId: this.selectedDatabase.id,
@@ -352,6 +391,12 @@ export class AddPromptComponent implements OnInit {
   }
 
   loadSections() {
+    // Fix #3: Add null check to prevent crash
+    if (!this.selectedOrg || !this.selectedDatabase || !this.selectedTab) {
+      console.warn('loadSections: Required selections are missing');
+      return;
+    }
+
     const params = {
       orgId: this.selectedOrg.id,
       databaseId: this.selectedDatabase.id,

@@ -8,55 +8,24 @@
         <h2>Configure Screen</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          label="Clear Groups"
-          class="p-button-outlined p-button-danger"
-          (click)="clearAllGroups()"
-          *ngIf="isFreeze && hasAnyGroups()"
-        >
+        <button pButton type="button" label="Clear Groups" class="p-button-outlined p-button-danger"
+          (click)="clearAllGroups()" *ngIf="isFreeze && hasAnyGroups()">
           <i class="pi pi-trash"></i>
         </button>
-        <button
-          pButton
-          type="button"
-          [label]="isFreeze ? 'Unlock' : 'Lock'"
-          class="p-button-outlined"
-          (click)="screenState()"
-          *ngIf="hasSelectedPrompts()"
-        >
-          <i
-            class="pi"
-            [class.pi-lock]="!isFreeze"
-            [class.pi-lock-open]="isFreeze"
-          ></i>
+        <button pButton type="button" [label]="isFreeze ? 'Unlock' : 'Lock'" class="p-button-outlined"
+          (click)="screenState()" *ngIf="hasSelectedPrompts()">
+          <i class="pi" [class.pi-lock]="!isFreeze" [class.pi-lock-open]="isFreeze"></i>
         </button>
-        <button
-          pButton
-          type="button"
-          [label]="hasExistingConfiguration() ? 'Cancel' : 'Clear'"
-          class="p-button-outlined p-button-danger"
-          (click)="handleCancelOrClear()"
-          *ngIf="
+        <button pButton type="button" [label]="hasExistingConfiguration() ? 'Cancel' : 'Clear'"
+          class="p-button-outlined p-button-danger" (click)="handleCancelOrClear()" *ngIf="
             !isFreeze &&
             (hasExistingConfiguration() ? hasChanges() : hasSelectedPrompts())
-          "
-        >
-          <i
-            class="pi"
-            [class.pi-times]="hasExistingConfiguration()"
-            [class.pi-trash]="!hasExistingConfiguration()"
-          ></i>
+          ">
+          <i class="pi" [class.pi-times]="hasExistingConfiguration()"
+            [class.pi-trash]="!hasExistingConfiguration()"></i>
         </button>
-        <button
-          pButton
-          class="p-button-outlined"
-          type="submit"
-          label="Save"
-          (click)="saveScreenConfiguration()"
-          *ngIf="hasSelectedPrompts() && isFreeze && hasChanges()"
-        >
+        <button pButton class="p-button-outlined" type="submit" label="Save" (click)="saveScreenConfiguration()"
+          *ngIf="hasSelectedPrompts() && isFreeze && hasChanges()">
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -72,17 +41,10 @@
 
           <div class="tab-cards-container" *ngIf="!isSidebarCollapsed">
             <div class="tab-cards">
-              <div
-                *ngFor="let tab of tabsData"
-                class="tab-card"
-                (click)="onTabClick(tab)"
-                [class.disabled]="isFreeze"
-              >
+              <div *ngFor="let tab of tabsData" class="tab-card" (click)="onTabClick(tab)" [class.disabled]="isFreeze">
                 <div class="tab-info">
                   <span class="tab-name">{{ tab.name }}</span>
-                  <span class="section-count"
-                    >- {{ tab?.sections?.length || 0 }} Section(s)</span
-                  >
+                  <span class="section-count">- {{ tab?.sections?.length || 0 }} Section(s)</span>
                 </div>
               </div>
             </div>
@@ -99,11 +61,7 @@
 
       <div class="separator">
         <button class="toggle-btn" (click)="toggleSidebar()">
-          <i
-            class="pi"
-            [class.pi-chevron-left]="!isSidebarCollapsed"
-            [class.pi-chevron-right]="isSidebarCollapsed"
-          ></i>
+          <i class="pi" [class.pi-chevron-left]="!isSidebarCollapsed" [class.pi-chevron-right]="isSidebarCollapsed"></i>
         </button>
       </div>
 
@@ -113,78 +71,44 @@
         </div>
 
         <div class="tab-container" *ngIf="openTabs.length">
-          <p-tabView
-            [(activeIndex)]="activeTabIndex"
-            [scrollable]="true"
-            class="full-height-tabs"
-            *ngIf="openTabs.length"
-          >
-            <p-tabPanel
-              *ngFor="let tab of openTabs; let i = index"
-              [header]="tab.name"
-              [selected]="i === activeTabIndex"
-            >
+          <p-tabView [(activeIndex)]="activeTabIndex" [scrollable]="true" class="full-height-tabs"
+            *ngIf="openTabs.length">
+            <p-tabPanel *ngFor="let tab of openTabs; let i = index" [header]="tab.name"
+              [selected]="i === activeTabIndex">
               <ng-template pTemplate="header">
-                <div
-                  class="tab-header-content"
-                  [class.dragging]="draggedTabIndex === i"
-                  [class.drag-enter]="
+                <div class="tab-header-content" [class.dragging]="draggedTabIndex === i" [class.drag-enter]="
                     draggedTabIndex !== null && draggedTabIndex !== i
-                  "
-                  [pDraggable]="!isFreeze ? 'tabScope' : ''"
-                  [pDroppable]="!isFreeze ? 'tabScope' : ''"
-                  [dragHandle]="'.drag-handle'"
-                  (onDragStart)="onTabDragStart(i)"
-                  (onDragEnd)="onTabDragEnd()"
-                  (onDragEnter)="onTabDragEnter(i)"
-                  (onDragLeave)="onTabDragLeave(i)"
-                  (onDrop)="onTabDrop(i)"
-                >
+                  " [pDraggable]="!isFreeze ? 'tabScope' : ''" [pDroppable]="!isFreeze ? 'tabScope' : ''"
+                  [dragHandle]="'.drag-handle'" (onDragStart)="onTabDragStart(i)" (onDragEnd)="onTabDragEnd()"
+                  (onDragEnter)="onTabDragEnter(i)" (onDragLeave)="onTabDragLeave(i)" (onDrop)="onTabDrop(i)">
                   <i class="pi pi-bars drag-handle mr-2" *ngIf="!isFreeze"></i>
                   <span>{{ tab.name }}</span>
-                  <i
-                    *ngIf="!isFreeze"
-                    class="pi pi-times tab-close"
-                    (click)="
+                  <i *ngIf="!isFreeze" class="pi pi-times tab-close" (click)="
                       handleTabClose(i);
                       $event.preventDefault();
                       $event.stopPropagation()
-                    "
-                  ></i>
+                    "></i>
                 </div>
               </ng-template>
               <div class="tab-content">
                 <p-accordion [multiple]="true">
-                  <p-accordionTab
-                    *ngFor="
+                  <p-accordionTab *ngFor="
                       let section of tab.sections;
                       let sectionIndex = index
-                    "
-                    [selected]="expandedSections[section.id]"
-                    (selectedChange)="onTabAccordionChange(section.id, $event)"
-                  >
+                    " [selected]="expandedSections[section.id]"
+                    (selectedChange)="onTabAccordionChange(section.id, $event)">
                     <ng-template pTemplate="header">
-                      <div
-                        class="section-header"
-                        [pDraggable]="!isFreeze ? 'sectionScope' : ''"
-                        [pDroppable]="!isFreeze ? 'sectionScope' : ''"
-                        [dragHandle]="'.section-drag-handle'"
-                        (onDragStart)="onSectionDragStart(tab.id, sectionIndex)"
-                        (onDragEnd)="onSectionDragEnd()"
+                      <div class="section-header" [pDraggable]="!isFreeze ? 'sectionScope' : ''"
+                        [pDroppable]="!isFreeze ? 'sectionScope' : ''" [dragHandle]="'.section-drag-handle'"
+                        (onDragStart)="onSectionDragStart(tab.id, sectionIndex)" (onDragEnd)="onSectionDragEnd()"
                         (onDragEnter)="onSectionDragEnter(tab.id, sectionIndex)"
-                        (onDragLeave)="onSectionDragLeave(sectionIndex)"
-                        (onDrop)="onSectionDrop(tab.id, sectionIndex)"
-                        [class.dragging]="draggedSectionIndex === sectionIndex"
-                        [class.drag-enter]="
+                        (onDragLeave)="onSectionDragLeave(sectionIndex)" (onDrop)="onSectionDrop(tab.id, sectionIndex)"
+                        [class.dragging]="draggedSectionIndex === sectionIndex" [class.drag-enter]="
                           draggedSectionIndex !== null &&
                           draggedSectionIndex !== sectionIndex
-                        "
-                      >
+                        ">
                         <div class="header-content">
-                          <i
-                            class="pi pi-bars section-drag-handle"
-                            *ngIf="!isFreeze"
-                          ></i>
+                          <i class="pi pi-bars section-drag-handle" *ngIf="!isFreeze"></i>
                           <span class="section-name">{{ section.name }}</span>
                           <span class="prompt-count">
                             {{ getSelectedPromptString(section.prompts) }}
@@ -192,52 +116,31 @@
                         </div>
 
                         <div class="header-actions">
-                          <div
-                            class="group-bullets"
-                            *ngIf="getGroupedPromptsCount(section) as groups"
-                          >
-                            <div
-                              class="group-bullet"
-                              *ngFor="let groupId of Object.keys(groups)"
-                              [ngStyle]="getGroupBulletStyle(+groupId, section)"
-                              (click)="
+                          <div class="group-bullets" *ngIf="getGroupedPromptsCount(section) as groups">
+                            <div class="group-bullet" *ngFor="let groupId of Object.keys(groups)"
+                              [ngStyle]="getGroupBulletStyle(+groupId, section)" (click)="
                                 $event.stopPropagation();
                                 selectGroupForAdding(+groupId, section)
-                              "
-                              [class.active]="activeGroupId === +groupId && activeGroupSectionId === section.id"
-                            ></div>
-                            <div
-                              class="group-bullet clear-groups"
-                              (click)="
+                              " [class.active]="activeGroupId === +groupId && activeGroupSectionId === section.id">
+                            </div>
+                            <div class="group-bullet clear-groups" (click)="
                                 $event.stopPropagation();
                                 clearSectionGroups(section)
-                              "
-                              *ngIf="isFreeze && hasSectionGroups(section)"
-                            >
+                              " *ngIf="isFreeze && hasSectionGroups(section)">
                               <i class="pi pi-times"></i>
                             </div>
-                            <div
-                              class="group-bullet add-group"
-                              (click)="
+                            <div class="group-bullet add-group" (click)="
                                 $event.stopPropagation();
                                 groupSelectedPrompts(section)
-                              "
-                              *ngIf="isFreeze && canGroupPrompts(section)"
-                            >
+                              " *ngIf="isFreeze && canGroupPrompts(section)">
                               <i class="pi pi-plus"></i>
                             </div>
                           </div>
 
-                          <div
-                            class="select-all-checkbox"
-                            (click)="$event.stopPropagation()"
-                            *ngIf="section.prompts?.length && !isFreeze"
-                          >
-                            <p-checkbox
-                              [(ngModel)]="section.selectAll"
-                              [binary]="true"
-                              (onChange)="toggleAllPrompts(section)"
-                            ></p-checkbox>
+                          <div class="select-all-checkbox" (click)="$event.stopPropagation()"
+                            *ngIf="section.prompts?.length && !isFreeze">
+                            <p-checkbox [(ngModel)]="section.selectAll" [binary]="true"
+                              (onChange)="toggleAllPrompts(section)"></p-checkbox>
                             <span class="select-all-label">Include All</span>
                           </div>
                         </div>
@@ -245,13 +148,10 @@
                     </ng-template>
                     <div class="prompts-list" *ngIf="section.prompts?.length">
                       <div class="prompts-grid">
-                        <div
-                          class="prompt-card"
-                          *ngFor="
+                        <div class="prompt-card" *ngFor="
                             let prompt of section.prompts;
                             let promptIndex = index
-                          "
-                          [ngClass]="{
+                          " [ngClass]="{
                             dragging:
                               draggedPromptIndex === promptIndex &&
                               draggedPromptSectionId === section.id,
@@ -268,50 +168,29 @@
                               activeGroupSectionId === section.id &&
                               prompt.groupId !== activeGroupId &&
                               isGroupActiveInSection(section, activeGroupId)
-                          }"
-                          [ngStyle]="getPromptMandatoryStyle(prompt)"
-                          (click)="
+                          }" [ngStyle]="getPromptMandatoryStyle(prompt)" (click)="
                             isFreeze
                               ? handlePromptSelection($event, prompt, section)
                               : togglePrompt(prompt, section)
-                          "
-                          (contextmenu)="onPromptRightClick($event, prompt)"
-                          [pDraggable]="
+                          " (contextmenu)="onPromptRightClick($event, prompt)" [pDraggable]="
                             !isFreeze ? 'promptScope-' + section.id : ''
-                          "
-                          [pDroppable]="
+                          " [pDroppable]="
                             !isFreeze ? 'promptScope-' + section.id : ''
-                          "
-                          [dragHandle]="'.prompt-drag-handle'"
-                          (onDragStart)="
+                          " [dragHandle]="'.prompt-drag-handle'" (onDragStart)="
                             onPromptDragStart(tab.id, section.id, promptIndex)
-                          "
-                          (onDragEnd)="onPromptDragEnd()"
-                          (onDragEnter)="
+                          " (onDragEnd)="onPromptDragEnd()" (onDragEnter)="
                             onPromptDragEnter(tab.id, section.id, promptIndex)
-                          "
-                          (onDragLeave)="onPromptDragLeave(promptIndex)"
-                          (onDrop)="
+                          " (onDragLeave)="onPromptDragLeave(promptIndex)" (onDrop)="
                             onPromptDrop(tab.id, section.id, promptIndex)
-                          "
-                        >
-                          <div
-                            class="group-dot-indicator"
-                            [ngStyle]="getPromptGroupDotStyle(prompt, section)"
-                            *ngIf="isFreeze && (prompt.groupId !== undefined && prompt.groupId !== null)"
-                          ></div>
+                          ">
+                          <div class="group-dot-indicator" [ngStyle]="getPromptGroupDotStyle(prompt, section)"
+                            *ngIf="isFreeze && (prompt.groupId !== undefined && prompt.groupId !== null)"></div>
                           <div class="card-checkbox" *ngIf="!isFreeze">
-                            <p-checkbox
-                              [(ngModel)]="prompt.selected"
-                              [binary]="true"
-                              (onChange)="updateSectionSelectAll(section)"
-                            ></p-checkbox>
+                            <p-checkbox [(ngModel)]="prompt.selected" [binary]="true"
+                              (onChange)="updateSectionSelectAll(section)"></p-checkbox>
                           </div>
                           <div class="prompt-header">
-                            <i
-                              class="pi pi-bars prompt-drag-handle"
-                              *ngIf="!isFreeze"
-                            ></i>
+                            <i class="pi pi-bars prompt-drag-handle" *ngIf="!isFreeze"></i>
                             <span class="prompt-name">{{ prompt.name }}</span>
                             <span class="prompt-type">({{ prompt.type }})</span>
                           </div>
@@ -334,7 +213,7 @@
     <h3>Confirm</h3>
     <p>Are you sure you want to revert to the previous configuration?</p>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeDialig()">No</button>
+      <button class="btn-cancel" (click)="closeDialog()">No</button>
       <button class="btn-confirm" (click)="clearSelected()">Yes</button>
     </div>
   </div>
@@ -345,7 +224,7 @@
     <h3>Confirm</h3>
     <p>Are you sure you want to clear all selections?</p>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeDialig()">No</button>
+      <button class="btn-cancel" (click)="closeDialog()">No</button>
       <button class="btn-confirm" (click)="clearAllSelections()">Yes</button>
     </div>
   </div>
