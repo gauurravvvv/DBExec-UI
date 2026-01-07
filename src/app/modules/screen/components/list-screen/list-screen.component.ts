@@ -219,4 +219,13 @@ export class ListScreenComponent implements OnInit {
       id,
     ]);
   }
+
+  onExecute(id: string) {
+    this.router.navigate([
+      '/app/screen/execute',
+      this.selectedScreen.id,
+      this.selectedDatabase.id,
+      id,
+    ]);
+  }
 }

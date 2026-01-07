@@ -13,11 +13,17 @@ import { EditScreenComponent } from './components/edit-screen/edit-screen.compon
 import { ListScreenComponent } from './components/list-screen/list-screen.component';
 import { ViewScreenComponent } from './components/view-screen/view-screen.component';
 import { ConfigureScreenComponent } from './components/configure-screen/configure-screen.component';
+import { ExecuteScreenComponent } from './components/execute-screen/execute-screen.component';
 import { RouterModule } from '@angular/router';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { TabViewModule } from 'primeng/tabview';
 import { AccordionModule } from 'primeng/accordion';
 import { DragDropModule } from 'primeng/dragdrop';
+import { SkeletonModule } from 'primeng/skeleton';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CalendarModule } from 'primeng/calendar';
+import { SliderModule } from 'primeng/slider';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @NgModule({
   declarations: [
@@ -26,6 +32,7 @@ import { DragDropModule } from 'primeng/dragdrop';
     ListScreenComponent,
     ViewScreenComponent,
     ConfigureScreenComponent,
+    ExecuteScreenComponent,
   ],
   imports: [
     CommonModule,
@@ -43,6 +50,11 @@ import { DragDropModule } from 'primeng/dragdrop';
     TabViewModule,
     AccordionModule,
     DragDropModule,
+    SkeletonModule,
+    InputNumberModule,
+    CalendarModule,
+    SliderModule,
+    RadioButtonModule,
   ],
   exports: [ConfigureScreenComponent],
 })

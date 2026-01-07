@@ -14,13 +14,7 @@
           <div class="search-box">
             <span class="p-input-icon-left">
               <i class="pi pi-search"></i>
-              <input
-                pInputText
-                type="text"
-                placeholder="Search..."
-                (input)="onSearch($event)"
-                [value]="searchTerm"
-              />
+              <input pInputText type="text" placeholder="Search..." (input)="onSearch($event)" [value]="searchTerm" />
             </span>
           </div>
 
@@ -28,17 +22,9 @@
             <!-- Organisation Dropdown -->
             <div class="dropdown-field" *ngIf="showOrganisationDropdown">
               <span class="p-float-label">
-                <p-dropdown
-                  [options]="organisations"
-                  [(ngModel)]="selectedScreen"
-                  optionLabel="name"
-                  [filter]="true"
-                  filterBy="name"
-                  [style]="{ width: '100%' }"
-                  [panelStyle]="{ width: '100%' }"
-                  (onChange)="onOrgChange($event)"
-                  inputId="org-dropdown"
-                >
+                <p-dropdown [options]="organisations" [(ngModel)]="selectedScreen" optionLabel="name" [filter]="true"
+                  filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }"
+                  (onChange)="onOrgChange($event)" inputId="org-dropdown">
                 </p-dropdown>
                 <label for="org-dropdown">Organisation</label>
               </span>
@@ -47,17 +33,9 @@
             <!-- Database Dropdown -->
             <div class="dropdown-field">
               <span class="p-float-label">
-                <p-dropdown
-                  [options]="databases"
-                  [(ngModel)]="selectedDatabase"
-                  optionLabel="name"
-                  [filter]="true"
-                  filterBy="name"
-                  [style]="{ width: '100%' }"
-                  [panelStyle]="{ width: '100%' }"
-                  (onChange)="onDBChange($event)"
-                  inputId="db-dropdown"
-                >
+                <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name" [filter]="true"
+                  filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }"
+                  (onChange)="onDBChange($event)" inputId="db-dropdown">
                 </p-dropdown>
                 <label for="db-dropdown">Database</label>
               </span>
@@ -73,20 +51,11 @@
               <th>Description</th>
               <th>
                 Status
-                <p-menu
-                  #statusMenu
-                  [popup]="true"
-                  [model]="statusFilterItems"
-                  [style]="{ width: '150px' }"
-                  appendTo="body"
-                >
+                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems" [style]="{ width: '150px' }"
+                  appendTo="body">
                 </p-menu>
-                <i
-                  class="pi pi-filter"
-                  (click)="statusMenu.toggle($event)"
-                  [ngClass]="{ 'active-filter': selectedStatus !== null }"
-                  style="margin-left: 5px; cursor: pointer"
-                >
+                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
+                  [ngClass]="{ 'active-filter': selectedStatus !== null }" style="margin-left: 5px; cursor: pointer">
                 </i>
               </th>
               <th>Created Date</th>
@@ -94,52 +63,35 @@
             </tr>
           </thead>
           <tbody>
-            <ng-container
-              *ngIf="filteredScreens && filteredScreens.length > 0; else noData"
-            >
+            <ng-container *ngIf="filteredScreens && filteredScreens.length > 0; else noData">
               <tr *ngFor="let screen of filteredScreens">
                 <td>
-                  <a
-                    class="admin-name"
-                    [routerLink]="[
+                  <a class="admin-name" [routerLink]="[
                       '/app/screen/view',
                       selectedScreen.id,
                       screen.id
-                    ]"
-                  >
+                    ]">
                     {{ screen.name }}
                   </a>
                 </td>
                 <td>{{ screen.description }}</td>
                 <td>
-                  <span
-                    class="status-badge"
-                    [class.active]="screen.status === 1"
-                  >
+                  <span class="status-badge" [class.active]="screen.status === 1">
                     {{ screen.status === 1 ? 'Active' : 'Inactive' }}
                   </span>
                 </td>
                 <td>{{ screen.createdOn | date : 'mediumDate' }}</td>
                 <td class="actions">
-                  <button
-                    class="action-btn edit"
-                    (click)="onEditScreen(screen)"
-                    title="Edit"
-                  >
+                  <button class="action-btn edit" (click)="onEditScreen(screen)" title="Edit">
                     <i class="pi pi-pencil"></i>
                   </button>
-                  <button
-                    class="action-btn edit"
-                    (click)="onConfig(screen.id)"
-                    title="Config"
-                  >
+                  <button class="action-btn edit" (click)="onConfig(screen.id)" title="Config">
                     <i class="pi pi-cog"></i>
                   </button>
-                  <button
-                    class="action-btn delete"
-                    (click)="confirmDelete(screen.id)"
-                    title="Delete"
-                  >
+                  <button class="action-btn execute" (click)="onExecute(screen.id)" title="Execute">
+                    <i class="pi pi-play"></i>
+                  </button>
+                  <button class="action-btn delete" (click)="confirmDelete(screen.id)" title="Delete">
                     <i class="pi pi-trash"></i>
                   </button>
                 </td>
@@ -151,9 +103,7 @@
                   <div class="no-data">
                     <i class="pi pi-plus-circle"></i>
                     <p>No screens found</p>
-                    <span class="sub-text"
-                      >Click on + to create a new Screen</span
-                    >
+                    <span class="sub-text">Click on + to create a new Screen</span>
                   </div>
                 </td>
               </tr>
@@ -171,26 +121,14 @@
             <ng-template #noEntries> Showing 0 to 0 of 0 entries </ng-template>
           </div>
           <div class="pagination-controls">
-            <button
-              [disabled]="currentPage === 1"
-              (click)="onPageChange(currentPage - 1)"
-              class="page-btn"
-            >
+            <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
               <i class="pi pi-chevron-left"></i>
             </button>
-            <button
-              *ngFor="let page of pages"
-              (click)="onPageChange(page)"
-              class="page-btn"
-              [class.active]="page === currentPage"
-            >
+            <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
+              [class.active]="page === currentPage">
               {{ page }}
             </button>
-            <button
-              [disabled]="currentPage === totalPages"
-              (click)="onPageChange(currentPage + 1)"
-              class="page-btn"
-            >
+            <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)" class="page-btn">
               <i class="pi pi-chevron-right"></i>
             </button>
           </div>

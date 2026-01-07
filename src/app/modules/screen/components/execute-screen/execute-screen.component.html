@@ -1,0 +1,87 @@
+<div class="add-admin-wrapper">
+    <div class="add-admin-container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="left-section">
+                <button pButton class="p-button-text" (click)="onBack()">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h2>Execute Screen</h2>
+            </div>
+            <div class="action-buttons">
+                <button pButton class="p-button-outlined p-button-success" type="button" label="Execute"
+                    (click)="onSubmit()" [disabled]="isSubmitting">
+                    <i class="pi pi-play mr-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="screen-content">
+            <!-- Tab Loading Skeleton -->
+            <div class="tab-skeleton-container" *ngIf="loadingTabs">
+                <div class="tab-skeleton-header">
+                    <p-skeleton *ngFor="let i of getSkeletonArray(SKELETON_TAB_COUNT)" width="120px" height="40px"
+                        styleClass="mr-2"></p-skeleton>
+                </div>
+            </div>
+
+            <!-- Tab Error State -->
+            <div class="error-state" *ngIf="!loadingTabs && tabError">
+                <i class="pi pi-exclamation-triangle"></i>
+                <span>{{ tabError }}</span>
+                <button pButton label="Retry" class="p-button-outlined" (click)="loadTabs()"></button>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" *ngIf="!loadingTabs && !tabError && tabs.length === 0">
+                <i class="pi pi-inbox"></i>
+                <span>No tabs configured for this screen</span>
+            </div>
+
+            <!-- Tab View -->
+            <p-tabView *ngIf="!loadingTabs && !tabError && tabs.length > 0" [(activeIndex)]="activeTabIndex"
+                (onChange)="onTabChange($event)" [scrollable]="true" styleClass="full-height-tabs">
+
+                <p-tabPanel *ngFor="let tab of tabs; let tabIndex = index" [header]="tab.name">
+                    <div class="tab-content">
+                        <!-- Section Loading Skeleton -->
+                        <div class="section-skeleton-container" *ngIf="tab.loading">
+                            <p-skeleton *ngFor="let i of getSkeletonArray(SKELETON_SECTION_COUNT)" width="100%"
+                                height="60px" styleClass="mb-3"></p-skeleton>
+                        </div>
+
+                        <!-- Section Error State -->
+                        <div class="error-state" *ngIf="!tab.loading && tab.error">
+                            <i class="pi pi-exclamation-triangle"></i>
+                            <span>{{ tab.error }}</span>
+                            <button pButton label="Retry" class="p-button-outlined"
+                                (click)="loadSections(tab)"></button>
+                        </div>
+
+                        <!-- Empty Sections State -->
+                        <div class="empty-state"
+                            *ngIf="!tab.loading && !tab.error && tab.loaded && tab.sections.length === 0">
+                            <i class="pi pi-folder-open"></i>
+                            <span>No sections in this tab</span>
+                        </div>
+
+                        <!-- Accordion Sections -->
+                        <p-accordion *ngIf="!tab.loading && !tab.error && tab.sections.length > 0" [multiple]="true">
+                            <p-accordionTab *ngFor="let section of tab.sections" [header]="section.name"
+                                [selected]="section.expanded" (selectedChange)="onSectionToggle(section, $event)">
+
+                                <!-- Section content placeholder -->
+                                <div class="section-content-placeholder">
+                                    <p><strong>Section:</strong> {{ section.name }}</p>
+                                    <p><strong>ID:</strong> {{ section.id }}</p>
+                                    <p><strong>Description:</strong> {{ section.description || 'No description' }}</p>
+                                </div>
+                            </p-accordionTab>
+                        </p-accordion>
+                    </div>
+                </p-tabPanel>
+            </p-tabView>
+        </div>
+    </div>
+</div>

@@ -5,6 +5,7 @@ import { EditScreenComponent } from './components/edit-screen/edit-screen.compon
 import { ListScreenComponent } from './components/list-screen/list-screen.component';
 import { ViewScreenComponent } from './components/view-screen/view-screen.component';
 import { ConfigureScreenComponent } from './components/configure-screen/configure-screen.component';
+import { ExecuteScreenComponent } from './components/execute-screen/execute-screen.component';
 
 const routes: Routes = [
   {
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'view/:orgId/:id', component: ViewScreenComponent },
   { path: 'edit/:orgId/:id', component: EditScreenComponent },
   { path: 'config/:orgId/:dbId/:id', component: ConfigureScreenComponent },
+  { path: 'execute/:orgId/:dbId/:screenId', component: ExecuteScreenComponent },
 ];
 
 @NgModule({

@@ -6,4 +6,5 @@ export interface IEnvironment {
   apiServer?: string;
   queryServer?: string;
   appURL?: string;
+  appVersion: string;
 }
