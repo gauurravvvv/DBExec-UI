@@ -199,7 +199,7 @@
                                     <input id="promptWhere" type="text" pInputText formControlName="promptWhere"
                                         (input)="onWhereConditionInput($event)" (keydown)="onWhereKeydown($event)"
                                         (blur)="hideSuggestionsDelayed()" (focus)="onWhereFocus($event)"
-                                        [placeholder]="getWhereTemplate()" autocomplete="off"
+                                        placeholder="Enter where condition" autocomplete="off"
                                         [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptWhere')?.invalid && promptForm.get('promptWhere')?.touched}">
                                 </span>
 
@@ -241,11 +241,22 @@
                             </small>
                             <small class="hint-text" *ngIf="promptForm.get('tables')?.value?.length > 0">
                                 <i class="pi pi-lightbulb"></i>
-                                Use <code>{{'{'}}value{{'}'}}</code> as placeholder for user input.
-                                <span *ngIf="selectedPromptType === 'dropdown'">Example:
-                                    <code>alias.column = '{{'{'}}value{{'}'}}'</code></span>
-                                <span *ngIf="selectedPromptType === 'multiselect'">Example:
-                                    <code>alias.column in ('{{'{'}}value{{'}'}}')</code></span>
+                                <span *ngIf="isRangeType()">
+                                    <strong>Range prompts:</strong> Use <code>{{'{'}}startValue{{'}'}}</code> and
+                                    <code>{{'{'}}endValue{{'}'}}</code> as placeholders.
+                                    <br>Example:
+                                    <code>alias.column BETWEEN '{{'{'}}startValue{{'}'}}' AND '{{'{'}}endValue{{'}'}}'</code>
+                                </span>
+                                <span *ngIf="isMultiValueType()">
+                                    <strong>Multi-value prompts:</strong> Use <code>{{'{'}}value{{'}'}}</code> as
+                                    placeholder.
+                                    <br>Example: <code>alias.column IN ('{{'{'}}value{{'}'}}')</code>
+                                </span>
+                                <span *ngIf="!isRangeType() && !isMultiValueType()">
+                                    <strong>Single-value prompts:</strong> Use <code>{{'{'}}value{{'}'}}</code> as
+                                    placeholder.
+                                    <br>Example: <code>alias.column = '{{'{'}}value{{'}'}}'</code>
+                                </span>
                             </small>
                         </div>
                     </div>

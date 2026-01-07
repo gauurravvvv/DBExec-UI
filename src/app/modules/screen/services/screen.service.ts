@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
-import { SCREEN, TAB } from 'src/app/constants/api';
+import { SCREEN } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -80,14 +79,14 @@ export class ScreenService {
 
   saveScreenConfiguration(
     configuration: any,
-    organisationId: string,
+    organisation: string,
     databaseId: string,
     screenId: string
   ) {
     return this.http
       .post(SCREEN.SAVE_CONFIGURATION, {
         configuration,
-        organisationId,
+        organisation,
         databaseId,
         screenId,
       })

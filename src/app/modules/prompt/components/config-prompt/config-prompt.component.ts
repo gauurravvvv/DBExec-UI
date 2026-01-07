@@ -652,28 +652,24 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.editingChipIndex = -1;
   }
 
-  getWhereTemplate(): string {
-    const selectedTables = this.promptForm.get('tables')?.value || [];
+  /**
+   * Check if the current prompt type is a range type (requires startValue and endValue)
+   */
+  isRangeType(): boolean {
+    return (
+      this.selectedPromptType === 'daterange' ||
+      this.selectedPromptType === 'rangeslider'
+    );
+  }
 
-    // Show default placeholder if no tables selected
-    if (!selectedTables.length) {
-      return 'Enter Where condition';
-    }
-
-    // Show custom placeholder based on table selection
-    let template = '';
-    if (selectedTables.length === 1) {
-      template = `${selectedTables[0].alias}.column_name`;
-    } else {
-      template = 'alias.column_name';
-    }
-
-    const operator =
-      this.selectedPromptType === 'dropdown'
-        ? ` = '{value}'`
-        : ` in ('{value}')`;
-
-    return `Example: ${template}${operator}`;
+  /**
+   * Check if the current prompt type is a multi-value type (can select multiple values)
+   */
+  isMultiValueType(): boolean {
+    return (
+      this.selectedPromptType === 'checkbox' ||
+      this.selectedPromptType === 'multiselect'
+    );
   }
 
   onWhereConditionInput(event: any) {
