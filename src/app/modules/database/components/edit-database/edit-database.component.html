@@ -44,34 +44,30 @@
         <form [formGroup]="databaseForm" class="admin-form">
             <div class="form-grid">
                 <!-- Name Field -->
-                <div class="form-field">
-                    <label for="name">Name<span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-database"></i>
-                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched">
-                        {{ getErrorMessage('name') }}
-                    </small>
-                </div>
+                <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-database"
+                    [required]="true"
+                    [showError]="!!(databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched)"
+                    [errorMessage]="getErrorMessage('name')">
+                </app-custom-input>
 
                 <!-- Description Field -->
-                <div class="form-field">
-                    <label for="description">Description<span class="required">*</span></label>
+                <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
+                    icon="pi-align-left" [required]="true"
+                    [showError]="!!(databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched)"
+                    [errorMessage]="getErrorMessage('description')">
+                </app-custom-input>
+
+                <!-- Organisation Field (readonly) -->
+                <div class="form-field" *ngIf="showOrganisationDropdown">
+                    <label for="organisation">Organisation</label>
                     <span class="p-input-icon-left">
-                        <i class="pi pi-align-left"></i>
-                        <input id="description" pInputText formControlName="description" placeholder="Enter description"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched}">
+                        <i class="pi pi-building"></i>
+                        <input id="organisation" type="text" pInputText [value]="organisationName" readonly
+                            class="readonly">
                     </span>
-                    <small class="error-message"
-                        *ngIf="databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched">
-                        {{ getErrorMessage('description') }}
-                    </small>
                 </div>
 
-                <!-- Type Field -->
+                <!-- Type Field (readonly) -->
                 <div class="form-field">
                     <label for="type">Type</label>
                     <span class="p-input-icon-left">
@@ -81,18 +77,11 @@
                 </div>
 
                 <!-- Host Field -->
-                <div class="form-field">
-                    <label for="host">Host<span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-desktop"></i>
-                        <input id="host" pInputText formControlName="host" placeholder="Enter database host"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('host')?.invalid && databaseForm.get('host')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="databaseForm.get('host')?.invalid && databaseForm.get('host')?.touched">
-                        {{ getErrorMessage('host') }}
-                    </small>
-                </div>
+                <app-custom-input formControlName="host" label="Host" placeholder="Enter database host"
+                    icon="pi-desktop" [required]="true"
+                    [showError]="!!(databaseForm.get('host')?.invalid && databaseForm.get('host')?.touched)"
+                    [errorMessage]="getErrorMessage('host')">
+                </app-custom-input>
 
                 <!-- Port Field -->
                 <div class="form-field">
@@ -110,32 +99,18 @@
                 </div>
 
                 <!-- Database Name Field -->
-                <div class="form-field">
-                    <label for="database">Database Name<span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-database"></i>
-                        <input id="database" pInputText formControlName="database" placeholder="Enter database name"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('database')?.invalid && databaseForm.get('database')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="databaseForm.get('database')?.invalid && databaseForm.get('database')?.touched">
-                        {{ getErrorMessage('database') }}
-                    </small>
-                </div>
+                <app-custom-input formControlName="database" label="Database Name" placeholder="Enter database name"
+                    icon="pi-database" [required]="true"
+                    [showError]="!!(databaseForm.get('database')?.invalid && databaseForm.get('database')?.touched)"
+                    [errorMessage]="getErrorMessage('database')">
+                </app-custom-input>
 
                 <!-- Username Field -->
-                <div class="form-field">
-                    <label for="username">Username<span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-user"></i>
-                        <input id="username" pInputText formControlName="username" placeholder="Enter database username"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('username')?.invalid && databaseForm.get('username')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="databaseForm.get('username')?.invalid && databaseForm.get('username')?.touched">
-                        {{ getErrorMessage('username') }}
-                    </small>
-                </div>
+                <app-custom-input formControlName="username" label="Username" placeholder="Enter database username"
+                    icon="pi-user" [required]="true"
+                    [showError]="!!(databaseForm.get('username')?.invalid && databaseForm.get('username')?.touched)"
+                    [errorMessage]="getErrorMessage('username')">
+                </app-custom-input>
 
                 <!-- Password Field -->
                 <div class="form-field">
@@ -153,17 +128,7 @@
                     </small>
                 </div>
 
-                <!-- Organisation Field -->
-                <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-building"></i>
-                        <input id="organisation" type="text" pInputText [value]="organisationName" readonly
-                            class="readonly">
-                    </span>
-                </div>
-
-                <!-- Status Field -->
+                <!-- Status Field (special handling for master database) -->
                 <div class="form-field">
                     <label for="status">Status</label>
                     <div class="status-toggle ml-3">

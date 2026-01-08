@@ -108,6 +108,18 @@
         width: 100%;
         align-content: start;
 
+        // Constrain custom components to 50% width
+        app-custom-input,
+        app-custom-dropdown,
+        app-custom-multiselect,
+        app-custom-toggle {
+          width: 50%;
+
+          @media (max-width: 768px) {
+            width: 100%;
+          }
+        }
+
         .form-field {
           display: flex;
           flex-direction: column;

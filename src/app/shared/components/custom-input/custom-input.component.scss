@@ -1,0 +1,68 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 0;
+
+  label {
+    font-weight: 500;
+    color: var(--text-color);
+
+    .required {
+      color: var(--error-color);
+      margin-left: 4px;
+    }
+  }
+
+  .p-input-icon-left {
+    position: relative;
+    width: 100%;
+
+    i {
+      color: var(--text-color);
+      opacity: 0.4;
+    }
+
+    input {
+      width: 100%;
+      padding-left: 35px;
+      background: var(--card-background);
+      color: var(--text-color);
+      border-color: var(--border-color);
+
+      &::placeholder {
+        color: var(--text-color);
+        opacity: 0.4;
+      }
+    }
+  }
+
+  input:not(.p-input-icon-left input) {
+    width: 100%;
+    background: var(--card-background);
+    color: var(--text-color);
+    border-color: var(--border-color);
+
+    &::placeholder {
+      color: var(--text-color);
+      opacity: 0.4;
+    }
+  }
+
+  .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+  }
+}
+
+:host ::ng-deep {
+  .p-inputtext:enabled:focus {
+    box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+    border-color: var(--primary-color) !important;
+  }
+
+  .p-inputtext:enabled:hover {
+    border-color: var(--primary-color) !important;
+  }
+}

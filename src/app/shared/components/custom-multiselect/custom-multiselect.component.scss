@@ -1,0 +1,238 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 0;
+
+  label {
+    font-weight: 500;
+    color: var(--text-color);
+
+    .required {
+      color: var(--error-color);
+      margin-left: 4px;
+    }
+  }
+
+  .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+  }
+}
+
+:host ::ng-deep {
+  .p-multiselect {
+    background: var(--card-background);
+    border-color: var(--border-color);
+
+    &.ng-invalid.ng-touched,
+    &.ng-invalid.ng-dirty {
+      border-color: var(--error-color);
+    }
+
+    &:not(.ng-invalid) {
+      border-color: var(--border-color);
+    }
+
+    &.p-focus {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+    }
+
+    .p-multiselect-label {
+      color: var(--text-color);
+      padding: 0.5rem;
+
+      &.p-placeholder {
+        color: var(--text-color);
+        opacity: 0.4;
+      }
+    }
+
+    .p-multiselect-trigger {
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+
+    .p-multiselect-token {
+      background: var(--primary-color);
+      color: var(--text-color);
+      padding: 0.25rem 0.5rem;
+      margin: 0.125rem;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .p-multiselect-token-icon {
+        color: var(--text-color);
+        font-size: 12px;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: all 0.2s;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      }
+    }
+  }
+
+  .p-multiselect-panel {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+
+    .p-multiselect-header {
+      background: var(--hover-background) !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      padding: 0.5rem !important;
+
+      .p-multiselect-filter-container {
+        .p-inputtext {
+          background: var(--card-background) !important;
+          border: 1px solid var(--border-color) !important;
+          color: var(--text-color) !important;
+
+          &::placeholder {
+            color: var(--text-color) !important;
+            opacity: 0.4;
+          }
+        }
+
+        .p-multiselect-filter-icon {
+          color: var(--text-color) !important;
+          opacity: 0.7;
+        }
+      }
+
+      .p-checkbox {
+        .p-checkbox-box {
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          background: var(--card-background);
+          border: 1px solid var(--border-color);
+          transition: all 0.2s;
+
+          &:not(.p-disabled):hover {
+            border-color: var(--primary-color);
+          }
+
+          &.p-highlight {
+            .p-checkbox-icon {
+              color: var(--text-color);
+              font-size: 12px;
+            }
+          }
+        }
+      }
+
+      .p-multiselect-close {
+        margin-left: 0.5rem;
+        width: 2rem;
+        height: 2rem;
+        color: var(--text-color);
+        opacity: 0.7;
+        border: 0 none;
+        background: var(--card-background);
+        border-radius: 50%;
+        transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+
+        &:hover {
+          background: var(--hover-background);
+          color: var(--text-color);
+          opacity: 1;
+        }
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 1px var(--primary-color-transparent);
+        }
+
+        &:active {
+          background: var(--hover-background);
+        }
+      }
+    }
+
+    .p-multiselect-items {
+      padding: 0.5rem 0;
+      background: var(--card-background) !important;
+
+      .p-multiselect-item {
+        color: var(--text-color) !important;
+        padding: 0.75rem 1rem;
+
+        &:hover {
+          background: var(--hover-background) !important;
+          color: var(--text-color) !important;
+        }
+
+        &.p-highlight {
+          background: var(--hover-background) !important;
+          color: var(--primary-color) !important;
+        }
+
+        .p-checkbox {
+          margin-right: 0.5rem;
+
+          .p-checkbox-box {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+
+            &:not(.p-disabled):hover {
+              border-color: var(--primary-color);
+            }
+
+            &.p-highlight {
+              .p-checkbox-icon {
+                color: var(--text-color);
+                font-size: 12px;
+              }
+            }
+          }
+        }
+      }
+
+      .p-multiselect-empty-message {
+        color: var(--text-color) !important;
+        opacity: 0.7;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    .p-multiselect-items-wrapper {
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+
+        &:hover {
+          background: var(--secondary-color);
+        }
+      }
+    }
+  }
+}

@@ -22,99 +22,42 @@
     <form [formGroup]="accessForm" class="admin-form">
       <div class="form-grid">
         <!-- Organisation Dropdown -->
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <label for="organisation">Organisation<span class="required">*</span></label>
-          <p-dropdown [options]="organisations" optionLabel="name" optionValue="id" formControlName="organisation"
-            [filter]="true" filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }"
-            (onChange)="loadDatabases()" placeholder="Select Organisation" [ngClass]="{
-              'ng-invalid ng-dirty':
-                accessForm.get('organisation')?.invalid &&
-                accessForm.get('organisation')?.touched
-            }">
-          </p-dropdown>
-          <small class="error-message" *ngIf="
-              accessForm.get('organisation')?.invalid &&
-              accessForm.get('organisation')?.touched
-            ">
-            Organisation is required
-          </small>
-        </div>
+        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation"
+          placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
+          [filter]="true" filterBy="name" [required]="true" (onChangeEvent)="loadDatabases()"
+          [showError]="!!(accessForm.get('organisation')?.invalid && accessForm.get('organisation')?.touched)"
+          errorMessage="Organisation is required">
+        </app-custom-dropdown>
 
         <!-- Database Dropdown -->
-        <div class="form-field">
-          <label for="database">Database<span class="required">*</span></label>
-          <p-dropdown [options]="databases" optionLabel="name" optionValue="id" formControlName="database"
-            [filter]="true" filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }"
-            (onChange)="loadConnections()" placeholder="Select Database" [ngClass]="{
-              'ng-invalid ng-dirty':
-                accessForm.get('database')?.invalid &&
-                accessForm.get('database')?.touched
-            }">
-          </p-dropdown>
-          <small class="error-message" *ngIf="
-              accessForm.get('database')?.invalid &&
-              accessForm.get('database')?.touched
-            ">
-            Database is required
-          </small>
-        </div>
+        <app-custom-dropdown formControlName="database" label="Database" placeholder="Select Database"
+          [options]="databases" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
+          (onChangeEvent)="loadConnections()"
+          [showError]="!!(accessForm.get('database')?.invalid && accessForm.get('database')?.touched)"
+          errorMessage="Database is required">
+        </app-custom-dropdown>
 
         <!-- Connection Dropdown -->
-        <div class="form-field">
-          <label for="connection">Connection<span class="required">*</span></label>
-          <p-dropdown [options]="connections" optionLabel="name" optionValue="id" formControlName="connection"
-            [filter]="true" filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }"
-            (onChange)="onConnectionChange()" placeholder="Select Connection" [ngClass]="{
-                      'ng-invalid ng-dirty':
-                        accessForm.get('connection')?.invalid &&
-                        accessForm.get('connection')?.touched
-                    }">
-          </p-dropdown>
-          <small class="error-message" *ngIf="
-                      accessForm.get('connection')?.invalid &&
-                      accessForm.get('connection')?.touched
-                    ">
-            Connection is required
-          </small>
-        </div>
+        <app-custom-dropdown formControlName="connection" label="Connection" placeholder="Select Connection"
+          [options]="connections" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
+          (onChangeEvent)="onConnectionChange()"
+          [showError]="!!(accessForm.get('connection')?.invalid && accessForm.get('connection')?.touched)"
+          errorMessage="Connection is required">
+        </app-custom-dropdown>
 
         <!-- Groups Multiselect -->
-        <div class="form-field">
-          <label for="groups">Groups</label>
-          <p-multiSelect [options]="groups" formControlName="groups" optionLabel="name" optionValue="id" [filter]="true"
-            filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }" placeholder="Select Groups"
-            display="chip" [ngClass]="{
-              'ng-invalid ng-dirty':
-                accessForm.get('groups')?.invalid &&
-                accessForm.get('groups')?.touched
-            }">
-          </p-multiSelect>
-          <small class="error-message" *ngIf="
-              accessForm.get('groups')?.invalid &&
-              accessForm.get('groups')?.touched
-            ">
-            Groups are required
-          </small>
-        </div>
+        <app-custom-multiselect formControlName="groups" label="Groups" placeholder="Select Groups" [options]="groups"
+          optionLabel="name" optionValue="id" [filter]="true" filterBy="name" display="chip"
+          [showError]="!!(accessForm.get('groups')?.invalid && accessForm.get('groups')?.touched)"
+          errorMessage="Groups are required">
+        </app-custom-multiselect>
 
         <!-- Users Multiselect -->
-        <div class="form-field">
-          <label for="users">Users</label>
-          <p-multiSelect [options]="users" formControlName="users" optionLabel="username" optionValue="id"
-            [filter]="true" filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }"
-            placeholder="Select Users" display="chip" [ngClass]="{
-              'ng-invalid ng-dirty':
-                accessForm.get('users')?.invalid &&
-                accessForm.get('users')?.touched
-            }">
-          </p-multiSelect>
-          <small class="error-message" *ngIf="
-              accessForm.get('users')?.invalid &&
-              accessForm.get('users')?.touched
-            ">
-            Users are required
-          </small>
-        </div>
+        <app-custom-multiselect formControlName="users" label="Users" placeholder="Select Users" [options]="users"
+          optionLabel="username" optionValue="id" [filter]="true" filterBy="name" display="chip"
+          [showError]="!!(accessForm.get('users')?.invalid && accessForm.get('users')?.touched)"
+          errorMessage="Users are required">
+        </app-custom-multiselect>
       </div>
     </form>
   </div>

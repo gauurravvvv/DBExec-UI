@@ -111,4 +111,24 @@ export class EditSuperAdminComponent implements OnInit {
     this.adminForm.markAsPristine();
     this.isCancelClicked = true;
   }
+
+  getFirstNameError(): string {
+    const control = this.adminForm.get('firstName');
+    if (control?.errors?.['required']) return 'First name is required';
+    if (control?.errors?.['minlength'])
+      return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'First name can only contain letters and hyphens';
+    return '';
+  }
+
+  getLastNameError(): string {
+    const control = this.adminForm.get('lastName');
+    if (control?.errors?.['required']) return 'Last name is required';
+    if (control?.errors?.['minlength'])
+      return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Last name can only contain letters and hyphens';
+    return '';
+  }
 }

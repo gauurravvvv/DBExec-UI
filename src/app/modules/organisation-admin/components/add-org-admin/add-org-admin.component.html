@@ -9,22 +9,10 @@
         <h2>Add Admin</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-outlined p-button-danger"
-          [disabled]="!isFormDirty"
-          (click)="onCancel()"
-        ></button>
-        <button
-          pButton
-          class="p-button-outlined"
-          type="submit"
-          label="Save"
-          (click)="onSubmit()"
-          [disabled]="adminFrom.invalid"
-        >
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger" [disabled]="!isFormDirty"
+          (click)="onCancel()"></button>
+        <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+          [disabled]="adminFrom.invalid">
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -34,239 +22,66 @@
     <form [formGroup]="adminFrom" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
-        <div class="form-field">
-          <label for="firstName"
-            >First Name <span class="required">*</span></label
-          >
-          <span class="p-input-icon-left">
-            <i class="pi pi-user"></i>
-            <input
-              id="firstName"
-              type="text"
-              pInputText
-              formControlName="firstName"
-              placeholder="Enter first name"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  adminFrom.get('firstName')?.invalid &&
-                  adminFrom.get('firstName')?.touched
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              adminFrom.get('firstName')?.invalid &&
-              adminFrom.get('firstName')?.touched
-            "
-          >
-            <div *ngIf="adminFrom.get('firstName')?.errors?.['required']">
-              First name is required
-            </div>
-
-            <div *ngIf="adminFrom.get('firstName')?.errors?.['minlength']">
-              First name must be at least
-              {{ adminFrom.get('firstName')?.errors?.['minlength'].requiredLength }}
-              characters
-            </div>
-
-            <div *ngIf="adminFrom.get('firstName')?.errors?.['pattern']">
-              First name can only contain letters and hyphens
-            </div>
-          </small>
-        </div>
+        <app-custom-input formControlName="firstName" label="First Name" placeholder="Enter first name" icon="pi-user"
+          [required]="true" [showError]="!!(adminFrom.get('firstName')?.invalid && adminFrom.get('firstName')?.touched)"
+          [errorMessage]="adminFrom.get('firstName')?.errors?.['required'] ? 'First name is required' : 
+                         adminFrom.get('firstName')?.errors?.['minlength'] ? 'First name must be at least ' + adminFrom.get('firstName')?.errors?.['minlength'].requiredLength + ' characters' :
+                         adminFrom.get('firstName')?.errors?.['pattern'] ? 'First name can only contain letters and hyphens' : ''">
+        </app-custom-input>
 
         <!-- Last Name -->
-        <div class="form-field">
-          <label for="lastName"
-            >Last Name <span class="required">*</span></label
-          >
-          <span class="p-input-icon-left">
-            <i class="pi pi-user"></i>
-            <input
-              id="lastName"
-              type="text"
-              pInputText
-              formControlName="lastName"
-              placeholder="Enter last name"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  adminFrom.get('lastName')?.invalid &&
-                  adminFrom.get('lastName')?.touched
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              adminFrom.get('lastName')?.invalid &&
-              adminFrom.get('lastName')?.touched
-            "
-          >
-            <div *ngIf="adminFrom.get('lastName')?.errors?.['required']">
-              Last name is required
-            </div>
-
-            <div *ngIf="adminFrom.get('lastName')?.errors?.['minlength']">
-              Last name must be at least
-              {{ adminFrom.get('lastName')?.errors?.['minlength'].requiredLength }}
-              characters
-            </div>
-
-            <div *ngIf="adminFrom.get('lastName')?.errors?.['pattern']">
-              Last name can only contain letters and hyphens
-            </div>
-          </small>
-        </div>
+        <app-custom-input formControlName="lastName" label="Last Name" placeholder="Enter last name" icon="pi-user"
+          [required]="true" [showError]="!!(adminFrom.get('lastName')?.invalid && adminFrom.get('lastName')?.touched)"
+          [errorMessage]="adminFrom.get('lastName')?.errors?.['required'] ? 'Last name is required' : 
+                         adminFrom.get('lastName')?.errors?.['minlength'] ? 'Last name must be at least ' + adminFrom.get('lastName')?.errors?.['minlength'].requiredLength + ' characters' :
+                         adminFrom.get('lastName')?.errors?.['pattern'] ? 'Last name can only contain letters and hyphens' : ''">
+        </app-custom-input>
 
         <!-- Username -->
-        <div class="form-field">
-          <label for="username">Username <span class="required">*</span></label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-user-edit"></i>
-            <input
-              id="username"
-              type="text"
-              pInputText
-              formControlName="username"
-              placeholder="Enter username"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  adminFrom.get('username')?.invalid &&
-                  adminFrom.get('username')?.touched
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              adminFrom.get('username')?.invalid &&
-              adminFrom.get('username')?.touched
-            "
-          >
-            <div *ngIf="adminFrom.get('username')?.errors?.['required']">
-              Username is required
-            </div>
-
-            <div *ngIf="adminFrom.get('username')?.errors?.['minlength']">
-              Username must be at least
-              {{ adminFrom.get('username')?.errors?.['minlength'].requiredLength }}
-              characters
-            </div>
-
-            <div *ngIf="adminFrom.get('username')?.errors?.['maxlength']">
-              Username cannot exceed
-              {{ adminFrom.get('username')?.errors?.['maxlength'].requiredLength }}
-              characters
-            </div>
-
-            <div *ngIf="adminFrom.get('username')?.errors?.['pattern']">
-              Username can only contain letters, numbers, dots, hyphens and
-              underscores
-            </div>
-          </small>
-        </div>
+        <app-custom-input formControlName="username" label="Username" placeholder="Enter username" icon="pi-user-edit"
+          [required]="true" [showError]="!!(adminFrom.get('username')?.invalid && adminFrom.get('username')?.touched)"
+          [errorMessage]="adminFrom.get('username')?.errors?.['required'] ? 'Username is required' : 
+                         adminFrom.get('username')?.errors?.['minlength'] ? 'Username must be at least ' + adminFrom.get('username')?.errors?.['minlength'].requiredLength + ' characters' :
+                         adminFrom.get('username')?.errors?.['maxlength'] ? 'Username cannot exceed ' + adminFrom.get('username')?.errors?.['maxlength'].requiredLength + ' characters' :
+                         adminFrom.get('username')?.errors?.['pattern'] ? 'Username can only contain letters, numbers, dots, hyphens and underscores' : ''">
+        </app-custom-input>
 
         <!-- Email -->
-        <div class="form-field">
-          <label for="email">Email <span class="required">*</span></label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-envelope"></i>
-            <input
-              id="email"
-              type="email"
-              pInputText
-              formControlName="email"
-              placeholder="Enter email address"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  adminFrom.get('email')?.invalid &&
-                  adminFrom.get('email')?.touched
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              adminFrom.get('email')?.invalid && adminFrom.get('email')?.touched
-            "
-          >
-            <span *ngIf="adminFrom.get('email')?.errors?.['required']"
-              >Email is required</span
-            >
-            <span *ngIf="adminFrom.get('email')?.errors?.['email']"
-              >Please enter a valid email</span
-            >
-          </small>
-        </div>
+        <app-custom-input formControlName="email" label="Email" placeholder="Enter email address" icon="pi-envelope"
+          type="email" [required]="true"
+          [showError]="!!(adminFrom.get('email')?.invalid && adminFrom.get('email')?.touched)" [errorMessage]="adminFrom.get('email')?.errors?.['required'] ? 'Email is required' : 
+                         adminFrom.get('email')?.errors?.['email'] ? 'Please enter a valid email' : ''">
+        </app-custom-input>
 
         <!-- Password -->
         <div class="form-field">
           <label for="password">Password <span class="required">*</span></label>
           <span class="p-input-icon-left p-input-icon-right">
             <i class="pi pi-lock"></i>
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              pInputText
-              formControlName="password"
-              placeholder="Enter password"
-              [ngClass]="{
+            <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText formControlName="password"
+              placeholder="Enter password" [ngClass]="{
                 'ng-invalid ng-dirty':
                   adminFrom.get('password')?.invalid &&
                   adminFrom.get('password')?.touched
-              }"
-            />
-            <i
-              class="pi pi-eye"
-              style="cursor: pointer"
-              (click)="togglePassword($event)"
-            ></i>
+              }" />
+            <i class="pi pi-eye" style="cursor: pointer" (click)="togglePassword($event)"></i>
           </span>
-          <small
-            class="error-message"
-            *ngIf="
+          <small class="error-message" *ngIf="
               adminFrom.get('password')?.invalid &&
               adminFrom.get('password')?.touched
-            "
-          >
+            ">
             Password must contain at least 8 characters, one uppercase letter,
             one lowercase letter, one number and one special character
           </small>
         </div>
 
         <!-- Organisation Dropdown -->
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <label for="organisation"
-            >Organisation <span class="required">*</span></label
-          >
-          <p-dropdown
-            [options]="organisations"
-            optionLabel="name"
-            optionValue="id"
-            formControlName="organisation"
-            [filter]="true"
-            filterBy="name"
-            [style]="{ width: '100%' }"
-            [panelStyle]="{ width: '100%' }"
-            placeholder="Select Organisation"
-            [ngClass]="{
-              'ng-invalid ng-dirty':
-                adminFrom.get('organisation')?.invalid &&
-                adminFrom.get('organisation')?.touched
-            }"
-          >
-          </p-dropdown>
-          <small
-            class="error-message"
-            *ngIf="
-              adminFrom.get('organisation')?.invalid &&
-              adminFrom.get('organisation')?.touched
-            "
-          >
-            Organisation is required
-          </small>
-        </div>
+        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation"
+          placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
+          [filter]="true" filterBy="name" [required]="true"
+          [showError]="!!(adminFrom.get('organisation')?.invalid && adminFrom.get('organisation')?.touched)"
+          errorMessage="Organisation is required">
+        </app-custom-dropdown>
       </div>
     </form>
   </div>

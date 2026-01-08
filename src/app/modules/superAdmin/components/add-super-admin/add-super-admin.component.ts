@@ -95,4 +95,36 @@ export class AddSuperAdminComponent implements OnInit {
       this.adminForm.get(key)?.setValue('');
     });
   }
+
+  getFirstNameError(): string {
+    const control = this.adminForm.get('firstName');
+    if (control?.errors?.['required']) return 'First name is required';
+    if (control?.errors?.['minlength'])
+      return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'First name can only contain letters and hyphens';
+    return '';
+  }
+
+  getLastNameError(): string {
+    const control = this.adminForm.get('lastName');
+    if (control?.errors?.['required']) return 'Last name is required';
+    if (control?.errors?.['minlength'])
+      return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Last name can only contain letters and hyphens';
+    return '';
+  }
+
+  getUsernameError(): string {
+    const control = this.adminForm.get('username');
+    if (control?.errors?.['required']) return 'Username is required';
+    if (control?.errors?.['minlength'])
+      return `Username must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Username cannot exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Username can only contain letters, numbers, dots, hyphens and underscores';
+    return '';
+  }
 }

@@ -22,76 +22,44 @@
         <!-- Form Section -->
         <form [formGroup]="connectionForm" class="admin-form" #formContainer>
             <div class="form-grid">
-                <!-- Name and Description fields -->
-                <div class="form-field">
-                    <label for="name">Name <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-box"></i>
-                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
-                            [ngClass]="{'ng-invalid ng-dirty': connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched">
-                        <span *ngIf="connectionForm.get('name')?.errors?.['required']">Name is required</span>
-                        <span *ngIf="connectionForm.get('name')?.errors?.['pattern']">Name can only contain
-                            letters, spaces and hyphens</span>
-                    </small>
-                </div>
+                <!-- Name Field -->
+                <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-box"
+                    [required]="true"
+                    [showError]="!!(connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched)"
+                    [errorMessage]="connectionForm.get('name')?.errors?.['required'] ? 'Name is required' : 
+                                   connectionForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
+                </app-custom-input>
 
-                <div class="form-field">
-                    <label for="description">Description</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-align-left"></i>
-                        <input id="description" pInputText formControlName="description" rows="3"
-                            placeholder="Enter description">
-                    </span>
-                </div>
+                <!-- Description Field -->
+                <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
+                    icon="pi-align-left">
+                </app-custom-input>
 
-                <!-- Organisation and Database dropdowns -->
-                <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation<span class="required"> *</span></label>
-                    <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
-                        formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                        [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"
-                        (onChange)="onOrganisationChange($event)"
-                        [ngClass]="{'ng-invalid ng-dirty': connectionForm.get('organisation')?.invalid && connectionForm.get('organisation')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="connectionForm.get('organisation')?.invalid && connectionForm.get('organisation')?.touched">
-                        Organisation is required
-                    </small>
-                </div>
+                <!-- Organisation Dropdown -->
+                <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation"
+                    label="Organisation" placeholder="Select Organisation" [options]="organisations" optionLabel="name"
+                    optionValue="id" [filter]="true" filterBy="name" [required]="true"
+                    [showError]="!!(connectionForm.get('organisation')?.invalid && connectionForm.get('organisation')?.touched)"
+                    errorMessage="Organisation is required"
+                    (ngModelChange)="onOrganisationChange({value: connectionForm.get('organisation')?.value})">
+                </app-custom-dropdown>
 
-                <div class="form-field">
-                    <label for="database">Database<span class="required"> *</span></label>
-                    <p-dropdown [options]="databases" optionLabel="name" optionValue="id" formControlName="database"
-                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        placeholder="Select Database"
-                        [ngClass]="{'ng-invalid ng-dirty': connectionForm.get('database')?.invalid && connectionForm.get('database')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="connectionForm.get('database')?.invalid && connectionForm.get('database')?.touched">
-                        Database is required
-                    </small>
-                </div>
+                <!-- Database Dropdown -->
+                <app-custom-dropdown formControlName="database" label="Database" placeholder="Select Database"
+                    [options]="databases" optionLabel="name" optionValue="id" [filter]="true" filterBy="name"
+                    [required]="true"
+                    [showError]="!!(connectionForm.get('database')?.invalid && connectionForm.get('database')?.touched)"
+                    errorMessage="Database is required">
+                </app-custom-dropdown>
 
-                <!--DB Username-->
-                <div class="form-field">
-                    <label for="dbUsername">Database Username <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-box"></i>
-                        <input id="username" type="text" pInputText formControlName="dbUsername"
-                            placeholder="Enter Database Username"
-                            [ngClass]="{'ng-invalid ng-dirty': connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched">
-                        <span *ngIf="connectionForm.get('dbUsername')?.errors?.['required']">Database Username is
-                            required</span>
-                    </small>
-                </div>
+                <!-- DB Username -->
+                <app-custom-input formControlName="dbUsername" label="Database Username"
+                    placeholder="Enter Database Username" icon="pi-user" [required]="true"
+                    [showError]="!!(connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched)"
+                    errorMessage="Database Username is required">
+                </app-custom-input>
 
-                <!--DB password-->
+                <!-- DB Password -->
                 <div class="form-field">
                     <label for="password">Database Password<span class="required"> *</span></label>
                     <span class="p-input-icon-left p-input-icon-right">

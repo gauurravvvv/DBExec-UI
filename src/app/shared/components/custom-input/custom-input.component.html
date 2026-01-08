@@ -1,0 +1,32 @@
+<div class="form-field">
+    <label *ngIf="label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+    </label>
+    <span class="p-input-icon-left" *ngIf="icon; else noIconInput">
+        <i class="pi {{ icon }}"></i>
+        <input 
+            [type]="type" 
+            pInputText 
+            [placeholder]="placeholder"
+            [value]="value"
+            [disabled]="disabled"
+            [ngClass]="{'ng-invalid ng-dirty': showError}"
+            (input)="onInputChange($event)"
+            (blur)="onBlur()">
+    </span>
+    <ng-template #noIconInput>
+        <input 
+            [type]="type" 
+            pInputText 
+            [placeholder]="placeholder"
+            [value]="value"
+            [disabled]="disabled"
+            [ngClass]="{'ng-invalid ng-dirty': showError}"
+            (input)="onInputChange($event)"
+            (blur)="onBlur()">
+    </ng-template>
+    <small class="error-message" *ngIf="showError && errorMessage">
+        {{ errorMessage }}
+    </small>
+</div>

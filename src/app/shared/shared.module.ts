@@ -13,11 +13,15 @@ import { ConfigurableGaugeChartComponent } from './components/configurable-gauge
 import { ConfigurableCardChartComponent } from './components/configurable-card-chart/configurable-card-chart.component';
 import { ConfigurableHeatmapChartComponent } from './components/configurable-heatmap-chart/configurable-heatmap-chart.component';
 import { ConfigurableTreemapChartComponent } from './components/configurable-treemap-chart/configurable-treemap-chart.component';
+import { CustomInputComponent } from './components/custom-input/custom-input.component';
+import { CustomDropdownComponent } from './components/custom-dropdown/custom-dropdown.component';
+import { CustomMultiselectComponent } from './components/custom-multiselect/custom-multiselect.component';
+import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.component';
 
 @NgModule({
   declarations: [
-    ChangePasswordDialogComponent, 
-    ConfigurableBarChartComponent, 
+    ChangePasswordDialogComponent,
+    ConfigurableBarChartComponent,
     ConfigurableLineChartComponent,
     ConfigurableAreaChartComponent,
     ConfigurablePolarChartComponent,
@@ -25,12 +29,22 @@ import { ConfigurableTreemapChartComponent } from './components/configurable-tre
     ConfigurableGaugeChartComponent,
     ConfigurableCardChartComponent,
     ConfigurableHeatmapChartComponent,
-    ConfigurableTreemapChartComponent
+    ConfigurableTreemapChartComponent,
+    CustomInputComponent,
+    CustomDropdownComponent,
+    CustomMultiselectComponent,
+    CustomToggleComponent,
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, AppPrimeNGModule, NgxChartsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    AppPrimeNGModule,
+    NgxChartsModule,
+  ],
   exports: [
-    ChangePasswordDialogComponent, 
-    ConfigurableBarChartComponent, 
+    ChangePasswordDialogComponent,
+    ConfigurableBarChartComponent,
     ConfigurableLineChartComponent,
     ConfigurableAreaChartComponent,
     ConfigurablePolarChartComponent,
@@ -38,9 +52,11 @@ import { ConfigurableTreemapChartComponent } from './components/configurable-tre
     ConfigurableGaugeChartComponent,
     ConfigurableCardChartComponent,
     ConfigurableHeatmapChartComponent,
-    ConfigurableTreemapChartComponent
+    ConfigurableTreemapChartComponent,
+    CustomInputComponent,
+    CustomDropdownComponent,
+    CustomMultiselectComponent,
+    CustomToggleComponent,
   ],
 })
 export class SharedModule {}
-
-

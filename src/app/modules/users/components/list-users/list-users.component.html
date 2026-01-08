@@ -21,13 +21,10 @@
 
                     <!-- Organisation Dropdown -->
                     <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                        <span class="p-float-label">
-                            <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
-                                [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)" inputId="org-dropdown">
-                            </p-dropdown>
-                            <label for="org-dropdown">Organisation</label>
-                        </span>
+                        <app-custom-dropdown [(ngModel)]="selectedOrg" placeholder="Select Organisation"
+                            [options]="organisations" optionLabel="name" [filter]="true" filterBy="name"
+                            (ngModelChange)="onOrgChange({value: selectedOrg})">
+                        </app-custom-dropdown>
                     </div>
                 </div>
             </div>

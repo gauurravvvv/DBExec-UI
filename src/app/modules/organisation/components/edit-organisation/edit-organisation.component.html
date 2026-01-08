@@ -48,146 +48,74 @@
             <!-- Step 1: Basic Information -->
             <div *ngIf="currentStep === 0" class="form-grid">
                 <!-- Organisation Name -->
-                <div class="form-field">
-                    <label for="name">Organisation Name <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-building"></i>
-                        <input id="name" type="text" pInputText formControlName="name"
-                            placeholder="Enter organisation name"
-                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('name')?.invalid && orgForm.get('name')?.touched}">
-                    </span>
-                    <small class="error-message" *ngIf="orgForm.get('name')?.invalid && orgForm.get('name')?.touched">
-                        Organisation name is required
-                    </small>
-                </div>
+                <app-custom-input formControlName="name" label="Organisation Name" placeholder="Enter organisation name"
+                    icon="pi-building" [required]="true"
+                    [showError]="!!(orgForm.get('name')?.invalid && orgForm.get('name')?.touched)"
+                    errorMessage="Organisation name is required">
+                </app-custom-input>
 
-                <!-- Description -->
-
-                <div class="form-field">
-                    <label for="description">Organisation Description <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-align-left"></i>
-                        <input id="description" type="text" pInputText formControlName="description"
-                            placeholder="Enter organisation description"
-                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('description')?.invalid && orgForm.get('description')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="orgForm.get('description')?.invalid && orgForm.get('description')?.touched">
-                        Organisation description is required
-                    </small>
-                </div>
+                <!-- Organisation Description -->
+                <app-custom-input formControlName="description" label="Organisation Description"
+                    placeholder="Enter organisation description" icon="pi-align-left" [required]="true"
+                    [showError]="!!(orgForm.get('description')?.invalid && orgForm.get('description')?.touched)"
+                    errorMessage="Organisation description is required">
+                </app-custom-input>
 
                 <!-- Status -->
-                <div class="form-field">
-                    <label for="status">Status</label>
-                    <div class="d-flex align-items-center pt-2">
-                        <p-inputSwitch class="ml-2" formControlName="status" [trueValue]="1"
-                            [falseValue]="0"></p-inputSwitch>
-                        <span class="ml-2 mb-1">{{ orgForm.get('status')?.value === 1 ? 'Active' : 'Inactive' }}</span>
-                    </div>
-                </div>
+                <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0"
+                    trueLabel="Active" falseLabel="Inactive">
+                </app-custom-toggle>
             </div>
 
             <!-- Step 2: Organisation Configuration -->
             <div *ngIf="currentStep === 1" class="form-grid">
                 <!-- Max Admins -->
-                <div class="form-field">
-                    <label for="maxAdmins">Maximum Admins <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-user-plus"></i>
-                        <input id="maxAdmins" type="text" pInputText formControlName="maxAdmins"
-                            placeholder="Enter maximum admins" (input)="onNumberInput($event)" maxlength="5"
-                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('maxAdmins')?.invalid && orgForm.get('maxAdmins')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="orgForm.get('maxAdmins')?.invalid && orgForm.get('maxAdmins')?.touched">
-                        <span *ngIf="orgForm.get('maxAdmins')?.errors?.['required']">Maximum admins is required</span>
-                        <span *ngIf="orgForm.get('maxAdmins')?.errors?.['min']">Value must be at least 1</span>
-                    </small>
-                </div>
+                <app-custom-input formControlName="maxAdmins" label="Maximum Admins" placeholder="Enter maximum admins"
+                    icon="pi-user-plus" [required]="true"
+                    [showError]="!!(orgForm.get('maxAdmins')?.invalid && orgForm.get('maxAdmins')?.touched)"
+                    [errorMessage]="orgForm.get('maxAdmins')?.errors?.['required'] ? 'Maximum admins is required' : 
+                                   orgForm.get('maxAdmins')?.errors?.['min'] ? 'Value must be at least 1' : ''">
+                </app-custom-input>
 
                 <!-- Max Users -->
-                <div class="form-field">
-                    <label for="maxUsers">Maximum Users <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-user"></i>
-                        <input id="maxUsers" type="text" pInputText formControlName="maxUsers"
-                            placeholder="Enter maximum users" (input)="onNumberInput($event)" maxlength="5"
-                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('maxUsers')?.invalid && orgForm.get('maxUsers')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="orgForm.get('maxUsers')?.invalid && orgForm.get('maxUsers')?.touched">
-                        <span *ngIf="orgForm.get('maxUsers')?.errors?.['required']">Maximum users is required</span>
-                        <span *ngIf="orgForm.get('maxUsers')?.errors?.['min']">Value must be at least 1</span>
-                    </small>
-                </div>
+                <app-custom-input formControlName="maxUsers" label="Maximum Users" placeholder="Enter maximum users"
+                    icon="pi-user" [required]="true"
+                    [showError]="!!(orgForm.get('maxUsers')?.invalid && orgForm.get('maxUsers')?.touched)"
+                    [errorMessage]="orgForm.get('maxUsers')?.errors?.['required'] ? 'Maximum users is required' : 
+                                   orgForm.get('maxUsers')?.errors?.['min'] ? 'Value must be at least 1' : ''">
+                </app-custom-input>
 
                 <!-- Max User Groups -->
-                <div class="form-field">
-                    <label for="maxUsers">Maximum Groups <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-users"></i>
-                        <input id="maxGroups" type="text" pInputText formControlName="maxGroups"
-                            placeholder="Enter maximum groups" (input)="onNumberInput($event)" maxlength="5"
-                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('maxGroups')?.invalid && orgForm.get('maxGroups')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="orgForm.get('maxGroups')?.invalid && orgForm.get('maxGroups')?.touched">
-                        <span *ngIf="orgForm.get('maxGroups')?.errors?.['required']">Maximum groups is required</span>
-                        <span *ngIf="orgForm.get('maxGroups')?.errors?.['min']">Value must be at least 1</span>
-                    </small>
-                </div>
+                <app-custom-input formControlName="maxGroups" label="Maximum Groups" placeholder="Enter maximum groups"
+                    icon="pi-users" [required]="true"
+                    [showError]="!!(orgForm.get('maxGroups')?.invalid && orgForm.get('maxGroups')?.touched)"
+                    [errorMessage]="orgForm.get('maxGroups')?.errors?.['required'] ? 'Maximum groups is required' : 
+                                   orgForm.get('maxGroups')?.errors?.['min'] ? 'Value must be at least 1' : ''">
+                </app-custom-input>
 
                 <!-- Max Environments -->
-                <div class="form-field">
-                    <label for="maxEnvironments">Maximum Environments <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-globe"></i>
-                        <input id="maxEnvironments" type="text" pInputText formControlName="maxEnvironments"
-                            placeholder="Enter maximum environments" (input)="onNumberInput($event)" maxlength="5"
-                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('maxEnvironments')?.invalid && orgForm.get('maxEnvironments')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="orgForm.get('maxEnvironments')?.invalid && orgForm.get('maxEnvironments')?.touched">
-                        <span *ngIf="orgForm.get('maxEnvironments')?.errors?.['required']">Maximum environments is
-                            required</span>
-                        <span *ngIf="orgForm.get('maxEnvironments')?.errors?.['min']">Value must be at least 1</span>
-                    </small>
-                </div>
+                <app-custom-input formControlName="maxEnvironments" label="Maximum Environments"
+                    placeholder="Enter maximum environments" icon="pi-globe" [required]="true"
+                    [showError]="!!(orgForm.get('maxEnvironments')?.invalid && orgForm.get('maxEnvironments')?.touched)"
+                    [errorMessage]="orgForm.get('maxEnvironments')?.errors?.['required'] ? 'Maximum environments is required' : 
+                                   orgForm.get('maxEnvironments')?.errors?.['min'] ? 'Value must be at least 1' : ''">
+                </app-custom-input>
 
                 <!-- Max Categories -->
-                <div class="form-field">
-                    <label for="maxCategories">Maximum Categories <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-list"></i>
-                        <input id="maxCategories" type="text" pInputText formControlName="maxCategories"
-                            placeholder="Enter maximum categories" (input)="onNumberInput($event)" maxlength="5"
-                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('maxCategories')?.invalid && orgForm.get('maxCategories')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="orgForm.get('maxCategories')?.invalid && orgForm.get('maxCategories')?.touched">
-                        <span *ngIf="orgForm.get('maxCategories')?.errors?.['required']">Maximum categories is
-                            required</span>
-                        <span *ngIf="orgForm.get('maxCategories')?.errors?.['min']">Value must be at least 1</span>
-                    </small>
-                </div>
+                <app-custom-input formControlName="maxCategories" label="Maximum Categories"
+                    placeholder="Enter maximum categories" icon="pi-list" [required]="true"
+                    [showError]="!!(orgForm.get('maxCategories')?.invalid && orgForm.get('maxCategories')?.touched)"
+                    [errorMessage]="orgForm.get('maxCategories')?.errors?.['required'] ? 'Maximum categories is required' : 
+                                   orgForm.get('maxCategories')?.errors?.['min'] ? 'Value must be at least 1' : ''">
+                </app-custom-input>
 
                 <!-- Max Databases -->
-                <div class="form-field">
-                    <label for="maxDatabases">Maximum Databases <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-database"></i>
-                        <input id="maxDatabases" type="text" pInputText formControlName="maxDatabases"
-                            placeholder="Enter maximum databases" (input)="onNumberInput($event)" maxlength="5"
-                            [ngClass]="{'ng-invalid ng-dirty': orgForm.get('maxDatabases')?.invalid && orgForm.get('maxDatabases')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="orgForm.get('maxDatabases')?.invalid && orgForm.get('maxDatabases')?.touched">
-                        <span *ngIf="orgForm.get('maxDatabases')?.errors?.['required']">Maximum databases is
-                            required</span>
-                        <span *ngIf="orgForm.get('maxDatabases')?.errors?.['min']">Value must be at least 1</span>
-                    </small>
-                </div>
+                <app-custom-input formControlName="maxDatabases" label="Maximum Databases"
+                    placeholder="Enter maximum databases" icon="pi-database" [required]="true"
+                    [showError]="!!(orgForm.get('maxDatabases')?.invalid && orgForm.get('maxDatabases')?.touched)"
+                    [errorMessage]="orgForm.get('maxDatabases')?.errors?.['required'] ? 'Maximum databases is required' : 
+                                   orgForm.get('maxDatabases')?.errors?.['min'] ? 'Value must be at least 1' : ''">
+                </app-custom-input>
             </div>
         </form>
     </div>

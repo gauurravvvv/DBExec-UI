@@ -21,79 +21,52 @@
         <!-- Form Section -->
         <form [formGroup]="connectionForm" class="admin-form" #formContainer>
             <div class="form-grid">
-                <!-- Name and Description fields -->
-                <div class="form-field">
-                    <label for="name">Name <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-box"></i>
-                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
-                            [ngClass]="{
-                'ng-invalid ng-dirty':
-                  connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched
-              }" />
-                    </span>
-                    <small class="error-message"
-                        *ngIf="connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched">
-                        <span *ngIf="connectionForm.get('name')?.errors?.['required']">Name is required</span>
-                        <span *ngIf="connectionForm.get('name')?.errors?.['pattern']">Name can only contain letters,
-                            spaces and
-                            hyphens</span>
-                    </small>
-                </div>
+                <!-- Name Field -->
+                <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-box"
+                    [required]="true"
+                    [showError]="!!(connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched)"
+                    [errorMessage]="connectionForm.get('name')?.errors?.['required'] ? 'Name is required' : 
+                                   connectionForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
+                </app-custom-input>
 
-                <div class="form-field">
-                    <label for="description">Description</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-align-left"></i>
-                        <input id="description" pInputText formControlName="description" rows="3"
-                            placeholder="Enter description" />
-                    </span>
-                </div>
+                <!-- Description Field -->
+                <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
+                    icon="pi-align-left">
+                </app-custom-input>
 
-                <!-- Organisation and Database fields (disabled) -->
+                <!-- Organisation Field (readonly) -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
                     <label for="organisation">Organisation</label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-building"></i>
-                        <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled />
+                        <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled
+                            class="readonly" />
                     </span>
                 </div>
 
+                <!-- Database Field (readonly) -->
                 <div class="form-field">
                     <label for="database">Database</label>
                     <span class="p-input-icon-left">
                         <i class="pi pi-database"></i>
-                        <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled />
+                        <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled
+                            class="readonly" />
                     </span>
                 </div>
 
-                <div class="form-field">
-                    <label for="status">Status</label>
-                    <div class="status-wrapper">
-                        <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
-                        <span class="status-text">{{
-                            connectionForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
-                            }}</span>
-                    </div>
-                </div>
+                <!-- Status Toggle -->
+                <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0"
+                    trueLabel="Active" falseLabel="Inactive">
+                </app-custom-toggle>
 
-                <!--DB Username-->
-                <div class="form-field">
-                    <label for="dbUsername">Database Username <span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-box"></i>
-                        <input id="username" type="text" pInputText formControlName="dbUsername"
-                            placeholder="Enter Database Username"
-                            [ngClass]="{'ng-invalid ng-dirty': connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched">
-                        <span *ngIf="connectionForm.get('dbUsername')?.errors?.['required']">Database Username is
-                            required</span>
-                    </small>
-                </div>
+                <!-- DB Username -->
+                <app-custom-input formControlName="dbUsername" label="Database Username"
+                    placeholder="Enter Database Username" icon="pi-user" [required]="true"
+                    [showError]="!!(connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched)"
+                    errorMessage="Database Username is required">
+                </app-custom-input>
 
-                <!--DB password-->
+                <!-- DB Password -->
                 <div class="form-field">
                     <label for="password">Database Password<span class="required"> *</span></label>
                     <span class="p-input-icon-left p-input-icon-right">

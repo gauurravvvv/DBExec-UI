@@ -23,58 +23,33 @@
         <form [formGroup]="userGroupForm" class="admin-form">
             <div class="form-grid">
                 <!-- Name Field -->
-                <div class="form-field">
-                    <label for="name">Name<span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-key"></i>
-                        <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
-                            [ngClass]="{'ng-invalid ng-dirty': userGroupForm.get('name')?.invalid && userGroupForm.get('name')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="userGroupForm.get('name')?.invalid && userGroupForm.get('name')?.touched">
-                        <span *ngIf="userGroupForm.get('name')?.errors?.['required']">Name is required</span>
-                        <span *ngIf="userGroupForm.get('name')?.errors?.['pattern']">Name can only contain
-                            letters, spaces and hyphens</span>
-                    </small>
-                </div>
+                <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-key"
+                    [required]="true"
+                    [showError]="!!(userGroupForm.get('name')?.invalid && userGroupForm.get('name')?.touched)"
+                    [errorMessage]="userGroupForm.get('name')?.errors?.['required'] ? 'Name is required' : 
+                                   userGroupForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
+                </app-custom-input>
 
                 <!-- Description Field -->
-                <div class="form-field">
-                    <label for="description">Description</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-align-left"></i>
-                        <input id="description" pInputText formControlName="description" rows="3"
-                            placeholder="Enter description">
-                    </span>
-                </div>
+                <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
+                    icon="pi-align-left">
+                </app-custom-input>
 
                 <!-- Organisation Dropdown -->
-                <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation<span class="required">*</span></label>
-                    <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
-                        formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                        [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"
-                        [ngClass]="{'ng-invalid ng-dirty': userGroupForm.get('organisation')?.invalid && userGroupForm.get('organisation')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="userGroupForm.get('organisation')?.invalid && userGroupForm.get('organisation')?.touched">
-                        Organisation is required
-                    </small>
-                </div>
+                <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation"
+                    label="Organisation" placeholder="Select Organisation" [options]="organisations" optionLabel="name"
+                    optionValue="id" [filter]="true" filterBy="name" [required]="true"
+                    [showError]="!!(userGroupForm.get('organisation')?.invalid && userGroupForm.get('organisation')?.touched)"
+                    errorMessage="Organisation is required">
+                </app-custom-dropdown>
 
-                <!-- Environments Dropdown -->
-                <div class="form-field">
-                    <label for="users">Users<span class="required">*</span></label>
-                    <p-multiSelect [options]="users" formControlName="users" optionLabel="username" optionValue="id"
-                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        placeholder="Select Users" display="chip"
-                        [ngClass]="{'ng-invalid ng-dirty': userGroupForm.get('users')?.invalid && userGroupForm.get('users')?.touched}">
-                    </p-multiSelect>
-                    <small class="error-message"
-                        *ngIf="userGroupForm.get('users')?.invalid && userGroupForm.get('users')?.touched">
-                        At least two users are required
-                    </small>
-                </div>
+                <!-- Users Multiselect -->
+                <app-custom-multiselect formControlName="users" label="Users" placeholder="Select Users"
+                    [options]="users" optionLabel="username" optionValue="id" [filter]="true" filterBy="name"
+                    display="chip" [required]="true"
+                    [showError]="!!(userGroupForm.get('users')?.invalid && userGroupForm.get('users')?.touched)"
+                    errorMessage="At least two users are required">
+                </app-custom-multiselect>
             </div>
         </form>
     </div>

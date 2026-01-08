@@ -14,33 +14,15 @@
           <div class="search-box">
             <span class="p-input-icon-left">
               <i class="pi pi-search"></i>
-              <input
-                pInputText
-                type="text"
-                placeholder="Search..."
-                (input)="onSearch($event)"
-                [value]="searchTerm"
-              />
+              <input pInputText type="text" placeholder="Search..." (input)="onSearch($event)" [value]="searchTerm" />
             </span>
           </div>
 
           <!-- Organisation Dropdown -->
           <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-            <span class="p-float-label">
-              <p-dropdown
-                [options]="organisations"
-                [(ngModel)]="selectedOrg"
-                optionLabel="name"
-                [filter]="true"
-                filterBy="name"
-                [style]="{ width: '100%' }"
-                [panelStyle]="{ width: '100%' }"
-                (onChange)="onOrgChange($event)"
-                inputId="org-dropdown"
-              >
-              </p-dropdown>
-              <label for="org-dropdown">Organisation</label>
-            </span>
+            <app-custom-dropdown [(ngModel)]="selectedOrg" placeholder="Select Organisation" [options]="organisations"
+              optionLabel="name" [filter]="true" filterBy="name" (ngModelChange)="onOrgChange({value: selectedOrg})">
+            </app-custom-dropdown>
           </div>
         </div>
       </div>
@@ -52,20 +34,11 @@
               <th>Email</th>
               <th>
                 Status
-                <p-menu
-                  #statusMenu
-                  [popup]="true"
-                  [model]="statusFilterItems"
-                  [style]="{ width: '150px' }"
-                  appendTo="body"
-                >
+                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems" [style]="{ width: '150px' }"
+                  appendTo="body">
                 </p-menu>
-                <i
-                  class="pi pi-filter"
-                  (click)="statusMenu.toggle($event)"
-                  [ngClass]="{ 'active-filter': selectedStatus !== null }"
-                  style="margin-left: 5px; cursor: pointer"
-                >
+                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
+                  [ngClass]="{ 'active-filter': selectedStatus !== null }" style="margin-left: 5px; cursor: pointer">
                 </i>
               </th>
               <th>Last Login</th>
@@ -74,58 +47,40 @@
             </tr>
           </thead>
           <tbody>
-            <ng-container
-              *ngIf="filteredAdmins && filteredAdmins.length > 0; else noData"
-            >
+            <ng-container *ngIf="filteredAdmins && filteredAdmins.length > 0; else noData">
               <tr *ngFor="let admin of filteredAdmins">
                 <td>
-                  <a
-                    class="admin-name"
-                    [routerLink]="[
+                  <a class="admin-name" [routerLink]="[
                       '/app/org-admin/view',
                       selectedOrg.id,
                       admin.id
-                    ]"
-                  >
+                    ]">
                     {{ admin.firstName + ' ' + admin?.lastName }}
                   </a>
                 </td>
                 <td>{{ admin.email }}</td>
                 <td>
-                  <span
-                    class="status-badge"
-                    [class.active]="admin.status === 1"
-                  >
+                  <span class="status-badge" [class.active]="admin.status === 1">
                     {{ admin.status === 1 ? 'Active' : 'Inactive' }}
                   </span>
                 </td>
                 <td>
                   {{
-                    admin.lastLogin
-                      ? (admin.lastLogin | date : 'medium')
-                      : 'Never logged in'
+                  admin.lastLogin
+                  ? (admin.lastLogin | date : 'medium')
+                  : 'Never logged in'
                   }}
                 </td>
                 <td>{{ admin.createdOn | date : 'mediumDate' }}</td>
                 <td class="actions">
-                  <button
-                    class="action-btn edit"
-                    (click)="onEdit(admin.id)"
-                    title="Edit"
-                    [disabled]="
+                  <button class="action-btn edit" (click)="onEdit(admin.id)" title="Edit" [disabled]="
                       !showOrganisationDropdown && admin.id == loggedInUserId
-                    "
-                  >
+                    ">
                     <i class="pi pi-pencil"></i>
                   </button>
-                  <button
-                    class="action-btn delete"
-                    (click)="confirmDelete(admin.id)"
-                    title="Delete"
-                    [disabled]="
+                  <button class="action-btn delete" (click)="confirmDelete(admin.id)" title="Delete" [disabled]="
                       !showOrganisationDropdown && admin.id == loggedInUserId
-                    "
-                  >
+                    ">
                     <i class="pi pi-trash"></i>
                   </button>
                 </td>
@@ -137,9 +92,7 @@
                   <div class="no-data">
                     <i class="pi pi-inbox"></i>
                     <p>No records found</p>
-                    <span class="sub-text"
-                      >No admin data is available at the moment</span
-                    >
+                    <span class="sub-text">No admin data is available at the moment</span>
                   </div>
                 </td>
               </tr>
@@ -157,26 +110,14 @@
             <ng-template #noEntries> Showing 0 to 0 of 0 entries </ng-template>
           </div>
           <div class="pagination-controls">
-            <button
-              [disabled]="currentPage === 1"
-              (click)="onPageChange(currentPage - 1)"
-              class="page-btn"
-            >
+            <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
               <i class="pi pi-chevron-left"></i>
             </button>
-            <button
-              *ngFor="let page of pages"
-              (click)="onPageChange(page)"
-              class="page-btn"
-              [class.active]="page === currentPage"
-            >
+            <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
+              [class.active]="page === currentPage">
               {{ page }}
             </button>
-            <button
-              [disabled]="currentPage === totalPages"
-              (click)="onPageChange(currentPage + 1)"
-              class="page-btn"
-            >
+            <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)" class="page-btn">
               <i class="pi pi-chevron-right"></i>
             </button>
           </div>

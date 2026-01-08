@@ -1,0 +1,136 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 0;
+
+  label {
+    font-weight: 500;
+    color: var(--text-color);
+
+    .required {
+      color: var(--error-color);
+      margin-left: 4px;
+    }
+  }
+
+  .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+  }
+}
+
+:host ::ng-deep {
+  .p-dropdown {
+    background: var(--card-background);
+    border-color: var(--border-color);
+
+    &.ng-invalid.ng-touched,
+    &.ng-invalid.ng-dirty {
+      border-color: var(--error-color);
+    }
+
+    &:not(.ng-invalid) {
+      border-color: var(--border-color);
+    }
+
+    &.p-focus {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+    }
+
+    .p-dropdown-label {
+      color: var(--text-color);
+
+      &.p-placeholder {
+        color: var(--text-color);
+        opacity: 0.4;
+      }
+
+      &.p-highlight {
+        background: transparent !important;
+        color: var(--text-color) !important;
+      }
+    }
+
+    .p-dropdown-trigger {
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+  }
+
+  .p-dropdown-panel {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+
+    .p-dropdown-header {
+      background: var(--hover-background) !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      padding: 0.5rem !important;
+
+      .p-dropdown-filter {
+        background: var(--card-background) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-color) !important;
+
+        &::placeholder {
+          color: var(--text-color) !important;
+          opacity: 0.4;
+        }
+      }
+
+      .p-dropdown-filter-icon {
+        color: var(--text-color) !important;
+        opacity: 0.7;
+      }
+    }
+
+    .p-dropdown-items {
+      padding: 0.5rem 0;
+      background: var(--card-background) !important;
+
+      .p-dropdown-item {
+        color: var(--text-color) !important;
+        padding: 0.75rem 1rem;
+
+        &:hover {
+          background: var(--hover-background) !important;
+          color: var(--text-color) !important;
+        }
+
+        &.p-highlight {
+          background: var(--hover-background) !important;
+          color: var(--primary-color) !important;
+        }
+      }
+
+      .p-dropdown-empty-message {
+        color: var(--text-color) !important;
+        padding: 0.75rem 1rem;
+        opacity: 0.4;
+      }
+    }
+
+    .p-dropdown-items-wrapper {
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+
+        &:hover {
+          background: var(--secondary-color);
+        }
+      }
+    }
+  }
+}

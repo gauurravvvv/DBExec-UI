@@ -1,0 +1,8 @@
+<div class="form-field">
+    <label *ngIf="label">{{ label }}</label>
+    <div class="toggle-container">
+        <p-inputSwitch [ngModel]="isChecked" [disabled]="disabled" (onChange)="onToggleChange($event.checked)">
+        </p-inputSwitch>
+        <span class="status-label" *ngIf="showStatusLabel">{{ statusLabel }}</span>
+    </div>
+</div>

@@ -101,6 +101,7 @@
         }
       }
 
+      // Username field specific styles (readonly)
       .form-field {
         width: 100%;
 
@@ -115,8 +116,7 @@
           }
         }
 
-        .p-input-icon-left,
-        .p-input-icon-right {
+        .p-input-icon-left {
           width: 100%;
 
           input {
@@ -130,84 +130,25 @@
               opacity: 0.5;
             }
 
-            &:focus {
-              border-color: var(--primary-color);
-              box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
-            }
+            &.readonly {
+              background: var(--hover-background) !important;
+              cursor: not-allowed;
+              opacity: 0.7;
 
-            &.ng-invalid.ng-dirty {
-              border-color: var(--error-color);
+              &:focus {
+                box-shadow: none;
+                border-color: var(--border-color);
+              }
             }
           }
 
           i {
             color: var(--text-color);
             opacity: 0.7;
-
-            &.pi-eye {
-              cursor: pointer;
-              &:hover {
-                opacity: 1;
-              }
-            }
           }
-        }
-
-        .error-message {
-          color: var(--error-color);
-          font-size: 0.875rem;
-          margin-top: 0.25rem;
-          display: block;
-        }
-
-        input.readonly {
-          background: var(--hover-background) !important;
-          cursor: not-allowed;
-          opacity: 0.7;
-
-          &:focus {
-            box-shadow: none;
-            border-color: var(--border-color);
-          }
-        }
-
-        // Status switch styling
-        .d-flex {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-
-          span {
-            color: var(--text-color);
-            font-size: 1rem;
-            line-height: 1;
-            margin-top: 2px;
-          }
-        }
-      }
-
-      .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 24px;
-
-        .p-button {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
         }
       }
     }
-  }
-}
-
-.p-input-icon-left.p-input-icon-right {
-  position: relative;
-
-  i.pi-lock {
-    left: 12px;
-    font-size: 1.1rem;
   }
 }
 
@@ -249,54 +190,6 @@
 
         &:hover:not(:disabled) {
           background: rgba(var(--error-rgb), 0.04) !important;
-        }
-      }
-    }
-  }
-
-  // InputSwitch styling
-  .p-inputswitch {
-    width: 3rem !important;
-    height: 1.5rem !important;
-    display: flex !important;
-    align-items: center !important;
-
-    .p-inputswitch-slider {
-      background: var(--border-color) !important;
-      border-radius: 30px !important;
-
-      &:before {
-        background: var(--card-background) !important;
-        width: 1rem !important;
-        height: 1rem !important;
-        left: 0.25rem !important;
-        margin-top: -0.5rem !important;
-        border-radius: 50% !important;
-        transition: all 0.2s ease !important;
-      }
-    }
-
-    &.p-inputswitch-checked {
-      .p-inputswitch-slider {
-        background: var(--success-color) !important;
-
-        &:before {
-          transform: translateX(1.5rem) !important;
-        }
-      }
-    }
-
-    &:not(.p-disabled) {
-      &:hover {
-        .p-inputswitch-slider {
-          background: var(--secondary-color) !important;
-        }
-      }
-
-      &.p-inputswitch-checked:hover {
-        .p-inputswitch-slider {
-          background: var(--success-color) !important;
-          opacity: 0.9;
         }
       }
     }

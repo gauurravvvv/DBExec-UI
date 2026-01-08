@@ -1,0 +1,14 @@
+<div class="form-field">
+    <label *ngIf="label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+    </label>
+    <p-multiSelect [options]="options" [optionLabel]="optionLabel" [optionValue]="optionValue" [(ngModel)]="value"
+        [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
+        [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [display]="display" [disabled]="disabled"
+        [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)" (onBlur)="onBlur()">
+    </p-multiSelect>
+    <small class="error-message" *ngIf="showError && errorMessage">
+        {{ errorMessage }}
+    </small>
+</div>

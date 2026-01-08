@@ -101,6 +101,7 @@
         }
       }
 
+      // Password field specific styles (not using custom component)
       .form-field {
         width: 100%;
 
@@ -158,19 +159,6 @@
           font-size: 0.875rem;
           margin-top: 0.25rem;
           display: block;
-        }
-      }
-
-      .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 24px;
-
-        .p-button {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
         }
       }
     }
