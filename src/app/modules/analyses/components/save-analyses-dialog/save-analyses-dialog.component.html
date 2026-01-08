@@ -4,28 +4,18 @@
         <form [formGroup]="analysisForm" class="analysis-form">
             <!-- Analysis Name -->
             <div class="form-field">
-                <label for="analysisName">Name <span class="required">*</span></label>
-                <span class="p-input-icon-left">
-                    <i class="pi pi-chart-bar"></i>
-                    <input id="analysisName" type="text" pInputText formControlName="name"
-                        placeholder="Enter analysis name" maxlength="100"
-                        [ngClass]="{'ng-invalid ng-dirty': analysisForm.get('name')?.invalid && analysisForm.get('name')?.touched}">
-                </span>
-                <small class="error-message"
-                    *ngIf="analysisForm.get('name')?.invalid && analysisForm.get('name')?.touched">
-                    Analysis name is required
-                </small>
+                <app-custom-input formControlName="name" label="Name" placeholder="Enter analysis name"
+                    icon="pi-chart-bar" [required]="true"
+                    [showError]="!!(analysisForm.get('name')?.invalid && analysisForm.get('name')?.touched)"
+                    errorMessage="Analysis name is required">
+                </app-custom-input>
             </div>
 
             <!-- Description -->
             <div class="form-field">
-                <label for="analysisDescription">Description</label>
-                <span class="p-input-icon-left">
-                    <i class="pi pi-align-left"></i>
-                    <input id="analysisDescription" type="text" pInputText formControlName="description"
-                        placeholder="Enter analysis description (optional)" maxlength="500"
-                        [ngClass]="{'ng-invalid ng-dirty': analysisForm.get('description')?.invalid && analysisForm.get('description')?.touched}">
-                </span>
+                <app-custom-input formControlName="description" label="Description"
+                    placeholder="Enter analysis description (optional)" icon="pi-align-left">
+                </app-custom-input>
                 <small class="char-count">
                     {{ analysisForm.get('description')?.value?.length || 0 }}/500 characters
                 </small>

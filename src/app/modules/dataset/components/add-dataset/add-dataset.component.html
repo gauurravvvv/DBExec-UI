@@ -4,25 +4,18 @@
         <div class="toolbar-left">
             <!-- Organisation Dropdown -->
             <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                <span class="p-float-label">
-                    <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name" [filter]="true"
-                        filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        (onChange)="onOrgChange($event)" inputId="org-dropdown">
-                    </p-dropdown>
-                    <label for="org-dropdown">Organisation</label>
-                </span>
+                <app-custom-dropdown [(ngModel)]="selectedOrg" label="Select Organisation" [floatingLabel]="true"
+                    [options]="organisations" optionLabel="name" [optionValue]="null" [filter]="true" filterBy="name"
+                    [floatingLabel]="true" (onChangeEvent)="onOrgChange({value: $event})">
+                </app-custom-dropdown>
             </div>
 
             <!-- Database Dropdown -->
             <div class="dropdown-field">
-                <span class="p-float-label">
-                    <p-dropdown [options]="availableDatabases" [(ngModel)]="selectedDatabaseObj" optionLabel="name"
-                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        (onChange)="onDatabaseChange($event)" [disabled]="isLoadingDatabases" inputId="db-dropdown"
-                        placeholder="Select Database">
-                    </p-dropdown>
-                    <label for="db-dropdown">Database</label>
-                </span>
+                <app-custom-dropdown [(ngModel)]="selectedDatabaseObj" label="Select Database" [floatingLabel]="true"
+                    [options]="availableDatabases" optionLabel="name" [optionValue]="null" [filter]="true"
+                    filterBy="name" [floatingLabel]="true" (onChangeEvent)="onDatabaseChange({value: $event})">
+                </app-custom-dropdown>
             </div>
 
         </div>

@@ -24,29 +24,21 @@
             <div class="form-container">
                 <!-- Left Column -->
                 <div class="form-grid left-column">
-                    <!-- Name and Description fields -->
+                    <!-- Name Field -->
                     <div class="form-field">
-                        <label for="name">Name <span class="required">*</span></label>
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-box"></i>
-                            <input id="name" type="text" pInputText formControlName="name" placeholder="Enter name"
-                                [ngClass]="{'ng-invalid ng-dirty': promptForm.get('name')?.invalid && promptForm.get('name')?.touched}">
-                        </span>
-                        <small class="error-message"
-                            *ngIf="promptForm.get('name')?.invalid && promptForm.get('name')?.touched">
-                            <span *ngIf="promptForm.get('name')?.errors?.['required']">Name is required</span>
-                            <span *ngIf="promptForm.get('name')?.errors?.['pattern']">Name can only contain
-                                letters, spaces and hyphens</span>
-                        </small>
+                        <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-box"
+                            [required]="true"
+                            [showError]="!!(promptForm.get('name')?.invalid && promptForm.get('name')?.touched)"
+                            [errorMessage]="promptForm.get('name')?.errors?.['required'] ? 'Name is required' : 
+                                           promptForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
+                        </app-custom-input>
                     </div>
 
+                    <!-- Description Field -->
                     <div class="form-field">
-                        <label for="description">Description</label>
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-align-left"></i>
-                            <input id="description" pInputText formControlName="description" rows="3"
-                                placeholder="Enter description">
-                        </span>
+                        <app-custom-input formControlName="description" label="Description"
+                            placeholder="Enter description" icon="pi-align-left">
+                        </app-custom-input>
                     </div>
 
                     <!-- Organisation and Database fields (disabled) -->
@@ -74,27 +66,20 @@
                         </span>
                     </div>
 
+                    <!-- Section dropdown -->
                     <div class="form-field">
-                        <label for="section">Section<span class="required"> *</span></label>
-                        <p-dropdown [options]="sections" optionLabel="name" optionValue="id" formControlName="section"
-                            [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                            placeholder="Select Section"
-                            [ngClass]="{'ng-invalid ng-dirty': promptForm.get('section')?.invalid && promptForm.get('section')?.touched}">
-                        </p-dropdown>
-                        <small class="error-message"
-                            *ngIf="promptForm.get('section')?.invalid && promptForm.get('section')?.touched">
-                            Section is required
-                        </small>
+                        <app-custom-dropdown formControlName="section" label="Section" placeholder="Select Section"
+                            [options]="sections" optionLabel="name" optionValue="id" [filter]="true" filterBy="name"
+                            [required]="true"
+                            [showError]="!!(promptForm.get('section')?.invalid && promptForm.get('section')?.touched)"
+                            errorMessage="Section is required">
+                        </app-custom-dropdown>
                     </div>
 
-                    <div class="form-field">
-                        <label for="status">Status</label>
-                        <div class="status-wrapper">
-                            <p-inputSwitch formControlName="status" [trueValue]="1" [falseValue]="0"></p-inputSwitch>
-                            <span class="status-text">{{ promptForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
-                                }}</span>
-                        </div>
-                    </div>
+                    <!-- Status -->
+                    <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0"
+                        trueLabel="Active" falseLabel="Inactive">
+                    </app-custom-toggle>
                 </div>
             </div>
         </form>

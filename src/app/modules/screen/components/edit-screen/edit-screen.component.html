@@ -9,22 +9,10 @@
         <h2>Edit Screen</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-outlined p-button-danger"
-          [disabled]="!isFormDirty"
-          (click)="onCancel()"
-        ></button>
-        <button
-          pButton
-          class="p-button-outlined"
-          type="submit"
-          label="Save"
-          (click)="onSubmit()"
-          [disabled]="screenForm.invalid || !isFormDirty"
-        >
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger" [disabled]="!isFormDirty"
+          (click)="onCancel()"></button>
+        <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+          [disabled]="screenForm.invalid || !isFormDirty">
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -32,95 +20,47 @@
 
     <!-- Form Section -->
     <form [formGroup]="screenForm" class="admin-form">
-      <!-- Organisation and Database dropdowns -->
       <div class="form-grid">
+        <!-- Organisation field (disabled) -->
+
+
+        <!-- Name Field -->
+        <div class="form-field">
+          <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-box" [required]="true"
+            [showError]="!!(screenForm.get('name')?.invalid && screenForm.get('name')?.touched)"
+            [errorMessage]="screenForm.get('name')?.errors?.['required'] ? 'Name is required' : 
+                           screenForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
+          </app-custom-input>
+        </div>
+
+        <!-- Description Field -->
+        <div class="form-field">
+          <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
+            icon="pi-align-left">
+          </app-custom-input>
+        </div>
+
         <div class="form-field" *ngIf="showOrganisationDropdown">
           <label for="organisation">Organisation</label>
           <span class="p-input-icon-left">
             <i class="pi pi-building"></i>
-            <input
-              id="organisation"
-              type="text"
-              pInputText
-              [value]="selectedOrgName"
-              disabled
-            />
+            <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled />
           </span>
         </div>
 
+        <!-- Database field (disabled) -->
         <div class="form-field">
           <label for="database">Database</label>
           <span class="p-input-icon-left">
             <i class="pi pi-database"></i>
-            <input
-              id="database"
-              type="text"
-              pInputText
-              [value]="selectedDatabaseName"
-              disabled
-            />
+            <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled />
           </span>
         </div>
 
-        <div class="form-field">
-          <label for="name">Name <span class="required">*</span></label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-box"></i>
-            <input
-              id="name"
-              type="text"
-              pInputText
-              formControlName="name"
-              placeholder="Enter name"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  screenForm.get('name')?.invalid &&
-                  screenForm.get('name')?.touched
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              screenForm.get('name')?.invalid && screenForm.get('name')?.touched
-            "
-          >
-            <span *ngIf="screenForm.get('name')?.errors?.['required']"
-              >Name is required</span
-            >
-            <span *ngIf="screenForm.get('name')?.errors?.['pattern']"
-              >Name can only contain letters, spaces and hyphens</span
-            >
-          </small>
-        </div>
-
-        <div class="form-field">
-          <label for="description">Description</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-align-left"></i>
-            <input
-              id="description"
-              pInputText
-              formControlName="description"
-              rows="3"
-              placeholder="Enter description"
-            />
-          </span>
-        </div>
-
-        <div class="form-field">
-          <label for="status">Status</label>
-          <div class="status-wrapper">
-            <p-inputSwitch
-              formControlName="status"
-              [trueValue]="1"
-              [falseValue]="0"
-            ></p-inputSwitch>
-            <span class="status-text">{{
-              screenForm.get('status')?.value === 1 ? 'Active' : 'Inactive'
-            }}</span>
-          </div>
-        </div>
+        <!-- Status -->
+        <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0" trueLabel="Active"
+          falseLabel="Inactive">
+        </app-custom-toggle>
       </div>
     </form>
   </div>

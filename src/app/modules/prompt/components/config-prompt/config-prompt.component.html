@@ -79,49 +79,32 @@
                     </div>
                     <div class="form-row schema-table-row">
                         <div class="form-field schema-field">
-                            <label for="schema">Schema<span class="required">*</span></label>
-                            <p-dropdown id="schema" [options]="schemas" formControlName="schema" [filter]="true"
-                                filterBy="name" placeholder="Select Schema" [style]="{'width':'100%'}"
-                                optionLabel="name"
-                                [ngClass]="{'ng-invalid ng-dirty': promptForm.get('schema')?.invalid && promptForm.get('schema')?.touched}">
-                            </p-dropdown>
-                            <small class="error-message"
-                                *ngIf="promptForm.get('schema')?.invalid && promptForm.get('schema')?.touched">
-                                Schema is required
-                            </small>
+                            <app-custom-dropdown formControlName="schema" label="Schema" placeholder="Select Schema"
+                                [options]="schemas" optionLabel="name" [optionValue]="null" [filter]="true"
+                                filterBy="name" [required]="true"
+                                [showError]="!!(promptForm.get('schema')?.invalid && promptForm.get('schema')?.touched)"
+                                errorMessage="Schema is required">
+                            </app-custom-dropdown>
                         </div>
                         <div class="form-field">
-                            <label for="promptTable">Table(s)<span class="required">*</span></label>
-                            <p-multiSelect [options]="getAvailableTables(promptForm.get('schema')?.value)"
-                                formControlName="tables" optionLabel="name" optionValue="value" [filter]="true"
-                                filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                                placeholder="Select Tables" display="chip"
-                                [ngClass]="{'ng-invalid ng-dirty': promptForm.get('tables')?.invalid && promptForm.get('tables')?.touched}">
-                            </p-multiSelect>
-                            <small class="error-message"
-                                *ngIf="promptForm.get('tables')?.invalid && promptForm.get('tables')?.touched">
-                                At least one table is required
-                            </small>
+                            <app-custom-multiselect formControlName="tables" label="Table(s)"
+                                placeholder="Select Tables"
+                                [options]="getAvailableTables(promptForm.get('schema')?.value)" optionLabel="name"
+                                optionValue="value" [filter]="true" filterBy="name" display="chip" [required]="true"
+                                [showError]="!!(promptForm.get('tables')?.invalid && promptForm.get('tables')?.touched)"
+                                errorMessage="At least one table is required">
+                            </app-custom-multiselect>
                         </div>
                     </div>
                     <div class="form-row" *ngIf="promptForm.get('tables')?.value?.length > 0">
                         <div class="form-field full-width">
-                            <label for="promptColumns">
-                                Column(s)<span class="required">*</span>
-                                <i class="pi pi-info-circle info-icon"
-                                    pTooltip="Select one or more columns to include in your query"
-                                    tooltipPosition="right"></i>
-                            </label>
-                            <p-multiSelect id="promptColumns" [options]="availableColumns" formControlName="columns"
-                                optionLabel="displayName" [filter]="true" filterBy="displayName,columnName"
-                                [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}" placeholder="Select Columns"
-                                display="chip" [showToggleAll]="true"
-                                [ngClass]="{'ng-invalid ng-dirty': promptForm.get('columns')?.invalid && promptForm.get('columns')?.touched}">
-                            </p-multiSelect>
-                            <small class="error-message"
-                                *ngIf="promptForm.get('columns')?.invalid && promptForm.get('columns')?.touched">
-                                At least one column is required
-                            </small>
+                            <app-custom-multiselect formControlName="columns" label="Column(s)"
+                                placeholder="Select Columns" [options]="availableColumns" optionLabel="displayName"
+                                [filter]="true" filterBy="displayName,columnName" display="chip" [showToggleAll]="true"
+                                [required]="true"
+                                [showError]="!!(promptForm.get('columns')?.invalid && promptForm.get('columns')?.touched)"
+                                errorMessage="At least one column is required">
+                            </app-custom-multiselect>
                         </div>
                     </div>
                     <div class="form-row" *ngIf="promptForm.get('tables')?.value?.length > 1">

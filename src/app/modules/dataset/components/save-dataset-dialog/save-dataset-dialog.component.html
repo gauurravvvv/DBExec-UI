@@ -4,28 +4,18 @@
         <form [formGroup]="datasetForm" class="dataset-form">
             <!-- Dataset Name -->
             <div class="form-field">
-                <label for="datasetName">Name <span class="required">*</span></label>
-                <span class="p-input-icon-left">
-                    <i class="pi pi-database"></i>
-                    <input id="datasetName" type="text" pInputText formControlName="name"
-                        placeholder="Enter dataset name" maxlength="100"
-                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched}">
-                </span>
-                <small class="error-message"
-                    *ngIf="datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched">
-                    Dataset name is required
-                </small>
+                <app-custom-input formControlName="name" label="Name" placeholder="Enter dataset name"
+                    icon="pi-database" [required]="true"
+                    [showError]="!!(datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched)"
+                    errorMessage="Dataset name is required">
+                </app-custom-input>
             </div>
 
             <!-- Description -->
             <div class="form-field">
-                <label for="datasetDescription">Description</label>
-                <span class="p-input-icon-left">
-                    <i class="pi pi-align-left"></i>
-                    <input id="datasetDescription" type="text" pInputText formControlName="description"
-                        placeholder="Enter dataset description (optional)" maxlength="500"
-                        [ngClass]="{'ng-invalid ng-dirty': datasetForm.get('description')?.invalid && datasetForm.get('description')?.touched}">
-                </span>
+                <app-custom-input formControlName="description" label="Description"
+                    placeholder="Enter dataset description (optional)" icon="pi-align-left">
+                </app-custom-input>
                 <small class="char-count">
                     {{ datasetForm.get('description')?.value?.length || 0 }}/500 characters
                 </small>

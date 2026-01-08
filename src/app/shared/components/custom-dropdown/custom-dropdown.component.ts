@@ -24,7 +24,7 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() placeholder = '';
   @Input() options: any[] = [];
   @Input() optionLabel = 'label';
-  @Input() optionValue = 'value';
+  @Input() optionValue: string | null = '';
   @Input() required = false;
   @Input() filter = true;
   @Input() filterBy = '';

@@ -58,10 +58,10 @@
             <!-- Center - Form Section -->
             <div class="form-section">
                 <div class="form-field">
-                    <label>Field Name to Display <span class="required">*</span></label>
-                    <input type="text" pInputText [(ngModel)]="customField.columnToView"
-                        placeholder="Enter the display name for this field" autocomplete="off"
-                        (ngModelChange)="onFieldNameChange()" />
+                    <app-custom-input [(ngModel)]="customField.columnToView" label="Field Name to Display"
+                        placeholder="Enter the display name for this field" icon="pi-tag" [required]="true"
+                        (ngModelChange)="onFieldNameChange()">
+                    </app-custom-input>
                 </div>
 
                 <div class="form-field custom-logic-field">

@@ -2,8 +2,8 @@
     <ng-container *ngIf="label">
         <!-- Floating Label -->
         <span class="p-float-label" *ngIf="floatingLabel">
-            <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="optionValue" [(ngModel)]="value"
-                [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
+            <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="$any(optionValue)"
+                [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
                 [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
                 [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)"
                 (onBlur)="onBlur()" [inputId]="inputId">
@@ -19,8 +19,8 @@
                 {{ label }}
                 <span class="required" *ngIf="required">*</span>
             </label>
-            <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="optionValue" [(ngModel)]="value"
-                [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
+            <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="$any(optionValue)"
+                [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
                 [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
                 [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)"
                 (onBlur)="onBlur()">
@@ -28,7 +28,7 @@
         </ng-container>
     </ng-container>
     <!-- No Label -->
-    <p-dropdown *ngIf="!label" [options]="options" [optionLabel]="optionLabel" [optionValue]="optionValue"
+    <p-dropdown *ngIf="!label" [options]="options" [optionLabel]="optionLabel" [optionValue]="$any(optionValue)"
         [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
         [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
         [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)" (onBlur)="onBlur()">

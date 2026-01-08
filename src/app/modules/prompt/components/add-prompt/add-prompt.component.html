@@ -28,47 +28,35 @@
         <!-- Form Section -->
         <form [formGroup]="sectionForm" class="admin-form">
             <div class="form-grid">
-                <!-- Organisation dropdown -->
                 <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation<span class="required"> *</span></label>
-                    <p-dropdown [options]="organisations" optionLabel="name" optionValue="id"
-                        formControlName="organisation" [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                        [panelStyle]="{'width':'100%'}" placeholder="Select Organisation"
-                        (onChange)="onOrganisationChange($event)"
-                        [ngClass]="{'ng-invalid ng-dirty': sectionForm.get('organisation')?.invalid && sectionForm.get('organisation')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="sectionForm.get('organisation')?.invalid && sectionForm.get('organisation')?.touched">
-                        Organisation is required
-                    </small>
+                    <app-custom-dropdown formControlName="organisation" label="Organisation"
+                        placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
+                        [filter]="true" filterBy="name" [required]="true"
+                        [showError]="!!(sectionForm.get('organisation')?.invalid && sectionForm.get('organisation')?.touched)"
+                        errorMessage="Organisation is required"
+                        (ngModelChange)="onOrganisationChange({value: sectionForm.get('organisation')?.value})">
+                    </app-custom-dropdown>
                 </div>
 
                 <!-- Database dropdown -->
                 <div class="form-field">
-                    <label for="database">Database<span class="required"> *</span></label>
-                    <p-dropdown [options]="databases" optionLabel="name" optionValue="id" formControlName="database"
-                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        placeholder="Select Database" (onChange)="onDatabaseChange($event)"
-                        [ngClass]="{'ng-invalid ng-dirty': sectionForm.get('database')?.invalid && sectionForm.get('database')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="sectionForm.get('database')?.invalid && sectionForm.get('database')?.touched">
-                        Database is required
-                    </small>
+                    <app-custom-dropdown formControlName="database" label="Database" placeholder="Select Database"
+                        [options]="databases" optionLabel="name" optionValue="id" [filter]="true" filterBy="name"
+                        [required]="true"
+                        [showError]="!!(sectionForm.get('database')?.invalid && sectionForm.get('database')?.touched)"
+                        errorMessage="Database is required"
+                        (ngModelChange)="onDatabaseChange({value: sectionForm.get('database')?.value})">
+                    </app-custom-dropdown>
                 </div>
 
                 <!-- Tab dropdown -->
                 <div class="form-field">
-                    <label for="tab">Tab<span class="required"> *</span></label>
-                    <p-dropdown [options]="tabs" optionLabel="name" optionValue="id" formControlName="tab"
-                        [filter]="true" filterBy="name" [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}"
-                        placeholder="Select Tab" (onChange)="onTabChange($event)"
-                        [ngClass]="{'ng-invalid ng-dirty': sectionForm.get('tab')?.invalid && sectionForm.get('tab')?.touched}">
-                    </p-dropdown>
-                    <small class="error-message"
-                        *ngIf="sectionForm.get('tab')?.invalid && sectionForm.get('tab')?.touched">
-                        Tab is required
-                    </small>
+                    <app-custom-dropdown formControlName="tab" label="Tab" placeholder="Select Tab" [options]="tabs"
+                        optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
+                        [showError]="!!(sectionForm.get('tab')?.invalid && sectionForm.get('tab')?.touched)"
+                        errorMessage="Tab is required"
+                        (ngModelChange)="onTabChange({value: sectionForm.get('tab')?.value})">
+                    </app-custom-dropdown>
                 </div>
 
                 <!-- Section Groups Container - Only show when tab is selected -->
@@ -93,16 +81,16 @@
 
                             <!-- Section Header -->
                             <div class="schema-header">
-                                <p-dropdown [options]="getAvailableSections(groupIndex)" optionLabel="name"
-                                    optionValue="id" formControlName="sectionId" [filter]="true" filterBy="name"
-                                    [style]="{'width':'300px'}" placeholder="Select Section"
-                                    (onChange)="onSectionChange($event, groupIndex)"
-                                    [ngClass]="{'ng-invalid ng-dirty': sectionGroup.get('sectionId')?.invalid && sectionGroup.get('sectionId')?.touched}">
-                                </p-dropdown>
-                                <small class="error-message"
-                                    *ngIf="sectionGroup.get('sectionId')?.invalid && sectionGroup.get('sectionId')?.touched">
-                                    Section is required
-                                </small>
+                                <div style="width: 300px;">
+                                    <app-custom-dropdown formControlName="sectionId" label="Section"
+                                        placeholder="Select Section" [options]="getAvailableSections(groupIndex)"
+                                        optionLabel="name" optionValue="id" [filter]="true" filterBy="name"
+                                        [required]="true"
+                                        [showError]="!!(sectionGroup.get('sectionId')?.invalid && sectionGroup.get('sectionId')?.touched)"
+                                        errorMessage="Section is required"
+                                        (ngModelChange)="onSectionChange({value: sectionGroup.get('sectionId')?.value}, groupIndex)">
+                                    </app-custom-dropdown>
+                                </div>
                                 <button pButton type="button" icon="pi pi-plus"
                                     class="p-button-rounded p-button-text add-btn"
                                     (click)="addPromptToSection(groupIndex)"
@@ -129,49 +117,31 @@
                                     <div class="mapping-inputs">
                                         <!-- Name field -->
                                         <div class="form-field">
-                                            <span class="p-input-icon-left">
-                                                <i class="pi pi-box"></i>
-                                                <input type="text" pInputText formControlName="name"
-                                                    placeholder="Enter prompt name"
-                                                    [ngClass]="{'ng-invalid ng-dirty': prompt.get('name')?.invalid && prompt.get('name')?.touched}">
-                                            </span>
-                                            <small class="error-message"
-                                                *ngIf="prompt.get('name')?.invalid && prompt.get('name')?.touched">
-                                                <span *ngIf="prompt.get('name')?.errors?.['required']">Prompt name is
-                                                    required</span>
-                                                <span *ngIf="prompt.get('name')?.errors?.['pattern']">Prompt name can
-                                                    only contain letters, spaces and hyphens</span>
-                                            </small>
+                                            <app-custom-input formControlName="name" label="Name"
+                                                placeholder="Enter prompt name" icon="pi-box" [required]="true"
+                                                [showError]="!!(prompt.get('name')?.invalid && prompt.get('name')?.touched)"
+                                                [errorMessage]="prompt.get('name')?.errors?.['required'] ? 'Prompt name is required' : 
+                                                               prompt.get('name')?.errors?.['pattern'] ? 'Prompt name can only contain letters, spaces and hyphens' : ''">
+                                            </app-custom-input>
                                         </div>
 
+                                        <!-- Description field -->
                                         <div class="form-field">
-                                            <span class="p-input-icon-left">
-                                                <i class="pi pi-align-left"></i>
-                                                <input pInputText formControlName="description"
-                                                    placeholder="Enter description"
-                                                    [ngClass]="{'ng-invalid ng-dirty': prompt.get('description')?.errors?.['pattern']}">
-                                            </span>
-                                            <small class="error-message"
-                                                *ngIf="prompt.get('description')?.errors?.['pattern']">
-                                                Description can only contain letters, spaces and hyphens
-                                            </small>
+                                            <app-custom-input formControlName="description" label="Description"
+                                                placeholder="Enter description" icon="pi-align-left"
+                                                [showError]="!!prompt.get('description')?.errors?.['pattern']"
+                                                errorMessage="Description can only contain letters, spaces and hyphens">
+                                            </app-custom-input>
                                         </div>
 
                                         <!-- Type field -->
                                         <div class="form-field">
-                                            <span class="p-input-icon-left">
-                                                <i class="pi pi-list"></i>
-                                                <p-dropdown [options]="promptTypes" formControlName="type"
-                                                    [filter]="true" filterBy="label" optionLabel="label"
-                                                    optionValue="value" [style]="{'width':'100%'}"
-                                                    placeholder="Select Type"
-                                                    [ngClass]="{'ng-invalid ng-dirty': prompt.get('type')?.invalid && prompt.get('type')?.touched}">
-                                                </p-dropdown>
-                                            </span>
-                                            <small class="error-message"
-                                                *ngIf="prompt.get('type')?.invalid && prompt.get('type')?.touched">
-                                                Type is required
-                                            </small>
+                                            <app-custom-dropdown formControlName="type" label="Type"
+                                                placeholder="Select Type" [options]="promptTypes" optionLabel="label"
+                                                optionValue="value" [filter]="true" filterBy="label" [required]="true"
+                                                [showError]="!!(prompt.get('type')?.invalid && prompt.get('type')?.touched)"
+                                                errorMessage="Type is required">
+                                            </app-custom-dropdown>
                                         </div>
                                     </div>
 

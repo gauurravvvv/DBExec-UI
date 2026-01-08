@@ -279,6 +279,12 @@ export class AddDatasetComponent
         this.isLoadingDatabases = false;
         if (this.globalService.handleSuccessService(response, false)) {
           this.availableDatabases = response.data || [];
+
+          // Auto-select the first database and load its schema
+          if (this.availableDatabases.length > 0) {
+            this.selectedDatabaseObj = this.availableDatabases[0];
+            this.proceedWithDatabaseChange(this.selectedDatabaseObj);
+          }
         }
       })
       .catch(() => {
