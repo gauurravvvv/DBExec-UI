@@ -143,7 +143,8 @@ export class ViewSuperAdminComponent implements OnInit {
             this.showChangePasswordDialog = false;
           }
         });
+    } else {
+      this.showChangePasswordDialog = false;
     }
-    this.showChangePasswordDialog = false;
   }
 }

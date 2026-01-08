@@ -94,6 +94,8 @@ export class ViewUsersComponent implements OnInit {
             this.showChangePasswordDialog = false;
           }
         });
+    } else {
+      this.showChangePasswordDialog = false;
     }
   }
 }

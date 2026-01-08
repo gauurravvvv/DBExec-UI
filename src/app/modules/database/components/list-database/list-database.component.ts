@@ -76,15 +76,15 @@ export class ListDatabaseComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedOrg = this.organisations[0].id;
           this.loaddbs();
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+  onOrgChange(orgId: any) {
+    this.selectedOrg = orgId;
     this.currentPage = 1;
     this.loaddbs();
   }
@@ -92,7 +92,7 @@ export class ListDatabaseComponent implements OnInit {
   loaddbs() {
     if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrg,
       pageNumber: this.currentPage,
       limit: this.pageSize,
     };

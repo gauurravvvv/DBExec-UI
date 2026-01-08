@@ -85,6 +85,17 @@ export class ChangePasswordDialogComponent implements OnInit {
 
   onCancel() {
     this.passwordForm.reset();
+    this.showNewPassword = false;
+    this.showConfirmPassword = false;
+    this.visible = false;
     this.close.emit(null);
+  }
+
+  onBackdropClick(event: Event) {
+    if (
+      (event.target as HTMLElement).classList.contains('change-password-popup')
+    ) {
+      this.onCancel();
+    }
   }
 }

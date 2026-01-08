@@ -22,8 +22,8 @@
                     <!-- Organisation Dropdown -->
                     <div class="dropdown-field" *ngIf="showOrganisationDropdown">
                         <app-custom-dropdown [(ngModel)]="selectedOrg" placeholder="Select Organisation"
-                            [options]="organisations" optionLabel="name" [filter]="true" filterBy="name"
-                            (ngModelChange)="onOrgChange({value: selectedOrg})">
+                            [options]="organisations" optionLabel="name" optionValue="id" [filter]="true"
+                            filterBy="name" (onChangeEvent)="onOrgChange($event)">
                         </app-custom-dropdown>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                         <ng-container *ngIf="filteredGroups && filteredGroups.length > 0; else noData">
                             <tr *ngFor="let group of filteredGroups">
                                 <td>
-                                    <a class="admin-name" [routerLink]="['/app/group/view',selectedOrg.id , group.id]">
+                                    <a class="admin-name" [routerLink]="['/app/group/view',selectedOrg , group.id]">
                                         {{ group.name }}
                                     </a>
                                 </td>

@@ -23,16 +23,16 @@
                         <!-- Organisation Dropdown -->
                         <div class="dropdown-field" *ngIf="showOrganisationDropdown">
                             <app-custom-dropdown [(ngModel)]="selectedOrg" placeholder="Select Organisation"
-                                [options]="organisations" optionLabel="name" [filter]="true" filterBy="name"
-                                (ngModelChange)="onOrgChange({value: selectedOrg})">
+                                [options]="organisations" optionLabel="name" optionValue="id" [filter]="true"
+                                filterBy="name" (onChangeEvent)="onOrgChange($event)">
                             </app-custom-dropdown>
                         </div>
 
                         <!-- Database Dropdown -->
                         <div class="dropdown-field">
                             <app-custom-dropdown [(ngModel)]="selectedDatabase" placeholder="Select Database"
-                                [options]="databases" optionLabel="name" [filter]="true" filterBy="name"
-                                (ngModelChange)="onDBChange({value: selectedDatabase})">
+                                [options]="databases" optionLabel="name" optionValue="id" [filter]="true"
+                                filterBy="name" (onChangeEvent)="onDBChange($event)">
                             </app-custom-dropdown>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                             <tr *ngFor="let connection of filteredConnections">
                                 <td>
                                     <a class="admin-name"
-                                        [routerLink]="['/app/connections/view', selectedOrg.id, connection.id]">
+                                        [routerLink]="['/app/connections/view', selectedOrg, connection.id]">
                                         {{ connection.name }}
                                     </a>
                                 </td>

@@ -40,8 +40,7 @@
                     label="Organisation" placeholder="Select Organisation" [options]="organisations" optionLabel="name"
                     optionValue="id" [filter]="true" filterBy="name" [required]="true"
                     [showError]="!!(connectionForm.get('organisation')?.invalid && connectionForm.get('organisation')?.touched)"
-                    errorMessage="Organisation is required"
-                    (ngModelChange)="onOrganisationChange({value: connectionForm.get('organisation')?.value})">
+                    errorMessage="Organisation is required" (onChangeEvent)="onOrganisationChange($event)">
                 </app-custom-dropdown>
 
                 <!-- Database Dropdown -->

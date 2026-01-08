@@ -58,9 +58,7 @@ export class ListGroupComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadGroups();
     }
   }
@@ -75,15 +73,15 @@ export class ListGroupComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedOrg = this.organisations[0].id;
           this.loadGroups();
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+  onOrgChange(orgId: any) {
+    this.selectedOrg = orgId;
     this.currentPage = 1;
     this.loadGroups();
   }
@@ -91,7 +89,7 @@ export class ListGroupComponent implements OnInit {
   loadGroups() {
     if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrg,
       pageNumber: this.currentPage,
       limit: this.pageSize,
     };
@@ -149,7 +147,7 @@ export class ListGroupComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([GROUP.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([GROUP.EDIT, this.selectedOrg, id]);
   }
 
   confirmDelete(id: string) {
@@ -165,7 +163,7 @@ export class ListGroupComponent implements OnInit {
   proceedDelete() {
     if (this.groupToDelete) {
       this.groupService
-        .deleteGroup(this.selectedOrg.id, this.groupToDelete)
+        .deleteGroup(this.selectedOrg, this.groupToDelete)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadGroups();

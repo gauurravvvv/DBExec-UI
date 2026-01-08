@@ -80,20 +80,20 @@ export class ListConnectionComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+  onOrgChange(orgId: any) {
+    this.selectedOrg = orgId;
     this.loadDatabases();
   }
 
-  onDBChange(event: any) {
-    this.selectedDatabase = event.value;
+  onDBChange(databaseId: any) {
+    this.selectedDatabase = databaseId;
     this.currentPage = 1;
     this.loadConnections();
   }
@@ -101,7 +101,7 @@ export class ListConnectionComponent implements OnInit {
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrg,
       pageNumber: 1,
       limit: 100,
     };
@@ -110,7 +110,7 @@ export class ListConnectionComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.databases = [...response.data];
         if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0];
+          this.selectedDatabase = this.databases[0].id;
           this.loadConnections();
         }
       }
@@ -120,8 +120,8 @@ export class ListConnectionComponent implements OnInit {
   loadConnections() {
     if (!this.selectedDatabase) return;
     const params = {
-      orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
+      orgId: this.selectedOrg,
+      databaseId: this.selectedDatabase,
       pageNumber: 1,
       limit: 100,
     };
@@ -180,7 +180,7 @@ export class ListConnectionComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([CONNECTION.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([CONNECTION.EDIT, this.selectedOrg, id]);
   }
 
   confirmDelete(id: string) {
@@ -196,7 +196,7 @@ export class ListConnectionComponent implements OnInit {
   proceedDelete() {
     if (this.tabToDelete) {
       this.connectionService
-        .deleteConnection(this.selectedOrg.id, this.tabToDelete)
+        .deleteConnection(this.selectedOrg, this.tabToDelete)
         .then(response => {
           this.showDeleteConfirm = false;
           this.tabToDelete = null;

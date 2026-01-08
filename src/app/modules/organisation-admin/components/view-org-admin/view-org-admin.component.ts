@@ -103,6 +103,8 @@ export class ViewOrgAdminComponent implements OnInit {
             this.showChangePasswordDialog = false;
           }
         });
+    } else {
+      this.showChangePasswordDialog = false;
     }
   }
 }

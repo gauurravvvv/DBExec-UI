@@ -81,9 +81,10 @@ export class AddConnectionComponent implements OnInit {
   }
 
   private loadDatabases() {
-    if (!this.selectedOrg) return;
+    const orgId = this.connectionForm.get('organisation')?.value;
+    if (!orgId) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: orgId,
       pageNumber: 1,
       limit: 100,
     };
@@ -95,13 +96,9 @@ export class AddConnectionComponent implements OnInit {
     });
   }
 
-  onOrganisationChange(event: any) {
+  onOrganisationChange(orgId: any) {
     this.connectionForm.get('database')?.reset();
-
-    this.selectedOrg = {
-      id: event.value,
-    };
-    this.selectedDatabase = null;
+    this.databases = [];
     this.loadDatabases();
     this.updateFormDirtyState();
   }
