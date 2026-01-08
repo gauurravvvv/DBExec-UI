@@ -25,9 +25,11 @@ export class CustomMultiselectComponent implements ControlValueAccessor {
   @Input() display: 'chip' | 'comma' = 'chip';
   @Input() errorMessage = '';
   @Input() showError = false;
+  @Input() floatingLabel = false;
 
   value: any[] = [];
   disabled = false;
+  inputId = `multiselect-${Math.random().toString(36).substring(2, 11)}`;
 
   private onChange: (value: any[]) => void = () => {};
   private onTouched: () => void = () => {};

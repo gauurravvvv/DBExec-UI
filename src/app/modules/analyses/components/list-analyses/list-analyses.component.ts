@@ -61,9 +61,7 @@ export class ListAnalysesComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatabases();
     }
   }
@@ -78,21 +76,21 @@ export class ListAnalysesComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+  onOrgChange(orgId: any) {
+    this.selectedOrg = orgId;
     this.currentPage = 1;
     this.loadDatabases();
   }
 
-  onDBChange(event: any) {
-    this.selectedDatabase = event.value;
+  onDBChange(databaseId: any) {
+    this.selectedDatabase = databaseId;
     this.currentPage = 1;
     this.loadAnalyses();
   }
@@ -100,7 +98,7 @@ export class ListAnalysesComponent implements OnInit {
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrg,
       pageNumber: 1,
       limit: 100,
     };
@@ -109,8 +107,15 @@ export class ListAnalysesComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.databases = [...response.data];
         if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0];
+          this.selectedDatabase = this.databases[0].id;
           this.loadAnalyses();
+        } else {
+          this.selectedDatabase = null;
+          this.analyses = [];
+          this.filteredAnalyses = [];
+          this.totalItems = 0;
+          this.totalPages = 0;
+          this.pages = [];
         }
       }
     });
@@ -119,8 +124,8 @@ export class ListAnalysesComponent implements OnInit {
   loadAnalyses() {
     if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
+      orgId: this.selectedOrg,
+      databaseId: this.selectedDatabase,
       pageNumber: this.currentPage,
       limit: this.pageSize,
     };
@@ -176,11 +181,11 @@ export class ListAnalysesComponent implements OnInit {
   }
 
   onView(id: string) {
-    this.router.navigate([ANALYSES.VIEW, this.selectedOrg.id, id]);
+    this.router.navigate([ANALYSES.VIEW, this.selectedOrg, id]);
   }
 
   onEdit(id: string) {
-    this.router.navigate([ANALYSES.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([ANALYSES.EDIT, this.selectedOrg, id]);
   }
 
   confirmDelete(id: string) {
@@ -196,7 +201,7 @@ export class ListAnalysesComponent implements OnInit {
   proceedDelete() {
     if (this.analysisToDelete) {
       this.analysesService
-        .deleteAnalyses(this.selectedOrg.id, this.analysisToDelete)
+        .deleteAnalyses(this.selectedOrg, this.analysisToDelete)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadAnalyses();

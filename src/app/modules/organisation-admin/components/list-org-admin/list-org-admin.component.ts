@@ -95,7 +95,7 @@ export class ListOrgAdminComponent implements OnInit {
 
     this.orgAdminService.listOrganisationAdmin(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.admins = response.data.orgAdmins;
+        this.admins = response.data.orgAdmins || [];
         this.filteredAdmins = [...this.admins];
         this.totalItems = this.admins.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);

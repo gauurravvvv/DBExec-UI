@@ -5,9 +5,31 @@
   width: 100%;
   margin-bottom: 0;
 
-  label {
+  .p-float-label {
+    display: block;
+    width: 100%;
+
+    label {
+      font-weight: 500;
+      color: var(--text-color);
+      opacity: 0.6;
+      background: var(--card-background);
+      padding: 0 8px;
+      margin-left: -4px;
+      z-index: 1;
+
+      .required {
+        color: var(--error-color);
+        margin-left: 4px;
+      }
+    }
+  }
+
+  .normal-label {
     font-weight: 500;
     color: var(--text-color);
+    display: block;
+    margin-bottom: 4px;
 
     .required {
       color: var(--error-color);

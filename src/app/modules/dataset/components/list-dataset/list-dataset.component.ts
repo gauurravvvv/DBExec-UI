@@ -69,9 +69,7 @@ export class ListDatasetComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatabases();
     }
   }
@@ -84,23 +82,32 @@ export class ListDatasetComponent implements OnInit {
 
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs];
+        this.organisations = [...response.data.orgs] || [];
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
+        } else {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.datasets = [];
+          this.filteredDatasets = [];
+          this.totalItems = 0;
+          this.totalPages = 0;
+          this.pages = [];
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+  onOrgChange(orgId: any) {
+    this.selectedOrg = orgId;
     this.currentPage = 1;
     this.loadDatabases();
   }
 
-  onDBChange(event: any) {
-    this.selectedDatabase = event.value;
+  onDBChange(databaseId: any) {
+    this.selectedDatabase = databaseId;
     this.currentPage = 1;
     this.loadDatasets();
   }
@@ -108,34 +115,41 @@ export class ListDatasetComponent implements OnInit {
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrg,
       pageNumber: 1,
       limit: 100,
     };
 
     this.databaseService.listDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...response.data];
+        this.databases = [...response.data] || [];
         if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0];
+          this.selectedDatabase = this.databases[0].id;
           this.loadDatasets();
+        } else {
+          this.selectedDatabase = null;
+          this.datasets = [];
+          this.filteredDatasets = [];
+          this.totalItems = 0;
+          this.totalPages = 0;
+          this.pages = [];
         }
       }
     });
   }
 
   loadDatasets() {
-    if (!this.selectedOrg) return;
+    if (!this.selectedOrg || !this.selectedDatabase) return;
     const params = {
-      orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
+      orgId: this.selectedOrg,
+      databaseId: this.selectedDatabase,
       pageNumber: this.currentPage,
       limit: this.pageSize,
     };
 
     this.datasetService.listDatasets(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.datasets = [...response.data.datasets];
+        this.datasets = [...response.data.datasets] || [];
         this.filteredDatasets = [...this.datasets];
         this.totalItems = this.datasets.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
@@ -192,11 +206,11 @@ export class ListDatasetComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([DATASET.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([DATASET.EDIT, this.selectedOrg, id]);
   }
 
   useAsAnalysis(id: string) {
-    this.router.navigate([ANALYSES.ADD, this.selectedOrg.id, id]);
+    this.router.navigate([ANALYSES.ADD, this.selectedOrg, id]);
   }
 
   confirmDelete(id: string) {
@@ -212,7 +226,7 @@ export class ListDatasetComponent implements OnInit {
   proceedDelete() {
     if (this.datasetToDelete) {
       this.datasetService
-        .deleteDataset(this.selectedOrg.id, this.datasetToDelete)
+        .deleteDataset(this.selectedOrg, this.datasetToDelete)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadDatasets();

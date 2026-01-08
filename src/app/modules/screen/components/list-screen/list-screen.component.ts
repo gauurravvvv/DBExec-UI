@@ -29,8 +29,8 @@ export class ListScreenComponent implements OnInit {
   organisations: any[] = [];
   databases: any[] = [];
   screens: any[] = [];
-  selectedScreen: any = {};
-  selectedDatabase: any = {};
+  selectedOrg: any = null;
+  selectedDatabase: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
@@ -62,9 +62,7 @@ export class ListScreenComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedScreen = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatabases();
     }
   }
@@ -79,38 +77,46 @@ export class ListScreenComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
-          this.selectedScreen = this.organisations[0];
+          this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
+        } else {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.filteredScreens = [];
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedScreen = event.value;
+  onOrgChange(orgId: any) {
+    this.selectedOrg = orgId;
     this.loadDatabases();
   }
 
-  onDBChange(event: any) {
-    this.selectedDatabase = event.value;
+  onDBChange(dbId: any) {
+    this.selectedDatabase = dbId;
     this.currentPage = 1;
     this.loadScreens();
   }
 
   loadDatabases() {
-    if (!this.selectedScreen) return;
+    if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedScreen.id,
+      orgId: this.selectedOrg,
       pageNumber: 1,
       limit: 100,
     };
 
     this.databaseService.listDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...response.data];
+        this.databases = [...response.data] || [];
         if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0];
+          this.selectedDatabase = this.databases[0].id;
           this.loadScreens();
+        } else {
+          this.selectedDatabase = null;
+          this.filteredScreens = [];
         }
       }
     });
@@ -119,15 +125,15 @@ export class ListScreenComponent implements OnInit {
   loadScreens() {
     if (!this.selectedDatabase) return;
     const params = {
-      orgId: this.selectedScreen.id,
-      databaseId: this.selectedDatabase.id,
+      orgId: this.selectedOrg,
+      databaseId: this.selectedDatabase,
       pageNumber: 1,
       limit: 100,
     };
 
     this.screenService.listScreen(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.screens = [...response.data];
+        this.screens = [...response.data] || [];
         this.filteredScreens = [...this.screens];
         this.totalItems = this.screens.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
@@ -179,7 +185,7 @@ export class ListScreenComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([SCREEN.EDIT, this.selectedScreen.id, id]);
+    this.router.navigate([SCREEN.EDIT, this.selectedOrg, id]);
   }
 
   confirmDelete(id: string) {
@@ -195,7 +201,7 @@ export class ListScreenComponent implements OnInit {
   proceedDelete() {
     if (this.screenToDelete) {
       this.screenService
-        .deleteScreen(this.selectedScreen.id, this.screenToDelete)
+        .deleteScreen(this.selectedOrg, this.screenToDelete)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadScreens();
@@ -208,14 +214,14 @@ export class ListScreenComponent implements OnInit {
 
   onEditScreen(screen: any) {
     // Handle edit action
-    this.router.navigate([SCREEN.EDIT, this.selectedScreen.id, screen.id]);
+    this.router.navigate([SCREEN.EDIT, this.selectedOrg, screen.id]);
   }
 
   onConfig(id: string) {
     this.router.navigate([
       SCREEN.CONFIG,
-      this.selectedScreen.id,
-      this.selectedDatabase.id,
+      this.selectedOrg,
+      this.selectedDatabase,
       id,
     ]);
   }
@@ -223,8 +229,8 @@ export class ListScreenComponent implements OnInit {
   onExecute(id: string) {
     this.router.navigate([
       '/app/screen/execute',
-      this.selectedScreen.id,
-      this.selectedDatabase.id,
+      this.selectedOrg,
+      this.selectedDatabase,
       id,
     ]);
   }

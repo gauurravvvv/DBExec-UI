@@ -21,24 +21,18 @@
           <div class="dropdowns-wrapper">
             <!-- Organisation Dropdown -->
             <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-              <span class="p-float-label">
-                <p-dropdown [options]="organisations" [(ngModel)]="selectedScreen" optionLabel="name" [filter]="true"
-                  filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }"
-                  (onChange)="onOrgChange($event)" inputId="org-dropdown">
-                </p-dropdown>
-                <label for="org-dropdown">Organisation</label>
-              </span>
+              <app-custom-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
+                optionValue="id" [filter]="true" label="Select Organisation" [floatingLabel]="true"
+                (onChangeEvent)="onOrgChange($event)">
+              </app-custom-dropdown>
             </div>
 
             <!-- Database Dropdown -->
             <div class="dropdown-field">
-              <span class="p-float-label">
-                <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name" [filter]="true"
-                  filterBy="name" [style]="{ width: '100%' }" [panelStyle]="{ width: '100%' }"
-                  (onChange)="onDBChange($event)" inputId="db-dropdown">
-                </p-dropdown>
-                <label for="db-dropdown">Database</label>
-              </span>
+              <app-custom-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
+                optionValue="id" [filter]="true" label="Select Database" [floatingLabel]="true"
+                (onChangeEvent)="onDBChange($event)">
+              </app-custom-dropdown>
             </div>
           </div>
         </div>
@@ -68,7 +62,7 @@
                 <td>
                   <a class="admin-name" [routerLink]="[
                       '/app/screen/view',
-                      selectedScreen.id,
+                      selectedOrg,
                       screen.id
                     ]">
                     {{ screen.name }}

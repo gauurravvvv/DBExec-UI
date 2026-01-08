@@ -30,10 +30,12 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() filterBy = '';
   @Input() errorMessage = '';
   @Input() showError = false;
+  @Input() floatingLabel = false;
   @Output() onChangeEvent = new EventEmitter<any>();
 
   value: any = null;
   disabled = false;
+  inputId = `dropdown-${Math.random().toString(36).substring(2, 11)}`;
 
   private onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};

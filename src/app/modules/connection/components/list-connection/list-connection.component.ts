@@ -112,6 +112,13 @@ export class ListConnectionComponent implements OnInit {
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0].id;
           this.loadConnections();
+        } else {
+          this.selectedDatabase = null;
+          this.connections = [];
+          this.filteredConnections = [];
+          this.totalItems = 0;
+          this.totalPages = 0;
+          this.pages = [];
         }
       }
     });

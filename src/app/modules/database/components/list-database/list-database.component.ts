@@ -99,7 +99,7 @@ export class ListDatabaseComponent implements OnInit {
 
     this.databaseService.listAllDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.dbs = response.data;
+        this.dbs = response.data || [];
         this.filteredDBs = [...this.dbs];
         this.totalItems = this.dbs.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);

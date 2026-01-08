@@ -96,7 +96,7 @@ export class ListGroupComponent implements OnInit {
 
     this.groupService.listGroupps(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.groups = response.data.groups;
+        this.groups = response.data.groups || [];
         this.filteredGroups = [...this.groups];
         this.totalItems = response.data.total || this.groups.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);

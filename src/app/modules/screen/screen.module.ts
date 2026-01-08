@@ -24,6 +24,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CalendarModule } from 'primeng/calendar';
 import { SliderModule } from 'primeng/slider';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { SharedModule } from 'src/app/shared';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
     InputSwitchModule,
     TabViewModule,
     AccordionModule,
+    SharedModule,
     DragDropModule,
     SkeletonModule,
     InputNumberModule,

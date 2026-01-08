@@ -17,6 +17,7 @@ import { ListPromptComponent } from './components/list-prompt/list-prompt.compon
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
 import { PromptRoutingModule } from './prompt-routing.module';
 import { SqlQueryDialogComponent } from './components/sql-query-dialog/sql-query-dialog.component';
+import { SharedModule } from 'src/app/shared';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { SqlQueryDialogComponent } from './components/sql-query-dialog/sql-query
     ButtonModule,
     RippleModule,
     AppPrimeNGModule,
+    SharedModule,
     PromptRoutingModule,
     TooltipModule,
     StoreModule.forFeature(CONFIG_PROMPT_FEATURE_KEY, configPromptReducer),

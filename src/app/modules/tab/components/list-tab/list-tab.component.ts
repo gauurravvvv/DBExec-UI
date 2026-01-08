@@ -62,9 +62,7 @@ export class ListTabComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatabases();
     }
   }
@@ -78,20 +76,20 @@ export class ListTabComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+  onOrgChange(orgId: any) {
+    this.selectedOrg = orgId;
     this.loadDatabases();
   }
 
-  onDBChange(event: any) {
-    this.selectedDatabase = event.value;
+  onDBChange(databaseId: any) {
+    this.selectedDatabase = databaseId;
     this.currentPage = 1;
     this.loadTabs();
   }
@@ -99,7 +97,7 @@ export class ListTabComponent implements OnInit {
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrg,
       pageNumber: 1,
       limit: 100,
     };
@@ -108,8 +106,15 @@ export class ListTabComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.databases = [...response.data];
         if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0];
+          this.selectedDatabase = this.databases[0].id;
           this.loadTabs();
+        } else {
+          this.selectedDatabase = null;
+          this.tabs = [];
+          this.filteredTabs = [];
+          this.totalItems = 0;
+          this.totalPages = 0;
+          this.pages = [];
         }
       }
     });
@@ -118,8 +123,8 @@ export class ListTabComponent implements OnInit {
   loadTabs() {
     if (!this.selectedDatabase) return;
     const params = {
-      orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
+      orgId: this.selectedOrg,
+      databaseId: this.selectedDatabase,
       pageNumber: 1,
       limit: 100,
     };
@@ -176,7 +181,7 @@ export class ListTabComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([TAB.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([TAB.EDIT, this.selectedOrg, id]);
   }
 
   confirmDelete(id: string) {
@@ -192,7 +197,7 @@ export class ListTabComponent implements OnInit {
   proceedDelete() {
     if (this.tabToDelete) {
       this.tabService
-        .deleteTab(this.selectedOrg.id, this.tabToDelete)
+        .deleteTab(this.selectedOrg, this.tabToDelete)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadTabs();
@@ -205,6 +210,6 @@ export class ListTabComponent implements OnInit {
 
   onEditTab(tab: any) {
     // Handle edit action
-    this.router.navigate([TAB.EDIT, this.selectedOrg.id, tab.id]);
+    this.router.navigate([TAB.EDIT, this.selectedOrg, tab.id]);
   }
 }

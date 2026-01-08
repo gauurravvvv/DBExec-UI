@@ -22,14 +22,10 @@
 
                         <!-- Organisation Dropdown -->
                         <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                            <span class="p-float-label">
-                                <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
-                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                    [panelStyle]="{'width':'100%'}" (onChange)="onOrgChange($event)"
-                                    inputId="org-dropdown">
-                                </p-dropdown>
-                                <label for="org-dropdown">Organisation</label>
-                            </span>
+                            <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name"
+                                optionValue="id" [filter]="true" [floatingLabel]="true" label="Select Organisation"
+                                filterBy="name" (onChangeEvent)="onOrgChange($event)">
+                            </app-custom-dropdown>
                         </div>
                     </div>
 
@@ -37,26 +33,18 @@
                     <div class="remaining-dropdowns">
                         <!-- Database Dropdown -->
                         <div class="dropdown-field">
-                            <span class="p-float-label">
-                                <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
-                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                    [panelStyle]="{'width':'100%'}" (onChange)="onDBChange($event)"
-                                    inputId="db-dropdown">
-                                </p-dropdown>
-                                <label for="db-dropdown">Database</label>
-                            </span>
+                            <app-custom-dropdown [(ngModel)]="selectedDatabase" [options]="databases" optionLabel="name"
+                                optionValue="id" [filter]="true" [floatingLabel]="true" label="Select Database"
+                                filterBy="name" (onChangeEvent)="onDBChange($event)">
+                            </app-custom-dropdown>
                         </div>
 
                         <!-- Tab Dropdown -->
                         <div class="dropdown-field">
-                            <span class="p-float-label">
-                                <p-dropdown [options]="tabs" [(ngModel)]="selectedTab" optionLabel="name"
-                                    [filter]="true" filterBy="name" [style]="{'width':'100%'}"
-                                    [panelStyle]="{'width':'100%'}" (onChange)="onTabChange($event)"
-                                    inputId="db-dropdown">
-                                </p-dropdown>
-                                <label for="db-dropdown">Tab</label>
-                            </span>
+                            <app-custom-dropdown [(ngModel)]="selectedTab" [options]="tabs" optionLabel="name"
+                                optionValue="id" [filter]="true" filterBy="name" [floatingLabel]="true"
+                                label="Select Tab" (onChangeEvent)="onTabChange($event)">
+                            </app-custom-dropdown>
                         </div>
                     </div>
                 </div>
@@ -86,8 +74,7 @@
                         <ng-container *ngIf="filteredSections && filteredSections.length > 0; else noData">
                             <tr *ngFor="let section of filteredSections">
                                 <td>
-                                    <a class="admin-name"
-                                        [routerLink]="['/app/section/view', selectedOrg.id, section.id]">
+                                    <a class="admin-name" [routerLink]="['/app/section/view', selectedOrg, section.id]">
                                         {{ section.name }}
                                     </a>
                                 </td>

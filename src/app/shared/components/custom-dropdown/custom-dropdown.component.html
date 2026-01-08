@@ -1,10 +1,35 @@
 <div class="form-field">
-    <label *ngIf="label">
-        {{ label }}
-        <span class="required" *ngIf="required">*</span>
-    </label>
-    <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="optionValue" [(ngModel)]="value"
-        [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
+    <ng-container *ngIf="label">
+        <!-- Floating Label -->
+        <span class="p-float-label" *ngIf="floatingLabel">
+            <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="optionValue" [(ngModel)]="value"
+                [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
+                [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
+                [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)"
+                (onBlur)="onBlur()" [inputId]="inputId">
+            </p-dropdown>
+            <label [for]="inputId">
+                {{ label }}
+                <span class="required" *ngIf="required">*</span>
+            </label>
+        </span>
+        <!-- Normal Label -->
+        <ng-container *ngIf="!floatingLabel">
+            <label class="normal-label">
+                {{ label }}
+                <span class="required" *ngIf="required">*</span>
+            </label>
+            <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="optionValue" [(ngModel)]="value"
+                [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
+                [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
+                [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)"
+                (onBlur)="onBlur()">
+            </p-dropdown>
+        </ng-container>
+    </ng-container>
+    <!-- No Label -->
+    <p-dropdown *ngIf="!label" [options]="options" [optionLabel]="optionLabel" [optionValue]="optionValue"
+        [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
         [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
         [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)" (onBlur)="onBlur()">
     </p-dropdown>

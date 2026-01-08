@@ -22,8 +22,8 @@
                     <div class="dropdowns-wrapper">
                         <!-- Organisation Dropdown -->
                         <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                            <app-custom-dropdown [(ngModel)]="selectedOrg" placeholder="Select Organisation"
-                                [options]="organisations" optionLabel="name" optionValue="id" [filter]="true"
+                            <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name"
+                                optionValue="id" [filter]="true" [floatingLabel]="true" label="Select Organisation"
                                 filterBy="name" (onChangeEvent)="onOrgChange($event)">
                             </app-custom-dropdown>
                         </div>
@@ -32,7 +32,8 @@
                         <div class="dropdown-field">
                             <app-custom-dropdown [(ngModel)]="selectedDatabase" placeholder="Select Database"
                                 [options]="databases" optionLabel="name" optionValue="id" [filter]="true"
-                                filterBy="name" (onChangeEvent)="onDBChange($event)">
+                                [floatingLabel]="true" label="Database" filterBy="name"
+                                (onChangeEvent)="onDBChange($event)">
                             </app-custom-dropdown>
                         </div>
                     </div>

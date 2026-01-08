@@ -21,8 +21,8 @@
 
                     <!-- Organisation Dropdown -->
                     <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                        <app-custom-dropdown [(ngModel)]="selectedOrg" placeholder="Select Organisation"
-                            [options]="organisations" optionLabel="name" optionValue="id" [filter]="true"
+                        <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name"
+                            optionValue="id" [filter]="true" [floatingLabel]="true" label="Select Organisation"
                             filterBy="name" (onChangeEvent)="onOrgChange($event)">
                         </app-custom-dropdown>
                     </div>

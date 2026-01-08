@@ -12,6 +12,7 @@ import { EditSectionComponent } from './components/edit-section/edit-section.com
 import { ListSectionComponent } from './components/list-section/list-section.component';
 import { ViewSectionComponent } from './components/view-section/view-section.component';
 import { SectionRoutingModule } from './section-routing.module';
+import { SharedModule } from 'src/app/shared';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { SectionRoutingModule } from './section-routing.module';
     ButtonModule,
     RippleModule,
     AppPrimeNGModule,
+    SharedModule,
     SectionRoutingModule,
   ],
 })

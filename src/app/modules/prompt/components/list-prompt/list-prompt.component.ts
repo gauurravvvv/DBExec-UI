@@ -86,9 +86,7 @@ export class ListPromptComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatabases();
     }
   }
@@ -103,20 +101,20 @@ export class ListPromptComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+  onOrgChange(orgId: any) {
+    this.selectedOrg = orgId;
     this.loadDatabases();
   }
 
-  onDBChange(event: any) {
-    this.selectedDatabase = event.value;
+  onDBChange(databaseId: any) {
+    this.selectedDatabase = databaseId;
     this.currentPage = 1;
     this.loadTabs();
   }
@@ -139,7 +137,7 @@ export class ListPromptComponent implements OnInit {
   loadPrompts() {
     if (!this.selectedSection) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrg,
       sectionId: this.selectedSection.id,
     };
 
@@ -158,7 +156,7 @@ export class ListPromptComponent implements OnInit {
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrg,
       pageNumber: 1,
       limit: 100,
     };
@@ -167,8 +165,21 @@ export class ListPromptComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.databases = response.data;
         if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0];
+          this.selectedDatabase = this.databases[0].id;
           this.loadTabs();
+        } else {
+          this.selectedDatabase = null;
+          this.selectedTab = null;
+          this.selectedSection = null;
+          this.tabs = [];
+          this.sections = [];
+          this.prompts = [];
+          this.filteredPrompts = [];
+          this.tabTreeNodes = [];
+          this.selectedNode = null;
+          this.totalItems = 0;
+          this.totalPages = 0;
+          this.pages = [];
         }
       }
     });
@@ -177,19 +188,30 @@ export class ListPromptComponent implements OnInit {
   loadTabs() {
     if (!this.selectedDatabase) return;
     const params = {
-      orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
+      orgId: this.selectedOrg,
+      databaseId: this.selectedDatabase,
       pageNumber: 1,
       limit: 100,
     };
 
     this.tabService.listTab(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = response.data;
+        this.tabs = response.data || [];
         if (this.tabs.length > 0) {
           this.selectedTab = this.tabs[0];
           this.tabTreeNodes = this.transformToTreeNodes(this.tabs);
           this.selectedNode = this.tabTreeNodes[0];
+        } else {
+          this.selectedTab = null;
+          this.selectedSection = null;
+          this.sections = [];
+          this.prompts = [];
+          this.filteredPrompts = [];
+          this.tabTreeNodes = [];
+          this.selectedNode = null;
+          this.totalItems = 0;
+          this.totalPages = 0;
+          this.pages = [];
         }
       }
     });
@@ -237,7 +259,7 @@ export class ListPromptComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([PROMPT.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([PROMPT.EDIT, this.selectedOrg, id]);
   }
 
   confirmDelete(id: string) {
@@ -253,7 +275,7 @@ export class ListPromptComponent implements OnInit {
   proceedDelete() {
     if (this.promptToDelete) {
       this.promptService
-        .deletePrompt(this.selectedOrg.id, this.promptToDelete)
+        .deletePrompt(this.selectedOrg, this.promptToDelete)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadPrompts();
@@ -265,7 +287,7 @@ export class ListPromptComponent implements OnInit {
   }
 
   onEditTab(tab: any) {
-    this.router.navigate([PROMPT.EDIT, this.selectedOrg.id, tab.id]);
+    this.router.navigate([PROMPT.EDIT, this.selectedOrg, tab.id]);
   }
 
   transformToTreeNodes(tabs: any[]): TreeNode[] {
@@ -319,6 +341,6 @@ export class ListPromptComponent implements OnInit {
   }
 
   onConfig(id: string) {
-    this.router.navigate([PROMPT.CONFIG, this.selectedOrg.id, id]);
+    this.router.navigate([PROMPT.CONFIG, this.selectedOrg, id]);
   }
 }

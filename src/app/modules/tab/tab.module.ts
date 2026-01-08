@@ -6,10 +6,11 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
+import { SharedModule } from 'src/app/shared';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { AddTabComponent } from './components/add-tab/add-tab.component';
-import { ListTabComponent } from './components/list-tab/list-tab.component';
 import { EditTabComponent } from './components/edit-tab/edit-tab.component';
+import { ListTabComponent } from './components/list-tab/list-tab.component';
 import { ViewTabComponent } from './components/view-tab/view-tab.component';
 import { TabRoutingModule } from './tab-routing.module';
 
@@ -29,6 +30,7 @@ import { TabRoutingModule } from './tab-routing.module';
     ButtonModule,
     RippleModule,
     AppPrimeNGModule,
+    SharedModule,
     TabRoutingModule,
   ],
 })

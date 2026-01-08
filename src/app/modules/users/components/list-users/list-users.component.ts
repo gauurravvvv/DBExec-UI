@@ -95,7 +95,7 @@ export class ListUsersComponent implements OnInit {
 
     this.userService.listUser(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.users = response.data.users;
+        this.users = response.data.users || [];
         this.filteredUsers = [...this.users];
         this.totalItems = this.users.length;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
