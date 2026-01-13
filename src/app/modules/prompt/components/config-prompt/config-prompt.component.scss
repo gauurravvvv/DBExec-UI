@@ -308,6 +308,18 @@
         }
       }
 
+      &.p-button-success {
+        color: var(--success-color, #22c55e) !important;
+
+        i {
+          color: var(--success-color, #22c55e) !important;
+        }
+
+        &:hover {
+          background: transparent !important;
+        }
+      }
+
       &.p-button-danger {
         color: var(--error-color) !important;
 
@@ -1400,6 +1412,42 @@
     i {
       flex-shrink: 0;
       font-size: 16px;
+    }
+  }
+
+  // Prompt value action buttons
+  .prompt-value-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-btn {
+      background: transparent;
+      border: none;
+      color: var(--primary-color);
+
+      i {
+        font-size: 14px;
+        color: var(--primary-color);
+      }
+
+      &:hover {
+        background: rgba(var(--primary-color-rgb), 0.1);
+      }
     }
   }
 }

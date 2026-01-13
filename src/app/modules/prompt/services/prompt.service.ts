@@ -95,6 +95,7 @@ export class PromptService {
       promptWhere,
       promptValues,
       promptSql,
+      promptValueSQL,
     } = promptConfigData;
     return this.http
       .post(PROMPT.CONFIG, {
@@ -107,6 +108,7 @@ export class PromptService {
         promptWhere,
         promptValues,
         promptSql,
+        promptValueSQL,
       })
       .toPromise()
       .then(response => {
@@ -120,6 +122,34 @@ export class PromptService {
       .get(PROMPT.GET_CONFIG + `${orgId}/${id}`)
       .toPromise()
       .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  getPromptValuesBySQL(params: any) {
+    return this.http
+      .post(PROMPT.GET_PROMPT_VALUES_BY_SQL, {
+        orgId: params.orgId,
+        databaseId: params.databaseId,
+        query: params.query,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  refreshPromptValuesBySQL(params: any) {
+    return this.http
+      .put(PROMPT.REFRSH_PROMPT_VALUES_BY_SQL, {
+        organisation: params.orgId,
+        databaseId: params.databaseId,
+        promptId: params.promptId,
+      })
+      .toPromise()
+      .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
       });

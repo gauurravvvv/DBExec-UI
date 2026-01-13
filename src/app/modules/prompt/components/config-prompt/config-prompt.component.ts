@@ -83,6 +83,9 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   @ViewChild(SqlQueryDialogComponent)
   sqlDialogComponent?: SqlQueryDialogComponent;
 
+  // Refresh state
+  isRefreshingValues = false;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -137,6 +140,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       promptWhere: ['', Validators.required],
       promptValues: [[]], // Initially no validation
       type: [''],
+      promptValueSQL: [''],
     });
 
     this.promptForm
@@ -1161,9 +1165,9 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       query: query.trim(),
     };
 
-    this.databaseService.runQuery(params).then(response => {
+    this.promptService.getPromptValuesBySQL(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        const results = response.data;
+        const results = response.data.columnValues;
 
         // API returns array of strings directly
         const newValues: string[] = [];
@@ -1184,7 +1188,10 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
         if (newValues.length > 0) {
           // Replace previous values with new values from query
-          this.promptForm.patchValue({ promptValues: newValues });
+          this.promptForm.patchValue({
+            promptValues: newValues,
+            promptValueSQL: response.data.query,
+          });
 
           this.closeSqlDialog();
         } else {
@@ -1278,5 +1285,48 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       .catch(err => {
         console.error('Failed to copy SQL:', err);
       });
+  }
+
+  refreshPromptValues() {
+    if (!this.promptId) {
+      return;
+    }
+
+    const params = {
+      orgId: this.orgId,
+      databaseId: this.promptForm.get('database')?.value,
+      promptId: this.promptId,
+    };
+
+    this.promptService
+      .refreshPromptValuesBySQL(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          const results = response.data.columnValues;
+
+          // API returns array of strings directly
+          const newValues: string[] = [];
+          if (Array.isArray(results)) {
+            results.forEach((item: any) => {
+              if (typeof item === 'string') {
+                newValues.push(item);
+              } else if (typeof item === 'object') {
+                const firstValue = Object.values(item)[0];
+                if (firstValue !== undefined && firstValue !== null) {
+                  newValues.push(String(firstValue));
+                }
+              }
+            });
+          }
+
+          if (newValues.length > 0) {
+            this.promptForm.patchValue({
+              promptValues: newValues,
+              promptValueSQL: response.data.query,
+            });
+          }
+        }
+      })
+      .catch(() => {});
   }
 }

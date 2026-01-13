@@ -25,8 +25,8 @@
             <!-- Error Fallback -->
             <div class="editor-fallback" *ngIf="monacoLoadFailed">
                 <textarea [(ngModel)]="sqlQuery"
-                    placeholder="SELECT DISTINCT column_name FROM schema.table_name WHERE condition"
-                    [disabled]="isSqlLoading" rows="12" class="fallback-textarea">
+                    placeholder="SELECT DISTINCT column_name FROM schema.table_name WHERE condition" rows="12"
+                    class="fallback-textarea">
                 </textarea>
             </div>
 
@@ -43,11 +43,9 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onCancel()"
-            [disabled]="isSqlLoading">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onCancel()">
         </button>
-        <button pButton type="button" label="Execute & Load" (click)="onExecute()" [loading]="isSqlLoading"
-            [disabled]="!sqlQuery.trim()">
+        <button pButton type="button" label="Execute & Load" (click)="onExecute()" [disabled]="!sqlQuery.trim()">
         </button>
     </ng-template>
 </p-dialog>

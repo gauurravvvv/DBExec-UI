@@ -281,19 +281,22 @@
                                 </label>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
                                     <button type="button" pButton
+                                        class="p-button-text p-button-rounded p-button-success" icon="pi pi-refresh"
+                                        pTooltip="Refresh prompt values" tooltipPosition="left"
+                                        (click)="refreshPromptValues()">
+                                    </button>
+                                    <button type="button" pButton
                                         class="p-button-text p-button-rounded p-button-warning" icon="pi pi-bolt"
                                         pTooltip="Load values from SQL query" tooltipPosition="left"
                                         (click)="openSqlDialog()">
                                     </button>
-                                    <label class="upload-label" style="cursor: pointer; margin-bottom: 0;">
-                                        <i class="pi pi-upload p-button-text p-button-rounded p-button-info"
-                                            pTooltip="Upload values from file (CSV/TXT). Values can be separated by comma, newline, or pipe"
-                                            tooltipPosition="left"></i>
-                                        <input type="file" accept=".csv,.txt" style="display: none;"
-                                            (change)="onPromptFileUpload($event)">
-                                    </label>
-                                    <button type="button" pButton
-                                        class="p-button-text p-button-rounded p-button-danger clear-all-button"
+                                    <button type="button" pButton class="p-button-text p-button-rounded p-button-info"
+                                        icon="pi pi-upload" pTooltip="Upload values from file (CSV/TXT)"
+                                        tooltipPosition="left" (click)="fileInput.click()">
+                                    </button>
+                                    <input type="file" #fileInput accept=".csv,.txt" style="display: none;"
+                                        (change)="onPromptFileUpload($event)">
+                                    <button type="button" pButton class="p-button-text p-button-rounded p-button-danger"
                                         icon="pi pi-trash" pTooltip="Clear all values" tooltipPosition="left"
                                         (click)="clearPromptValues()"
                                         [disabled]="!promptForm.get('promptValues')?.value?.length">

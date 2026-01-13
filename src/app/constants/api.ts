@@ -129,6 +129,8 @@ export const PROMPT = {
   UPDATE: '/prompt/update',
   CONFIG: '/prompt/config',
   GET_CONFIG: '/prompt/getConfig/',
+  GET_PROMPT_VALUES_BY_SQL: '/prompt/getValues',
+  REFRSH_PROMPT_VALUES_BY_SQL: '/prompt/refreshValues',
 };
 
 export const SCREEN = {

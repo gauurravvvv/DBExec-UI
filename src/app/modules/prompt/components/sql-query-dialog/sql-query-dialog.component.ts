@@ -158,7 +158,6 @@ export class SqlQueryDialogComponent
         // Reset state when dialog opens
         this.sqlQuery = '';
         this.sqlError = '';
-        this.isSqlLoading = false;
 
         // Initialize Monaco editor after DOM is ready
         setTimeout(() => this.loadMonacoEditor(), 100);
@@ -402,10 +401,6 @@ export class SqlQueryDialogComponent
       return;
     }
     this.execute.emit(this.sqlQuery.trim());
-  }
-
-  setLoading(loading: boolean): void {
-    this.isSqlLoading = loading;
   }
 
   setError(error: string): void {
