@@ -1,0 +1,91 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '800px'}" [draggable]="false" [resizable]="false"
+    header="Customise Number Input" styleClass="number-config-dialog" (onHide)="onClose()">
+
+    <div class="dialog-content">
+        <!-- Configuration Options Panel -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <i class="pi pi-cog"></i>
+                <span>Configuration Options</span>
+            </div>
+
+            <div class="config-form">
+                <!-- Placeholder -->
+                <div class="config-group">
+                    <label>Placeholder Text</label>
+                    <input type="text" pInputText [(ngModel)]="config.placeholder" placeholder="e.g., Enter number" />
+                </div>
+
+                <!-- Min Value -->
+                <div class="config-group">
+                    <label>Minimum Value (optional)</label>
+                    <p-inputNumber [(ngModel)]="config.min" placeholder="No minimum" [showButtons]="true"
+                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus">
+                    </p-inputNumber>
+                </div>
+
+                <!-- Max Value -->
+                <div class="config-group">
+                    <label>Maximum Value (optional)</label>
+                    <p-inputNumber [(ngModel)]="config.max" placeholder="No maximum" [showButtons]="true"
+                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus">
+                    </p-inputNumber>
+                </div>
+
+                <!-- Step -->
+                <div class="config-group">
+                    <label>Step</label>
+                    <p-inputNumber [(ngModel)]="config.step" [min]="1" [showButtons]="true" buttonLayout="horizontal"
+                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus">
+                    </p-inputNumber>
+                    <small class="hint">Increment/decrement step value</small>
+                </div>
+
+                <!-- Show Buttons -->
+                <div class="config-row">
+                    <label>Show +/- Buttons</label>
+                    <p-inputSwitch [(ngModel)]="config.showButtons"></p-inputSwitch>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview Panel -->
+        <div class="preview-panel">
+            <div class="panel-header">
+                <i class="pi pi-eye"></i>
+                <span>Live Preview</span>
+            </div>
+
+            <div class="preview-content">
+                <div class="preview-label">How it will look:</div>
+                <p-inputNumber [(ngModel)]="previewValue" [placeholder]="config.placeholder" [min]="$any(config.min)"
+                    [max]="$any(config.max)" [step]="config.step" [showButtons]="config.showButtons"
+                    buttonLayout="horizontal" [style]="{width: '100%'}" incrementButtonIcon="pi pi-plus"
+                    decrementButtonIcon="pi pi-minus">
+                </p-inputNumber>
+
+                <div class="preview-actions" *ngIf="previewValue !== null">
+                    <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
+                        icon="pi pi-check" (click)="setAsDefault()">
+                    </button>
+                </div>
+
+                <div class="default-indicator" *ngIf="config.defaultValue !== null">
+                    <i class="pi pi-bookmark"></i>
+                    <span>Default: <strong>{{config.defaultValue}}</strong></span>
+                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
+                        (click)="clearDefault()" pTooltip="Clear default">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        </button>
+        <button pButton type="button" label="Apply Customisation" (click)="onSave()">
+            <i class="pi pi-check mr-2"></i>
+        </button>
+    </ng-template>
+</p-dialog>

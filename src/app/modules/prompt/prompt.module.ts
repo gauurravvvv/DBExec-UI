@@ -16,7 +16,17 @@ import { EditPromptComponent } from './components/edit-prompt/edit-prompt.compon
 import { ListPromptComponent } from './components/list-prompt/list-prompt.component';
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
 import { PromptRoutingModule } from './prompt-routing.module';
-import { SqlQueryDialogComponent } from './components/sql-query-dialog/sql-query-dialog.component';
+import { SqlQueryDialogComponent } from './components/dialogs/sql-query-dialog/sql-query-dialog.component';
+import { DropdownConfigDialogComponent } from './components/dialogs/dropdown-config-dialog/dropdown-config-dialog.component';
+import { MultiselectConfigDialogComponent } from './components/dialogs/multiselect-config-dialog/multiselect-config-dialog.component';
+import { CheckboxConfigDialogComponent } from './components/dialogs/checkbox-config-dialog/checkbox-config-dialog.component';
+import { RadioConfigDialogComponent } from './components/dialogs/radio-config-dialog/radio-config-dialog.component';
+import { TextConfigDialogComponent } from './components/dialogs/text-config-dialog/text-config-dialog.component';
+import { NumberConfigDialogComponent } from './components/dialogs/number-config-dialog/number-config-dialog.component';
+import { DateConfigDialogComponent } from './components/dialogs/date-config-dialog/date-config-dialog.component';
+import { DateRangeConfigDialogComponent } from './components/dialogs/daterange-config-dialog/daterange-config-dialog.component';
+import { CalendarConfigDialogComponent } from './components/dialogs/calendar-config-dialog/calendar-config-dialog.component';
+import { RangeSliderConfigDialogComponent } from './components/dialogs/rangeslider-config-dialog/rangeslider-config-dialog.component';
 import { SharedModule } from 'src/app/shared';
 
 @NgModule({
@@ -27,6 +37,16 @@ import { SharedModule } from 'src/app/shared';
     ViewPromptComponent,
     ConfigPromptComponent,
     SqlQueryDialogComponent,
+    DropdownConfigDialogComponent,
+    MultiselectConfigDialogComponent,
+    CheckboxConfigDialogComponent,
+    RadioConfigDialogComponent,
+    TextConfigDialogComponent,
+    NumberConfigDialogComponent,
+    DateConfigDialogComponent,
+    DateRangeConfigDialogComponent,
+    CalendarConfigDialogComponent,
+    RangeSliderConfigDialogComponent,
   ],
   imports: [
     CommonModule,

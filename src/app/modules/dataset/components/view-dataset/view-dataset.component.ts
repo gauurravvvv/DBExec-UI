@@ -12,11 +12,13 @@ import { DatasetService } from '../../services/dataset.service';
 export class ViewDatasetComponent implements OnInit {
   datasetData: any;
   showDeleteConfirm = false;
+  showDeleteFieldConfirm = false;
   showEditFieldsDialog = false;
   showEditCustomFieldDialog = false;
   showAddCustomFieldDialog = false;
   selectedField: any = null;
   selectedFieldIndex: number = -1;
+  fieldToDelete: any = null;
   isLoadingField = false;
 
   constructor(
@@ -68,6 +70,40 @@ export class ViewDatasetComponent implements OnInit {
         if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([DATASET.LIST]);
         }
+      });
+  }
+
+  // Delete field methods
+  confirmDeleteField(field: any, index: number): void {
+    this.fieldToDelete = field;
+    this.showDeleteFieldConfirm = true;
+  }
+
+  cancelDeleteField(): void {
+    this.fieldToDelete = null;
+    this.showDeleteFieldConfirm = false;
+  }
+
+  proceedDeleteField(): void {
+    if (!this.fieldToDelete) return;
+
+    this.datasetService
+      .deleteDatasetField(
+        this.datasetData.organisationId,
+        this.datasetData.id,
+        this.fieldToDelete.id
+      )
+      .then((response: any) => {
+        this.showDeleteFieldConfirm = false;
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.fieldToDelete = null;
+          // Reload dataset data from API
+          this.loadDatasetData();
+        }
+      })
+      .catch(() => {
+        this.showDeleteFieldConfirm = false;
+        this.fieldToDelete = null;
       });
   }
 

@@ -1,0 +1,140 @@
+Prompt Type Configuration Dialogs - Implementation Plan
+Goal
+Create configuration dialogs for each prompt type allowing users to configure:
+
+Placeholder text - Hint text shown when empty
+Default value - Pre-selected value(s)
+Filter options - Enable/disable search filter
+Filter label - Custom placeholder for filter input
+Type-specific settings - Unique options per prompt type
+Prompt Types & Configuration Options
+1. Dropdown (dropdown)
+Config Option	Type	Default	Description
+placeholder	string	"Select an option"	Placeholder text
+defaultValue	string	null	Pre-selected value
+filter
+boolean	true	Enable search filter
+filterPlaceholder	string	"Search..."	Filter input placeholder
+showClear	boolean	true	Show clear button
+editable	boolean	false	Allow typing custom values
+2. Multi Select (multiselect)
+Config Option	Type	Default	Description
+placeholder	string	"Select options"	Placeholder text
+defaultValues	string[]	[]	Pre-selected values
+filter
+boolean	true	Enable search filter
+filterPlaceholder	string	"Search..."	Filter input placeholder
+showToggleAll	boolean	true	Show select all checkbox
+maxSelectedLabels	number	3	Max items shown before collapse
+selectionLimit	number	null	Max selectable items
+3. Checkbox (checkbox)
+Config Option	Type	Default	Description
+label	string	""	Label text next to checkbox
+defaultChecked	boolean	false	Default checked state
+binary	boolean	true	Binary mode (true/false)
+4. Radio (radio)
+Config Option	Type	Default	Description
+defaultValue	string	null	Pre-selected option
+layout	"horizontal" | "vertical"	"vertical"	Radio button layout
+5. Text (
+text
+)
+Config Option	Type	Default	Description
+placeholder	string	"Enter text"	Placeholder text
+defaultValue	string	""	Default text value
+maxLength	number	null	Max character limit
+6. Number (number)
+Config Option	Type	Default	Description
+placeholder	string	"Enter number"	Placeholder text
+defaultValue	number	null	Default number value
+min
+number	null	Minimum value
+max	number	null	Maximum value
+step	number	1	Increment step
+showButtons	boolean	true	Show +/- buttons
+7. Date (
+date
+)
+Config Option	Type	Default	Description
+placeholder	string	"Select date"	Placeholder text
+defaultValue	Date	null	Default date
+dateFormat	string	"mm/dd/yy"	Display format
+showIcon	boolean	true	Show calendar icon
+showButtonBar	boolean	true	Show Today/Clear buttons
+minDate	Date	null	Minimum selectable date
+maxDate	Date	null	Maximum selectable date
+8. Date Range (daterange)
+Config Option	Type	Default	Description
+placeholder	string	"Select date range"	Placeholder text
+defaultStartDate	Date	null	Default start date
+defaultEndDate	Date	null	Default end date
+dateFormat	string	"mm/dd/yy"	Display format
+showIcon	boolean	true	Show calendar icon
+numberOfMonths	number	2	Months to show side-by-side
+9. Calendar (calendar)
+Config Option	Type	Default	Description
+placeholder	string	"Select date/time"	Placeholder text
+defaultValue	Date	null	Default date/time
+showTime	boolean	false	Include time picker
+hourFormat	"12" | "24"	"12"	Time format
+dateFormat	string	"mm/dd/yy"	Display format
+inline	boolean	false	Show inline (not popup)
+10. Range Slider (rangeslider)
+Config Option	Type	Default	Description
+defaultMin	number	0	Default minimum value
+defaultMax	number	100	Default maximum value
+min
+number	0	Minimum bound
+max	number	100	Maximum bound
+step	number	1	Increment step
+orientation	"horizontal" | "vertical"	"horizontal"	Slider orientation
+Component Architecture
+Single Universal Dialog Component
+Create one PromptConfigDialogComponent that dynamically renders config options based on prompt type.
+
+src/app/modules/prompt/components/prompt-config-dialog/
+├── prompt-config-dialog.component.ts
+├── prompt-config-dialog.component.html
+├── prompt-config-dialog.component.scss
+└── prompt-config.interface.ts  (config interfaces)
+Dialog Structure (Two-Column Layout)
+┌─────────────────────────────────────────────────────┐
+│  Configure [Prompt Type]                        [X] │
+├─────────────────────────┬───────────────────────────┤
+│  CONFIGURATION OPTIONS  │      LIVE PREVIEW         │
+│                         │                           │
+│  Placeholder: [____]    │   [Rendered Component]    │
+│  Default Value: [____]  │                           │
+│  ☑ Enable Filter        │   "How it will look"      │
+│  Filter Label: [____]   │                           │
+│  ...                    │                           │
+├─────────────────────────┴───────────────────────────┤
+│                        [Cancel]  [Apply Config]     │
+└─────────────────────────────────────────────────────┤
+Integration Points
+1. Config Prompt Page
+Add "Configure Display" button next to prompt type dropdown
+Button visible only when prompt type is selected
+Opens PromptConfigDialogComponent with current type
+2. Data Storage
+Store config as JSON in promptDisplayConfig field
+Save with prompt configuration API
+3. Execute Screen
+Read config when rendering prompts
+Apply placeholder, default values, filter settings
+Implementation Steps
+ Create PromptConfigInterface with all config types
+ Create PromptConfigDialogComponent
+ Implement dynamic form rendering based on type
+ Add live preview for each prompt type
+ Add "Configure Display" button to config-prompt
+ Wire up save/load of config data
+ Update execute-screen to apply configs
+User Review Required
+IMPORTANT
+
+Please confirm:
+
+Are the configuration options listed above sufficient?
+Should any prompt types have additional options?
+Preferred approach: Single universal dialog vs separate dialog per type?

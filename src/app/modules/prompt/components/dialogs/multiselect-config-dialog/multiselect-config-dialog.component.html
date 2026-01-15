@@ -1,0 +1,99 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '800px'}" [draggable]="false" [resizable]="false"
+    header="Customise Multiselect" styleClass="multiselect-config-dialog" (onHide)="onClose()">
+
+    <div class="dialog-content">
+        <!-- Configuration Options Panel -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <i class="pi pi-cog"></i>
+                <span>Configuration Options</span>
+            </div>
+
+            <div class="config-form">
+                <!-- Placeholder -->
+                <div class="config-group">
+                    <label>Placeholder Text</label>
+                    <input type="text" pInputText [(ngModel)]="config.placeholder" placeholder="e.g., Select options" />
+                </div>
+
+                <!-- Filter Toggle -->
+                <div class="config-row">
+                    <label>Enable Search Filter</label>
+                    <p-inputSwitch [(ngModel)]="config.filter"></p-inputSwitch>
+                </div>
+
+                <!-- Filter Placeholder (shown only when filter is enabled) -->
+                <div class="config-group" *ngIf="config.filter">
+                    <label>Filter Placeholder</label>
+                    <input type="text" pInputText [(ngModel)]="config.filterPlaceholder"
+                        placeholder="e.g., Search..." />
+                    <small class="hint">Note: Placeholder for search filter inside dropdown</small>
+                </div>
+
+                <!-- Show Toggle All -->
+                <div class="config-row">
+                    <label>Show Select All Checkbox</label>
+                    <p-inputSwitch [(ngModel)]="config.showToggleAll"></p-inputSwitch>
+                </div>
+
+                <!-- Display Mode -->
+                <div class="config-group">
+                    <label>Display Mode</label>
+                    <p-dropdown [options]="displayModes" [(ngModel)]="config.displayMode" optionLabel="label"
+                        optionValue="value" [style]="{width: '100%'}">
+                    </p-dropdown>
+                    <small class="hint">How selected items are displayed</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview Panel -->
+        <div class="preview-panel">
+            <div class="panel-header">
+                <i class="pi pi-eye"></i>
+                <span>Live Preview</span>
+            </div>
+
+            <div class="preview-content">
+                <div class="preview-label">How it will look:</div>
+                <p-multiSelect [options]="formattedOptions" [(ngModel)]="selectedValues"
+                    [placeholder]="config.placeholder" [filter]="config.filter" [showToggleAll]="config.showToggleAll"
+                    [display]="config.displayMode" [appendTo]="'body'" [style]="{width: '100%'}" optionLabel="label"
+                    optionValue="value">
+                </p-multiSelect>
+
+                <div class="preview-actions" *ngIf="selectedValues && selectedValues.length > 0">
+                    <button pButton type="button" label="Set as Defaults" class="p-button-text p-button-sm"
+                        icon="pi pi-check" (click)="setAsDefaults()">
+                    </button>
+                </div>
+
+                <div class="preview-hint" *ngIf="formattedOptions.length === 0">
+                    <i class="pi pi-info-circle"></i>
+                    <span>Add prompt values to see the multiselect preview</span>
+                </div>
+
+                <div class="default-indicator" *ngIf="config.defaultValues && config.defaultValues.length > 0">
+                    <i class="pi pi-bookmark"></i>
+                    <div class="default-values">
+                        <span>Default values:</span>
+                        <div class="default-chips">
+                            <span class="default-chip" *ngFor="let val of config.defaultValues">{{val}}</span>
+                        </div>
+                    </div>
+                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
+                        (click)="clearDefaults()" pTooltip="Clear defaults">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        </button>
+        <button pButton type="button" label="Apply Customisation" (click)="onSave()">
+            <i class="pi pi-check mr-2"></i>
+        </button>
+    </ng-template>
+</p-dialog>

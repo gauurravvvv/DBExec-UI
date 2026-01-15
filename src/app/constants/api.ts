@@ -99,6 +99,7 @@ export const DATASET = {
   VIEW_FIELD: '/dataset/get/field/',
   UPDATE: '/dataset/update',
   UPDATE_FIELD: '/dataset/update/field',
+  DELETE_FIELD: '/dataset/delete/field/',
   VALIDATE_FIELD: '/dataset/validate/field',
   ADD_FIELD: '/dataset/add/field',
   RUN_QUERY: '/dataset/run',

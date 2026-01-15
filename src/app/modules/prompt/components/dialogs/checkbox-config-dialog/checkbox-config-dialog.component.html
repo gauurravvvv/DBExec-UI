@@ -1,0 +1,58 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '800px'}" [draggable]="false" [resizable]="false"
+    header="Customise Checkbox" styleClass="checkbox-config-dialog" (onHide)="onClose()">
+
+    <div class="dialog-content">
+        <!-- Configuration Options Panel -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <i class="pi pi-cog"></i>
+                <span>Configuration Options</span>
+            </div>
+
+            <div class="config-form">
+                <!-- Label Text -->
+                <div class="config-group">
+                    <label>Label Text</label>
+                    <input type="text" pInputText [(ngModel)]="config.label" placeholder="e.g., Accept terms" />
+                </div>
+
+                <!-- Default Checked -->
+                <div class="config-row">
+                    <label>Default Checked</label>
+                    <p-inputSwitch [(ngModel)]="config.defaultChecked"></p-inputSwitch>
+                </div>
+
+                <!-- Binary Mode -->
+                <div class="config-row">
+                    <label>Binary Mode</label>
+                    <p-inputSwitch [(ngModel)]="config.binary"></p-inputSwitch>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview Panel -->
+        <div class="preview-panel">
+            <div class="panel-header">
+                <i class="pi pi-eye"></i>
+                <span>Live Preview</span>
+            </div>
+
+            <div class="preview-content">
+                <div class="preview-label">How it will look:</div>
+                <div class="preview-checkbox">
+                    <p-checkbox [(ngModel)]="config.defaultChecked" [binary]="config.binary" 
+                        [label]="config.label || 'Checkbox label'" inputId="preview-checkbox">
+                    </p-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        </button>
+        <button pButton type="button" label="Apply Customisation" (click)="onSave()">
+            <i class="pi pi-check mr-2"></i>
+        </button>
+    </ng-template>
+</p-dialog>

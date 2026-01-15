@@ -8,6 +8,10 @@
                 <h2>Configure Prompt</h2>
             </div>
             <div class="action-buttons">
+                <button pButton type="button" label="Customise" class="p-button-outlined" *ngIf="isConfigurable()"
+                    (click)="openConfigDialog()" pTooltip="Customise prompt display options" tooltipPosition="bottom">
+                    <i class="pi pi-cog mr-2"></i>
+                </button>
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
                     [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
                 </button>
@@ -340,3 +344,56 @@
     [currentSchema]="promptForm.get('schema')?.value?.name" (close)="closeSqlDialog()"
     (execute)="executeSqlQuery($event)">
 </app-sql-query-dialog>
+
+<!-- Dropdown Configuration Dialog -->
+<app-dropdown-config-dialog [visible]="showDropdownConfigDialog"
+    [promptValues]="promptForm.get('promptValues')?.value || []" [currentConfig]="dropdownConfig"
+    (close)="showDropdownConfigDialog = false" (save)="onDropdownConfigSaved($event)">
+</app-dropdown-config-dialog>
+
+<!-- Multiselect Configuration Dialog -->
+<app-multiselect-config-dialog [visible]="showMultiselectConfigDialog"
+    [promptValues]="promptForm.get('promptValues')?.value || []" [currentConfig]="multiselectConfig"
+    (close)="showMultiselectConfigDialog = false" (save)="onMultiselectConfigSaved($event)">
+</app-multiselect-config-dialog>
+
+<!-- Checkbox Configuration Dialog -->
+<app-checkbox-config-dialog [visible]="showCheckboxConfigDialog" [currentConfig]="checkboxConfig"
+    (close)="showCheckboxConfigDialog = false" (save)="onCheckboxConfigSaved($event)">
+</app-checkbox-config-dialog>
+
+<!-- Radio Configuration Dialog -->
+<app-radio-config-dialog [visible]="showRadioConfigDialog"
+    [promptValues]="promptForm.get('promptValues')?.value || []" [currentConfig]="radioConfig"
+    (close)="showRadioConfigDialog = false" (save)="onRadioConfigSaved($event)">
+</app-radio-config-dialog>
+
+<!-- Text Configuration Dialog -->
+<app-text-config-dialog [visible]="showTextConfigDialog" [currentConfig]="textConfig"
+    (close)="showTextConfigDialog = false" (save)="onTextConfigSaved($event)">
+</app-text-config-dialog>
+
+<!-- Number Configuration Dialog -->
+<app-number-config-dialog [visible]="showNumberConfigDialog" [currentConfig]="numberConfig"
+    (close)="showNumberConfigDialog = false" (save)="onNumberConfigSaved($event)">
+</app-number-config-dialog>
+
+<!-- Date Configuration Dialog -->
+<app-date-config-dialog [visible]="showDateConfigDialog" [currentConfig]="dateConfig"
+    (close)="showDateConfigDialog = false" (save)="onDateConfigSaved($event)">
+</app-date-config-dialog>
+
+<!-- Date Range Configuration Dialog -->
+<app-daterange-config-dialog [visible]="showDateRangeConfigDialog" [currentConfig]="dateRangeConfig"
+    (close)="showDateRangeConfigDialog = false" (save)="onDateRangeConfigSaved($event)">
+</app-daterange-config-dialog>
+
+<!-- Calendar Configuration Dialog -->
+<app-calendar-config-dialog [visible]="showCalendarConfigDialog" [currentConfig]="calendarConfig"
+    (close)="showCalendarConfigDialog = false" (save)="onCalendarConfigSaved($event)">
+</app-calendar-config-dialog>
+
+<!-- Range Slider Configuration Dialog -->
+<app-rangeslider-config-dialog [visible]="showRangeSliderConfigDialog" [currentConfig]="rangeSliderConfig"
+    (close)="showRangeSliderConfigDialog = false" (save)="onRangeSliderConfigSaved($event)">
+</app-rangeslider-config-dialog>

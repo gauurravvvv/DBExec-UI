@@ -1,0 +1,67 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '800px'}" [draggable]="false" [resizable]="false"
+    header="Customise Radio" styleClass="radio-config-dialog" (onHide)="onClose()">
+
+    <div class="dialog-content">
+        <!-- Configuration Options Panel -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <i class="pi pi-cog"></i>
+                <span>Configuration Options</span>
+            </div>
+
+            <div class="config-form">
+                <!-- Layout -->
+                <div class="config-group">
+                    <label>Layout</label>
+                    <p-dropdown [options]="layoutOptions" [(ngModel)]="config.layout" optionLabel="label"
+                        optionValue="value" [style]="{width: '100%'}">
+                    </p-dropdown>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview Panel -->
+        <div class="preview-panel">
+            <div class="panel-header">
+                <i class="pi pi-eye"></i>
+                <span>Live Preview</span>
+            </div>
+
+            <div class="preview-content">
+                <div class="preview-label">How it will look:</div>
+                <div [class]="'radio-preview ' + config.layout">
+                    <p-radioButton *ngFor="let option of formattedOptions" [value]="option.value"
+                        [(ngModel)]="selectedValue" [label]="option.label" [inputId]="option.value">
+                    </p-radioButton>
+                </div>
+
+                <div class="preview-actions" *ngIf="selectedValue">
+                    <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
+                        icon="pi pi-check" (click)="setAsDefault()">
+                    </button>
+                </div>
+
+                <div class="preview-hint" *ngIf="formattedOptions.length === 0">
+                    <i class="pi pi-info-circle"></i>
+                    <span>Add prompt values to see the radio preview</span>
+                </div>
+
+                <div class="default-indicator" *ngIf="config.defaultValue">
+                    <i class="pi pi-bookmark"></i>
+                    <span>Default: <strong>{{config.defaultValue}}</strong></span>
+                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
+                        (click)="clearDefault()" pTooltip="Clear default">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        </button>
+        <button pButton type="button" label="Apply Customisation" (click)="onSave()">
+            <i class="pi pi-check mr-2"></i>
+        </button>
+    </ng-template>
+</p-dialog>

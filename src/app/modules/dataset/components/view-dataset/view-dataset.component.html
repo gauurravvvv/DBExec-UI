@@ -123,11 +123,18 @@
                                         <span class="column-view">{{ entity.columnToView }}</span>
                                         <span class="column-use">{{ entity.columnToUse }}</span>
                                     </div>
-                                    <button pButton class="p-button-text p-button-sm btn-edit"
-                                        (click)="openEditFieldDialog(entity, i)" pTooltip="Edit field"
-                                        tooltipPosition="top">
-                                        <i class="pi pi-pencil"></i>
-                                    </button>
+                                    <div class="field-actions">
+                                        <button pButton class="p-button-text p-button-sm btn-edit"
+                                            (click)="openEditFieldDialog(entity, i)" pTooltip="Edit field"
+                                            tooltipPosition="top">
+                                            <i class="pi pi-pencil"></i>
+                                        </button>
+                                        <button pButton class="p-button-text p-button-sm p-button-danger btn-delete"
+                                            (click)="confirmDeleteField(entity, i)" pTooltip="Delete field"
+                                            tooltipPosition="top" [disabled]="entity.type !== 2">
+                                            <i class="pi pi-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -187,6 +194,18 @@
         <div class="popup-actions">
             <button class="btn-cancel" (click)="cancelDelete()">No</button>
             <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Field Confirmation Dialog -->
+<div class="confirmation-popup" *ngIf="showDeleteFieldConfirm">
+    <div class="popup-content">
+        <h3>Confirm Delete Field</h3>
+        <p>Are you sure you want to delete the field <strong><em>{{ fieldToDelete?.columnToView }}</em></strong>?</p>
+        <div class="popup-actions">
+            <button class="btn-cancel" (click)="cancelDeleteField()">No</button>
+            <button class="btn-confirm" (click)="proceedDeleteField()">Yes</button>
         </div>
     </div>
 </div>

@@ -402,6 +402,9 @@ export class AddCustomFieldDialogComponent
       return;
     }
 
+    // Get IDs of custom fields used in the formula
+    const usedCustomFieldIds = this.getUsedCustomFieldIds();
+
     this.isSubmitting = true;
 
     if (this.editMode && this.editFieldData) {
@@ -412,6 +415,7 @@ export class AddCustomFieldDialogComponent
         organisation: this.editFieldData.organisationId,
         columnNameToView: this.customField.columnToView,
         customLogic: this.customField.columnToUse,
+        used_field_ids: usedCustomFieldIds,
       };
 
       this.datasetService
@@ -432,6 +436,7 @@ export class AddCustomFieldDialogComponent
         datasetId: this.datasetId,
         name: this.customField.columnToView,
         customLogic: this.customField.columnToUse,
+        used_field_ids: usedCustomFieldIds,
       };
 
       this.datasetService
@@ -446,6 +451,40 @@ export class AddCustomFieldDialogComponent
           this.isSubmitting = false;
         });
     }
+  }
+
+  /**
+   * Get IDs of all fields that are referenced in the formula
+   * Returns an array of field IDs (both default and custom fields)
+   */
+  private getUsedCustomFieldIds(): number[] {
+    const formula = this.customField.columnToUse || '';
+
+    // Extract all field references from formula (e.g., {fieldName})
+    const fieldReferences = formula.match(/\{([^}]+)\}/g);
+    if (!fieldReferences || fieldReferences.length === 0) {
+      return [];
+    }
+
+    const usedIds: number[] = [];
+
+    // Check each field reference against ALL dataset fields
+    for (const ref of fieldReferences) {
+      // Remove braces to get field name
+      const fieldName = ref.slice(1, -1);
+
+      // Find matching field by columnToUse or columnToView (any type)
+      const matchedField = this.datasetFields.find(
+        (field: any) =>
+          field.columnToUse === fieldName || field.columnToView === fieldName
+      );
+
+      if (matchedField && !usedIds.includes(matchedField.id)) {
+        usedIds.push(matchedField.id);
+      }
+    }
+
+    return usedIds;
   }
 
   onCancel() {

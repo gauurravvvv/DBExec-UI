@@ -1,0 +1,85 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '800px'}" [draggable]="false" [resizable]="false"
+    header="Customise Date Range Picker" styleClass="daterange-config-dialog" (onHide)="onClose()">
+
+    <div class="dialog-content">
+        <!-- Configuration Options Panel -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <i class="pi pi-cog"></i>
+                <span>Configuration Options</span>
+            </div>
+
+            <div class="config-form">
+                <!-- Placeholder -->
+                <div class="config-group">
+                    <label>Placeholder Text</label>
+                    <input type="text" pInputText [(ngModel)]="config.placeholder"
+                        placeholder="e.g., Select date range" />
+                </div>
+
+                <!-- Date Format -->
+                <div class="config-group">
+                    <label>Date Format</label>
+                    <p-dropdown [options]="dateFormatOptions" [(ngModel)]="config.dateFormat" optionLabel="label"
+                        optionValue="value" [style]="{width: '100%'}">
+                    </p-dropdown>
+                </div>
+
+                <!-- Show Icon -->
+                <div class="config-row">
+                    <label>Show Calendar Icon</label>
+                    <p-inputSwitch [(ngModel)]="config.showIcon"></p-inputSwitch>
+                </div>
+
+                <!-- Number of Months -->
+                <div class="config-group">
+                    <label>Number of Months</label>
+                    <p-inputNumber [(ngModel)]="config.numberOfMonths" [min]="1" [max]="3" [showButtons]="true"
+                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus">
+                    </p-inputNumber>
+                    <small class="hint">Months to show side-by-side</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview Panel -->
+        <div class="preview-panel">
+            <div class="panel-header">
+                <i class="pi pi-eye"></i>
+                <span>Live Preview</span>
+            </div>
+
+            <div class="preview-content">
+                <div class="preview-label">How it will look:</div>
+                <p-calendar [(ngModel)]="previewRange" [placeholder]="config.placeholder" selectionMode="range"
+                    [dateFormat]="config.dateFormat" [showIcon]="config.showIcon"
+                    [numberOfMonths]="config.numberOfMonths" [style]="{width: '100%'}">
+                </p-calendar>
+
+                <div class="preview-actions" *ngIf="previewRange && previewRange.length === 2">
+                    <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
+                        icon="pi pi-check" (click)="setAsDefault()">
+                    </button>
+                </div>
+
+                <div class="default-indicator"
+                    *ngIf="config.defaultStartDate && config.defaultEndDate">
+                    <i class="pi pi-bookmark"></i>
+                    <span>Default: <strong>{{config.defaultStartDate | date}} - {{config.defaultEndDate |
+                            date}}</strong></span>
+                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
+                        (click)="clearDefault()" pTooltip="Clear default">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        </button>
+        <button pButton type="button" label="Apply Customisation" (click)="onSave()">
+            <i class="pi pi-check mr-2"></i>
+        </button>
+    </ng-template>
+</p-dialog>

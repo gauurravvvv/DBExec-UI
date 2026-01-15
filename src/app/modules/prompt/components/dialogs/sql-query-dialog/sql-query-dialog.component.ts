@@ -9,7 +9,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import { MonacoIntelliSenseService } from '../../../dataset/services copy/monaco-intellisense.service';
+import { MonacoIntelliSenseService } from '../../../../dataset/services copy/monaco-intellisense.service';
 
 declare const monaco: any;
 declare const window: any;

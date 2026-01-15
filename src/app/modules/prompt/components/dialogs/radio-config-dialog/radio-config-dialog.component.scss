@@ -1,0 +1,14 @@
+.radio-preview {
+  &.vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &.horizontal {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}

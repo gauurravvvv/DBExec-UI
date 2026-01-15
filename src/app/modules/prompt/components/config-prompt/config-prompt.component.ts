@@ -25,7 +25,7 @@ import {
   selectSchemaByKey,
   selectIsSchemaStale,
 } from '../../store';
-import { SqlQueryDialogComponent } from '../sql-query-dialog/sql-query-dialog.component';
+import { SqlQueryDialogComponent } from '../dialogs/sql-query-dialog/sql-query-dialog.component';
 import { PROMPT_TYPES } from '../../constants/prompt.constant';
 
 @Component({
@@ -85,6 +85,46 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
   // Refresh state
   isRefreshingValues = false;
+
+  // Dropdown Configuration Dialog
+  showDropdownConfigDialog = false;
+  dropdownConfig: any = {};
+
+  // Multiselect Configuration Dialog
+  showMultiselectConfigDialog = false;
+  multiselectConfig: any = {};
+
+  // Checkbox Configuration Dialog
+  showCheckboxConfigDialog = false;
+  checkboxConfig: any = {};
+
+  // Radio Configuration Dialog
+  showRadioConfigDialog = false;
+  radioConfig: any = {};
+
+  // Text Configuration Dialog
+  showTextConfigDialog = false;
+  textConfig: any = {};
+
+  // Number Configuration Dialog
+  showNumberConfigDialog = false;
+  numberConfig: any = {};
+
+  // Date Configuration Dialog
+  showDateConfigDialog = false;
+  dateConfig: any = {};
+
+  // Date Range Configuration Dialog
+  showDateRangeConfigDialog = false;
+  dateRangeConfig: any = {};
+
+  // Calendar Configuration Dialog
+  showCalendarConfigDialog = false;
+  calendarConfig: any = {};
+
+  // Range Slider Configuration Dialog
+  showRangeSliderConfigDialog = false;
+  rangeSliderConfig: any = {};
 
   constructor(
     private fb: FormBuilder,
@@ -1145,6 +1185,223 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
    */
   closeSqlDialog(): void {
     this.showSqlDialog = false;
+  }
+
+  /**
+   * Open dropdown configuration dialog
+   */
+  openDropdownConfigDialog(): void {
+    this.showDropdownConfigDialog = true;
+  }
+
+  /**
+   * Handle dropdown config saved
+   */
+  onDropdownConfigSaved(config: any): void {
+    this.dropdownConfig = config;
+    this.showDropdownConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open multiselect configuration dialog
+   */
+  openMultiselectConfigDialog(): void {
+    this.showMultiselectConfigDialog = true;
+  }
+
+  /**
+   * Handle multiselect config saved
+   */
+  onMultiselectConfigSaved(config: any): void {
+    this.multiselectConfig = config;
+    this.showMultiselectConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open checkbox configuration dialog
+   */
+  openCheckboxConfigDialog(): void {
+    this.showCheckboxConfigDialog = true;
+  }
+
+  /**
+   * Handle checkbox config saved
+   */
+  onCheckboxConfigSaved(config: any): void {
+    this.checkboxConfig = config;
+    this.showCheckboxConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open radio configuration dialog
+   */
+  openRadioConfigDialog(): void {
+    this.showRadioConfigDialog = true;
+  }
+
+  /**
+   * Handle radio config saved
+   */
+  onRadioConfigSaved(config: any): void {
+    this.radioConfig = config;
+    this.showRadioConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open text configuration dialog
+   */
+  openTextConfigDialog(): void {
+    this.showTextConfigDialog = true;
+  }
+
+  /**
+   * Handle text config saved
+   */
+  onTextConfigSaved(config: any): void {
+    this.textConfig = config;
+    this.showTextConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open number configuration dialog
+   */
+  openNumberConfigDialog(): void {
+    this.showNumberConfigDialog = true;
+  }
+
+  /**
+   * Handle number config saved
+   */
+  onNumberConfigSaved(config: any): void {
+    this.numberConfig = config;
+    this.showNumberConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open date configuration dialog
+   */
+  openDateConfigDialog(): void {
+    this.showDateConfigDialog = true;
+  }
+
+  /**
+   * Handle date config saved
+   */
+  onDateConfigSaved(config: any): void {
+    this.dateConfig = config;
+    this.showDateConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open date range configuration dialog
+   */
+  openDateRangeConfigDialog(): void {
+    this.showDateRangeConfigDialog = true;
+  }
+
+  /**
+   * Handle date range config saved
+   */
+  onDateRangeConfigSaved(config: any): void {
+    this.dateRangeConfig = config;
+    this.showDateRangeConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open calendar configuration dialog
+   */
+  openCalendarConfigDialog(): void {
+    this.showCalendarConfigDialog = true;
+  }
+
+  /**
+   * Handle calendar config saved
+   */
+  onCalendarConfigSaved(config: any): void {
+    this.calendarConfig = config;
+    this.showCalendarConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Open range slider configuration dialog
+   */
+  openRangeSliderConfigDialog(): void {
+    this.showRangeSliderConfigDialog = true;
+  }
+
+  /**
+   * Handle range slider config saved
+   */
+  onRangeSliderConfigSaved(config: any): void {
+    this.rangeSliderConfig = config;
+    this.showRangeSliderConfigDialog = false;
+    this.promptForm.markAsDirty();
+  }
+
+  /**
+   * Check if current prompt type is configurable (has a config dialog)
+   */
+  isConfigurable(): boolean {
+    const configurableTypes = [
+      'dropdown',
+      'multiselect',
+      'checkbox',
+      'radio',
+      'text',
+      'number',
+      'date',
+      'daterange',
+      'calendar',
+      'rangeslider'
+    ];
+    return configurableTypes.includes(this.selectedPromptType);
+  }
+
+  /**
+   * Open config dialog based on prompt type
+   */
+  openConfigDialog(): void {
+    switch (this.selectedPromptType) {
+      case 'dropdown':
+        this.openDropdownConfigDialog();
+        break;
+      case 'multiselect':
+        this.openMultiselectConfigDialog();
+        break;
+      case 'checkbox':
+        this.openCheckboxConfigDialog();
+        break;
+      case 'radio':
+        this.openRadioConfigDialog();
+        break;
+      case 'text':
+        this.openTextConfigDialog();
+        break;
+      case 'number':
+        this.openNumberConfigDialog();
+        break;
+      case 'date':
+        this.openDateConfigDialog();
+        break;
+      case 'daterange':
+        this.openDateRangeConfigDialog();
+        break;
+      case 'calendar':
+        this.openCalendarConfigDialog();
+        break;
+      case 'rangeslider':
+        this.openRangeSliderConfigDialog();
+        break;
+    }
   }
 
   /**

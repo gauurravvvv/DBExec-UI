@@ -1,0 +1,91 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '800px'}" [draggable]="false" [resizable]="false"
+    header="Customise Range Slider" styleClass="rangeslider-config-dialog" (onHide)="onClose()">
+
+    <div class="dialog-content">
+        <!-- Configuration Options Panel -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <i class="pi pi-cog"></i>
+                <span>Configuration Options</span>
+            </div>
+
+            <div class="config-form">
+                <!-- Min Bound -->
+                <div class="config-group">
+                    <label>Minimum Bound</label>
+                    <p-inputNumber [(ngModel)]="config.min" [showButtons]="true" buttonLayout="horizontal"
+                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus">
+                    </p-inputNumber>
+                </div>
+
+                <!-- Max Bound -->
+                <div class="config-group">
+                    <label>Maximum Bound</label>
+                    <p-inputNumber [(ngModel)]="config.max" [showButtons]="true" buttonLayout="horizontal"
+                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus">
+                    </p-inputNumber>
+                </div>
+
+                <!-- Step -->
+                <div class="config-group">
+                    <label>Step</label>
+                    <p-inputNumber [(ngModel)]="config.step" [min]="1" [showButtons]="true" buttonLayout="horizontal"
+                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus">
+                    </p-inputNumber>
+                    <small class="hint">Increment/decrement step value</small>
+                </div>
+
+                <!-- Orientation -->
+                <div class="config-group">
+                    <label>Orientation</label>
+                    <p-dropdown [options]="orientationOptions" [(ngModel)]="config.orientation" optionLabel="label"
+                        optionValue="value" [style]="{width: '100%'}">
+                    </p-dropdown>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview Panel -->
+        <div class="preview-panel">
+            <div class="panel-header">
+                <i class="pi pi-eye"></i>
+                <span>Live Preview</span>
+            </div>
+
+            <div class="preview-content">
+                <div class="preview-label">How it will look:</div>
+                <div class="slider-preview" [class.vertical]="config.orientation === 'vertical'">
+                    <p-slider [(ngModel)]="previewRange" [min]="config.min" [max]="config.max" [step]="config.step"
+                        [range]="true" [orientation]="config.orientation">
+                    </p-slider>
+                    <div class="range-values">
+                        <span>Min: <strong>{{previewRange[0]}}</strong></span>
+                        <span>Max: <strong>{{previewRange[1]}}</strong></span>
+                    </div>
+                </div>
+
+                <div class="preview-actions">
+                    <button pButton type="button" label="Set as Defaults" class="p-button-text p-button-sm"
+                        icon="pi pi-check" (click)="setAsDefault()">
+                    </button>
+                    <button pButton type="button" label="Reset to Bounds" class="p-button-text p-button-sm"
+                        icon="pi pi-refresh" (click)="resetToDefaults()">
+                    </button>
+                </div>
+
+                <div class="default-indicator">
+                    <i class="pi pi-bookmark"></i>
+                    <span>Default Range: <strong>{{config.defaultMin}} - {{config.defaultMax}}</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        </button>
+        <button pButton type="button" label="Apply Customisation" (click)="onSave()">
+            <i class="pi pi-check mr-2"></i>
+        </button>
+    </ng-template>
+</p-dialog>

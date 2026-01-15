@@ -103,14 +103,21 @@ export class DatasetService {
   }
 
   updateDatasetMapping(payload: any) {
-    const { fieldId, datasetId, organisation, columnNameToView, customLogic } =
-      payload;
+    const {
+      fieldId,
+      datasetId,
+      organisation,
+      columnNameToView,
+      customLogic,
+      used_field_ids,
+    } = payload;
 
     const requestBody: any = {
       fieldId,
       datasetId,
       organisation,
       columnNameToView,
+      used_field_ids,
     };
 
     // Include customLogic only if provided (for custom fields)
@@ -250,13 +257,15 @@ export class DatasetService {
   }
 
   addCustomField(payload: any) {
-    const { organisation, datasetId, name, customLogic } = payload;
+    const { organisation, datasetId, name, customLogic, used_field_ids } =
+      payload;
     return this.http
       .post(DATASET.ADD_FIELD, {
         organisation,
         datasetId,
         name,
         customLogic,
+        used_field_ids,
       })
       .toPromise()
       .then((response: any) => {
@@ -272,6 +281,16 @@ export class DatasetService {
         organisation,
         datasetId,
       })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  deleteDatasetField(orgId: string, datasetId: string, fieldId: string) {
+    return this.http
+      .delete(DATASET.DELETE_FIELD + `${orgId}/${datasetId}/${fieldId}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
