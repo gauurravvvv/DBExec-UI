@@ -31,7 +31,8 @@
                 <div class="fields-list">
                     <div class="field-item" *ngFor="let field of filteredFields" (click)="selectDatasetField(field)"
                         (dblclick)="insertField(field)"
-                        [class.selected]="selectedField?.columnToUse === field.columnToUse">
+                        [class.selected]="selectedField?.columnToUse === field.columnToUse"
+                        [class.custom-field]="field.type === 2">
                         <span class="field-name">{{ field.columnToView }}</span>
                         <code class="field-column">{{ field.columnToUse }}</code>
                     </div>

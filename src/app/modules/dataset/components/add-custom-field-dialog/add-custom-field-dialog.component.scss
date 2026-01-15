@@ -237,6 +237,10 @@
         background: rgba(var(--primary-rgb), 0.05);
       }
 
+      &.custom-field {
+        border-left: 3px solid var(--primary-color);
+      }
+
       .field-name {
         font-size: 12px;
         font-weight: 600;

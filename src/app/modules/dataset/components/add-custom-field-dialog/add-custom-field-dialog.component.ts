@@ -140,7 +140,16 @@ export class AddCustomFieldDialogComponent
         this.expandedCategories = {};
         this.selectedFunction = null;
         this.fieldSearchQuery = '';
-        this.filteredFields = [...this.datasetFields];
+
+        // Filter out the current field being edited to prevent self-reference
+        if (this.editMode && this.editFieldData) {
+          this.filteredFields = this.datasetFields.filter(
+            (field: any) => field.id !== this.editFieldData.id
+          );
+        } else {
+          this.filteredFields = [...this.datasetFields];
+        }
+
         this.selectedField = null;
 
         // Initialize Monaco editor after DOM is ready
@@ -284,7 +293,14 @@ export class AddCustomFieldDialogComponent
     }
 
     const allFunctions = this.getAllFunctions();
-    const datasetFields = this.datasetFields || [];
+
+    // Filter out current field in edit mode to prevent self-reference
+    let availableFields = this.datasetFields || [];
+    if (this.editMode && this.editFieldData) {
+      availableFields = availableFields.filter(
+        (field: any) => field.id !== this.editFieldData.id
+      );
+    }
 
     this.completionProviderDisposable =
       monaco.languages.registerCompletionItemProvider('formulaLang', {
@@ -311,7 +327,7 @@ export class AddCustomFieldDialogComponent
           const openBraceMatch = textUntilPosition.match(/\{([^}]*)$/);
           if (openBraceMatch) {
             // Suggest dataset fields using helper
-            datasetFields.forEach((field: any) => {
+            availableFields.forEach((field: any) => {
               suggestions.push(
                 createFieldCompletionItem(field, range, monaco, true)
               );
@@ -325,7 +341,7 @@ export class AddCustomFieldDialogComponent
           });
 
           // Add field suggestions with { wrapper using helper
-          datasetFields.forEach((field: any) => {
+          availableFields.forEach((field: any) => {
             suggestions.push(
               createFieldCompletionItem(field, range, monaco, false)
             );
@@ -597,11 +613,21 @@ export class AddCustomFieldDialogComponent
   // Dataset Fields Methods
   onFieldSearch() {
     const query = this.fieldSearchQuery.toLowerCase().trim();
+
+    // Get the base list of fields (excluding current field in edit mode)
+    let baseFields = this.datasetFields;
+    if (this.editMode && this.editFieldData) {
+      baseFields = this.datasetFields.filter(
+        (field: any) => field.id !== this.editFieldData.id
+      );
+    }
+
     if (!query) {
-      this.filteredFields = [...this.datasetFields];
+      this.filteredFields = [...baseFields];
       return;
     }
-    this.filteredFields = this.datasetFields.filter(
+
+    this.filteredFields = baseFields.filter(
       (field: any) =>
         field.columnToView?.toLowerCase().includes(query) ||
         field.columnToUse?.toLowerCase().includes(query)
