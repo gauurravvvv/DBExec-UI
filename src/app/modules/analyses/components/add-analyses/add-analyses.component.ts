@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -85,13 +85,17 @@ export class AddAnalysesComponent implements OnInit {
   // Editing
   editingTitleId: number | null = null;
 
+  // Axis field selection mode
+  activeAxisSelection: 'x' | 'y' | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private analysesService: AnalysesService,
-    private store: Store
+    private store: Store,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -251,6 +255,8 @@ export class AddAnalysesComponent implements OnInit {
       x: 0,
       y: 0,
       chartType: null,
+      xAxisColumn: null,
+      yAxisColumn: null,
       config: getDefaultChartConfig(), // Each visual has its own config
     });
     // Auto-focus the newly added visual
@@ -333,6 +339,64 @@ export class AddAnalysesComponent implements OnInit {
       visual.chartType = null;
       visual.title = `Untitled Visual`;
     }
+  }
+
+  // --- Axis Field Selection Mode ---
+
+  // Start axis selection mode (user clicked on X or Y axis slot)
+  startAxisSelection(axis: 'x' | 'y'): void {
+    // Toggle off if same axis is clicked again
+    if (this.activeAxisSelection === axis) {
+      this.activeAxisSelection = null;
+    } else {
+      this.activeAxisSelection = axis;
+    }
+  }
+
+  // Cancel axis selection mode
+  cancelAxisSelection(): void {
+    this.activeAxisSelection = null;
+  }
+
+  // Handle field click from the Fields panel
+  onFieldClick(field: any): void {
+    if (this.activeAxisSelection && this.focusedVisualId) {
+      const visual = this.getFocusedVisual();
+      if (visual) {
+        if (this.activeAxisSelection === 'x') {
+          visual.xAxisColumn = field.columnToUse;
+        } else if (this.activeAxisSelection === 'y') {
+          visual.yAxisColumn = field.columnToUse;
+        }
+        // Clear selection mode after assignment
+        this.activeAxisSelection = null;
+        // Trigger change detection to update the UI
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      }
+    }
+  }
+
+  // Clear a specific axis field
+  clearAxisField(axis: 'x' | 'y', event: Event): void {
+    event.stopPropagation();
+    const visual = this.getFocusedVisual();
+    if (visual) {
+      if (axis === 'x') {
+        visual.xAxisColumn = null;
+      } else {
+        visual.yAxisColumn = null;
+      }
+    }
+  }
+
+  // Get display name for a column
+  getFieldDisplayName(columnToUse: string | null): string {
+    if (!columnToUse || !this.datasetDetails?.datasetFields) return '';
+    const field = this.datasetDetails.datasetFields.find(
+      (f: any) => f.columnToUse === columnToUse
+    );
+    return field?.columnToView || columnToUse;
   }
 
   clearFocus(): void {

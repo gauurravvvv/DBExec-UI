@@ -67,17 +67,18 @@
                     </div>
 
                     <!-- Fields List -->
-                    <div class="fields-list">
+                    <div class="fields-list" [class.selection-mode]="activeAxisSelection">
                         <div class="field-card" *ngFor="let field of datasetDetails?.datasetFields"
-                            [class.custom-field]="field.type === 2">
+                            [class.custom-field]="field.type === 2" [class.selectable]="activeAxisSelection !== null"
+                            (click)="onFieldClick(field)">
                             <div class="field-icon">
                                 <i class="pi pi-bars"></i>
                             </div>
                             <div class="field-info">
                                 <div class="field-name">{{ field.columnToView }}</div>
                             </div>
-                            <div class="field-menu">
-                                <i class="pi pi-ellipsis-v"></i>
+                            <div class="field-action" *ngIf="activeAxisSelection">
+                                <i class="pi pi-plus-circle"></i>
                             </div>
                         </div>
                     </div>
@@ -135,19 +136,37 @@
                             *ngIf="getFocusedVisual()?.chartType && hasAxisLabels(getFocusedVisual()?.chartType)">
                             <div class="section-divider"></div>
                             <div class="axis-selection-title">Data Mapping</div>
-                            <div class="axis-group">
-                                <label>X-Axis Column</label>
-                                <p-dropdown [options]="datasetDetails?.datasetFields"
-                                    [(ngModel)]="getFocusedVisual().xAxisColumn" optionLabel="columnToView"
-                                    optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
-                                </p-dropdown>
+                            <div class="axis-hint" *ngIf="activeAxisSelection">
+                                <i class="pi pi-arrow-left"></i>
+                                <span>Click a field from the left panel</span>
                             </div>
-                            <div class="axis-group">
-                                <label>Y-Axis Column</label>
-                                <p-dropdown [options]="datasetDetails?.datasetFields"
-                                    [(ngModel)]="getFocusedVisual().yAxisColumn" optionLabel="columnToView"
-                                    optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
-                                </p-dropdown>
+
+                            <!-- X-Axis Slot -->
+                            <div class="axis-slot" [class.active]="activeAxisSelection === 'x'"
+                                [class.has-value]="getFocusedVisual()?.xAxisColumn" (click)="startAxisSelection('x')">
+                                <div class="axis-label">X-Axis</div>
+                                <div class="axis-value" *ngIf="getFocusedVisual()?.xAxisColumn">
+                                    <span>{{ getFieldDisplayName(getFocusedVisual()?.xAxisColumn) }}</span>
+                                    <i class="pi pi-times clear-btn" (click)="clearAxisField('x', $event)"></i>
+                                </div>
+                                <div class="axis-placeholder" *ngIf="!getFocusedVisual()?.xAxisColumn">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Click to select field</span>
+                                </div>
+                            </div>
+
+                            <!-- Y-Axis Slot -->
+                            <div class="axis-slot" [class.active]="activeAxisSelection === 'y'"
+                                [class.has-value]="getFocusedVisual()?.yAxisColumn" (click)="startAxisSelection('y')">
+                                <div class="axis-label">Y-Axis</div>
+                                <div class="axis-value" *ngIf="getFocusedVisual()?.yAxisColumn">
+                                    <span>{{ getFieldDisplayName(getFocusedVisual()?.yAxisColumn) }}</span>
+                                    <i class="pi pi-times clear-btn" (click)="clearAxisField('y', $event)"></i>
+                                </div>
+                                <div class="axis-placeholder" *ngIf="!getFocusedVisual()?.yAxisColumn">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Click to select field</span>
+                                </div>
                             </div>
                         </div>
 
@@ -156,19 +175,37 @@
                             *ngIf="getFocusedVisual()?.chartType && !hasAxisLabels(getFocusedVisual()?.chartType)">
                             <div class="section-divider"></div>
                             <div class="axis-selection-title">Data Mapping</div>
-                            <div class="axis-group">
-                                <label>Category Column</label>
-                                <p-dropdown [options]="datasetDetails?.datasetFields"
-                                    [(ngModel)]="getFocusedVisual().xAxisColumn" optionLabel="columnToView"
-                                    optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
-                                </p-dropdown>
+                            <div class="axis-hint" *ngIf="activeAxisSelection">
+                                <i class="pi pi-arrow-left"></i>
+                                <span>Click a field from the left panel</span>
                             </div>
-                            <div class="axis-group">
-                                <label>Value Column</label>
-                                <p-dropdown [options]="datasetDetails?.datasetFields"
-                                    [(ngModel)]="getFocusedVisual().yAxisColumn" optionLabel="columnToView"
-                                    optionValue="columnName" placeholder="Select column" [style]="{'width': '100%'}">
-                                </p-dropdown>
+
+                            <!-- Category Slot -->
+                            <div class="axis-slot" [class.active]="activeAxisSelection === 'x'"
+                                [class.has-value]="getFocusedVisual()?.xAxisColumn" (click)="startAxisSelection('x')">
+                                <div class="axis-label">Category</div>
+                                <div class="axis-value" *ngIf="getFocusedVisual()?.xAxisColumn">
+                                    <span>{{ getFieldDisplayName(getFocusedVisual()?.xAxisColumn) }}</span>
+                                    <i class="pi pi-times clear-btn" (click)="clearAxisField('x', $event)"></i>
+                                </div>
+                                <div class="axis-placeholder" *ngIf="!getFocusedVisual()?.xAxisColumn">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Click to select field</span>
+                                </div>
+                            </div>
+
+                            <!-- Value Slot -->
+                            <div class="axis-slot" [class.active]="activeAxisSelection === 'y'"
+                                [class.has-value]="getFocusedVisual()?.yAxisColumn" (click)="startAxisSelection('y')">
+                                <div class="axis-label">Value</div>
+                                <div class="axis-value" *ngIf="getFocusedVisual()?.yAxisColumn">
+                                    <span>{{ getFieldDisplayName(getFocusedVisual()?.yAxisColumn) }}</span>
+                                    <i class="pi pi-times clear-btn" (click)="clearAxisField('y', $event)"></i>
+                                </div>
+                                <div class="axis-placeholder" *ngIf="!getFocusedVisual()?.yAxisColumn">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Click to select field</span>
+                                </div>
                             </div>
                         </div>
                     </div>
