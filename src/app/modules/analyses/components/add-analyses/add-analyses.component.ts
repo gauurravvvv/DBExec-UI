@@ -21,6 +21,8 @@ import {
   hasAxisLabels,
   supportsGradient,
 } from '../../constants/charts.constants';
+import { ChartDataTransformerService } from '../../services';
+import { Visual, AxisSelection, createVisual } from '../../models';
 import { AnalysesService } from '../../service/analyses.service';
 import { ANALYSES } from 'src/app/constants/routes';
 import {
@@ -49,15 +51,18 @@ export class AddAnalysesComponent implements OnInit {
   datasetStatus$!: Observable<DatasetLoadingStatus>;
   isDataLoaded$!: Observable<boolean>;
 
+  // Raw graph data from store (for chart transformations)
+  rawGraphData: any[] = [];
+
   // Sidebar toggle states
   isFieldsPanelOpen: boolean = true;
   isVisualsPanelOpen: boolean = true;
 
   // Visuals
-  visuals: any[] = [];
+  visuals: Visual[] = [];
   visualCounter: number = 0;
   focusedVisualId: number | null = null;
-  resizingVisual: any = null;
+  resizingVisual: Visual | null = null;
   resizeStartX: number = 0;
   resizeStartY: number = 0;
   resizeStartWidth: number = 0;
@@ -86,7 +91,7 @@ export class AddAnalysesComponent implements OnInit {
   editingTitleId: number | null = null;
 
   // Axis field selection mode
-  activeAxisSelection: 'x' | 'y' | null = null;
+  activeAxisSelection: 'x' | 'y' | 'z' | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -95,7 +100,8 @@ export class AddAnalysesComponent implements OnInit {
     private globalService: GlobalService,
     private analysesService: AnalysesService,
     private store: Store,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private chartDataTransformer: ChartDataTransformerService
   ) {}
 
   ngOnInit(): void {
@@ -113,6 +119,14 @@ export class AddAnalysesComponent implements OnInit {
         this.isDataLoaded$ = this.store.select(
           selectIsDatasetLoaded(this.orgId, this.datasetId)
         );
+
+        // Subscribe to graphData$ to populate rawGraphData
+        this.graphData$.subscribe(data => {
+          if (data && data.length > 0) {
+            this.rawGraphData = data;
+            this.cdr.detectChanges();
+          }
+        });
 
         // Check if we have cached data and if it's stale
         this.checkCachedDataAndLoad();
@@ -247,24 +261,26 @@ export class AddAnalysesComponent implements OnInit {
 
   addVisual(): void {
     this.visualCounter++;
-    this.visuals.push({
-      id: this.visualCounter,
-      title: `Untitled Visual`,
-      width: 400,
-      height: 350,
-      x: 0,
-      y: 0,
-      chartType: null,
-      xAxisColumn: null,
-      yAxisColumn: null,
-      config: getDefaultChartConfig(), // Each visual has its own config
-    });
+    this.visuals.push(
+      createVisual(this.visualCounter, getDefaultChartConfig())
+    );
     // Auto-focus the newly added visual
     this.focusedVisualId = this.visualCounter;
   }
 
-  getFocusedVisual(): any {
+  getFocusedVisual(): Visual | null {
     return this.visuals.find(v => v.id === this.focusedVisualId) || null;
+  }
+
+  /**
+   * Safe getter for focused visual - use this in templates with ngModel
+   * Returns a placeholder visual to avoid null errors when no visual is focused
+   */
+  get focusedVisual(): Visual {
+    const visual = this.getFocusedVisual();
+    if (visual) return visual;
+    // Return an empty visual to avoid null errors in template bindings
+    return createVisual(0, getDefaultChartConfig());
   }
 
   // Check if there's at least one visual with a chart type selected
@@ -310,6 +326,21 @@ export class AddAnalysesComponent implements OnInit {
     return isTreeMapChartType(chartType);
   }
 
+  /**
+   * Check if a visual has all required fields mapped for its chart type
+   * For heat maps: requires x, y, and z axis columns
+   * For other charts: requires x and y axis columns
+   */
+  hasRequiredChartFields(visual: Visual): boolean {
+    if (!visual.chartType) return false;
+
+    if (this.isHeatMapChartType(visual.chartType)) {
+      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
+    }
+
+    return !!(visual.xAxisColumn && visual.yAxisColumn);
+  }
+
   hasAxisLabels(chartType: string | null): boolean {
     return hasAxisLabels(chartType);
   }
@@ -317,12 +348,30 @@ export class AddAnalysesComponent implements OnInit {
   supportsGradient(chartType: string | null): boolean {
     return supportsGradient(chartType);
   }
+  /**
+   * Compute and store chart data on the visual object based on axis selections
+   * Uses ChartDataTransformerService for modular data transformation
+   * @param visual - The visual object with xAxisColumn, yAxisColumn, and zAxisColumn
+   */
+  updateVisualChartData(visual: any): void {
+    visual.chartData = this.chartDataTransformer.transformData(
+      visual.chartType,
+      this.rawGraphData,
+      {
+        xAxisColumn: visual.xAxisColumn,
+        yAxisColumn: visual.yAxisColumn,
+        zAxisColumn: visual.zAxisColumn,
+      }
+    );
+  }
 
   setVisualChartType(chartType: any): void {
     const visual = this.getFocusedVisual();
     if (visual) {
       visual.chartType = chartType.id;
       visual.title = chartType.name;
+      // Recompute chart data for new chart type (different types need different formats)
+      this.updateVisualChartData(visual);
     }
   }
 
@@ -338,13 +387,13 @@ export class AddAnalysesComponent implements OnInit {
     if (visual) {
       visual.chartType = null;
       visual.title = `Untitled Visual`;
+      visual.chartData = []; // Clear chart data when chart type is cleared
     }
   }
-
   // --- Axis Field Selection Mode ---
 
-  // Start axis selection mode (user clicked on X or Y axis slot)
-  startAxisSelection(axis: 'x' | 'y'): void {
+  // Start axis selection mode (user clicked on X, Y, or Z axis slot)
+  startAxisSelection(axis: 'x' | 'y' | 'z'): void {
     // Toggle off if same axis is clicked again
     if (this.activeAxisSelection === axis) {
       this.activeAxisSelection = null;
@@ -363,11 +412,20 @@ export class AddAnalysesComponent implements OnInit {
     if (this.activeAxisSelection && this.focusedVisualId) {
       const visual = this.getFocusedVisual();
       if (visual) {
+        // Use columnToView (or columnToUse as fallback) to get the field name
+        const fieldName = field.columnToView || field.columnToUse;
+
         if (this.activeAxisSelection === 'x') {
-          visual.xAxisColumn = field.columnToUse;
+          visual.xAxisColumn = fieldName;
         } else if (this.activeAxisSelection === 'y') {
-          visual.yAxisColumn = field.columnToUse;
+          visual.yAxisColumn = fieldName;
+        } else if (this.activeAxisSelection === 'z') {
+          visual.zAxisColumn = fieldName;
         }
+
+        // Update chart data if required axes are set
+        this.updateVisualChartData(visual);
+
         // Clear selection mode after assignment
         this.activeAxisSelection = null;
         // Trigger change detection to update the UI
@@ -378,15 +436,20 @@ export class AddAnalysesComponent implements OnInit {
   }
 
   // Clear a specific axis field
-  clearAxisField(axis: 'x' | 'y', event: Event): void {
+  clearAxisField(axis: 'x' | 'y' | 'z', event: Event): void {
     event.stopPropagation();
     const visual = this.getFocusedVisual();
     if (visual) {
       if (axis === 'x') {
         visual.xAxisColumn = null;
-      } else {
+      } else if (axis === 'y') {
         visual.yAxisColumn = null;
+      } else if (axis === 'z') {
+        visual.zAxisColumn = null;
       }
+      // Re-compute chart data after clearing
+      this.updateVisualChartData(visual);
+      this.cdr.detectChanges();
     }
   }
 
@@ -394,7 +457,8 @@ export class AddAnalysesComponent implements OnInit {
   getFieldDisplayName(columnToUse: string | null): string {
     if (!columnToUse || !this.datasetDetails?.datasetFields) return '';
     const field = this.datasetDetails.datasetFields.find(
-      (f: any) => f.columnToUse === columnToUse
+      (f: any) =>
+        f.columnToUse === columnToUse || f.columnToView === columnToUse
     );
     return field?.columnToView || columnToUse;
   }

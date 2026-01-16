@@ -430,34 +430,21 @@
     transition: all 0.2s ease;
   }
 
-  // Selection mode styles for fields
+  // Selection mode styles for fields - simple highlight
   .fields-list.selection-mode {
     .field-card {
       cursor: pointer;
       border-color: var(--primary-color);
-      background-color: rgba(var(--primary-color-rgb), 0.05);
-      animation: pulse-border 2s infinite;
+      background-color: rgba(var(--primary-color-rgb), 0.08);
 
       &:hover {
         background-color: rgba(var(--primary-color-rgb), 0.15);
-        transform: translateX(4px);
-        box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.2);
       }
     }
   }
 
   .field-card.selectable {
     cursor: pointer;
-  }
-
-  @keyframes pulse-border {
-    0%,
-    100% {
-      border-color: var(--primary-color);
-    }
-    50% {
-      border-color: rgba(var(--primary-color-rgb), 0.4);
-    }
   }
 
   // Axis Slot Styles (replaces dropdowns)
@@ -559,38 +546,28 @@
   .axis-hint {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 10px;
-    background-color: rgba(var(--primary-color-rgb), 0.1);
-    border-radius: 6px;
-    font-size: 11px;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--primary-color-rgb), 0.15),
+      rgba(var(--primary-color-rgb), 0.08)
+    );
+    border: 1px solid rgba(var(--primary-color-rgb), 0.25);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
     color: var(--primary-color);
-    animation: pulse-hint 2s infinite;
 
     i {
-      font-size: 14px;
-      animation: bounce-left 1s infinite;
+      font-size: 16px;
+      opacity: 0.9;
+      // Static arrow, no animation
     }
-  }
 
-  @keyframes pulse-hint {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.7;
-    }
-  }
-
-  @keyframes bounce-left {
-    0%,
-    100% {
-      transform: translateX(0);
-    }
-    50% {
-      transform: translateX(-4px);
+    span {
+      flex: 1;
     }
   }
 
@@ -617,6 +594,23 @@
   .chart-type-section {
     display: flex;
     flex-direction: column;
+    padding: 0 10px 16px 10px; // Add padding for data mapping field spacing
+
+    .section-divider {
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 8px 0 12px 0;
+    }
+
+    .axis-selection-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
   }
 
   // Selected Chart Header (when chart type already selected)
@@ -692,7 +686,10 @@
   // Chart Type Grid
   .chart-type-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    ); // minmax(0, 1fr) ensures equal width
     gap: 6px;
     padding: 8px 10px;
   }
@@ -711,12 +708,12 @@
     gap: 4px;
     min-height: 50px;
     position: relative;
+    box-sizing: border-box;
+    width: 100%;
 
     &:hover {
       background-color: var(--hover-background);
       border-color: var(--primary-color);
-      transform: scale(1.05);
-      z-index: 2;
 
       .chart-icon {
         color: var(--primary-color);
@@ -755,12 +752,13 @@
     }
 
     .axis-selection-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--secondary-color);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-color);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      text-align: center;
     }
 
     .axis-group {

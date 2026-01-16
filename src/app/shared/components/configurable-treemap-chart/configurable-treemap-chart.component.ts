@@ -1,6 +1,21 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
+} from '@angular/core';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
-import { COLOR_PALETTES, DUMMY_SINGLE_SERIES, DUMMY_MULTI_SERIES, createColorScheme, getLegendPositionEnum } from '../../helpers/chart-config.helper';
+import {
+  COLOR_PALETTES,
+  DUMMY_SINGLE_SERIES,
+  DUMMY_MULTI_SERIES,
+  createColorScheme,
+  getLegendPositionEnum,
+} from '../../helpers/chart-config.helper';
 
 export interface TreeMapData {
   name: string;
@@ -22,9 +37,11 @@ export interface TreeMapConfig {
   templateUrl: './configurable-treemap-chart.component.html',
   styleUrls: ['./configurable-treemap-chart.component.scss'],
 })
-export class ConfigurableTreemapChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableTreemapChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousColorScheme: string = '';
-  
+
   @Input() data: TreeMapData[] = [];
   @Input() showConfigPanel: boolean = true;
   @Input() chartWidth: number | undefined;
@@ -56,19 +73,7 @@ export class ConfigurableTreemapChartComponent implements OnInit, OnChanges, DoC
   // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
-  dummyData: TreeMapData[] = [
-    { name: 'Germany', value: 8940000 },
-    { name: 'USA', value: 5000000 },
-    { name: 'France', value: 3600000 },
-    { name: 'UK', value: 2800000 },
-    { name: 'Italy', value: 2100000 },
-    { name: 'Spain', value: 1800000 },
-  ];
-
   ngOnInit(): void {
-    if (!this.data || this.data.length === 0) {
-      this.data = [...this.dummyData];
-    }
     this.updateColorScheme();
     this.updateViewDimensions();
     this.previousColorScheme = this.config.colorScheme;
@@ -112,5 +117,7 @@ export class ConfigurableTreemapChartComponent implements OnInit, OnChanges, DoC
     };
   }
 
-  onChartSelect(event: any): void { this.onSelect.emit(event); }
+  onChartSelect(event: any): void {
+    this.onSelect.emit(event);
+  }
 }

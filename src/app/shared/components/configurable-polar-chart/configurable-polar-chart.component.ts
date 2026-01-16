@@ -1,7 +1,27 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
+} from '@angular/core';
 import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import { COLOR_PALETTES, DUMMY_SINGLE_SERIES, DUMMY_MULTI_SERIES, createColorScheme, getLegendPositionEnum } from '../../helpers/chart-config.helper';
-import { curveLinear, curveCardinalClosed, curveCatmullRomClosed, curveLinearClosed } from 'd3-shape';
+import {
+  COLOR_PALETTES,
+  DUMMY_SINGLE_SERIES,
+  DUMMY_MULTI_SERIES,
+  createColorScheme,
+  getLegendPositionEnum,
+} from '../../helpers/chart-config.helper';
+import {
+  curveLinear,
+  curveCardinalClosed,
+  curveCatmullRomClosed,
+  curveLinearClosed,
+} from 'd3-shape';
 
 export interface PolarChartSeries {
   name: string;
@@ -45,9 +65,11 @@ export interface PolarChartConfig {
   templateUrl: './configurable-polar-chart.component.html',
   styleUrls: ['./configurable-polar-chart.component.scss'],
 })
-export class ConfigurablePolarChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurablePolarChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousColorScheme: string = '';
-  
+
   @Input() data: PolarChartSeries[] = [];
   @Input() showConfigPanel: boolean = true;
   @Input() chartWidth: number | undefined;
@@ -97,35 +119,7 @@ export class ConfigurablePolarChartComponent implements OnInit, OnChanges, DoChe
   // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
-  dummyData: PolarChartSeries[] = [
-    {
-      name: 'Team A',
-      series: [
-        { name: 'Communication', value: 85 },
-        { name: 'Problem Solving', value: 90 },
-        { name: 'Technical Skills', value: 75 },
-        { name: 'Teamwork', value: 88 },
-        { name: 'Creativity', value: 70 },
-        { name: 'Leadership', value: 65 },
-      ],
-    },
-    {
-      name: 'Team B',
-      series: [
-        { name: 'Communication', value: 70 },
-        { name: 'Problem Solving', value: 80 },
-        { name: 'Technical Skills', value: 95 },
-        { name: 'Teamwork', value: 75 },
-        { name: 'Creativity', value: 85 },
-        { name: 'Leadership', value: 80 },
-      ],
-    },
-  ];
-
   ngOnInit(): void {
-    if (!this.data || this.data.length === 0) {
-      this.data = [...this.dummyData];
-    }
     this.updateColorScheme();
     this.updateViewDimensions();
     this.previousColorScheme = this.config.colorScheme;
@@ -171,18 +165,30 @@ export class ConfigurablePolarChartComponent implements OnInit, OnChanges, DoChe
 
   getCurve(): any {
     switch (this.config.curveType) {
-      case 'cardinalClosed': return curveCardinalClosed;
-      case 'catmullRomClosed': return curveCatmullRomClosed;
-      case 'linearClosed': return curveLinearClosed;
-      default: return curveLinearClosed;
+      case 'cardinalClosed':
+        return curveCardinalClosed;
+      case 'catmullRomClosed':
+        return curveCatmullRomClosed;
+      case 'linearClosed':
+        return curveLinearClosed;
+      default:
+        return curveLinearClosed;
     }
   }
 
   getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below' ? LegendPosition.Below : LegendPosition.Right;
+    return this.config.legendPosition === 'below'
+      ? LegendPosition.Below
+      : LegendPosition.Right;
   }
 
-  onChartSelect(event: any): void { this.onSelect.emit(event); }
-  onChartActivate(event: any): void { this.onActivate.emit(event); }
-  onChartDeactivate(event: any): void { this.onDeactivate.emit(event); }
+  onChartSelect(event: any): void {
+    this.onSelect.emit(event);
+  }
+  onChartActivate(event: any): void {
+    this.onActivate.emit(event);
+  }
+  onChartDeactivate(event: any): void {
+    this.onDeactivate.emit(event);
+  }
 }

@@ -1,13 +1,22 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
+} from '@angular/core';
 import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import { 
-  COLOR_PALETTES, 
-  DUMMY_SINGLE_SERIES, 
-  DUMMY_MULTI_SERIES, 
+import {
+  COLOR_PALETTES,
+  DUMMY_SINGLE_SERIES,
+  DUMMY_MULTI_SERIES,
   DEFAULT_BAR_CHART_CONFIG,
   BarChartConfig,
   createColorScheme,
-  getLegendPositionEnum
+  getLegendPositionEnum,
 } from '../../helpers/chart-config.helper';
 
 export interface BarChartData {
@@ -22,7 +31,9 @@ export interface BarChartData {
   templateUrl: './configurable-bar-chart.component.html',
   styleUrls: ['./configurable-bar-chart.component.scss'],
 })
-export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableBarChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   // Track previous color scheme to detect changes
   private previousColorScheme: string = '';
   // Data input
@@ -37,7 +48,7 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
 
   // External config input (from parent component)
   @Input() chartConfig: BarChartConfig | undefined;
-  
+
   // Chart type variant (bar-vertical, bar-horizontal, bar-vertical-2d, etc.)
   @Input() chartType: string = 'bar-vertical';
 
@@ -65,7 +76,7 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
     name: 'custom',
     selectable: true,
     group: ScaleType.Ordinal,
-    domain: []
+    domain: [],
   };
 
   // Available color schemes
@@ -90,17 +101,10 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
   // Color scheme palettes (using imported constants)
   private colorPalettes = COLOR_PALETTES;
 
-  // Dummy data for initial rendering (using imported constants)
-  private dummyData = DUMMY_SINGLE_SERIES;
-
   // Multi-series data for grouped/stacked/normalized charts
   multiData = DUMMY_MULTI_SERIES;
 
   ngOnInit(): void {
-    // Use dummy data if no data is provided
-    if (!this.data || this.data.length === 0) {
-      this.data = [...this.dummyData];
-    }
     this.updateColorScheme();
     this.updateViewDimensions();
     this.previousColorScheme = this.config.colorScheme;
@@ -126,7 +130,11 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
       this.updateColorScheme();
     }
     // Detect changes to legend settings and recalculate dimensions
-    if (this.config && (this.config.legend !== this.previousLegend || this.config.legendPosition !== this.previousLegendPosition)) {
+    if (
+      this.config &&
+      (this.config.legend !== this.previousLegend ||
+        this.config.legendPosition !== this.previousLegendPosition)
+    ) {
       this.previousLegend = this.config.legend;
       this.previousLegendPosition = this.config.legendPosition;
       this.updateViewDimensions();
@@ -140,7 +148,7 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
       const padding = 20;
       let width = this.chartWidth - padding;
       let height = this.chartHeight - headerHeight - padding;
-      
+
       // Account for legend space when legend is enabled
       if (this.config.legend) {
         if (this.config.legendPosition === 'below') {
@@ -149,7 +157,7 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
           width -= 120; // Reserve space for legend on right
         }
       }
-      
+
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       // Let ngx-charts auto-size
@@ -171,7 +179,7 @@ export class ConfigurableBarChartComponent implements OnInit, OnChanges, DoCheck
       name: 'custom',
       selectable: true,
       group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['vivid']
+      domain: palette || this.colorPalettes['vivid'],
     };
   }
 

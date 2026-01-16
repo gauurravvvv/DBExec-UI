@@ -1,6 +1,21 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
+} from '@angular/core';
 import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import { COLOR_PALETTES, DUMMY_SINGLE_SERIES, DUMMY_MULTI_SERIES, createColorScheme, getLegendPositionEnum } from '../../helpers/chart-config.helper';
+import {
+  COLOR_PALETTES,
+  DUMMY_SINGLE_SERIES,
+  DUMMY_MULTI_SERIES,
+  createColorScheme,
+  getLegendPositionEnum,
+} from '../../helpers/chart-config.helper';
 
 export interface PieChartData {
   name: string;
@@ -34,9 +49,11 @@ export interface PieChartConfig {
   templateUrl: './configurable-pie-chart.component.html',
   styleUrls: ['./configurable-pie-chart.component.scss'],
 })
-export class ConfigurablePieChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurablePieChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousColorScheme: string = '';
-  
+
   @Input() data: PieChartData[] = [];
   @Input() showConfigPanel: boolean = true;
   @Input() chartWidth: number | undefined;
@@ -80,13 +97,7 @@ export class ConfigurablePieChartComponent implements OnInit, OnChanges, DoCheck
   // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
-  // Dummy data (using imported constants)
-  dummyData = DUMMY_SINGLE_SERIES;
-
   ngOnInit(): void {
-    if (!this.data || this.data.length === 0) {
-      this.data = [...this.dummyData];
-    }
     this.updateColorScheme();
     this.updateViewDimensions();
     this.previousColorScheme = this.config.colorScheme;
@@ -131,10 +142,18 @@ export class ConfigurablePieChartComponent implements OnInit, OnChanges, DoCheck
   }
 
   getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below' ? LegendPosition.Below : LegendPosition.Right;
+    return this.config.legendPosition === 'below'
+      ? LegendPosition.Below
+      : LegendPosition.Right;
   }
 
-  onChartSelect(event: any): void { this.onSelect.emit(event); }
-  onChartActivate(event: any): void { this.onActivate.emit(event); }
-  onChartDeactivate(event: any): void { this.onDeactivate.emit(event); }
+  onChartSelect(event: any): void {
+    this.onSelect.emit(event);
+  }
+  onChartActivate(event: any): void {
+    this.onActivate.emit(event);
+  }
+  onChartDeactivate(event: any): void {
+    this.onDeactivate.emit(event);
+  }
 }

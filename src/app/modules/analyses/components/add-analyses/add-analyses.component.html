@@ -77,9 +77,6 @@
                             <div class="field-info">
                                 <div class="field-name">{{ field.columnToView }}</div>
                             </div>
-                            <div class="field-action" *ngIf="activeAxisSelection">
-                                <i class="pi pi-plus-circle"></i>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -91,8 +88,8 @@
             <div class="sidebar-content">
                 <div class="sidebar-header-info">
                     <div class="dataset-label">
-                        {{ focusedVisualId && !getFocusedVisual()?.chartType ? 'Select Chart Type' :
-                        focusedVisualId && getFocusedVisual()?.chartType ? 'Data Mapping' : 'Visuals' }}
+                        {{ focusedVisualId && !focusedVisual.chartType ? 'Select Chart Type' :
+                        focusedVisualId && focusedVisual.chartType ? 'Data Mapping' : 'Visuals' }}
                     </div>
                 </div>
                 <div class="sidebar-divider"></div>
@@ -106,7 +103,7 @@
                     </div>
 
                     <!-- Chart Type Grid (when visual is focused but no chart type selected) -->
-                    <div class="chart-type-section" *ngIf="focusedVisualId && !getFocusedVisual()?.chartType">
+                    <div class="chart-type-section" *ngIf="focusedVisualId && !focusedVisual.chartType">
                         <div class="chart-type-hint">
                             <i class="pi pi-info-circle"></i>
                             <span>Select a chart type for this visual</span>
@@ -116,7 +113,7 @@
                                 <div class="category-label">{{ category }}</div>
                                 <div class="chart-type-grid">
                                     <div class="chart-type-card" *ngFor="let chartType of getChartsByCategory(category)"
-                                        [class.selected]="getFocusedVisual()?.chartType === chartType.id"
+                                        [class.selected]="focusedVisual.chartType === chartType.id"
                                         (click)="setVisualChartType(chartType)" [pTooltip]="chartType.description"
                                         tooltipPosition="bottom">
                                         <div class="chart-icon" [class.rotate]="chartType.rotate">
@@ -130,84 +127,117 @@
                     </div>
 
                     <!-- Data Mapping Section (when chart type is already selected) -->
-                    <div class="chart-type-section" *ngIf="focusedVisualId && getFocusedVisual()?.chartType">
-                        <!-- Axis Column Selection (show when chart type is selected) -->
-                        <div class="axis-selection-section"
-                            *ngIf="getFocusedVisual()?.chartType && hasAxisLabels(getFocusedVisual()?.chartType)">
-                            <div class="section-divider"></div>
-                            <div class="axis-selection-title">Data Mapping</div>
-                            <div class="axis-hint" *ngIf="activeAxisSelection">
-                                <i class="pi pi-arrow-left"></i>
-                                <span>Click a field from the left panel</span>
-                            </div>
+                    <div class="chart-type-section" *ngIf="focusedVisualId && focusedVisual.chartType">
+                        <div class="section-divider"></div>
+                        <div class="axis-selection-title">Data Mapping</div>
+                        <div class="axis-hint" *ngIf="activeAxisSelection">
+                            <i class="pi pi-arrow-left"></i>
+                            <span>Click a field from the left panel</span>
+                        </div>
 
+                        <!-- Heat Map: Row, Column, Value (3 fields) -->
+                        <ng-container *ngIf="isHeatMapChartType(focusedVisual.chartType)">
+                            <!-- Row Slot -->
+                            <div class="axis-slot" [class.active]="activeAxisSelection === 'x'"
+                                [class.has-value]="focusedVisual.xAxisColumn" (click)="startAxisSelection('x')">
+                                <div class="axis-label">Row</div>
+                                <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+                                    <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
+                                    <i class="pi pi-times clear-btn" (click)="clearAxisField('x', $event)"></i>
+                                </div>
+                                <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Click to select field</span>
+                                </div>
+                            </div>
+                            <!-- Column Slot -->
+                            <div class="axis-slot" [class.active]="activeAxisSelection === 'y'"
+                                [class.has-value]="focusedVisual.yAxisColumn" (click)="startAxisSelection('y')">
+                                <div class="axis-label">Column</div>
+                                <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+                                    <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
+                                    <i class="pi pi-times clear-btn" (click)="clearAxisField('y', $event)"></i>
+                                </div>
+                                <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Click to select field</span>
+                                </div>
+                            </div>
+                            <!-- Value Slot -->
+                            <div class="axis-slot" [class.active]="activeAxisSelection === 'z'"
+                                [class.has-value]="focusedVisual.zAxisColumn" (click)="startAxisSelection('z')">
+                                <div class="axis-label">Value</div>
+                                <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
+                                    <span>{{ getFieldDisplayName(focusedVisual.zAxisColumn) }}</span>
+                                    <i class="pi pi-times clear-btn" (click)="clearAxisField('z', $event)"></i>
+                                </div>
+                                <div class="axis-placeholder" *ngIf="!focusedVisual.zAxisColumn">
+                                    <i class="pi pi-plus"></i>
+                                    <span>Click to select field</span>
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <!-- Axis charts: X-Axis, Y-Axis (bar, line, area) -->
+                        <ng-container
+                            *ngIf="hasAxisLabels(focusedVisual.chartType) && !isHeatMapChartType(focusedVisual.chartType)">
                             <!-- X-Axis Slot -->
                             <div class="axis-slot" [class.active]="activeAxisSelection === 'x'"
-                                [class.has-value]="getFocusedVisual()?.xAxisColumn" (click)="startAxisSelection('x')">
+                                [class.has-value]="focusedVisual.xAxisColumn" (click)="startAxisSelection('x')">
                                 <div class="axis-label">X-Axis</div>
-                                <div class="axis-value" *ngIf="getFocusedVisual()?.xAxisColumn">
-                                    <span>{{ getFieldDisplayName(getFocusedVisual()?.xAxisColumn) }}</span>
+                                <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+                                    <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
                                     <i class="pi pi-times clear-btn" (click)="clearAxisField('x', $event)"></i>
                                 </div>
-                                <div class="axis-placeholder" *ngIf="!getFocusedVisual()?.xAxisColumn">
+                                <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
                                     <i class="pi pi-plus"></i>
                                     <span>Click to select field</span>
                                 </div>
                             </div>
-
                             <!-- Y-Axis Slot -->
                             <div class="axis-slot" [class.active]="activeAxisSelection === 'y'"
-                                [class.has-value]="getFocusedVisual()?.yAxisColumn" (click)="startAxisSelection('y')">
+                                [class.has-value]="focusedVisual.yAxisColumn" (click)="startAxisSelection('y')">
                                 <div class="axis-label">Y-Axis</div>
-                                <div class="axis-value" *ngIf="getFocusedVisual()?.yAxisColumn">
-                                    <span>{{ getFieldDisplayName(getFocusedVisual()?.yAxisColumn) }}</span>
+                                <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+                                    <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
                                     <i class="pi pi-times clear-btn" (click)="clearAxisField('y', $event)"></i>
                                 </div>
-                                <div class="axis-placeholder" *ngIf="!getFocusedVisual()?.yAxisColumn">
+                                <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
                                     <i class="pi pi-plus"></i>
                                     <span>Click to select field</span>
                                 </div>
                             </div>
-                        </div>
+                        </ng-container>
 
-                        <!-- Value/Category for non-axis charts (pie, gauge, cards) -->
-                        <div class="axis-selection-section"
-                            *ngIf="getFocusedVisual()?.chartType && !hasAxisLabels(getFocusedVisual()?.chartType)">
-                            <div class="section-divider"></div>
-                            <div class="axis-selection-title">Data Mapping</div>
-                            <div class="axis-hint" *ngIf="activeAxisSelection">
-                                <i class="pi pi-arrow-left"></i>
-                                <span>Click a field from the left panel</span>
-                            </div>
-
+                        <!-- Non-axis charts: Category, Value (pie, gauge, card, tree-map) -->
+                        <ng-container *ngIf="!hasAxisLabels(focusedVisual.chartType)">
                             <!-- Category Slot -->
                             <div class="axis-slot" [class.active]="activeAxisSelection === 'x'"
-                                [class.has-value]="getFocusedVisual()?.xAxisColumn" (click)="startAxisSelection('x')">
+                                [class.has-value]="focusedVisual.xAxisColumn" (click)="startAxisSelection('x')">
                                 <div class="axis-label">Category</div>
-                                <div class="axis-value" *ngIf="getFocusedVisual()?.xAxisColumn">
-                                    <span>{{ getFieldDisplayName(getFocusedVisual()?.xAxisColumn) }}</span>
+                                <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+                                    <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
                                     <i class="pi pi-times clear-btn" (click)="clearAxisField('x', $event)"></i>
                                 </div>
-                                <div class="axis-placeholder" *ngIf="!getFocusedVisual()?.xAxisColumn">
+                                <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
                                     <i class="pi pi-plus"></i>
                                     <span>Click to select field</span>
                                 </div>
                             </div>
-
                             <!-- Value Slot -->
                             <div class="axis-slot" [class.active]="activeAxisSelection === 'y'"
-                                [class.has-value]="getFocusedVisual()?.yAxisColumn" (click)="startAxisSelection('y')">
+                                [class.has-value]="focusedVisual.yAxisColumn" (click)="startAxisSelection('y')">
                                 <div class="axis-label">Value</div>
-                                <div class="axis-value" *ngIf="getFocusedVisual()?.yAxisColumn">
-                                    <span>{{ getFieldDisplayName(getFocusedVisual()?.yAxisColumn) }}</span>
+                                <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+                                    <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
                                     <i class="pi pi-times clear-btn" (click)="clearAxisField('y', $event)"></i>
                                 </div>
-                                <div class="axis-placeholder" *ngIf="!getFocusedVisual()?.yAxisColumn">
+                                <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
                                     <i class="pi pi-plus"></i>
                                     <span>Click to select field</span>
                                 </div>
                             </div>
-                        </div>
+                        </ng-container>
                     </div>
                 </div>
             </div>
@@ -252,58 +282,80 @@
                             <small>{{ visual.width }}px × {{ visual.height }}px</small>
                         </div>
 
+                        <!-- Placeholder when chart type selected but fields not mapped -->
+                        <div class="visual-content-placeholder"
+                            *ngIf="visual.chartType && !hasRequiredChartFields(visual)">
+                            <i class="pi pi-database"></i>
+                            <p>Select data fields to visualize</p>
+                            <small>Map X-Axis and Y-Axis{{ isHeatMapChartType(visual.chartType) ? ' and Value' : '' }}
+                                fields</small>
+                        </div>
+
                         <!-- Bar Chart Types -->
-                        <app-configurable-bar-chart *ngIf="isBarChartType(visual.chartType)" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [chartType]="visual.chartType">
+                        <app-configurable-bar-chart
+                            *ngIf="isBarChartType(visual.chartType) && hasRequiredChartFields(visual)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [chartType]="visual.chartType || ''"
+                            [data]="visual.chartData">
                         </app-configurable-bar-chart>
 
                         <!-- Line Chart -->
-                        <app-configurable-line-chart *ngIf="visual.chartType === 'line'" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config">
+                        <app-configurable-line-chart
+                            *ngIf="visual.chartType === 'line' && hasRequiredChartFields(visual)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [data]="visual.chartData">
                         </app-configurable-line-chart>
 
                         <!-- Area Chart Types -->
-                        <app-configurable-area-chart *ngIf="isAreaChartType(visual.chartType)" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [chartType]="visual.chartType">
+                        <app-configurable-area-chart
+                            *ngIf="isAreaChartType(visual.chartType) && hasRequiredChartFields(visual)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [chartType]="visual.chartType || ''"
+                            [data]="visual.chartData">
                         </app-configurable-area-chart>
 
                         <!-- Polar/Radar Chart -->
-                        <app-configurable-polar-chart *ngIf="visual.chartType === 'polar'" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config">
+                        <app-configurable-polar-chart
+                            *ngIf="visual.chartType === 'polar' && hasRequiredChartFields(visual)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [data]="visual.chartData">
                         </app-configurable-polar-chart>
 
                         <!-- Pie Chart Types -->
-                        <app-configurable-pie-chart *ngIf="isPieChartType(visual.chartType)" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [chartType]="visual.chartType">
+                        <app-configurable-pie-chart
+                            *ngIf="isPieChartType(visual.chartType) && hasRequiredChartFields(visual)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [chartType]="visual.chartType || ''"
+                            [data]="visual.chartData">
                         </app-configurable-pie-chart>
 
                         <!-- Gauge Chart Types -->
-                        <app-configurable-gauge-chart *ngIf="isGaugeChartType(visual.chartType)"
+                        <app-configurable-gauge-chart
+                            *ngIf="isGaugeChartType(visual.chartType) && hasRequiredChartFields(visual)"
                             [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config" [chartType]="visual.chartType">
+                            [chartConfig]="visual.config" [chartType]="visual.chartType || ''"
+                            [data]="visual.chartData">
                         </app-configurable-gauge-chart>
 
                         <!-- Number Card Chart -->
-                        <app-configurable-card-chart *ngIf="isCardChartType(visual.chartType)" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config">
+                        <app-configurable-card-chart
+                            *ngIf="isCardChartType(visual.chartType) && hasRequiredChartFields(visual)"
+                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                            [chartConfig]="visual.config" [data]="visual.chartData">
                         </app-configurable-card-chart>
 
                         <!-- Heat Map Chart -->
-                        <app-configurable-heatmap-chart *ngIf="isHeatMapChartType(visual.chartType)"
+                        <app-configurable-heatmap-chart
+                            *ngIf="isHeatMapChartType(visual.chartType) && hasRequiredChartFields(visual)"
                             [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config">
+                            [chartConfig]="visual.config" [data]="visual.chartData">
                         </app-configurable-heatmap-chart>
 
                         <!-- Tree Map Chart -->
-                        <app-configurable-treemap-chart *ngIf="isTreeMapChartType(visual.chartType)"
+                        <app-configurable-treemap-chart
+                            *ngIf="isTreeMapChartType(visual.chartType) && hasRequiredChartFields(visual)"
                             [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config">
+                            [chartConfig]="visual.config" [data]="visual.chartData">
                         </app-configurable-treemap-chart>
                     </div>
                     <!-- Resize Handles -->
@@ -339,7 +391,7 @@
         </div>
 
         <!-- Right Configuration Sidebar (opens on right-click only) -->
-        <div class="config-sidebar" *ngIf="isConfigSidebarOpen && focusedVisualId && getFocusedVisual()?.chartType">
+        <div class="config-sidebar" *ngIf="isConfigSidebarOpen && focusedVisualId && focusedVisual.chartType">
             <div class="sidebar-content">
                 <div class="sidebar-header-info">
                     <div class="dataset-label">Chart Configuration</div>
@@ -351,52 +403,52 @@
                     <!-- Color Scheme -->
                     <div class="config-group">
                         <label>Color Scheme</label>
-                        <p-dropdown [options]="colorSchemes" [(ngModel)]="getFocusedVisual().config.colorScheme"
+                        <p-dropdown [options]="colorSchemes" [(ngModel)]="focusedVisual.config.colorScheme"
                             optionLabel="label" optionValue="value" [style]="{'width': '100%'}">
                         </p-dropdown>
                     </div>
 
                     <!-- Axis Options (Not for pie/gauge/card charts - they don't have X/Y axes) -->
                     <div class="config-section"
-                        *ngIf="!isPieChartType(getFocusedVisual()?.chartType) && !isGaugeChartType(getFocusedVisual()?.chartType) && !isCardChartType(getFocusedVisual()?.chartType)">
+                        *ngIf="!isPieChartType(focusedVisual.chartType) && !isGaugeChartType(focusedVisual.chartType) && !isCardChartType(focusedVisual.chartType)">
                         <div class="section-title">Axis Options</div>
                         <div class="config-row">
                             <label>Show X Axis</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.xAxis"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.xAxis"></p-inputSwitch>
                         </div>
                         <div class="config-row">
                             <label>Show Y Axis</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.yAxis"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.yAxis"></p-inputSwitch>
                         </div>
                         <div class="config-row">
                             <label>Show Grid Lines</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.showGridLines"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.showGridLines"></p-inputSwitch>
                         </div>
                     </div>
 
                     <!-- Labels (Only for charts with traditional axes - not pie/polar) -->
-                    <div class="config-section" *ngIf="hasAxisLabels(getFocusedVisual()?.chartType)">
+                    <div class="config-section" *ngIf="hasAxisLabels(focusedVisual.chartType)">
                         <div class="section-title">Labels</div>
                         <div class="config-row">
                             <label>Show X Axis Label</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.showXAxisLabel"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.showXAxisLabel"></p-inputSwitch>
                         </div>
-                        <div class="config-group" *ngIf="getFocusedVisual().config.showXAxisLabel">
+                        <div class="config-group" *ngIf="focusedVisual.config.showXAxisLabel">
                             <label>X Axis Label</label>
-                            <input type="text" pInputText [(ngModel)]="getFocusedVisual().config.xAxisLabel" />
+                            <input type="text" pInputText [(ngModel)]="focusedVisual.config.xAxisLabel" />
                         </div>
                         <div class="config-row">
                             <label>Show Y Axis Label</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.showYAxisLabel"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.showYAxisLabel"></p-inputSwitch>
                         </div>
-                        <div class="config-group" *ngIf="getFocusedVisual().config.showYAxisLabel">
+                        <div class="config-group" *ngIf="focusedVisual.config.showYAxisLabel">
                             <label>Y Axis Label</label>
-                            <input type="text" pInputText [(ngModel)]="getFocusedVisual().config.yAxisLabel" />
+                            <input type="text" pInputText [(ngModel)]="focusedVisual.config.yAxisLabel" />
                         </div>
                         <!-- Show Data Labels only for bar charts -->
-                        <div class="config-row" *ngIf="isBarChartType(getFocusedVisual()?.chartType)">
+                        <div class="config-row" *ngIf="isBarChartType(focusedVisual.chartType)">
                             <label>Show Data Labels</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.showDataLabel"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.showDataLabel"></p-inputSwitch>
                         </div>
                     </div>
 
@@ -405,210 +457,209 @@
                         <div class="section-title">Display Options</div>
 
                         <!-- Legend Options (not for card charts) -->
-                        <ng-container *ngIf="!isCardChartType(getFocusedVisual()?.chartType)">
+                        <ng-container *ngIf="!isCardChartType(focusedVisual.chartType)">
                             <div class="config-row">
                                 <label>Show Legend</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.legend"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.legend"></p-inputSwitch>
                             </div>
-                            <ng-container *ngIf="getFocusedVisual().config.legend">
+                            <ng-container *ngIf="focusedVisual.config.legend">
                                 <div class="config-group">
                                     <label>Legend Position</label>
                                     <p-dropdown [options]="legendPositions"
-                                        [(ngModel)]="getFocusedVisual().config.legendPosition" optionLabel="label"
+                                        [(ngModel)]="focusedVisual.config.legendPosition" optionLabel="label"
                                         optionValue="value" [style]="{'width': '100%'}">
                                     </p-dropdown>
                                 </div>
                                 <div class="config-group">
                                     <label>Legend Title</label>
-                                    <input type="text" pInputText [(ngModel)]="getFocusedVisual().config.legendTitle" />
+                                    <input type="text" pInputText [(ngModel)]="focusedVisual.config.legendTitle" />
                                 </div>
                             </ng-container>
                         </ng-container>
 
                         <!-- Styling Options -->
-                        <div class="config-row" *ngIf="supportsGradient(getFocusedVisual()?.chartType)">
+                        <div class="config-row" *ngIf="supportsGradient(focusedVisual.chartType)">
                             <label>Gradient Fill</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.gradient"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.gradient"></p-inputSwitch>
                         </div>
                         <div class="config-row">
                             <label>Animations</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.animations"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.animations"></p-inputSwitch>
                         </div>
                         <div class="config-row">
                             <label>Disable Tooltip</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.tooltipDisabled"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.tooltipDisabled"></p-inputSwitch>
                         </div>
-                        <div class="config-row" *ngIf="hasAxisLabels(getFocusedVisual()?.chartType)">
+                        <div class="config-row" *ngIf="hasAxisLabels(focusedVisual.chartType)">
                             <label>Round Domains</label>
-                            <p-inputSwitch [(ngModel)]="getFocusedVisual().config.roundDomains"></p-inputSwitch>
+                            <p-inputSwitch [(ngModel)]="focusedVisual.config.roundDomains"></p-inputSwitch>
                         </div>
 
                         <!-- Bar Chart Specific Options -->
-                        <ng-container *ngIf="isBarChartType(getFocusedVisual()?.chartType)">
+                        <ng-container *ngIf="isBarChartType(focusedVisual.chartType)">
                             <div class="section-title" style="margin-top: 12px;">Bar Chart Options</div>
                             <div class="config-group">
                                 <label>Bar Padding</label>
-                                <p-inputNumber [(ngModel)]="getFocusedVisual().config.barPadding" [min]="0" [max]="50"
+                                <p-inputNumber [(ngModel)]="focusedVisual.config.barPadding" [min]="0" [max]="50"
                                     [showButtons]="true" [style]="{'width': '100%'}">
                                 </p-inputNumber>
                             </div>
                             <div class="config-row">
                                 <label>Round Edges</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.roundEdges"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.roundEdges"></p-inputSwitch>
                             </div>
                             <div class="config-row">
                                 <label>Hide Zero Bars</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.noBarWhenZero"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.noBarWhenZero"></p-inputSwitch>
                             </div>
                         </ng-container>
 
                         <!-- Line Chart Specific Options -->
-                        <ng-container *ngIf="getFocusedVisual()?.chartType === 'line'">
+                        <ng-container *ngIf="focusedVisual.chartType === 'line'">
                             <div class="config-group">
                                 <label>Curve Type</label>
-                                <p-dropdown [options]="curveTypes" [(ngModel)]="getFocusedVisual().config.curveType"
+                                <p-dropdown [options]="curveTypes" [(ngModel)]="focusedVisual.config.curveType"
                                     optionLabel="label" optionValue="value" [style]="{'width': '100%'}">
                                 </p-dropdown>
                             </div>
                             <div class="config-row">
                                 <label>Auto Scale</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.autoScale"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.autoScale"></p-inputSwitch>
                             </div>
                             <div class="config-row">
                                 <label>Timeline</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.timeline"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.timeline"></p-inputSwitch>
                             </div>
                         </ng-container>
 
                         <!-- Area Chart Specific Options -->
-                        <ng-container *ngIf="isAreaChartType(getFocusedVisual()?.chartType)">
+                        <ng-container *ngIf="isAreaChartType(focusedVisual.chartType)">
                             <div class="config-group">
                                 <label>Curve Type</label>
-                                <p-dropdown [options]="curveTypes" [(ngModel)]="getFocusedVisual().config.curveType"
+                                <p-dropdown [options]="curveTypes" [(ngModel)]="focusedVisual.config.curveType"
                                     optionLabel="label" optionValue="value" [style]="{'width': '100%'}">
                                 </p-dropdown>
                             </div>
                             <div class="config-row">
                                 <label>Auto Scale</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.autoScale"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.autoScale"></p-inputSwitch>
                             </div>
                             <div class="config-row">
                                 <label>Timeline</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.timeline"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.timeline"></p-inputSwitch>
                             </div>
                         </ng-container>
 
                         <!-- Pie Chart Specific Options -->
-                        <ng-container *ngIf="isPieChartType(getFocusedVisual()?.chartType)">
+                        <ng-container *ngIf="isPieChartType(focusedVisual.chartType)">
                             <div class="section-title" style="margin-top: 12px;">Pie Chart Options</div>
                             <div class="config-row">
                                 <label>Show Labels</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.labels"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.labels"></p-inputSwitch>
                             </div>
-                            <ng-container *ngIf="getFocusedVisual().config.labels">
+                            <ng-container *ngIf="focusedVisual.config.labels">
                                 <div class="config-row">
                                     <label>Trim Labels</label>
-                                    <p-inputSwitch [(ngModel)]="getFocusedVisual().config.trimLabels"></p-inputSwitch>
+                                    <p-inputSwitch [(ngModel)]="focusedVisual.config.trimLabels"></p-inputSwitch>
                                 </div>
-                                <div class="config-group" *ngIf="getFocusedVisual().config.trimLabels">
+                                <div class="config-group" *ngIf="focusedVisual.config.trimLabels">
                                     <label>Max Label Length</label>
-                                    <p-inputNumber [(ngModel)]="getFocusedVisual().config.maxLabelLength" [min]="5"
+                                    <p-inputNumber [(ngModel)]="focusedVisual.config.maxLabelLength" [min]="5"
                                         [max]="50" [showButtons]="true" [style]="{'width': '100%'}">
                                     </p-inputNumber>
                                 </div>
                             </ng-container>
-                            <div class="config-row" *ngIf="getFocusedVisual()?.chartType === 'pie'">
+                            <div class="config-row" *ngIf="focusedVisual.chartType === 'pie'">
                                 <label>Doughnut</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.doughnut"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.doughnut"></p-inputSwitch>
                             </div>
                             <div class="config-group"
-                                *ngIf="getFocusedVisual().config.doughnut && getFocusedVisual()?.chartType === 'pie'">
+                                *ngIf="focusedVisual.config.doughnut && focusedVisual.chartType === 'pie'">
                                 <label>Arc Width</label>
-                                <p-inputNumber [(ngModel)]="getFocusedVisual().config.arcWidth" [min]="0.1" [max]="0.9"
+                                <p-inputNumber [(ngModel)]="focusedVisual.config.arcWidth" [min]="0.1" [max]="0.9"
                                     [step]="0.05" [showButtons]="true" [style]="{'width': '100%'}">
                                 </p-inputNumber>
                             </div>
-                            <div class="config-row" *ngIf="getFocusedVisual()?.chartType === 'pie'">
+                            <div class="config-row" *ngIf="focusedVisual.chartType === 'pie'">
                                 <label>Explode Slices</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.explodeSlices"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.explodeSlices"></p-inputSwitch>
                             </div>
                         </ng-container>
 
                         <!-- Polar Chart Specific Options -->
-                        <ng-container *ngIf="getFocusedVisual()?.chartType === 'polar'">
+                        <ng-container *ngIf="focusedVisual.chartType === 'polar'">
                             <div class="section-title" style="margin-top: 12px;">Polar Chart Options</div>
                             <div class="config-row">
                                 <label>Trim Labels</label>
-                                <p-inputSwitch [(ngModel)]="getFocusedVisual().config.labelTrim"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.labelTrim"></p-inputSwitch>
                             </div>
-                            <div class="config-group" *ngIf="getFocusedVisual().config.labelTrim">
+                            <div class="config-group" *ngIf="focusedVisual.config.labelTrim">
                                 <label>Max Label Length</label>
-                                <p-inputNumber [(ngModel)]="getFocusedVisual().config.labelTrimSize" [min]="5"
-                                    [max]="50" [showButtons]="true" [style]="{'width': '100%'}">
+                                <p-inputNumber [(ngModel)]="focusedVisual.config.labelTrimSize" [min]="5" [max]="50"
+                                    [showButtons]="true" [style]="{'width': '100%'}">
                                 </p-inputNumber>
                             </div>
                             <div class="config-row">
                                 <label>Show Series on Hover</label>
-                                <p-inputSwitch
-                                    [(ngModel)]="getFocusedVisual().config.showSeriesOnHover"></p-inputSwitch>
+                                <p-inputSwitch [(ngModel)]="focusedVisual.config.showSeriesOnHover"></p-inputSwitch>
                             </div>
                             <div class="config-group">
                                 <label>Range Fill Opacity</label>
-                                <p-inputNumber [(ngModel)]="getFocusedVisual().config.rangeFillOpacity" [min]="0"
-                                    [max]="1" [step]="0.05" [showButtons]="true" [style]="{'width': '100%'}">
+                                <p-inputNumber [(ngModel)]="focusedVisual.config.rangeFillOpacity" [min]="0" [max]="1"
+                                    [step]="0.05" [showButtons]="true" [style]="{'width': '100%'}">
                                 </p-inputNumber>
                             </div>
                         </ng-container>
 
                         <!-- Gauge Chart Specific Options -->
-                        <ng-container *ngIf="isGaugeChartType(getFocusedVisual()?.chartType)">
+                        <ng-container *ngIf="isGaugeChartType(focusedVisual.chartType)">
                             <div class="section-title" style="margin-top: 12px;">Gauge Chart Options</div>
                             <div class="config-group">
                                 <label>Min Value</label>
-                                <p-inputNumber [(ngModel)]="getFocusedVisual().config.min" [showButtons]="true"
+                                <p-inputNumber [(ngModel)]="focusedVisual.config.min" [showButtons]="true"
                                     [style]="{'width': '100%'}">
                                 </p-inputNumber>
                             </div>
                             <div class="config-group">
                                 <label>Max Value</label>
-                                <p-inputNumber [(ngModel)]="getFocusedVisual().config.max" [showButtons]="true"
+                                <p-inputNumber [(ngModel)]="focusedVisual.config.max" [showButtons]="true"
                                     [style]="{'width': '100%'}">
                                 </p-inputNumber>
                             </div>
                             <div class="config-group">
                                 <label>Units</label>
-                                <input type="text" pInputText [(ngModel)]="getFocusedVisual().config.units" />
+                                <input type="text" pInputText [(ngModel)]="focusedVisual.config.units" />
                             </div>
-                            <ng-container *ngIf="getFocusedVisual()?.chartType === 'gauge'">
+                            <ng-container *ngIf="focusedVisual.chartType === 'gauge'">
                                 <div class="config-row">
                                     <label>Show Axis</label>
-                                    <p-inputSwitch [(ngModel)]="getFocusedVisual().config.showAxis"></p-inputSwitch>
+                                    <p-inputSwitch [(ngModel)]="focusedVisual.config.showAxis"></p-inputSwitch>
                                 </div>
                                 <div class="config-row">
                                     <label>Show Text</label>
-                                    <p-inputSwitch [(ngModel)]="getFocusedVisual().config.showText"></p-inputSwitch>
+                                    <p-inputSwitch [(ngModel)]="focusedVisual.config.showText"></p-inputSwitch>
                                 </div>
-                                <div class="config-group" *ngIf="getFocusedVisual().config.showAxis">
+                                <div class="config-group" *ngIf="focusedVisual.config.showAxis">
                                     <label>Big Segments</label>
-                                    <p-inputNumber [(ngModel)]="getFocusedVisual().config.bigSegments" [min]="1"
-                                        [max]="20" [showButtons]="true" [style]="{'width': '100%'}">
+                                    <p-inputNumber [(ngModel)]="focusedVisual.config.bigSegments" [min]="1" [max]="20"
+                                        [showButtons]="true" [style]="{'width': '100%'}">
                                     </p-inputNumber>
                                 </div>
-                                <div class="config-group" *ngIf="getFocusedVisual().config.showAxis">
+                                <div class="config-group" *ngIf="focusedVisual.config.showAxis">
                                     <label>Small Segments</label>
-                                    <p-inputNumber [(ngModel)]="getFocusedVisual().config.smallSegments" [min]="0"
-                                        [max]="10" [showButtons]="true" [style]="{'width': '100%'}">
+                                    <p-inputNumber [(ngModel)]="focusedVisual.config.smallSegments" [min]="0" [max]="10"
+                                        [showButtons]="true" [style]="{'width': '100%'}">
                                     </p-inputNumber>
                                 </div>
                                 <div class="config-group">
                                     <label>Angle Span (degrees)</label>
-                                    <p-inputNumber [(ngModel)]="getFocusedVisual().config.angleSpan" [min]="90"
-                                        [max]="360" [showButtons]="true" [style]="{'width': '100%'}">
+                                    <p-inputNumber [(ngModel)]="focusedVisual.config.angleSpan" [min]="90" [max]="360"
+                                        [showButtons]="true" [style]="{'width': '100%'}">
                                     </p-inputNumber>
                                 </div>
                                 <div class="config-group">
                                     <label>Start Angle (degrees)</label>
-                                    <p-inputNumber [(ngModel)]="getFocusedVisual().config.startAngle" [min]="-180"
+                                    <p-inputNumber [(ngModel)]="focusedVisual.config.startAngle" [min]="-180"
                                         [max]="180" [showButtons]="true" [style]="{'width': '100%'}">
                                     </p-inputNumber>
                                 </div>
@@ -616,11 +667,11 @@
                         </ng-container>
 
                         <!-- Number Card Chart Specific Options -->
-                        <ng-container *ngIf="isCardChartType(getFocusedVisual()?.chartType)">
+                        <ng-container *ngIf="isCardChartType(focusedVisual.chartType)">
                             <div class="section-title" style="margin-top: 12px;">Card Options</div>
                             <div class="config-group">
                                 <label>Inner Padding</label>
-                                <p-inputNumber [(ngModel)]="getFocusedVisual().config.innerPadding" [min]="0" [max]="50"
+                                <p-inputNumber [(ngModel)]="focusedVisual.config.innerPadding" [min]="0" [max]="50"
                                     [showButtons]="true" [style]="{'width': '100%'}">
                                 </p-inputNumber>
                             </div>

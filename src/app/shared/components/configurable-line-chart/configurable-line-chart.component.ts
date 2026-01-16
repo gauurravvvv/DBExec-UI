@@ -1,7 +1,28 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
+} from '@angular/core';
 import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import { COLOR_PALETTES, DUMMY_SINGLE_SERIES, DUMMY_MULTI_SERIES, createColorScheme, getLegendPositionEnum } from '../../helpers/chart-config.helper';
-import { curveLinear, curveMonotoneX, curveStep, curveBasis, curveCardinal } from 'd3-shape';
+import {
+  COLOR_PALETTES,
+  DUMMY_SINGLE_SERIES,
+  DUMMY_MULTI_SERIES,
+  createColorScheme,
+  getLegendPositionEnum,
+} from '../../helpers/chart-config.helper';
+import {
+  curveLinear,
+  curveMonotoneX,
+  curveStep,
+  curveBasis,
+  curveCardinal,
+} from 'd3-shape';
 
 export interface LineChartSeries {
   name: string;
@@ -13,7 +34,7 @@ export interface LineChartConfig {
   legend: boolean;
   legendPosition: string;
   legendTitle: string;
-  // Axis options  
+  // Axis options
   xAxis: boolean;
   yAxis: boolean;
   showGridLines: boolean;
@@ -45,10 +66,12 @@ export interface LineChartConfig {
   templateUrl: './configurable-line-chart.component.html',
   styleUrls: ['./configurable-line-chart.component.scss'],
 })
-export class ConfigurableLineChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableLineChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   // Track previous color scheme to detect changes
   private previousColorScheme: string = '';
-  
+
   // Data input
   @Input() data: LineChartSeries[] = [];
 
@@ -125,36 +148,7 @@ export class ConfigurableLineChartComponent implements OnInit, OnChanges, DoChec
     { label: 'Below', value: 'below' },
   ];
 
-  // Dummy data for preview
-  dummyData: LineChartSeries[] = [
-    {
-      name: 'Series A',
-      series: [
-        { name: 'Jan', value: 8500 },
-        { name: 'Feb', value: 7300 },
-        { name: 'Mar', value: 9100 },
-        { name: 'Apr', value: 8400 },
-        { name: 'May', value: 9800 },
-        { name: 'Jun', value: 11200 },
-      ],
-    },
-    {
-      name: 'Series B',
-      series: [
-        { name: 'Jan', value: 6200 },
-        { name: 'Feb', value: 5800 },
-        { name: 'Mar', value: 7100 },
-        { name: 'Apr', value: 6500 },
-        { name: 'May', value: 7800 },
-        { name: 'Jun', value: 8400 },
-      ],
-    },
-  ];
-
   ngOnInit(): void {
-    if (!this.data || this.data.length === 0) {
-      this.data = [...this.dummyData];
-    }
     this.updateColorScheme();
     this.updateViewDimensions();
     this.previousColorScheme = this.config.colorScheme;
@@ -214,7 +208,9 @@ export class ConfigurableLineChartComponent implements OnInit, OnChanges, DoChec
   }
 
   getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below' ? LegendPosition.Below : LegendPosition.Right;
+    return this.config.legendPosition === 'below'
+      ? LegendPosition.Below
+      : LegendPosition.Right;
   }
 
   onChartSelect(event: any): void {

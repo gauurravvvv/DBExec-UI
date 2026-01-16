@@ -1,6 +1,21 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
+} from '@angular/core';
 import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import { COLOR_PALETTES, DUMMY_SINGLE_SERIES, DUMMY_MULTI_SERIES, createColorScheme, getLegendPositionEnum } from '../../helpers/chart-config.helper';
+import {
+  COLOR_PALETTES,
+  DUMMY_SINGLE_SERIES,
+  DUMMY_MULTI_SERIES,
+  createColorScheme,
+  getLegendPositionEnum,
+} from '../../helpers/chart-config.helper';
 
 export interface GaugeChartData {
   name: string;
@@ -36,9 +51,11 @@ export interface GaugeChartConfig {
   templateUrl: './configurable-gauge-chart.component.html',
   styleUrls: ['./configurable-gauge-chart.component.scss'],
 })
-export class ConfigurableGaugeChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableGaugeChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousColorScheme: string = '';
-  
+
   @Input() data: GaugeChartData[] = [];
   @Input() showConfigPanel: boolean = true;
   @Input() chartWidth: number | undefined;
@@ -88,19 +105,12 @@ export class ConfigurableGaugeChartComponent implements OnInit, OnChanges, DoChe
   // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
-  dummyData: GaugeChartData[] = [
-    { name: 'Progress', value: 75 },
-  ];
-
   // For linear gauge, use a single value
   get linearValue(): number {
     return this.data && this.data.length > 0 ? this.data[0].value : this.value;
   }
 
   ngOnInit(): void {
-    if (!this.data || this.data.length === 0) {
-      this.data = [...this.dummyData];
-    }
     this.updateColorScheme();
     this.updateViewDimensions();
     this.previousColorScheme = this.config.colorScheme;
@@ -145,10 +155,18 @@ export class ConfigurableGaugeChartComponent implements OnInit, OnChanges, DoChe
   }
 
   getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below' ? LegendPosition.Below : LegendPosition.Right;
+    return this.config.legendPosition === 'below'
+      ? LegendPosition.Below
+      : LegendPosition.Right;
   }
 
-  onChartSelect(event: any): void { this.onSelect.emit(event); }
-  onChartActivate(event: any): void { this.onActivate.emit(event); }
-  onChartDeactivate(event: any): void { this.onDeactivate.emit(event); }
+  onChartSelect(event: any): void {
+    this.onSelect.emit(event);
+  }
+  onChartActivate(event: any): void {
+    this.onActivate.emit(event);
+  }
+  onChartDeactivate(event: any): void {
+    this.onDeactivate.emit(event);
+  }
 }
