@@ -6,11 +6,11 @@
                 [yAxis]="config.yAxis" [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
                 [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
                 [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [autoScale]="config.autoScale"
-                [rangeFillOpacity]="config.rangeFillOpacity" [animations]="config.animations" [curve]="getCurve()"
-                [labelTrim]="config.labelTrim" [labelTrimSize]="config.labelTrimSize"
-                [tooltipDisabled]="config.tooltipDisabled" [showSeriesOnHover]="config.showSeriesOnHover"
-                (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
-                (deactivate)="onChartDeactivate($event)">
+                [gradient]="config.gradient" [rangeFillOpacity]="config.rangeFillOpacity"
+                [animations]="config.animations" [curve]="getCurve()" [labelTrim]="config.labelTrim"
+                [labelTrimSize]="config.labelTrimSize" [tooltipDisabled]="config.tooltipDisabled"
+                [showSeriesOnHover]="config.showSeriesOnHover" (select)="onChartSelect($event)"
+                (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
             </ngx-charts-polar-chart>
         </div>
     </div>

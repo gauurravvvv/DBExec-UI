@@ -46,6 +46,7 @@ export interface PolarChartConfig {
   // Scale
   autoScale: boolean;
   // Styling
+  gradient: boolean;
   animations: boolean;
   rangeFillOpacity: number;
   // Curve
@@ -95,6 +96,7 @@ export class ConfigurablePolarChartComponent
     xAxisLabel: '',
     yAxisLabel: '',
     autoScale: true,
+    gradient: false,
     animations: false,
     rangeFillOpacity: 0.15,
     curveType: 'linearClosed',
@@ -144,9 +146,12 @@ export class ConfigurablePolarChartComponent
 
   private updateViewDimensions(): void {
     if (this.chartWidth && this.chartHeight) {
-      const padding = 20;
-      const width = this.chartWidth - padding;
-      const height = this.chartHeight - padding;
+      // Minimal padding - let ngx-charts handle internal layout
+      const padding = 10;
+      let width = this.chartWidth - padding;
+      let height = this.chartHeight - padding;
+
+      // ngx-charts handles legend space internally
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       this.view = undefined;

@@ -8,10 +8,14 @@
                     [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
                     [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
                     [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
-                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [autoScale]="config.autoScale"
-                    [timeline]="config.timeline" [gradient]="config.gradient" [animations]="config.animations"
-                    [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
-                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
+                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel"
+                    [trimXAxisTicks]="config.trimXAxisTicks" [trimYAxisTicks]="config.trimYAxisTicks"
+                    [rotateXAxisTicks]="config.rotateXAxisTicks" [maxXAxisTickLength]="config.maxXAxisTickLength"
+                    [maxYAxisTickLength]="config.maxYAxisTickLength" [wrapTicks]="config.wrapTicks"
+                    [autoScale]="config.autoScale" [timeline]="config.timeline" [gradient]="config.gradient"
+                    [animations]="config.animations" [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()"
+                    (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
+                    (deactivate)="onChartDeactivate($event)">
                 </ngx-charts-area-chart>
                 <ng-template #autoSizeArea>
                     <ngx-charts-area-chart [results]="data" [scheme]="colorSchemeObj" [legend]="config.legend"
@@ -19,10 +23,14 @@
                         [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
                         [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
                         [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                        [yAxisLabel]="config.yAxisLabel" [autoScale]="config.autoScale" [timeline]="config.timeline"
-                        [gradient]="config.gradient" [animations]="config.animations"
-                        [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
-                        (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
+                        [yAxisLabel]="config.yAxisLabel" [trimXAxisTicks]="config.trimXAxisTicks"
+                        [trimYAxisTicks]="config.trimYAxisTicks" [rotateXAxisTicks]="config.rotateXAxisTicks"
+                        [maxXAxisTickLength]="config.maxXAxisTickLength"
+                        [maxYAxisTickLength]="config.maxYAxisTickLength" [wrapTicks]="config.wrapTicks"
+                        [autoScale]="config.autoScale" [timeline]="config.timeline" [gradient]="config.gradient"
+                        [animations]="config.animations" [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()"
+                        (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
+                        (deactivate)="onChartDeactivate($event)">
                     </ngx-charts-area-chart>
                 </ng-template>
             </ng-container>

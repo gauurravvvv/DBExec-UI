@@ -13,13 +13,16 @@
         <div class="chart-section">
             <!-- Bar Vertical -->
             <ng-container *ngIf="chartType === 'bar-vertical'">
-                <ngx-charts-bar-vertical [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"
-                    [legendPosition]="getLegendPosition()" [legendTitle]="config.legendTitle" [xAxis]="config.xAxis"
-                    [yAxis]="config.yAxis" [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
-                    [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
-                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel"
-                    [showDataLabel]="config.showDataLabel" [gradient]="config.gradient" [animations]="config.animations"
-                    [barPadding]="config.barPadding" [roundEdges]="config.roundEdges"
+                <ngx-charts-bar-vertical [results]="data" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [legendPosition]="getLegendPosition()" [legendTitle]="config.legendTitle"
+                    [xAxis]="config.xAxis" [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
+                    [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [trimXAxisTicks]="config.trimXAxisTicks"
+                    [trimYAxisTicks]="config.trimYAxisTicks" [rotateXAxisTicks]="config.rotateXAxisTicks"
+                    [maxXAxisTickLength]="config.maxXAxisTickLength" [maxYAxisTickLength]="config.maxYAxisTickLength"
+                    [wrapTicks]="config.wrapTicks" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
+                    [animations]="config.animations" [barPadding]="config.barPadding" [roundEdges]="config.roundEdges"
                     [noBarWhenZero]="config.noBarWhenZero" [tooltipDisabled]="config.tooltipDisabled"
                     (select)="handleSelect($event)" (activate)="handleActivate($event)"
                     (deactivate)="handleDeactivate($event)">
@@ -28,13 +31,16 @@
 
             <!-- Bar Horizontal -->
             <ng-container *ngIf="chartType === 'bar-horizontal'">
-                <ngx-charts-bar-horizontal [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"
-                    [legendPosition]="getLegendPosition()" [legendTitle]="config.legendTitle" [xAxis]="config.xAxis"
-                    [yAxis]="config.yAxis" [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
-                    [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
-                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel"
-                    [showDataLabel]="config.showDataLabel" [gradient]="config.gradient" [animations]="config.animations"
-                    [barPadding]="config.barPadding" [roundEdges]="config.roundEdges"
+                <ngx-charts-bar-horizontal [results]="data" [view]="view!" [scheme]="colorSchemeObj"
+                    [legend]="config.legend" [legendPosition]="getLegendPosition()" [legendTitle]="config.legendTitle"
+                    [xAxis]="config.xAxis" [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
+                    [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
+                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
+                    [yAxisLabel]="config.yAxisLabel" [trimXAxisTicks]="config.trimXAxisTicks"
+                    [trimYAxisTicks]="config.trimYAxisTicks" [rotateXAxisTicks]="config.rotateXAxisTicks"
+                    [maxXAxisTickLength]="config.maxXAxisTickLength" [maxYAxisTickLength]="config.maxYAxisTickLength"
+                    [wrapTicks]="config.wrapTicks" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
+                    [animations]="config.animations" [barPadding]="config.barPadding" [roundEdges]="config.roundEdges"
                     [noBarWhenZero]="config.noBarWhenZero" [tooltipDisabled]="config.tooltipDisabled"
                     (select)="handleSelect($event)" (activate)="handleActivate($event)"
                     (deactivate)="handleDeactivate($event)">

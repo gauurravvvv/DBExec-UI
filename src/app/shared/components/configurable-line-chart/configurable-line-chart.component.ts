@@ -44,6 +44,13 @@ export interface LineChartConfig {
   showYAxisLabel: boolean;
   xAxisLabel: string;
   yAxisLabel: string;
+  // Axis tick formatting
+  trimXAxisTicks: boolean;
+  trimYAxisTicks: boolean;
+  rotateXAxisTicks: boolean;
+  maxXAxisTickLength: number;
+  maxYAxisTickLength: number;
+  wrapTicks: boolean;
   // Scale
   autoScale: boolean;
   timeline: boolean;
@@ -106,6 +113,13 @@ export class ConfigurableLineChartComponent
     showYAxisLabel: true,
     xAxisLabel: 'X Axis',
     yAxisLabel: 'Y Axis',
+    // Axis tick formatting
+    trimXAxisTicks: true,
+    trimYAxisTicks: true,
+    rotateXAxisTicks: true,
+    maxXAxisTickLength: 16,
+    maxYAxisTickLength: 16,
+    wrapTicks: false,
     autoScale: true,
     timeline: false,
     showDataLabel: false,
@@ -173,9 +187,12 @@ export class ConfigurableLineChartComponent
 
   private updateViewDimensions(): void {
     if (this.chartWidth && this.chartHeight) {
-      const padding = 20;
-      const width = this.chartWidth - padding;
-      const height = this.chartHeight - padding;
+      // Minimal padding - let ngx-charts handle internal layout
+      const padding = 10;
+      let width = this.chartWidth - padding;
+      let height = this.chartHeight - padding;
+
+      // ngx-charts handles legend space internally
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       this.view = undefined;

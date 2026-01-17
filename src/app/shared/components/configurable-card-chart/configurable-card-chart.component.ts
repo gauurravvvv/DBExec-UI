@@ -32,6 +32,8 @@ export interface CardChartConfig {
   innerPadding: number;
   // Styling
   animations: boolean;
+  // Tooltip
+  tooltipDisabled: boolean;
   // Color
   colorScheme: string;
 }
@@ -63,6 +65,7 @@ export class ConfigurableCardChartComponent
     emptyColor: 'rgba(0, 0, 0, 0)',
     innerPadding: 15,
     animations: true,
+    tooltipDisabled: false,
     colorScheme: 'vivid',
   };
 

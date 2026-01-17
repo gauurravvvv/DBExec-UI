@@ -120,44 +120,23 @@ export class ConfigurableBarChartComponent
     }
   }
 
-  private previousLegend: boolean = false;
-  private previousLegendPosition: string = 'right';
-
   ngDoCheck(): void {
     // Detect changes to colorScheme within the config object
     if (this.config && this.config.colorScheme !== this.previousColorScheme) {
       this.previousColorScheme = this.config.colorScheme;
       this.updateColorScheme();
     }
-    // Detect changes to legend settings and recalculate dimensions
-    if (
-      this.config &&
-      (this.config.legend !== this.previousLegend ||
-        this.config.legendPosition !== this.previousLegendPosition)
-    ) {
-      this.previousLegend = this.config.legend;
-      this.previousLegendPosition = this.config.legendPosition;
-      this.updateViewDimensions();
-    }
   }
 
   private updateViewDimensions(): void {
     if (this.chartWidth && this.chartHeight) {
-      // Account for header (~45px) and some padding
-      const headerHeight = 45;
-      const padding = 20;
+      // Minimal padding - let ngx-charts handle internal layout
+      const padding = 10;
       let width = this.chartWidth - padding;
-      let height = this.chartHeight - headerHeight - padding;
+      let height = this.chartHeight - padding;
 
-      // Account for legend space when legend is enabled
-      if (this.config.legend) {
-        if (this.config.legendPosition === 'below') {
-          height -= 60; // Reserve space for legend below
-        } else {
-          width -= 120; // Reserve space for legend on right
-        }
-      }
-
+      // ngx-charts handles legend space internally, no need to manually subtract
+      // Just ensure minimum dimensions
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       // Let ngx-charts auto-size
