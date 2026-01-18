@@ -476,6 +476,22 @@
       border-color: var(--primary-color);
       background-color: rgba(var(--primary-color-rgb), 0.08);
     }
+
+    &.optional {
+      border-style: dotted;
+      opacity: 0.8;
+
+      .axis-label {
+        font-style: italic;
+        color: var(--secondary-color);
+        opacity: 0.8;
+      }
+
+      &.has-value {
+        border-style: solid;
+        opacity: 1;
+      }
+    }
   }
 
   @keyframes pulse-slot {
@@ -658,6 +674,41 @@
     i {
       color: var(--primary-color);
       font-size: 12px;
+    }
+  }
+
+  // Chart Search Wrapper
+  .chart-search-wrapper {
+    padding: 10px 12px;
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
+
+    .p-input-icon-left {
+      input {
+        width: 100%;
+        padding-left: 2.5rem;
+        font-size: 13px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--hover-background);
+        transition: all 0.2s ease;
+
+        &:focus {
+          border-color: var(--primary-color);
+          background-color: var(--card-background);
+        }
+
+        &::placeholder {
+          color: var(--secondary-color);
+          font-style: italic;
+        }
+      }
+
+      i {
+        color: var(--secondary-color);
+        font-size: 14px;
+        left: 0.75rem;
+      }
     }
   }
 
@@ -1007,7 +1058,9 @@
   overflow: hidden; // Keep content inside the box
   display: flex;
   flex-direction: column;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
   min-width: 300px;
   min-height: 250px;
@@ -1259,7 +1312,7 @@
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  overflow: hidden; // Keep content inside
+  overflow: visible; // Changed from hidden to allow legend below to display
   min-height: 0;
   min-width: 0;
 
@@ -1524,4 +1577,87 @@
     width: 200px;
     min-width: 200px;
   }
+}
+
+// Maximized Visual Overlay
+.maximized-visual-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.maximized-visual-container {
+  background: var(--surface-card, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  max-width: 95vw;
+  max-height: 95vh;
+  width: 1280px;
+  height: 850px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.maximized-visual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--surface-border, #e0e0e0);
+  background: var(--surface-ground, #f8f9fa);
+
+  .maximized-visual-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color, #333);
+  }
+
+  .close-maximize-btn {
+    color: var(--text-secondary-color, #666);
+    width: 36px;
+    height: 36px;
+
+    &:hover {
+      background: var(--surface-hover, rgba(0, 0, 0, 0.08));
+      color: var(--text-color, #333);
+    }
+  }
+}
+
+.maximized-visual-body {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--surface-card, #ffffff);
 }

@@ -8,65 +8,76 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType } from '@swimlane/ngx-charts';
+import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
 import {
   COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
   createColorScheme,
   getLegendPositionEnum,
 } from '../../helpers/chart-config.helper';
 
-export interface CardChartData {
-  name: string;
-  value: number;
-}
-
-export interface CardChartConfig {
-  // Colors
-  cardColor: string;
-  bandColor: string;
-  textColor: string;
-  emptyColor: string;
-  // Layout
-  innerPadding: number;
+export interface BoxChartConfig {
+  // Axis
+  xAxis: boolean;
+  yAxis: boolean;
+  showGridLines: boolean;
+  // Labels
+  showXAxisLabel: boolean;
+  showYAxisLabel: boolean;
+  xAxisLabel: string;
+  yAxisLabel: string;
+  // Legend
+  legend: boolean;
+  legendTitle: string;
+  legendPosition: string;
   // Styling
+  gradient: boolean;
   animations: boolean;
+  // Tooltip
+  tooltipDisabled: boolean;
   // Color
   colorScheme: string;
+  roundDomains: boolean;
 }
 
 @Component({
-  selector: 'app-configurable-card-chart',
-  templateUrl: './configurable-card-chart.component.html',
-  styleUrls: ['./configurable-card-chart.component.scss'],
+  selector: 'app-configurable-box-chart',
+  templateUrl: './configurable-box-chart.component.html',
+  styleUrls: ['./configurable-box-chart.component.scss'],
 })
-export class ConfigurableCardChartComponent
+export class ConfigurableBoxChartComponent
   implements OnInit, OnChanges, DoCheck
 {
   private previousColorScheme: string = '';
 
-  @Input() data: CardChartData[] = [];
+  @Input() data: any[] = [];
   @Input() showConfigPanel: boolean = true;
   @Input() chartWidth: number | undefined;
   @Input() chartHeight: number | undefined;
-  @Input() chartConfig: CardChartConfig | undefined;
+  @Input() chartConfig: BoxChartConfig | undefined;
 
   view: [number, number] | undefined;
 
   @Output() onSelect = new EventEmitter<any>();
 
-  private defaultConfig: CardChartConfig = {
-    cardColor: '',
-    bandColor: '',
-    textColor: '',
-    emptyColor: 'rgba(0, 0, 0, 0)',
-    innerPadding: 15,
-    animations: true,
+  private defaultConfig: BoxChartConfig = {
+    xAxis: true,
+    yAxis: true,
+    showGridLines: true,
+    showXAxisLabel: true,
+    showYAxisLabel: true,
+    xAxisLabel: 'Category',
+    yAxisLabel: 'Value',
+    legend: false,
+    legendTitle: 'Legend',
+    legendPosition: 'right',
+    gradient: false,
+    animations: false,
+    tooltipDisabled: false,
     colorScheme: 'vivid',
+    roundDomains: false,
   };
 
-  get config(): CardChartConfig {
+  get config(): BoxChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
 
@@ -77,7 +88,6 @@ export class ConfigurableCardChartComponent
     domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
   };
 
-  // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
@@ -105,9 +115,16 @@ export class ConfigurableCardChartComponent
 
   private updateViewDimensions(): void {
     if (this.chartWidth && this.chartHeight) {
-      const padding = 20;
-      const width = this.chartWidth - padding;
-      const height = this.chartHeight - padding;
+      const padding = 10;
+      let width = this.chartWidth - padding;
+      let height = this.chartHeight - padding;
+
+      // When legend is below and enabled, subtract space for legend
+      if (this.config.legend && this.config.legendPosition === 'below') {
+        const legendHeight = 80; // Space for legend + spacing
+        height = height - legendHeight;
+      }
+
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       this.view = undefined;
@@ -122,6 +139,12 @@ export class ConfigurableCardChartComponent
       group: ScaleType.Ordinal,
       domain: palette || this.colorPalettes['vivid'],
     };
+  }
+
+  getLegendPosition(): LegendPosition {
+    return this.config.legendPosition === 'below'
+      ? LegendPosition.Below
+      : LegendPosition.Right;
   }
 
   onChartSelect(event: any): void {

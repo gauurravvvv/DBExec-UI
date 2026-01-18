@@ -87,11 +87,14 @@ export class AddAnalysesComponent implements OnInit {
   // Dragging
   draggingVisual: any = null;
 
-  // Editing
-  editingTitleId: number | null = null;
+  // Maximized visual for fullscreen view
+  maximizedVisual: any = null;
 
   // Axis field selection mode
   activeAxisSelection: 'x' | 'y' | 'z' | null = null;
+
+  // Search for chart types
+  chartSearchQuery: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -101,7 +104,7 @@ export class AddAnalysesComponent implements OnInit {
     private analysesService: AnalysesService,
     private store: Store,
     private cdr: ChangeDetectorRef,
-    private chartDataTransformer: ChartDataTransformerService
+    private chartDataTransformer: ChartDataTransformerService,
   ) {}
 
   ngOnInit(): void {
@@ -111,13 +114,13 @@ export class AddAnalysesComponent implements OnInit {
       if (this.datasetId && this.orgId) {
         // Initialize selectors with dynamic keys
         this.graphData$ = this.store.select(
-          selectDatasetData(this.orgId, this.datasetId)
+          selectDatasetData(this.orgId, this.datasetId),
         );
         this.datasetStatus$ = this.store.select(
-          selectDatasetStatus(this.orgId, this.datasetId)
+          selectDatasetStatus(this.orgId, this.datasetId),
         );
         this.isDataLoaded$ = this.store.select(
-          selectIsDatasetLoaded(this.orgId, this.datasetId)
+          selectIsDatasetLoaded(this.orgId, this.datasetId),
         );
 
         // Subscribe to graphData$ to populate rawGraphData
@@ -202,7 +205,7 @@ export class AddAnalysesComponent implements OnInit {
       AddAnalysesActions.loadDatasetData({
         orgId: this.orgId,
         datasetId: this.datasetId,
-      })
+      }),
     );
 
     this.datasetService
@@ -218,7 +221,7 @@ export class AddAnalysesComponent implements OnInit {
               orgId: this.orgId,
               datasetId: this.datasetId,
               data: response.data,
-            })
+            }),
           );
         } else {
           // Dispatch failure action
@@ -227,7 +230,7 @@ export class AddAnalysesComponent implements OnInit {
               orgId: this.orgId,
               datasetId: this.datasetId,
               error: response?.message || 'Failed to load graph data',
-            })
+            }),
           );
         }
       })
@@ -237,7 +240,7 @@ export class AddAnalysesComponent implements OnInit {
             orgId: this.orgId,
             datasetId: this.datasetId,
             error: error.message || 'Failed to load graph data',
-          })
+          }),
         );
       });
   }
@@ -262,7 +265,7 @@ export class AddAnalysesComponent implements OnInit {
   addVisual(): void {
     this.visualCounter++;
     this.visuals.push(
-      createVisual(this.visualCounter, getDefaultChartConfig())
+      createVisual(this.visualCounter, getDefaultChartConfig()),
     );
     // Auto-focus the newly added visual
     this.focusedVisualId = this.visualCounter;
@@ -289,12 +292,27 @@ export class AddAnalysesComponent implements OnInit {
   }
 
   getChartCategories(): string[] {
-    const categories = [...new Set(this.chartTypes.map(c => c.category))];
+    const filtered = this.getFilteredChartTypes();
+    const categories = [...new Set(filtered.map(c => c.category))];
     return categories;
   }
 
   getChartsByCategory(category: string): any[] {
-    return this.chartTypes.filter(c => c.category === category);
+    const filtered = this.getFilteredChartTypes();
+    return filtered.filter(c => c.category === category);
+  }
+
+  getFilteredChartTypes(): any[] {
+    if (!this.chartSearchQuery || this.chartSearchQuery.trim() === '') {
+      return this.chartTypes;
+    }
+    const query = this.chartSearchQuery.toLowerCase().trim();
+    return this.chartTypes.filter(
+      chart =>
+        chart.name.toLowerCase().includes(query) ||
+        chart.description.toLowerCase().includes(query) ||
+        chart.category.toLowerCase().includes(query),
+    );
   }
 
   // Wrapper methods for imported helper functions (needed for template access)
@@ -324,6 +342,30 @@ export class AddAnalysesComponent implements OnInit {
 
   isTreeMapChartType(chartType: string | null): boolean {
     return isTreeMapChartType(chartType);
+  }
+
+  /**
+   * Check if a chart type supports legend
+   * Advanced pie and pie grid have built-in displays and don't use legend property
+   * Tree map doesn't support legend in ngx-charts
+   */
+  supportsLegend(chartType: string | null): boolean {
+    if (!chartType) return false;
+    const noLegendTypes = [
+      'pie-advanced',
+      'pie-grid',
+      'tree-map',
+      'number-card',
+    ];
+    return !noLegendTypes.includes(chartType);
+  }
+
+  isBubbleChartType(chartType: string | null): boolean {
+    return chartType === 'bubble';
+  }
+
+  isBoxChartType(chartType: string | null): boolean {
+    return chartType === 'box-chart';
   }
 
   /**
@@ -361,7 +403,7 @@ export class AddAnalysesComponent implements OnInit {
         xAxisColumn: visual.xAxisColumn,
         yAxisColumn: visual.yAxisColumn,
         zAxisColumn: visual.zAxisColumn,
-      }
+      },
     );
   }
 
@@ -458,7 +500,7 @@ export class AddAnalysesComponent implements OnInit {
     if (!columnToUse || !this.datasetDetails?.datasetFields) return '';
     const field = this.datasetDetails.datasetFields.find(
       (f: any) =>
-        f.columnToUse === columnToUse || f.columnToView === columnToUse
+        f.columnToUse === columnToUse || f.columnToView === columnToUse,
     );
     return field?.columnToView || columnToUse;
   }
@@ -540,12 +582,12 @@ export class AddAnalysesComponent implements OnInit {
     if (this.resizeDirection.includes('bottom')) {
       this.resizingVisual.height = Math.max(
         250,
-        this.resizeStartHeight + deltaY
+        this.resizeStartHeight + deltaY,
       );
     } else if (this.resizeDirection.includes('top')) {
       this.resizingVisual.height = Math.max(
         250,
-        this.resizeStartHeight - deltaY
+        this.resizeStartHeight - deltaY,
       );
     }
   }
@@ -592,21 +634,13 @@ export class AddAnalysesComponent implements OnInit {
     this.draggingVisual = null;
   }
 
-  startEditTitle(id: number, event: Event): void {
+  maximizeVisual(visual: any, event: Event): void {
     event.stopPropagation();
-    this.editingTitleId = id;
+    this.maximizedVisual = visual;
   }
 
-  finishEditTitle(): void {
-    this.editingTitleId = null;
-  }
-
-  onTitleKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.finishEditTitle();
-    } else if (event.key === 'Escape') {
-      this.finishEditTitle();
-    }
+  minimizeVisual(): void {
+    this.maximizedVisual = null;
   }
 
   saveAnalysis(): void {
@@ -615,7 +649,7 @@ export class AddAnalysesComponent implements OnInit {
   }
 
   handleSaveDialogClose(
-    formData: { name: string; description: string } | null
+    formData: { name: string; description: string } | null,
   ): void {
     this.showSaveDialog = false;
 

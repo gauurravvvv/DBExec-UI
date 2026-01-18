@@ -197,14 +197,6 @@ export const CHART_TYPES = [
     description:
       'Shows data distribution through quartiles, median, and outliers',
   },
-  {
-    id: 'sankey',
-    name: 'Sankey Diagram',
-    icon: 'pi pi-arrows-h',
-    category: 'Flow',
-    description:
-      'Illustrates flow quantities between nodes with proportional links',
-  },
 ];
 
 export const COLOR_SCHEMES = [
@@ -302,6 +294,9 @@ export const DEFAULT_CHART_CONFIG = {
   maxXAxisTickLength: 16,
   maxYAxisTickLength: 16,
   wrapTicks: false,
+  // Bubble chart specific
+  minRadius: 3,
+  maxRadius: 20,
 };
 
 // Chart type arrays for helper functions

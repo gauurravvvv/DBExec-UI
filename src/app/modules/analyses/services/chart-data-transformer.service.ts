@@ -20,6 +20,8 @@ const MULTI_SERIES_CHART_TYPES = [
   'polar',
 ];
 const HEAT_MAP_CHART_TYPE = 'heat-map';
+const BUBBLE_CHART_TYPE = 'bubble';
+const BOX_CHART_TYPE = 'box-chart';
 
 /**
  * Maximum label length for chart categories (prevents overflow)
@@ -51,7 +53,7 @@ export class ChartDataTransformerService {
   transformData(
     chartType: string | null,
     rawData: any[],
-    mapping: ChartDataMapping
+    mapping: ChartDataMapping,
   ): ChartData {
     try {
       if (!chartType || !rawData?.length) {
@@ -61,6 +63,16 @@ export class ChartDataTransformerService {
       // Heat-map requires special 3-dimensional handling
       if (this.isHeatMapChart(chartType)) {
         return this.transformToHeatMapFormat(rawData, mapping);
+      }
+
+      // Bubble chart requires x, y, r format with 3 dimensions
+      if (chartType === BUBBLE_CHART_TYPE) {
+        return this.transformToBubbleFormat(rawData, mapping);
+      }
+
+      // Box plot requires statistical data format
+      if (chartType === BOX_CHART_TYPE) {
+        return this.transformToBoxPlotFormat(rawData, mapping);
       }
 
       // Standard 2-field transformation
@@ -75,7 +87,7 @@ export class ChartDataTransformerService {
     } catch (error) {
       console.error(
         'ChartDataTransformerService: Error transforming data',
-        error
+        error,
       );
       return [];
     }
@@ -92,7 +104,7 @@ export class ChartDataTransformerService {
    */
   private transformToSingleSeries(
     rawData: any[],
-    mapping: ChartDataMapping
+    mapping: ChartDataMapping,
   ): SingleSeriesData[] {
     if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
       return [];
@@ -251,7 +263,7 @@ export class ChartDataTransformerService {
    * Used for line, area, polar charts
    */
   private wrapAsMultiSeries(
-    singleSeries: SingleSeriesData[]
+    singleSeries: SingleSeriesData[],
   ): MultiSeriesData[] {
     return [
       {
@@ -267,7 +279,7 @@ export class ChartDataTransformerService {
    */
   private transformToHeatMapFormat(
     rawData: any[],
-    mapping: ChartDataMapping
+    mapping: ChartDataMapping,
   ): MultiSeriesData[] {
     if (!mapping.xAxisColumn || !mapping.yAxisColumn || !mapping.zAxisColumn) {
       return [];
@@ -322,10 +334,112 @@ export class ChartDataTransformerService {
   }
 
   /**
+   * Transform data to bubble chart format
+   * Bubble charts need: [{ name: 'Series', series: [{ name, x, y, r }] }]
+   * Uses x-axis for x, y-axis for y, z-axis for bubble size (r)
+   */
+  private transformToBubbleFormat(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): MultiSeriesData[] {
+    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
+      return [];
+    }
+
+    const bubbleData: any[] = [];
+    const categoryMap = new Map<string, any[]>();
+
+    rawData.forEach(row => {
+      const category = this.formatLabelValue(row[mapping.xAxisColumn!]);
+      const x = this.toNumber(row[mapping.xAxisColumn!]);
+      const y = this.toNumber(row[mapping.yAxisColumn!]);
+      const r = mapping.zAxisColumn
+        ? this.toNumber(row[mapping.zAxisColumn])
+        : 10; // Default size if no z-axis
+
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, []);
+      }
+
+      categoryMap.get(category)!.push({
+        name: category,
+        x: x,
+        y: y,
+        r: Math.max(r, 1), // Ensure minimum size
+      });
+    });
+
+    // Convert to multi-series format
+    return Array.from(categoryMap.entries()).map(([category, points]) => ({
+      name: category,
+      series: points,
+    }));
+  }
+
+  /**
+   * Transform data to box plot format
+   * Box plots need: [{ name, value: [min, q1, median, q3, max] }]
+   * Groups by x-axis and calculates statistics for y-axis values
+   */
+  private transformToBoxPlotFormat(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any[] {
+    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
+      return [];
+    }
+
+    const groupMap = new Map<string, number[]>();
+
+    // Group numeric values by category
+    rawData.forEach(row => {
+      const category = this.formatLabelValue(row[mapping.xAxisColumn!]);
+      const value = this.toNumber(row[mapping.yAxisColumn!]);
+
+      if (!groupMap.has(category)) {
+        groupMap.set(category, []);
+      }
+      groupMap.get(category)!.push(value);
+    });
+
+    // Calculate box plot statistics for each group
+    return Array.from(groupMap.entries()).map(([category, values]) => {
+      const sorted = values.sort((a, b) => a - b);
+      const min = sorted[0];
+      const max = sorted[sorted.length - 1];
+      const q1 = this.percentile(sorted, 25);
+      const median = this.percentile(sorted, 50);
+      const q3 = this.percentile(sorted, 75);
+
+      return {
+        name: category,
+        value: [min, q1, median, q3, max],
+      };
+    });
+  }
+
+  /**
+   * Calculate percentile of a sorted array
+   */
+  private percentile(sorted: number[], p: number): number {
+    const index = (p / 100) * (sorted.length - 1);
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    const weight = index - lower;
+
+    if (lower === upper) {
+      return sorted[lower];
+    }
+
+    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+  }
+
+  /**
    * Check if chart type requires a third dimension (z-axis)
+   * Heat map and bubble charts benefit from a third dimension
    */
   requiresThirdDimension(chartType: string | null): boolean {
-    return this.isHeatMapChart(chartType);
+    return this.isHeatMapChart(chartType) || chartType === BUBBLE_CHART_TYPE;
   }
 
   /**
@@ -339,6 +453,14 @@ export class ChartDataTransformerService {
   } {
     if (this.isHeatMapChart(chartType)) {
       return { field1: 'Row', field2: 'Column', field3: 'Value' };
+    }
+
+    if (chartType === BUBBLE_CHART_TYPE) {
+      return { field1: 'X-Axis', field2: 'Y-Axis', field3: 'Size' };
+    }
+
+    if (chartType === BOX_CHART_TYPE) {
+      return { field1: 'Category', field2: 'Values' };
     }
 
     // Check if it's a chart with axes (bar, line, area, etc.)

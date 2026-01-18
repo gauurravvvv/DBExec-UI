@@ -1,6 +1,6 @@
 <div class="gauge-chart-container">
     <div class="chart-wrapper">
-        <div class="chart-section">
+        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
             <!-- Standard Gauge Chart -->
             <ng-container *ngIf="chartType === 'gauge'">
                 <ngx-charts-gauge [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"

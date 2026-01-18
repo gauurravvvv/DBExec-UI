@@ -1,6 +1,6 @@
 <div class="heatmap-chart-container">
     <div class="chart-wrapper">
-        <div class="chart-section">
+        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
             <ngx-charts-heat-map [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"
                 [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis"
                 [yAxis]="config.yAxis" [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"

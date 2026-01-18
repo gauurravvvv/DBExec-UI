@@ -151,7 +151,12 @@ export class ConfigurablePolarChartComponent
       let width = this.chartWidth - padding;
       let height = this.chartHeight - padding;
 
-      // ngx-charts handles legend space internally
+      // When legend is below and enabled, subtract space for legend
+      if (this.config.legend && this.config.legendPosition === 'below') {
+        const legendHeight = 80; // Space for legend + spacing
+        height = height - legendHeight;
+      }
+
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       this.view = undefined;

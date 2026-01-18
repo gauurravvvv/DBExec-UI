@@ -136,8 +136,15 @@ export class ConfigurableGaugeChartComponent
   private updateViewDimensions(): void {
     if (this.chartWidth && this.chartHeight) {
       const padding = 20;
-      const width = this.chartWidth - padding;
-      const height = this.chartHeight - padding;
+      let width = this.chartWidth - padding;
+      let height = this.chartHeight - padding;
+
+      // When legend is below and enabled, subtract space for legend
+      if (this.config.legend && this.config.legendPosition === 'below') {
+        const legendHeight = 80; // Space for legend + spacing
+        height = height - legendHeight;
+      }
+
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       this.view = undefined;

@@ -78,6 +78,8 @@ export class ConfigurableLineChartComponent
 {
   // Track previous color scheme to detect changes
   private previousColorScheme: string = '';
+  private previousLegendPosition: string = 'right';
+  private previousLegendEnabled: boolean = false;
 
   // Data input
   @Input() data: LineChartSeries[] = [];
@@ -166,6 +168,8 @@ export class ConfigurableLineChartComponent
     this.updateColorScheme();
     this.updateViewDimensions();
     this.previousColorScheme = this.config.colorScheme;
+    this.previousLegendPosition = this.config.legendPosition;
+    this.previousLegendEnabled = this.config.legend;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -174,7 +178,10 @@ export class ConfigurableLineChartComponent
     }
     if (changes['chartConfig']) {
       this.updateColorScheme();
+      this.updateViewDimensions();
       this.previousColorScheme = this.config.colorScheme;
+      this.previousLegendPosition = this.config.legendPosition;
+      this.previousLegendEnabled = this.config.legend;
     }
   }
 
@@ -182,6 +189,15 @@ export class ConfigurableLineChartComponent
     if (this.config && this.config.colorScheme !== this.previousColorScheme) {
       this.previousColorScheme = this.config.colorScheme;
       this.updateColorScheme();
+    }
+    if (
+      this.config &&
+      (this.config.legendPosition !== this.previousLegendPosition ||
+        this.config.legend !== this.previousLegendEnabled)
+    ) {
+      this.previousLegendPosition = this.config.legendPosition;
+      this.previousLegendEnabled = this.config.legend;
+      this.updateViewDimensions();
     }
   }
 
@@ -192,7 +208,13 @@ export class ConfigurableLineChartComponent
       let width = this.chartWidth - padding;
       let height = this.chartHeight - padding;
 
-      // ngx-charts handles legend space internally
+      // When legend is below and enabled, subtract space for legend
+      // This makes ngx-charts render a smaller chart, leaving room for the legend
+      if (this.config.legend && this.config.legendPosition === 'below') {
+        const legendHeight = 80; // Space for legend + spacing
+        height = height - legendHeight;
+      }
+
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       this.view = undefined;

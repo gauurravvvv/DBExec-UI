@@ -47,39 +47,37 @@
       width: 100% !important;
       height: 100% !important;
       display: flex !important;
-      flex-direction: row !important;
       flex-wrap: nowrap !important;
-      align-items: flex-start !important;
     }
 
     svg.ngx-charts {
-      flex: 1 !important;
+      flex: 1 1 auto !important;
       min-width: 0 !important;
+      min-height: 0 !important;
+      overflow: visible !important;
     }
 
     .chart-legend {
       flex-shrink: 0 !important;
       flex-grow: 0 !important;
-      overflow-y: auto !important;
-      max-height: 100% !important;
+      overflow: auto !important;
+    }
 
-      .legend-labels {
-        background: transparent !important;
+    .legend-labels {
+      background: transparent !important;
 
-        .legend-label {
+      .legend-label {
+        color: var(--text-color, #333) !important;
+
+        .legend-label-text {
           color: var(--text-color, #333) !important;
-
-          .legend-label-text {
-            color: var(--text-color, #333) !important;
-          }
         }
       }
     }
 
     .legend-wrap {
       flex-shrink: 0;
-      overflow-y: auto !important;
-      max-height: 100% !important;
+      overflow: auto !important;
     }
 
     // Advanced pie chart styles
@@ -101,6 +99,36 @@
         .total-value {
           color: var(--text-color, #333) !important;
         }
+      }
+    }
+  }
+
+  // When legend is below, force column layout
+  &.legend-below {
+    padding-bottom: 8px;
+
+    ::ng-deep {
+      .ngx-charts-outer {
+        flex-direction: column !important;
+      }
+
+      svg.ngx-charts {
+        flex: 0 0 auto !important;
+      }
+
+      .chart-legend {
+        max-height: 60px !important;
+        width: 100% !important;
+        margin-top: 16px !important;
+        overflow: hidden !important;
+      }
+
+      .legend-wrap {
+        overflow: hidden !important;
+      }
+
+      .legend-labels {
+        overflow: hidden !important;
       }
     }
   }

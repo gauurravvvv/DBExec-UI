@@ -1,0 +1,12 @@
+<div class="box-chart-container">
+    <div class="chart-wrapper">
+        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
+            <ngx-charts-box-chart [results]="data" [view]="view!" [scheme]="colorSchemeObj" [xAxis]="config.xAxis"
+                [yAxis]="config.yAxis" [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [showGridLines]="config.showGridLines"
+                [roundDomains]="config.roundDomains" [gradient]="config.gradient" [animations]="config.animations"
+                [tooltipDisabled]="config.tooltipDisabled" (select)="onChartSelect($event)">
+            </ngx-charts-box-chart>
+        </div>
+    </div>
+</div>

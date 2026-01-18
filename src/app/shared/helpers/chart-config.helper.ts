@@ -250,6 +250,9 @@ export interface BarChartConfig extends BaseChartConfig, AxisConfig {
   barPadding: number;
   roundEdges: boolean;
   noBarWhenZero: boolean;
+  // Scale bounds (optional)
+  yScaleMin?: number;
+  yScaleMax?: number;
 }
 
 export const DEFAULT_BAR_CHART_CONFIG: BarChartConfig = {
@@ -259,6 +262,7 @@ export const DEFAULT_BAR_CHART_CONFIG: BarChartConfig = {
   barPadding: 8,
   roundEdges: false,
   noBarWhenZero: true,
+  // yScaleMin and yScaleMax are undefined by default (auto-scale)
 };
 
 // ========= Line Chart Config =========

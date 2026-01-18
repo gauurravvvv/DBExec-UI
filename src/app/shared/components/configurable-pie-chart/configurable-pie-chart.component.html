@@ -1,6 +1,6 @@
 <div class="pie-chart-container">
     <div class="chart-wrapper">
-        <div class="chart-section">
+        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
             <!-- Standard Pie Chart -->
             <ng-container *ngIf="chartType === 'pie'">
                 <ngx-charts-pie-chart [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"

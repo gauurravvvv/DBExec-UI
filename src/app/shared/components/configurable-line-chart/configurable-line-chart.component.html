@@ -1,7 +1,7 @@
 <div class="line-chart-container">
     <!-- Chart Section -->
     <div class="chart-wrapper">
-        <div class="chart-section">
+        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
             <ngx-charts-line-chart *ngIf="view; else autoSizeChart" [view]="view" [results]="data"
                 [scheme]="colorSchemeObj" [legend]="config.legend" [legendTitle]="config.legendTitle"
                 [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis" [yAxis]="config.yAxis"

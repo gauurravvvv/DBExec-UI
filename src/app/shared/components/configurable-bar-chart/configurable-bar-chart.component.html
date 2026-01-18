@@ -10,7 +10,7 @@
     <!-- Main Content Area -->
     <div class="chart-wrapper" [class.with-config]="showConfigPanel && !isConfigPanelCollapsed">
         <!-- Chart Section -->
-        <div class="chart-section">
+        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
             <!-- Bar Vertical -->
             <ng-container *ngIf="chartType === 'bar-vertical'">
                 <ngx-charts-bar-vertical [results]="data" [view]="view!" [scheme]="colorSchemeObj"

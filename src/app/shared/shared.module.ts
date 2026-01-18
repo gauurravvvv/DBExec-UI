@@ -13,6 +13,8 @@ import { ConfigurableGaugeChartComponent } from './components/configurable-gauge
 import { ConfigurableCardChartComponent } from './components/configurable-card-chart/configurable-card-chart.component';
 import { ConfigurableHeatmapChartComponent } from './components/configurable-heatmap-chart/configurable-heatmap-chart.component';
 import { ConfigurableTreemapChartComponent } from './components/configurable-treemap-chart/configurable-treemap-chart.component';
+import { ConfigurableBubbleChartComponent } from './components/configurable-bubble-chart/configurable-bubble-chart.component';
+import { ConfigurableBoxChartComponent } from './components/configurable-box-chart/configurable-box-chart.component';
 import { CustomInputComponent } from './components/custom-input/custom-input.component';
 import { CustomDropdownComponent } from './components/custom-dropdown/custom-dropdown.component';
 import { CustomMultiselectComponent } from './components/custom-multiselect/custom-multiselect.component';
@@ -30,6 +32,8 @@ import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.
     ConfigurableCardChartComponent,
     ConfigurableHeatmapChartComponent,
     ConfigurableTreemapChartComponent,
+    ConfigurableBubbleChartComponent,
+    ConfigurableBoxChartComponent,
     CustomInputComponent,
     CustomDropdownComponent,
     CustomMultiselectComponent,
@@ -53,6 +57,8 @@ import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.
     ConfigurableCardChartComponent,
     ConfigurableHeatmapChartComponent,
     ConfigurableTreemapChartComponent,
+    ConfigurableBubbleChartComponent,
+    ConfigurableBoxChartComponent,
     CustomInputComponent,
     CustomDropdownComponent,
     CustomMultiselectComponent,

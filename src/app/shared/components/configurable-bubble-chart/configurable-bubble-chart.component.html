@@ -1,0 +1,15 @@
+<div class="bubble-chart-container">
+    <div class="chart-wrapper">
+        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
+            <ngx-charts-bubble-chart [results]="data" [view]="view!" [scheme]="colorSchemeObj" [xAxis]="config.xAxis"
+                [yAxis]="config.yAxis" [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
+                [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [legend]="config.legend"
+                [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()"
+                [showGridLines]="config.showGridLines" [autoScale]="config.autoScale" [minRadius]="config.minRadius"
+                [maxRadius]="config.maxRadius" [tooltipDisabled]="config.tooltipDisabled"
+                (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
+                (deactivate)="onChartDeactivate($event)">
+            </ngx-charts-bubble-chart>
+        </div>
+    </div>
+</div>

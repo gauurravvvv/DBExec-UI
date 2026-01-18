@@ -1,6 +1,6 @@
 <div class="area-chart-container">
     <div class="chart-wrapper">
-        <div class="chart-section">
+        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
             <!-- Standard Area Chart -->
             <ng-container *ngIf="chartType === 'area'">
                 <ngx-charts-area-chart *ngIf="view; else autoSizeArea" [view]="view" [results]="data"

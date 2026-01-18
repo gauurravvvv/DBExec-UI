@@ -36,6 +36,8 @@ export class ConfigurableBarChartComponent
 {
   // Track previous color scheme to detect changes
   private previousColorScheme: string = '';
+  private previousLegendPosition: string = 'right';
+  private previousLegendEnabled: boolean = false;
   // Data input
   @Input() data: BarChartData[] = [];
 
@@ -108,6 +110,8 @@ export class ConfigurableBarChartComponent
     this.updateColorScheme();
     this.updateViewDimensions();
     this.previousColorScheme = this.config.colorScheme;
+    this.previousLegendPosition = this.config.legendPosition;
+    this.previousLegendEnabled = this.config.legend;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -116,7 +120,10 @@ export class ConfigurableBarChartComponent
     }
     if (changes['chartConfig']) {
       this.updateColorScheme();
+      this.updateViewDimensions(); // Recalculate for legend changes
       this.previousColorScheme = this.config.colorScheme;
+      this.previousLegendPosition = this.config.legendPosition;
+      this.previousLegendEnabled = this.config.legend;
     }
   }
 
@@ -125,6 +132,16 @@ export class ConfigurableBarChartComponent
     if (this.config && this.config.colorScheme !== this.previousColorScheme) {
       this.previousColorScheme = this.config.colorScheme;
       this.updateColorScheme();
+    }
+    // Detect changes to legend settings
+    if (
+      this.config &&
+      (this.config.legendPosition !== this.previousLegendPosition ||
+        this.config.legend !== this.previousLegendEnabled)
+    ) {
+      this.previousLegendPosition = this.config.legendPosition;
+      this.previousLegendEnabled = this.config.legend;
+      this.updateViewDimensions();
     }
   }
 
@@ -135,8 +152,14 @@ export class ConfigurableBarChartComponent
       let width = this.chartWidth - padding;
       let height = this.chartHeight - padding;
 
-      // ngx-charts handles legend space internally, no need to manually subtract
-      // Just ensure minimum dimensions
+      // When legend is below and enabled, subtract space for legend
+      // This makes ngx-charts render a smaller chart, leaving room for the legend
+      if (this.config.legend && this.config.legendPosition === 'below') {
+        const legendHeight = 80; // Space for legend + spacing
+        height = height - legendHeight;
+      }
+
+      // Ensure minimum dimensions
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       // Let ngx-charts auto-size

@@ -8,65 +8,78 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType } from '@swimlane/ngx-charts';
+import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
 import {
   COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
   createColorScheme,
   getLegendPositionEnum,
 } from '../../helpers/chart-config.helper';
 
-export interface CardChartData {
-  name: string;
-  value: number;
-}
-
-export interface CardChartConfig {
-  // Colors
-  cardColor: string;
-  bandColor: string;
-  textColor: string;
-  emptyColor: string;
-  // Layout
-  innerPadding: number;
-  // Styling
-  animations: boolean;
+export interface BubbleChartConfig {
+  // Axis
+  xAxis: boolean;
+  yAxis: boolean;
+  showGridLines: boolean;
+  // Labels
+  showXAxisLabel: boolean;
+  showYAxisLabel: boolean;
+  xAxisLabel: string;
+  yAxisLabel: string;
+  // Legend
+  legend: boolean;
+  legendTitle: string;
+  legendPosition: string;
+  // Tooltip
+  tooltipDisabled: boolean;
   // Color
   colorScheme: string;
+  // Bubble specific
+  autoScale: boolean;
+  minRadius: number;
+  maxRadius: number;
 }
 
 @Component({
-  selector: 'app-configurable-card-chart',
-  templateUrl: './configurable-card-chart.component.html',
-  styleUrls: ['./configurable-card-chart.component.scss'],
+  selector: 'app-configurable-bubble-chart',
+  templateUrl: './configurable-bubble-chart.component.html',
+  styleUrls: ['./configurable-bubble-chart.component.scss'],
 })
-export class ConfigurableCardChartComponent
+export class ConfigurableBubbleChartComponent
   implements OnInit, OnChanges, DoCheck
 {
   private previousColorScheme: string = '';
 
-  @Input() data: CardChartData[] = [];
+  @Input() data: any[] = [];
   @Input() showConfigPanel: boolean = true;
   @Input() chartWidth: number | undefined;
   @Input() chartHeight: number | undefined;
-  @Input() chartConfig: CardChartConfig | undefined;
+  @Input() chartConfig: BubbleChartConfig | undefined;
 
   view: [number, number] | undefined;
 
   @Output() onSelect = new EventEmitter<any>();
+  @Output() onActivate = new EventEmitter<any>();
+  @Output() onDeactivate = new EventEmitter<any>();
 
-  private defaultConfig: CardChartConfig = {
-    cardColor: '',
-    bandColor: '',
-    textColor: '',
-    emptyColor: 'rgba(0, 0, 0, 0)',
-    innerPadding: 15,
-    animations: true,
+  private defaultConfig: BubbleChartConfig = {
+    xAxis: true,
+    yAxis: true,
+    showGridLines: true,
+    showXAxisLabel: true,
+    showYAxisLabel: true,
+    xAxisLabel: 'X-Axis',
+    yAxisLabel: 'Y-Axis',
+    legend: true,
+    legendTitle: 'Legend',
+    legendPosition: 'right',
+    tooltipDisabled: false,
     colorScheme: 'vivid',
+    autoScale: true,
+    minRadius: 3,
+    maxRadius: 20,
   };
 
-  get config(): CardChartConfig {
+  get config(): BubbleChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
 
@@ -77,7 +90,6 @@ export class ConfigurableCardChartComponent
     domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
   };
 
-  // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
@@ -105,9 +117,16 @@ export class ConfigurableCardChartComponent
 
   private updateViewDimensions(): void {
     if (this.chartWidth && this.chartHeight) {
-      const padding = 20;
-      const width = this.chartWidth - padding;
-      const height = this.chartHeight - padding;
+      const padding = 10;
+      let width = this.chartWidth - padding;
+      let height = this.chartHeight - padding;
+
+      // When legend is below and enabled, subtract space for legend
+      if (this.config.legend && this.config.legendPosition === 'below') {
+        const legendHeight = 80; // Space for legend + spacing
+        height = height - legendHeight;
+      }
+
       this.view = [Math.max(width, 100), Math.max(height, 100)];
     } else {
       this.view = undefined;
@@ -124,7 +143,21 @@ export class ConfigurableCardChartComponent
     };
   }
 
+  getLegendPosition(): LegendPosition {
+    return this.config.legendPosition === 'below'
+      ? LegendPosition.Below
+      : LegendPosition.Right;
+  }
+
   onChartSelect(event: any): void {
     this.onSelect.emit(event);
+  }
+
+  onChartActivate(event: any): void {
+    this.onActivate.emit(event);
+  }
+
+  onChartDeactivate(event: any): void {
+    this.onDeactivate.emit(event);
   }
 }
