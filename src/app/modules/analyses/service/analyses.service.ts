@@ -6,6 +6,7 @@ import {
   DATASET,
   SUPER_ADMIN,
   ANALYSES,
+  ANALYSES_VISUAL,
 } from 'src/app/constants/api';
 
 @Injectable({
@@ -20,7 +21,7 @@ export class AnalysesService {
         DATASET.LIST +
           `/${params.orgId}` +
           `/${params.databaseId}` +
-          `/${params.pageNumber}/${params.limit}`
+          `/${params.pageNumber}/${params.limit}`,
       )
       .toPromise()
       .then((response: any) => {
@@ -92,6 +93,34 @@ export class AnalysesService {
   viewVisuals(orgId: string, analysisId: string) {
     return this.http
       .get(ANALYSES.VIEW_VISUAL + `${orgId}/${analysisId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  /**
+   * List all visuals for an analysis (skeleton data only)
+   * GET /visual/list/:orgId/:analysisId
+   */
+  listVisuals(orgId: string, analysisId: string) {
+    return this.http
+      .get(ANALYSES_VISUAL.LIST + `/${orgId}/${analysisId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  /**
+   * Get individual visual data with full configuration
+   * GET /visual/get/:orgId/:analysisId/:visualId
+   */
+  getVisual(orgId: string, analysisId: string, visualId: string | number) {
+    return this.http
+      .get(ANALYSES_VISUAL.VIEW + `${orgId}/${analysisId}/${visualId}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -237,7 +266,7 @@ export class AnalysesService {
         DATABASE.LIST_SCHEMA_TABLES +
           `${params.orgId}` +
           `/${params.databaseId}` +
-          `/${params.schemaName}`
+          `/${params.schemaName}`,
       )
       .toPromise()
       .then((response: any) => {
@@ -253,7 +282,7 @@ export class AnalysesService {
           `${params.orgId}` +
           `/${params.databaseId}` +
           `/${params.schemaName}` +
-          `/${params.tableName}`
+          `/${params.tableName}`,
       )
       .toPromise()
       .then((response: any) => {

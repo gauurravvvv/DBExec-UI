@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Box Position Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .box {
+            width: 50%;
+            height: 50%;
+            background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            box-shadow:
+                0 20px 60px rgba(102, 126, 234, 0.4),
+                0 0 40px rgba(118, 75, 162, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .box:hover {
+            transform: scale(1.02);
+            box-shadow:
+                0 25px 80px rgba(102, 126, 234, 0.5),
+                0 0 60px rgba(118, 75, 162, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .box h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .info span {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="box" id="box">
+            <h2>📦 Responsive Box</h2>
+            <div class="info">
+                <span id="positionInfo">Position: X: 0, Y: 0</span>
+                <span id="sizeInfo">Size: W: 0, H: 0</span>
+                <span id="screenInfo">Screen: W: 0, H: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const box = document.getElementById('box');
+        const positionInfo = document.getElementById('positionInfo');
+        const sizeInfo = document.getElementById('sizeInfo');
+        const screenInfo = document.getElementById('screenInfo');
+
+        function logBoxInfo() {
+            const rect = box.getBoundingClientRect();
+
+            const info = {
+                position: {
+                    x: Math.round(rect.left),
+                    y: Math.round(rect.top)
+                },
+                size: {
+                    width: Math.round(rect.width),
+                    height: Math.round(rect.height)
+                },
+                screen: {
+                    width: window.innerWidth,
+                    height: window.innerHeight
+                },
+                percentages: {
+                    widthPercent: ((rect.width / window.innerWidth) * 100).toFixed(2) + '%',
+                    heightPercent: ((rect.height / window.innerHeight) * 100).toFixed(2) + '%'
+                }
+            };
+
+            // Console log the information
+            console.clear();
+            console.log('=== Box Position & Size Info ===');
+            console.log(`📍 Position: X: ${info.position.x}px, Y: ${info.position.y}px`);
+            console.log(`📐 Box Size: Width: ${info.size.width}px, Height: ${info.size.height}px`);
+            console.log(`🖥️  Screen Size: Width: ${info.screen.width}px, Height: ${info.screen.height}px`);
+            console.log(`📊 Percentages: Width: ${info.percentages.widthPercent}, Height: ${info.percentages.heightPercent}`);
+            console.log('================================');
+
+            // Update the UI display
+            positionInfo.textContent = `Position: X: ${info.position.x}px, Y: ${info.position.y}px`;
+            sizeInfo.textContent = `Size: W: ${info.size.width}px (${info.percentages.widthPercent}), H: ${info.size.height}px (${info.percentages.heightPercent})`;
+            screenInfo.textContent = `Screen: W: ${info.screen.width}px, H: ${info.screen.height}px`;
+        }
+
+        // Initial log
+        logBoxInfo();
+
+        // Log on window resize
+        window.addEventListener('resize', logBoxInfo);
+    </script>
+</body>
+
+</html>

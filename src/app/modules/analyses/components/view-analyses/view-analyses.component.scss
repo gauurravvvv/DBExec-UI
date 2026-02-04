@@ -784,7 +784,10 @@
 .canvas-area {
   flex: 1;
   padding: 20px;
-  overflow: auto;
+  // Use scroll for y to always show scrollbar (prevents width changes when scrollbar appears/disappears)
+  // Use hidden for x to prevent horizontal overflow from affecting width calculations
+  overflow-y: scroll;
+  overflow-x: hidden;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -799,7 +802,9 @@
   overflow: hidden; // Keep content inside the box
   display: flex;
   flex-direction: column;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
   min-width: 300px;
   min-height: 250px;
@@ -1330,4 +1335,152 @@
       }
     }
   }
+}
+
+// ===================================================================
+// Visual Loading Placeholder
+// ===================================================================
+.visual-loading-placeholder,
+.visual-error-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  min-height: 200px;
+  background: linear-gradient(
+    135deg,
+    var(--hover-background) 0%,
+    var(--background-color) 100%
+  );
+  border-radius: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.loading-content,
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+.loading-spinner {
+  font-size: 36px;
+  color: var(--primary-color);
+}
+
+.loading-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--secondary-color);
+  letter-spacing: 0.5px;
+}
+
+.error-icon {
+  font-size: 36px;
+  color: var(--error-color, #dc3545);
+}
+
+.error-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--error-color, #dc3545);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+// ===================================================================
+// Maximized Visual Overlay
+// ===================================================================
+.maximized-visual-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.maximized-visual-container {
+  background: var(--surface-card, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+  max-width: 85vw;
+  max-height: 80vh;
+  width: 750px;
+  height: 520px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.maximized-visual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--surface-border, #e0e0e0);
+  background: var(--surface-ground, #f8f9fa);
+
+  .maximized-visual-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color, #333);
+  }
+
+  .close-maximize-btn {
+    color: var(--text-secondary-color, #666);
+    width: 36px;
+    height: 36px;
+
+    &:hover {
+      background: var(--surface-hover, rgba(0, 0, 0, 0.08));
+      color: var(--text-color, #333);
+    }
+  }
+}
+
+.maximized-visual-body {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--surface-card, #ffffff);
 }

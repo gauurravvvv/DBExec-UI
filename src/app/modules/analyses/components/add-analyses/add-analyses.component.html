@@ -297,7 +297,7 @@
 
 
         <!-- Center Container -->
-        <div class="editor-container">
+        <div class="editor-container" #canvasContainer>
             <div class="canvas-area" *ngIf="visuals.length > 0" (click)="clearFocus()">
                 <div class="visual-box" *ngFor="let visual of visuals" [class.focused]="focusedVisualId === visual.id"
                     [class.disabled]="focusedVisualId !== null && focusedVisualId !== visual.id"
@@ -789,49 +789,49 @@
         <div class="maximized-visual-body">
             <!-- Bar Chart Types -->
             <app-configurable-bar-chart *ngIf="isBarChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
-                [chartWidth]="1200" [chartHeight]="700" [chartConfig]="maximizedVisual.config"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
                 [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
             </app-configurable-bar-chart>
 
             <!-- Line Chart -->
             <app-configurable-line-chart *ngIf="maximizedVisual.chartType === 'line'" [showConfigPanel]="false"
-                [chartWidth]="1200" [chartHeight]="700" [chartConfig]="maximizedVisual.config"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
                 [data]="maximizedVisual.chartData">
             </app-configurable-line-chart>
 
             <!-- Area Chart Types -->
             <app-configurable-area-chart *ngIf="isAreaChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
-                [chartWidth]="1200" [chartHeight]="700" [chartConfig]="maximizedVisual.config"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
                 [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
             </app-configurable-area-chart>
 
             <!-- Polar/Radar Chart -->
             <app-configurable-polar-chart *ngIf="maximizedVisual.chartType === 'polar'" [showConfigPanel]="false"
-                [chartWidth]="1200" [chartHeight]="700" [chartConfig]="maximizedVisual.config"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
                 [data]="maximizedVisual.chartData">
             </app-configurable-polar-chart>
 
             <!-- Pie Chart Types -->
             <app-configurable-pie-chart *ngIf="isPieChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
-                [chartWidth]="1200" [chartHeight]="700" [chartConfig]="maximizedVisual.config"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
                 [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
             </app-configurable-pie-chart>
 
             <!-- Gauge Chart Types -->
             <app-configurable-gauge-chart *ngIf="isGaugeChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
-                [chartWidth]="1200" [chartHeight]="700" [chartConfig]="maximizedVisual.config"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
                 [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
             </app-configurable-gauge-chart>
 
             <!-- Number Card Chart -->
             <app-configurable-card-chart *ngIf="isCardChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
-                [chartWidth]="1200" [chartHeight]="700" [chartConfig]="maximizedVisual.config"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
                 [data]="maximizedVisual.chartData">
             </app-configurable-card-chart>
 
             <!-- Heat Map Chart -->
             <app-configurable-heatmap-chart *ngIf="isHeatMapChartType(maximizedVisual.chartType)"
-                [showConfigPanel]="false" [chartWidth]="1200" [chartHeight]="700" [chartConfig]="maximizedVisual.config"
+                [showConfigPanel]="false" [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
                 [data]="maximizedVisual.chartData">
             </app-configurable-heatmap-chart>
         </div>

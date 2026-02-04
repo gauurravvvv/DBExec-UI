@@ -72,70 +72,96 @@
         </div>
 
         <!-- Center Container - Canvas (Read-only)-->
-        <div class="editor-container">
+        <div class="editor-container" #canvasContainer>
             <div class="canvas-area read-only" *ngIf="visuals.length > 0">
                 <div class="visual-box" *ngFor="let visual of visuals" [style.width.px]="visual.width"
-                    [style.height.px]="visual.height" [style.left.px]="visual.x" [style.top.px]="visual.y">
+                    [style.height.px]="visual.height">
 
-                    <!-- Visual Title (Read-only) -->
+                    <!-- Visual Title (Read-only) with action buttons -->
                     <div class="visual-inline-title">
                         <span class="inline-title-text">{{visual.title}}</span>
+                        <!-- Action buttons -->
+                        <div class="visual-action-buttons">
+                            <button *ngIf="visual.chartType && hasRequiredChartFields(visual)" pButton
+                                icon="pi pi-window-maximize" class="p-button-text p-button-sm action-btn"
+                                (click)="maximizeVisual(visual, $event)" pTooltip="Maximize" tooltipPosition="top">
+                            </button>
+                        </div>
                     </div>
 
                     <div class="visual-body">
-                        <!-- Bar Chart Types -->
-                        <app-configurable-bar-chart *ngIf="isBarChartType(visual.chartType)" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [chartType]="visual.chartType" [data]="visual.chartData">
-                        </app-configurable-bar-chart>
+                        <!-- Loading Placeholder -->
+                        <div class="visual-loading-placeholder" *ngIf="visual.loading">
+                            <div class="loading-content">
+                                <i class="pi pi-spin pi-spinner loading-spinner"></i>
+                                <span class="loading-text">Loading visualization...</span>
+                            </div>
+                        </div>
 
-                        <!-- Line Chart -->
-                        <app-configurable-line-chart *ngIf="visual.chartType === 'line'" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [data]="visual.chartData">
-                        </app-configurable-line-chart>
+                        <!-- Error State -->
+                        <div class="visual-error-placeholder" *ngIf="visual.error">
+                            <div class="error-content">
+                                <i class="pi pi-exclamation-triangle error-icon"></i>
+                                <span class="error-text">Failed to load visualization</span>
+                            </div>
+                        </div>
 
-                        <!-- Area Chart Types -->
-                        <app-configurable-area-chart *ngIf="isAreaChartType(visual.chartType)" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [chartType]="visual.chartType" [data]="visual.chartData">
-                        </app-configurable-area-chart>
+                        <!-- Chart Components (only show when loaded) -->
+                        <ng-container *ngIf="!visual.loading && !visual.error">
+                            <!-- Bar Chart Types -->
+                            <app-configurable-bar-chart *ngIf="isBarChartType(visual.chartType)"
+                                [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [chartType]="visual.chartType" [data]="visual.chartData">
+                            </app-configurable-bar-chart>
 
-                        <!-- Polar/Radar Chart -->
-                        <app-configurable-polar-chart *ngIf="visual.chartType === 'polar'" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [data]="visual.chartData">
-                        </app-configurable-polar-chart>
+                            <!-- Line Chart -->
+                            <app-configurable-line-chart *ngIf="visual.chartType === 'line'" [showConfigPanel]="false"
+                                [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [data]="visual.chartData">
+                            </app-configurable-line-chart>
 
-                        <!-- Pie Chart Types -->
-                        <app-configurable-pie-chart *ngIf="isPieChartType(visual.chartType)" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [chartType]="visual.chartType" [data]="visual.chartData">
-                        </app-configurable-pie-chart>
+                            <!-- Area Chart Types -->
+                            <app-configurable-area-chart *ngIf="isAreaChartType(visual.chartType)"
+                                [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [chartType]="visual.chartType" [data]="visual.chartData">
+                            </app-configurable-area-chart>
 
-                        <!-- Gauge Chart Types -->
-                        <app-configurable-gauge-chart *ngIf="isGaugeChartType(visual.chartType)"
-                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config" [chartType]="visual.chartType" [data]="visual.chartData">
-                        </app-configurable-gauge-chart>
+                            <!-- Polar/Radar Chart -->
+                            <app-configurable-polar-chart *ngIf="visual.chartType === 'polar'" [showConfigPanel]="false"
+                                [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [data]="visual.chartData">
+                            </app-configurable-polar-chart>
 
-                        <!-- Number Card Chart -->
-                        <app-configurable-card-chart *ngIf="isCardChartType(visual.chartType)" [showConfigPanel]="false"
-                            [chartWidth]="visual.width" [chartHeight]="visual.height - 45" [chartConfig]="visual.config"
-                            [data]="visual.chartData">
-                        </app-configurable-card-chart>
+                            <!-- Pie Chart Types -->
+                            <app-configurable-pie-chart *ngIf="isPieChartType(visual.chartType)"
+                                [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [chartType]="visual.chartType" [data]="visual.chartData">
+                            </app-configurable-pie-chart>
 
-                        <!-- Heat Map Chart -->
-                        <app-configurable-heatmap-chart *ngIf="isHeatMapChartType(visual.chartType)"
-                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config" [data]="visual.chartData">
-                        </app-configurable-heatmap-chart>
+                            <!-- Gauge Chart Types -->
+                            <app-configurable-gauge-chart *ngIf="isGaugeChartType(visual.chartType)"
+                                [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [chartType]="visual.chartType" [data]="visual.chartData">
+                            </app-configurable-gauge-chart>
 
-                        <!-- Tree Map Chart -->
-                        <app-configurable-treemap-chart *ngIf="isTreeMapChartType(visual.chartType)"
-                            [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
-                            [chartConfig]="visual.config" [data]="visual.chartData">
-                        </app-configurable-treemap-chart>
+                            <!-- Number Card Chart -->
+                            <app-configurable-card-chart *ngIf="isCardChartType(visual.chartType)"
+                                [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [data]="visual.chartData">
+                            </app-configurable-card-chart>
+
+                            <!-- Heat Map Chart -->
+                            <app-configurable-heatmap-chart *ngIf="isHeatMapChartType(visual.chartType)"
+                                [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [data]="visual.chartData">
+                            </app-configurable-heatmap-chart>
+
+                            <!-- Tree Map Chart -->
+                            <app-configurable-treemap-chart *ngIf="isTreeMapChartType(visual.chartType)"
+                                [showConfigPanel]="false" [chartWidth]="visual.width" [chartHeight]="visual.height - 45"
+                                [chartConfig]="visual.config" [data]="visual.chartData">
+                            </app-configurable-treemap-chart>
+                        </ng-container>
                     </div>
                 </div>
             </div>
@@ -146,6 +172,67 @@
                 <h3>No Visuals Available</h3>
                 <p>This analysis doesn't contain any visualizations</p>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Maximized Visual Overlay -->
+<div class="maximized-visual-overlay" *ngIf="maximizedVisual" (click)="minimizeVisual()">
+    <div class="maximized-visual-container" (click)="$event.stopPropagation()">
+        <div class="maximized-visual-header">
+            <span class="maximized-visual-title">{{maximizedVisual.title}}</span>
+            <button pButton icon="pi pi-times" class="p-button-text p-button-rounded close-maximize-btn"
+                (click)="minimizeVisual()" pTooltip="Close" tooltipPosition="left">
+            </button>
+        </div>
+        <div class="maximized-visual-body">
+            <!-- Bar Chart Types -->
+            <app-configurable-bar-chart *ngIf="isBarChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
+            </app-configurable-bar-chart>
+
+            <!-- Line Chart -->
+            <app-configurable-line-chart *ngIf="maximizedVisual.chartType === 'line'" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [data]="maximizedVisual.chartData">
+            </app-configurable-line-chart>
+
+            <!-- Area Chart Types -->
+            <app-configurable-area-chart *ngIf="isAreaChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
+            </app-configurable-area-chart>
+
+            <!-- Polar/Radar Chart -->
+            <app-configurable-polar-chart *ngIf="maximizedVisual.chartType === 'polar'" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [data]="maximizedVisual.chartData">
+            </app-configurable-polar-chart>
+
+            <!-- Pie Chart Types -->
+            <app-configurable-pie-chart *ngIf="isPieChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
+            </app-configurable-pie-chart>
+
+            <!-- Gauge Chart Types -->
+            <app-configurable-gauge-chart *ngIf="isGaugeChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
+            </app-configurable-gauge-chart>
+
+            <!-- Number Card Chart -->
+            <app-configurable-card-chart *ngIf="isCardChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [data]="maximizedVisual.chartData">
+            </app-configurable-card-chart>
+
+            <!-- Heat Map Chart -->
+            <app-configurable-heatmap-chart *ngIf="isHeatMapChartType(maximizedVisual.chartType)"
+                [showConfigPanel]="false" [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [data]="maximizedVisual.chartData">
+            </app-configurable-heatmap-chart>
         </div>
     </div>
 </div>

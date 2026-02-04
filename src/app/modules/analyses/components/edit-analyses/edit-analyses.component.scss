@@ -377,6 +377,23 @@
   .chart-type-section {
     display: flex;
     flex-direction: column;
+    padding: 0 10px 16px 10px; // Add padding for data mapping field spacing
+
+    .section-divider {
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 8px 0 12px 0;
+    }
+
+    .axis-selection-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
   }
 
   // Selected Chart Header (when chart type already selected)
@@ -404,7 +421,7 @@
 
     button {
       color: var(--secondary-color);
-      
+
       &:hover {
         color: var(--primary-color);
       }
@@ -424,6 +441,41 @@
     i {
       color: var(--primary-color);
       font-size: 12px;
+    }
+  }
+
+  // Chart Search Wrapper
+  .chart-search-wrapper {
+    padding: 10px 12px;
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
+
+    .p-input-icon-left {
+      input {
+        width: 100%;
+        padding-left: 2.5rem;
+        font-size: 13px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--hover-background);
+        transition: all 0.2s ease;
+
+        &:focus {
+          border-color: var(--primary-color);
+          background-color: var(--card-background);
+        }
+
+        &::placeholder {
+          color: var(--secondary-color);
+          font-style: italic;
+        }
+      }
+
+      i {
+        color: var(--secondary-color);
+        font-size: 14px;
+        left: 0.75rem;
+      }
     }
   }
 
@@ -491,7 +543,7 @@
     &.selected {
       background-color: rgba(var(--primary-color-rgb), 0.15);
       border-color: var(--primary-color);
-      
+
       .chart-icon {
         color: var(--primary-color);
       }
@@ -536,7 +588,7 @@
 
       ::ng-deep .p-dropdown {
         width: 100% !important;
-        
+
         .p-dropdown-label {
           font-size: 12px;
           padding: 8px 12px;
@@ -586,6 +638,162 @@
       font-size: 10px;
       opacity: 0.7;
       font-style: italic;
+    }
+  }
+
+  // Selection mode styles for fields - simple highlight
+  .fields-list.selection-mode {
+    .field-card {
+      cursor: pointer;
+      border-color: var(--primary-color);
+      background-color: rgba(var(--primary-color-rgb), 0.08);
+
+      &:hover {
+        background-color: rgba(var(--primary-color-rgb), 0.15);
+      }
+    }
+  }
+
+  .field-card.selectable {
+    cursor: pointer;
+  }
+
+  // Axis Slot Styles (replaces dropdowns)
+  .axis-slot {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: var(--card-background);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--primary-color);
+      background-color: rgba(var(--primary-color-rgb), 0.05);
+    }
+
+    &.active {
+      border-color: var(--primary-color);
+      border-style: solid;
+      background-color: rgba(var(--primary-color-rgb), 0.1);
+      animation: pulse-slot 1.5s infinite;
+    }
+
+    &.has-value {
+      border-style: solid;
+      border-color: var(--primary-color);
+      background-color: rgba(var(--primary-color-rgb), 0.08);
+    }
+
+    &.optional {
+      border-style: dotted;
+      opacity: 0.8;
+
+      .axis-label {
+        font-style: italic;
+        color: var(--secondary-color);
+        opacity: 0.8;
+      }
+
+      &.has-value {
+        border-style: solid;
+        opacity: 1;
+      }
+    }
+  }
+
+  @keyframes pulse-slot {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.1);
+    }
+  }
+
+  .axis-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--secondary-color);
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .axis-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    span {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .clear-btn {
+      color: var(--secondary-color);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #ff5252;
+        background-color: rgba(255, 82, 82, 0.1);
+      }
+    }
+  }
+
+  .axis-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--secondary-color);
+
+    i {
+      font-size: 12px;
+    }
+
+    span {
+      font-size: 12px;
+      font-style: italic;
+    }
+  }
+
+  .axis-hint {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--primary-color-rgb), 0.15),
+      rgba(var(--primary-color-rgb), 0.08)
+    );
+    border: 1px solid rgba(var(--primary-color-rgb), 0.25);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--primary-color);
+
+    i {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    span {
+      flex: 1;
     }
   }
 }
@@ -706,7 +914,7 @@
       color: var(--text-color);
     }
 
-    input[type="text"] {
+    input[type='text'] {
       width: 100%;
     }
   }
@@ -754,7 +962,10 @@
 .canvas-area {
   flex: 1;
   padding: 20px;
-  overflow: auto;
+  // Use scroll for y to always show scrollbar (prevents width changes when scrollbar appears/disappears)
+  // Use hidden for x to prevent horizontal overflow from affecting width calculations
+  overflow-y: scroll;
+  overflow-x: hidden;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -769,7 +980,9 @@
   overflow: hidden; // Keep content inside the box
   display: flex;
   flex-direction: column;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
   min-width: 300px;
   min-height: 250px;
@@ -892,7 +1105,7 @@
   justify-content: center;
   padding: 10px 14px 5px;
   position: relative;
-  
+
   .inline-title-text {
     font-size: 14px;
     font-weight: 600;
@@ -907,12 +1120,12 @@
     max-width: calc(100% - 20px); // Prevent overflow into buttons area
     line-height: 1.4;
     transition: background-color 0.2s ease;
-    
+
     &:hover {
       background-color: rgba(var(--primary-color-rgb), 0.1);
     }
   }
-  
+
   .title-input {
     border: 1px solid var(--primary-color);
     background-color: var(--card-background);
@@ -924,25 +1137,25 @@
     text-align: center;
     outline: none;
     width: 250px;
-    
+
     &:focus {
       box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
     }
   }
-  
+
   .title-edit-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
   }
-  
+
   .char-counter {
     font-size: 11px;
     color: var(--text-color-secondary);
     opacity: 0.7;
   }
-  
+
   .visual-action-buttons {
     position: absolute;
     right: 8px;
@@ -952,16 +1165,16 @@
     gap: 2px;
     opacity: 0;
     transition: opacity 0.2s ease;
-    
+
     .action-btn {
       color: var(--text-color-secondary);
       padding: 4px;
-      
+
       &:hover {
         color: var(--primary-color);
       }
     }
-    
+
     .close-btn:hover {
       color: var(--danger-color, #ff5252) !important;
     }
@@ -1065,7 +1278,6 @@
     .ngx-charts-outer {
       width: 100% !important;
       height: 100% !important;
-     
     }
 
     svg.ngx-charts {
@@ -1241,5 +1453,68 @@
   .visuals-sidebar {
     width: 200px;
     min-width: 200px;
+  }
+}
+
+// ===================================================================
+// Visual Loading Placeholder
+// ===================================================================
+.visual-loading-placeholder,
+.visual-error-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  min-height: 200px;
+  background: linear-gradient(
+    135deg,
+    var(--hover-background) 0%,
+    var(--background-color) 100%
+  );
+  border-radius: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.loading-content,
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+.loading-spinner {
+  font-size: 36px;
+  color: var(--primary-color);
+}
+
+.loading-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--secondary-color);
+  letter-spacing: 0.5px;
+}
+
+.error-icon {
+  font-size: 36px;
+  color: var(--error-color, #dc3545);
+}
+
+.error-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--error-color, #dc3545);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
   }
 }

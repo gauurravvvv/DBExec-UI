@@ -1043,7 +1043,10 @@
 .canvas-area {
   flex: 1;
   padding: 20px;
-  overflow: auto;
+  // Use scroll for y to always show scrollbar (prevents width changes when scrollbar appears/disappears)
+  // Use hidden for x to prevent horizontal overflow from affecting width calculations
+  overflow-y: scroll;
+  overflow-x: hidden;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -1606,11 +1609,11 @@
 .maximized-visual-container {
   background: var(--surface-card, #ffffff);
   border-radius: 12px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  max-width: 95vw;
-  max-height: 95vh;
-  width: 1280px;
-  height: 850px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+  max-width: 85vw;
+  max-height: 80vh;
+  width: 750px;
+  height: 520px;
   display: flex;
   flex-direction: column;
   overflow: hidden;

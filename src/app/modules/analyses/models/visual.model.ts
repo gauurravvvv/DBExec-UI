@@ -48,17 +48,29 @@ export interface Visual {
   /** Display title of the visual */
   title: string;
 
-  /** Width in pixels */
+  /** Width in pixels (computed from widthRatio) */
   width: number;
 
-  /** Height in pixels */
+  /** Height in pixels (computed from heightRatio) */
   height: number;
 
-  /** X position on canvas */
+  /** Width as ratio of canvas width (0-1, e.g., 0.5 = 50%) */
+  widthRatio: number;
+
+  /** Height as ratio of canvas height (0-1, e.g., 0.5 = 50%) */
+  heightRatio: number;
+
+  /** X position on canvas (computed from xRatio) */
   x: number;
 
-  /** Y position on canvas */
+  /** Y position on canvas (computed from yRatio) */
   y: number;
+
+  /** X position as ratio of canvas width (0-1) */
+  xRatio: number;
+
+  /** Y position as ratio of canvas height (0-1) */
+  yRatio: number;
 
   /** Chart type identifier (e.g., 'bar-vertical', 'line', 'pie') */
   chartType: string | null;
@@ -116,15 +128,20 @@ export interface FieldLabels {
 
 /**
  * Factory function to create a new Visual with default values
+ * Default ratios: 0.5 width (50% of canvas), 0.45 height (45% of canvas)
  */
 export function createVisual(id: number, config: any): Visual {
   return {
     id,
     title: 'Untitled Visual',
-    width: 400,
-    height: 350,
+    width: 400, // Will be computed from widthRatio
+    height: 350, // Will be computed from heightRatio
+    widthRatio: 0.5, // 50% of available space (2 visuals per row)
+    heightRatio: 0.45, // 45% of canvas height
     x: 0,
     y: 0,
+    xRatio: 0,
+    yRatio: 0,
     chartType: null,
     xAxisColumn: null,
     yAxisColumn: null,

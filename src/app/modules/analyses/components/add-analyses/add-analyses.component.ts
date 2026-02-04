@@ -1,38 +1,47 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
-import { DatasetService } from '../../../dataset/services/dataset.service';
+import { ANALYSES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasetService } from '../../../dataset/services/dataset.service';
 import {
   CHART_TYPES,
   COLOR_SCHEMES,
   CURVE_TYPES,
   LEGEND_POSITIONS,
   getDefaultChartConfig,
-  isBarChartType,
-  isAreaChartType,
-  isPieChartType,
-  isGaugeChartType,
-  isCardChartType,
-  isHeatMapChartType,
-  isTreeMapChartType,
   hasAxisLabels,
+  isAreaChartType,
+  isBarChartType,
+  isCardChartType,
+  isGaugeChartType,
+  isHeatMapChartType,
+  isPieChartType,
+  isTreeMapChartType,
   supportsGradient,
 } from '../../constants/charts.constants';
-import { ChartDataTransformerService } from '../../services';
-import { Visual, AxisSelection, createVisual } from '../../models';
+import { Visual, createVisual } from '../../models';
 import { AnalysesService } from '../../service/analyses.service';
-import { ANALYSES } from 'src/app/constants/routes';
+import { ChartDataTransformerService } from '../../services';
 import {
   AddAnalysesActions,
   DatasetLoadingStatus,
+  selectDatasetByKey,
   selectDatasetData,
   selectDatasetStatus,
-  selectIsDatasetStale,
-  selectDatasetByKey,
   selectIsDatasetLoaded,
+  selectIsDatasetStale,
 } from '../../store';
 
 @Component({
@@ -40,7 +49,7 @@ import {
   templateUrl: './add-analyses.component.html',
   styleUrls: ['./add-analyses.component.scss'],
 })
-export class AddAnalysesComponent implements OnInit {
+export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   datasetId: string = '';
   orgId: string = '';
   databaseId: string = '';
@@ -96,6 +105,16 @@ export class AddAnalysesComponent implements OnInit {
   // Search for chart types
   chartSearchQuery: string = '';
 
+  // Canvas container reference and dimensions for responsive sizing
+  @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
+  canvasWidth: number = 1000; // Default fallback
+  canvasHeight: number = 600; // Default fallback
+
+  // Reference canvas size for backward compatibility with legacy visuals
+  private readonly REFERENCE_CANVAS_WIDTH = 1200;
+  private readonly REFERENCE_CANVAS_HEIGHT = 600;
+  private resizeObserver: ResizeObserver | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -135,6 +154,143 @@ export class AddAnalysesComponent implements OnInit {
         this.checkCachedDataAndLoad();
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Get initial canvas dimensions after view is initialized
+    setTimeout(() => {
+      this.updateCanvasDimensions();
+      this.lastStableWidth = this.canvasWidth; // Initialize threshold baseline
+    }, 0);
+    // Set up ResizeObserver to detect canvas size changes from any source
+    this.setupResizeObserver();
+  }
+
+  ngOnDestroy(): void {
+    // Clean up ResizeObserver
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    // Clear any pending debounce
+    if (this.resizeDebounceTimer) {
+      clearTimeout(this.resizeDebounceTimer);
+    }
+  }
+
+  private resizeDebounceTimer: any = null;
+  private lastStableWidth: number = 0;
+
+  /**
+   * Setup ResizeObserver to detect canvas size changes
+   * Handles: main sidebar toggle, internal sidebars, window resize
+   * Uses debounce to prevent oscillation loops
+   */
+  private setupResizeObserver(): void {
+    if (
+      typeof ResizeObserver !== 'undefined' &&
+      this.canvasContainer?.nativeElement
+    ) {
+      this.resizeObserver = new ResizeObserver(() => {
+        // Debounce resize events to prevent oscillation
+        if (this.resizeDebounceTimer) {
+          clearTimeout(this.resizeDebounceTimer);
+        }
+        this.resizeDebounceTimer = setTimeout(() => {
+          this.handleResize();
+        }, 100);
+      });
+      this.resizeObserver.observe(this.canvasContainer.nativeElement);
+    }
+  }
+
+  /**
+   * Handle resize with threshold to prevent oscillation
+   * Only recalculate if width changes by more than 10px
+   */
+  private handleResize(): void {
+    if (!this.canvasContainer?.nativeElement) return;
+
+    const rect = this.canvasContainer.nativeElement.getBoundingClientRect();
+    const newWidth = rect.width || 1000;
+
+    // Only recalculate if width change exceeds threshold (prevents oscillation)
+    const THRESHOLD = 10;
+    if (Math.abs(newWidth - this.lastStableWidth) > THRESHOLD) {
+      this.lastStableWidth = newWidth;
+      this.updateCanvasDimensions();
+      this.recalculateAllVisualDimensions();
+    }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    // Note: ResizeObserver will also fire, so we don't need to duplicate here
+  }
+
+  /**
+   * Update canvas dimensions from the container element
+   */
+  private updateCanvasDimensions(): void {
+    if (this.canvasContainer?.nativeElement) {
+      const rect = this.canvasContainer.nativeElement.getBoundingClientRect();
+      this.canvasWidth = rect.width || 1000;
+      this.canvasHeight = rect.height || 600;
+    }
+  }
+
+  /**
+   * Recalculate all visual pixel dimensions from their ratios
+   */
+  private recalculateAllVisualDimensions(): void {
+    this.visuals.forEach(visual => {
+      this.computeVisualDimensions(visual);
+    });
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Compute pixel dimensions from ratios for a single visual.
+   * For flexbox layout, widthRatio represents the fraction of total row width.
+   * Examples: 0.5 = half width (2 per row), 1.0 = full width (1 per row)
+   */
+  private computeVisualDimensions(visual: Visual): void {
+    // Canvas has 20px padding on each side
+    const CANVAS_PADDING = 40;
+    // Flexbox gap between visuals
+    const GAP = 20;
+    // Scrollbar width (always visible now to prevent resize oscillation)
+    const SCROLLBAR_WIDTH = 17;
+
+    // Calculate content width (canvas minus padding and scrollbar)
+    const contentWidth = Math.max(
+      0,
+      this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH,
+    );
+
+    // For a visual with widthRatio, we need to account for gaps
+    // If widthRatio = 0.5, there are 2 visuals per row, so 1 gap
+    // If widthRatio = 0.33, there are 3 visuals per row, so 2 gaps
+    const numVisualsInRow = Math.max(1, Math.round(1 / visual.widthRatio));
+    const gapsInRow = numVisualsInRow - 1;
+
+    // Available width for visuals after accounting for gaps
+    const availableForVisuals = contentWidth - gapsInRow * GAP;
+
+    const oldWidth = visual.width;
+
+    // Each visual gets its ratio of the available space
+    visual.width = Math.max(
+      300,
+      Math.round(visual.widthRatio * availableForVisuals),
+    );
+    visual.height = Math.max(
+      250,
+      Math.round(visual.heightRatio * this.canvasHeight),
+    );
+
+    // Position (for absolute positioning if needed later)
+    visual.x = Math.round(visual.xRatio * this.canvasWidth);
+    visual.y = Math.round(visual.yRatio * this.canvasHeight);
   }
 
   /**
@@ -256,19 +412,81 @@ export class AddAnalysesComponent implements OnInit {
 
   toggleFieldsPanel(): void {
     this.isFieldsPanelOpen = !this.isFieldsPanelOpen;
+    // Wait for CSS transition to complete, then recalculate dimensions
+    setTimeout(() => {
+      this.updateCanvasDimensions();
+      this.recalculateAllVisualDimensions();
+    }, 350); // Match CSS transition duration
   }
 
   toggleVisualsPanel(): void {
     this.isVisualsPanelOpen = !this.isVisualsPanelOpen;
+    // Wait for CSS transition to complete, then recalculate dimensions
+    setTimeout(() => {
+      this.updateCanvasDimensions();
+      this.recalculateAllVisualDimensions();
+    }, 350); // Match CSS transition duration
   }
 
   addVisual(): void {
     this.visualCounter++;
-    this.visuals.push(
-      createVisual(this.visualCounter, getDefaultChartConfig()),
-    );
+    const visual = createVisual(this.visualCounter, getDefaultChartConfig());
+
+    // Smart grid placement: 2 visuals per row (each 50% width)
+    // Find the next available position
+    const { xRatio, yRatio } = this.getNextVisualPosition();
+    visual.xRatio = xRatio;
+    visual.yRatio = yRatio;
+
+    // Compute initial pixel dimensions from ratios based on current canvas size
+    this.computeVisualDimensions(visual);
+    this.visuals.push(visual);
     // Auto-focus the newly added visual
     this.focusedVisualId = this.visualCounter;
+  }
+
+  /**
+   * Calculate next available position for a new visual in grid layout
+   * Grid: 2 columns (50% width each), rows stack vertically
+   */
+  private getNextVisualPosition(): { xRatio: number; yRatio: number } {
+    if (this.visuals.length === 0) {
+      return { xRatio: 0, yRatio: 0 };
+    }
+
+    // Group visuals by their row (based on yRatio, with tolerance for float comparison)
+    const rows: Map<number, any[]> = new Map();
+    this.visuals.forEach(v => {
+      // Round yRatio to 2 decimal places for grouping
+      const rowKey = Math.round((v.yRatio || 0) * 100);
+      if (!rows.has(rowKey)) {
+        rows.set(rowKey, []);
+      }
+      rows.get(rowKey)!.push(v);
+    });
+
+    // Find the last row and check if it has space
+    const sortedRowKeys = Array.from(rows.keys()).sort((a, b) => a - b);
+    const lastRowKey = sortedRowKeys[sortedRowKeys.length - 1];
+    const lastRowVisuals = rows.get(lastRowKey) || [];
+
+    // If last row has only 1 visual with xRatio near 0 (left side), place on right
+    if (lastRowVisuals.length === 1 && (lastRowVisuals[0].xRatio || 0) < 0.25) {
+      return { xRatio: 0.5, yRatio: lastRowVisuals[0].yRatio }; // 2% gap between visuals
+    }
+
+    // Otherwise, start a new row below the highest bottom edge
+    let maxBottom = 0;
+    this.visuals.forEach(v => {
+      const bottom = (v.yRatio || 0) + (v.heightRatio || 0.45);
+      if (bottom > maxBottom) {
+        maxBottom = bottom;
+      }
+    });
+
+    // Add small gap (roughly 10px as ratio)
+    const gap = this.canvasHeight > 0 ? 10 / this.canvasHeight : 0.02;
+    return { xRatio: 0, yRatio: maxBottom + gap };
   }
 
   getFocusedVisual(): Visual | null {
@@ -590,11 +808,25 @@ export class AddAnalysesComponent implements OnInit {
         this.resizeStartHeight - deltaY,
       );
     }
+
+    // Update ratios based on new pixel dimensions
+    this.resizingVisual.widthRatio =
+      this.resizingVisual.width / this.canvasWidth;
+    this.resizingVisual.heightRatio =
+      this.resizingVisual.height / this.canvasHeight;
   }
 
   stopResize(mouseMoveHandler: any, mouseUpHandler: any): void {
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
+
+    // Log final ratio values for debugging
+    if (this.resizingVisual) {
+      console.log(
+        `Visual resized: ${(this.resizingVisual.widthRatio * 100).toFixed(1)}% × ${(this.resizingVisual.heightRatio * 100).toFixed(1)}%`,
+      );
+    }
+
     this.resizingVisual = null;
     // Clear resize flag after a short delay to prevent click from firing
     setTimeout(() => {
@@ -654,6 +886,28 @@ export class AddAnalysesComponent implements OnInit {
     this.showSaveDialog = false;
 
     if (formData) {
+      // Build visual configurations with ratio-based fields only
+      const visualConfigurations = this.visuals.map(visual => {
+        const visualConfig = {
+          id: visual.id,
+          title: visual.title,
+          // Ratios for responsive positioning and sizing
+          widthRatio: visual.widthRatio,
+          heightRatio: visual.heightRatio,
+          xRatio: visual.xRatio,
+          yRatio: visual.yRatio,
+          // Chart type
+          chartType: visual.chartType,
+          // Field mappings (columns selected for axes)
+          xAxisColumn: visual.xAxisColumn || null,
+          yAxisColumn: visual.yAxisColumn || null,
+          zAxisColumn: visual.zAxisColumn || null, // For heatmap/bubble charts
+          // Full chart configuration (colors, legend, labels, etc.)
+          config: visual.config ? { ...visual.config } : null,
+        };
+        return visualConfig;
+      });
+
       // Build analysis payload
       const analysisPayload = {
         name: formData.name,
@@ -661,18 +915,7 @@ export class AddAnalysesComponent implements OnInit {
         datasetId: this.datasetId,
         organisation: this.orgId,
         database: this.databaseId,
-        visuals: this.visuals.map(visual => ({
-          id: visual.id,
-          title: visual.title,
-          x: visual.x || 0,
-          y: visual.y || 0,
-          width: visual.width,
-          height: visual.height,
-          chartType: visual.chartType,
-          xAxisColumn: visual.xAxisColumn || null,
-          yAxisColumn: visual.yAxisColumn || null,
-          config: visual.config ? { ...visual.config } : null,
-        })),
+        visuals: visualConfigurations,
       };
 
       this.analysesService.addAnalyses(analysisPayload).then(response => {

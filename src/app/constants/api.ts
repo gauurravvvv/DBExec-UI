@@ -186,3 +186,8 @@ export const ANALYSES = {
   UPDATE: '/analyses/update',
   VIEW_VISUAL: '/analyses/visual/',
 };
+
+export const ANALYSES_VISUAL = {
+  LIST: '/visual/list',
+  VIEW: '/visual/get/',
+};
