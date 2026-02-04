@@ -15,15 +15,12 @@ import { SectionService } from '../../services/section.service';
   styleUrls: ['./list-section.component.scss'],
 })
 export class ListSectionComponent implements OnInit {
-  users: any[] = [];
+  // PrimeNG Table handles pagination and filtering locally
+  limit = 1000;
+
   filteredSections: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
+
   searchTerm: string = '';
-  selectedStatus: number | null = null;
   showDeleteConfirm = false;
   sectionToDelete: string | null = null;
   Math = Math;
@@ -38,28 +35,13 @@ export class ListSectionComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
-
   constructor(
     private databaseService: DatabaseService,
     private sectionService: SectionService,
     private organisationService: OrganisationService,
     private tabService: TabService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -76,7 +58,6 @@ export class ListSectionComponent implements OnInit {
       pageNumber: 1,
       limit: 100,
     };
-
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
@@ -95,13 +76,11 @@ export class ListSectionComponent implements OnInit {
 
   onDBChange(databaseId: any) {
     this.selectedDatabase = databaseId;
-    this.currentPage = 1;
     this.loadTabs();
   }
 
   onTabChange(tabId: any) {
     this.selectedTab = tabId;
-    this.currentPage = 1;
     this.loadSections();
   }
 
@@ -125,9 +104,6 @@ export class ListSectionComponent implements OnInit {
           this.tabs = [];
           this.sections = [];
           this.filteredSections = [];
-          this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
         }
       }
     });
@@ -139,17 +115,13 @@ export class ListSectionComponent implements OnInit {
       orgId: this.selectedOrg,
       tabId: this.selectedTab,
       pageNumber: 1,
-      limit: 100,
+      limit: this.limit,
     };
 
     this.sectionService.listSection(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.sections = [...response.data];
         this.filteredSections = [...this.sections];
-        this.totalItems = this.sections.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
   }
@@ -173,49 +145,9 @@ export class ListSectionComponent implements OnInit {
           this.selectedTab = null;
           this.sections = [];
           this.filteredSections = [];
-          this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
         }
       }
     });
-  }
-
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadTabs();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.sections];
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(section =>
-        section.name.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(
-        section => section.status === this.selectedStatus
-      );
-    }
-
-    this.filteredSections = filtered;
   }
 
   onAddNewSection() {

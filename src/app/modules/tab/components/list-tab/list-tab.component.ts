@@ -14,15 +14,11 @@ import { TabService } from '../../services/tab.service';
   styleUrls: ['./list-tab.component.scss'],
 })
 export class ListTabComponent implements OnInit {
-  users: any[] = [];
+  // PrimeNG Table handles pagination and filtering locally
+  limit = 1000;
+
   filteredTabs: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
-  searchTerm: string = '';
-  selectedStatus: number | null = null;
+
   showDeleteConfirm = false;
   tabToDelete: string | null = null;
   Math = Math;
@@ -35,27 +31,12 @@ export class ListTabComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
-
   constructor(
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
     private tabService: TabService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -90,7 +71,6 @@ export class ListTabComponent implements OnInit {
 
   onDBChange(databaseId: any) {
     this.selectedDatabase = databaseId;
-    this.currentPage = 1;
     this.loadTabs();
   }
 
@@ -112,9 +92,6 @@ export class ListTabComponent implements OnInit {
           this.selectedDatabase = null;
           this.tabs = [];
           this.filteredTabs = [];
-          this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
         }
       }
     });
@@ -126,55 +103,18 @@ export class ListTabComponent implements OnInit {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
       pageNumber: 1,
-      limit: 100,
+      limit: this.limit,
     };
 
     this.tabService.listTab(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.tabs = [...response.data];
         this.filteredTabs = [...this.tabs];
-        this.totalItems = this.tabs.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
   }
 
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadTabs();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.tabs];
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(user =>
-        user.name.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(user => user.status === this.selectedStatus);
-    }
-
-    this.filteredTabs = filtered;
-  }
+  // Methods for manual pagination and filtering have been removed as PrimeNG Table handles this locally.
 
   onAddNewTab() {
     this.router.navigate([TAB.ADD]);

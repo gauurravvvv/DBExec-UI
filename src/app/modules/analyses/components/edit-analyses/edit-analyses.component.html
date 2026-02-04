@@ -2,9 +2,12 @@
     <!-- Header Toolbar -->
     <div class="query-toolbar">
         <div class="toolbar-left">
-            <h3 class="toolbar-title">
-                Edit Analysis
-            </h3>
+            <div class="left-section">
+                <button pButton class="p-button-text" (click)="goBack()">
+                    <i class="pi pi-arrow-left"></i>
+                </button>
+                <h3 class="toolbar-title">Edit Analysis</h3>
+            </div>
         </div>
         <div class="toolbar-right">
             <button pButton class="p-button-text btn-primary" title="Save Analysis" (click)="saveAnalysis()"

@@ -14,15 +14,13 @@ import { AnalysesService } from '../../service/analyses.service';
   styleUrls: ['./list-analyses.component.scss'],
 })
 export class ListAnalysesComponent implements OnInit {
+  // PrimeNG Table handles pagination and filtering locally
+  limit = 1000;
+
   analyses: any[] = [];
   filteredAnalyses: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
+
   searchTerm: string = '';
-  selectedStatus: number | null = null;
   showDeleteConfirm = false;
   analysisToDelete: string | null = null;
   Math = Math;
@@ -34,27 +32,12 @@ export class ListAnalysesComponent implements OnInit {
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatabase: any = {};
 
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
-
   constructor(
     private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
     private analysesService: AnalysesService,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
   ) {}
 
   ngOnInit() {
@@ -85,13 +68,11 @@ export class ListAnalysesComponent implements OnInit {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.currentPage = 1;
     this.loadDatabases();
   }
 
   onDBChange(databaseId: any) {
     this.selectedDatabase = databaseId;
-    this.currentPage = 1;
     this.loadAnalyses();
   }
 
@@ -113,9 +94,6 @@ export class ListAnalysesComponent implements OnInit {
           this.selectedDatabase = null;
           this.analyses = [];
           this.filteredAnalyses = [];
-          this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
         }
       }
     });
@@ -126,58 +104,16 @@ export class ListAnalysesComponent implements OnInit {
     const params = {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
-      pageNumber: this.currentPage,
-      limit: this.pageSize,
+      pageNumber: 1,
+      limit: this.limit,
     };
 
     this.analysesService.listAnalyses(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.analyses = [...(response.data.analyses || [])];
         this.filteredAnalyses = [...this.analyses];
-        this.totalItems = this.analyses.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
-  }
-
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadAnalyses();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.analyses];
-
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(analysis =>
-        analysis.name.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(
-        analysis => analysis.status === this.selectedStatus
-      );
-    }
-
-    this.filteredAnalyses = filtered;
   }
 
   onView(id: string) {

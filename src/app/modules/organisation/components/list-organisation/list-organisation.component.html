@@ -1,111 +1,144 @@
-<div class="organisation-wrapper">
-    <div class="organisation-container">
-        <div class="page-header">
-            <h2>Organisations</h2>
-            <button pButton class="p-button-outlined" (click)="onAddNewOrganisation()">
-                + Add Organisation
-            </button>
-        </div>
-        <div class="table-section">
-            <!-- Search and Page Size -->
-            <div class="table-controls">
-                <span class="p-input-icon-left">
-                    <i class="pi pi-search"></i>
-                    <input pInputText type="text" style="width: 100%;" placeholder="Search..."
-                        (input)="onSearch($event)" [value]="searchTerm">
-                </span>
+<div class="dataset-page-wrapper">
+    <div class="dataset-content-container">
+
+        <!-- Header Section -->
+        <div class="page-header-section">
+            <div class="header-content">
+                <h2>Organisations</h2>
             </div>
-            <div class="table-container">
-                <table class="admin-table">
-                    <thead>
+        </div>
+
+        <!-- Unified Toolbar & Content Card -->
+        <div class="content-card">
+            <div class="card-toolbar">
+                <div class="toolbar-left">
+                    <!-- Placeholder for filters if needed -->
+                </div>
+
+                <div class="toolbar-right">
+                    <!-- Search -->
+                    <span class="p-input-icon-left search-input-wrapper">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            placeholder="Search..." class="modern-search" />
+                    </span>
+
+                    <!-- Add Button -->
+                    <button pButton label="Add" icon="pi pi-plus" (click)="onAddNewOrganisation()"
+                        class="p-button-raised p-button-primary modern-button">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrapper">
+                <p-table #dt [value]="organisations" [rows]="10" [paginator]="true"
+                    [globalFilterFields]="['name', 'status']" [rowHover]="true" dataKey="id"
+                    currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
+                    [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
+                    scrollHeight="calc(100vh - 400px)">
+
+                    <ng-template pTemplate="header">
                         <tr>
-                            <th>Name</th>
-                            <th>Max Admins</th>
-                            <th>Max Users</th>
-                            <th>Max Environments</th>
-                            <th>Max Categories</th>
-                            <th>Max Databases</th>
-                            <th>
-                                Status
-                                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
-                                    [style]="{'width': '150px'}" appendTo="body">
-                                </p-menu>
-                                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
-                                    [ngClass]="{'active-filter': selectedStatus !== null}"
-                                    style="margin-left: 5px; cursor: pointer;">
-                                </i>
+                            <th pSortableColumn="name" style="width: 250px">
+                                <div class="th-content">
+                                    Name <p-sortIcon field="name"></p-sortIcon>
+                                </div>
                             </th>
-                            <th>Created Date</th>
-                            <th>Actions</th>
+                            <th pSortableColumn="config.maxAdmins" style="width: 120px">
+                                <div class="th-content centered-header">
+                                    Admins <p-sortIcon field="config.maxAdmins"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="config.maxUsers" style="width: 120px">
+                                <div class="th-content centered-header">
+                                    Users <p-sortIcon field="config.maxUsers"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="config.maxEnvironment" style="width: 120px">
+                                <div class="th-content centered-header">
+                                    Envs <p-sortIcon field="config.maxEnvironment"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="config.maxCategories" style="width: 120px">
+                                <div class="th-content centered-header">
+                                    Cats <p-sortIcon field="config.maxCategories"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="config.maxDatabases" style="width: 120px">
+                                <div class="th-content centered-header">
+                                    DBs <p-sortIcon field="config.maxDatabases"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="status" style="width: 140px">
+                                <div class="th-content">
+                                    Status <p-sortIcon field="status"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="createdOn" style="width: 160px">
+                                <div class="th-content">
+                                    Created <p-sortIcon field="createdOn"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th style="width: 100px">
+                                <!-- Actions -->
+                            </th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <ng-container *ngIf="filteredOrgs && filteredOrgs.length > 0; else noData">
-                            <tr *ngFor="let org of filteredOrgs">
-                                <td>
-                                    <a class="org-name" [routerLink]="['/app/organisation/view', org.id]">
-                                        {{ org.name }}
-                                    </a>
-                                </td>
-                                <td>{{ org.config.maxAdmins }}</td>
-                                <td>{{ org.config.maxUsers }}</td>
-                                <td>{{ org.config.maxEnvironment }}</td>
-                                <td>{{ org.config.maxCategories }}</td>
-                                <td>{{ org.config.maxDatabases }}</td>
-                                <td>
-                                    <span class="status-badge" [class.active]="org.status === 1">
-                                        {{ org.status === 1 ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </td>
-                                <td>{{ org.createdOn | date:'mediumDate' }}</td>
-                                <td class="actions">
-                                    <button class="action-btn edit" (click)="onEdit(org)" title="Edit">
+                    </ng-template>
+                    <ng-template pTemplate="body" let-org>
+                        <tr class="modern-row">
+                            <td>
+                                <a class="dataset-name-link" [routerLink]="['/app/organisation/view', org.id]">
+                                    {{ org.name }}
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <span class="count-badge">{{ org.config.maxAdmins }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="count-badge">{{ org.config.maxUsers }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="count-badge">{{ org.config.maxEnvironment }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="count-badge">{{ org.config.maxCategories }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="count-badge">{{ org.config.maxDatabases }}</span>
+                            </td>
+                            <td>
+                                <span class="status-indicator"
+                                    [ngClass]="{'active': org.status === 1, 'inactive': org.status !== 1}">
+                                    <span class="dot"></span>
+                                    {{ org.status === 1 ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="date-text">{{ org.createdOn | date:'mediumDate' }}</span>
+                            </td>
+                            <td>
+                                <div class="row-actions">
+                                    <button class="icon-btn edit-btn" (click)="onEdit(org)" pTooltip="Edit"
+                                        tooltipPosition="left">
                                         <i class="pi pi-pencil"></i>
                                     </button>
-                                    <button class="action-btn delete" (click)="confirmDelete(org.id)" title="Delete">
+                                    <button class="icon-btn delete-btn" (click)="confirmDelete(org.id)"
+                                        pTooltip="Delete" tooltipPosition="left">
                                         <i class="pi pi-trash"></i>
                                     </button>
-                                </td>
-                            </tr>
-                        </ng-container>
-                        <ng-template #noData>
-                            <tr style="height: 100%;">
-                                <td colspan="9">
-                                    <div class="no-data">
-                                        <i class="pi pi-inbox"></i>
-                                        <p>No records found</p>
-                                        <span class="sub-text">No organization data is available at the moment</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </tbody>
-                </table>
-                <!-- Pagination -->
-                <div class="pagination">
-                    <div class="pagination-info">
-                        <ng-container *ngIf="totalItems > 0; else noEntries">
-                            Showing {{ (currentPage - 1) * pageSize + 1 }} to
-                            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
-                        </ng-container>
-                        <ng-template #noEntries>
-                            Showing 0 to 0 of 0 entries
-                        </ng-template>
-                    </div>
-                    <div class="pagination-controls">
-                        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
-                            <i class="pi pi-chevron-left"></i>
-                        </button>
-                        <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
-                            [class.active]="page === currentPage">
-                            {{ page }}
-                        </button>
-                        <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)"
-                            class="page-btn">
-                            <i class="pi pi-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="9" class="empty-message-cell">
+                                No such record found
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
             </div>
         </div>
     </div>
@@ -114,7 +147,7 @@
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
         <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this organization?</p>
+        <p>Are you sure you want to delete this organisation?</p>
         <div class="popup-actions">
             <button class="btn-cancel" (click)="cancelDelete()">No</button>
             <button class="btn-confirm" (click)="proceedDelete()">Yes</button>

@@ -16,43 +16,23 @@ export class ListDatabaseComponent implements OnInit {
   dbs: any[] = [];
   filteredDBs: any[] = [];
   currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
-  searchTerm: string = '';
-  selectedStatus: number | null = null;
-  showDeleteConfirm = false;
-  dbToDelete: string | null = null;
-  Math = Math;
+  // PrimeNG Table handles pagination and filtering locally
+  limit = 1000;
+
   organisations: any[] = [];
   selectedOrg: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatabase: any = null;
+  showDeleteConfirm = false;
   deleteConfiguration: boolean = false;
-
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
 
   constructor(
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -85,7 +65,6 @@ export class ListDatabaseComponent implements OnInit {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.currentPage = 1;
     this.loaddbs();
   }
 
@@ -93,54 +72,16 @@ export class ListDatabaseComponent implements OnInit {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
-      pageNumber: this.currentPage,
-      limit: this.pageSize,
+      pageNumber: 1,
+      limit: this.limit,
     };
 
     this.databaseService.listAllDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.dbs = response.data || [];
         this.filteredDBs = [...this.dbs];
-        this.totalItems = this.dbs.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
-  }
-
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loaddbs();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.dbs];
-
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(db => db.name.toLowerCase().includes(search));
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(env => env.status === this.selectedStatus);
-    }
-
-    this.filteredDBs = filtered;
   }
 
   onAddNewDatabase() {
@@ -169,7 +110,7 @@ export class ListDatabaseComponent implements OnInit {
           this.selectedDatabase.organisationId,
           this.selectedDatabase.id,
           this.selectedDatabase.isMasterDB ? '1' : '0',
-          this.deleteConfiguration
+          this.deleteConfiguration,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {

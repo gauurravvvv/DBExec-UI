@@ -30,10 +30,34 @@
     align-items: center;
     gap: 8px;
 
+    .left-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      button {
+        min-width: 0;
+        background: transparent !important;
+        border: none !important;
+        color: var(--text-color) !important;
+        padding: 0.5rem !important;
+
+        &:hover {
+          background: var(--hover-background) !important;
+          border-radius: 4px;
+        }
+
+        i {
+          font-size: 1.2rem;
+          color: var(--text-color) !important;
+        }
+      }
+    }
+
     .toolbar-title {
       margin: 0;
-      margin-left: 8px;
-      font-size: 16px;
+      margin-left: 0;
+      font-size: 20px;
       font-weight: 600;
       color: var(--text-color);
       display: flex;
@@ -49,6 +73,12 @@
   .toolbar-right {
     display: flex;
     gap: 8px !important;
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
 
     .p-button,
     button {
@@ -1015,6 +1045,23 @@
   &.dragging {
     opacity: 0.5;
     cursor: move;
+  }
+
+  &.blinking-visual {
+    animation: blink-border 0.25s ease-in-out infinite;
+    border-color: var(--primary-color);
+  }
+}
+
+@keyframes blink-border {
+  0%,
+  100% {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(var(--primary-color-rgb), 0.6);
+  }
+  50% {
+    border-color: transparent;
+    box-shadow: none;
   }
 }
 

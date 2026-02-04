@@ -15,15 +15,13 @@ import { ConnectionService } from '../../services/connection.service';
   styleUrls: ['./list-connection.component.scss'],
 })
 export class ListConnectionComponent implements OnInit {
+  // PrimeNG Table handles pagination and filtering locally
+  limit = 1000;
+
   users: any[] = [];
   filteredConnections: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
+
   searchTerm: string = '';
-  selectedStatus: number | null = null;
   showDeleteConfirm = false;
   tabToDelete: string | null = null;
   Math = Math;
@@ -36,28 +34,13 @@ export class ListConnectionComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
-
   constructor(
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
     private tabService: TabService,
     private connectionService: ConnectionService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -94,7 +77,6 @@ export class ListConnectionComponent implements OnInit {
 
   onDBChange(databaseId: any) {
     this.selectedDatabase = databaseId;
-    this.currentPage = 1;
     this.loadConnections();
   }
 
@@ -116,9 +98,6 @@ export class ListConnectionComponent implements OnInit {
           this.selectedDatabase = null;
           this.connections = [];
           this.filteredConnections = [];
-          this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
         }
       }
     });
@@ -130,56 +109,15 @@ export class ListConnectionComponent implements OnInit {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
       pageNumber: 1,
-      limit: 100,
+      limit: this.limit,
     };
 
     this.connectionService.listConnection(params).then((response: any) => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.connections = [...response.data.connections];
         this.filteredConnections = [...this.connections];
-        this.totalItems = this.connections.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
-  }
-
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadConnections();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.connections];
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(connection =>
-        connection.name.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(
-        connection => connection.status === this.selectedStatus
-      );
-    }
-
-    this.filteredConnections = filtered;
   }
 
   onAddNewConnection() {

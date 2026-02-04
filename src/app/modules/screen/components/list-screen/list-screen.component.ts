@@ -14,15 +14,12 @@ import { ScreenService } from '../../services/screen.service';
   styleUrls: ['./list-screen.component.scss'],
 })
 export class ListScreenComponent implements OnInit {
-  users: any[] = [];
+  // PrimeNG Table handles pagination and filtering locally
+  limit = 1000;
+
   filteredScreens: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
+
   searchTerm: string = '';
-  selectedStatus: number | null = null;
   showDeleteConfirm = false;
   screenToDelete: string | null = null;
   Math = Math;
@@ -35,27 +32,12 @@ export class ListScreenComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
-
   constructor(
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
     private screenService: ScreenService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -96,7 +78,6 @@ export class ListScreenComponent implements OnInit {
 
   onDBChange(dbId: any) {
     this.selectedDatabase = dbId;
-    this.currentPage = 1;
     this.loadScreens();
   }
 
@@ -110,7 +91,7 @@ export class ListScreenComponent implements OnInit {
 
     this.databaseService.listDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...response.data] || [];
+        this.databases = response.data || [];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0].id;
           this.loadScreens();
@@ -128,56 +109,15 @@ export class ListScreenComponent implements OnInit {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
       pageNumber: 1,
-      limit: 100,
+      limit: this.limit,
     };
 
     this.screenService.listScreen(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.screens = [...response.data] || [];
+        this.screens = response.data;
         this.filteredScreens = [...this.screens];
-        this.totalItems = this.screens.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
-  }
-
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadScreens();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.screens];
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(screen =>
-        screen.name.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(
-        screen => screen.status === this.selectedStatus
-      );
-    }
-
-    this.filteredScreens = filtered;
   }
 
   onAddNewScreen() {

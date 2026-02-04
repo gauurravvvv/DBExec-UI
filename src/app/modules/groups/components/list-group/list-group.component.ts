@@ -14,15 +14,13 @@ import { GroupService } from '../../services/group.service';
   styleUrls: ['./list-group.component.scss'],
 })
 export class ListGroupComponent implements OnInit {
+  // PrimeNG Table handles pagination and filtering locally
+  limit = 1000;
+
   groups: any[] = [];
-  filteredGroups: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
+  filteredGroups: any[] = []; // Compat
+
   searchTerm: string = '';
-  selectedStatus: number | null = null;
   showDeleteConfirm = false;
   groupToDelete: string | null = null;
   Math = Math;
@@ -32,26 +30,11 @@ export class ListGroupComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
-
   constructor(
     private groupService: GroupService,
     private organisationService: OrganisationService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -82,7 +65,6 @@ export class ListGroupComponent implements OnInit {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.currentPage = 1;
     this.loadGroups();
   }
 
@@ -90,56 +72,16 @@ export class ListGroupComponent implements OnInit {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
-      pageNumber: this.currentPage,
-      limit: this.pageSize,
+      pageNumber: 1,
+      limit: this.limit,
     };
 
     this.groupService.listGroupps(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.groups = response.data.groups || [];
         this.filteredGroups = [...this.groups];
-        this.totalItems = response.data.total || this.groups.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
-  }
-
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadGroups();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.groups];
-
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(group =>
-        group.name.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(group => group.status === this.selectedStatus);
-    }
-
-    this.filteredGroups = filtered;
   }
 
   onAddNewCategory() {

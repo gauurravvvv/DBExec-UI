@@ -15,14 +15,8 @@ import { DatabaseService } from 'src/app/modules/database/services/database.serv
 })
 export class ListDatasetComponent implements OnInit {
   datasets: any[] = [];
-  filteredDatasets: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
+  limit = 1000;
   totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
-  searchTerm: string = '';
-  selectedStatus: number | null = null;
   showDeleteConfirm = false;
   datasetToDelete: string | null = null;
   Math = Math;
@@ -33,21 +27,6 @@ export class ListDatasetComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatabase: any = {};
-
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
 
   addDatasetItems: MenuItem[] = [
     {
@@ -62,7 +41,7 @@ export class ListDatasetComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private datasetService: DatasetService,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
   ) {}
 
   ngOnInit() {
@@ -82,7 +61,7 @@ export class ListDatasetComponent implements OnInit {
 
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs] || [];
+        this.organisations = response.data.orgs || [];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
@@ -91,10 +70,7 @@ export class ListDatasetComponent implements OnInit {
           this.databases = [];
           this.selectedDatabase = null;
           this.datasets = [];
-          this.filteredDatasets = [];
           this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
         }
       }
     });
@@ -102,13 +78,11 @@ export class ListDatasetComponent implements OnInit {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.currentPage = 1;
     this.loadDatabases();
   }
 
   onDBChange(databaseId: any) {
     this.selectedDatabase = databaseId;
-    this.currentPage = 1;
     this.loadDatasets();
   }
 
@@ -122,80 +96,37 @@ export class ListDatasetComponent implements OnInit {
 
     this.databaseService.listDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...response.data] || [];
+        this.databases = response.data || [];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0].id;
           this.loadDatasets();
         } else {
           this.selectedDatabase = null;
           this.datasets = [];
-          this.filteredDatasets = [];
           this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
         }
       }
     });
   }
 
   loadDatasets() {
-    if (!this.selectedOrg || !this.selectedDatabase) return;
+    if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
-      pageNumber: this.currentPage,
-      limit: this.pageSize,
+      pageNumber: 1,
+      limit: this.limit,
     };
 
     this.datasetService.listDatasets(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.datasets = [...response.data.datasets] || [];
-        this.filteredDatasets = [...this.datasets];
+        this.datasets = response.data.datasets || [];
         this.totalItems = this.datasets.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
   }
 
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadDatasets();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.datasets];
-
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(dataset =>
-        dataset.name.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(
-        dataset => dataset.status === this.selectedStatus
-      );
-    }
-
-    this.filteredDatasets = filtered;
-  }
+  // Removed manual filtering and pagination methods as PrimeNG table handles this
 
   onAddNewAdmin() {
     this.router.navigate([DATASET.ADD]);

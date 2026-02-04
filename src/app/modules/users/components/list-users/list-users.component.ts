@@ -14,43 +14,26 @@ import { UserService } from '../../services/user.service';
 })
 export class ListUsersComponent implements OnInit {
   users: any[] = [];
-  filteredUsers: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
+  // PrimeNG Table handles pagination and filtering locally
+  limit = 1000;
+
+  filteredUsers: any[] = []; // Compat
+
   searchTerm: string = '';
-  selectedStatus: number | null = null;
   showDeleteConfirm = false;
   userToDelete: string | null = null;
-  Math = Math;
+
   organisations: any[] = [];
   selectedOrg: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
-
   constructor(
     private userService: UserService,
     private organisationService: OrganisationService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -81,7 +64,6 @@ export class ListUsersComponent implements OnInit {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.currentPage = 1;
     this.loadUsers();
   }
 
@@ -89,59 +71,16 @@ export class ListUsersComponent implements OnInit {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
-      pageNumber: this.currentPage,
-      limit: this.pageSize,
+      pageNumber: 1,
+      limit: this.limit,
     };
 
     this.userService.listUser(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.users = response.data.users || [];
         this.filteredUsers = [...this.users];
-        this.totalItems = this.users.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
       }
     });
-  }
-
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadUsers();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.users];
-
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        user =>
-          user.firstName.toLowerCase().includes(search) ||
-          user.lastName.toLowerCase().includes(search) ||
-          user.email.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(user => user.status === this.selectedStatus);
-    }
-
-    this.filteredUsers = filtered;
   }
 
   onAddNewAdmin() {

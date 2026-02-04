@@ -443,6 +443,44 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.visuals.push(visual);
     // Auto-focus the newly added visual
     this.focusedVisualId = this.visualCounter;
+
+    // Scroll to the new visual (scoped to canvas container only)
+    setTimeout(() => {
+      if (!this.canvasContainer?.nativeElement) return;
+
+      const container = this.canvasContainer.nativeElement.querySelector(
+        '.canvas-area',
+      ) as HTMLElement;
+      if (!container) return;
+
+      const visualElements = container.querySelectorAll('.visual-box');
+      if (visualElements && visualElements.length > 0) {
+        const lastVisual = visualElements[
+          visualElements.length - 1
+        ] as HTMLElement;
+
+        const containerRect = container.getBoundingClientRect();
+        const visualRect = lastVisual.getBoundingClientRect();
+
+        // Calculate offset to center the visual in the container
+        // Formula: (VisualCenter) - (ContainerCenter)
+        const offset =
+          visualRect.top +
+          visualRect.height / 2 -
+          (containerRect.top + containerRect.height / 2);
+
+        container.scrollTo({
+          top: container.scrollTop + offset,
+          behavior: 'smooth',
+        });
+
+        // Add blinking effect
+        lastVisual.classList.add('blinking-visual');
+        setTimeout(() => {
+          lastVisual.classList.remove('blinking-visual');
+        }, 500);
+      }
+    }, 100);
   }
 
   /**

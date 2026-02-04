@@ -1,145 +1,167 @@
-<div class="super-admin-wrapper">
-    <div class="super-admin-container">
-        <div class="page-header">
-            <h2>Datasets</h2>
-            <p-splitButton outlined label="Add Dataset" icon="pi pi-plus" (onClick)="onAddNewAdmin()"
-                [model]="addDatasetItems" styleClass="p-button-outlined" class="p-button-outlined">
-            </p-splitButton>
+<div class="dataset-page-wrapper">
+    <div class="dataset-content-container">
+
+        <!-- Header Section -->
+        <div class="page-header-section">
+            <div class="header-content">
+                <h2>Datasets</h2>
+            </div>
         </div>
-        <div class="table-section">
-            <!-- Search and Page Size -->
-            <div class="table-controls">
-                <div class="filter-container">
-                    <!-- Search Box -->
-                    <div class="search-box">
+
+        <!-- Unified Toolbar & Content Card -->
+        <div class="content-card">
+            <div class="card-toolbar">
+                <div class="toolbar-left">
+                    <!-- Filters -->
+                    <div class="filter-group" *ngIf="showOrganisationDropdown">
                         <span class="p-input-icon-left">
-                            <i class="pi pi-search"></i>
-                            <input pInputText type="text" placeholder="Search..." (input)="onSearch($event)"
-                                [value]="searchTerm">
+                            <i class="pi pi-building"></i>
+                            <p-dropdown [options]="organisations" [(ngModel)]="selectedOrg" optionLabel="name"
+                                optionValue="id" [filter]="true" filterBy="name" (onChange)="onOrgChange($event.value)"
+                                placeholder="Organisation" styleClass="modern-dropdown">
+                            </p-dropdown>
                         </span>
                     </div>
 
-                    <div class="dropdowns-wrapper">
-                        <!-- Organisation Dropdown -->
-                        <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                            <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name"
-                                optionValue="id" [filter]="true" filterBy="name" (onChangeEvent)="onOrgChange($event)"
-                                label="Select Organisation" [floatingLabel]="true">
-                            </app-custom-dropdown>
-                        </div>
-
-                        <!-- Database Dropdown -->
-                        <div class="dropdown-field">
-                            <app-custom-dropdown [(ngModel)]="selectedDatabase" label="Select Database"
-                                [floatingLabel]="true" [options]="databases" optionLabel="name" optionValue="id"
-                                [filter]="true" filterBy="name" (onChangeEvent)="onDBChange($event)">
-                            </app-custom-dropdown>
-                        </div>
+                    <div class="filter-group">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-database"></i>
+                            <p-dropdown [options]="databases" [(ngModel)]="selectedDatabase" optionLabel="name"
+                                optionValue="id" [filter]="true" filterBy="name" (onChange)="onDBChange($event.value)"
+                                placeholder="Database" styleClass="modern-dropdown"
+                                [emptyMessage]="'No databases found'">
+                            </p-dropdown>
+                        </span>
                     </div>
+                </div>
+
+                <div class="toolbar-right">
+                    <!-- Search -->
+                    <span class="p-input-icon-left search-input-wrapper">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            placeholder="Search..." class="modern-search" />
+                    </span>
+
+                    <!-- Add Button -->
+                    <p-splitButton label="New Dataset" icon="pi pi-plus" (onClick)="onAddNewAdmin()"
+                        [model]="addDatasetItems" styleClass="p-button-raised p-button-primary modern-split-button">
+                    </p-splitButton>
                 </div>
             </div>
-            <div class="table-container">
-                <table class="admin-table">
-                    <thead>
+
+            <!-- Table -->
+            <div class="table-wrapper">
+                <p-table #dt [value]="datasets" [rows]="50" [paginator]="true"
+                    [globalFilterFields]="['name','description','databaseName','status', 'owner']" [rowHover]="true"
+                    dataKey="id" currentPageReportTemplate="{first} - {last} of {totalRecords}"
+                    [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50,100]"
+                    styleClass="p-datatable-sm modern-table" [scrollable]="true" scrollHeight="calc(100vh - 400px)">
+
+                    <ng-template pTemplate="header">
                         <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Database Name</th>
-                            <th>Mappings Count</th>
-                            <th>
-                                Status
-                                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
-                                    [style]="{'width': '150px'}" appendTo="body">
-                                </p-menu>
-                                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
-                                    [ngClass]="{'active-filter': selectedStatus !== null}"
-                                    style="margin-left: 5px; cursor: pointer;">
-                                </i>
+                            <th pSortableColumn="name" style="width: 20%">
+                                <div class="th-content">
+                                    Name <p-sortIcon field="name"></p-sortIcon>
+                                </div>
                             </th>
-                            <th>Actions</th>
+                            <th pSortableColumn="description" style="width: 25%">
+                                <div class="th-content">
+                                    Description <p-sortIcon field="description"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="databaseName" style="width: 15%">
+                                <div class="th-content">
+                                    Database <p-sortIcon field="databaseName"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="owner" style="width: 15%">
+                                <div class="th-content">
+                                    Owner <p-sortIcon field="owner"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="createdAt" style="width: 15%">
+                                <div class="th-content">
+                                    Created <p-sortIcon field="createdAt"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th pSortableColumn="status" style="width: 10%">
+                                <div class="th-content">
+                                    Status <p-sortIcon field="status"></p-sortIcon>
+                                </div>
+                            </th>
+                            <th style="width: 5%">
+                                <div class="th-content">
+                                    Actions
+                                </div>
+                            </th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <ng-container *ngIf="filteredDatasets && filteredDatasets.length > 0; else noData">
-                            <tr *ngFor="let dataset of filteredDatasets">
-                                <td>
-                                    <a class="admin-name" [routerLink]="['/app/dataset/view', selectedOrg, dataset.id]">
-                                        {{ dataset.name }}
-                                    </a>
-                                </td>
-                                <td>{{ dataset.description }}</td>
-                                <td>
-                                    <span class="database-chip">
-                                        <span class="chip-content">
-                                            <i class="pi pi-database"></i>
-                                            {{ dataset.databaseName }}
-                                        </span>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="field-count">
-                                        <i class="pi pi-list"></i>
-                                        {{ dataset.columnMappings?.length || 0 }} Mappings
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="status-badge" [class.active]="dataset.status === 1">
-                                        {{ dataset.status === 1 ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </td>
-                                <td class="actions">
-                                    <button class="action-btn analytics" (click)="useAsAnalysis(dataset.id)"
-                                        title="Create Analysis">
+                    </ng-template>
+                    <ng-template pTemplate="body" let-dataset>
+                        <tr class="modern-row">
+                            <td>
+                                <a class="dataset-name-link"
+                                    [routerLink]="['/app/dataset/view', selectedOrg, dataset.id]">
+                                    {{ dataset.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="description-text" [title]="dataset.description">{{ dataset.description
+                                    }}</span>
+                            </td>
+                            <td>
+                                <div class="database-pill">
+                                    <i class="pi pi-database"></i>
+                                    <span>{{ dataset.databaseName }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="owner-text">{{ dataset.owner }}</span>
+                            </td>
+                            <td>
+                                <span class="date-text">{{ dataset.createdAt | date:'mediumDate' }}</span>
+                            </td>
+                            <td>
+                                <span class="status-indicator"
+                                    [ngClass]="{'active': dataset.status === 1, 'inactive': dataset.status !== 1}">
+                                    <span class="dot"></span>
+                                    {{ dataset.status === 1 ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="row-actions">
+                                    <button class="icon-btn" (click)="useAsAnalysis(dataset.id)"
+                                        pTooltip="Create Analysis" tooltipPosition="left">
                                         <i class="pi pi-chart-bar"></i>
                                     </button>
-                                    <button class="action-btn edit" (click)="onEdit(dataset.id)" title="Edit">
+                                    <button class="icon-btn" (click)="onEdit(dataset.id)" pTooltip="Edit"
+                                        tooltipPosition="left">
                                         <i class="pi pi-pencil"></i>
                                     </button>
-                                    <button class="action-btn delete" (click)="confirmDelete(dataset.id)"
-                                        title="Delete">
+                                    <button class="icon-btn delete-btn" (click)="confirmDelete(dataset.id)"
+                                        pTooltip="Delete" tooltipPosition="left">
                                         <i class="pi pi-trash"></i>
                                     </button>
-                                </td>
-                            </tr>
-                        </ng-container>
-                        <ng-template #noData>
-                            <tr style="height: 100%;">
-                                <td colspan="6">
-                                    <div class="no-data">
-                                        <i class="pi pi-inbox"></i>
-                                        <p>No records found</p>
-                                        <span class="sub-text">No datasets available at the moment</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="6" class="empty-state-cell">
+                                <div class="empty-state">
+                                    <div class="empty-icon-wrapper">
+                                        <i class="pi pi-folder-open"></i>
                                     </div>
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </tbody>
-                </table>
-                <!-- Pagination -->
-                <div class="pagination">
-                    <div class="pagination-info">
-                        <ng-container *ngIf="totalItems > 0; else noEntries">
-                            Showing {{ (currentPage - 1) * pageSize + 1 }} to
-                            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
-                        </ng-container>
-                        <ng-template #noEntries>
-                            Showing 0 to 0 of 0 entries
-                        </ng-template>
-                    </div>
-                    <div class="pagination-controls">
-                        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
-                            <i class="pi pi-chevron-left"></i>
-                        </button>
-                        <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
-                            [class.active]="page === currentPage">
-                            {{ page }}
-                        </button>
-                        <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)"
-                            class="page-btn">
-                            <i class="pi pi-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
+                                    <h4>No Datasets Found</h4>
+                                    <p>Get started by creating a new dataset from your database.</p>
+                                    <button pButton label="Create Dataset" icon="pi pi-plus" (click)="onAddNewAdmin()"
+                                        class="p-button-text"></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
             </div>
         </div>
     </div>

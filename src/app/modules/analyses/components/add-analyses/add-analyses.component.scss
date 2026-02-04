@@ -1097,6 +1097,23 @@
     opacity: 0.5;
     cursor: move;
   }
+
+  &.blinking-visual {
+    animation: blink-border 0.25s ease-in-out infinite;
+    border-color: var(--primary-color);
+  }
+}
+
+@keyframes blink-border {
+  0%,
+  100% {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(var(--primary-color-rgb), 0.6);
+  }
+  50% {
+    border-color: transparent;
+    box-shadow: none;
+  }
 }
 
 // Resize Handles
