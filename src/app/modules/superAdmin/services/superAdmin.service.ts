@@ -1,9 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
 import { SUPER_ADMIN } from 'src/app/constants/api';
-import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -11,9 +9,9 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class SuperAdminService {
   constructor(private http: HttpClient) {}
 
-  listSuperAdmin(params: IParams) {
+  listSuperAdmin(params: any) {
     return this.http
-      .get(SUPER_ADMIN.LIST + `/${params.pageNumber}/${params.limit}`)
+      .get(SUPER_ADMIN.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

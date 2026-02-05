@@ -11,12 +11,7 @@ export class DatasetService {
 
   listDatasets(params: any) {
     return this.http
-      .get(
-        DATASET.LIST +
-          `/${params.orgId}` +
-          `/${params.databaseId}` +
-          `/${params.pageNumber}/${params.limit}`
-      )
+      .get(DATASET.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -187,7 +182,7 @@ export class DatasetService {
         DATABASE.LIST_SCHEMA_TABLES +
           `${params.orgId}` +
           `/${params.databaseId}` +
-          `/${params.schemaName}`
+          `/${params.schemaName}`,
       )
       .toPromise()
       .then((response: any) => {
@@ -203,7 +198,7 @@ export class DatasetService {
           `${params.orgId}` +
           `/${params.databaseId}` +
           `/${params.schemaName}` +
-          `/${params.tableName}`
+          `/${params.tableName}`,
       )
       .toPromise()
       .then((response: any) => {

@@ -10,11 +10,9 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class UserService {
   constructor(private http: HttpClient) {}
 
-  listUser(params: IParams) {
+  listUser(params: any) {
     return this.http
-      .get(
-        USER.LIST + `/${params.orgId}` + `/${params.pageNumber}/${params.limit}`
-      )
+      .get(USER.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

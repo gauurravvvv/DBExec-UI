@@ -22,12 +22,10 @@
         </div>
 
         <div class="toolbar-right">
-          <!-- Search -->
-          <span class="p-input-icon-left search-input-wrapper">
-            <i class="pi pi-search"></i>
-            <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
-              placeholder="Search..." class="modern-search" />
-          </span>
+          <!-- Clear Filters Button -->
+          <button pButton label="Clear Filters" icon="pi pi-filter-slash" (click)="clearFilters()"
+            [disabled]="!isFilterActive" class="p-button-outlined p-button-danger modern-button mr-2">
+          </button>
 
           <!-- Add Button -->
           <button pButton label="Add" icon="pi pi-plus" (click)="onAddNewDatabase()"
@@ -38,17 +36,17 @@
 
       <!-- Table -->
       <div class="table-wrapper">
-        <p-table #dt [value]="dbs" [rows]="10" [paginator]="true"
-          [globalFilterFields]="['name', 'config.dbType', 'status']" [rowHover]="true" dataKey="id"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
-          scrollHeight="calc(100vh - 400px)">
+        <p-table #dt [value]="dbs" [rows]="10" [paginator]="true" [lazy]="true" (onLazyLoad)="loadDatabases($event)"
+          [totalRecords]="totalItems" [globalFilterFields]="['name', 'description', 'config.dbType', 'status']"
+          [rowHover]="true" dataKey="id" currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-sm modern-table"
+          [scrollable]="true" scrollHeight="calc(100vh - 400px)">
 
           <ng-template pTemplate="header">
             <tr>
-              <th pSortableColumn="name" style="width: 25%">
+              <th style="width: 25%" pFrozenColumn>
                 <div class="th-content">
-                  Name <p-sortIcon field="name"></p-sortIcon>
+                  Name
                 </div>
               </th>
               <th style="width: 25%">
@@ -56,32 +54,57 @@
                   Description
                 </div>
               </th>
-              <th pSortableColumn="config.dbType" style="width: 15%">
+              <th style="width: 15%">
                 <div class="th-content">
-                  Type <p-sortIcon field="config.dbType"></p-sortIcon>
+                  Type
                 </div>
               </th>
-              <th pSortableColumn="status" style="width: 15%">
+              <th style="width: 15%">
                 <div class="th-content">
-                  Status <p-sortIcon field="status"></p-sortIcon>
+                  Status
                 </div>
               </th>
-              <th pSortableColumn="createdOn" style="width: 15%">
+              <th style="width: 15%">
                 <div class="th-content">
-                  Created <p-sortIcon field="createdOn"></p-sortIcon>
+                  Created
                 </div>
               </th>
               <th style="width: 5%">
                 <!-- Actions -->
               </th>
             </tr>
+            <!-- Filter Row -->
+            <tr>
+              <th pFrozenColumn>
+                <input pInputText type="text" [(ngModel)]="filterValues.name" (input)="onFilterChange()"
+                  placeholder="Search Name" class="w-full p-column-filter">
+              </th>
+              <th>
+                <input pInputText type="text" [(ngModel)]="filterValues.description" (input)="onFilterChange()"
+                  placeholder="Search Description" class="w-full p-column-filter">
+              </th>
+              <th>
+                <!-- No filter for Type currently, or add if needed. Keeping it empty for now as requested filter list was Name, Desc, Status -->
+              </th>
+              <th>
+                <!-- <p-dropdown [options]="statusOptions" [(ngModel)]="filterValues.status" (onChange)="onFilterChange()"
+                  placeholder="Select Status" [showClear]="true" [style]="{'width':'100%'}" appendTo="body"
+                  styleClass="w-full p-column-filter">
+                </p-dropdown> -->
+              </th>
+              <th>
+                <!-- No filter for Created On -->
+              </th>
+              <th>
+                <!-- No filter for Actions -->
+              </th>
+            </tr>
           </ng-template>
           <ng-template pTemplate="body" let-db>
             <tr class="modern-row">
-              <td>
+              <td pFrozenColumn>
                 <a class="dataset-name-link"
                   [routerLink]="['/app/database/view', db.organisationId, db.id, db.isMasterDB ? 1 : 0]">
-                  <i class="pi pi-database" style="margin-right: 8px;"></i>
                   {{ db.name }}
                   <span class="master-badge" *ngIf="db.isMasterDB">
                     <i class="pi pi-star-fill"></i>
@@ -90,10 +113,10 @@
                 </a>
               </td>
               <td>
-                <span class="description-text" [title]="db.description">{{ db.description || 'No description' }}</span>
+                <span class="description-text" [title]="db.description">{{ db.description || '-' }}</span>
               </td>
               <td>
-                <span class="pill">{{ db.config.dbType || 'Standard' }}</span>
+                <span class="pill">{{ 'PostgreSQL' }}</span>
               </td>
               <td>
                 <span class="status-indicator" [ngClass]="{'active': db.status === 1, 'inactive': db.status !== 1}">
@@ -102,7 +125,7 @@
                 </span>
               </td>
               <td>
-                <span class="date-text">{{ db.createdOn | date:'mediumDate' }}</span>
+                <span class="date-text">{{ db.createdOn | date:'medium' }}</span>
               </td>
               <td>
                 <div class="row-actions">
@@ -119,7 +142,7 @@
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="6" class="empty-message-cell">
+              <td colspan="6" class="empty-message-cell text-center">
                 No such record found
               </td>
             </tr>
@@ -131,58 +154,91 @@
 </div>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content">
-    <h3>Confirm Delete</h3>
-    <p>Are you sure you want to delete this database?</p>
+  <div class="popup-content" [class.master-warning]="selectedDatabase?.isMasterDB">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon" [class.danger]="selectedDatabase?.isMasterDB">
+        <i class="pi" [ngClass]="selectedDatabase?.isMasterDB ? 'pi-exclamation-triangle' : 'pi-trash'"></i>
+      </div>
+      <h3>{{ selectedDatabase?.isMasterDB ? 'Critical Warning' : 'Confirm Delete' }}</h3>
+    </div>
 
-    <!-- Special warning for master database -->
-    <div class="warning-container" *ngIf="selectedDatabase?.isMasterDB">
-      <div class="warning-message">
-        <div class="warning-header">
-          <i class="pi pi-exclamation-triangle"></i>
-          <span class="warning-title">Critical Warning: Master Database</span>
-        </div>
-        <div class="warning-content">
-          <div class="warning-text">
-            <p>
-              <i class="pi pi-circle-fill"></i>You are attempting to delete a
-              master database that controls core system operations.
-            </p>
-            <p>
-              <i class="pi pi-circle-fill"></i>Deleting this database will
-              permanently remove all system configurations and cannot be
-              undone.
-            </p>
-            <p>
-              <i class="pi pi-circle-fill"></i>You will need to create a new
-              master database to restore system functionality and continue
-              operations.
-            </p>
-            <p>
-              <i class="pi pi-circle-fill"></i>Please ensure you have taken a
-              complete backup of all configurations and data before
-              proceeding.
-            </p>
-            <p>
-              <i class="pi pi-circle-fill"></i>This action requires immediate
-              system reconfiguration after deletion.
-            </p>
-            <p class="warning-checkbox">
-              <p-checkbox [(ngModel)]="deleteConfiguration" [binary]="true" inputId="deleteConfig">
-              </p-checkbox>
-              <label for="deleteConfig">
-                Do you want to delete the database data too that are required
-                for system operations?
-              </label>
-            </p>
-          </div>
-        </div>
+    <!-- Standard Delete Section (Non-Master DB) -->
+    <div class="standard-delete-section" *ngIf="!selectedDatabase?.isMasterDB">
+      <div class="db-info-badge">
+        <i class="pi pi-database"></i>
+        <span>{{ selectedDatabase?.name }}</span>
+      </div>
+
+      <p class="delete-intro">
+        Are you sure you want to delete this database?
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>All associated data will be removed</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>Connected datasets will be affected</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Master DB Warning Section -->
+    <div class="master-warning-section" *ngIf="selectedDatabase?.isMasterDB">
+      <div class="warning-badge">
+        <i class="pi pi-database"></i>
+        <span>Master Database</span>
+      </div>
+
+      <p class="warning-intro">
+        You are about to delete <strong>{{ selectedDatabase?.name }}</strong>, which is the master database.
+      </p>
+
+      <ul class="warning-list">
+        <li>
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Controls core system operations</span>
+        </li>
+        <li>
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Permanently removes all configurations</span>
+        </li>
+        <li>
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Requires system reconfiguration</span>
+        </li>
+        <li>
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Cannot be undone</span>
+        </li>
+      </ul>
+
+      <div class="checkbox-option">
+        <p-checkbox [(ngModel)]="deleteConfiguration" [binary]="true" inputId="deleteConfig">
+        </p-checkbox>
+        <label for="deleteConfig">
+          Also delete associated system data
+        </label>
       </div>
     </div>
 
+    <!-- Actions -->
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDelete()">No</button>
-      <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()">
+        <i class="pi pi-trash"></i>
+        {{ selectedDatabase?.isMasterDB ? 'Delete Master DB' : 'Delete' }}
+      </button>
     </div>
   </div>
 </div>

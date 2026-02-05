@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { GROUP } from 'src/app/constants/api';
-import { IParams } from 'src/app/core/interfaces/global.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -10,13 +9,9 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class GroupService {
   constructor(private http: HttpClient) {}
 
-  listGroupps(params: IParams) {
+  listGroupps(params: any) {
     return this.http
-      .get(
-        GROUP.LIST +
-          `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`
-      )
+      .get(GROUP.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

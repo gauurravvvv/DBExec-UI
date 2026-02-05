@@ -16,12 +16,10 @@
                 </div>
 
                 <div class="toolbar-right">
-                    <!-- Search -->
-                    <span class="p-input-icon-left search-input-wrapper">
-                        <i class="pi pi-search"></i>
-                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
-                            placeholder="Search..." class="modern-search" />
-                    </span>
+                    <!-- Clear Filters Button -->
+                    <button pButton label="Clear Filters" icon="pi pi-filter-slash" (click)="clearFilters()"
+                        [disabled]="!isFilterActive" class="p-button-outlined p-button-danger modern-button mr-2">
+                    </button>
 
                     <!-- Add Button -->
                     <button pButton label="Add" icon="pi pi-plus" (click)="onAddNewOrganisation()"
@@ -32,80 +30,76 @@
 
             <!-- Table -->
             <div class="table-wrapper">
-                <p-table #dt [value]="organisations" [rows]="10" [paginator]="true"
-                    [globalFilterFields]="['name', 'status']" [rowHover]="true" dataKey="id"
+                <p-table #dt [value]="organisations" [rows]="10" [paginator]="true" [lazy]="true"
+                    (onLazyLoad)="loadOrganisations($event)" [totalRecords]="totalItems"
+                    [globalFilterFields]="['name', 'description', 'status']" [rowHover]="true" dataKey="id"
                     currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
                     [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
                     scrollHeight="calc(100vh - 400px)">
 
                     <ng-template pTemplate="header">
                         <tr>
-                            <th pSortableColumn="name" style="width: 250px">
+                            <th style="width: 20%" pFrozenColumn>
                                 <div class="th-content">
-                                    Name <p-sortIcon field="name"></p-sortIcon>
+                                    Name
                                 </div>
                             </th>
-                            <th pSortableColumn="config.maxAdmins" style="width: 120px">
-                                <div class="th-content centered-header">
-                                    Admins <p-sortIcon field="config.maxAdmins"></p-sortIcon>
-                                </div>
-                            </th>
-                            <th pSortableColumn="config.maxUsers" style="width: 120px">
-                                <div class="th-content centered-header">
-                                    Users <p-sortIcon field="config.maxUsers"></p-sortIcon>
-                                </div>
-                            </th>
-                            <th pSortableColumn="config.maxEnvironment" style="width: 120px">
-                                <div class="th-content centered-header">
-                                    Envs <p-sortIcon field="config.maxEnvironment"></p-sortIcon>
-                                </div>
-                            </th>
-                            <th pSortableColumn="config.maxCategories" style="width: 120px">
-                                <div class="th-content centered-header">
-                                    Cats <p-sortIcon field="config.maxCategories"></p-sortIcon>
-                                </div>
-                            </th>
-                            <th pSortableColumn="config.maxDatabases" style="width: 120px">
-                                <div class="th-content centered-header">
-                                    DBs <p-sortIcon field="config.maxDatabases"></p-sortIcon>
-                                </div>
-                            </th>
-                            <th pSortableColumn="status" style="width: 140px">
+                            <th style="width: 35%">
                                 <div class="th-content">
-                                    Status <p-sortIcon field="status"></p-sortIcon>
+                                    Description
                                 </div>
                             </th>
-                            <th pSortableColumn="createdOn" style="width: 160px">
+                            <th style="width: 15%">
                                 <div class="th-content">
-                                    Created <p-sortIcon field="createdOn"></p-sortIcon>
+                                    Status
                                 </div>
                             </th>
-                            <th style="width: 100px">
+                            <th style="width: 20%">
+                                <div class="th-content">
+                                    Created
+                                </div>
+                            </th>
+                            <th style="width: 10%">
                                 <!-- Actions -->
+                            </th>
+                        </tr>
+                        <!-- Filter Row -->
+                        <tr>
+                            <th pFrozenColumn>
+                                <input pInputText type="text" [(ngModel)]="filterValues.name"
+                                    (input)="onFilterChange('name')" placeholder="Search Name"
+                                    class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <input pInputText type="text" [(ngModel)]="filterValues.description"
+                                    (input)="onFilterChange('description')" placeholder="Search Description"
+                                    class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <!-- <p-dropdown [options]="statusOptions" [(ngModel)]="filterValues.status"
+                                    (onChange)="onFilterChange('status')" placeholder="Select Status" [showClear]="true"
+                                    [style]="{'width':'100%'}" appendTo="body" styleClass="w-full p-column-filter">
+                                </p-dropdown> -->
+                            </th>
+                            <th>
+                                <!-- No filter for Created On -->
+                            </th>
+                            <th>
+                                <!-- No filter for Actions -->
                             </th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-org>
                         <tr class="modern-row">
-                            <td>
+                            <td pFrozenColumn>
                                 <a class="dataset-name-link" [routerLink]="['/app/organisation/view', org.id]">
                                     {{ org.name }}
                                 </a>
                             </td>
-                            <td class="text-center">
-                                <span class="count-badge">{{ org.config.maxAdmins }}</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="count-badge">{{ org.config.maxUsers }}</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="count-badge">{{ org.config.maxEnvironment }}</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="count-badge">{{ org.config.maxCategories }}</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="count-badge">{{ org.config.maxDatabases }}</span>
+                            <td>
+                                <span class="description-text" [title]="org.description">
+                                    {{ org.description || '-' }}
+                                </span>
                             </td>
                             <td>
                                 <span class="status-indicator"
@@ -115,7 +109,7 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="date-text">{{ org.createdOn | date:'mediumDate' }}</span>
+                                <span class="date-text">{{ org.createdOn | date:'medium' }}</span>
                             </td>
                             <td>
                                 <div class="row-actions">
@@ -133,7 +127,7 @@
                     </ng-template>
                     <ng-template pTemplate="emptymessage">
                         <tr>
-                            <td colspan="9" class="empty-message-cell">
+                            <td colspan="5" class="empty-message-cell text-center">
                                 No such record found
                             </td>
                         </tr>
@@ -146,11 +140,43 @@
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
-        <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this organisation?</p>
+        <!-- Header -->
+        <div class="popup-header">
+            <div class="popup-icon">
+                <i class="pi pi-trash"></i>
+            </div>
+            <h3>Confirm Delete</h3>
+        </div>
+
+        <!-- Delete Info Section -->
+        <div class="standard-delete-section">
+
+            <p class="delete-intro">
+                Are you sure you want to delete this organisation?
+            </p>
+
+            <ul class="delete-info-list">
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>All associated users will lose access</span>
+                </li>
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>This action cannot be undone</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Actions -->
         <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">No</button>
-            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+            <button class="btn-cancel" (click)="cancelDelete()">
+                <i class="pi pi-times"></i>
+                Cancel
+            </button>
+            <button class="btn-confirm" (click)="proceedDelete()">
+                <i class="pi pi-trash"></i>
+                Delete
+            </button>
         </div>
     </div>
 </div>

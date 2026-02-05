@@ -22,12 +22,10 @@
                 </div>
 
                 <div class="toolbar-right">
-                    <!-- Search -->
-                    <span class="p-input-icon-left search-input-wrapper">
-                        <i class="pi pi-search"></i>
-                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
-                            placeholder="Search..." class="modern-search" />
-                    </span>
+                    <!-- Clear Filters Button -->
+                    <button pButton label="Clear Filters" icon="pi pi-filter-slash" (click)="clearFilters()"
+                        [disabled]="!isFilterActive" class="p-button-outlined p-button-danger modern-button mr-2">
+                    </button>
 
                     <!-- Add Button -->
                     <button pButton label="Add" icon="pi pi-plus" (click)="onAddNewCategory()"
@@ -38,50 +36,85 @@
 
             <!-- Table -->
             <div class="table-wrapper">
-                <p-table #dt [value]="groups" [rows]="10" [paginator]="true" [globalFilterFields]="['name', 'status']"
-                    [rowHover]="true" dataKey="id" currentPageReportTemplate="{first} - {last} of {totalRecords}"
-                    [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50,100]"
-                    styleClass="p-datatable-sm modern-table" [scrollable]="true" scrollHeight="calc(100vh - 400px)">
+                <p-table #dt [value]="filteredGroups" [rows]="10" [paginator]="true" [lazy]="true"
+                    (onLazyLoad)="loadGroups($event)" [totalRecords]="totalRecords"
+                    [globalFilterFields]="['name', 'description', 'status']" [rowHover]="true" dataKey="id"
+                    currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
+                    [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
+                    scrollHeight="calc(100vh - 400px)">
 
                     <ng-template pTemplate="header">
                         <tr>
-                            <th pSortableColumn="name" style="width: 30%">
+                            <th style="width: 25%">
                                 <div class="th-content">
-                                    Name <p-sortIcon field="name"></p-sortIcon>
+                                    Name
                                 </div>
                             </th>
-                            <th style="width: 20%">
+                            <th style="width: 30%">
                                 <div class="th-content">
-                                    Users
+                                    Description
                                 </div>
                             </th>
-                            <th pSortableColumn="status" style="width: 20%">
+                            <th style="width: 15%">
                                 <div class="th-content">
-                                    Status <p-sortIcon field="status"></p-sortIcon>
+                                    No. of Users
                                 </div>
                             </th>
-                            <th pSortableColumn="createdOn" style="width: 25%">
+                            <th style="width: 12%">
                                 <div class="th-content">
-                                    Created <p-sortIcon field="createdOn"></p-sortIcon>
+                                    Status
                                 </div>
                             </th>
-                            <th style="width: 5%">
-                                <!-- Actions -->
+                            <th style="width: 15%">
+                                <div class="th-content">
+                                    Created
+                                </div>
+                            </th>
+                            <th style="width: 10%">
+                                <div class="th-content">
+                                    Actions
+                                </div>
+                            </th>
+                        </tr>
+                        <!-- Filter Row -->
+                        <tr>
+                            <th>
+                                <input pInputText type="text" [(ngModel)]="filterValues.name" (input)="onFilterChange()"
+                                    placeholder="Search Name" class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <input pInputText type="text" [(ngModel)]="filterValues.description"
+                                    (input)="onFilterChange()" placeholder="Search Description"
+                                    class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <!-- No filter for No. of Users -->
+                            </th>
+                            <th>
+                                <!-- No filter for Status -->
+                            </th>
+                            <th>
+                                <!-- No filter for Created -->
+                            </th>
+                            <th>
+                                <!-- No filter for Actions -->
                             </th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-group>
                         <tr class="modern-row">
                             <td>
-                                <a class="dataset-name-link" [routerLink]="['/app/group/view',selectedOrg , group.id]">
-                                    <i class="pi pi-users" style="margin-right: 8px;"></i>
+                                <a class="dataset-name-link" [routerLink]="['/app/group/view', selectedOrg, group.id]">
                                     {{ group.name }}
                                 </a>
                             </td>
                             <td>
-                                <span class="pill">
-                                    <i class="pi pi-user" style="font-size: 0.8rem; margin-right: 4px;"></i>
-                                    {{ group.userGroups.length }} Users
+                                <span class="description-text" [title]="group.description">{{ group.description ||
+                                    '-' }}</span>
+                            </td>
+                            <td>
+                                <span class="users-count">
+                                    <span class="count">{{ group.userGroups?.length || 0 }}</span>
                                 </span>
                             </td>
                             <td>
@@ -92,7 +125,7 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="date-text">{{ group.createdOn | date:'mediumDate' }}</span>
+                                <span class="date-text">{{ group.createdOn | date:'medium' }}</span>
                             </td>
                             <td>
                                 <div class="row-actions">
@@ -110,7 +143,7 @@
                     </ng-template>
                     <ng-template pTemplate="emptymessage">
                         <tr>
-                            <td colspan="5" class="empty-message-cell">
+                            <td colspan="6" class="empty-message-cell text-center">
                                 No such record found
                             </td>
                         </tr>
@@ -123,11 +156,46 @@
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
-        <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this group?</p>
+        <!-- Header -->
+        <div class="popup-header">
+            <div class="popup-icon">
+                <i class="pi pi-trash"></i>
+            </div>
+            <h3>Confirm Delete</h3>
+        </div>
+
+        <!-- Delete Info Section -->
+        <div class="standard-delete-section">
+            <p class="delete-intro">
+                Are you sure you want to delete this group?
+            </p>
+
+            <ul class="delete-info-list">
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>All users will be removed from this group</span>
+                </li>
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>Group permissions will be revoked</span>
+                </li>
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>This action cannot be undone</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Actions -->
         <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">No</button>
-            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+            <button class="btn-cancel" (click)="cancelDelete()">
+                <i class="pi pi-times"></i>
+                Cancel
+            </button>
+            <button class="btn-confirm" (click)="proceedDelete()">
+                <i class="pi pi-trash"></i>
+                Delete
+            </button>
         </div>
     </div>
 </div>

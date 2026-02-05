@@ -10,13 +10,9 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class OrganisationAdminService {
   constructor(private http: HttpClient) {}
 
-  listOrganisationAdmin(params: IParams) {
+  listOrganisationAdmin(params: any) {
     return this.http
-      .get(
-        ORG_ADMIN.LIST +
-          `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`
-      )
+      .get(ORG_ADMIN.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

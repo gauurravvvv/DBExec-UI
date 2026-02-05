@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { ConnectionService } from '../../services/connection.service';
 
 @Component({
@@ -14,9 +15,13 @@ import { ConnectionService } from '../../services/connection.service';
   templateUrl: './list-connection.component.html',
   styleUrls: ['./list-connection.component.scss'],
 })
-export class ListConnectionComponent implements OnInit {
-  // PrimeNG Table handles pagination and filtering locally
-  limit = 1000;
+export class ListConnectionComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
+  // Pagination limit for connections
+  limit = 10;
+  totalRecords = 0;
+  lastTableLazyLoadEvent: any;
 
   users: any[] = [];
   filteredConnections: any[] = [];
@@ -28,36 +33,65 @@ export class ListConnectionComponent implements OnInit {
   organisations: any[] = [];
   databases: any[] = [];
   connections: any[] = [];
-  selectedOrg: any = {};
-  selectedDatabase: any = {};
+  selectedOrg: any = null;
+  selectedDatabase: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
+  // Filter values for column filtering
+  filterValues: any = {
+    name: '',
+    description: '',
+    dbUsername: '',
+  };
+
+  // Debouncing for filter changes
+  private filter$ = new Subject<void>();
+  private filterSubscription!: Subscription;
+
+  get isFilterActive(): boolean {
+    return (
+      !!this.filterValues.name ||
+      !!this.filterValues.description ||
+      !!this.filterValues.dbUsername
+    );
+  }
+
   constructor(
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
-    private tabService: TabService,
     private connectionService: ConnectionService,
     private router: Router,
     private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
+    // Setup debounced filter
+    this.filterSubscription = this.filter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadConnections();
+      });
+
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatabases();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
     }
   }
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
@@ -80,12 +114,27 @@ export class ListConnectionComponent implements OnInit {
     this.loadConnections();
   }
 
+  onFilterChange() {
+    // Trigger debounced API call
+    this.filter$.next();
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
+      dbUsername: '',
+    };
+    // Immediately reload without filters
+    this.loadConnections();
+  }
+
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
       pageNumber: 1,
-      limit: 100,
+      limit: 10000,
     };
 
     this.databaseService.listDatabase(params).then(response => {
@@ -103,19 +152,46 @@ export class ListConnectionComponent implements OnInit {
     });
   }
 
-  loadConnections() {
+  loadConnections(event?: any) {
     if (!this.selectedDatabase) return;
-    const params = {
+
+    // Store the event for future reloads
+    if (event) {
+      this.lastTableLazyLoadEvent = event;
+    }
+
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const limit = event ? event.rows : this.limit;
+
+    const params: any = {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
-      pageNumber: 1,
-      limit: this.limit,
+      page: page,
+      limit: limit,
     };
+
+    // Build filter object like list-super-admin
+    const filter: any = {};
+    if (this.filterValues.name) {
+      filter.name = this.filterValues.name;
+    }
+    if (this.filterValues.description) {
+      filter.description = this.filterValues.description;
+    }
+    if (this.filterValues.dbUsername) {
+      filter.dbUsername = this.filterValues.dbUsername;
+    }
+
+    // Add JSON stringified filter if any filter is set
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
 
     this.connectionService.listConnection(params).then((response: any) => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.connections = [...response.data.connections];
         this.filteredConnections = [...this.connections];
+        this.totalRecords = response.data.totalItems || this.connections.length;
       }
     });
   }
@@ -146,7 +222,9 @@ export class ListConnectionComponent implements OnInit {
           this.showDeleteConfirm = false;
           this.tabToDelete = null;
           if (this.globalService.handleSuccessService(response)) {
-            this.loadConnections();
+            if (this.lastTableLazyLoadEvent) {
+              this.loadConnections(this.lastTableLazyLoadEvent);
+            }
           }
         });
     }

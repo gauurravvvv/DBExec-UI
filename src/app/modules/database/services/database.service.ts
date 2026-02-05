@@ -13,7 +13,7 @@ export class DatabaseService {
       .get(
         DATABASE.LIST +
           `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`
+          `/${params.pageNumber}/${params.limit}`,
       )
       .toPromise()
       .then((response: any) => {
@@ -24,11 +24,7 @@ export class DatabaseService {
 
   listAllDatabase(params: any) {
     return this.http
-      .get(
-        DATABASE.LIST_ALL +
-          `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`
-      )
+      .get(DATABASE.LIST_ALL, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -40,7 +36,7 @@ export class DatabaseService {
     orgId: string,
     id: string,
     isMasterDb: string,
-    deleteConfiguration: boolean
+    deleteConfiguration: boolean,
   ) {
     return this.http
       .post(DATABASE.DELETE + `${orgId}/${id}/${isMasterDb}`, {
@@ -161,7 +157,7 @@ export class DatabaseService {
         DATABASE.LIST_SCHEMA_TABLES +
           `${params.orgId}` +
           `/${params.databaseId}` +
-          `/${params.schemaName}`
+          `/${params.schemaName}`,
       )
       .toPromise()
       .then((response: any) => {
@@ -177,7 +173,7 @@ export class DatabaseService {
           `${params.orgId}` +
           `/${params.databaseId}` +
           `/${params.schemaName}` +
-          `/${params.tableName}`
+          `/${params.tableName}`,
       )
       .toPromise()
       .then((response: any) => {

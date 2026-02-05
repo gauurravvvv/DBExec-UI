@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { DATABASE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -13,11 +15,17 @@ import { DatabaseService } from '../../services/database.service';
   styleUrls: ['./list-database.component.scss'],
 })
 export class ListDatabaseComponent implements OnInit {
+  @ViewChild('dt') dt!: Table;
   dbs: any[] = [];
   filteredDBs: any[] = [];
-  currentPage = 1;
-  // PrimeNG Table handles pagination and filtering locally
-  limit = 1000;
+  listParams: any = {
+    limit: 10,
+    pageNumber: 1,
+  };
+  totalItems = 0;
+
+  private searchSubject = new Subject<void>();
+  lastTableLazyLoadEvent: any;
 
   organisations: any[] = [];
   selectedOrg: any = {};
@@ -36,20 +44,26 @@ export class ListDatabaseComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Setup debounce for filter changes
+    this.searchSubject.pipe(debounceTime(500)).subscribe(() => {
+      if (this.lastTableLazyLoadEvent) {
+        this.loadDatabases(this.lastTableLazyLoadEvent);
+      }
+    });
+
     if (this.showOrganisationDropdown) {
+      // Super Admin: Load organisations first, then trigger table load
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
-      this.loaddbs();
+      // Non-Super Admin: Set org from token, lazy load will trigger automatically
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     }
   }
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -57,7 +71,13 @@ export class ListDatabaseComponent implements OnInit {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
-          this.loaddbs();
+          // Trigger lazy load by resetting table, or call API directly if table not ready
+          if (this.dt) {
+            this.dt.reset();
+          } else {
+            // Table not ready yet, call API directly with default params
+            this.listDatabaseAPI(this.selectedOrg);
+          }
         }
       }
     });
@@ -65,21 +85,72 @@ export class ListDatabaseComponent implements OnInit {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.loaddbs();
+    // Reset table which triggers onLazyLoad -> loadDatabases
+    if (this.dt) {
+      this.dt.reset();
+    }
   }
 
-  loaddbs() {
-    if (!this.selectedOrg) return;
-    const params = {
-      orgId: this.selectedOrg,
-      pageNumber: 1,
-      limit: this.limit,
+  filterValues: any = {
+    name: '',
+    description: '',
+  };
+
+  get isFilterActive(): boolean {
+    return !!this.filterValues.name || !!this.filterValues.description;
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
     };
+    this.onFilterChange();
+  }
+
+  onFilterChange() {
+    this.searchSubject.next();
+  }
+
+  loadDatabases(event: any) {
+    if (!event) return;
+    this.lastTableLazyLoadEvent = event;
+    const page = event.first / event.rows + 1;
+    const limit = event.rows;
+
+    this.listParams.pageNumber = page;
+    this.listParams.limit = limit;
+
+    this.listDatabaseAPI();
+  }
+
+  listDatabaseAPI(overrideOrgId?: any) {
+    // Handle both object with .id property and primitive ID values
+    let orgId = overrideOrgId || this.selectedOrg;
+    if (typeof orgId === 'object' && orgId !== null) {
+      orgId = orgId.id;
+    }
+    if (!orgId) return;
+
+    const params: any = {
+      orgId: orgId,
+      pageNumber: this.listParams.pageNumber,
+      limit: this.listParams.limit,
+    };
+
+    let filter: any = {};
+    if (this.filterValues.name) filter.name = this.filterValues.name;
+    if (this.filterValues.description)
+      filter.description = this.filterValues.description;
+
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
 
     this.databaseService.listAllDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.dbs = response.data || [];
-        this.filteredDBs = [...this.dbs];
+        this.dbs = response.data.databases || [];
+        this.totalItems = response.data.count || 0;
       }
     });
   }
@@ -114,7 +185,9 @@ export class ListDatabaseComponent implements OnInit {
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.loaddbs();
+            if (this.lastTableLazyLoadEvent) {
+              this.loadDatabases(this.lastTableLazyLoadEvent);
+            }
             this.showDeleteConfirm = false;
             this.selectedDatabase = null;
           }

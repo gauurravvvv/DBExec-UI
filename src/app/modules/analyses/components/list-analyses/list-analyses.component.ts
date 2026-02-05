@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { ANALYSES } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -13,24 +15,43 @@ import { AnalysesService } from '../../service/analyses.service';
   templateUrl: './list-analyses.component.html',
   styleUrls: ['./list-analyses.component.scss'],
 })
-export class ListAnalysesComponent implements OnInit {
-  // PrimeNG Table handles pagination and filtering locally
-  limit = 1000;
+export class ListAnalysesComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
+  limit = 10;
+  totalRecords = 0;
+  lastTableLazyLoadEvent: any;
 
   analyses: any[] = [];
   filteredAnalyses: any[] = [];
 
-  searchTerm: string = '';
   showDeleteConfirm = false;
   analysisToDelete: string | null = null;
-  Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
-  selectedOrg: any = {};
+  selectedOrg: any = null;
+  selectedDatabase: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
-  loggedInUserId: any = this.globalService.getTokenDetails('userId');
-  selectedDatabase: any = {};
+
+  // Filter values for column filtering
+  filterValues: any = {
+    name: '',
+    description: '',
+    datasetName: '',
+  };
+
+  // Debouncing for filter changes
+  private filter$ = new Subject<void>();
+  private filterSubscription!: Subscription;
+
+  get isFilterActive(): boolean {
+    return (
+      !!this.filterValues.name ||
+      !!this.filterValues.description ||
+      !!this.filterValues.datasetName
+    );
+  }
 
   constructor(
     private organisationService: OrganisationService,
@@ -41,6 +62,13 @@ export class ListAnalysesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Setup debounced filter
+    this.filterSubscription = this.filter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadAnalyses();
+      });
+
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
@@ -49,18 +77,30 @@ export class ListAnalysesComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs];
+        this.organisations = response.data.orgs || [];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
+        } else {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.analyses = [];
+          this.totalRecords = 0;
         }
       }
     });
@@ -76,17 +116,32 @@ export class ListAnalysesComponent implements OnInit {
     this.loadAnalyses();
   }
 
+  onFilterChange() {
+    // Trigger debounced API call
+    this.filter$.next();
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
+      datasetName: '',
+    };
+    // Immediately reload without filters
+    this.loadAnalyses();
+  }
+
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
       pageNumber: 1,
-      limit: 100,
+      limit: 10000,
     };
 
     this.databaseService.listDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...response.data];
+        this.databases = response.data || [];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0].id;
           this.loadAnalyses();
@@ -94,24 +149,53 @@ export class ListAnalysesComponent implements OnInit {
           this.selectedDatabase = null;
           this.analyses = [];
           this.filteredAnalyses = [];
+          this.totalRecords = 0;
         }
       }
     });
   }
 
-  loadAnalyses() {
-    if (!this.selectedOrg) return;
-    const params = {
+  loadAnalyses(event?: any) {
+    if (!this.selectedOrg || !this.selectedDatabase) return;
+
+    // Store the event for future reloads
+    if (event) {
+      this.lastTableLazyLoadEvent = event;
+    }
+
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const limit = event ? event.rows : this.limit;
+
+    const params: any = {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
-      pageNumber: 1,
-      limit: this.limit,
+      page: page, // The API expects 'page' not 'pageNumber' based on other components
+      limit: limit,
     };
+
+    // Build filter object (Note: Analysis API might need filter param handling if backend supports it)
+    // Assuming backend supports 'filter' param like other list APIs
+    const filter: any = {};
+    if (this.filterValues.name) {
+      filter.name = this.filterValues.name;
+    }
+    if (this.filterValues.description) {
+      filter.description = this.filterValues.description;
+    }
+    if (this.filterValues.datasetName) {
+      filter.datasetName = this.filterValues.datasetName;
+    }
+
+    // Add JSON stringified filter if any filter is set
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
 
     this.analysesService.listAnalyses(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.analyses = [...(response.data.analyses || [])];
+        this.analyses = response.data.analyses || [];
         this.filteredAnalyses = [...this.analyses];
+        this.totalRecords = response.data.totalItems || this.analyses.length;
       }
     });
   }

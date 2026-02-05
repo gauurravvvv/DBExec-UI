@@ -62,7 +62,7 @@ export class AnalysesService {
 
   listAnalyses(params: any) {
     return this.http
-      .get(ANALYSES.LIST + `/${params.orgId}` + `/${params.databaseId}`)
+      .get(ANALYSES.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

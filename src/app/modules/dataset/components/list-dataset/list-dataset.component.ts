@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { ANALYSES, DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -13,20 +16,38 @@ import { DatabaseService } from 'src/app/modules/database/services/database.serv
   templateUrl: './list-dataset.component.html',
   styleUrls: ['./list-dataset.component.scss'],
 })
-export class ListDatasetComponent implements OnInit {
+export class ListDatasetComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
+  limit = 10;
+  totalRecords = 0;
+  lastTableLazyLoadEvent: any;
+
   datasets: any[] = [];
-  limit = 1000;
-  totalItems = 0;
+  filteredDatasets: any[] = [];
+
   showDeleteConfirm = false;
   datasetToDelete: string | null = null;
-  Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
-  selectedOrg: any = {};
+  selectedOrg: any = null;
+  selectedDatabase: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
-  loggedInUserId: any = this.globalService.getTokenDetails('userId');
-  selectedDatabase: any = {};
+
+  // Filter values for column filtering
+  filterValues: any = {
+    name: '',
+    description: '',
+  };
+
+  // Debouncing for filter changes
+  private filter$ = new Subject<void>();
+  private filterSubscription!: Subscription;
+
+  get isFilterActive(): boolean {
+    return !!this.filterValues.name || !!this.filterValues.description;
+  }
 
   addDatasetItems: MenuItem[] = [
     {
@@ -45,6 +66,13 @@ export class ListDatasetComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Setup debounced filter
+    this.filterSubscription = this.filter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadDatasets();
+      });
+
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
@@ -53,10 +81,16 @@ export class ListDatasetComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -70,7 +104,7 @@ export class ListDatasetComponent implements OnInit {
           this.databases = [];
           this.selectedDatabase = null;
           this.datasets = [];
-          this.totalItems = 0;
+          this.totalRecords = 0;
         }
       }
     });
@@ -86,12 +120,26 @@ export class ListDatasetComponent implements OnInit {
     this.loadDatasets();
   }
 
+  onFilterChange() {
+    // Trigger debounced API call
+    this.filter$.next();
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
+    };
+    // Immediately reload without filters
+    this.loadDatasets();
+  }
+
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
       pageNumber: 1,
-      limit: 100,
+      limit: 10000,
     };
 
     this.databaseService.listDatabase(params).then(response => {
@@ -103,30 +151,53 @@ export class ListDatasetComponent implements OnInit {
         } else {
           this.selectedDatabase = null;
           this.datasets = [];
-          this.totalItems = 0;
+          this.filteredDatasets = [];
+          this.totalRecords = 0;
         }
       }
     });
   }
 
-  loadDatasets() {
-    if (!this.selectedOrg) return;
-    const params = {
+  loadDatasets(event?: any) {
+    if (!this.selectedOrg || !this.selectedDatabase) return;
+
+    // Store the event for future reloads
+    if (event) {
+      this.lastTableLazyLoadEvent = event;
+    }
+
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const limit = event ? event.rows : this.limit;
+
+    const params: any = {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
-      pageNumber: 1,
-      limit: this.limit,
+      page: page,
+      limit: limit,
     };
+
+    // Build filter object
+    const filter: any = {};
+    if (this.filterValues.name) {
+      filter.name = this.filterValues.name;
+    }
+    if (this.filterValues.description) {
+      filter.description = this.filterValues.description;
+    }
+
+    // Add JSON stringified filter if any filter is set
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
 
     this.datasetService.listDatasets(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasets = response.data.datasets || [];
-        this.totalItems = this.datasets.length;
+        this.filteredDatasets = [...this.datasets];
+        this.totalRecords = response.data.totalItems || this.datasets.length;
       }
     });
   }
-
-  // Removed manual filtering and pagination methods as PrimeNG table handles this
 
   onAddNewAdmin() {
     this.router.navigate([DATASET.ADD]);

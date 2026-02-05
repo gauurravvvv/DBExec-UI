@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { CONNECTIONS, TAB } from 'src/app/constants/api';
+import { CONNECTIONS } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -11,23 +11,7 @@ export class ConnectionService {
 
   listConnection(params: any) {
     return this.http
-      .get(
-        CONNECTIONS.LIST +
-          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
-      )
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
-  }
-
-  listAllTabData(params: any) {
-    return this.http
-      .get(
-        TAB.GET_ALL +
-          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
-      )
+      .get(CONNECTIONS.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

@@ -4,7 +4,9 @@ import { SuperAdminService } from '../../services/superAdmin.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list-super-admin',
@@ -15,11 +17,8 @@ export class ListSuperAdminComponent implements OnInit {
   Math = Math;
   loggedInUserId: any;
 
-  // Params to fetch all for client-side handling
-  listParams: IParams = {
-    limit: 1000,
-    pageNumber: 1,
-  };
+  @ViewChild('dt') dt!: Table;
+  private searchSubject = new Subject<void>();
 
   superAdmins: any[] = [];
   totalItems = 0;
@@ -27,15 +26,57 @@ export class ListSuperAdminComponent implements OnInit {
   showDeleteConfirm = false;
   adminIdToDelete: number | null = null;
 
+  // Component-managed filter values
+  filterValues: any = {
+    username: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+  };
+
   constructor(
     private superAdminService: SuperAdminService,
     private router: Router,
     private globalService: GlobalService,
   ) {}
 
+  loading = false; // REMOVED (Global loader used)
+  lastTableLazyLoadEvent: any;
+
   ngOnInit(): void {
     this.loggedInUserId = this.globalService.getTokenDetails('userId');
-    this.listSuperAdminAPI();
+    // Initial load will be triggered by p-table lazy load if [lazy]="true" is set
+
+    // Setup debounce for filter changes
+    this.searchSubject.pipe(debounceTime(500)).subscribe(() => {
+      // Trigger lazy load with current pagination but updated filters
+      if (this.lastTableLazyLoadEvent) {
+        this.loadSuperAdmins(this.lastTableLazyLoadEvent);
+      }
+    });
+  }
+
+  onFilterChange() {
+    this.searchSubject.next();
+  }
+
+  get isFilterActive(): boolean {
+    return (
+      !!this.filterValues.username ||
+      !!this.filterValues.firstName ||
+      !!this.filterValues.lastName ||
+      !!this.filterValues.email
+    );
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      username: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+    };
+    this.onFilterChange();
   }
 
   onEdit(adminId: string): void {
@@ -63,7 +104,10 @@ export class ListSuperAdminComponent implements OnInit {
   onDelete(adminId: number) {
     this.superAdminService.deleteSuperAdmin(adminId).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
-        this.listSuperAdminAPI();
+        // Refresh current view
+        if (this.lastTableLazyLoadEvent) {
+          this.loadSuperAdmins(this.lastTableLazyLoadEvent);
+        }
       }
     });
   }
@@ -72,12 +116,49 @@ export class ListSuperAdminComponent implements OnInit {
     this.router.navigate([SUPER_ADMIN.ADD]);
   }
 
-  listSuperAdminAPI() {
-    this.superAdminService.listSuperAdmin(this.listParams).then((res: any) => {
-      if (this.globalService.handleSuccessService(res, false)) {
-        this.superAdmins = [...res.data.superAdmins];
-        this.totalItems = this.superAdmins.length;
-      }
-    });
+  loadSuperAdmins(event: any) {
+    // this.loading = true; // REMOVED
+    this.lastTableLazyLoadEvent = event;
+
+    const page = event.first / event.rows + 1;
+    const limit = event.rows;
+
+    const params: any = {
+      page,
+      limit,
+    };
+
+    const filter: any = {};
+
+    // Handle Filters from component-managed filterValues
+    if (this.filterValues.username) {
+      filter.username = this.filterValues.username;
+    }
+    if (this.filterValues.firstName) {
+      filter.firstName = this.filterValues.firstName;
+    }
+    if (this.filterValues.lastName) {
+      filter.lastName = this.filterValues.lastName;
+    }
+    if (this.filterValues.email) {
+      filter.email = this.filterValues.email;
+    }
+
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
+
+    this.superAdminService
+      .listSuperAdmin(params)
+      .then((res: any) => {
+        // this.loading = false; // REMOVED
+        if (this.globalService.handleSuccessService(res, false)) {
+          this.superAdmins = res.data.superAdmins;
+          this.totalItems = res.data.count;
+        }
+      })
+      .catch(() => {
+        // this.loading = false; // REMOVED
+      });
   }
 }

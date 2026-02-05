@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-
 import { GROUP } from 'src/app/constants/routes';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { GroupService } from '../../services/group.service';
@@ -13,22 +14,36 @@ import { GroupService } from '../../services/group.service';
   templateUrl: './list-group.component.html',
   styleUrls: ['./list-group.component.scss'],
 })
-export class ListGroupComponent implements OnInit {
-  // PrimeNG Table handles pagination and filtering locally
-  limit = 1000;
+export class ListGroupComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
+  limit = 10;
+  totalRecords = 0;
+  lastTableLazyLoadEvent: any;
 
   groups: any[] = [];
-  filteredGroups: any[] = []; // Compat
+  filteredGroups: any[] = [];
 
-  searchTerm: string = '';
   showDeleteConfirm = false;
   groupToDelete: string | null = null;
-  Math = Math;
   organisations: any[] = [];
-  selectedOrg: any = {};
+  selectedOrg: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
-  loggedInUserId: any = this.globalService.getTokenDetails('userId');
+
+  // Filter values for column filtering
+  filterValues: any = {
+    name: '',
+    description: '',
+  };
+
+  // Debouncing for filter changes
+  private filter$ = new Subject<void>();
+  private filterSubscription!: Subscription;
+
+  get isFilterActive(): boolean {
+    return !!this.filterValues.name || !!this.filterValues.description;
+  }
 
   constructor(
     private groupService: GroupService,
@@ -38,6 +53,13 @@ export class ListGroupComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Setup debounced filter
+    this.filterSubscription = this.filter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadGroups();
+      });
+
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
@@ -46,10 +68,16 @@ export class ListGroupComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -57,6 +85,7 @@ export class ListGroupComponent implements OnInit {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
+          // Trigger load after org is selected
           this.loadGroups();
         }
       }
@@ -68,18 +97,56 @@ export class ListGroupComponent implements OnInit {
     this.loadGroups();
   }
 
-  loadGroups() {
-    if (!this.selectedOrg) return;
-    const params = {
-      orgId: this.selectedOrg,
-      pageNumber: 1,
-      limit: this.limit,
+  onFilterChange() {
+    // Trigger debounced API call
+    this.filter$.next();
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
     };
+    // Immediately reload without filters
+    this.loadGroups();
+  }
+
+  loadGroups(event?: any) {
+    if (!this.selectedOrg) return;
+
+    // Store the event for future reloads
+    if (event) {
+      this.lastTableLazyLoadEvent = event;
+    }
+
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const limit = event ? event.rows : this.limit;
+
+    const params: any = {
+      orgId: this.selectedOrg,
+      page: page,
+      limit: limit,
+    };
+
+    // Build filter object
+    const filter: any = {};
+    if (this.filterValues.name) {
+      filter.name = this.filterValues.name;
+    }
+    if (this.filterValues.description) {
+      filter.description = this.filterValues.description;
+    }
+
+    // Add JSON stringified filter if any filter is set
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
 
     this.groupService.listGroupps(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.groups = response.data.groups || [];
         this.filteredGroups = [...this.groups];
+        this.totalRecords = response.data.totalItems || this.groups.length;
       }
     });
   }
@@ -108,7 +175,9 @@ export class ListGroupComponent implements OnInit {
         .deleteGroup(this.selectedOrg, this.groupToDelete)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.loadGroups();
+            if (this.lastTableLazyLoadEvent) {
+              this.loadGroups(this.lastTableLazyLoadEvent);
+            }
             this.showDeleteConfirm = false;
             this.groupToDelete = null;
           }

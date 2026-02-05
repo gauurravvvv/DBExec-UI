@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ORGANISATION } from 'src/app/constants/api';
-import { IParams } from 'src/app/core/interfaces/global.interface';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
@@ -11,12 +10,12 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 export class OrganisationService {
   constructor(
     private http: HttpClient,
-    private httpClientService: HttpClientService
+    private httpClientService: HttpClientService,
   ) {}
 
-  listOrganisation(params: IParams) {
-    return this.httpClientService
-      .apiGet(ORGANISATION.LIST + `/${params.pageNumber}/${params.limit}`)
+  listOrganisation(params: any) {
+    return this.http
+      .get(ORGANISATION.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
