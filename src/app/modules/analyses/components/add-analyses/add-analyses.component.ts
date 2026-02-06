@@ -66,9 +66,42 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Sidebar toggle states
   isFieldsPanelOpen: boolean = true;
   isVisualsPanelOpen: boolean = true;
+  isVisualListPanelOpen: boolean = false;
+  isFilterPanelOpen: boolean = false;
+
+  // Search queries
+  visualListSearchQuery: string = '';
+  datasetFieldsSearchQuery: string = '';
 
   // Visuals
   visuals: Visual[] = [];
+
+  // Filtered visuals based on search query
+  get filteredVisuals(): Visual[] {
+    if (!this.visualListSearchQuery) {
+      return this.visuals;
+    }
+    return this.visuals.filter(visual =>
+      visual.title
+        .toLowerCase()
+        .includes(this.visualListSearchQuery.toLowerCase()),
+    );
+  }
+
+  // Filtered dataset fields based on search query
+  get filteredDatasetFields(): any[] {
+    if (!this.datasetDetails?.datasetFields) {
+      return [];
+    }
+    if (!this.datasetFieldsSearchQuery) {
+      return this.datasetDetails.datasetFields;
+    }
+    return this.datasetDetails.datasetFields.filter((field: any) =>
+      field.columnToView
+        .toLowerCase()
+        .includes(this.datasetFieldsSearchQuery.toLowerCase()),
+    );
+  }
   visualCounter: number = 0;
   focusedVisualId: number | null = null;
   resizingVisual: Visual | null = null;
@@ -412,6 +445,10 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleFieldsPanel(): void {
     this.isFieldsPanelOpen = !this.isFieldsPanelOpen;
+    // If opening fields panel, close visual list panel (mutual exclusivity)
+    if (this.isFieldsPanelOpen) {
+      this.isVisualListPanelOpen = false;
+    }
     // Wait for CSS transition to complete, then recalculate dimensions
     setTimeout(() => {
       this.updateCanvasDimensions();
@@ -421,11 +458,50 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleVisualsPanel(): void {
     this.isVisualsPanelOpen = !this.isVisualsPanelOpen;
+    // If opening visuals panel, close filter panel (mutual exclusivity)
+    if (this.isVisualsPanelOpen) {
+      this.isFilterPanelOpen = false;
+    }
     // Wait for CSS transition to complete, then recalculate dimensions
     setTimeout(() => {
       this.updateCanvasDimensions();
       this.recalculateAllVisualDimensions();
     }, 350); // Match CSS transition duration
+  }
+
+  toggleVisualListPanel(): void {
+    this.isVisualListPanelOpen = !this.isVisualListPanelOpen;
+    // If opening visual list panel, close fields panel (mutual exclusivity)
+    if (this.isVisualListPanelOpen) {
+      this.isFieldsPanelOpen = false;
+    }
+    // Wait for CSS transition to complete, then recalculate dimensions
+    setTimeout(() => {
+      this.updateCanvasDimensions();
+      this.recalculateAllVisualDimensions();
+    }, 350); // Match CSS transition duration
+  }
+
+  toggleFilterPanel(): void {
+    this.isFilterPanelOpen = !this.isFilterPanelOpen;
+    // If opening filter panel, close visuals panel (mutual exclusivity)
+    if (this.isFilterPanelOpen) {
+      this.isVisualsPanelOpen = false;
+    }
+    // Wait for CSS transition to complete, then recalculate dimensions
+    setTimeout(() => {
+      this.updateCanvasDimensions();
+      this.recalculateAllVisualDimensions();
+    }, 350); // Match CSS transition duration
+  }
+
+  addFilter(): void {
+    // Placeholder for future filter implementation
+    // this.globalService.showToast(
+    //   'info',
+    //   'Coming Soon',
+    //   'Filter functionality will be available soon',
+    // );
   }
 
   addVisual(): void {
@@ -697,6 +773,15 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.activeAxisSelection = null;
     } else {
       this.activeAxisSelection = axis;
+
+      // Ensure dataset fields sidebar is open for field selection
+      if (!this.isFieldsPanelOpen) {
+        // Close visual list if open (mutual exclusivity)
+        if (this.isVisualListPanelOpen) {
+          this.isVisualListPanelOpen = false;
+        }
+        this.isFieldsPanelOpen = true;
+      }
     }
   }
 
@@ -911,6 +996,92 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   minimizeVisual(): void {
     this.maximizedVisual = null;
+  }
+
+  /**
+   * Scroll to a specific visual and highlight it
+   */
+  scrollToVisual(visual: Visual, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    // Don't focus - only scroll and highlight
+    setTimeout(() => {
+      if (!this.canvasContainer?.nativeElement) return;
+
+      const container = this.canvasContainer.nativeElement.querySelector(
+        '.canvas-area',
+      ) as HTMLElement;
+      if (!container) return;
+
+      // Find the visual element by matching its visual ID
+      const visualElements = container.querySelectorAll('.visual-box');
+      const visualArray = Array.from(visualElements);
+
+      const targetIndex = this.visuals.findIndex(v => v.id === visual.id);
+      if (targetIndex >= 0 && targetIndex < visualArray.length) {
+        const targetVisual = visualArray[targetIndex] as HTMLElement;
+
+        const containerRect = container.getBoundingClientRect();
+        const visualRect = targetVisual.getBoundingClientRect();
+
+        // Calculate offset to center the visual in the container
+        const offset =
+          visualRect.top +
+          visualRect.height / 2 -
+          (containerRect.top + containerRect.height / 2);
+
+        container.scrollTo({
+          top: container.scrollTop + offset,
+          behavior: 'smooth',
+        });
+
+        // Add blinking highlight animation (like Add Visual)
+        targetVisual.classList.add('blinking-visual');
+        setTimeout(() => {
+          targetVisual.classList.remove('blinking-visual');
+        }, 500);
+      }
+    }, 100);
+  }
+
+  /**
+   * Get visual configuration status for display
+   */
+  getVisualStatus(visual: Visual): {
+    label: string;
+    class: string;
+    icon: string;
+  } {
+    if (!visual.chartType) {
+      return {
+        label: 'No chart type',
+        class: 'status-incomplete',
+        icon: 'pi-circle',
+      };
+    }
+    if (!this.hasRequiredChartFields(visual)) {
+      return {
+        label: 'Fields needed',
+        class: 'status-incomplete',
+        icon: 'pi-exclamation-circle',
+      };
+    }
+    return {
+      label: 'Ready',
+      class: 'status-complete',
+      icon: 'pi-check-circle',
+    };
+  }
+
+  /**
+   * Get chart type display name
+   */
+  getChartTypeName(chartTypeId: string | null): string {
+    if (!chartTypeId) return 'Not selected';
+    const chartType = this.chartTypes.find(c => c.id === chartTypeId);
+    return chartType?.name || chartTypeId;
   }
 
   saveAnalysis(): void {

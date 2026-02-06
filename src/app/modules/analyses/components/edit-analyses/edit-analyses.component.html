@@ -19,6 +19,10 @@
 
     <!-- Sub Header with Toggle Buttons -->
     <div class="sub-header">
+        <button pButton class="p-button-text btn-primary visual-list-btn" [class.active]="isVisualListPanelOpen"
+            (click)="toggleVisualListPanel()" title="Toggle Visual List Pane">
+            <i class="pi pi-list"></i>
+        </button>
         <button pButton class="p-button-text btn-primary field-btn" [class.active]="isFieldsPanelOpen"
             (click)="toggleFieldsPanel()" title="Toggle Fields Pane">
             <i class="pi pi-database"></i>
@@ -26,6 +30,10 @@
         <button pButton class="p-button-text btn-primary visual-btn" [class.active]="isVisualsPanelOpen"
             (click)="toggleVisualsPanel()" title="Toggle Visuals Pane">
             <i class="pi pi-chart-bar"></i>
+        </button>
+        <button pButton class="p-button-text btn-primary filter-btn" [class.active]="isFilterPanelOpen"
+            (click)="toggleFilterPanel()" title="Toggle Filter Pane">
+            <i class="pi pi-filter"></i>
         </button>
         <div class="analysis-name" style="margin-left: 16px; display: flex; align-items: center; gap: 8px;">
             <span style="font-weight: 500;">{{ analysisDetails?.name }}</span>
@@ -35,7 +43,46 @@
     <!-- Main Content Area with Sidebar and Center -->
     <div class="main-content">
 
-        <!-- Left Sidebar - Fields Panel -->
+        <!-- Left Sidebar 1 - Visual List Panel -->
+        <div class="visual-list-sidebar" [class.collapsed]="!isVisualListPanelOpen">
+            <div class="sidebar-content">
+                <div class="sidebar-header-info">
+                    <div class="dataset-label">Canvas Contents</div>
+                </div>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-content-inner">
+                    <!-- Search Input -->
+                    <div class="search-wrapper" *ngIf="visuals.length > 0">
+                        <span class="p-input-icon-left" style="width: 100%;">
+                            <i class="pi pi-search"></i>
+                            <input type="text" pInputText placeholder="Search visuals..."
+                                [(ngModel)]="visualListSearchQuery" style="width: 100%;" />
+                        </span>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="visual-list-empty" *ngIf="visuals.length === 0">
+                        <i class="pi pi-inbox"></i>
+                        <p>No visuals yet</p>
+                    </div>
+
+                    <!-- Visual List Items -->
+                    <div class="visual-list-items" *ngIf="visuals.length > 0">
+                        <div class="visual-list-item" *ngFor="let visual of filteredVisuals; let i = index"
+                            [class.focused]="focusedVisualId === visual.id" (click)="scrollToVisual(visual, $event)">
+                            <div class="visual-icon">
+                                <i class="pi pi-circle-fill"></i>
+                            </div>
+                            <div class="visual-info">
+                                <div class="visual-name">{{ visual.title }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Sidebar 2 - Fields Panel -->
         <div class="database-sidebar" [class.collapsed]="!isFieldsPanelOpen">
             <div class="sidebar-content">
                 <div class="sidebar-header-info">
@@ -43,16 +90,24 @@
                 </div>
                 <div class="sidebar-divider"></div>
                 <div class="sidebar-content-inner">
-                    <!-- Dataset Name Section -->
                     <div class="dataset-name-section">
                         <div class="dataset-name-divider">
                             <span class="dataset-name-text">{{ datasetDetails?.name }}</span>
                         </div>
                     </div>
 
+                    <!-- Search Input -->
+                    <div class="search-wrapper" *ngIf="datasetDetails?.datasetFields?.length">
+                        <span class="p-input-icon-left" style="width: 100%;">
+                            <i class="pi pi-search"></i>
+                            <input type="text" pInputText placeholder="Search fields..."
+                                [(ngModel)]="datasetFieldsSearchQuery" style="width: 100%;" />
+                        </span>
+                    </div>
+
                     <!-- Fields List -->
                     <div class="fields-list" [class.selection-mode]="activeAxisSelection">
-                        <div class="field-card" *ngFor="let field of datasetDetails?.datasetFields"
+                        <div class="field-card" *ngFor="let field of filteredDatasetFields"
                             [class.custom-field]="field.type === 2" [class.selectable]="activeAxisSelection !== null"
                             (click)="onFieldClick(field)">
                             <div class="field-icon">
@@ -277,6 +332,28 @@
             </div>
         </div>
 
+        <!-- Left Sidebar 4 - Filter Panel -->
+        <div class="filter-sidebar" [class.collapsed]="!isFilterPanelOpen">
+            <div class="sidebar-content">
+                <div class="sidebar-header-info">
+                    <div class="dataset-label">Filters</div>
+                </div>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-content-inner">
+                    <!-- Add Filter Button -->
+                    <div class="add-filter-section">
+                        <button pButton label="Add Filter" icon="pi pi-plus" class="p-button-outlined add-filter-button"
+                            (click)="addFilter()" pTooltip="Coming soon" tooltipPosition="bottom"></button>
+                    </div>
+
+                    <!-- Filter List (placeholder for future implementation) -->
+                    <div class="filter-list-empty">
+                        <i class="pi pi-filter-slash"></i>
+                        <p>No filters yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Center Container -->
         <div class="editor-container" #canvasContainer>
