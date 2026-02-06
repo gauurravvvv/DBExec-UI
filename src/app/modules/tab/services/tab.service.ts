@@ -11,10 +11,7 @@ export class TabService {
 
   listTab(params: any) {
     return this.http
-      .get(
-        TAB.LIST +
-          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
-      )
+      .get(TAB.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -26,7 +23,7 @@ export class TabService {
     return this.http
       .get(
         TAB.GET_ALL +
-          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
+          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`,
       )
       .toPromise()
       .then((response: any) => {

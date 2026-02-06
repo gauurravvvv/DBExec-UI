@@ -5,6 +5,7 @@
         <div class="page-header-section">
             <div class="header-content">
                 <h2>User Groups</h2>
+                <p class="subtitle">Manage user groups to streamline access and permissions</p>
             </div>
         </div>
 
@@ -45,7 +46,7 @@
 
                     <ng-template pTemplate="header">
                         <tr>
-                            <th style="width: 25%">
+                            <th style="width: 25%" pFrozenColumn>
                                 <div class="th-content">
                                     Name
                                 </div>
@@ -78,7 +79,7 @@
                         </tr>
                         <!-- Filter Row -->
                         <tr>
-                            <th>
+                            <th pFrozenColumn>
                                 <input pInputText type="text" [(ngModel)]="filterValues.name" (input)="onFilterChange()"
                                     placeholder="Search Name" class="w-full p-column-filter">
                             </th>
@@ -103,7 +104,7 @@
                     </ng-template>
                     <ng-template pTemplate="body" let-group>
                         <tr class="modern-row">
-                            <td>
+                            <td pFrozenColumn>
                                 <a class="dataset-name-link" [routerLink]="['/app/group/view', selectedOrg, group.id]">
                                     {{ group.name }}
                                 </a>

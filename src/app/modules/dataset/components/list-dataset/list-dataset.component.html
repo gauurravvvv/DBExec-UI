@@ -5,6 +5,7 @@
         <div class="page-header-section">
             <div class="header-content">
                 <h2>Datasets</h2>
+                <p class="subtitle">Manage datasets required for creating analyses</p>
             </div>
         </div>
 
@@ -54,7 +55,7 @@
 
                     <ng-template pTemplate="header">
                         <tr>
-                            <th style="width: 30%">
+                            <th style="width: 30%" pFrozenColumn>
                                 <div class="th-content">
                                     Name
                                 </div>
@@ -82,7 +83,7 @@
                         </tr>
                         <!-- Filter Row -->
                         <tr>
-                            <th>
+                            <th pFrozenColumn>
                                 <input pInputText type="text" [(ngModel)]="filterValues.name" (input)="onFilterChange()"
                                     placeholder="Search Name" class="w-full p-column-filter">
                             </th>
@@ -104,7 +105,7 @@
                     </ng-template>
                     <ng-template pTemplate="body" let-dataset>
                         <tr class="modern-row">
-                            <td>
+                            <td pFrozenColumn>
                                 <a class="dataset-name-link"
                                     [routerLink]="['/app/dataset/view', selectedOrg, dataset.id]">
                                     {{ dataset.name }}

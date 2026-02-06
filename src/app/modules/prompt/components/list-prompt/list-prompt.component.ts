@@ -1,88 +1,83 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { SectionService } from 'src/app/modules/section/services/section.service';
-import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { PromptService } from '../../services/prompt.service';
-
-interface TreeNode {
-  key: string;
-  label: string;
-  data: any;
-  children?: TreeNode[];
-  expanded?: boolean;
-  selectable?: boolean;
-  leaf?: boolean;
-  type?: 'tab' | 'section';
-}
 
 @Component({
   selector: 'app-list-prompt',
   templateUrl: './list-prompt.component.html',
   styleUrls: ['./list-prompt.component.scss'],
 })
-export class ListPromptComponent implements OnInit {
-  users: any[] = [];
+export class ListPromptComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
+  // Pagination limit for prompts
+  limit = 10;
+  totalRecords = 0;
+  lastTableLazyLoadEvent: any;
+
   filteredPrompts: any[] = [];
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  totalPages = 0;
-  pages: number[] = [];
+
   searchTerm: string = '';
-  selectedStatus: number | null = null;
   showDeleteConfirm = false;
   promptToDelete: string | null = null;
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
   prompts: any[] = [];
-  tabs: any[] = [];
-  sections: any[] = [];
-  selectedOrg: any = {};
-  selectedDatabase: any = {};
-  selectedTab: any = {};
-  selectedSection: any = {};
+  selectedOrg: any = null;
+  selectedDatabase: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  tabTreeNodes: TreeNode[] = [];
-  selectedNode: TreeNode | null = null;
+  // Filter values for column filtering
+  filterValues: any = {
+    name: '',
+    description: '',
+    tabName: '',
+    sectionName: '',
+    type: '',
+  };
 
-  treeExpanded: boolean = false;
+  // Debouncing for filter changes
+  private filter$ = new Subject<void>();
+  private filterSubscription!: Subscription;
 
-  statusFilterItems: MenuItem[] = [
-    {
-      label: 'All',
-      command: () => this.filterByStatus(null),
-    },
-    {
-      label: 'Active',
-      command: () => this.filterByStatus(1),
-    },
-    {
-      label: 'Inactive',
-      command: () => this.filterByStatus(0),
-    },
-  ];
+  get isFilterActive(): boolean {
+    return (
+      !!this.filterValues.name ||
+      !!this.filterValues.description ||
+      !!this.filterValues.tabName ||
+      !!this.filterValues.sectionName ||
+      !!this.filterValues.type
+    );
+  }
 
   constructor(
     private databaseService: DatabaseService,
-    private sectionService: SectionService,
     private organisationService: OrganisationService,
-    private tabService: TabService,
+    private promptService: PromptService,
     private router: Router,
     private globalService: GlobalService,
-    private promptService: PromptService
   ) {}
 
   ngOnInit() {
+    // Setup debounced filter
+    this.filterSubscription = this.filter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadPrompts();
+      });
+
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
@@ -91,12 +86,17 @@ export class ListPromptComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
-
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
@@ -115,42 +115,27 @@ export class ListPromptComponent implements OnInit {
 
   onDBChange(databaseId: any) {
     this.selectedDatabase = databaseId;
-    this.currentPage = 1;
-    this.loadTabs();
+    this.loadPrompts();
   }
 
-  onTabChange(event: any) {
-    const selectedNode = event.node;
-
-    if (selectedNode.type === 'tab') {
-      selectedNode.expanded = !selectedNode.expanded;
-      this.selectedTab = selectedNode.data;
-    } else if (selectedNode.type === 'section') {
-      this.selectedSection = selectedNode.data;
-      this.selectedTab = this.tabs.find(
-        tab => tab.id === selectedNode.data.tabId
-      );
-      this.loadPrompts();
-    }
+  onFilterChange() {
+    // Trigger debounced API call
+    this.filter$.next();
   }
 
-  loadPrompts() {
-    if (!this.selectedSection) return;
-    const params = {
-      orgId: this.selectedOrg,
-      sectionId: this.selectedSection.id,
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
+      tabName: '',
+      sectionName: '',
+      type: '',
     };
-
-    this.promptService.listPrompt(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.prompts = response.data;
-        this.filteredPrompts = [...this.prompts];
-        this.totalItems = this.prompts.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        this.generatePageNumbers();
-        this.applyFilters();
-      }
-    });
+    if (this.dt) {
+      this.dt.reset();
+    }
+    // Immediately reload without filters
+    this.loadPrompts();
   }
 
   loadDatabases() {
@@ -158,7 +143,7 @@ export class ListPromptComponent implements OnInit {
     const params = {
       orgId: this.selectedOrg,
       pageNumber: 1,
-      limit: 100,
+      limit: 10000,
     };
 
     this.databaseService.listDatabase(params).then(response => {
@@ -166,92 +151,65 @@ export class ListPromptComponent implements OnInit {
         this.databases = response.data;
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0].id;
-          this.loadTabs();
+          this.loadPrompts();
         } else {
           this.selectedDatabase = null;
-          this.selectedTab = null;
-          this.selectedSection = null;
-          this.tabs = [];
-          this.sections = [];
           this.prompts = [];
           this.filteredPrompts = [];
-          this.tabTreeNodes = [];
-          this.selectedNode = null;
-          this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
         }
       }
     });
   }
 
-  loadTabs() {
+  loadPrompts(event?: any) {
     if (!this.selectedDatabase) return;
-    const params = {
+
+    // Store the event for future reloads
+    if (event) {
+      this.lastTableLazyLoadEvent = event;
+    }
+
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const limit = event ? event.rows : this.limit;
+
+    const params: any = {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
-      pageNumber: 1,
-      limit: 100,
+      page: page,
+      limit: limit,
     };
 
-    this.tabService.listTab(params).then(response => {
+    // Build filter object
+    const filter: any = {};
+    if (this.filterValues.name) {
+      filter.name = this.filterValues.name;
+    }
+    if (this.filterValues.description) {
+      filter.description = this.filterValues.description;
+    }
+    if (this.filterValues.tabName) {
+      filter.tabName = this.filterValues.tabName;
+    }
+    if (this.filterValues.sectionName) {
+      filter.sectionName = this.filterValues.sectionName;
+    }
+
+    if (this.filterValues.type) {
+      filter.type = this.filterValues.type;
+    }
+
+    // Add JSON stringified filter if any filter is set
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
+
+    this.promptService.listPrompt(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = response.data || [];
-        if (this.tabs.length > 0) {
-          this.selectedTab = this.tabs[0];
-          this.tabTreeNodes = this.transformToTreeNodes(this.tabs);
-          this.selectedNode = this.tabTreeNodes[0];
-        } else {
-          this.selectedTab = null;
-          this.selectedSection = null;
-          this.sections = [];
-          this.prompts = [];
-          this.filteredPrompts = [];
-          this.tabTreeNodes = [];
-          this.selectedNode = null;
-          this.totalItems = 0;
-          this.totalPages = 0;
-          this.pages = [];
-        }
+        this.prompts = response.data?.prompts || [];
+        this.filteredPrompts = [...this.prompts];
+        this.totalRecords = response.data?.count;
       }
     });
-  }
-
-  generatePageNumbers() {
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadTabs();
-  }
-
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
-    this.applyFilters();
-  }
-
-  filterByStatus(status: number | null) {
-    this.selectedStatus = status;
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    let filtered = [...this.prompts];
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(prompt =>
-        prompt.name.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.selectedStatus !== null) {
-      filtered = filtered.filter(
-        prompt => prompt.status === this.selectedStatus
-      );
-    }
-
-    this.filteredPrompts = filtered;
   }
 
   onAddNewPrompt() {
@@ -260,6 +218,10 @@ export class ListPromptComponent implements OnInit {
 
   onEdit(id: string) {
     this.router.navigate([PROMPT.EDIT, this.selectedOrg, id]);
+  }
+
+  onConfig(id: string) {
+    this.router.navigate([PROMPT.CONFIG, this.selectedOrg, id]);
   }
 
   confirmDelete(id: string) {
@@ -277,70 +239,16 @@ export class ListPromptComponent implements OnInit {
       this.promptService
         .deletePrompt(this.selectedOrg, this.promptToDelete)
         .then(response => {
+          this.showDeleteConfirm = false;
+          this.promptToDelete = null;
           if (this.globalService.handleSuccessService(response)) {
-            this.loadPrompts();
-            this.showDeleteConfirm = false;
-            this.promptToDelete = null;
+            if (this.lastTableLazyLoadEvent) {
+              this.loadPrompts(this.lastTableLazyLoadEvent);
+            } else {
+              this.loadPrompts();
+            }
           }
         });
     }
-  }
-
-  onEditTab(tab: any) {
-    this.router.navigate([PROMPT.EDIT, this.selectedOrg, tab.id]);
-  }
-
-  transformToTreeNodes(tabs: any[]): TreeNode[] {
-    return tabs.map(tab => ({
-      key: `tab-${tab.id}`,
-      label: tab.name,
-      data: tab,
-      expanded: false,
-      type: 'tab',
-      selectable: true,
-      leaf: false,
-      children: tab.sections?.length
-        ? tab.sections.map((section: any) => ({
-            key: `section-${section.id}`,
-            label: section.name,
-            data: section,
-            type: 'section',
-            selectable: true,
-            leaf: true,
-          }))
-        : [],
-    }));
-  }
-
-  onTreeClick() {
-    this.treeExpanded = !this.treeExpanded;
-
-    if (!this.treeExpanded) {
-      this.tabTreeNodes.forEach(node => {
-        if (node.children) {
-          node.expanded = false;
-        }
-      });
-    }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const dropdownElement = (event.target as HTMLElement).closest(
-      '.dropdown-field'
-    );
-    if (!dropdownElement) {
-      this.treeExpanded = false;
-
-      this.tabTreeNodes.forEach(node => {
-        if (node.children) {
-          node.expanded = false;
-        }
-      });
-    }
-  }
-
-  onConfig(id: string) {
-    this.router.navigate([PROMPT.CONFIG, this.selectedOrg, id]);
   }
 }

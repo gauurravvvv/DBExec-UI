@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { SectionService } from '../../services/section.service';
 
 @Component({
@@ -14,9 +16,13 @@ import { SectionService } from '../../services/section.service';
   templateUrl: './list-section.component.html',
   styleUrls: ['./list-section.component.scss'],
 })
-export class ListSectionComponent implements OnInit {
-  // PrimeNG Table handles pagination and filtering locally
-  limit = 1000;
+export class ListSectionComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
+  // Pagination limit for sections
+  limit = 10;
+  totalRecords = 0;
+  lastTableLazyLoadEvent: any;
 
   filteredSections: any[] = [];
 
@@ -26,25 +32,48 @@ export class ListSectionComponent implements OnInit {
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
-  tabs: any[] = [];
   sections: any[] = [];
-  selectedOrg: any = {};
-  selectedDatabase: any = {};
-  selectedTab: any = {};
+  selectedOrg: any = null;
+  selectedDatabase: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
+
+  // Filter values for column filtering
+  filterValues: any = {
+    name: '',
+    description: '',
+    tabName: '',
+  };
+
+  // Debouncing for filter changes
+  private filter$ = new Subject<void>();
+  private filterSubscription!: Subscription;
+
+  get isFilterActive(): boolean {
+    return (
+      !!this.filterValues.name ||
+      !!this.filterValues.description ||
+      !!this.filterValues.tabName
+    );
+  }
 
   constructor(
     private databaseService: DatabaseService,
     private sectionService: SectionService,
     private organisationService: OrganisationService,
-    private tabService: TabService,
     private router: Router,
     private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
+    // Setup debounced filter
+    this.filterSubscription = this.filter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadSections();
+      });
+
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
@@ -53,10 +82,16 @@ export class ListSectionComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
@@ -76,11 +111,21 @@ export class ListSectionComponent implements OnInit {
 
   onDBChange(databaseId: any) {
     this.selectedDatabase = databaseId;
-    this.loadTabs();
+    this.loadSections();
   }
 
-  onTabChange(tabId: any) {
-    this.selectedTab = tabId;
+  onFilterChange() {
+    // Trigger debounced API call
+    this.filter$.next();
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
+      tabName: '',
+    };
+    // Immediately reload without filters
     this.loadSections();
   }
 
@@ -89,7 +134,7 @@ export class ListSectionComponent implements OnInit {
     const params = {
       orgId: this.selectedOrg,
       pageNumber: 1,
-      limit: 100,
+      limit: 10000,
     };
 
     this.databaseService.listDatabase(params).then(response => {
@@ -97,55 +142,56 @@ export class ListSectionComponent implements OnInit {
         this.databases = [...response.data];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0].id;
-          this.loadTabs();
-        } else {
-          this.selectedDatabase = null;
-          this.selectedTab = null;
-          this.tabs = [];
-          this.sections = [];
-          this.filteredSections = [];
-        }
-      }
-    });
-  }
-
-  loadSections() {
-    if (!this.selectedOrg) return;
-    const params = {
-      orgId: this.selectedOrg,
-      tabId: this.selectedTab,
-      pageNumber: 1,
-      limit: this.limit,
-    };
-
-    this.sectionService.listSection(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.sections = [...response.data];
-        this.filteredSections = [...this.sections];
-      }
-    });
-  }
-
-  loadTabs() {
-    if (!this.selectedDatabase) return;
-    const params = {
-      orgId: this.selectedOrg,
-      databaseId: this.selectedDatabase,
-      pageNumber: 1,
-      limit: 100,
-    };
-
-    this.tabService.listTab(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = [...response.data];
-        if (this.tabs.length > 0) {
-          this.selectedTab = this.tabs[0].id;
           this.loadSections();
         } else {
-          this.selectedTab = null;
+          this.selectedDatabase = null;
           this.sections = [];
           this.filteredSections = [];
         }
+      }
+    });
+  }
+
+  loadSections(event?: any) {
+    if (!this.selectedDatabase) return;
+
+    // Store the event for future reloads
+    if (event) {
+      this.lastTableLazyLoadEvent = event;
+    }
+
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const limit = event ? event.rows : this.limit;
+
+    const params: any = {
+      orgId: this.selectedOrg,
+      databaseId: this.selectedDatabase,
+      page: page,
+      limit: limit,
+    };
+
+    // Build filter object
+    const filter: any = {};
+    if (this.filterValues.name) {
+      filter.name = this.filterValues.name;
+    }
+    if (this.filterValues.description) {
+      filter.description = this.filterValues.description;
+    }
+    if (this.filterValues.tabName) {
+      filter.tabName = this.filterValues.tabName;
+    }
+
+    // Add JSON stringified filter if any filter is set
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
+
+    this.sectionService.listSection(params).then((response: any) => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.sections = response.data?.sections || [];
+        this.filteredSections = [...this.sections];
+        this.totalRecords = response.data?.count || this.sections.length;
       }
     });
   }
@@ -173,17 +219,18 @@ export class ListSectionComponent implements OnInit {
       this.sectionService
         .deleteSection(this.selectedOrg, this.sectionToDelete)
         .then(response => {
+          this.showDeleteConfirm = false;
+          this.sectionToDelete = null;
           if (this.globalService.handleSuccessService(response)) {
-            this.loadSections();
-            this.showDeleteConfirm = false;
-            this.sectionToDelete = null;
+            if (this.lastTableLazyLoadEvent) {
+              this.loadSections(this.lastTableLazyLoadEvent);
+            }
           }
         });
     }
   }
 
-  onEditTab(tab: any) {
-    // Handle edit action
-    this.router.navigate([SECTION.EDIT, this.selectedOrg, tab.id]);
+  onEditSection(section: any) {
+    this.router.navigate([SECTION.EDIT, this.selectedOrg, section.id]);
   }
 }

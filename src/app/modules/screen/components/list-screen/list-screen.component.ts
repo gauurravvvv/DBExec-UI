@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuItem } from 'primeng/api';
-import { SCREEN, TAB } from 'src/app/constants/routes';
+import { MenuItem, LazyLoadEvent } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { SCREEN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
@@ -13,9 +16,13 @@ import { ScreenService } from '../../services/screen.service';
   templateUrl: './list-screen.component.html',
   styleUrls: ['./list-screen.component.scss'],
 })
-export class ListScreenComponent implements OnInit {
-  // PrimeNG Table handles pagination and filtering locally
-  limit = 1000;
+export class ListScreenComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
+  // Pagination limit for screens
+  limit = 10;
+  totalRecords = 0;
+  lastTableLazyLoadEvent: any;
 
   filteredScreens: any[] = [];
 
@@ -32,6 +39,20 @@ export class ListScreenComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
+  // Filter values for column filtering
+  filterValues: any = {
+    name: '',
+    description: '',
+  };
+
+  // Debouncing for filter changes
+  private filter$ = new Subject<void>();
+  private filterSubscription!: Subscription;
+
+  get isFilterActive(): boolean {
+    return !!this.filterValues.name || !!this.filterValues.description;
+  }
+
   constructor(
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
@@ -41,6 +62,13 @@ export class ListScreenComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Setup debounced filter
+    this.filterSubscription = this.filter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadScreens();
+      });
+
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
@@ -49,10 +77,16 @@ export class ListScreenComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -66,6 +100,8 @@ export class ListScreenComponent implements OnInit {
           this.databases = [];
           this.selectedDatabase = null;
           this.filteredScreens = [];
+          this.screens = [];
+          this.totalRecords = 0;
         }
       }
     });
@@ -76,8 +112,8 @@ export class ListScreenComponent implements OnInit {
     this.loadDatabases();
   }
 
-  onDBChange(dbId: any) {
-    this.selectedDatabase = dbId;
+  onDBChange(databaseId: any) {
+    this.selectedDatabase = databaseId;
     this.loadScreens();
   }
 
@@ -86,44 +122,84 @@ export class ListScreenComponent implements OnInit {
     const params = {
       orgId: this.selectedOrg,
       pageNumber: 1,
-      limit: 100,
+      limit: 10000,
     };
 
     this.databaseService.listDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = response.data || [];
+        this.databases = [...response.data];
         if (this.databases.length > 0) {
           this.selectedDatabase = this.databases[0].id;
           this.loadScreens();
         } else {
           this.selectedDatabase = null;
+          this.screens = [];
           this.filteredScreens = [];
         }
       }
     });
   }
 
-  loadScreens() {
+  loadScreens(event?: any) {
     if (!this.selectedDatabase) return;
-    const params = {
+
+    // Store the event for future reloads
+    if (event) {
+      this.lastTableLazyLoadEvent = event;
+    }
+
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const limit = event ? event.rows : this.limit;
+
+    const params: any = {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
-      pageNumber: 1,
-      limit: this.limit,
+      page: page,
+      limit: limit,
     };
 
-    this.screenService.listScreen(params).then(response => {
+    // Build filter object
+    const filter: any = {};
+    if (this.filterValues.name) {
+      filter.name = this.filterValues.name;
+    }
+    if (this.filterValues.description) {
+      filter.description = this.filterValues.description;
+    }
+
+    // Add JSON stringified filter if any filter is set
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
+
+    this.screenService.listScreen(params).then((response: any) => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.screens = response.data;
+        this.screens = response.data?.screens || [];
         this.filteredScreens = [...this.screens];
+        this.totalRecords = response.data?.count || this.screens.length;
       }
     });
+  }
+
+  onFilterChange() {
+    // Trigger debounced API call
+    this.filter$.next();
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
+    };
+    // Immediately reload without filters
+    this.loadScreens();
   }
 
   onAddNewScreen() {
     this.router.navigate([SCREEN.ADD]);
   }
 
+  // Not used but kept for reference if direct edit without object is needed
   onEdit(id: string) {
     this.router.navigate([SCREEN.EDIT, this.selectedOrg, id]);
   }
@@ -143,17 +219,18 @@ export class ListScreenComponent implements OnInit {
       this.screenService
         .deleteScreen(this.selectedOrg, this.screenToDelete)
         .then(response => {
+          this.showDeleteConfirm = false;
+          this.screenToDelete = null;
           if (this.globalService.handleSuccessService(response)) {
-            this.loadScreens();
-            this.showDeleteConfirm = false;
-            this.screenToDelete = null;
+            if (this.lastTableLazyLoadEvent) {
+              this.loadScreens(this.lastTableLazyLoadEvent);
+            }
           }
         });
     }
   }
 
   onEditScreen(screen: any) {
-    // Handle edit action
     this.router.navigate([SCREEN.EDIT, this.selectedOrg, screen.id]);
   }
 

@@ -5,6 +5,7 @@
         <div class="page-header-section">
             <div class="header-content">
                 <h2>Users</h2>
+                <p class="subtitle">Manage business users and application access</p>
             </div>
         </div>
 
@@ -45,7 +46,7 @@
 
                     <ng-template pTemplate="header">
                         <tr>
-                            <th style="width: 12%">
+                            <th style="width: 12%" pFrozenColumn>
                                 <div class="th-content">
                                     Username
                                 </div>
@@ -88,7 +89,7 @@
                         </tr>
                         <!-- Filter Row -->
                         <tr>
-                            <th>
+                            <th pFrozenColumn>
                                 <input pInputText type="text" [(ngModel)]="filterValues.username"
                                     (input)="onFilterChange()" placeholder="Search Username"
                                     class="w-full p-column-filter">
@@ -124,7 +125,7 @@
                     </ng-template>
                     <ng-template pTemplate="body" let-user>
                         <tr class="modern-row">
-                            <td>
+                            <td pFrozenColumn>
                                 <a class="dataset-name-link" [routerLink]="['/app/users/view', selectedOrg, user.id]">
                                     {{ user.username }}
                                 </a>
@@ -151,7 +152,7 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="date-text">{{ user.createdOn | date:'mediumDate' }}</span>
+                                <span class="date-text">{{ user.createdOn | date:'medium' }}</span>
                             </td>
                             <td>
                                 <div class="row-actions">

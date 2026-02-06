@@ -39,7 +39,7 @@ export class AddSectionComponent implements OnInit {
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private databaseService: DatabaseService,
-    private sectionService: SectionService
+    private sectionService: SectionService,
   ) {
     this.initForm();
   }
@@ -171,7 +171,7 @@ export class AddSectionComponent implements OnInit {
   getAvailableTabs(currentIndex: number): any[] {
     const selectedTabs = this.tabGroups.controls
       .map((group, index) =>
-        index !== currentIndex ? group.get('tab')?.value : null
+        index !== currentIndex ? group.get('tab')?.value : null,
       )
       .filter(tab => tab !== null);
 
@@ -201,7 +201,7 @@ export class AddSectionComponent implements OnInit {
         if (sectionIndices.length > 1) {
           this.hasDuplicates = true;
           this.duplicateRows[`${groupIndex}-${name}`] = sectionIndices.map(
-            index => [groupIndex, index]
+            index => [groupIndex, index],
           );
         }
       });
@@ -210,7 +210,7 @@ export class AddSectionComponent implements OnInit {
 
   isDuplicateRow(groupIndex: number, sectionIndex: number): boolean {
     return Object.values(this.duplicateRows).some(positions =>
-      positions.some(([g, s]) => g === groupIndex && s === sectionIndex)
+      positions.some(([g, s]) => g === groupIndex && s === sectionIndex),
     );
   }
 
@@ -326,7 +326,7 @@ export class AddSectionComponent implements OnInit {
     };
     this.tabService.listTab(param).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = [...response.data];
+        this.tabs = [...response.data.tabs];
       }
     });
   }

@@ -11,7 +11,7 @@ export class PromptService {
 
   listPrompt(params: any) {
     return this.http
-      .get(PROMPT.LIST + `/${params.orgId}/${params.sectionId}`)
+      .get(PROMPT.LIST, { params })
       .toPromise()
       .then(response => {
         const result = JSON.parse(JSON.stringify(response));

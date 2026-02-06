@@ -12,10 +12,7 @@ export class SectionService {
 
   listSection(params: any) {
     return this.http
-      .get(
-        SECTION.LIST +
-          `/${params.orgId}/${params.tabId}/${params.pageNumber}/${params.limit}`
-      )
+      .get(SECTION.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

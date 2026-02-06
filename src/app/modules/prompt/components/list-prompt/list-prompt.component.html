@@ -1,155 +1,186 @@
-<div class="super-admin-wrapper">
-    <div class="super-admin-container">
-        <div class="page-header">
-            <h2>Prompts</h2>
-            <button pButton class="p-button-outlined" (click)="onAddNewPrompt()">
-                + Add Prompt
-            </button>
+<div class="dataset-page-wrapper">
+    <div class="dataset-content-container">
+        <!-- Page Header -->
+        <div class="page-header-section">
+            <div class="header-content">
+                <h2>Prompts</h2>
+                <p class="subtitle">Configure database fields for data filtering and query generation</p>
+            </div>
         </div>
-        <div class="table-section">
-            <!-- Search and Page Size -->
-            <div class="table-controls">
-                <div class="filter-container">
-                    <!-- Search Box and First Dropdown -->
-                    <div class="search-and-first-dropdown">
-                        <div class="search-box">
-                            <span class="p-input-icon-left">
-                                <i class="pi pi-search"></i>
-                                <input pInputText type="text" placeholder="Search..." (input)="onSearch($event)"
-                                    [value]="searchTerm">
-                            </span>
-                        </div>
 
-                        <!-- Organisation Dropdown -->
-                        <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                            <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name"
-                                optionValue="id" [filter]="true" [floatingLabel]="true" label="Select Organisation"
-                                filterBy="name" (onChangeEvent)="onOrgChange($event)">
-                            </app-custom-dropdown>
-                        </div>
+        <!-- Content Card -->
+        <div class="content-card">
+            <!-- Toolbar -->
+            <div class="card-toolbar">
+                <div class="toolbar-left">
+                    <!-- Organisation Dropdown -->
+                    <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+                        <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name"
+                            optionValue="id" [filter]="true" label="Organisation" [floatingLabel]="true" filterBy="name"
+                            (onChangeEvent)="onOrgChange($event)">
+                        </app-custom-dropdown>
                     </div>
 
-                    <!-- Remaining Dropdowns -->
-                    <div class="remaining-dropdowns">
-                        <!-- Database Dropdown -->
-                        <div class="dropdown-field">
-                            <app-custom-dropdown [(ngModel)]="selectedDatabase" [options]="databases" optionLabel="name"
-                                optionValue="id" [filter]="true" [floatingLabel]="true" label="Select Database"
-                                filterBy="name" (onChangeEvent)="onDBChange($event)">
-                            </app-custom-dropdown>
-                        </div>
-
-                        <!-- Tab Dropdown -->
-                        <div class="dropdown-field">
-                            <span class="p-float-label">
-                                <div class="custom-tree-select p-input-wrapper"
-                                    [class.p-inputwrapper-filled]="selectedNode?.label" [class.expanded]="treeExpanded"
-                                    (click)="onTreeClick()">
-                                    <span class="selected-value">{{ (selectedNode && !selectedNode.children) ?
-                                        selectedNode.label : 'Select Section' }}</span>
-                                    <i class="pi pi-chevron-down" [class.expanded]="treeExpanded"></i>
-                                </div>
-                                <div class="tree-container" *ngIf="treeExpanded">
-                                    <p-tree [value]="tabTreeNodes" [filter]="true" filterPlaceholder="Search"
-                                        filterMode="strict" selectionMode="single" [(selection)]="selectedNode"
-                                        (onNodeSelect)="onTabChange($event)" [style]="{'width':'100%'}"
-                                        class="tree-dropdown">
-                                    </p-tree>
-                                </div>
-                                <label>Tab & Section</label>
-                            </span>
-                        </div>
+                    <!-- Database Dropdown -->
+                    <div class="dropdown-field">
+                        <app-custom-dropdown [(ngModel)]="selectedDatabase" placeholder="Select Database"
+                            [options]="databases" optionLabel="name" optionValue="id" [filter]="true"
+                            [floatingLabel]="true" label="Database" filterBy="name"
+                            (onChangeEvent)="onDBChange($event)">
+                        </app-custom-dropdown>
                     </div>
+                </div>
+
+                <div class="toolbar-right">
+                    <!-- Clear Filters Button -->
+                    <button pButton label="Clear Filters" icon="pi pi-filter-slash" (click)="clearFilters()"
+                        [disabled]="!isFilterActive" class="p-button-outlined p-button-danger modern-button">
+                    </button>
+
+                    <!-- Add Button -->
+                    <button pButton label="Add" icon="pi pi-plus" (click)="onAddNewPrompt()"
+                        class="p-button-raised p-button-primary modern-button">
+                    </button>
                 </div>
             </div>
-            <div class="table-container">
-                <table class="admin-table">
-                    <thead>
+
+            <!-- Table Wrapper -->
+            <div class="table-wrapper">
+                <p-table #dt [value]="prompts" [rows]="10" [paginator]="true" [lazy]="true"
+                    (onLazyLoad)="loadPrompts($event)" [totalRecords]="totalRecords"
+                    [globalFilterFields]="['name', 'description', 'tabName', 'sectionName']" [rowHover]="true"
+                    dataKey="id" currentPageReportTemplate="{first} - {last} of {totalRecords}"
+                    [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50,100]"
+                    styleClass="p-datatable-sm modern-table" [scrollable]="true" scrollHeight="calc(100vh - 450px)">
+
+                    <ng-template pTemplate="header">
                         <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Type</th>
-                            <th>
-                                Status
-                                <p-menu #statusMenu [popup]="true" [model]="statusFilterItems"
-                                    [style]="{'width': '150px'}" appendTo="body">
-                                </p-menu>
-                                <i class="pi pi-filter" (click)="statusMenu.toggle($event)"
-                                    [ngClass]="{'active-filter': selectedStatus !== null}"
-                                    style="margin-left: 5px; cursor: pointer;">
-                                </i>
+                            <th style="width: 15%" pFrozenColumn>
+                                <div class="th-content">Name</div>
                             </th>
-                            <th>Created Date</th>
-                            <th>Actions</th>
+                            <th style="width: 20%">
+                                <div class="th-content">Description</div>
+                            </th>
+                            <th style="width: 12%">
+                                <div class="th-content">Tab</div>
+                            </th>
+                            <th style="width: 12%">
+                                <div class="th-content">Section</div>
+                            </th>
+                            <th style="width: 10%">
+                                <div class="th-content">Type</div>
+                            </th>
+                            <th style="width: 10%">
+                                <div class="th-content">Status</div>
+                            </th>
+                            <th style="width: 12%">
+                                <div class="th-content">Created</div>
+                            </th>
+                            <th style="width: 9%">
+                                <div class="th-content centered-header">Actions</div>
+                            </th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <ng-container *ngIf="filteredPrompts && filteredPrompts.length > 0; else noData">
-                            <tr *ngFor="let prompt of filteredPrompts">
-                                <td>
-                                    <a class="admin-name" [routerLink]="['/app/prompt/view', selectedOrg, prompt.id]">
-                                        {{ prompt.name }}
-                                    </a>
-                                </td>
-                                <td>{{ prompt.description }}</td>
-                                <td>{{ prompt.type }}</td>
-                                <td>
-                                    <span class="status-badge" [class.active]="prompt.status === 1">
-                                        {{ prompt.status === 1 ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </td>
-                                <td>{{ prompt.createdOn | date:'mediumDate' }}</td>
-                                <td class="actions">
-                                    <button class="action-btn edit" (click)="onEdit(prompt.id)" title="Edit">
+                        <!-- Filter Row -->
+                        <tr>
+                            <th pFrozenColumn>
+                                <input pInputText type="text" [(ngModel)]="filterValues.name" (input)="onFilterChange()"
+                                    placeholder="Search Name" class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <input pInputText type="text" [(ngModel)]="filterValues.description"
+                                    (input)="onFilterChange()" placeholder="Search Description"
+                                    class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <input pInputText type="text" [(ngModel)]="filterValues.tabName"
+                                    (input)="onFilterChange()" placeholder="Search Tab" class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <input pInputText type="text" [(ngModel)]="filterValues.sectionName"
+                                    (input)="onFilterChange()" placeholder="Search Section"
+                                    class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <input pInputText type="text" [(ngModel)]="filterValues.type" (input)="onFilterChange()"
+                                    placeholder="Search Type" class="w-full p-column-filter">
+                            </th>
+                            <th>
+                                <!-- Status Filter -->
+                            </th>
+                            <th>
+                                <!-- No filter for Created -->
+                            </th>
+                            <th>
+                                <!-- No filter for Actions -->
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-prompt>
+                        <tr>
+                            <td pFrozenColumn>
+                                <a class="dataset-name-link"
+                                    [routerLink]="['/app/prompt/view', selectedOrg, prompt.id]">
+                                    {{ prompt.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="description-text" [title]="prompt.description">
+                                    {{ prompt.description }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="description-text">
+                                    {{ prompt.tabName || 'N/A' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="description-text">
+                                    {{ prompt.sectionName || 'N/A' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="pill">
+                                    {{ prompt.type }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-indicator"
+                                    [ngClass]="{'active': prompt.status === 1, 'inactive': prompt.status !== 1}">
+                                    <span class="dot"></span>
+                                    {{ prompt.status === 1 ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="date-text">{{ prompt.createdOn | date:'medium' }}</span>
+                            </td>
+                            <td>
+                                <div class="row-actions">
+                                    <button class="icon-btn" (click)="onEdit(prompt.id)" pTooltip="Edit"
+                                        tooltipPosition="left">
                                         <i class="pi pi-pencil"></i>
                                     </button>
-                                    <button class="action-btn edit" (click)="onConfig(prompt.id)" title="Config">
+                                    <button class="icon-btn" (click)="onConfig(prompt.id)" pTooltip="Config"
+                                        tooltipPosition="left">
                                         <i class="pi pi-cog"></i>
                                     </button>
-                                    <button class="action-btn delete" (click)="confirmDelete(prompt.id)" title="Delete">
+                                    <button class="icon-btn delete-btn" (click)="confirmDelete(prompt.id)"
+                                        pTooltip="Delete" tooltipPosition="left">
                                         <i class="pi pi-trash"></i>
                                     </button>
-                                </td>
-                            </tr>
-                        </ng-container>
-                        <ng-template #noData>
-                            <tr style="height: 100%;">
-                                <td colspan="6">
-                                    <div class="no-data">
-                                        <i class="pi pi-plus-circle"></i>
-                                        <p>No prompts found</p>
-                                        <span class="sub-text">Click on + to create a new prompt</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </tbody>
-                </table>
-                <!-- Pagination -->
-                <div class="pagination">
-                    <div class="pagination-info">
-                        <ng-container *ngIf="totalItems > 0; else noEntries">
-                            Showing {{ (currentPage - 1) * pageSize + 1 }} to
-                            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
-                        </ng-container>
-                        <ng-template #noEntries>
-                            Showing 0 to 0 of 0 entries
-                        </ng-template>
-                    </div>
-                    <div class="pagination-controls">
-                        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" class="page-btn">
-                            <i class="pi pi-chevron-left"></i>
-                        </button>
-                        <button *ngFor="let page of pages" (click)="onPageChange(page)" class="page-btn"
-                            [class.active]="page === currentPage">
-                            {{ page }}
-                        </button>
-                        <button [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)"
-                            class="page-btn">
-                            <i class="pi pi-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="8" class="empty-message-cell">
+                                No prompts found
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
             </div>
         </div>
     </div>
@@ -157,11 +188,42 @@
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
-        <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this prompt?</p>
+        <!-- Header -->
+        <div class="popup-header">
+            <div class="popup-icon">
+                <i class="pi pi-trash"></i>
+            </div>
+            <h3>Confirm Delete</h3>
+        </div>
+
+        <!-- Delete Info Section -->
+        <div class="standard-delete-section">
+            <p class="delete-intro">
+                Are you sure you want to delete this prompt?
+            </p>
+
+            <ul class="delete-info-list">
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>This will permanently remove the prompt</span>
+                </li>
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>This action cannot be undone</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Actions -->
         <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">No</button>
-            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+            <button class="btn-cancel" (click)="cancelDelete()">
+                <i class="pi pi-times"></i>
+                Cancel
+            </button>
+            <button class="btn-confirm" (click)="proceedDelete()">
+                <i class="pi pi-trash"></i>
+                Delete
+            </button>
         </div>
     </div>
 </div>

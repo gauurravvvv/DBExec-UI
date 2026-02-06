@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -13,9 +16,13 @@ import { TabService } from '../../services/tab.service';
   templateUrl: './list-tab.component.html',
   styleUrls: ['./list-tab.component.scss'],
 })
-export class ListTabComponent implements OnInit {
-  // PrimeNG Table handles pagination and filtering locally
-  limit = 1000;
+export class ListTabComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
+  // Pagination limit for tabs
+  limit = 10;
+  totalRecords = 0;
+  lastTableLazyLoadEvent: any;
 
   filteredTabs: any[] = [];
 
@@ -25,11 +32,25 @@ export class ListTabComponent implements OnInit {
   organisations: any[] = [];
   databases: any[] = [];
   tabs: any[] = [];
-  selectedOrg: any = {};
-  selectedDatabase: any = {};
+  selectedOrg: any = null;
+  selectedDatabase: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
+
+  // Filter values for column filtering
+  filterValues: any = {
+    name: '',
+    description: '',
+  };
+
+  // Debouncing for filter changes
+  private filter$ = new Subject<void>();
+  private filterSubscription!: Subscription;
+
+  get isFilterActive(): boolean {
+    return !!this.filterValues.name || !!this.filterValues.description;
+  }
 
   constructor(
     private databaseService: DatabaseService,
@@ -40,6 +61,13 @@ export class ListTabComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Setup debounced filter
+    this.filterSubscription = this.filter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadTabs();
+      });
+
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
@@ -48,10 +76,16 @@ export class ListTabComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: 1,
+      limit: 10000,
     };
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
@@ -74,12 +108,26 @@ export class ListTabComponent implements OnInit {
     this.loadTabs();
   }
 
+  onFilterChange() {
+    // Trigger debounced API call
+    this.filter$.next();
+  }
+
+  clearFilters() {
+    this.filterValues = {
+      name: '',
+      description: '',
+    };
+    // Immediately reload without filters
+    this.loadTabs();
+  }
+
   loadDatabases() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
       pageNumber: 1,
-      limit: 100,
+      limit: 10000,
     };
 
     this.databaseService.listDatabase(params).then(response => {
@@ -97,24 +145,46 @@ export class ListTabComponent implements OnInit {
     });
   }
 
-  loadTabs() {
+  loadTabs(event?: any) {
     if (!this.selectedDatabase) return;
-    const params = {
+
+    // Store the event for future reloads
+    if (event) {
+      this.lastTableLazyLoadEvent = event;
+    }
+
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const limit = event ? event.rows : this.limit;
+
+    const params: any = {
       orgId: this.selectedOrg,
       databaseId: this.selectedDatabase,
-      pageNumber: 1,
-      limit: this.limit,
+      page: page,
+      limit: limit,
     };
 
-    this.tabService.listTab(params).then(response => {
+    // Build filter object
+    const filter: any = {};
+    if (this.filterValues.name) {
+      filter.name = this.filterValues.name;
+    }
+    if (this.filterValues.description) {
+      filter.description = this.filterValues.description;
+    }
+
+    // Add JSON stringified filter if any filter is set
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
+
+    this.tabService.listTab(params).then((response: any) => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = [...response.data];
+        this.tabs = response.data?.tabs || [];
         this.filteredTabs = [...this.tabs];
+        this.totalRecords = response.data?.count || this.tabs.length;
       }
     });
   }
-
-  // Methods for manual pagination and filtering have been removed as PrimeNG Table handles this locally.
 
   onAddNewTab() {
     this.router.navigate([TAB.ADD]);
@@ -139,17 +209,18 @@ export class ListTabComponent implements OnInit {
       this.tabService
         .deleteTab(this.selectedOrg, this.tabToDelete)
         .then(response => {
+          this.showDeleteConfirm = false;
+          this.tabToDelete = null;
           if (this.globalService.handleSuccessService(response)) {
-            this.loadTabs();
-            this.showDeleteConfirm = false;
-            this.tabToDelete = null;
+            if (this.lastTableLazyLoadEvent) {
+              this.loadTabs(this.lastTableLazyLoadEvent);
+            }
           }
         });
     }
   }
 
   onEditTab(tab: any) {
-    // Handle edit action
     this.router.navigate([TAB.EDIT, this.selectedOrg, tab.id]);
   }
 }

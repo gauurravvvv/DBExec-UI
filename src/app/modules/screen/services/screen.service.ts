@@ -11,10 +11,7 @@ export class ScreenService {
 
   listScreen(params: any) {
     return this.http
-      .get(
-        SCREEN.LIST +
-          `/${params.orgId}/${params.databaseId}/${params.pageNumber}/${params.limit}`
-      )
+      .get(SCREEN.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -81,7 +78,7 @@ export class ScreenService {
     configuration: any,
     organisation: string,
     databaseId: string,
-    screenId: string
+    screenId: string,
   ) {
     return this.http
       .post(SCREEN.SAVE_CONFIGURATION, {
