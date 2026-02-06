@@ -799,6 +799,66 @@
     </div>
 </div>
 
+<div class="maximized-visual-overlay" *ngIf="maximizedVisual" (click)="minimizeVisual()">
+    <div class="maximized-visual-container" (click)="$event.stopPropagation()">
+        <div class="maximized-visual-header">
+            <span class="maximized-visual-title">{{maximizedVisual.title}}</span>
+            <button pButton icon="pi pi-times" class="p-button-text p-button-rounded close-maximize-btn"
+                (click)="minimizeVisual()" pTooltip="Close" tooltipPosition="left">
+            </button>
+        </div>
+        <div class="maximized-visual-body">
+            <!-- Bar Chart Types -->
+            <app-configurable-bar-chart *ngIf="isBarChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
+            </app-configurable-bar-chart>
+
+            <!-- Line Chart -->
+            <app-configurable-line-chart *ngIf="maximizedVisual.chartType === 'line'" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [data]="maximizedVisual.chartData">
+            </app-configurable-line-chart>
+
+            <!-- Area Chart Types -->
+            <app-configurable-area-chart *ngIf="isAreaChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
+            </app-configurable-area-chart>
+
+            <!-- Polar/Radar Chart -->
+            <app-configurable-polar-chart *ngIf="maximizedVisual.chartType === 'polar'" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [data]="maximizedVisual.chartData">
+            </app-configurable-polar-chart>
+
+            <!-- Pie Chart Types -->
+            <app-configurable-pie-chart *ngIf="isPieChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
+            </app-configurable-pie-chart>
+
+            <!-- Gauge Chart Types -->
+            <app-configurable-gauge-chart *ngIf="isGaugeChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [chartType]="maximizedVisual.chartType || ''" [data]="maximizedVisual.chartData">
+            </app-configurable-gauge-chart>
+
+            <!-- Number Card Chart -->
+            <app-configurable-card-chart *ngIf="isCardChartType(maximizedVisual.chartType)" [showConfigPanel]="false"
+                [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [data]="maximizedVisual.chartData">
+            </app-configurable-card-chart>
+
+            <!-- Heat Map Chart -->
+            <app-configurable-heatmap-chart *ngIf="isHeatMapChartType(maximizedVisual.chartType)"
+                [showConfigPanel]="false" [chartWidth]="700" [chartHeight]="400" [chartConfig]="maximizedVisual.config"
+                [data]="maximizedVisual.chartData">
+            </app-configurable-heatmap-chart>
+        </div>
+    </div>
+</div>
+
 <!-- Save Analysis Dialog -->
 <app-save-analyses-dialog [visible]="showSaveDialog" [initialName]="analysisDetails?.name"
     [initialDescription]="analysisDetails?.description" [dialogTitle]="'Update Analysis'"

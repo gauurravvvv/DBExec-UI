@@ -74,12 +74,6 @@
     display: flex;
     gap: 8px !important;
 
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
     .p-button,
     button {
       padding: 0.5rem !important;
@@ -136,6 +130,85 @@
         color: var(--primary-color) !important;
       }
     }
+  }
+
+  // Dataset Loading Status Indicator
+  .dataset-status-indicator {
+    margin-left: auto;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+
+    .status-loading,
+    .status-loaded,
+    .status-error {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      i {
+        font-size: 14px;
+      }
+    }
+
+    .status-loading {
+      color: var(--primary-color);
+      background-color: rgba(var(--primary-color-rgb), 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+
+      i {
+        animation: spin 1s linear infinite;
+      }
+    }
+
+    .status-loaded {
+      color: #22c55e;
+      background-color: rgba(34, 197, 94, 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+
+    .status-error {
+      color: #ef4444;
+      background-color: rgba(239, 68, 68, 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+
+    .refresh-btn {
+      margin-left: 8px;
+      padding: 6px !important;
+      min-width: auto !important;
+      color: var(--secondary-color);
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        color: var(--primary-color);
+        background-color: rgba(var(--primary-color-rgb), 0.1);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -362,7 +435,6 @@
     font-size: 12px;
     font-weight: 600;
     color: var(--text-color);
-    text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
     overflow: hidden;
@@ -427,431 +499,20 @@
     white-space: nowrap;
   }
 
-  .field-menu {
+  .field-card.custom-field {
+    border-left: 3px solid var(--primary-color);
+  }
+
+  .field-action {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-    color: var(--secondary-color);
+    color: var(--primary-color);
     font-size: 14px;
-    opacity: 0;
-    visibility: hidden;
     transition: all 0.2s ease;
-    cursor: pointer;
-
-    &:hover {
-      color: var(--primary-color);
-    }
-  }
-
-  // Add Visual Section
-  .add-visual-section {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .add-visual-button {
-    width: 100%;
-    font-weight: 600;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  // Visual List Section
-  .visual-list-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    text-align: center;
-    color: var(--secondary-color);
-
-    i {
-      font-size: 48px;
-      margin-bottom: 12px;
-      opacity: 0.5;
-    }
-
-    p {
-      font-size: 13px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--text-color);
-    }
-  }
-
-  .visual-list-items {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px;
-  }
-
-  .visual-list-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background-color: var(--hover-background);
-      border-color: var(--primary-color);
-      transform: translateX(2px);
-    }
-
-    &.focused {
-      border-color: var(--primary-color);
-      background-color: rgba(var(--primary-color-rgb), 0.08);
-    }
-  }
-
-  .visual-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    color: var(--secondary-color);
-    font-size: 12px;
-  }
-
-  .visual-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .visual-name {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  // Add Filter Section
-  .add-filter-section {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .add-filter-button {
-    width: 100%;
-    font-weight: 600;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  .filter-list-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    text-align: center;
-    color: var(--secondary-color);
-
-    i {
-      font-size: 48px;
-      margin-bottom: 12px;
-      opacity: 0.5;
-    }
-
-    p {
-      font-size: 13px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--text-color);
-    }
-  }
-
-  // Chart Type Section
-  .chart-type-section {
-    display: flex;
-    flex-direction: column;
-    padding: 0 10px 16px 10px; // Add padding for data mapping field spacing
-
-    .section-divider {
-      height: 1px;
-      background-color: var(--border-color);
-      margin: 8px 0 12px 0;
-    }
-
-    .axis-selection-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-color);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-  }
-
-  // Selected Chart Header (when chart type already selected)
-  .selected-chart-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    background-color: rgba(var(--primary-color-rgb), 0.08);
-    border-bottom: 1px solid var(--border-color);
-
-    .selected-chart-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-color);
-
-      i {
-        color: var(--primary-color);
-        font-size: 16px;
-      }
-    }
-
-    button {
-      color: var(--secondary-color);
-
-      &:hover {
-        color: var(--primary-color);
-      }
-    }
-  }
-
-  .chart-type-hint {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    background-color: rgba(var(--primary-color-rgb), 0.08);
-    border-bottom: 1px solid var(--border-color);
-    font-size: 11px;
-    color: var(--text-color);
-
-    i {
-      color: var(--primary-color);
-      font-size: 12px;
-    }
-  }
-
-  // Chart Search Wrapper
-  .chart-search-wrapper {
-    padding: 10px 12px;
-    background-color: var(--card-background);
-    border-bottom: 1px solid var(--border-color);
-
-    .p-input-icon-left {
-      input {
-        width: 100%;
-        padding-left: 2.5rem;
-        font-size: 13px;
-        border-radius: 6px;
-        border: 1px solid var(--border-color);
-        background-color: var(--hover-background);
-        transition: all 0.2s ease;
-
-        &:focus {
-          border-color: var(--primary-color);
-          background-color: var(--card-background);
-        }
-
-        &::placeholder {
-          color: var(--secondary-color);
-          font-style: italic;
-        }
-      }
-
-      i {
-        color: var(--secondary-color);
-        font-size: 14px;
-        left: 0.75rem;
-      }
-    }
-  }
-
-  // Chart Categories Container
-  .chart-categories {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .chart-category-section {
-    margin-bottom: 4px;
-  }
-
-  .category-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--secondary-color);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 8px 10px 4px 10px;
-    background-color: var(--hover-background);
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  // Chart Type Grid
-  .chart-type-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    padding: 8px 10px;
-  }
-
-  .chart-type-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 4px;
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    gap: 4px;
-    min-height: 50px;
-    position: relative;
-
-    &:hover {
-      background-color: var(--hover-background);
-      border-color: var(--primary-color);
-      transform: scale(1.05);
-      z-index: 2;
-
-      .chart-icon {
-        color: var(--primary-color);
-      }
-
-      .chart-name {
-        opacity: 1;
-        max-height: 24px;
-      }
-    }
-
-    &.selected {
-      background-color: rgba(var(--primary-color-rgb), 0.15);
-      border-color: var(--primary-color);
-
-      .chart-icon {
-        color: var(--primary-color);
-      }
-
-      .chart-name {
-        color: var(--primary-color);
-        font-weight: 600;
-        opacity: 1;
-      }
-    }
-  }
-
-  // Axis Selection Section
-  .axis-selection-section {
-    padding: 0 10px 16px 10px;
-
-    .section-divider {
-      height: 1px;
-      background-color: var(--border-color);
-      margin: 12px 0;
-    }
-
-    .axis-selection-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--secondary-color);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-    }
-
-    .axis-group {
-      margin-bottom: 12px;
-
-      label {
-        display: block;
-        font-size: 12px;
-        color: var(--text-color-secondary);
-        margin-bottom: 6px;
-        font-weight: 500;
-      }
-
-      ::ng-deep .p-dropdown {
-        width: 100% !important;
-
-        .p-dropdown-label {
-          font-size: 12px;
-          padding: 8px 12px;
-        }
-      }
-    }
-  }
-
-  .chart-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: var(--secondary-color);
-    transition: all 0.2s ease;
-
-    &.rotate {
-      transform: rotate(90deg);
-    }
-  }
-
-  .chart-name {
-    font-size: 8px;
-    font-weight: 500;
-    color: var(--text-color);
-    text-align: center;
-    line-height: 1.1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-    opacity: 0.7;
-    max-height: 16px;
-    transition: all 0.2s ease;
-  }
-
-  // Visual Count
-  .visual-count {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    text-align: center;
-    color: var(--secondary-color);
-    font-size: 11px;
-
-    .hint {
-      font-size: 10px;
-      opacity: 0.7;
-      font-style: italic;
-    }
   }
 
   // Selection mode styles for fields - simple highlight
@@ -1003,10 +664,423 @@
     i {
       font-size: 16px;
       opacity: 0.9;
+      // Static arrow, no animation
     }
 
     span {
       flex: 1;
+    }
+  }
+
+  // Add Visual Section
+  .add-visual-section {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .add-visual-button {
+    width: 100%;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // Add Filter Section
+  .add-filter-section {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .add-filter-button {
+    width: 100%;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .filter-list-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--secondary-color);
+
+    i {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    p {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-color);
+    }
+  }
+
+  // Visual List Section
+  .visual-list-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--secondary-color);
+
+    i {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    p {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-color);
+    }
+  }
+
+  .visual-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .visual-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--hover-background);
+      border-color: var(--primary-color);
+      transform: translateX(2px);
+    }
+
+    &.focused {
+      border-color: var(--primary-color);
+      background-color: rgba(var(--primary-color-rgb), 0.08);
+    }
+  }
+
+  .visual-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--secondary-color);
+    font-size: 12px;
+  }
+
+  .visual-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .visual-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // Chart Type Section
+  .chart-type-section {
+    display: flex;
+    flex-direction: column;
+    padding: 0 10px 16px 10px; // Add padding for data mapping field spacing
+
+    .section-divider {
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 8px 0 12px 0;
+    }
+
+    .axis-selection-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+  }
+
+  // Selected Chart Header (when chart type already selected)
+  .selected-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background-color: rgba(var(--primary-color-rgb), 0.08);
+    border-bottom: 1px solid var(--border-color);
+
+    .selected-chart-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-color);
+
+      i {
+        color: var(--primary-color);
+        font-size: 16px;
+      }
+    }
+
+    button {
+      color: var(--secondary-color);
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  .chart-type-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background-color: rgba(var(--primary-color-rgb), 0.08);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 11px;
+    color: var(--text-color);
+
+    i {
+      color: var(--primary-color);
+      font-size: 12px;
+    }
+  }
+
+  // Chart Search Wrapper
+  .chart-search-wrapper {
+    padding: 10px 12px;
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
+
+    .p-input-icon-left {
+      input {
+        width: 100%;
+        padding-left: 2.5rem;
+        font-size: 13px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background-color: var(--hover-background);
+        transition: all 0.2s ease;
+
+        &:focus {
+          border-color: var(--primary-color);
+          background-color: var(--card-background);
+        }
+
+        &::placeholder {
+          color: var(--secondary-color);
+          font-style: italic;
+        }
+      }
+
+      i {
+        color: var(--secondary-color);
+        font-size: 14px;
+        left: 0.75rem;
+      }
+    }
+  }
+
+  // Chart Categories Container
+  .chart-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .chart-category-section {
+    margin-bottom: 4px;
+  }
+
+  .category-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 10px 4px 10px;
+    background-color: var(--hover-background);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  // Chart Type Grid
+  .chart-type-grid {
+    display: grid;
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    ); // minmax(0, 1fr) ensures equal width
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  .chart-type-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 4px;
+    min-height: 50px;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+
+    &:hover {
+      background-color: var(--hover-background);
+      border-color: var(--primary-color);
+
+      .chart-icon {
+        color: var(--primary-color);
+      }
+
+      .chart-name {
+        opacity: 1;
+        max-height: 24px;
+      }
+    }
+
+    &.selected {
+      background-color: rgba(var(--primary-color-rgb), 0.15);
+      border-color: var(--primary-color);
+
+      .chart-icon {
+        color: var(--primary-color);
+      }
+
+      .chart-name {
+        color: var(--primary-color);
+        font-weight: 600;
+        opacity: 1;
+      }
+    }
+  }
+
+  // Axis Selection Section
+  .axis-selection-section {
+    padding: 0 10px 16px 10px;
+
+    .section-divider {
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 12px 0;
+    }
+
+    .axis-selection-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .axis-group {
+      margin-bottom: 12px;
+
+      label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-color-secondary);
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+
+      ::ng-deep .p-dropdown {
+        width: 100% !important;
+
+        .p-dropdown-label {
+          font-size: 12px;
+          padding: 8px 12px;
+        }
+      }
+    }
+  }
+
+  .chart-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--secondary-color);
+    transition: all 0.2s ease;
+
+    &.rotate {
+      transform: rotate(90deg);
+    }
+  }
+
+  .chart-name {
+    font-size: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+    text-align: center;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    opacity: 0.7;
+    max-height: 16px;
+    transition: all 0.2s ease;
+  }
+
+  // Visual Count
+  .visual-count {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+    color: var(--secondary-color);
+    font-size: 11px;
+
+    .hint {
+      font-size: 10px;
+      opacity: 0.7;
+      font-style: italic;
     }
   }
 }
@@ -1047,10 +1121,9 @@
     justify-content: space-between;
 
     .dataset-label {
-      font-size: 11px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--secondary-color);
-      text-transform: uppercase;
       letter-spacing: 0.5px;
       margin: 0;
     }
@@ -1497,36 +1570,62 @@
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  overflow: hidden; // Keep content inside
+  overflow: visible; // Changed from hidden to allow legend below to display
   min-height: 0;
   min-width: 0;
 
   // Chart component should fill the container
-  app-configurable-bar-chart {
+  app-configurable-bar-chart,
+  app-configurable-line-chart,
+  app-configurable-area-chart,
+  app-configurable-pie-chart,
+  app-configurable-polar-chart,
+  app-configurable-gauge-chart,
+  app-configurable-card-chart,
+  app-configurable-heatmap-chart,
+  app-configurable-treemap-chart {
     width: 100%;
     height: 100%;
     display: flex;
     flex: 1;
   }
 
-  // Deep styles to fix ngx-charts bottom gap
+  // Deep styles to fix ngx-charts and ensure legend visibility
   ::ng-deep {
     .bar-chart-container,
+    .line-chart-container,
+    .area-chart-container,
+    .pie-chart-container,
+    .polar-chart-container,
+    .gauge-chart-container,
+    .card-chart-container,
+    .heatmap-chart-container,
+    .treemap-chart-container,
     .chart-wrapper,
     .chart-section {
       width: 100% !important;
       height: 100% !important;
       display: flex !important;
       flex: 1 !important;
+      overflow: visible !important; // Ensure legend is visible
     }
 
     ngx-charts-bar-vertical,
     ngx-charts-bar-horizontal,
+    ngx-charts-bar-vertical-2d,
+    ngx-charts-bar-horizontal-2d,
+    ngx-charts-bar-vertical-stacked,
+    ngx-charts-bar-horizontal-stacked,
+    ngx-charts-bar-vertical-normalized,
+    ngx-charts-bar-horizontal-normalized,
     ngx-charts-line-chart,
     ngx-charts-area-chart,
+    ngx-charts-area-chart-stacked,
+    ngx-charts-area-chart-normalized,
     ngx-charts-pie-chart,
     ngx-charts-advanced-pie-chart,
     ngx-charts-pie-grid,
+    ngx-charts-polar-chart,
     ngx-charts-gauge,
     ngx-charts-linear-gauge,
     ngx-charts-number-card,
@@ -1541,11 +1640,30 @@
     .ngx-charts-outer {
       width: 100% !important;
       height: 100% !important;
+      overflow: visible !important;
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: flex-start !important;
     }
 
     svg.ngx-charts {
-      width: 100% !important;
-      height: 100% !important;
+      flex: 1 !important;
+      min-width: 0 !important;
+      overflow: visible !important;
+    }
+
+    // Legend layout styles - keep legend on right side
+    .chart-legend {
+      flex-shrink: 0 !important;
+      flex-grow: 0 !important;
+      overflow-y: auto !important;
+      max-height: 100% !important;
+    }
+
+    .legend-wrap {
+      overflow-y: auto !important;
+      max-height: 100% !important;
     }
 
     // Remove bottom gap under chart
@@ -1719,65 +1837,85 @@
   }
 }
 
-// ===================================================================
-// Visual Loading Placeholder
-// ===================================================================
-.visual-loading-placeholder,
-.visual-error-placeholder {
+// Maximized Visual Overlay
+.maximized-visual-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  width: 100%;
-  min-height: 200px;
-  background: linear-gradient(
-    135deg,
-    var(--hover-background) 0%,
-    var(--background-color) 100%
-  );
-  border-radius: 8px;
-  animation: pulse 2s ease-in-out infinite;
+  animation: fadeIn 0.2s ease-out;
 }
 
-.loading-content,
-.error-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 32px;
-  text-align: center;
-}
-
-.loading-spinner {
-  font-size: 36px;
-  color: var(--primary-color);
-}
-
-.loading-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--secondary-color);
-  letter-spacing: 0.5px;
-}
-
-.error-icon {
-  font-size: 36px;
-  color: var(--error-color, #dc3545);
-}
-
-.error-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--error-color, #dc3545);
-}
-
-@keyframes pulse {
-  0%,
-  100% {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
   }
-  50% {
-    opacity: 0.7;
+}
+
+.maximized-visual-container {
+  background: var(--surface-card, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+  max-width: 85vw;
+  max-height: 80vh;
+  width: 750px;
+  height: 520px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
   }
+  to {
+    transform: scale(1);
+  }
+}
+
+.maximized-visual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--surface-border, #e0e0e0);
+  background: var(--surface-ground, #f8f9fa);
+
+  .maximized-visual-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color, #333);
+  }
+
+  .close-maximize-btn {
+    color: var(--text-secondary-color, #666);
+    width: 36px;
+    height: 36px;
+
+    &:hover {
+      background: var(--surface-hover, rgba(0, 0, 0, 0.08));
+      color: var(--text-color, #333);
+    }
+  }
+}
+
+.maximized-visual-body {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--surface-card, #ffffff);
 }
