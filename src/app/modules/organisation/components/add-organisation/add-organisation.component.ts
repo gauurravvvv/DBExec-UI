@@ -22,7 +22,7 @@ export class AddOrganisationComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private organisationService: OrganisationService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     this.initForm();
   }
@@ -37,19 +37,13 @@ export class AddOrganisationComponent implements OnInit {
     this.orgForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(REGEX.orgName)]],
       description: ['', [Validators.required]],
-      maxAdmins: ['', [Validators.required, Validators.min(1)]],
-      maxUsers: ['', [Validators.required, Validators.min(1)]],
-      maxEnvironments: ['', [Validators.required, Validators.min(1)]],
-      maxCategories: ['', [Validators.required, Validators.min(1)]],
-      maxDatabases: ['', [Validators.required, Validators.min(1)]],
-      maxGroups: ['', [Validators.required, Validators.min(1)]],
       encryptionAlgorithm: ['', [Validators.required]],
       pepperKey: [
         '',
         [
           Validators.required,
           Validators.pattern(
-            /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{32,}$/
+            /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{32,}$/,
           ),
         ],
       ],
@@ -117,7 +111,7 @@ export class AddOrganisationComponent implements OnInit {
     event.preventDefault();
     this.showPepperKey = !this.showPepperKey;
     const pepperKeyInput = document.getElementById(
-      'pepperKey'
+      'pepperKey',
     ) as HTMLInputElement;
     if (pepperKeyInput) {
       pepperKeyInput.type = this.showPepperKey ? 'text' : 'password';

@@ -12,16 +12,7 @@
                 <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
                     [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
                 </button>
-                <ng-container *ngIf="currentStep === 0">
-                    <button pButton type="button" label="Next" (click)="nextStep()" class="p-button-outlined"
-                        [disabled]="!isBasicInfoValid()">
-                        <i class="pi pi-arrow-right ml-2"></i>
-                    </button>
-                </ng-container>
-                <ng-container *ngIf="currentStep === 1">
-                    <button pButton type="button" label="Previous" class="p-button-outlined" (click)="previousStep()">
-                        <i class="pi pi-arrow-left mr-2"></i>
-                    </button>
+                <ng-container>
                     <button pButton type="submit" class="p-button-outlined" label="Save" (click)="onSubmit()"
                         [disabled]="orgForm.invalid || !isFormDirty">
                         <i class="pi pi-save mr-2"></i>
@@ -30,23 +21,11 @@
             </div>
         </div>
 
-        <!-- Steps -->
-        <div class="steps-container" [ngClass]="'step-' + (currentStep + 1)">
-            <div class="step" [class.active]="currentStep === 0" (click)="goToStep(0)">
-                <div class="step-dot">1</div>
-                <span class="step-label">Basic Information</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step" [class.active]="currentStep === 1" (click)="goToStep(1)">
-                <div class="step-dot">2</div>
-                <span class="step-label">Organisation Configuration</span>
-            </div>
-        </div>
 
         <!-- Form Section -->
         <form [formGroup]="orgForm" class="admin-form mt-4">
             <!-- Step 1: Basic Information -->
-            <div *ngIf="currentStep === 0" class="form-grid">
+            <div class="form-grid">
                 <!-- Organisation Name -->
                 <app-custom-input formControlName="name" label="Organisation Name" placeholder="Enter organisation name"
                     icon="pi-building" [required]="true"
@@ -65,57 +44,6 @@
                 <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0"
                     trueLabel="Active" falseLabel="Inactive">
                 </app-custom-toggle>
-            </div>
-
-            <!-- Step 2: Organisation Configuration -->
-            <div *ngIf="currentStep === 1" class="form-grid">
-                <!-- Max Admins -->
-                <app-custom-input formControlName="maxAdmins" label="Maximum Admins" placeholder="Enter maximum admins"
-                    icon="pi-user-plus" [required]="true"
-                    [showError]="!!(orgForm.get('maxAdmins')?.invalid && orgForm.get('maxAdmins')?.touched)"
-                    [errorMessage]="orgForm.get('maxAdmins')?.errors?.['required'] ? 'Maximum admins is required' : 
-                                   orgForm.get('maxAdmins')?.errors?.['min'] ? 'Value must be at least 1' : ''">
-                </app-custom-input>
-
-                <!-- Max Users -->
-                <app-custom-input formControlName="maxUsers" label="Maximum Users" placeholder="Enter maximum users"
-                    icon="pi-user" [required]="true"
-                    [showError]="!!(orgForm.get('maxUsers')?.invalid && orgForm.get('maxUsers')?.touched)"
-                    [errorMessage]="orgForm.get('maxUsers')?.errors?.['required'] ? 'Maximum users is required' : 
-                                   orgForm.get('maxUsers')?.errors?.['min'] ? 'Value must be at least 1' : ''">
-                </app-custom-input>
-
-                <!-- Max User Groups -->
-                <app-custom-input formControlName="maxGroups" label="Maximum Groups" placeholder="Enter maximum groups"
-                    icon="pi-users" [required]="true"
-                    [showError]="!!(orgForm.get('maxGroups')?.invalid && orgForm.get('maxGroups')?.touched)"
-                    [errorMessage]="orgForm.get('maxGroups')?.errors?.['required'] ? 'Maximum groups is required' : 
-                                   orgForm.get('maxGroups')?.errors?.['min'] ? 'Value must be at least 1' : ''">
-                </app-custom-input>
-
-                <!-- Max Environments -->
-                <app-custom-input formControlName="maxEnvironments" label="Maximum Environments"
-                    placeholder="Enter maximum environments" icon="pi-globe" [required]="true"
-                    [showError]="!!(orgForm.get('maxEnvironments')?.invalid && orgForm.get('maxEnvironments')?.touched)"
-                    [errorMessage]="orgForm.get('maxEnvironments')?.errors?.['required'] ? 'Maximum environments is required' : 
-                                   orgForm.get('maxEnvironments')?.errors?.['min'] ? 'Value must be at least 1' : ''">
-                </app-custom-input>
-
-                <!-- Max Categories -->
-                <app-custom-input formControlName="maxCategories" label="Maximum Categories"
-                    placeholder="Enter maximum categories" icon="pi-list" [required]="true"
-                    [showError]="!!(orgForm.get('maxCategories')?.invalid && orgForm.get('maxCategories')?.touched)"
-                    [errorMessage]="orgForm.get('maxCategories')?.errors?.['required'] ? 'Maximum categories is required' : 
-                                   orgForm.get('maxCategories')?.errors?.['min'] ? 'Value must be at least 1' : ''">
-                </app-custom-input>
-
-                <!-- Max Databases -->
-                <app-custom-input formControlName="maxDatabases" label="Maximum Databases"
-                    placeholder="Enter maximum databases" icon="pi-database" [required]="true"
-                    [showError]="!!(orgForm.get('maxDatabases')?.invalid && orgForm.get('maxDatabases')?.touched)"
-                    [errorMessage]="orgForm.get('maxDatabases')?.errors?.['required'] ? 'Maximum databases is required' : 
-                                   orgForm.get('maxDatabases')?.errors?.['min'] ? 'Value must be at least 1' : ''">
-                </app-custom-input>
             </div>
         </form>
     </div>

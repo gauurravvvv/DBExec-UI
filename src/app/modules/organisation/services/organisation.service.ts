@@ -24,28 +24,11 @@ export class OrganisationService {
   }
 
   addOrganisation(orgForm: FormGroup) {
-    const {
-      name,
-      description,
-      maxUsers,
-      maxEnvironments,
-      maxDatabases,
-      maxAdmins,
-      maxCategories,
-      maxGroups,
-      encryptionAlgorithm,
-      pepperKey,
-    } = orgForm.value;
+    const { name, description, encryptionAlgorithm, pepperKey } = orgForm.value;
     return this.httpClientService
       .apiPost(ORGANISATION.ADD, {
         name,
         description,
-        maxUsers,
-        maxEnvironments,
-        maxDatabases,
-        maxAdmins,
-        maxCategories,
-        maxGroups,
         encryptionAlgorithm,
         pepperKey,
       })
@@ -57,28 +40,13 @@ export class OrganisationService {
   }
 
   editOrganisation(orgForm: FormGroup) {
-    const {
-      id,
-      name,
-      maxUsers,
-      maxEnvironment,
-      maxDatabases,
-      maxAdmins,
-      maxCategories,
-      maxGroups,
-      status,
-    } = orgForm.getRawValue();
+    const { id, name, status, description } = orgForm.getRawValue();
     return this.httpClientService
       .apiPut(ORGANISATION.EDIT, {
         id,
         name,
-        maxUsers,
-        maxEnvironment,
-        maxDatabases,
-        maxAdmins,
-        maxCategories,
-        maxGroups,
         status: status ? 1 : 0,
+        description,
       })
       .toPromise()
       .then((response: any) => {
