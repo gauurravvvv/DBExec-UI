@@ -12,13 +12,8 @@
         <button pButton class="p-button-outlined mr-2" (click)="onEdit()">
           <i class="pi pi-pencil mr-2"></i>Edit
         </button>
-        <button
-          pButton
-          class="p-button-outlined p-button-danger"
-          type="button"
-          label="Delete"
-          (click)="confirmDelete()"
-        >
+        <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
+          (click)="confirmDelete()">
           <i class="pi pi-trash mr-2"></i>
         </button>
       </div>
@@ -44,18 +39,12 @@
             </div>
             <div class="info-item">
               <label>Status</label>
-              <span
-                class="status-badge"
-                [class.active]="groupData.status === 1"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="
+              <span class="status-badge" [class.active]="groupData.status === 1">
+                <i class="pi" [ngClass]="
                     groupData.status === 1
                       ? 'pi-check-circle'
                       : 'pi-times-circle'
-                  "
-                ></i>
+                  "></i>
                 {{ groupData.status === 1 ? 'Active' : 'Inactive' }}
               </span>
             </div>
@@ -101,10 +90,7 @@
             <span class="count-badge">{{ groupData.connections.length }}</span>
           </h3>
           <div class="fields-list">
-            <div
-              class="field-item"
-              *ngFor="let connection of groupData.connections"
-            >
+            <div class="field-item" *ngFor="let connection of groupData.connections">
               <i class="pi pi-user"></i>
               {{ connection }}
             </div>
@@ -119,14 +105,48 @@
   </div>
 </div>
 
-<!-- Update the confirmation popup to match list-category exactly -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">
-    <h3>Confirm Delete</h3>
-    <p>Are you sure you want to delete this group?</p>
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3>Confirm Delete</h3>
+    </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        Are you sure you want to delete this group?
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>All users will be removed from this group</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>Group permissions will be revoked</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDelete()">No</button>
-      <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()">
+        <i class="pi pi-trash"></i>
+        Delete
+      </button>
     </div>
   </div>
 </div>

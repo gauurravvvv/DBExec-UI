@@ -242,35 +242,93 @@
 </div>
 
 <!-- Delete Confirmation Dialog -->
+<!-- Delete Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content">
-    <h3>Confirm Delete</h3>
-    <p>Are you sure you want to delete this database?</p>
+  <div class="popup-content" [class.master-warning]="dbData?.isMasterDB">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon" [class.danger]="dbData?.isMasterDB">
+        <i class="pi" [ngClass]="dbData?.isMasterDB ? 'pi-exclamation-triangle' : 'pi-trash'"></i>
+      </div>
+      <h3>{{ dbData?.isMasterDB ? 'Critical Warning' : 'Confirm Delete' }}</h3>
+    </div>
 
-    <!-- Special warning for master database -->
-    <div class="warning-container" *ngIf="dbData?.isMasterDB">
-      <div class="warning-message">
-        <div class="warning-header">
-          <i class="pi pi-exclamation-triangle"></i>
-          <span class="warning-title">Critical Warning: Master Database</span>
-        </div>
-        <div class="warning-content">
-          <p>
-            <i class="pi pi-circle-fill"></i>You are attempting to delete a
-            master database.
-          </p>
-          <p><i class="pi pi-circle-fill"></i>This action cannot be undone.</p>
-          <p>
-            <i class="pi pi-circle-fill"></i>All associated data will be
-            permanently lost.
-          </p>
-        </div>
+    <!-- Standard Delete Section (Non-Master DB) -->
+    <div class="standard-delete-section" *ngIf="!dbData?.isMasterDB">
+      <div class="db-info-badge">
+        <i class="pi pi-database"></i>
+        <span>{{ dbData?.config?.dbName }}</span>
+      </div>
+
+      <p class="delete-intro">
+        Are you sure you want to delete this database?
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>All associated data will be removed</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>Connected datasets will be affected</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Master DB Warning Section -->
+    <div class="master-warning-section" *ngIf="dbData?.isMasterDB">
+      <div class="warning-badge">
+        <i class="pi pi-database"></i>
+        <span>Master Database</span>
+      </div>
+
+      <p class="warning-intro">
+        You are about to delete <strong>{{ dbData?.config?.dbName }}</strong>, which is the master database.
+      </p>
+
+      <ul class="warning-list">
+        <li>
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Controls core system operations</span>
+        </li>
+        <li>
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Permanently removes all configurations</span>
+        </li>
+        <li>
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Requires system reconfiguration</span>
+        </li>
+        <li>
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Cannot be undone</span>
+        </li>
+      </ul>
+
+      <div class="checkbox-option">
+        <p-checkbox [(ngModel)]="deleteConfiguration" [binary]="true" inputId="deleteConfig">
+        </p-checkbox>
+        <label for="deleteConfig">
+          Also delete associated system data
+        </label>
       </div>
     </div>
 
+    <!-- Actions -->
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDelete()">No</button>
-      <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()">
+        <i class="pi pi-trash"></i>
+        {{ dbData?.isMasterDB ? 'Delete Master DB' : 'Delete' }}
+      </button>
     </div>
   </div>
 </div>

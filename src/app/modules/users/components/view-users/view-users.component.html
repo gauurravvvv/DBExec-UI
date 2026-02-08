@@ -9,33 +9,16 @@
         <h2>User Details</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          class="p-button-outlined"
-          type="button"
-          label="Edit"
-          [disabled]="userId == loggedInUserId"
-          [routerLink]="['/app/users/edit', orgId, userId]"
-        >
+        <button pButton class="p-button-outlined" type="button" label="Edit" [disabled]="userId == loggedInUserId"
+          [routerLink]="['/app/users/edit', orgId, userId]">
           <i class="pi pi-pencil mr-2"></i>
         </button>
-        <button
-          pButton
-          class="p-button-outlined"
-          type="button"
-          label="Change Password"
-          (click)="openChangePasswordDialog()"
-        >
+        <button pButton class="p-button-outlined" type="button" label="Change Password"
+          (click)="openChangePasswordDialog()">
           <i class="pi pi-key mr-2"></i>
         </button>
-        <button
-          pButton
-          class="p-button-outlined p-button-danger"
-          type="button"
-          label="Delete"
-          [disabled]="userId == loggedInUserId"
-          (click)="confirmDelete(userId)"
-        >
+        <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
+          [disabled]="userId == loggedInUserId" (click)="confirmDelete(userId)">
           <i class="pi pi-trash mr-2"></i>
         </button>
       </div>
@@ -48,10 +31,7 @@
         <div class="first-row">
           <!-- Avatar Section -->
           <div class="avatar-section">
-            <div
-              class="avatar-circle"
-              [style.background-color]="avatarBackground"
-            >
+            <div class="avatar-circle" [style.background-color]="avatarBackground">
               {{ userInitials }}
             </div>
             <h3 class="admin-name">
@@ -111,9 +91,9 @@
               </span>
               <span class="value">{{
                 userData?.lastLogin
-                  ? (userData?.lastLogin | date : 'medium')
-                  : 'Never logged in'
-              }}</span>
+                ? (userData?.lastLogin | date : 'medium')
+                : 'Never logged in'
+                }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
@@ -121,10 +101,7 @@
                 Status
               </span>
               <span class="value">
-                <span
-                  class="status-badge"
-                  [class.active]="userData?.status === 1"
-                >
+                <span class="status-badge" [class.active]="userData?.status === 1">
                   {{ userData?.status === 1 ? 'Active' : 'Inactive' }}
                 </span>
               </span>
@@ -136,7 +113,7 @@
               </span>
               <span class="value">{{
                 userData?.createdOn | date : 'medium'
-              }}</span>
+                }}</span>
             </div>
           </div>
         </div>
@@ -147,17 +124,49 @@
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">
-    <h3>Confirm Delete</h3>
-    <p>Are you sure you want to delete this user?</p>
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3>Confirm Delete</h3>
+    </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        Are you sure you want to delete this user?
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>User access will be revoked</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>Login credentials will be invalidated</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDelete()">No</button>
-      <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()">
+        <i class="pi pi-trash"></i>
+        Delete
+      </button>
     </div>
   </div>
 </div>
 
-<app-change-password-dialog
-  [visible]="showChangePasswordDialog"
-  (close)="onPasswordDialogClose($event)"
->
+<app-change-password-dialog [visible]="showChangePasswordDialog" (close)="onPasswordDialogClose($event)">
 </app-change-password-dialog>

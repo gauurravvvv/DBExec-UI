@@ -186,14 +186,48 @@
     [editFieldData]="selectedField" (close)="onEditCustomFieldDialogClose($event)">
 </app-add-custom-field-dialog>
 
-<!-- Delete Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
     <div class="popup-content">
-        <h3>Confirm Delete</h3>
-        <p>Are you sure you want to delete this dataset?</p>
+        <!-- Header -->
+        <div class="popup-header">
+            <div class="popup-icon">
+                <i class="pi pi-trash"></i>
+            </div>
+            <h3>Confirm Delete</h3>
+        </div>
+
+        <!-- Delete Info Section -->
+        <div class="standard-delete-section">
+            <p class="delete-intro">
+                Are you sure you want to delete this dataset?
+            </p>
+
+            <ul class="delete-info-list">
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>All associated analyses will be affected</span>
+                </li>
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>Dataset configurations will be removed</span>
+                </li>
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>This action cannot be undone</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Actions -->
         <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">No</button>
-            <button class="btn-confirm" (click)="proceedDelete()">Yes</button>
+            <button class="btn-cancel" (click)="cancelDelete()">
+                <i class="pi pi-times"></i>
+                Cancel
+            </button>
+            <button class="btn-confirm" (click)="proceedDelete()">
+                <i class="pi pi-trash"></i>
+                Delete
+            </button>
         </div>
     </div>
 </div>
@@ -201,11 +235,42 @@
 <!-- Delete Field Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteFieldConfirm">
     <div class="popup-content">
-        <h3>Confirm Delete Field</h3>
-        <p>Are you sure you want to delete the field <strong><em>{{ fieldToDelete?.columnToView }}</em></strong>?</p>
+        <!-- Header -->
+        <div class="popup-header">
+            <div class="popup-icon">
+                <i class="pi pi-trash"></i>
+            </div>
+            <h3>Confirm Delete Field</h3>
+        </div>
+
+        <!-- Delete Info Section -->
+        <div class="standard-delete-section">
+            <p class="delete-intro">
+                Are you sure you want to delete this field?
+            </p>
+
+            <ul class="delete-info-list">
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>This field will be removed from the dataset</span>
+                </li>
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>This action cannot be undone</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Actions -->
         <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDeleteField()">No</button>
-            <button class="btn-confirm" (click)="proceedDeleteField()">Yes</button>
+            <button class="btn-cancel" (click)="cancelDeleteField()">
+                <i class="pi pi-times"></i>
+                Cancel
+            </button>
+            <button class="btn-confirm" (click)="proceedDeleteField()">
+                <i class="pi pi-trash"></i>
+                Delete
+            </button>
         </div>
     </div>
 </div>
