@@ -12,6 +12,7 @@ import { ConnectionService } from 'src/app/modules/connection/services/connectio
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { AccessService } from '../../services/access.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-grant-access',
@@ -35,7 +36,7 @@ export class GrantAccessComponent implements OnInit {
     private globalService: GlobalService,
     private databaseService: DatabaseService,
     private acessService: AccessService,
-    private connectionService: ConnectionService
+    private connectionService: ConnectionService,
   ) {}
 
   get isFormDirty(): boolean {
@@ -76,8 +77,8 @@ export class GrantAccessComponent implements OnInit {
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService
@@ -101,8 +102,8 @@ export class GrantAccessComponent implements OnInit {
     const params = {
       orgId,
       databaseId,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.connectionService
@@ -125,8 +126,8 @@ export class GrantAccessComponent implements OnInit {
 
     const params = {
       orgId,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.databaseService
@@ -179,7 +180,7 @@ export class GrantAccessComponent implements OnInit {
           users: [],
           groups: [],
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
 
       // Clear databases, groups, and users arrays
@@ -198,7 +199,7 @@ export class GrantAccessComponent implements OnInit {
           users: [],
           groups: [],
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
 
       // Clear only groups and users arrays
@@ -252,7 +253,7 @@ export class GrantAccessComponent implements OnInit {
               users: existingUserIds,
               groups: existingGroupIds,
             },
-            { emitEvent: false }
+            { emitEvent: false },
           );
         } else {
           // Clear data on unsuccessful response
@@ -263,7 +264,7 @@ export class GrantAccessComponent implements OnInit {
               users: [],
               groups: [],
             },
-            { emitEvent: false }
+            { emitEvent: false },
           );
         }
       })
@@ -276,7 +277,7 @@ export class GrantAccessComponent implements OnInit {
             users: [],
             groups: [],
           },
-          { emitEvent: false }
+          { emitEvent: false },
         );
       });
   }

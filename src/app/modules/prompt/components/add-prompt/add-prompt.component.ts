@@ -13,6 +13,7 @@ import { PromptService } from 'src/app/modules/prompt/services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { PROMPT_TYPES } from '../../constants/prompt.constant';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-prompt',
@@ -52,7 +53,7 @@ export class AddPromptComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
     private databaseService: DatabaseService,
     private sectionService: SectionService,
-    private promptService: PromptService
+    private promptService: PromptService,
   ) {
     this.initForm();
   }
@@ -215,7 +216,7 @@ export class AddPromptComponent implements OnInit, OnDestroy {
         if (promptIndices.length > 1) {
           this.hasDuplicates = true;
           this.duplicateRows[`${groupIndex}-${name}`] = promptIndices.map(
-            index => [groupIndex, index] as [number, number]
+            index => [groupIndex, index] as [number, number],
           );
         }
       });
@@ -224,14 +225,14 @@ export class AddPromptComponent implements OnInit, OnDestroy {
 
   isDuplicateRow(groupIndex: number, promptIndex: number): boolean {
     return Object.values(this.duplicateRows).some(positions =>
-      positions.some(([g, s]) => g === groupIndex && s === promptIndex)
+      positions.some(([g, s]) => g === groupIndex && s === promptIndex),
     );
   }
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -334,8 +335,8 @@ export class AddPromptComponent implements OnInit, OnDestroy {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg.id,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.databaseService.listDatabase(params).then(response => {
@@ -380,12 +381,12 @@ export class AddPromptComponent implements OnInit, OnDestroy {
     const param = {
       orgId: this.selectedOrg.id,
       databaseId: this.selectedDatabase.id,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
     this.tabService.listTab(param).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = response.data;
+        this.tabs = [...response.data.tabs];
       }
     });
   }
@@ -401,12 +402,12 @@ export class AddPromptComponent implements OnInit, OnDestroy {
       orgId: this.selectedOrg.id,
       databaseId: this.selectedDatabase.id,
       tabId: this.selectedTab.id,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
     this.sectionService.listSection(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.sections = response.data;
+        this.sections = [...response.data.sections];
         if (this.sectionGroups.length === 0) {
           this.addSectionGroup();
         }
@@ -428,12 +429,12 @@ export class AddPromptComponent implements OnInit, OnDestroy {
   getAvailableSections(currentIndex: number): any[] {
     const selectedSections = this.sectionGroups.controls
       .map((group, index) =>
-        index !== currentIndex ? group.get('sectionId')?.value : null
+        index !== currentIndex ? group.get('sectionId')?.value : null,
       )
       .filter(section => section !== null);
 
     return this.sections.filter(
-      section => !selectedSections.includes(section.id)
+      section => !selectedSections.includes(section.id),
     );
   }
 }

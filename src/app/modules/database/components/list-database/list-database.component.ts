@@ -8,6 +8,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatabaseService } from '../../services/database.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-list-database',
@@ -20,7 +21,7 @@ export class ListDatabaseComponent implements OnInit {
   filteredDBs: any[] = [];
   listParams: any = {
     limit: 10,
-    pageNumber: 1,
+    page: 1,
   };
   totalItems = 0;
 
@@ -62,8 +63,8 @@ export class ListDatabaseComponent implements OnInit {
 
   loadOrganisations() {
     const params = {
-      page: 1,
-      limit: 10000,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -118,7 +119,7 @@ export class ListDatabaseComponent implements OnInit {
     const page = event.first / event.rows + 1;
     const limit = event.rows;
 
-    this.listParams.pageNumber = page;
+    this.listParams.page = page;
     this.listParams.limit = limit;
 
     this.listDatabaseAPI();
@@ -134,7 +135,7 @@ export class ListDatabaseComponent implements OnInit {
 
     const params: any = {
       orgId: orgId,
-      pageNumber: this.listParams.pageNumber,
+      page: this.listParams.page,
       limit: this.listParams.limit,
     };
 

@@ -50,6 +50,7 @@ import {
   getSectionGroupColor as getSectionGroupColorHelper,
   getGroupedPromptsCount as getGroupedPromptsCountHelper,
 } from './helpers/style.helper';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-configure-screen',
@@ -93,7 +94,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     private screenService: ScreenService,
     private route: ActivatedRoute,
     private tabService: TabService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -174,7 +175,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
 
             // Find the color index in our palette
             const colorIndex = this.groupColors.findIndex(
-              c => c === prompt.color
+              c => c === prompt.color,
             );
             if (colorIndex !== -1) {
               colorIndices.set(prompt.groupId, colorIndex);
@@ -198,7 +199,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     // Process each tab in the configuration
     configData.forEach(configTab => {
       const tab = patchedTabs.find(
-        (t: TabData) => String(t.id) === String(configTab.id)
+        (t: TabData) => String(t.id) === String(configTab.id),
       );
       if (tab) {
         // Set tab sequence
@@ -210,7 +211,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
         // Process each section in the configuration
         configTab.sections.forEach((configSection: any) => {
           const section = tab.sections.find(
-            (s: Section) => String(s.id) === String(configSection.id)
+            (s: Section) => String(s.id) === String(configSection.id),
           );
           if (section) {
             // Set section sequence
@@ -220,20 +221,20 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
 
             // Get this section's color indices
             const colorIndices = sectionColorIndices.get(
-              String(configSection.id)
+              String(configSection.id),
             );
             const sectionColors = sectionGroupColors.get(
-              String(configSection.id)
+              String(configSection.id),
             );
 
             // Sort prompts by sequence
             configSection.prompts.sort(
-              (a: any, b: any) => a.sequence - b.sequence
+              (a: any, b: any) => a.sequence - b.sequence,
             );
 
             // Create a map of configured prompts with their data
             const promptConfigMap = new Map<string, ConfigPrompt>(
-              configSection.prompts.map((p: ConfigPrompt) => [String(p.id), p])
+              configSection.prompts.map((p: ConfigPrompt) => [String(p.id), p]),
             );
 
             // Track groups in this section to ensure they get their own colors
@@ -257,7 +258,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
                     // Find the first unused color index
                     colorIndex = this.groupColors.findIndex(
                       (_, idx) =>
-                        !Array.from(colorIndices?.values() || []).includes(idx)
+                        !Array.from(colorIndices?.values() || []).includes(idx),
                     );
                     if (colorIndex !== -1) {
                       colorIndices?.set(configPrompt.groupId, colorIndex);
@@ -269,7 +270,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
                   // Update current group ID counter if needed
                   section.currentGroupId = Math.max(
                     section.currentGroupId,
-                    configPrompt.groupId
+                    configPrompt.groupId,
                   );
 
                   return {
@@ -314,20 +315,20 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
 
             // Update section's selectAll status
             section.selectAll = section.prompts.every(
-              (p: Prompt) => p.selected
+              (p: Prompt) => p.selected,
             );
 
             // Update the global currentGroupId if needed
             this.currentGroupId = Math.max(
               this.currentGroupId,
-              section.currentGroupId
+              section.currentGroupId,
             );
           }
         });
 
         // Sort sections based on sequence
         tab.sections.sort(
-          (a: Section, b: Section) => (a.sequence || 0) - (b.sequence || 0)
+          (a: Section, b: Section) => (a.sequence || 0) - (b.sequence || 0),
         );
       }
     });
@@ -335,7 +336,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     // Filter and sort tabs
     this.openTabs = patchedTabs
       .filter((tab: TabData) =>
-        configData.some(configTab => String(configTab.id) === String(tab.id))
+        configData.some(configTab => String(configTab.id) === String(tab.id)),
       )
       .sort((a: TabData, b: TabData) => (a.sequence || 0) - (b.sequence || 0));
 
@@ -370,8 +371,8 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     let params = {
       orgId: this.orgId,
       databaseId: this.databaseId,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
     this.tabService
       .listAllTabData(params)
@@ -495,14 +496,14 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
           // Update sections and prompts while preserving selection state
           this.selectedTab.sections = this.selectedTab.sections.map(section => {
             const originalSection = originalTab.sections.find(
-              s => s.id === section.id
+              s => s.id === section.id,
             );
             if (originalSection) {
               return {
                 ...section,
                 prompts: section.prompts.map(prompt => {
                   const originalPrompt = originalSection.prompts.find(
-                    p => p.id === prompt.id
+                    p => p.id === prompt.id,
                   );
                   if (originalPrompt) {
                     return {
@@ -562,7 +563,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
   updateSectionSelectAll(section: any) {
     if (section.prompts) {
       section.selectAll = section.prompts.every(
-        (prompt: any) => prompt.selected
+        (prompt: any) => prompt.selected,
       );
     }
   }
@@ -625,7 +626,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
           tabCopy.sequence = existingTab?.sequence;
           tabCopy.sections = tabCopy.sections.map((section: Section) => {
             const existingSection = existingTab?.sections.find(
-              s => s.id === section.id
+              s => s.id === section.id,
             );
 
             return {
@@ -633,7 +634,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
               sequence: existingSection?.sequence,
               prompts: section.prompts.map((prompt: Prompt) => {
                 const existingPrompt = existingSection?.prompts.find(
-                  p => p.id === prompt.id
+                  p => p.id === prompt.id,
                 );
                 return {
                   ...prompt,
@@ -645,7 +646,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
               }),
               selectAll: existingSection
                 ? section.prompts.every(p =>
-                    existingSection.prompts.some(ep => ep.id === p.id)
+                    existingSection.prompts.some(ep => ep.id === p.id),
                   )
                 : false,
             };
@@ -687,7 +688,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
               isMandatory: prompt.isMandatory || false,
             })),
         })),
-      }))
+      })),
     );
   }
 
@@ -735,8 +736,8 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     // Check if we have any original screen configuration
     const hasOriginalConfig = this.refactoredTabData.some(tab =>
       tab.sections.some(section =>
-        section.prompts.some((prompt: any) => prompt.selected)
-      )
+        section.prompts.some((prompt: any) => prompt.selected),
+      ),
     );
 
     if (hasOriginalConfig) {
@@ -752,7 +753,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
       // Re-populate open tabs with original configuration
       this.refactoredTabData.forEach(tab => {
         const hasSelectedPrompts = tab.sections.some(section =>
-          section.prompts.some((prompt: any) => prompt.selected)
+          section.prompts.some((prompt: any) => prompt.selected),
         );
 
         if (hasSelectedPrompts) {
@@ -803,8 +804,8 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
   hasSelectedPrompts(): boolean {
     return this.openTabs.some(tab =>
       tab.sections.some(section =>
-        section.prompts.some((prompt: any) => prompt.selected)
-      )
+        section.prompts.some((prompt: any) => prompt.selected),
+      ),
     );
   }
 
@@ -823,7 +824,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
             (prompt: any) =>
               prompt.selected &&
               prompt.groupId !== undefined &&
-              prompt.groupId !== null
+              prompt.groupId !== null,
           )
           .forEach((prompt: any) => {
             if (!groupIdMap.has(prompt.groupId)) {
@@ -871,7 +872,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
         screenConfig,
         this.orgId,
         this.databaseId,
-        this.screenId
+        this.screenId,
       )
       .then(response => {
         if (this.globalService.handleSuccessService(response, true)) {
@@ -938,7 +939,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
       this.openTabs,
       this.draggedTabIndex,
       dropIndex,
-      this.activeTabIndex
+      this.activeTabIndex,
     );
     this.openTabs = result.tabs;
     this.draggedTabIndex = result.newDragIndex;
@@ -994,7 +995,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     const result = reorderSections(
       tab.sections,
       this.draggedSectionIndex,
-      dropIndex
+      dropIndex,
     );
     tab.sections = result.sections;
     this.draggedSectionIndex = result.newDragIndex;
@@ -1023,7 +1024,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
   onPromptDragStart(
     tabId: string | number,
     sectionId: string | number,
-    promptIndex: number
+    promptIndex: number,
   ) {
     if (this.isFreeze) return;
     this.draggedPromptIndex = promptIndex;
@@ -1040,7 +1041,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
   onPromptDragEnter(
     tabId: string | number,
     sectionId: string | number,
-    dropIndex: number
+    dropIndex: number,
   ) {
     if (
       this.isFreeze ||
@@ -1061,7 +1062,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     this.draggedPromptIndex = reorderPrompts(
       section,
       this.draggedPromptIndex,
-      dropIndex
+      dropIndex,
     );
   }
 
@@ -1072,7 +1073,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
   onPromptDrop(
     tabId: string | number,
     sectionId: string | number,
-    dropIndex: number
+    dropIndex: number,
   ) {
     if (
       this.isFreeze ||
@@ -1111,7 +1112,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
       }
 
       const index = this.selectedPrompts[section.id].findIndex(
-        p => p.id === prompt.id
+        p => p.id === prompt.id,
       );
       if (index === -1) {
         this.selectedPrompts[section.id].push(prompt);
@@ -1138,13 +1139,13 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
 
           // Find the color index used by the active group in this section
           const activeGroupPrompt = section.prompts.find(
-            p => p.groupId === this.activeGroupId && p.colorIndex !== undefined
+            p => p.groupId === this.activeGroupId && p.colorIndex !== undefined,
           );
           const activeGroupColorIndex = activeGroupPrompt?.colorIndex;
 
           // Check if the active group has mandatory prompts
           const isActiveGroupMandatory = section.prompts.some(
-            p => p.groupId === this.activeGroupId && p.isMandatory
+            p => p.groupId === this.activeGroupId && p.isMandatory,
           );
 
           prompt.groupId = this.activeGroupId;
@@ -1168,7 +1169,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     const result = validateAndCleanupGroupHelper(
       section,
       groupId,
-      this.activeGroupId
+      this.activeGroupId,
     );
     if (result.cleanedGroupId !== null) {
       this.activeGroupId = null;
@@ -1214,7 +1215,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
     groupPromptsHelper(
       this.selectedPrompts[section.id],
       newGroupId,
-      nextColorIndex
+      nextColorIndex,
     );
     this.selectedPrompts[section.id] = [];
   }
@@ -1228,7 +1229,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
       groupId,
       section,
       this.activeGroupId,
-      this.activeGroupSectionId
+      this.activeGroupSectionId,
     );
   }
 
@@ -1237,7 +1238,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
       prompt,
       section,
       this.activeGroupId,
-      this.activeGroupSectionId
+      this.activeGroupSectionId,
     );
   }
 
@@ -1246,7 +1247,7 @@ export class ConfigureScreenComponent implements OnInit, OnDestroy {
       prompt,
       section,
       this.activeGroupId,
-      this.activeGroupSectionId
+      this.activeGroupSectionId,
     );
   }
 

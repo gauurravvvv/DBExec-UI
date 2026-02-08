@@ -8,6 +8,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from '../../services/user.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-list-users',
@@ -84,8 +85,8 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   loadOrganisations() {
     const params = {
-      page: 1,
-      limit: 10000,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {

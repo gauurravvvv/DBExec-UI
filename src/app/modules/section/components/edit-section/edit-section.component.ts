@@ -7,6 +7,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { SectionService } from '../../services/section.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-edit-section',
@@ -32,7 +33,7 @@ export class EditSectionComponent implements OnInit {
     private globalService: GlobalService,
     private messageService: MessageService,
     private tabService: TabService,
-    private sectionService: SectionService
+    private sectionService: SectionService,
   ) {
     this.initForm();
   }
@@ -99,8 +100,8 @@ export class EditSectionComponent implements OnInit {
     const param = {
       orgId: this.sectionData.organisationId,
       databaseId: this.sectionData.databaseId,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
     this.tabService.listTab(param).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {

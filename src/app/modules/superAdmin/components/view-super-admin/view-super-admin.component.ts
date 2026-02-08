@@ -42,7 +42,7 @@ export class ViewSuperAdminComponent implements OnInit {
     private router: Router,
     private superAdminService: SuperAdminService,
     private messageService: MessageService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +71,6 @@ export class ViewSuperAdminComponent implements OnInit {
 
   private setAdminInitials(): void {
     if (this.adminData) {
-      console.log(this.adminData);
       const firstInitial = this.adminData.firstName.charAt(0).toUpperCase();
       const lastInitial = this.adminData.lastName.charAt(0).toUpperCase();
       this.adminInitials = `${firstInitial}${lastInitial}`;

@@ -9,6 +9,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { AnalysesService } from '../../service/analyses.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-list-analyses',
@@ -85,8 +86,8 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   loadOrganisations() {
     const params = {
-      page: 1,
-      limit: 10000,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -135,8 +136,8 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
-      pageNumber: 1,
-      limit: 10000,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.databaseService.listDatabase(params).then(response => {

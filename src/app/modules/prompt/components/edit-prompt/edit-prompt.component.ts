@@ -7,6 +7,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { PromptService } from '../../services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { PROMPT } from 'src/app/constants/routes';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-edit-prompt',
@@ -33,7 +34,7 @@ export class EditPromptComponent implements OnInit {
     private globalService: GlobalService,
     private messageService: MessageService,
     private sectionService: SectionService,
-    private promptService: PromptService
+    private promptService: PromptService,
   ) {
     this.initForm();
   }
@@ -100,8 +101,8 @@ export class EditPromptComponent implements OnInit {
     const param = {
       orgId: this.sectionData.organisationId,
       tabId: this.sectionData.section.tab.id,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
     this.sectionService.listSection(param).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {

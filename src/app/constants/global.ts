@@ -69,3 +69,6 @@ export const RESET_PASSWORD_PAGE_OPTIONS = [
     description: 'One Time Password verification for added security',
   },
 ];
+
+export const MAX_LIMIT = 10000000;
+export const DEFAULT_PAGE = 1;

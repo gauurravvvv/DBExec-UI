@@ -11,6 +11,7 @@ import { GROUP } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { GroupService } from '../../services/group.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-edit-group',
@@ -33,7 +34,7 @@ export class EditGroupComponent implements OnInit {
     private route: ActivatedRoute,
     private groupService: GroupService,
     private userService: UserService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit(): void {
@@ -84,12 +85,12 @@ export class EditGroupComponent implements OnInit {
 
         this.loadUsers({
           orgId: groupData.organisationId,
-          pageNumber: 1,
-          limit: 100,
+          page: DEFAULT_PAGE,
+          limit: MAX_LIMIT,
         });
 
         const usersIds = groupData.userGroups.map(
-          (mapping: any) => mapping.userId
+          (mapping: any) => mapping.userId,
         );
 
         this.groupForm.patchValue({
@@ -132,7 +133,6 @@ export class EditGroupComponent implements OnInit {
 
   onSubmit(): void {
     if (this.canSubmit()) {
-      console.log(this.groupForm.value);
       this.groupService.editGroup(this.groupForm).then(response => {
         if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([GROUP.LIST]);

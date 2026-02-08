@@ -7,6 +7,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { REGEX } from 'src/app/constants/regex.constant';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-org-admin',
@@ -25,7 +26,7 @@ export class AddOrgAdminComponent implements OnInit {
     private router: Router,
     private orgAdminService: OrganisationAdminService,
     private organisationService: OrganisationService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     this.initForm();
   }
@@ -83,8 +84,8 @@ export class AddOrgAdminComponent implements OnInit {
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {

@@ -13,6 +13,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { GroupService } from '../../services/group.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-group',
@@ -33,7 +34,7 @@ export class AddGroupComponent implements OnInit {
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private groupService: GroupService,
-    private userService: UserService
+    private userService: UserService,
   ) {
     this.initForm();
   }
@@ -75,8 +76,8 @@ export class AddGroupComponent implements OnInit {
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -92,8 +93,8 @@ export class AddGroupComponent implements OnInit {
 
     const params = {
       orgId,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.userService.listUser(params).then(response => {

@@ -37,6 +37,16 @@
                          userForm.get('lastName')?.errors?.['pattern'] ? 'Last name can only contain letters and hyphens' : ''">
         </app-custom-input>
 
+        <!-- Organisation (readonly) -->
+        <div class="form-field" *ngIf="showOrganisationDropdown">
+          <label for="organisation">Organisation</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-building"></i>
+            <input id="organisation" type="text" pInputText [value]="selectedOrgName" placeholder="Organisation"
+              readonly class="readonly" />
+          </span>
+        </div>
+
         <!-- Username (readonly) -->
         <div class="form-field">
           <label for="username">Username <span class="required">*</span></label>
@@ -54,15 +64,6 @@
                          userForm.get('email')?.errors?.['email'] ? 'Please enter a valid email' : ''">
         </app-custom-input>
 
-        <!-- Organisation (readonly) -->
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <label for="organisation">Organisation</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-building"></i>
-            <input id="organisation" type="text" pInputText [value]="selectedOrgName" placeholder="Organisation"
-              readonly class="readonly" />
-          </span>
-        </div>
 
         <!-- Status -->
         <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0" trueLabel="Active"

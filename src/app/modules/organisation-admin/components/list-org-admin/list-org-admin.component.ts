@@ -8,6 +8,7 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ROLES } from 'src/app/constants/user.constant';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-list-org-admin',
@@ -85,8 +86,8 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
 
   loadOrganisations() {
     const params = {
-      page: 1,
-      limit: 10000,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {

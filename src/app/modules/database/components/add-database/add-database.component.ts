@@ -7,6 +7,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatabaseService } from '../../services/database.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-database',
@@ -25,7 +26,7 @@ export class AddDatabaseComponent implements OnInit {
     private databaseService: DatabaseService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private router: Router
+    private router: Router,
   ) {}
 
   // Add getter for form dirty state
@@ -90,7 +91,7 @@ export class AddDatabaseComponent implements OnInit {
     this.databaseForm.get('isMasterDB')?.valueChanges.subscribe(isMaster => {
       const acknowledgmentControl = this.databaseForm.get('acknowledgment');
       const schemaAcknowledgmentControl = this.databaseForm.get(
-        'schemaAcknowledgment'
+        'schemaAcknowledgment',
       );
       const adminPasswordControl = this.databaseForm.get('adminPassword');
       const adminEmailControl = this.databaseForm.get('adminEmail');
@@ -126,8 +127,8 @@ export class AddDatabaseComponent implements OnInit {
   loadOrganisations(): void {
     if (this.showOrganisationDropdown) {
       const params = {
-        pageNumber: 1,
-        limit: 100,
+        page: DEFAULT_PAGE,
+        limit: MAX_LIMIT,
       };
       this.organisationService.listOrganisation(params).then(response => {
         if (this.globalService.handleSuccessService(response, false)) {

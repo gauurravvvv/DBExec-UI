@@ -8,6 +8,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ScreenService } from '../../services/screen.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-screen',
@@ -29,7 +30,7 @@ export class AddScreenComponent implements OnInit {
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private databaseService: DatabaseService,
-    private screenService: ScreenService
+    private screenService: ScreenService,
   ) {
     this.initForm();
   }
@@ -74,8 +75,8 @@ export class AddScreenComponent implements OnInit {
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -119,8 +120,8 @@ export class AddScreenComponent implements OnInit {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg.id,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.databaseService.listDatabase(params).then(response => {

@@ -8,6 +8,7 @@ import { DatabaseService } from 'src/app/modules/database/services/database.serv
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ConnectionService } from '../../services/connection.service';
 import { REGEX } from 'src/app/constants/regex.constant';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-connection',
@@ -31,7 +32,7 @@ export class AddConnectionComponent implements OnInit {
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private databaseService: DatabaseService,
-    private connectionService: ConnectionService
+    private connectionService: ConnectionService,
   ) {
     this.initForm();
   }
@@ -69,8 +70,8 @@ export class AddConnectionComponent implements OnInit {
 
   private loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -85,8 +86,8 @@ export class AddConnectionComponent implements OnInit {
     if (!orgId) return;
     const params = {
       orgId: orgId,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.databaseService.listDatabase(params).then(response => {

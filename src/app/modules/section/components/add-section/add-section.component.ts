@@ -9,6 +9,7 @@ import { DatabaseService } from 'src/app/modules/database/services/database.serv
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { SectionService } from '../../services/section.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-section',
@@ -216,8 +217,8 @@ export class AddSectionComponent implements OnInit {
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -293,8 +294,8 @@ export class AddSectionComponent implements OnInit {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg.id,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.databaseService.listDatabase(params).then(response => {
@@ -321,8 +322,8 @@ export class AddSectionComponent implements OnInit {
     const param = {
       orgId: this.selectedOrg.id,
       databaseId: this.selectedDatabase.id,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
     this.tabService.listTab(param).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {

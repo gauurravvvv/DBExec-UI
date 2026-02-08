@@ -37,6 +37,14 @@
                          userForm.get('lastName')?.errors?.['pattern'] ? 'Last name can only contain letters and hyphens' : ''">
         </app-custom-input>
 
+        <!-- Organisation Dropdown -->
+        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation"
+          placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
+          [filter]="true" filterBy="name" [required]="true"
+          [showError]="!!(userForm.get('organisation')?.invalid && userForm.get('organisation')?.touched)"
+          errorMessage="Organisation is required">
+        </app-custom-dropdown>
+
         <!-- Username -->
         <app-custom-input formControlName="username" label="Username" placeholder="Enter username" icon="pi-user-edit"
           [required]="true" [showError]="!!(userForm.get('username')?.invalid && userForm.get('username')?.touched)"
@@ -75,13 +83,7 @@
           </small>
         </div>
 
-        <!-- Organisation Dropdown -->
-        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation"
-          placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
-          [filter]="true" filterBy="name" [required]="true"
-          [showError]="!!(userForm.get('organisation')?.invalid && userForm.get('organisation')?.touched)"
-          errorMessage="Organisation is required">
-        </app-custom-dropdown>
+
       </div>
     </form>
   </div>

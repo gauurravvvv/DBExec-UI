@@ -7,6 +7,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from '../../services/user.service';
 import { REGEX } from 'src/app/constants/regex.constant';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-users',
@@ -25,7 +26,7 @@ export class AddUsersComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private organisationService: OrganisationService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     this.initForm();
   }
@@ -83,8 +84,8 @@ export class AddUsersComponent implements OnInit {
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {

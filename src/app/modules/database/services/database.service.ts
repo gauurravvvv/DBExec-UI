@@ -10,11 +10,7 @@ export class DatabaseService {
 
   listDatabase(params: any) {
     return this.http
-      .get(
-        DATABASE.LIST +
-          `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`,
-      )
+      .get(DATABASE.LIST, { params })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

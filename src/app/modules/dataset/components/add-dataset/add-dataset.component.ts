@@ -11,8 +11,10 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { MessageService } from 'primeng/api';
 import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
+import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
@@ -32,18 +34,14 @@ import { QueryService } from '../../services copy/query.service';
 import { DatasetService } from '../../services/dataset.service';
 import { SqlFormatterService } from '../../services/sql-formatter.service';
 import { SqlValidatorService } from '../../services/sql-validator.service';
-import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
-import { DATASET } from 'src/app/constants/routes';
-import { MessageService } from 'primeng/api';
 import {
   AddDatasetActions,
   SchemaLoadingStatus,
-  selectSchemaData,
-  selectSchemaStatus,
   selectIsSchemaStale,
   selectSchemaByKey,
-  selectIsSchemaLoaded,
 } from '../../store';
+import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -132,7 +130,7 @@ export class AddDatasetComponent
     }
     const search = this.schemaSearchText.toLowerCase();
     return this.availableDatabases.filter(db =>
-      db.name.toLowerCase().includes(search)
+      db.name.toLowerCase().includes(search),
     );
   }
 
@@ -159,7 +157,7 @@ export class AddDatasetComponent
       // Show schema if its name matches or if any of its tables match
       const schemaNameMatches = schema.name.toLowerCase().includes(search);
       const hasMatchingTable = schema.tables.some((table: any) =>
-        table.name.toLowerCase().includes(search)
+        table.name.toLowerCase().includes(search),
       );
       return schemaNameMatches || hasMatchingTable;
     });
@@ -176,7 +174,7 @@ export class AddDatasetComponent
     private datasetService: DatasetService,
     private router: Router,
     private messageService: MessageService,
-    private store: Store
+    private store: Store,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -205,8 +203,8 @@ export class AddDatasetComponent
 
   loadOrganisations(): void {
     const params = {
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
@@ -269,8 +267,8 @@ export class AddDatasetComponent
     this.selectedDatabaseObj = null;
     const params = {
       orgId: this.selectedOrg.id,
-      pageNumber: 1,
-      limit: 100,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     };
 
     this.databaseService
@@ -320,7 +318,7 @@ export class AddDatasetComponent
       AddDatasetActions.refreshSchemaData({
         orgId,
         dbId: dbIdStr,
-      })
+      }),
     );
 
     // Collapse this database's tree (schemas and tables)
@@ -578,7 +576,7 @@ export class AddDatasetComponent
           monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
           () => {
             this.executeQuery();
-          }
+          },
         );
 
         // Focus the editor
@@ -604,7 +602,7 @@ export class AddDatasetComponent
         // Add keyboard shortcuts via service
         this.monacoIntelliSenseService.registerKeyboardShortcuts(
           this.editor,
-          () => this.executeQuery()
+          () => this.executeQuery(),
         );
 
         // Add custom context menu items
@@ -659,7 +657,7 @@ export class AddDatasetComponent
       this.completionProviderDisposable =
         this.monacoIntelliSenseService.registerSQLCompletions(
           this.databases,
-          this.editor
+          this.editor,
         );
       this.hoverProviderDisposable =
         this.monacoIntelliSenseService.registerHoverProvider(this.databases);
@@ -735,7 +733,7 @@ export class AddDatasetComponent
       AddDatasetActions.loadSchemaData({
         orgId,
         dbId: dbIdStr,
-      })
+      }),
     );
 
     return new Promise((resolve, reject) => {
@@ -754,7 +752,7 @@ export class AddDatasetComponent
                     orgId,
                     dbId: dbIdStr,
                     data: schemaData[0],
-                  })
+                  }),
                 );
 
                 // Store schema data by database ID
@@ -777,7 +775,7 @@ export class AddDatasetComponent
                   orgId,
                   dbId: dbIdStr,
                   error: error.message || 'Failed to load schema',
-                })
+                }),
               );
 
               this.loadingDatabases[dbId] = false;
@@ -791,7 +789,7 @@ export class AddDatasetComponent
             orgId,
             dbId: dbIdStr,
             error: error.message || 'Failed to load schema',
-          })
+          }),
         );
 
         this.loadingDatabases[dbId] = false;
@@ -1055,8 +1053,8 @@ export class AddDatasetComponent
             dataObj.rowCount !== undefined
               ? dataObj.rowCount
               : Array.isArray(data)
-              ? data.length
-              : 0;
+                ? data.length
+                : 0;
 
           this.queryResult = {
             columns: columns,
@@ -1198,7 +1196,7 @@ export class AddDatasetComponent
   isTableExpanded(
     dbId: string,
     schemaName: string,
-    tableName: string
+    tableName: string,
   ): boolean {
     const key = `${dbId}.${schemaName}.${tableName}`;
     return this.expandedTables[key] || false;
@@ -1208,7 +1206,7 @@ export class AddDatasetComponent
     dbId: string,
     schemaName: string,
     tableName: string,
-    columnName: string
+    columnName: string,
   ): void {
     if (!this.editor) return;
 
