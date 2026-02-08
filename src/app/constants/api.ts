@@ -191,3 +191,7 @@ export const ANALYSES_VISUAL = {
   LIST: '/visual/list',
   VIEW: '/visual/get/',
 };
+
+export const GLOBAL_SEARCH = {
+  SEARCH: '/search/global',
+};

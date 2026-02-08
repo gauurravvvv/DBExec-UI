@@ -1,0 +1,37 @@
+<!-- Search Modal Overlay -->
+<div class="search-modal-overlay" *ngIf="showSearchModal" (click)="closeSearchModal()">
+    <div class="search-modal-content" (click)="$event.stopPropagation()">
+        <div class="search-header">
+            <i class="pi pi-search search-icon"></i>
+            <input #searchInput type="text" [(ngModel)]="searchTerm" (input)="onSearch()"
+                placeholder="Type to search..." class="search-input">
+            <span class="esc-hint">ESC</span>
+            <i class="pi pi-times close-icon" (click)="closeSearchModal()"></i>
+        </div>
+
+        <div class="search-results" *ngIf="searchResults.length > 0">
+            <div class="result-group">
+                <div class="result-item" *ngFor="let result of searchResults" (click)="navigateToResult(result)">
+                    <div class="result-icon">
+                        <i [class]="result.icon"></i>
+                    </div>
+                    <div class="result-info">
+                        <div class="result-title">{{ result.title }}</div>
+                        <div class="result-type">{{ result.entityType }}</div>
+                        <div class="result-breadcrumb" *ngIf="result.breadcrumb">
+
+                            {{ result.breadcrumb }}
+                        </div>
+                    </div>
+                    <i class="pi pi-arrow-right action-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0">
+            <i class="pi pi-search"></i>
+            <p>No results found for "{{ searchTerm }}"</p>
+        </div>
+
+    </div>
+</div>

@@ -12,6 +12,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { interval, Subscription } from 'rxjs';
 import { Renderer2 } from '@angular/core';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
+import { GlobalSearchService } from '../../../services/global-search.service';
 
 @Component({
   selector: 'app-header',
@@ -84,7 +85,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private router: Router,
     private globalService: GlobalService,
     private renderer: Renderer2,
-    private store: Store
+    private store: Store,
+    private globalSearchService: GlobalSearchService,
   ) {
     // Always use light mode (theming disabled)
     this.isDarkMode = false;
@@ -232,6 +234,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.isFullscreen = false;
       }
     }
+  }
+
+  openSearchModal() {
+    this.globalSearchService.openSearch();
   }
 
   @HostListener('document:fullscreenchange', ['$event'])

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Subject, Subscription } from 'rxjs';
@@ -69,6 +69,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     private promptService: PromptService,
     private router: Router,
     private globalService: GlobalService,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
@@ -79,11 +80,54 @@ export class ListPromptComponent implements OnInit, OnDestroy {
         this.loadPrompts();
       });
 
+    this.route.queryParams.subscribe(params => {
+      if (params['orgId'] || params['databaseId'] || params['name']) {
+        this.handleDeepLinking(params);
+      } else {
+        if (this.showOrganisationDropdown) {
+          this.loadOrganisations();
+        } else {
+          this.selectedOrg =
+            this.globalService.getTokenDetails('organisationId');
+          this.loadDatabases();
+        }
+      }
+    });
+  }
+
+  handleDeepLinking(params: any) {
+    const orgId = params['orgId'] ? Number(params['orgId']) : null;
+    const databaseId = params['databaseId']
+      ? Number(params['databaseId'])
+      : null;
+    const name = params['name'];
+
+    if (name) {
+      this.filterValues.name = name;
+    }
+
     if (this.showOrganisationDropdown) {
-      this.loadOrganisations();
+      const orgPromise = orgId
+        ? this.loadOrganisations(orgId)
+        : this.loadOrganisations();
+
+      orgPromise.then(() => {
+        if (orgId) {
+          if (databaseId) {
+            this.loadDatabases(databaseId);
+          } else {
+            this.loadDatabases();
+          }
+        }
+      });
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-      this.loadDatabases();
+
+      if (databaseId) {
+        this.loadDatabases(databaseId);
+      } else {
+        this.loadDatabases();
+      }
     }
   }
 
@@ -93,19 +137,32 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs;
-        if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0].id;
-          this.loadDatabases();
+  loadOrganisations(preSelectedOrgId?: number): Promise<void> {
+    return new Promise(resolve => {
+      const params = {
+        page: DEFAULT_PAGE,
+        limit: MAX_LIMIT,
+      };
+      this.organisationService.listOrganisation(params).then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = response.data.orgs;
+          if (this.organisations.length > 0) {
+            if (
+              preSelectedOrgId &&
+              this.organisations.find(o => o.id === preSelectedOrgId)
+            ) {
+              this.selectedOrg = preSelectedOrgId;
+            } else {
+              this.selectedOrg = this.organisations[0].id;
+            }
+
+            if (!preSelectedOrgId) {
+              this.loadDatabases();
+            }
+          }
         }
-      }
+        resolve();
+      });
     });
   }
 
@@ -139,26 +196,39 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     this.loadPrompts();
   }
 
-  loadDatabases() {
-    if (!this.selectedOrg) return;
-    const params = {
-      orgId: this.selectedOrg,
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
-
-    this.databaseService.listDatabase(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = response.data;
-        if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0].id;
-          this.loadPrompts();
-        } else {
-          this.selectedDatabase = null;
-          this.prompts = [];
-          this.filteredPrompts = [];
-        }
+  loadDatabases(preSelectedDbId?: number): Promise<void> {
+    return new Promise(resolve => {
+      if (!this.selectedOrg) {
+        resolve();
+        return;
       }
+      const params = {
+        orgId: this.selectedOrg,
+        page: DEFAULT_PAGE,
+        limit: MAX_LIMIT,
+      };
+
+      this.databaseService.listDatabase(params).then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.databases = response.data;
+          if (this.databases.length > 0) {
+            if (
+              preSelectedDbId &&
+              this.databases.find(d => d.id === preSelectedDbId)
+            ) {
+              this.selectedDatabase = preSelectedDbId;
+            } else {
+              this.selectedDatabase = this.databases[0].id;
+            }
+            this.loadPrompts();
+          } else {
+            this.selectedDatabase = null;
+            this.prompts = [];
+            this.filteredPrompts = [];
+          }
+        }
+        resolve();
+      });
     });
   }
 
