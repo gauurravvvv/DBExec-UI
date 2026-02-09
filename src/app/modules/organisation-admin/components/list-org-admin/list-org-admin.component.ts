@@ -97,6 +97,11 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
           this.selectedOrg = this.organisations[0].id;
           // Trigger load after org is selected
           this.loadAdmins();
+        } else {
+          this.selectedOrg = null;
+          this.admins = [];
+          this.filteredAdmins = [];
+          this.totalRecords = 0;
         }
       }
     });
@@ -160,13 +165,24 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.orgAdminService.listOrganisationAdmin(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.admins = response.data.orgAdmins || [];
-        this.filteredAdmins = [...this.admins];
-        this.totalRecords = response.data.totalItems || this.admins.length;
-      }
-    });
+    this.orgAdminService
+      .listOrganisationAdmin(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.admins = response.data.orgAdmins || [];
+          this.filteredAdmins = [...this.admins];
+          this.totalRecords = response.data.totalItems || this.admins.length;
+        } else {
+          this.admins = [];
+          this.filteredAdmins = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.admins = [];
+        this.filteredAdmins = [];
+        this.totalRecords = 0;
+      });
   }
 
   onAddNewAdmin() {

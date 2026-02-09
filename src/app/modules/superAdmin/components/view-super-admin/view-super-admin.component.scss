@@ -3,294 +3,353 @@ $radius-lg: 16px;
 $radius-md: 12px;
 $radius-sm: 8px;
 
-.view-admin-wrapper {
-  background-color: var(--card-background);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--shadow-color);
-  height: 100%;
+.dataset-page-wrapper {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 0;
 
-  .view-admin-container {
-    height: 100%;
+  // Card Styles moved here
+  background: var(--card-background);
+  border-radius: $radius-lg;
+  box-shadow:
+    0 4px 20px -5px rgba(0, 0, 0, 0.08),
+    0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  overflow-y: auto;
+  position: relative;
+
+  .dataset-content-container {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    padding: 1.5rem 2rem;
+    max-width: 100%; // Full width
+    margin: 0 auto;
+    width: 100%;
+    gap: 1.5rem;
+  }
+}
 
-    .page-header {
-      padding: 20px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card-background);
-      border-radius: 8px 8px 0 0;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+// 1. Header Section
+.page-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 0.5rem;
 
-      .left-section {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-
-        h2 {
-          margin: 0;
-          color: var(--text-color);
-        }
-
-        button {
-          min-width: 0rem;
-          background: transparent !important;
-          border: none !important;
-          color: var(--text-color) !important;
-
-          &:hover {
-            background: var(--hover-background) !important;
-          }
-
-          i {
-            color: var(--text-color) !important;
-          }
-        }
-      }
-
-      .action-buttons {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
+  .header-content {
+    h2 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--text-color);
+      letter-spacing: -0.025em;
+      margin: 0 0 0.5rem 0;
     }
 
-    .profile-container {
-      padding: 30px;
-      overflow-y: auto;
-      flex: 1;
-      height: calc(100% - 80px); // Subtract header height
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-color-secondary);
+      margin: 0;
+      font-weight: 400;
+      padding-left: 2px;
+    }
+  }
 
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
+  .header-actions {
+    display: flex;
+    gap: 12px;
 
-      &::-webkit-scrollbar-track {
-        background: var(--card-background);
-        border-radius: 4px;
-      }
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.6rem 1.25rem;
+      border-radius: $radius-sm;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
 
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: 4px;
-
-        &:hover {
-          background: var(--secondary-color);
-        }
-      }
-
-      .details-grid {
+      &.back-button {
+        padding: 0 !important;
+        width: 36px;
+        height: 36px;
+        border-radius: 50% !important;
         display: flex;
-        flex-direction: column;
-        gap: 40px;
-        height: 100%;
-
-        .first-row,
-        .second-row {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 30px;
-        }
-      }
-
-      .avatar-section {
-        display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        background: transparent !important;
+        color: var(--text-color) !important;
+        min-width: 0;
+        border: none !important;
+        transition: all 0.2s ease;
 
-        .avatar-circle {
-          width: 120px;
-          height: 120px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2.5rem;
-          color: white;
-          margin-bottom: 16px;
+        &:hover {
+          background: var(--hover-background) !important;
         }
-
-        .admin-name {
-          margin: 10px 0 5px;
-          font-size: 1.5rem;
-          text-align: center;
-          color: var(--text-color);
-        }
-
-        .admin-username {
-          color: var(--secondary-color);
-          margin: 0;
-          text-align: center;
-        }
-      }
-
-      .detail-group {
-        background: var(--card-background);
-        padding: 20px;
-        border-radius: 8px;
-        height: fit-content;
-
-        h4 {
-          color: var(--text-color);
-          margin-bottom: 20px;
-          padding-bottom: 10px;
-          border-bottom: 2px solid var(--border-color);
-        }
-
-        .detail-item {
-          margin-bottom: 20px;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          .label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--secondary-color);
-            margin-bottom: 5px;
-
-            i {
-              font-size: 1rem;
-              color: var(--text-color);
-            }
-          }
-
-          .value {
-            display: block;
-            font-size: 1.1rem;
-            color: var(--text-color);
-            padding: 4px 0;
-
-            .status-badge {
-              display: inline-block;
-              padding: 0.3rem 0.6rem;
-              border-radius: 4px;
-              font-size: 0.9rem;
-              font-weight: 500;
-              background-color: #ff4444;
-              color: white;
-
-              &.active {
-                background: rgba(var(--success-rgb), 0.15);
-                color: var(--success-color);
-              }
-
-              &:not(.active) {
-                background: rgba(var(--error-rgb), 0.15);
-                color: var(--error-color);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .avatar-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-
-    .avatar-circle {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      color: white;
-      margin-bottom: 16px;
-    }
-
-    .admin-name {
-      margin: 10px 0 5px;
-      font-size: 1.5rem;
-      text-align: center;
-    }
-
-    .admin-username {
-      color: #666;
-      margin: 0;
-      text-align: center;
-    }
-  }
-
-  .detail-group {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-
-    h4 {
-      color: #333;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #e0e0e0;
-    }
-
-    .detail-item {
-      margin-bottom: 20px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #666;
-        margin-bottom: 5px;
 
         i {
-          font-size: 1rem;
+          font-size: 1.1rem;
+        }
+      }
+      i {
+        font-size: 0.9rem;
+      }
+
+      &.btn-secondary {
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+          background: var(--hover-background);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
         }
       }
 
-      .value {
-        display: block;
-        font-size: 1.1rem;
-        color: #333;
-        padding: 4px 0;
+      &.btn-primary {
+        background: linear-gradient(135deg, #2196f3, #1976d2);
+        color: white;
+        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
 
-        .status-badge {
-          display: inline-block;
-          padding: 0.3rem 0.6rem;
-          border-radius: 4px;
-          font-size: 0.9rem;
-          font-weight: 500;
-          background-color: #ff4444;
-          color: white;
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
 
-          &.active {
-            background-color: #4caf50;
-          }
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: var(--secondary-color);
+          box-shadow: none;
+        }
+      }
+
+      &.btn-danger {
+        background: linear-gradient(135deg, #f44336, #d32f2f);
+        color: white;
+        box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: var(--secondary-color);
+          box-shadow: none;
         }
       }
     }
   }
 }
 
-// Responsive adjustments
-@media screen and (max-width: 768px) {
-  .view-admin-wrapper {
-    .profile-container {
-      .details-grid {
-        .first-row,
-        .second-row {
-          grid-template-columns: 1fr;
+// 2. Main Grid Layout
+.admin-details-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr; // Fixed identity width, fluid info
+  align-items: stretch; // Stretch to same height
+  min-height: 600px; // Minimum height for the card
+
+  // Mobile/Tablet specific
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// 3. Common Card Styles
+
+// 4. Identity Section Styling
+.identity-section {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  // Removed border and background for unified look as per user request
+
+  @media screen and (max-width: 1024px) {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 32px;
+  }
+
+  .avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 32px;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -16px;
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--border-color),
+        transparent
+      );
+    }
+
+    .avatar-circle {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      border: 4px solid var(--card-background);
+      outline: 1px solid var(--border-color);
+    }
+
+    .admin-name {
+      margin: 0 0 6px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-color);
+      text-align: center;
+      letter-spacing: -0.01em;
+    }
+
+    .admin-username {
+      margin: 0 0 16px;
+      color: var(--secondary-color);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background-color: var(--hover-background);
+      color: var(--secondary-color);
+      border: 1px solid var(--border-color);
+
+      &.active {
+        background: rgba(76, 175, 80, 0.1);
+        color: var(--success-color);
+        border: 1px solid rgba(76, 175, 80, 0.2);
+      }
+    }
+  }
+
+  .identity-meta {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .meta-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--hover-background);
+      border-radius: $radius-sm;
+      border: 1px solid transparent;
+
+      .label {
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+        font-weight: 500;
+      }
+
+      .value {
+        font-size: 0.95rem;
+        color: var(--text-color);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// 5. Details Section Styling
+.details-section {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+
+  .section-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border-color);
+
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    padding: 32px;
+    flex: 1;
+
+    @media screen and (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .info-group {
+      h4 {
+        color: var(--primary-color);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 20px;
+        font-weight: 700;
+        opacity: 0.9;
+      }
+
+      .detail-row {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .label {
+          font-size: 0.85rem;
+          color: var(--secondary-color);
+          margin-bottom: 6px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          i {
+            font-size: 1rem;
+            opacity: 0.7;
+          }
+        }
+
+        .value {
+          font-size: 1.05rem;
+          font-weight: 500;
+          color: var(--text-color);
+          padding-left: 24px; // Align with label text
         }
       }
     }
@@ -484,6 +543,7 @@ $radius-sm: 8px;
       background: transparent !important;
       border: none !important;
       color: var(--text-color) !important;
+      min-width: 0px !important;
 
       &:hover {
         background: var(--hover-background) !important;

@@ -179,6 +179,13 @@ export class ListTabComponent implements OnInit, OnDestroy {
             if (!preSelectedOrgId) {
               this.loadDatabases();
             }
+          } else {
+            this.selectedOrg = null;
+            this.databases = [];
+            this.selectedDatabase = null;
+            this.tabs = [];
+            this.filteredTabs = [];
+            this.totalRecords = 0;
           }
         }
         resolve();
@@ -198,27 +205,46 @@ export class ListTabComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService.listDatabase(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = [...response.data];
-          if (this.databases.length > 0) {
-            if (
-              preSelectedDbId &&
-              this.databases.find(d => d.id === preSelectedDbId)
-            ) {
-              this.selectedDatabase = preSelectedDbId;
+      this.databaseService
+        .listDatabase(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.databases = [...response.data];
+            if (this.databases.length > 0) {
+              if (
+                preSelectedDbId &&
+                this.databases.find(d => d.id === preSelectedDbId)
+              ) {
+                this.selectedDatabase = preSelectedDbId;
+              } else {
+                this.selectedDatabase = this.databases[0].id;
+              }
+              this.loadTabs();
             } else {
-              this.selectedDatabase = this.databases[0].id;
+              this.selectedDatabase = null;
+              this.tabs = [];
+              this.filteredTabs = [];
+              this.totalRecords = 0;
             }
-            this.loadTabs();
           } else {
+            this.selectedOrg = null;
+            this.databases = [];
             this.selectedDatabase = null;
             this.tabs = [];
             this.filteredTabs = [];
+            this.totalRecords = 0;
           }
-        }
-        resolve();
-      });
+          resolve();
+        })
+        .catch(() => {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.tabs = [];
+          this.filteredTabs = [];
+          this.totalRecords = 0;
+          resolve();
+        });
     });
   }
 
@@ -254,13 +280,24 @@ export class ListTabComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.tabService.listTab(params).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = response.data?.tabs || [];
-        this.filteredTabs = [...this.tabs];
-        this.totalRecords = response.data?.count || this.tabs.length;
-      }
-    });
+    this.tabService
+      .listTab(params)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.tabs = response.data?.tabs || [];
+          this.filteredTabs = [...this.tabs];
+          this.totalRecords = response.data?.count || this.tabs.length;
+        } else {
+          this.tabs = [];
+          this.filteredTabs = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.tabs = [];
+        this.filteredTabs = [];
+        this.totalRecords = 0;
+      });
   }
 
   onAddNewTab() {

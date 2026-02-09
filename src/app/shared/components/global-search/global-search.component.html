@@ -9,9 +9,21 @@
             <i class="pi pi-times close-icon" (click)="closeSearchModal()"></i>
         </div>
 
+
+        <div class="search-filters" *ngIf="uniqueEntityTypes.length > 0">
+            <button class="filter-pill" [class.active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
+                All
+            </button>
+            <button class="filter-pill" *ngFor="let type of uniqueEntityTypes" [class.active]="activeFilter === type"
+                (click)="setFilter(type)">
+                {{ type }}
+            </button>
+        </div>
+
         <div class="search-results" *ngIf="searchResults.length > 0">
             <div class="result-group">
-                <div class="result-item" *ngFor="let result of searchResults" (click)="navigateToResult(result)">
+                <div class="result-item" *ngFor="let result of filteredSearchResults"
+                    (click)="navigateToResult(result)">
                     <div class="result-icon">
                         <i [class]="result.icon"></i>
                     </div>

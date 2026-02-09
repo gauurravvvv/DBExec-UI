@@ -100,6 +100,13 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
           this.loadDatabases();
+        } else {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.connections = [];
+          this.filteredConnections = [];
+          this.totalRecords = 0;
         }
       }
     });
@@ -138,19 +145,35 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
       limit: MAX_LIMIT,
     };
 
-    this.databaseService.listDatabase(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...response.data];
-        if (this.databases.length > 0) {
-          this.selectedDatabase = this.databases[0].id;
-          this.loadConnections();
+    this.databaseService.listDatabase(params).then(
+      response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.databases = [...response.data];
+          if (this.databases.length > 0) {
+            this.selectedDatabase = this.databases[0].id;
+            this.loadConnections();
+          } else {
+            this.selectedDatabase = null;
+            this.connections = [];
+            this.filteredConnections = [];
+            this.totalRecords = 0;
+          }
         } else {
           this.selectedDatabase = null;
+          this.databases = [];
           this.connections = [];
           this.filteredConnections = [];
+          this.totalRecords = 0;
         }
-      }
-    });
+      },
+      error => {
+        this.selectedDatabase = null;
+        this.databases = [];
+        this.connections = [];
+        this.filteredConnections = [];
+        this.totalRecords = 0;
+      },
+    );
   }
 
   loadConnections(event?: any) {
@@ -188,13 +211,25 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.connectionService.listConnection(params).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.connections = [...response.data.connections];
-        this.filteredConnections = [...this.connections];
-        this.totalRecords = response.data.totalItems || this.connections.length;
-      }
-    });
+    this.connectionService.listConnection(params).then(
+      (response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.connections = [...response.data.connections];
+          this.filteredConnections = [...this.connections];
+          this.totalRecords =
+            response.data.totalItems || this.connections.length;
+        } else {
+          this.connections = [];
+          this.filteredConnections = [];
+          this.totalRecords = 0;
+        }
+      },
+      error => {
+        this.connections = [];
+        this.filteredConnections = [];
+        this.totalRecords = 0;
+      },
+    );
   }
 
   onAddNewConnection() {

@@ -96,6 +96,11 @@ export class ListUsersComponent implements OnInit, OnDestroy {
           this.selectedOrg = this.organisations[0].id;
           // Trigger load after org is selected
           this.loadUsers();
+        } else {
+          this.selectedOrg = null;
+          this.users = [];
+          this.filteredUsers = [];
+          this.totalRecords = 0;
         }
       }
     });
@@ -159,13 +164,24 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.userService.listUser(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.users = response.data.users || [];
-        this.filteredUsers = [...this.users];
-        this.totalRecords = response.data.totalItems || this.users.length;
-      }
-    });
+    this.userService
+      .listUser(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.users = response.data.users || [];
+          this.filteredUsers = [...this.users];
+          this.totalRecords = response.data.totalItems || this.users.length;
+        } else {
+          this.users = [];
+          this.filteredUsers = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.users = [];
+        this.filteredUsers = [];
+        this.totalRecords = 0;
+      });
   }
 
   onAddNewAdmin() {

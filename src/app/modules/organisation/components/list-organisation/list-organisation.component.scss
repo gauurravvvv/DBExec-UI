@@ -114,22 +114,108 @@ $radius-sm: 8px;
 
     // Modern Button
     .modern-button {
-      border-radius: 6px !important;
+      border-radius: $radius-sm !important;
       font-weight: 600;
       padding: 0.65rem 1.25rem;
 
-      ::ng-deep .p-button {
-        background: var(--primary-color);
+      // When pButton directive is used + primary class
+      &.p-button-primary {
+        background: linear-gradient(135deg, #2196f3, #1976d2);
+        color: white;
         border: none;
+        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        transition: all 0.2s ease;
 
         &:hover {
-          opacity: 0.9;
+          opacity: 1;
           transform: translateY(-1px);
-          box-shadow: 0 1px 2px 0 var(--shadow-color);
+          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
         }
 
         &:focus {
           box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+      }
+
+      &.p-button-outlined {
+        // Ensure outlined buttons use default PrimeNG outlined styles or custom outlined
+        background: transparent;
+        border: 1px solid var(--border-color);
+        // ... (PrimeNG likely handles this, but we ensure no gradient overrides)
+
+        &.p-button-danger {
+          border-color: var(--error-color);
+          color: var(--error-color);
+          &:hover {
+            background: rgba(var(--error-rgb), 0.04);
+          }
+        }
+      }
+    }
+
+    // Button Styles - Matching view-super-admin
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.6rem 1.25rem;
+      border-radius: $radius-sm;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      i {
+        font-size: 0.9rem;
+      }
+
+      &.btn-secondary {
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+          background: var(--hover-background);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+      }
+
+      &.btn-primary {
+        background: linear-gradient(135deg, #2196f3, #1976d2);
+        color: white;
+        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: var(--secondary-color);
+          box-shadow: none;
+        }
+      }
+
+      &.btn-danger {
+        background: linear-gradient(135deg, #f44336, #d32f2f);
+        color: white;
+        box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: var(--secondary-color);
+          box-shadow: none;
         }
       }
     }
@@ -329,21 +415,32 @@ $radius-sm: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid transparent;
-          background: transparent;
-          border-radius: 6px;
-          color: var(--secondary-color);
+          border: none;
+          border-radius: $radius-sm;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.2s ease;
+          font-size: 0.9rem;
 
-          &:hover {
-            background: var(--hover-background);
-            color: var(--primary-color);
+          &.edit-btn {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+            &:hover {
+              transform: translateY(-1px);
+              box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+            }
           }
 
-          &.delete-btn:hover {
-            background: rgba(244, 67, 54, 0.1);
-            color: var(--error-color);
+          &.delete-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+
+            &:hover {
+              transform: translateY(-1px);
+              box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+            }
           }
         }
       }
@@ -536,9 +633,9 @@ td.empty-message-cell {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        padding: 0.75rem 1.5rem;
-        border-radius: $radius-md;
+        gap: 8px;
+        padding: 0.6rem 1.25rem;
+        border-radius: $radius-sm;
         border: none;
         font-weight: 600;
         cursor: pointer;
@@ -546,26 +643,32 @@ td.empty-message-cell {
         font-size: 0.9rem;
 
         i {
-          font-size: 0.85rem;
+          font-size: 0.9rem;
         }
 
         &.btn-cancel {
-          background: var(--hover-background);
+          background: var(--card-background);
           color: var(--text-color);
           border: 1px solid var(--border-color);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
           &:hover {
-            background: var(--border-color);
+            background: var(--hover-background);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
           }
         }
 
         &.btn-confirm {
           background: linear-gradient(135deg, #f44336, #d32f2f);
           color: white;
-          box-shadow: 0 4px 14px rgba(244, 67, 54, 0.35);
+          box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+
           &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.45);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
           }
+
           &:active {
             transform: translateY(0);
           }

@@ -27,20 +27,26 @@
         align-items: center;
         gap: 1rem;
 
-        button {
-          min-width: 0;
+        .back-button {
+          padding: 0 !important;
+          width: 36px;
+          height: 36px;
+          border-radius: 50% !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           background: transparent !important;
-          border: none !important;
           color: var(--text-color) !important;
-          padding: 0.5rem !important;
+          min-width: 0;
+          border: none !important;
+          transition: all 0.2s ease;
 
           &:hover {
             background: var(--hover-background) !important;
-            border-radius: 4px;
           }
 
           i {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
           }
         }
 
@@ -57,10 +63,53 @@
         display: flex;
         gap: 12px;
 
-        .p-button {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
+        .btn-cancel {
+          background: var(--card-background) !important;
+          border: 1px solid var(--border-color) !important;
+          color: var(--text-color) !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: 6px !important; // Match $radius-sm
+          font-weight: 600;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+          &:hover:not(:disabled) {
+            background: var(--hover-background) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        .btn-save {
+          background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+          color: white !important;
+          border: none !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: 6px !important; // Match $radius-sm
+          font-weight: 600;
+          box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+          transition: all 0.2s ease;
+
+          &:hover:not(:disabled) {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--secondary-color) !important;
+            box-shadow: none;
+          }
+
+          i {
+            font-size: 0.9rem;
+          }
         }
       }
     }

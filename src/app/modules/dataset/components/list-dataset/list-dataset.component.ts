@@ -160,6 +160,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
             this.databases = [];
             this.selectedDatabase = null;
             this.datasets = [];
+            this.filteredDatasets = [];
             this.totalRecords = 0;
           }
         }
@@ -204,28 +205,46 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService.listDatabase(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = response.data || [];
-          if (this.databases.length > 0) {
-            if (
-              preSelectedDbId &&
-              this.databases.find(d => d.id === preSelectedDbId)
-            ) {
-              this.selectedDatabase = preSelectedDbId;
+      this.databaseService
+        .listDatabase(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.databases = response.data || [];
+            if (this.databases.length > 0) {
+              if (
+                preSelectedDbId &&
+                this.databases.find(d => d.id === preSelectedDbId)
+              ) {
+                this.selectedDatabase = preSelectedDbId;
+              } else {
+                this.selectedDatabase = this.databases[0].id;
+              }
+              this.loadDatasets();
             } else {
-              this.selectedDatabase = this.databases[0].id;
+              this.selectedDatabase = null;
+              this.datasets = [];
+              this.filteredDatasets = [];
+              this.totalRecords = 0;
             }
-            this.loadDatasets();
           } else {
+            this.selectedOrg = null;
+            this.databases = [];
             this.selectedDatabase = null;
             this.datasets = [];
             this.filteredDatasets = [];
             this.totalRecords = 0;
           }
-        }
-        resolve();
-      });
+          resolve();
+        })
+        .catch(() => {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.datasets = [];
+          this.filteredDatasets = [];
+          this.totalRecords = 0;
+          resolve();
+        });
     });
   }
 
@@ -261,13 +280,24 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.datasetService.listDatasets(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasets = response.data.datasets || [];
-        this.filteredDatasets = [...this.datasets];
-        this.totalRecords = response.data.totalItems || this.datasets.length;
-      }
-    });
+    this.datasetService
+      .listDatasets(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasets = response.data.datasets || [];
+          this.filteredDatasets = [...this.datasets];
+          this.totalRecords = response.data.totalItems || this.datasets.length;
+        } else {
+          this.datasets = [];
+          this.filteredDatasets = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.datasets = [];
+        this.filteredDatasets = [];
+        this.totalRecords = 0;
+      });
   }
 
   onAddNewAdmin() {

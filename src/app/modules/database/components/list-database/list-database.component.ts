@@ -79,6 +79,11 @@ export class ListDatabaseComponent implements OnInit {
             // Table not ready yet, call API directly with default params
             this.listDatabaseAPI(this.selectedOrg);
           }
+        } else {
+          // No organisations found, clear everything
+          this.selectedOrg = null;
+          this.dbs = [];
+          this.totalItems = 0;
         }
       }
     });
@@ -148,12 +153,23 @@ export class ListDatabaseComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.databaseService.listAllDatabase(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.dbs = response.data.databases || [];
-        this.totalItems = response.data.count || 0;
-      }
-    });
+    this.databaseService
+      .listAllDatabase(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.dbs = response.data.databases || [];
+          this.totalItems = response.data.count || 0;
+        } else {
+          // If response not successful, clear the list
+          this.dbs = [];
+          this.totalItems = 0;
+        }
+      })
+      .catch(() => {
+        // If API fails, clear the list
+        this.dbs = [];
+        this.totalItems = 0;
+      });
   }
 
   onAddNewDatabase() {

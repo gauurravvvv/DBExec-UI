@@ -155,8 +155,8 @@ export class ListScreenComponent implements OnInit, OnDestroy {
             this.selectedOrg = null;
             this.databases = [];
             this.selectedDatabase = null;
-            this.filteredScreens = [];
             this.screens = [];
+            this.filteredScreens = [];
             this.totalRecords = 0;
           }
         }
@@ -187,27 +187,46 @@ export class ListScreenComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService.listDatabase(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = [...response.data];
-          if (this.databases.length > 0) {
-            if (
-              preSelectedDbId &&
-              this.databases.find(d => d.id === preSelectedDbId)
-            ) {
-              this.selectedDatabase = preSelectedDbId;
+      this.databaseService
+        .listDatabase(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.databases = [...response.data];
+            if (this.databases.length > 0) {
+              if (
+                preSelectedDbId &&
+                this.databases.find(d => d.id === preSelectedDbId)
+              ) {
+                this.selectedDatabase = preSelectedDbId;
+              } else {
+                this.selectedDatabase = this.databases[0].id;
+              }
+              this.loadScreens();
             } else {
-              this.selectedDatabase = this.databases[0].id;
+              this.selectedDatabase = null;
+              this.screens = [];
+              this.filteredScreens = [];
+              this.totalRecords = 0;
             }
-            this.loadScreens();
           } else {
+            this.selectedOrg = null;
+            this.databases = [];
             this.selectedDatabase = null;
             this.screens = [];
             this.filteredScreens = [];
+            this.totalRecords = 0;
           }
-        }
-        resolve();
-      });
+          resolve();
+        })
+        .catch(() => {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.screens = [];
+          this.filteredScreens = [];
+          this.totalRecords = 0;
+          resolve();
+        });
     });
   }
 
@@ -243,13 +262,24 @@ export class ListScreenComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.screenService.listScreen(params).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.screens = response.data?.screens || [];
-        this.filteredScreens = [...this.screens];
-        this.totalRecords = response.data?.count || this.screens.length;
-      }
-    });
+    this.screenService
+      .listScreen(params)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.screens = response.data?.screens || [];
+          this.filteredScreens = [...this.screens];
+          this.totalRecords = response.data?.count || this.screens.length;
+        } else {
+          this.screens = [];
+          this.filteredScreens = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.screens = [];
+        this.filteredScreens = [];
+        this.totalRecords = 0;
+      });
   }
 
   onFilterChange() {

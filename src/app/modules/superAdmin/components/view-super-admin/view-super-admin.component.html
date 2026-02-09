@@ -1,125 +1,128 @@
-<div class="view-admin-wrapper">
-  <div class="view-admin-container">
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
     <!-- Header Section -->
-    <div class="page-header">
-      <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/super-admin">
-          <i class="pi pi-arrow-left"></i>
-        </button>
-        <h2>Super Admin Details</h2>
+    <div class="page-header-section">
+      <div class="header-content">
+        <div class="flex align-items-center gap-2 mb-2">
+          <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/super-admin">
+            <i class="pi pi-arrow-left text-xl"></i>
+          </button>
+          <h2 class="m-0">Super Admin Details</h2>
+        </div>
       </div>
-      <div class="action-buttons">
-        <button pButton class="p-button-outlined" type="button" label="Edit" [disabled]="adminId == loggedInUserId"
+
+      <div class="header-actions flex gap-2">
+        <button class="btn-secondary" (click)="openChangePasswordDialog()">
+          <i class="pi pi-key"></i>
+          Change Password
+        </button>
+        <button class="btn-primary" [disabled]="adminId == loggedInUserId"
           [routerLink]="['/app/super-admin/edit', adminId]">
-          <i class="pi pi-pencil mr-2"></i>
+          <i class="pi pi-pencil"></i>
+          Edit
         </button>
-        <button pButton class="p-button-outlined" type="button" label="Change Password"
-          (click)="openChangePasswordDialog()">
-          <i class="pi pi-key mr-2"></i>
-        </button>
-        <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
-          [disabled]="adminId == loggedInUserId" (click)="confirmDelete(adminId)">
-          <i class="pi pi-trash mr-2"></i>
+        <button class="btn-danger" [disabled]="adminId == loggedInUserId" (click)="confirmDelete(adminId)">
+          <i class="pi pi-trash"></i>
+          Delete
         </button>
       </div>
     </div>
 
-    <!-- Profile Section -->
-    <div class="profile-container">
-      <div class="details-grid">
-        <!-- First Row: Avatar and Personal Info -->
-        <div class="first-row">
-          <!-- Avatar Section -->
-          <div class="avatar-section">
-            <div class="avatar-circle" [style.background-color]="avatarBackground">
-              {{ adminInitials }}
-            </div>
-            <h3 class="admin-name">
-              {{ adminData?.firstName }} {{ adminData?.lastName }}
-            </h3>
-            <p class="admin-username">@ {{ adminData?.username }}</p>
-          </div>
+    <!-- Main Content Card -->
 
-          <!-- Personal Information -->
-          <div class="detail-group">
-            <h4>Personal Information</h4>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-user"></i>
-                First Name
-              </span>
+    <div class="admin-details-grid">
+      <!-- 1. Identity Section (Left) -->
+      <div class="identity-section">
+        <div class="avatar-section">
+          <div class="avatar-circle" [style.background-color]="avatarBackground">
+            {{ adminInitials }}
+          </div>
+          <h3 class="admin-name">
+            {{ adminData?.firstName }} {{ adminData?.lastName }}
+          </h3>
+          <p class="admin-username">@{{ adminData?.username }}</p>
+          <div class="status-wrapper">
+            <span class="status-badge" [class.active]="adminData?.status === 1">
+              {{ adminData?.status === 1 ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="identity-meta">
+          <div class="meta-item">
+            <span class="label">Role</span>
+            <span class="value">Super Admin</span>
+          </div>
+          <div class="meta-item">
+            <span class="label">Member Since</span>
+            <span class="value">{{ adminData?.createdOn | date : 'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Details Section (Right) -->
+      <div class="details-section">
+        <div class="section-header">
+          <h3>Account Information</h3>
+        </div>
+
+        <div class="info-grid">
+          <!-- Personal Info -->
+          <div class="info-group">
+            <h4>Personal Details</h4>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-user"></i> First Name</span>
               <span class="value">{{ adminData?.firstName }}</span>
             </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-user"></i>
-                Last Name
-              </span>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-user"></i> Last Name</span>
               <span class="value">{{ adminData?.lastName }}</span>
             </div>
           </div>
-        </div>
 
-        <!-- Second Row: Contact and Account Info -->
-        <div class="second-row">
-          <!-- Contact Information -->
-          <div class="detail-group">
-            <h4>Contact Information</h4>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-envelope"></i>
-                Email
-              </span>
+          <!-- Contact Info -->
+          <div class="info-group">
+            <h4>Contact Details</h4>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-envelope"></i> Email</span>
               <span class="value">{{ adminData?.email }}</span>
             </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-building"></i>
-                Organisation
-              </span>
-              <span class="value">{{ adminData?.organisationName }}</span>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-phone"></i> Mobile</span>
+              <span class="value">{{ adminData?.mobile || 'Not provided' }}</span>
             </div>
           </div>
 
-          <!-- Account Information -->
-          <div class="detail-group">
-            <h4>Account Information</h4>
+          <!-- Org Info -->
+          <div class="info-group">
+            <h4>Organisation</h4>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-building"></i> Name</span>
+              <span class="value">{{ adminData?.organisationName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-id-card"></i> Org ID</span>
+              <span class="value">#{{ adminData?.organisationId }}</span>
+            </div>
+          </div>
 
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-clock"></i>
-                Last Login
-              </span>
-              <span class="value">{{
-                adminData?.lastLogin
-                ? (adminData?.lastLogin | date : 'medium')
-                : 'Never logged in'
+          <!-- System Info -->
+          <div class="info-group">
+            <h4>System</h4>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-clock"></i> Last Login</span>
+              <span class="value">{{ adminData?.lastLogin ? (adminData?.lastLogin | date : 'medium') : 'Never'
                 }}</span>
             </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-check-circle"></i>
-                Status
-              </span>
-              <span class="value">
-                <span class="status-badge" [class.active]="adminData?.status === 1">
-                  {{ adminData?.status === 1 ? 'Active' : 'Inactive' }}
-                </span>
-              </span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-calendar"></i>
-                Created On
-              </span>
-              <span class="value">{{
-                adminData?.createdOn | date : 'medium'
-                }}</span>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-shield"></i> Default User</span>
+              <span class="value">{{ adminData?.isDefault === 1 ? 'Yes' : 'No' }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </div>
 

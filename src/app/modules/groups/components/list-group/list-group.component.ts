@@ -88,6 +88,11 @@ export class ListGroupComponent implements OnInit, OnDestroy {
           this.selectedOrg = this.organisations[0].id;
           // Trigger load after org is selected
           this.loadGroups();
+        } else {
+          this.selectedOrg = null;
+          this.groups = [];
+          this.filteredGroups = [];
+          this.totalRecords = 0;
         }
       }
     });
@@ -143,13 +148,24 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.groupService.listGroupps(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.groups = response.data.groups || [];
-        this.filteredGroups = [...this.groups];
-        this.totalRecords = response.data.totalItems || this.groups.length;
-      }
-    });
+    this.groupService
+      .listGroupps(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.groups = response.data.groups || [];
+          this.filteredGroups = [...this.groups];
+          this.totalRecords = response.data.totalItems || this.groups.length;
+        } else {
+          this.groups = [];
+          this.filteredGroups = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.groups = [];
+        this.filteredGroups = [];
+        this.totalRecords = 0;
+      });
   }
 
   onAddNewCategory() {

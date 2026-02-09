@@ -156,6 +156,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
             this.databases = [];
             this.selectedDatabase = null;
             this.analyses = [];
+            this.filteredAnalyses = [];
             this.totalRecords = 0;
           }
         }
@@ -201,28 +202,46 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService.listDatabase(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = response.data || [];
-          if (this.databases.length > 0) {
-            if (
-              preSelectedDbId &&
-              this.databases.find(d => d.id === preSelectedDbId)
-            ) {
-              this.selectedDatabase = preSelectedDbId;
+      this.databaseService
+        .listDatabase(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.databases = response.data || [];
+            if (this.databases.length > 0) {
+              if (
+                preSelectedDbId &&
+                this.databases.find(d => d.id === preSelectedDbId)
+              ) {
+                this.selectedDatabase = preSelectedDbId;
+              } else {
+                this.selectedDatabase = this.databases[0].id;
+              }
+              this.loadAnalyses();
             } else {
-              this.selectedDatabase = this.databases[0].id;
+              this.selectedDatabase = null;
+              this.analyses = [];
+              this.filteredAnalyses = [];
+              this.totalRecords = 0;
             }
-            this.loadAnalyses();
           } else {
+            this.selectedOrg = null;
+            this.databases = [];
             this.selectedDatabase = null;
             this.analyses = [];
             this.filteredAnalyses = [];
             this.totalRecords = 0;
           }
-        }
-        resolve();
-      });
+          resolve();
+        })
+        .catch(() => {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.analyses = [];
+          this.filteredAnalyses = [];
+          this.totalRecords = 0;
+          resolve();
+        });
     });
   }
 
@@ -262,13 +281,24 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.analysesService.listAnalyses(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.analyses = response.data.analyses || [];
-        this.filteredAnalyses = [...this.analyses];
-        this.totalRecords = response.data.totalItems || this.analyses.length;
-      }
-    });
+    this.analysesService
+      .listAnalyses(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.analyses = response.data.analyses || [];
+          this.filteredAnalyses = [...this.analyses];
+          this.totalRecords = response.data.totalItems || this.analyses.length;
+        } else {
+          this.analyses = [];
+          this.filteredAnalyses = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.analyses = [];
+        this.filteredAnalyses = [];
+        this.totalRecords = 0;
+      });
   }
 
   onView(id: string) {

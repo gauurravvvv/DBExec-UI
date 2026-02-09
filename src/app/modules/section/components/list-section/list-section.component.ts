@@ -155,6 +155,13 @@ export class ListSectionComponent implements OnInit, OnDestroy {
             if (!preSelectedOrgId) {
               this.loadDatabases();
             }
+          } else {
+            this.selectedOrg = null;
+            this.databases = [];
+            this.selectedDatabase = null;
+            this.sections = [];
+            this.filteredSections = [];
+            this.totalRecords = 0;
           }
         }
         resolve();
@@ -199,27 +206,46 @@ export class ListSectionComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService.listDatabase(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = [...response.data];
-          if (this.databases.length > 0) {
-            if (
-              preSelectedDbId &&
-              this.databases.find(d => d.id === preSelectedDbId)
-            ) {
-              this.selectedDatabase = preSelectedDbId;
+      this.databaseService
+        .listDatabase(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.databases = [...response.data];
+            if (this.databases.length > 0) {
+              if (
+                preSelectedDbId &&
+                this.databases.find(d => d.id === preSelectedDbId)
+              ) {
+                this.selectedDatabase = preSelectedDbId;
+              } else {
+                this.selectedDatabase = this.databases[0].id;
+              }
+              this.loadSections();
             } else {
-              this.selectedDatabase = this.databases[0].id;
+              this.selectedDatabase = null;
+              this.sections = [];
+              this.filteredSections = [];
+              this.totalRecords = 0;
             }
-            this.loadSections();
           } else {
+            this.selectedOrg = null;
+            this.databases = [];
             this.selectedDatabase = null;
             this.sections = [];
             this.filteredSections = [];
+            this.totalRecords = 0;
           }
-        }
-        resolve();
-      });
+          resolve();
+        })
+        .catch(() => {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.sections = [];
+          this.filteredSections = [];
+          this.totalRecords = 0;
+          resolve();
+        });
     });
   }
 
@@ -258,13 +284,24 @@ export class ListSectionComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.sectionService.listSection(params).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.sections = response.data?.sections || [];
-        this.filteredSections = [...this.sections];
-        this.totalRecords = response.data?.count || this.sections.length;
-      }
-    });
+    this.sectionService
+      .listSection(params)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.sections = response.data?.sections || [];
+          this.filteredSections = [...this.sections];
+          this.totalRecords = response.data?.count || this.sections.length;
+        } else {
+          this.sections = [];
+          this.filteredSections = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.sections = [];
+        this.filteredSections = [];
+        this.totalRecords = 0;
+      });
   }
 
   onAddNewSection() {

@@ -159,6 +159,13 @@ export class ListPromptComponent implements OnInit, OnDestroy {
             if (!preSelectedOrgId) {
               this.loadDatabases();
             }
+          } else {
+            this.selectedOrg = null;
+            this.databases = [];
+            this.selectedDatabase = null;
+            this.prompts = [];
+            this.filteredPrompts = [];
+            this.totalRecords = 0;
           }
         }
         resolve();
@@ -208,27 +215,46 @@ export class ListPromptComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService.listDatabase(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = response.data;
-          if (this.databases.length > 0) {
-            if (
-              preSelectedDbId &&
-              this.databases.find(d => d.id === preSelectedDbId)
-            ) {
-              this.selectedDatabase = preSelectedDbId;
+      this.databaseService
+        .listDatabase(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.databases = response.data;
+            if (this.databases.length > 0) {
+              if (
+                preSelectedDbId &&
+                this.databases.find(d => d.id === preSelectedDbId)
+              ) {
+                this.selectedDatabase = preSelectedDbId;
+              } else {
+                this.selectedDatabase = this.databases[0].id;
+              }
+              this.loadPrompts();
             } else {
-              this.selectedDatabase = this.databases[0].id;
+              this.selectedDatabase = null;
+              this.prompts = [];
+              this.filteredPrompts = [];
+              this.totalRecords = 0;
             }
-            this.loadPrompts();
           } else {
+            this.selectedOrg = null;
+            this.databases = [];
             this.selectedDatabase = null;
             this.prompts = [];
             this.filteredPrompts = [];
+            this.totalRecords = 0;
           }
-        }
-        resolve();
-      });
+          resolve();
+        })
+        .catch(() => {
+          this.selectedOrg = null;
+          this.databases = [];
+          this.selectedDatabase = null;
+          this.prompts = [];
+          this.filteredPrompts = [];
+          this.totalRecords = 0;
+          resolve();
+        });
     });
   }
 
@@ -274,13 +300,24 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.promptService.listPrompt(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.prompts = response.data?.prompts || [];
-        this.filteredPrompts = [...this.prompts];
-        this.totalRecords = response.data?.count;
-      }
-    });
+    this.promptService
+      .listPrompt(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.prompts = response.data?.prompts || [];
+          this.filteredPrompts = [...this.prompts];
+          this.totalRecords = response.data?.count;
+        } else {
+          this.prompts = [];
+          this.filteredPrompts = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(() => {
+        this.prompts = [];
+        this.filteredPrompts = [];
+        this.totalRecords = 0;
+      });
   }
 
   onAddNewPrompt() {

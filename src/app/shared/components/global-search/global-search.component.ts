@@ -23,6 +23,8 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   showSearchModal = false;
   searchTerm = '';
   searchResults: any[] = [];
+  uniqueEntityTypes: string[] = [];
+  activeFilter: string = 'ALL';
   openSearchSubscription?: Subscription;
   searchSubject = new Subject<string>();
 
@@ -96,6 +98,8 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   performSearch(term: string) {
     if (!term.trim()) {
       this.searchResults = [];
+      this.uniqueEntityTypes = [];
+      this.activeFilter = 'ALL';
       return;
     }
 
@@ -115,14 +119,37 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
               ...item,
             };
           });
+          this.extractEntityTypes();
         } else {
           this.searchResults = [];
+          this.uniqueEntityTypes = [];
         }
       })
       .catch(error => {
         console.error('Search failed', error);
         this.searchResults = [];
+        this.uniqueEntityTypes = [];
       });
+  }
+
+  extractEntityTypes() {
+    const types = new Set(this.searchResults.map(item => item.entityType));
+    this.uniqueEntityTypes = Array.from(types).sort();
+    // Reset filter to ALL when new search results arrive
+    this.activeFilter = 'ALL';
+  }
+
+  get filteredSearchResults() {
+    if (this.activeFilter === 'ALL') {
+      return this.searchResults;
+    }
+    return this.searchResults.filter(
+      item => item.entityType === this.activeFilter,
+    );
+  }
+
+  setFilter(filter: string) {
+    this.activeFilter = filter;
   }
 
   getBreadcrumb(item: any): string {
