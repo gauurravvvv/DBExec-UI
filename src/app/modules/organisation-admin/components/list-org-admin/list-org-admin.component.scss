@@ -114,22 +114,21 @@ $radius-sm: 8px;
 
     // Modern Button
     .modern-button {
-      border-radius: 6px !important;
+      border-radius: $radius-sm !important;
       font-weight: 600;
       padding: 0.65rem 1.25rem;
 
-      ::ng-deep .p-button {
-        background: var(--primary-color);
+      &.p-button-primary {
+        background: linear-gradient(135deg, #2196f3, #1976d2);
+        color: white;
         border: none;
+        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        transition: all 0.2s ease;
 
         &:hover {
-          opacity: 0.9;
+          opacity: 1;
           transform: translateY(-1px);
-          box-shadow: 0 1px 2px 0 var(--shadow-color);
-        }
-
-        &:focus {
-          box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
         }
       }
     }
@@ -326,6 +325,11 @@ $radius-sm: 8px;
           &:hover {
             background: var(--hover-background);
             color: var(--primary-color);
+          }
+
+          &.edit-btn:hover {
+            background: rgba(33, 150, 243, 0.1);
+            color: #1976d2;
           }
 
           &.delete-btn:hover {

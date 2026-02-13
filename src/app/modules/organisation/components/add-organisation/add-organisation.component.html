@@ -3,26 +3,27 @@
         <!-- Header Section -->
         <div class="page-header">
             <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/organisation">
+                <button pButton class="p-button-text back-button" routerLink="/app/organisation">
                     <i class="pi pi-arrow-left"></i>
                 </button>
                 <h2>Add Organisation</h2>
             </div>
             <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
                     [disabled]="!isFormDirty || orgForm.pristine" (click)="onCancel()">
                 </button>
                 <ng-container *ngIf="currentStep === 0">
-                    <button pButton type="button" label="Next" (click)="nextStep()" class="p-button-outlined"
+                    <button pButton type="button" label="Next" (click)="nextStep()" class="p-button-primary btn-save"
                         [disabled]="!isBasicInfoValid()">
                         <i class="pi pi-arrow-right ml-2"></i>
                     </button>
                 </ng-container>
                 <ng-container *ngIf="currentStep === 1">
-                    <button pButton type="button" label="Previous" class="p-button-outlined" (click)="previousStep()">
+                    <button pButton type="button" label="Previous" class="p-button-outlined btn-cancel"
+                        (click)="previousStep()">
                         <i class="pi pi-arrow-left mr-2"></i>
                     </button>
-                    <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                    <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
                         [disabled]="!isFormValid()">
                         <i class="pi pi-save mr-2"></i>
                     </button>

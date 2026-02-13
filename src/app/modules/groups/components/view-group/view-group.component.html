@@ -3,18 +3,17 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" (click)="goBack()">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Group Details</h2>
       </div>
-      <div class="action-buttons">
-        <button pButton class="p-button-outlined mr-2" (click)="onEdit()">
-          <i class="pi pi-pencil mr-2"></i>Edit
+      <div class="header-actions">
+        <button class="btn-primary" (click)="onEdit()">
+          <i class="pi pi-pencil"></i> Edit
         </button>
-        <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
-          (click)="confirmDelete()">
-          <i class="pi pi-trash mr-2"></i>
+        <button class="btn-danger" type="button" (click)="confirmDelete()">
+          <i class="pi pi-trash"></i> Delete
         </button>
       </div>
     </div>

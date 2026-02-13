@@ -3,15 +3,15 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/users">
+        <button pButton class="p-button-text back-button" routerLink="/app/users">
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Edit User</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()"></button>
-        <button pButton type="submit" label="Save" class="p-button-outlined"
+        <button pButton class="p-button-primary btn-save" type="submit" label="Save"
           [disabled]="userForm.invalid || !isFormDirty" (click)="onSubmit()">
           <i class="pi pi-save mr-2"></i>
         </button>

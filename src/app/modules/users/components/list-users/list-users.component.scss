@@ -118,6 +118,19 @@ $radius-sm: 8px;
       font-weight: 600;
       padding: 0.65rem 1.25rem;
 
+      &.p-button-primary {
+        background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+        border: none !important;
+        color: white !important;
+        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        transition: all 0.2s ease;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
+      }
+
       ::ng-deep .p-button {
         background: var(--primary-color);
         border: none;
@@ -326,6 +339,11 @@ $radius-sm: 8px;
           &:hover {
             background: var(--hover-background);
             color: var(--primary-color);
+          }
+
+          &.edit-btn:hover {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196f3;
           }
 
           &.delete-btn:hover {

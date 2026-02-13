@@ -40,24 +40,100 @@ $radius-sm: 8px;
 
         button {
           min-width: 0rem;
-          background: transparent !important;
-          border: none !important;
-          color: var(--text-color) !important;
 
-          &:hover {
-            background: var(--hover-background) !important;
-          }
-
-          i {
+          &.back-button {
+            padding: 0 !important;
+            width: 36px;
+            height: 36px;
+            border-radius: 50% !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent !important;
             color: var(--text-color) !important;
+            border: none !important;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: var(--hover-background) !important;
+            }
+
+            i {
+              font-size: 1.1rem;
+            }
           }
         }
       }
 
-      .action-buttons {
+      .header-actions {
         display: flex;
-        gap: 10px;
-        align-items: center;
+        gap: 12px;
+
+        button {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0.6rem 1.25rem;
+          border-radius: $radius-sm;
+          font-weight: 600;
+          font-size: 0.9rem;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          i {
+            font-size: 0.9rem;
+          }
+
+          &.btn-secondary {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+            &:hover {
+              background: var(--hover-background);
+              transform: translateY(-1px);
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+          }
+
+          &.btn-primary {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+            &:hover:not(:disabled) {
+              transform: translateY(-1px);
+              box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+            }
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+              background: var(--secondary-color);
+              box-shadow: none;
+            }
+          }
+
+          &.btn-danger {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+
+            &:hover:not(:disabled) {
+              transform: translateY(-1px);
+              box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+            }
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+              background: var(--secondary-color);
+              box-shadow: none;
+            }
+          }
+        }
       }
     }
 

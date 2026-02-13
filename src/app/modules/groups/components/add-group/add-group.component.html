@@ -3,16 +3,16 @@
         <!-- Header Section -->
         <div class="page-header">
             <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/group">
+                <button pButton class="p-button-text back-button" routerLink="/app/group">
                     <i class="pi pi-arrow-left"></i>
                 </button>
                 <h2>Add Group</h2>
             </div>
             <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
                     [disabled]="!isFormDirty" (click)="onCancel()">
                 </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
                     [disabled]="userGroupForm.invalid || userGroupForm.get('users')?.value?.length <= 1">
                     <i class="pi pi-save mr-2"></i>
                 </button>

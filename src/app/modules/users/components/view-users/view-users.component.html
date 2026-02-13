@@ -3,23 +3,21 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/users">
+        <button pButton class="p-button-text back-button" routerLink="/app/users">
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>User Details</h2>
       </div>
-      <div class="action-buttons">
-        <button pButton class="p-button-outlined" type="button" label="Edit" [disabled]="userId == loggedInUserId"
+      <div class="header-actions">
+        <button class="btn-primary" type="button" [disabled]="userId == loggedInUserId"
           [routerLink]="['/app/users/edit', orgId, userId]">
-          <i class="pi pi-pencil mr-2"></i>
+          <i class="pi pi-pencil"></i> Edit
         </button>
-        <button pButton class="p-button-outlined" type="button" label="Change Password"
-          (click)="openChangePasswordDialog()">
-          <i class="pi pi-key mr-2"></i>
+        <button class="btn-secondary" type="button" (click)="openChangePasswordDialog()">
+          <i class="pi pi-key"></i> Change Password
         </button>
-        <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
-          [disabled]="userId == loggedInUserId" (click)="confirmDelete(userId)">
-          <i class="pi pi-trash mr-2"></i>
+        <button class="btn-danger" type="button" [disabled]="userId == loggedInUserId" (click)="confirmDelete(userId)">
+          <i class="pi pi-trash"></i> Delete
         </button>
       </div>
     </div>

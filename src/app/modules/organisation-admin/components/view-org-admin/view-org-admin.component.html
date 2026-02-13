@@ -3,24 +3,25 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/org-admin">
-          <i class="pi pi-arrow-left"></i>
+        <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/org-admin">
+          <i class="pi pi-arrow-left text-xl"></i>
         </button>
         <h2>Admin Details</h2>
       </div>
-      <div class="action-buttons">
-        <button pButton class="p-button-outlined" type="button" label="Edit"
-          [disabled]="!showChangePassword && adminId == loggedInUserId"
+      <div class="header-actions flex gap-2">
+        <button class="btn-primary" [disabled]="!showChangePassword && adminId == loggedInUserId"
           [routerLink]="['/app/org-admin/edit', selectedOrgId, adminId]">
-          <i class="pi pi-pencil mr-2"></i>
+          <i class="pi pi-pencil"></i>
+          Edit
         </button>
-        <button pButton class="p-button-outlined" type="button" label="Change Password" *ngIf="showChangePassword"
-          (click)="openChangePasswordDialog()">
-          <i class="pi pi-key mr-2"></i>
+        <button class="btn-secondary" *ngIf="showChangePassword" (click)="openChangePasswordDialog()">
+          <i class="pi pi-key"></i>
+          Change Password
         </button>
-        <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
-          [disabled]="!showChangePassword && adminId == loggedInUserId" (click)="confirmDelete(adminId)">
-          <i class="pi pi-trash mr-2"></i>
+        <button class="btn-danger" [disabled]="!showChangePassword && adminId == loggedInUserId"
+          (click)="confirmDelete(adminId)">
+          <i class="pi pi-trash"></i>
+          Delete
         </button>
       </div>
     </div>

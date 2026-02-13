@@ -360,6 +360,11 @@ $radius-sm: 8px;
             color: var(--primary-color);
           }
 
+          &.edit-btn:hover {
+            background: rgba(33, 150, 243, 0.1);
+            color: #1976d2;
+          }
+
           &.delete-btn:hover {
             background: rgba(244, 67, 54, 0.1);
             color: var(--error-color);

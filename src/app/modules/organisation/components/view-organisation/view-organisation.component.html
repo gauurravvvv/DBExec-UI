@@ -3,19 +3,19 @@
         <!-- Header Section -->
         <div class="page-header">
             <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/organisation">
-                    <i class="pi pi-arrow-left"></i>
+                <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/organisation">
+                    <i class="pi pi-arrow-left text-xl"></i>
                 </button>
                 <h2>Organisation Details</h2>
             </div>
-            <div class="action-buttons">
-                <button pButton class="p-button-outlined" type="button" label="Edit"
-                    [routerLink]="['/app/organisation/edit', organisationId]">
-                    <i class="pi pi-pencil mr-2"></i>
+            <div class="header-actions flex gap-2">
+                <button class="btn-primary" [routerLink]="['/app/organisation/edit', organisationId]">
+                    <i class="pi pi-pencil"></i>
+                    Edit
                 </button>
-                <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
-                    (click)="confirmDelete(organisationId)">
-                    <i class="pi pi-trash mr-2"></i>
+                <button class="btn-danger" (click)="confirmDelete(organisationId)">
+                    <i class="pi pi-trash"></i>
+                    Delete
                 </button>
             </div>
         </div>
@@ -41,95 +41,118 @@
                     </div>
 
                     <!-- Basic Information -->
-                    <div class="info-section">
-                        <div class="detail-group">
-                            <h4>Basic Information</h4>
-                            <div class="detail-item">
-                                <span class="label">
-                                    <i class="pi pi-building"></i>
-                                    Organisation Name
-                                </span>
-                                <span class="value">{{ organisationData.name }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">
-                                    <i class="pi pi-id-card"></i>
-                                    Organisation ID
-                                </span>
-                                <span class="value">#{{ organisationData.id }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">
-                                    <i class="pi pi-calendar"></i>
-                                    Created On
-                                </span>
-                                <span class="value">{{ organisationData.createdOn | date:'medium' }}</span>
-                            </div>
+                    <div class="detail-group">
+                        <h4>Basic Information</h4>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-building"></i>
+                                Organisation Name
+                            </span>
+                            <span class="value">{{ organisationData.name }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-id-card"></i>
+                                Organisation ID
+                            </span>
+                            <span class="value">#{{ organisationData.id }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-calendar"></i>
+                                Created On
+                            </span>
+                            <span class="value">{{ organisationData.createdOn | date:'medium' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stats-row">
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <i class="pi pi-user"></i>
+                            <span class="stat-value">{{ organisationData.usersCount || 0 }}</span>
+                            <span class="stat-label">Users</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <i class="pi pi-shield"></i>
+                            <span class="stat-value">{{ organisationData.adminsCount || 0 }}</span>
+                            <span class="stat-label">Admins</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <i class="pi pi-users"></i>
+                            <span class="stat-value">{{ organisationData.groupsCount || 0 }}</span>
+                            <span class="stat-label">Groups</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <i class="pi pi-database"></i>
+                            <span class="stat-value">{{ organisationData.databasesCount || 0 }}</span>
+                            <span class="stat-label">Databases</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <i class="pi pi-link"></i>
+                            <span class="stat-value">{{ organisationData.connectionsCount || 0 }}</span>
+                            <span class="stat-label">Connections</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Second Row -->
                 <div class="second-row">
-                    <!-- Resource Allocation -->
+                    <!-- Configuration Limits -->
                     <div class="detail-group">
-                        <h4>Maximum Resource Limits</h4>
-                        <div class="resource-grid">
-                            <div class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="pi pi-database"></i>
-                                </div>
-                                <div class="resource-details">
-                                    <span class="resource-label">Max Databases</span>
-                                    <span class="resource-value">{{ organisationData.config.maxDatabases }}</span>
-                                </div>
-                            </div>
-                            <div class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="pi pi-users"></i>
-                                </div>
-                                <div class="resource-details">
-                                    <span class="resource-label">Max Admins</span>
-                                    <span class="resource-value">{{ organisationData.config.maxAdmins }}</span>
-                                </div>
-                            </div>
-                            <div class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="pi pi-user"></i>
-                                </div>
-                                <div class="resource-details">
-                                    <span class="resource-label">Max Users</span>
-                                    <span class="resource-value">{{ organisationData.config.maxUsers }}</span>
-                                </div>
-                            </div>
+                        <h4>Configuration Limits</h4>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-database"></i>
+                                Max Databases
+                            </span>
+                            <span class="value">{{ organisationData.config.maxDatabases }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-user"></i>
+                                Max Users
+                            </span>
+                            <span class="value">{{ organisationData.config.maxUsers }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-shield"></i>
+                                Max Admins
+                            </span>
+                            <span class="value">{{ organisationData.config.maxAdmins }}</span>
+                        </div>
+                    </div>
 
-                            <div class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="pi pi-users"></i>
-                                </div>
-                                <div class="resource-details">
-                                    <span class="resource-label">Max Groups</span>
-                                    <span class="resource-value">{{ organisationData.config.maxGroups }}</span>
-                                </div>
-                            </div>
-                            <div class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="pi pi-globe"></i>
-                                </div>
-                                <div class="resource-details">
-                                    <span class="resource-label">Max Environments</span>
-                                    <span class="resource-value">{{ organisationData.config.maxEnvironment }}</span>
-                                </div>
-                            </div>
-                            <div class="resource-item">
-                                <div class="resource-icon">
-                                    <i class="pi pi-list"></i>
-                                </div>
-                                <div class="resource-details">
-                                    <span class="resource-label">Max Categories</span>
-                                    <span class="resource-value">{{ organisationData.config.maxCategories }}</span>
-                                </div>
-                            </div>
+                    <!-- Additional Limits -->
+                    <div class="detail-group">
+                        <h4>Additional Limits</h4>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-users"></i>
+                                Max Groups
+                            </span>
+                            <span class="value">{{ organisationData.config.maxGroups }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-globe"></i>
+                                Max Environments
+                            </span>
+                            <span class="value">{{ organisationData.config.maxEnvironment }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">
+                                <i class="pi pi-list"></i>
+                                Max Categories
+                            </span>
+                            <span class="value">{{ organisationData.config.maxCategories }}</span>
                         </div>
                     </div>
                 </div>

@@ -19,6 +19,11 @@ interface OrganisationData {
   status: number;
   createdOn: Date;
   config: OrganisationConfig;
+  usersCount: number;
+  adminsCount: number;
+  groupsCount: number;
+  databasesCount: number;
+  connectionsCount: number;
 }
 
 @Component({
@@ -37,7 +42,7 @@ export class ViewOrganisationComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private organisationService: OrganisationService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
