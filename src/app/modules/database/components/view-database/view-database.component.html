@@ -3,19 +3,23 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" (click)="goBack()">
-          <i class="pi pi-arrow-left"></i>
+        <button pButton class="p-button-text p-button-plain back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left text-xl"></i>
         </button>
         <h2>Database Details</h2>
       </div>
-      <div class="action-buttons">
-        <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-text"
-          (click)="loadDatabaseData()"></button>
-        <button pButton class="p-button-outlined" type="button" (click)="onEdit()">
-          <i class="pi pi-pencil mr-2"></i>Edit
+      <div class="header-actions">
+        <button class="btn-secondary" (click)="loadDatabaseData()">
+          <i class="pi pi-refresh"></i>
+          Refresh
         </button>
-        <button pButton class="p-button-outlined p-button-danger" type="button" (click)="confirmDelete()">
-          <i class="pi pi-trash mr-2"></i>Delete
+        <button class="btn-primary" type="button" (click)="onEdit()">
+          <i class="pi pi-pencil"></i>
+          Edit
+        </button>
+        <button class="btn-danger" type="button" (click)="confirmDelete()">
+          <i class="pi pi-trash"></i>
+          Delete
         </button>
       </div>
     </div>

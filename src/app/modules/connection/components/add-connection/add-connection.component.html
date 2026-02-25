@@ -3,16 +3,16 @@
         <!-- Header Section -->
         <div class="page-header">
             <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/connections">
+                <button pButton class="p-button-text back-button" routerLink="/app/connections">
                     <i class="pi pi-arrow-left"></i>
                 </button>
                 <h2>Add Connection</h2>
             </div>
             <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
                     [disabled]="!isFormDirty" (click)="onCancel()">
                 </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
                     [disabled]="connectionForm.invalid">
                     <i class="pi pi-save mr-2"></i>
                 </button>
