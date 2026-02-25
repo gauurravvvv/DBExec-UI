@@ -43,9 +43,9 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onCancel()">
+        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" (click)="onCancel()">
         </button>
-        <button pButton type="button" label="Execute & Load" (click)="onExecute()" [disabled]="!sqlQuery.trim()">
+        <button pButton type="button" label="Execute & Load" class="p-button-primary btn-save" (click)="onExecute()" [disabled]="!sqlQuery.trim()">
         </button>
     </ng-template>
 </p-dialog>

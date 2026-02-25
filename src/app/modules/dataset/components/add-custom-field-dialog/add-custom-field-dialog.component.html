@@ -100,14 +100,14 @@
 
                 <!-- Footer Actions -->
                 <div class="popup-actions">
-                    <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                    <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
                         (click)="onCancel()" [disabled]="isSubmitting">
                     </button>
-                    <button pButton type="button" label="Validate" class="p-button-outlined p-button-secondary"
+                    <button pButton type="button" label="Validate" class="p-button-outlined btn-secondary"
                         (click)="onValidate()" [disabled]="!customField.columnToUse || isValidating">
                     </button>
                     <button pButton type="button" [label]="editMode ? 'Save Changes' : 'Add Field'"
-                        class="p-button-outlined" (click)="onSubmit()" [disabled]="!isSaveEnabled || isSubmitting">
+                        class="p-button-primary btn-save" (click)="onSubmit()" [disabled]="!isSaveEnabled || isSubmitting">
                         <i class="pi mr-2" [ngClass]="editMode ? 'pi-save' : 'pi-plus'"></i>
                     </button>
                 </div>

@@ -3,8 +3,8 @@
         <!-- Header Section -->
         <div class="page-header">
             <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/prompt">
-                    <i class="pi pi-arrow-left"></i>
+                <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/prompt">
+                    <i class="pi pi-arrow-left text-xl"></i>
                 </button>
                 <h2>Add Prompt</h2>
             </div>
@@ -15,10 +15,10 @@
                 </div>
             </div>
             <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
                     [disabled]="!isFormDirty" (click)="onCancel()">
                 </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
                     [disabled]="sectionForm.invalid || hasDuplicates">
                     <i class="pi pi-save mr-2"></i>
                 </button>

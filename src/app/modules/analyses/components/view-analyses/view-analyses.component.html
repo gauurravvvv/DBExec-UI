@@ -3,25 +3,26 @@
     <div class="query-toolbar">
         <div class="toolbar-left">
             <div class="left-section">
-                <button pButton class="p-button-text" (click)="goBack()">
-                    <i class="pi pi-arrow-left"></i>
+                <button pButton class="p-button-text p-button-plain back-button" (click)="goBack()">
+                    <i class="pi pi-arrow-left text-xl"></i>
                 </button>
                 <h3 class="toolbar-title">View Analysis</h3>
             </div>
         </div>
         <div class="toolbar-right">
-            <div class="action-buttons">
-                <button pButton class="p-button-outlined" type="button" label="Edit"
+            <div class="header-actions">
+                <button class="btn-primary" type="button"
                     [routerLink]="['/app/analyses/edit', orgId, analysisId]">
-                    <i class="pi pi-pencil mr-2"></i>
+                    <i class="pi pi-pencil"></i>
+                    Edit
                 </button>
-                <button pButton class="p-button-outlined p-button-success" type="button" label="Publish"
-                    (click)="onPublish()">
-                    <i class="pi pi-send mr-2"></i>
+                <button class="btn-success" type="button" (click)="onPublish()">
+                    <i class="pi pi-send"></i>
+                    Publish
                 </button>
-                <button pButton class="p-button-outlined p-button-danger" type="button" label="Delete"
-                    (click)="onDelete()">
-                    <i class="pi pi-trash mr-2"></i>
+                <button class="btn-danger" type="button" (click)="onDelete()">
+                    <i class="pi pi-trash"></i>
+                    Delete
                 </button>
             </div>
         </div>

@@ -22,10 +22,10 @@
             </div>
 
             <div class="popup-actions">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
                     (click)="onCancel()">
                 </button>
-                <button pButton type="submit" label="Save Analysis" class="p-button-outlined"
+                <button pButton type="submit" label="Save Analysis" class="p-button-primary btn-save"
                     [disabled]="analysisForm.invalid" (click)="onSubmit()">
                     <i class="pi pi-save mr-2"></i>
                 </button>

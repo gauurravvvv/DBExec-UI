@@ -3,15 +3,15 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text" routerLink="/app/tab">
-          <i class="pi pi-arrow-left"></i>
+        <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/tab">
+          <i class="pi pi-arrow-left text-xl"></i>
         </button>
         <h2>Edit Tab</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()"></button>
-        <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+        <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
           [disabled]="tabForm.invalid || !isFormDirty">
           <i class="pi pi-save mr-2"></i>
         </button>

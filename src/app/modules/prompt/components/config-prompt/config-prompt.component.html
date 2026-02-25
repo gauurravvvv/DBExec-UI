@@ -2,20 +2,20 @@
     <div class="add-admin-container">
         <div class="page-header">
             <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/prompt">
-                    <i class="pi pi-arrow-left"></i>
+                <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/prompt">
+                    <i class="pi pi-arrow-left text-xl"></i>
                 </button>
                 <h2>Configure Prompt</h2>
             </div>
             <div class="action-buttons">
-                <button pButton type="button" label="Customise" class="p-button-outlined" *ngIf="isConfigurable()"
+                <button pButton type="button" label="Customise" class="p-button-outlined btn-secondary" *ngIf="isConfigurable()"
                     (click)="openConfigDialog()" pTooltip="Customise prompt display options" tooltipPosition="bottom">
                     <i class="pi pi-cog mr-2"></i>
                 </button>
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
                     [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
                 </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
+                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
                     [disabled]="promptForm.invalid || !isFormDirty">
                     <i class="pi pi-save mr-2"></i>
                 </button>

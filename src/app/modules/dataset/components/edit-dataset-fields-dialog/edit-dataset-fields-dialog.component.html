@@ -17,10 +17,10 @@
             </div>
 
             <div class="popup-actions">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
+                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
                     (click)="onCancel()" [disabled]="isSubmitting">
                 </button>
-                <button pButton type="button" label="Save" class="p-button-outlined" (click)="onSubmit()"
+                <button pButton type="button" label="Save" class="p-button-primary btn-save" (click)="onSubmit()"
                     [disabled]="!isSaveEnabled || isSubmitting">
                     <i class="pi pi-save mr-2"></i>
                 </button>
