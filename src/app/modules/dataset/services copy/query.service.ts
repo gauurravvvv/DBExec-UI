@@ -14,6 +14,9 @@ export class QueryService {
     orgId: number;
     databaseId: number;
     query: string;
+    page?: number;
+    limit?: number;
+    filter?: string;
   }): Observable<any> {
     return this.httpClientService.queryPost('/query/execute', queryData);
   }
@@ -97,12 +100,12 @@ export class QueryService {
     return this.httpClientService.queryPost('/query/explain', queryData);
   }
 
-  // Export query results - use Query Server
+  // Export query results as CSV - use Query Server
   exportQueryResults(queryData: {
     orgId: number;
     databaseId: number;
     query: string;
-    format: 'csv' | 'json' | 'xlsx';
+    filter?: string;
   }): Observable<Blob> {
     return this.httpClientService.queryPost('/query/export', queryData, {
       responseType: 'blob',

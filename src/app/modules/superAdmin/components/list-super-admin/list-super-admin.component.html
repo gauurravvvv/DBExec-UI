@@ -152,12 +152,13 @@
                             <td>
                                 <div class="row-actions">
                                     <button class="icon-btn edit-btn" (click)="onEdit(admin.id)"
-                                        [disabled]="admin.id == loggedInUserId" pTooltip="Edit" tooltipPosition="left">
+                                        [disabled]="admin.id == loggedInUserId" pTooltip="Edit"
+                                        tooltipPosition="bottom">
                                         <i class="pi pi-pencil"></i>
                                     </button>
                                     <button class="icon-btn delete-btn" (click)="confirmDelete(admin.id)"
                                         [disabled]="admin.id == loggedInUserId" pTooltip="Delete"
-                                        tooltipPosition="left">
+                                        tooltipPosition="bottom">
                                         <i class="pi pi-trash"></i>
                                     </button>
                                 </div>

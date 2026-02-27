@@ -186,76 +186,33 @@
                 </div>
             </div>
 
-            <!-- Results Section -->
-            <div class="results-section" *ngIf="selectedDatabaseObj && queryResult">
-                <div class="results-content">
-                    <!-- Results Header -->
-                    <div class="results-header">
-                        <div class="results-info">
-                            <span class="results-title">
-                                <i class="pi pi-table"></i>
-                                Query Results
-                            </span>
-                            <span class="results-meta" *ngIf="!queryResult.error">
-                                {{ queryResult.rowCount }} row(s) in {{ queryResult.executionTime }}
-                            </span>
-                        </div>
-                        <div class="results-actions">
-                            <button class="btn btn-icon" *ngIf="!queryResult.error" title="Export Results">
-                                <i class="pi pi-download"></i>
-                            </button>
-                            <button class="btn btn-icon" (click)="queryResult = null" title="Close Results">
-                                <i class="pi pi-times"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Error Message -->
-                    <div class="results-error" *ngIf="queryResult.error">
-                        <i class="pi pi-exclamation-triangle"></i>
-                        <div class="error-content">
-                            <h4>Query Execution Failed</h4>
-                            <p>{{ queryResult.error }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Success Message (for non-SELECT queries) -->
-                    <div class="results-success" *ngIf="queryResult.message && !queryResult.error">
-                        <i class="pi pi-check-circle"></i>
-                        <div class="success-content">
-                            <h4>Query Executed Successfully</h4>
-                            <p>{{ queryResult.message }}</p>
-                            <p *ngIf="queryResult.executionTime" class="execution-time">
-                                Execution Time: {{ queryResult.executionTime }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Results Table -->
-                    <div class="results-table-wrapper" *ngIf="!queryResult.error && queryResult.rows.length > 0">
-                        <table class="results-table">
-                            <thead>
-                                <tr>
-                                    <th class="row-number-header">#</th>
-                                    <th *ngFor="let column of queryResult.columns">{{ column }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of queryResult.rows; let i = index">
-                                    <td class="row-number">{{ i + 1 }}</td>
-                                    <td *ngFor="let column of queryResult.columns" [title]="row[column]">
-                                        {{ row[column] !== null && row[column] !== undefined ? row[column] : 'NULL' }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- No Results Message -->
-                    <div class="results-empty" *ngIf="!queryResult.error && queryResult.rows.length === 0">
-                        <i class="pi pi-inbox"></i>
-                        <p>Query executed successfully but returned no rows.</p>
-                    </div>
+            <!-- Results Status Bar (floating at bottom of editor) -->
+            <div class="results-status-bar" *ngIf="selectedDatabaseObj && queryResult">
+                <div class="status-bar-left">
+                    <span class="status-icon" [ngClass]="{'error': queryResult.error, 'success': !queryResult.error}">
+                        <i class="pi" [ngClass]="queryResult.error ? 'pi-times-circle' : 'pi-check-circle'"></i>
+                    </span>
+                    <span class="status-text" *ngIf="queryResult.error">Query failed</span>
+                    <span class="status-text" *ngIf="!queryResult.error && queryResult.rows.length > 0">
+                        {{ queryResult.rowCount }} row(s) in {{ queryResult.executionTime }}
+                    </span>
+                    <span class="status-text"
+                        *ngIf="!queryResult.error && queryResult.rows.length === 0 && queryResult.message">
+                        {{ queryResult.message }}
+                    </span>
+                    <span class="status-text"
+                        *ngIf="!queryResult.error && queryResult.rows.length === 0 && !queryResult.message">
+                        No rows returned ({{ queryResult.executionTime }})
+                    </span>
+                </div>
+                <div class="status-bar-right">
+                    <button class="status-bar-btn view-btn" (click)="showResultsPopup = true" title="View Results">
+                        <i class="pi pi-external-link"></i>
+                        View Results
+                    </button>
+                    <button class="status-bar-btn close-btn" (click)="queryResult = null" title="Dismiss">
+                        <i class="pi pi-times"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -289,6 +246,120 @@
 <!-- Save as Dataset Dialog -->
 <app-save-dataset-dialog [visible]="showDatasetDialog" (close)="onDatasetDialogClose($event)">
 </app-save-dataset-dialog>
+
+<!-- Results Popup Overlay -->
+<div class="results-popup-overlay" *ngIf="showResultsPopup && queryResult" (click)="showResultsPopup = false">
+    <div class="results-popup-container" (click)="$event.stopPropagation()"
+        [class.compact]="queryResult.error || (queryResult.rows.length === 0 && !isResultFilterActive && queryResult.columns.length === 0)">
+        <!-- Popup Header -->
+        <div class="results-popup-header">
+            <div class="popup-header-left">
+                <i class="pi pi-table"></i>
+                <span class="popup-title">Query Results</span>
+                <span class="popup-meta" *ngIf="!queryResult.error && queryResult.columns.length > 0">
+                    {{ queryResult.rowCount }} row(s) in {{ queryResult.executionTime }}
+                </span>
+            </div>
+            <div class="popup-header-right">
+                <button pButton label="Export CSV" icon="pi pi-download"
+                    class="p-button-outlined p-button-success p-button-sm export-csv-btn"
+                    (click)="exportResultsAsCsv()" [disabled]="isExportingResults"
+                    *ngIf="!queryResult.error && queryResult.columns.length > 0">
+                </button>
+                <button pButton label="Clear Filters" icon="pi pi-filter-slash"
+                    class="p-button-outlined p-button-danger p-button-sm clear-filters-btn"
+                    (click)="clearResultFilters()" [disabled]="!isResultFilterActive"
+                    *ngIf="!queryResult.error && queryResult.columns.length > 0">
+                </button>
+                <button pButton class="p-button-text p-button-rounded p-button-sm" icon="pi pi-times"
+                    (click)="showResultsPopup = false" pTooltip="Close" tooltipPosition="bottom">
+                </button>
+            </div>
+        </div>
+
+        <!-- Popup Body -->
+        <div class="results-popup-body">
+            <!-- Error Message -->
+            <div class="results-error-card" *ngIf="queryResult.error">
+                <div class="error-icon-wrapper">
+                    <i class="pi pi-times"></i>
+                </div>
+                <h4>Query Execution Failed</h4>
+                <div class="error-message-box">
+                    <code>{{ queryResult.error }}</code>
+                </div>
+                <div class="error-meta" *ngIf="queryResult.executionTime">
+                    <i class="pi pi-clock"></i>
+                    <span>{{ queryResult.executionTime }}</span>
+                </div>
+            </div>
+
+            <!-- Success Message (for non-SELECT queries) -->
+            <div class="results-success-card" *ngIf="queryResult.message && !queryResult.error">
+                <div class="success-icon-wrapper">
+                    <i class="pi pi-check"></i>
+                </div>
+                <h4>Query Executed Successfully</h4>
+                <p class="success-message">{{ queryResult.message }}</p>
+                <div class="success-meta" *ngIf="queryResult.executionTime">
+                    <i class="pi pi-clock"></i>
+                    <span>{{ queryResult.executionTime }}</span>
+                </div>
+            </div>
+
+            <!-- Results Table with PrimeNG -->
+            <div class="results-table-container" *ngIf="!queryResult.error && queryResult.columns.length > 0">
+                <p-table #resultsTable [value]="queryResult.rows" [rows]="resultRows" [paginator]="isPaginationEnabled"
+                    [lazy]="isPaginationEnabled" (onLazyLoad)="onResultsLazyLoad($event)"
+                    [totalRecords]="queryResult.rowCount" [rowHover]="true"
+                    currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
+                    [rowsPerPageOptions]="[10, 50, 100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
+                    scrollHeight="calc(80vh - 200px)">
+
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 60px" pFrozenColumn>#</th>
+                            <th *ngFor="let col of queryResult.columns">
+                                <div class="th-content">
+                                    {{ col }}
+                                </div>
+                            </th>
+                        </tr>
+                        <!-- Filter Row -->
+                        <tr>
+                            <th pFrozenColumn></th>
+                            <th *ngFor="let col of queryResult.columns">
+                                <input pInputText type="text" [(ngModel)]="resultFilterValues[col]"
+                                    (input)="onResultFilterChange()" [placeholder]="'Search ' + col"
+                                    class="w-full p-column-filter">
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                        <tr>
+                            <td pFrozenColumn class="row-number-cell">{{ rowIndex + 1 }}</td>
+                            <td *ngFor="let col of queryResult.columns" [title]="row[col]">
+                                <span [ngClass]="{'null-value': row[col] === null || row[col] === undefined}">
+                                    {{ row[col] !== null && row[col] !== undefined ? row[col] : 'NULL' }}
+                                </span>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td [attr.colspan]="queryResult.columns.length + 1" class="empty-message-cell text-center">
+                                No matching records found
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <!-- Hidden File Input for SQL Import -->
 <input type="file" #fileInput style="display: none;" (change)="onFileSelected($event)" />

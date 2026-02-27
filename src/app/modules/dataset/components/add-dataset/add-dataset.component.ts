@@ -12,8 +12,8 @@ import {
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { MessageService } from 'primeng/api';
-import { Observable } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, first } from 'rxjs/operators';
 import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -93,6 +93,20 @@ export class AddDatasetComponent
 
   // Save as Dataset Dialog
   showDatasetDialog = false;
+
+  // Results Popup
+  showResultsPopup = false;
+  resultRows = 25;
+  resultPage = 1;
+  isExportingResults = false;
+  resultFilterValues: { [key: string]: string } = {};
+  private resultFilterSubject = new Subject<void>();
+  private lastExecutedQuery = '';
+  private lastResultsLazyEvent: any = null;
+
+  get isPaginationEnabled(): boolean {
+    return !!this.queryResult && this.queryResult.rowCount > this.resultRows;
+  }
 
   // Change Confirmation Dialog
   showChangeConfirmDialog = false;
@@ -181,6 +195,24 @@ export class AddDatasetComponent
   }
 
   ngOnInit(): void {
+    // Setup debounce for result filter changes
+    this.resultFilterSubject.pipe(debounceTime(500)).subscribe(() => {
+      if (!this.lastExecutedQuery) return;
+
+      // Reset to first page on filter change
+      this.resultPage = 1;
+
+      // Build filter object from non-empty filter values
+      const filter: { [key: string]: string } = {};
+      for (const col of Object.keys(this.resultFilterValues)) {
+        if (this.resultFilterValues[col]) {
+          filter[col] = this.resultFilterValues[col];
+        }
+      }
+
+      this.executeQueryForDatabase(this.lastExecutedQuery, 1, this.resultRows, filter);
+    });
+
     // Load organisations if super admin
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
@@ -454,6 +486,8 @@ export class AddDatasetComponent
   }
 
   ngOnDestroy(): void {
+    this.resultFilterSubject.complete();
+
     if (this.editor) {
       this.editor.dispose();
     }
@@ -827,6 +861,9 @@ export class AddDatasetComponent
    */
   executeCompleteQuery(): void {
     const query = this.editor?.getValue() || this.currentQuery;
+    this.resultPage = 1;
+    this.resultFilterValues = {};
+    this.queryResult = null;
     this.executeQueryForDatabase(query);
   }
 
@@ -835,6 +872,9 @@ export class AddDatasetComponent
    * @param selectedText The selected SQL text to execute
    */
   executeSelectedQuery(selectedText: string): void {
+    this.resultPage = 1;
+    this.resultFilterValues = {};
+    this.queryResult = null;
     this.executeQueryForDatabase(selectedText);
   }
 
@@ -978,7 +1018,93 @@ export class AddDatasetComponent
     this.currentQuery = '';
   }
 
-  private executeQueryForDatabase(query: string): void {
+  onResultFilterChange(): void {
+    this.resultFilterSubject.next();
+  }
+
+  clearResultFilters(): void {
+    this.resultFilterValues = {};
+    this.resultPage = 1;
+    if (this.lastExecutedQuery) {
+      this.executeQueryForDatabase(this.lastExecutedQuery, 1, this.resultRows);
+    }
+  }
+
+  exportResultsAsCsv(): void {
+    if (!this.lastExecutedQuery || !this.selectedDatabaseObj?.id || !this.selectedOrg?.id) return;
+
+    this.isExportingResults = true;
+
+    // Build filter from current filter values
+    const filter: { [key: string]: string } = {};
+    for (const col of Object.keys(this.resultFilterValues)) {
+      if (this.resultFilterValues[col]) {
+        filter[col] = this.resultFilterValues[col];
+      }
+    }
+
+    const payload: any = {
+      orgId: this.selectedOrg.id,
+      databaseId: this.selectedDatabaseObj.id,
+      query: this.lastExecutedQuery,
+    };
+
+    if (Object.keys(filter).length > 0) {
+      payload.filter = JSON.stringify(filter);
+    }
+
+    this.queryService.exportQueryResults(payload).subscribe({
+      next: (blob: Blob) => {
+        const databaseName = this.selectedDatabaseObj.name || 'database';
+        const fileName = `${databaseName}_query_results.csv`;
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.isExportingResults = false;
+      },
+      error: (error: any) => {
+        this.isExportingResults = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Export Failed',
+          detail: error.error?.message || error.message || 'Failed to export query results',
+          key: 'topRight',
+          life: 3000,
+          styleClass: 'custom-toast',
+        });
+      },
+    });
+  }
+
+  get isResultFilterActive(): boolean {
+    return Object.values(this.resultFilterValues).some(v => !!v);
+  }
+
+  onResultsLazyLoad(event: any): void {
+    this.lastResultsLazyEvent = event;
+    const page = Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
+    const limit = event.rows || this.resultRows;
+
+    if (!this.lastExecutedQuery) return;
+
+    this.resultPage = page;
+    this.resultRows = limit;
+
+    // Build filter object from non-empty filter values
+    const filter: { [key: string]: string } = {};
+    for (const col of Object.keys(this.resultFilterValues)) {
+      if (this.resultFilterValues[col]) {
+        filter[col] = this.resultFilterValues[col];
+      }
+    }
+
+    this.executeQueryForDatabase(this.lastExecutedQuery, page, limit, filter);
+  }
+
+  private executeQueryForDatabase(query: string, page: number = 1, limit: number = this.resultRows, filter: { [key: string]: string } = {}): void {
     if (!query.trim()) {
       return;
     }
@@ -988,16 +1114,24 @@ export class AddDatasetComponent
     }
 
     this.isExecutingQuery = true;
-    this.queryResult = null;
+    this.lastExecutedQuery = query;
 
     const startTime = Date.now();
 
+    const payload: any = {
+      orgId: this.selectedOrg.id,
+      databaseId: this.selectedDatabaseObj.id,
+      query: query,
+      page: page,
+      limit: limit,
+    };
+
+    if (Object.keys(filter).length > 0) {
+      payload.filter = JSON.stringify(filter);
+    }
+
     this.queryService
-      .executeQuery({
-        orgId: this.selectedOrg.id,
-        databaseId: this.selectedDatabaseObj.id,
-        query: query,
-      })
+      .executeQuery(payload)
       .subscribe({
         next: (response: any) => {
           // Check if response indicates an error (status: false)
@@ -1063,6 +1197,11 @@ export class AddDatasetComponent
             executionTime: executionTime,
             query: dataObj.query || response.query,
           };
+
+          // Auto-open results popup if there are columns (even with 0 rows)
+          if (this.queryResult.columns.length > 0) {
+            this.showResultsPopup = true;
+          }
 
           this.isExecutingQuery = false;
         },
