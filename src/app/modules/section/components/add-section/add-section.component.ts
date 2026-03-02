@@ -32,6 +32,7 @@ export class AddSectionComponent implements OnInit {
   isNewlyAddedSection: boolean = false;
   lastAddedSectionIndex: number = -1;
   lastAddedGroupIndex: number = -1;
+  expandedGroups: Set<number> = new Set();
 
   constructor(
     private fb: FormBuilder,
@@ -76,13 +77,9 @@ export class AddSectionComponent implements OnInit {
         },
         Validators.required,
       ],
-      database: [{ value: '', disabled: true }, Validators.required],
+      database: [{ value: '', disabled: false }, Validators.required],
       tabGroups: this.fb.array([]),
     });
-
-    if (!this.showOrganisationDropdown) {
-      this.sectionForm.get('database')?.enable();
-    }
   }
 
   get tabGroups(): FormArray {
@@ -109,7 +106,9 @@ export class AddSectionComponent implements OnInit {
 
   addTabGroup() {
     this.tabGroups.push(this.createTabGroup());
-    this.lastAddedGroupIndex = this.tabGroups.length - 1;
+    const newIndex = this.tabGroups.length - 1;
+    this.lastAddedGroupIndex = newIndex;
+    this.expandedGroups.add(newIndex);
 
     this.scrollToBottom();
     setTimeout(() => {
@@ -123,6 +122,17 @@ export class AddSectionComponent implements OnInit {
 
   removeTabGroup(index: number) {
     this.tabGroups.removeAt(index);
+    this.expandedGroups.delete(index);
+    // Re-index expanded groups above the removed index
+    const newExpanded = new Set<number>();
+    this.expandedGroups.forEach(i => {
+      if (i > index) {
+        newExpanded.add(i - 1);
+      } else {
+        newExpanded.add(i);
+      }
+    });
+    this.expandedGroups = newExpanded;
     this.checkForDuplicates();
   }
 
@@ -130,12 +140,14 @@ export class AddSectionComponent implements OnInit {
     while (this.tabGroups.length !== 0) {
       this.tabGroups.removeAt(0);
     }
+    this.expandedGroups.clear();
     this.addTabGroup();
   }
 
   addSectionToTab(groupIndex: number) {
     const sections = this.getTabSections(groupIndex);
     sections.push(this.createSection());
+    this.expandedGroups.add(groupIndex);
 
     this.lastAddedSectionIndex = sections.length - 1;
     this.lastAddedGroupIndex = groupIndex;
@@ -151,12 +163,44 @@ export class AddSectionComponent implements OnInit {
     }, 300);
   }
 
+  toggleGroup(index: number) {
+    if (this.expandedGroups.has(index)) {
+      this.expandedGroups.delete(index);
+    } else {
+      this.expandedGroups.add(index);
+    }
+  }
+
+  isGroupExpanded(index: number): boolean {
+    return this.expandedGroups.has(index);
+  }
+
+  expandAll() {
+    for (let i = 0; i < this.tabGroups.length; i++) {
+      this.expandedGroups.add(i);
+    }
+  }
+
+  collapseAll() {
+    this.expandedGroups.clear();
+  }
+
+  get areAllExpanded(): boolean {
+    return this.tabGroups.length > 0 && this.expandedGroups.size === this.tabGroups.length;
+  }
+
+  get hasEmptySections(): boolean {
+    return this.tabGroups.controls.some(
+      group => (group.get('sections') as FormArray).length === 0,
+    );
+  }
+
   scrollToBottom(): void {
     setTimeout(() => {
-      const formElement = document.querySelector('.admin-form');
-      if (formElement) {
-        formElement.scrollTo({
-          top: formElement.scrollHeight,
+      const fieldsList = document.querySelector('.fields-list');
+      if (fieldsList) {
+        fieldsList.scrollTo({
+          top: fieldsList.scrollHeight,
           behavior: 'smooth',
         });
       }
@@ -282,9 +326,7 @@ export class AddSectionComponent implements OnInit {
     };
     this.selectedDatabase = null;
 
-    const databaseControl = this.sectionForm.get('database');
-    databaseControl?.enable();
-    databaseControl?.setValue('');
+    this.sectionForm.get('database')?.setValue('');
 
     this.clearAllTabs();
     this.loadDatabases();

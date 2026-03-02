@@ -19,7 +19,7 @@
                     [disabled]="!isFormDirty" (click)="onCancel()">
                 </button>
                 <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="sectionForm.invalid || hasDuplicates">
+                    [disabled]="sectionForm.invalid || hasDuplicates || hasEmptyPrompts">
                     <i class="pi pi-save mr-2"></i>
                 </button>
             </div>
@@ -64,6 +64,14 @@
                     <div class="fields-header">
                         <label>Section Groups<span class="required">*</span></label>
                         <div class="button-group">
+                            <button pButton type="button"
+                                [icon]="areAllExpanded ? 'pi pi-angle-double-up' : 'pi pi-angle-double-down'"
+                                class="p-button-rounded p-button-text expand-collapse-btn"
+                                (click)="areAllExpanded ? collapseAll() : expandAll()"
+                                [pTooltip]="areAllExpanded ? 'Collapse All' : 'Expand All'"
+                                tooltipPosition="bottom"
+                                *ngIf="sectionGroups.length > 0">
+                            </button>
                             <button pButton type="button" icon="pi pi-times"
                                 class="p-button-rounded p-button-text p-button-danger clear-btn mr-1"
                                 (click)="clearAllSectionGroups()">
@@ -81,6 +89,11 @@
 
                             <!-- Section Header -->
                             <div class="schema-header">
+                                <button pButton type="button"
+                                    [icon]="isGroupExpanded(groupIndex) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                                    class="p-button-rounded p-button-text expand-btn"
+                                    (click)="toggleGroup(groupIndex)">
+                                </button>
                                 <div style="width: 300px;">
                                     <app-custom-dropdown formControlName="sectionId" label="Section"
                                         placeholder="Select Section" [options]="getAvailableSections(groupIndex)"
@@ -91,6 +104,9 @@
                                         (ngModelChange)="onSectionChange({value: sectionGroup.get('sectionId')?.value}, groupIndex)">
                                     </app-custom-dropdown>
                                 </div>
+                                <span class="section-count" *ngIf="!isGroupExpanded(groupIndex)">
+                                    {{ getPrompts(groupIndex).length }} prompt{{ getPrompts(groupIndex).length !== 1 ? 's' : '' }}
+                                </span>
                                 <button pButton type="button" icon="pi pi-plus"
                                     class="p-button-rounded p-button-text add-btn"
                                     (click)="addPromptToSection(groupIndex)"
@@ -103,7 +119,7 @@
                             </div>
 
                             <!-- Prompts for this section -->
-                            <div class="mappings-list" formArrayName="prompts">
+                            <div class="mappings-list" formArrayName="prompts" *ngIf="isGroupExpanded(groupIndex)">
                                 <div *ngFor="let prompt of getPrompts(groupIndex).controls; let promptIndex=index"
                                     [formGroupName]="promptIndex" class="mapping-row" [ngClass]="{
                                         'duplicate': isDuplicateRow(groupIndex, promptIndex),

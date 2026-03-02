@@ -73,13 +73,9 @@ export class AddTabComponent implements OnInit {
         },
         Validators.required,
       ],
-      database: [{ value: '', disabled: true }, Validators.required],
+      database: [{ value: '', disabled: false }, Validators.required],
       tabs: this.fb.array([]),
     });
-
-    if (!this.showOrganisationDropdown) {
-      this.tabForm.get('database')?.enable();
-    }
   }
 
   createTabGroup(): FormGroup {
@@ -118,10 +114,10 @@ export class AddTabComponent implements OnInit {
 
   scrollToBottom(): void {
     setTimeout(() => {
-      const formElement = document.querySelector('.admin-form');
-      if (formElement) {
-        formElement.scrollTo({
-          top: formElement.scrollHeight,
+      const fieldsList = document.querySelector('.fields-list');
+      if (fieldsList) {
+        fieldsList.scrollTo({
+          top: fieldsList.scrollHeight,
           behavior: 'smooth',
         });
       }
@@ -168,9 +164,7 @@ export class AddTabComponent implements OnInit {
     };
     this.selectedDatabase = null;
 
-    const databaseControl = this.tabForm.get('database');
-    databaseControl?.enable();
-    databaseControl?.setValue('');
+    this.tabForm.get('database')?.setValue('');
 
     this.clearAllTabs();
     this.loadDatabases();

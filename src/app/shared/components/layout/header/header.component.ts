@@ -32,6 +32,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isFullscreen = false;
   @ViewChild('notificationMenu') notificationMenu!: ElementRef;
 
+  announcementTitle: string | null = 'System Maintenance Notice';
+  announcementDescription: string | null = 'The system will undergo scheduled maintenance on March 5th, 2026. Some services may be temporarily unavailable during this period. Please save your work beforehand.';
+  typedMessage: string = '';
+  isTyping: boolean = false;
+  showAnnouncementOverlay: boolean = false;
+  doNotShowAgain: boolean = false;
+  private typewriterTimer: any;
+
   showNotificationMenu = false;
   unreadNotifications = 2; // Example count
   notifications = [
@@ -110,11 +118,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
 
     this.updateUnreadCount();
+
+    // Start typewriter effect for announcement
+    if (this.announcementTitle) {
+      this.startTypewriter();
+    }
   }
 
   ngOnDestroy() {
     if (this.timeSubscription) {
       this.timeSubscription.unsubscribe();
+    }
+    if (this.typewriterTimer) {
+      clearTimeout(this.typewriterTimer);
     }
   }
 
@@ -144,6 +160,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     ) {
       this.showNotificationMenu = false;
     }
+
   }
 
   toggleProfileMenu(event: Event) {
@@ -243,5 +260,44 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @HostListener('document:fullscreenchange', ['$event'])
   onFullscreenChange() {
     this.isFullscreen = !!document.fullscreenElement;
+  }
+
+  private startTypewriter() {
+    if (!this.announcementTitle) return;
+
+    this.typedMessage = '';
+    this.isTyping = true;
+    let index = 0;
+    const message = this.announcementTitle;
+
+    const typeNextChar = () => {
+      if (index < message.length) {
+        this.typedMessage += message.charAt(index);
+        index++;
+        this.typewriterTimer = setTimeout(typeNextChar, 15);
+      } else {
+        this.isTyping = false;
+      }
+    };
+
+    this.typewriterTimer = setTimeout(typeNextChar, 500);
+  }
+
+  closeAnnouncementPopup() {
+    this.showAnnouncementOverlay = false;
+    if (this.doNotShowAgain) {
+      this.dismissAnnouncement();
+    }
+  }
+
+  dismissAnnouncement() {
+    this.announcementTitle = null;
+    this.announcementDescription = null;
+    this.typedMessage = '';
+    this.isTyping = false;
+    this.showAnnouncementOverlay = false;
+    if (this.typewriterTimer) {
+      clearTimeout(this.typewriterTimer);
+    }
   }
 }

@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ORGANISATION } from 'src/app/constants/routes';
+import { AnnouncementData } from '../announcement-dialog/announcement-dialog.component';
+import { AnnouncementService } from '../../services/announcement.service';
 
 interface OrganisationConfig {
   maxDatabases: number;
@@ -37,11 +39,13 @@ export class ViewOrganisationComponent implements OnInit {
   avatarBackground: string = '#2196F3';
   organisationInitials: string = '';
   showDeleteConfirm: boolean = false;
+  showAnnouncementDialog: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private organisationService: OrganisationService,
+    private announcementService: AnnouncementService,
     private globalService: GlobalService,
   ) {}
 
@@ -89,6 +93,17 @@ export class ViewOrganisationComponent implements OnInit {
         if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ORGANISATION.LIST]);
         }
+      });
+  }
+
+  onAnnouncementSave(data: AnnouncementData) {
+    this.announcementService
+      .addAnnouncement({
+        organisation: this.organisationId,
+        ...data,
+      })
+      .then(response => {
+        this.globalService.handleSuccessService(response);
       });
   }
 }

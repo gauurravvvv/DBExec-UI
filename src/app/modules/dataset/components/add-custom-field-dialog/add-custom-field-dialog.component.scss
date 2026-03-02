@@ -48,6 +48,15 @@
         color: var(--text-color);
       }
     }
+
+    .close-btn {
+      color: var(--secondary-color);
+
+      &:hover {
+        color: var(--text-color);
+        background: var(--hover-background) !important;
+      }
+    }
   }
 
   // Main Body - 3 columns

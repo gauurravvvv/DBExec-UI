@@ -1,0 +1,60 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 0;
+
+  label {
+    font-weight: 500;
+    color: var(--text-color);
+
+    .required {
+      color: var(--error-color);
+      margin-left: 4px;
+    }
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--card-background);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    resize: vertical;
+    line-height: 1.5;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: var(--text-color);
+      opacity: 0.4;
+    }
+
+    &:enabled:focus {
+      outline: none;
+      box-shadow: 0 0 0 1px var(--primary-color-transparent);
+      border-color: var(--primary-color);
+    }
+
+    &:enabled:hover {
+      border-color: var(--primary-color);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &.ng-invalid.ng-dirty {
+      border-color: var(--error-color);
+    }
+  }
+
+  .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+  }
+}

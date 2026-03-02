@@ -65,6 +65,55 @@
   </div>
 </header>
 
+<!-- Organisation Announcement Banner -->
+<div class="announcement-banner" *ngIf="announcementTitle">
+  <div class="banner-shimmer"></div>
+  <div class="banner-glow-left"></div>
+  <div class="banner-glow-right"></div>
+  <div class="banner-content">
+    <div class="banner-text-wrapper">
+      <span class="banner-label" (click)="showAnnouncementOverlay = true">ANNOUNCEMENT</span>
+      <span class="banner-divider">|</span>
+      <span class="banner-message">
+        {{ typedMessage }}<span class="typewriter-cursor" *ngIf="isTyping">|</span>
+      </span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Announcement Detail Popup -->
+<div class="announcement-popup-backdrop" *ngIf="showAnnouncementOverlay" (click)="showAnnouncementOverlay = false">
+  <div class="announcement-popup" (click)="$event.stopPropagation()">
+    <!-- Left accent stripe -->
+    <div class="popup-accent"></div>
+
+    <div class="popup-inner">
+      <!-- Top row: icon + tag -->
+      <div class="popup-header-row">
+        <span class="popup-tag">Announcement</span>
+      </div>
+
+      <!-- Title -->
+      <h3 class="popup-title">{{ announcementTitle }}</h3>
+
+      <!-- Description -->
+      <p class="popup-description">{{ announcementDescription }}</p>
+
+      <!-- Footer -->
+      <div class="popup-footer-row">
+        <label class="do-not-show">
+          <p-checkbox [(ngModel)]="doNotShowAgain" [binary]="true"></p-checkbox>
+          <span>Do not show again</span>
+        </label>
+        <button class="popup-btn" (click)="closeAnnouncementPopup()">
+          Dismiss
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="notification-menu" [class.show]="showNotificationMenu" #notificationMenu>
   <div class="notification-header">
     <h3>Notifications</h3>

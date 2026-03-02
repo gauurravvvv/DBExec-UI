@@ -195,3 +195,8 @@ export const ANALYSES_VISUAL = {
 export const GLOBAL_SEARCH = {
   SEARCH: '/search/global',
 };
+
+export const ANNOUNCEMENT = {
+  CONFIGURE: '/announcement/configure',
+  GET: '/announcement/get/',
+};

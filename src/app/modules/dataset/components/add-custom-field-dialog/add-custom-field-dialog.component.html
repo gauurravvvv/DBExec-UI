@@ -6,6 +6,9 @@
                 <i class="pi pi-code"></i>
                 <h2>{{ editMode ? 'Edit Custom Field' : 'Add Custom Field' }}</h2>
             </div>
+            <button pButton class="p-button-text p-button-rounded p-button-sm close-btn" icon="pi pi-times"
+                (click)="onCancel()" pTooltip="Close" tooltipPosition="bottom">
+            </button>
         </div>
 
         <!-- Main Content -->

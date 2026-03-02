@@ -14,9 +14,11 @@ import { ConfigurableLineChartComponent } from './components/configurable-line-c
 import { ConfigurablePieChartComponent } from './components/configurable-pie-chart/configurable-pie-chart.component';
 import { ConfigurablePolarChartComponent } from './components/configurable-polar-chart/configurable-polar-chart.component';
 import { ConfigurableTreemapChartComponent } from './components/configurable-treemap-chart/configurable-treemap-chart.component';
+import { CustomCalendarComponent } from './components/custom-calendar/custom-calendar.component';
 import { CustomDropdownComponent } from './components/custom-dropdown/custom-dropdown.component';
 import { CustomInputComponent } from './components/custom-input/custom-input.component';
 import { CustomMultiselectComponent } from './components/custom-multiselect/custom-multiselect.component';
+import { CustomTextareaComponent } from './components/custom-textarea/custom-textarea.component';
 import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.component';
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
@@ -35,9 +37,11 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     ConfigurableTreemapChartComponent,
     ConfigurableBubbleChartComponent,
     ConfigurableBoxChartComponent,
+    CustomCalendarComponent,
     CustomInputComponent,
     CustomDropdownComponent,
     CustomMultiselectComponent,
+    CustomTextareaComponent,
     CustomToggleComponent,
     GlobalSearchComponent,
   ],
@@ -61,9 +65,11 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     ConfigurableTreemapChartComponent,
     ConfigurableBubbleChartComponent,
     ConfigurableBoxChartComponent,
+    CustomCalendarComponent,
     CustomInputComponent,
     CustomDropdownComponent,
     CustomMultiselectComponent,
+    CustomTextareaComponent,
     CustomToggleComponent,
     GlobalSearchComponent,
   ],

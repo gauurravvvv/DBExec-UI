@@ -61,6 +61,7 @@ import { TreeSelectModule } from 'primeng/treeselect';
 import { CarouselModule } from 'primeng/carousel';
 import { SplitterModule } from 'primeng/splitter';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { ColorPickerModule } from 'primeng/colorpicker';
 
 @NgModule({
   imports: [
@@ -124,6 +125,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
     TreeSelectModule,
     CarouselModule,
     SplitButtonModule,
+    ColorPickerModule,
   ],
   exports: [
     BreadcrumbModule,
@@ -186,6 +188,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
     TreeSelectModule,
     CarouselModule,
     SplitButtonModule,
+    ColorPickerModule,
   ],
   providers: [ConfirmationService, MessageService],
 })

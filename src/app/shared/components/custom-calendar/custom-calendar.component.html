@@ -1,0 +1,40 @@
+<div class="form-field">
+    <ng-container *ngIf="label">
+        <!-- Floating Label -->
+        <span class="p-float-label" *ngIf="floatingLabel">
+            <p-calendar [(ngModel)]="value" [showTime]="showTime" [showIcon]="showIcon" [dateFormat]="dateFormat"
+                [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)" [maxDate]="$any(maxDate)"
+                [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
+                (onSelect)="onValueChange($event)" (onBlur)="onBlur()" [inputId]="inputId"
+                [appendTo]="appendTo" panelStyleClass="custom-calendar-panel">
+            </p-calendar>
+            <label [for]="inputId">
+                {{ label }}
+                <span class="required" *ngIf="required">*</span>
+            </label>
+        </span>
+        <!-- Normal Label -->
+        <ng-container *ngIf="!floatingLabel">
+            <label class="normal-label">
+                {{ label }}
+                <span class="required" *ngIf="required">*</span>
+            </label>
+            <p-calendar [(ngModel)]="value" [showTime]="showTime" [showIcon]="showIcon" [dateFormat]="dateFormat"
+                [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)" [maxDate]="$any(maxDate)"
+                [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
+                (onSelect)="onValueChange($event)" (onBlur)="onBlur()" [appendTo]="appendTo"
+                panelStyleClass="custom-calendar-panel">
+            </p-calendar>
+        </ng-container>
+    </ng-container>
+    <!-- No Label -->
+    <p-calendar *ngIf="!label" [(ngModel)]="value" [showTime]="showTime" [showIcon]="showIcon"
+        [dateFormat]="dateFormat" [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)"
+        [maxDate]="$any(maxDate)" [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
+        (onSelect)="onValueChange($event)" (onBlur)="onBlur()" [appendTo]="appendTo"
+        panelStyleClass="custom-calendar-panel">
+    </p-calendar>
+    <small class="error-message" *ngIf="showError && errorMessage">
+        {{ errorMessage }}
+    </small>
+</div>

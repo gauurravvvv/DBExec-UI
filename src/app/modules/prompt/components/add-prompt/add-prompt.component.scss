@@ -305,6 +305,19 @@
               display: flex;
               align-items: center;
 
+              .expand-collapse-btn {
+                color: var(--secondary-color) !important;
+
+                &:hover {
+                  color: var(--primary-color) !important;
+                  background: var(--hover-background) !important;
+                }
+
+                i {
+                  color: inherit !important;
+                }
+              }
+
               .clear-btn {
                 margin-right: -0.5rem;
                 color: var(--error-color) !important;
@@ -1046,6 +1059,33 @@
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--surface-border);
   position: relative;
+
+  .expand-btn {
+    flex-shrink: 0;
+    color: var(--secondary-color) !important;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+
+    &:hover {
+      color: var(--primary-color) !important;
+      background: var(--hover-background) !important;
+    }
+
+    i {
+      color: inherit !important;
+      font-size: 1rem;
+    }
+  }
+
+  .section-count {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    background: var(--hover-background);
+    padding: 3px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
 
   p-dropdown {
     flex: 0 0 300px;

@@ -44,6 +44,7 @@ export class AddPromptComponent implements OnInit, OnDestroy {
   selectedSection: any = null;
   lastAddedPromptIndex: number = -1;
   promptTypes = PROMPT_TYPES;
+  expandedGroups: Set<number> = new Set();
 
   constructor(
     private fb: FormBuilder,
@@ -135,7 +136,9 @@ export class AddPromptComponent implements OnInit, OnDestroy {
 
   addSectionGroup() {
     this.sectionGroups.push(this.createSectionGroup());
-    this.lastAddedGroupIndex = this.sectionGroups.length - 1;
+    const newIndex = this.sectionGroups.length - 1;
+    this.lastAddedGroupIndex = newIndex;
+    this.expandedGroups.add(newIndex);
 
     this.scrollToBottom();
     setTimeout(() => {
@@ -149,12 +152,19 @@ export class AddPromptComponent implements OnInit, OnDestroy {
 
   removeSectionGroup(index: number) {
     this.sectionGroups.removeAt(index);
+    this.expandedGroups.delete(index);
+    const newExpanded = new Set<number>();
+    this.expandedGroups.forEach(i => {
+      newExpanded.add(i > index ? i - 1 : i);
+    });
+    this.expandedGroups = newExpanded;
     this.checkForDuplicates();
   }
 
   addPromptToSection(groupIndex: number) {
     const prompts = this.getPrompts(groupIndex);
     prompts.push(this.createPrompt());
+    this.expandedGroups.add(groupIndex);
     this.lastAddedPromptIndex = prompts.length - 1;
     this.lastAddedGroupIndex = groupIndex;
     this.scrollToBottom();
@@ -179,6 +189,39 @@ export class AddPromptComponent implements OnInit, OnDestroy {
     while (this.sectionGroups.length !== 0) {
       this.sectionGroups.removeAt(0);
     }
+    this.expandedGroups.clear();
+  }
+
+  toggleGroup(index: number) {
+    if (this.expandedGroups.has(index)) {
+      this.expandedGroups.delete(index);
+    } else {
+      this.expandedGroups.add(index);
+    }
+  }
+
+  isGroupExpanded(index: number): boolean {
+    return this.expandedGroups.has(index);
+  }
+
+  expandAll() {
+    for (let i = 0; i < this.sectionGroups.length; i++) {
+      this.expandedGroups.add(i);
+    }
+  }
+
+  collapseAll() {
+    this.expandedGroups.clear();
+  }
+
+  get areAllExpanded(): boolean {
+    return this.sectionGroups.length > 0 && this.expandedGroups.size === this.sectionGroups.length;
+  }
+
+  get hasEmptyPrompts(): boolean {
+    return this.sectionGroups.controls.some(
+      group => (group.get('prompts') as FormArray).length === 0,
+    );
   }
 
   scrollToBottom(): void {
