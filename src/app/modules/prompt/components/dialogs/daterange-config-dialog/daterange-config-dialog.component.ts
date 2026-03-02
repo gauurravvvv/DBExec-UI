@@ -21,11 +21,7 @@ export interface DateRangeConfig {
   numberOfMonths: number;
   inline: boolean;
   readonlyInput: boolean;
-  touchUI: boolean;
   // Navigation
-  yearNavigator: boolean;
-  monthNavigator: boolean;
-  yearRange: string;
   firstDayOfWeek: number;
   showOtherMonths: boolean;
   selectOtherMonths: boolean;
@@ -63,10 +59,6 @@ export class DateRangeConfigDialogComponent implements OnChanges, DoCheck {
     numberOfMonths: 2,
     inline: false,
     readonlyInput: false,
-    touchUI: false,
-    yearNavigator: false,
-    monthNavigator: false,
-    yearRange: '2000:2030',
     firstDayOfWeek: 0,
     showOtherMonths: true,
     selectOtherMonths: false,

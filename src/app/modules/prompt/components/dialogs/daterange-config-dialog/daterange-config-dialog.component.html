@@ -66,11 +66,6 @@
                     <p-inputSwitch [(ngModel)]="config.readonlyInput"></p-inputSwitch>
                 </div>
 
-                <div class="config-row">
-                    <label>Touch UI (mobile optimised)</label>
-                    <p-inputSwitch [(ngModel)]="config.touchUI"></p-inputSwitch>
-                </div>
-
                 <!-- ── NAVIGATION ── -->
                 <div class="section-label">
                     <i class="pi pi-compass"></i> Navigation
@@ -85,22 +80,6 @@
                     <label>Allow Selecting Other Month Days</label>
                     <p-inputSwitch [(ngModel)]="config.selectOtherMonths" [disabled]="!config.showOtherMonths">
                     </p-inputSwitch>
-                </div>
-
-                <div class="config-row">
-                    <label>Month Navigator Dropdown</label>
-                    <p-inputSwitch [(ngModel)]="config.monthNavigator"></p-inputSwitch>
-                </div>
-
-                <div class="config-row">
-                    <label>Year Navigator Dropdown</label>
-                    <p-inputSwitch [(ngModel)]="config.yearNavigator"></p-inputSwitch>
-                </div>
-
-                <div class="config-group" *ngIf="config.yearNavigator">
-                    <label>Year Range</label>
-                    <input type="text" pInputText [(ngModel)]="config.yearRange" placeholder="e.g., 2000:2030" />
-                    <small class="hint">Format: startYear:endYear</small>
                 </div>
 
                 <div class="config-group">
@@ -176,20 +155,18 @@
             </div>
 
             <div class="preview-content">
-                <div class="preview-label">How it will look:</div>
+                <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
                     <p-calendar [(ngModel)]="previewRange" [placeholder]="config.placeholder" selectionMode="range"
                         [dateFormat]="config.dateFormat" [numberOfMonths]="config.numberOfMonths"
                         [showIcon]="config.showIcon && !config.inline" [showButtonBar]="config.showButtonBar"
                         [showWeek]="config.showWeek" [inline]="config.inline" [readonlyInput]="config.readonlyInput"
-                        [touchUI]="config.touchUI" [showOtherMonths]="config.showOtherMonths"
-                        [selectOtherMonths]="config.selectOtherMonths" [yearNavigator]="config.yearNavigator"
-                        [monthNavigator]="config.monthNavigator" [yearRange]="config.yearRange"
+                        [showOtherMonths]="config.showOtherMonths" [selectOtherMonths]="config.selectOtherMonths"
                         [firstDayOfWeek]="config.firstDayOfWeek" [showTime]="config.showTime"
-                        [hourFormat]="config.hourFormat" [showSeconds]="config.showSeconds" [minDate]="$any(config.minDate)"
-                        [maxDate]="$any(config.maxDate)" [disabledDays]="config.disabledDays" [style]="{width: '100%'}"
-                        appendTo="body">
+                        [hourFormat]="config.hourFormat" [showSeconds]="config.showSeconds"
+                        [minDate]="$any(config.minDate)" [maxDate]="$any(config.maxDate)"
+                        [disabledDays]="config.disabledDays" [style]="{width: '100%'}" appendTo="body">
                     </p-calendar>
                 </ng-container>
 
@@ -222,16 +199,13 @@
                         <span class="summary-chip" *ngIf="config.inline">Inline</span>
                         <span class="summary-chip" *ngIf="config.showButtonBar">Button Bar</span>
                         <span class="summary-chip" *ngIf="config.showWeek">Week Nos.</span>
-                        <span class="summary-chip" *ngIf="config.yearNavigator">Year Nav</span>
-                        <span class="summary-chip" *ngIf="config.monthNavigator">Month Nav</span>
-                        <span class="summary-chip" *ngIf="config.touchUI">Touch UI</span>
                         <span class="summary-chip" *ngIf="config.readonlyInput">Read-only</span>
                         <span class="summary-chip" *ngIf="config.disabledDays.length > 0">{{ config.disabledDays.length
                             }} day(s) off</span>
                         <span class="summary-chip" *ngIf="config.minDate">Min date</span>
                         <span class="summary-chip" *ngIf="config.maxDate">Max date</span>
                         <span class="summary-empty"
-                            *ngIf="!config.showTime && !config.inline && !config.showButtonBar && !config.showWeek && !config.yearNavigator && !config.monthNavigator && !config.touchUI && !config.readonlyInput && config.disabledDays.length === 0 && !config.minDate && !config.maxDate && config.numberOfMonths <= 1">
+                            *ngIf="!config.showTime && !config.inline && !config.showButtonBar && !config.showWeek && !config.readonlyInput && config.disabledDays.length === 0 && !config.minDate && !config.maxDate && config.numberOfMonths <= 1">
                             Default configuration
                         </span>
                     </div>
@@ -242,9 +216,13 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        <button class="btn-cancel" type="button" (click)="onClose()">
+            <i class="pi pi-times"></i>
+            Cancel
         </button>
-        <button pButton type="button" label="Apply Customisation" icon="pi pi-check" (click)="onSave()">
+        <button class="btn-primary" type="button" (click)="onSave()">
+            <i class="pi pi-check"></i>
+            Apply
         </button>
     </ng-template>
 </p-dialog>

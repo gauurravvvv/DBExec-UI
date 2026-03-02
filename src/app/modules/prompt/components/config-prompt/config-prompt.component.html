@@ -8,17 +8,20 @@
                 <h2>Configure Prompt</h2>
             </div>
             <div class="action-buttons">
-                <button pButton type="button" label="Customise" class="p-button-outlined btn-secondary"
-                    *ngIf="isConfigurable()" (click)="openConfigDialog()" pTooltip="Customise prompt display options"
-                    tooltipPosition="bottom">
-                    <i class="pi pi-cog mr-2"></i>
+                <button class="btn-secondary" type="button" *ngIf="isConfigurable()" (click)="openConfigDialog()"
+                    pTooltip="Customise prompt display options" tooltipPosition="bottom">
+                    <i class="pi pi-cog"></i>
+                    Customise
                 </button>
-                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-                    [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
+                <button class="btn-cancel" type="button" [disabled]="!isFormDirty || isCancelClicked"
+                    (click)="onCancel()">
+                    <i class="pi pi-times"></i>
+                    Cancel
                 </button>
-                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
+                <button class="btn-primary" type="submit" (click)="onSubmit()"
                     [disabled]="promptForm.invalid || !isFormDirty">
-                    <i class="pi pi-save mr-2"></i>
+                    <i class="pi pi-save"></i>
+                    Save
                 </button>
             </div>
         </div>
@@ -359,8 +362,8 @@
 </app-multiselect-config-dialog>
 
 <!-- Checkbox Configuration Dialog -->
-<app-checkbox-config-dialog [(visible)]="showCheckboxConfigDialog" [currentConfig]="checkboxConfig"
-    (close)="showCheckboxConfigDialog = false" (save)="onCheckboxConfigSaved($event)">
+<app-checkbox-config-dialog [(visible)]="showCheckboxConfigDialog" [promptValues]="promptForm.get('promptValues')?.value || []"
+    [currentConfig]="checkboxConfig" (close)="showCheckboxConfigDialog = false" (save)="onCheckboxConfigSaved($event)">
 </app-checkbox-config-dialog>
 
 <!-- Radio Configuration Dialog -->

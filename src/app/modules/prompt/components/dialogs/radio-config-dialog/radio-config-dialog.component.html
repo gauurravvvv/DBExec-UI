@@ -43,7 +43,7 @@
         <div class="preview-panel">
             <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
             <div class="preview-content">
-                <div class="preview-label">How it will look:</div>
+                <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
                     <div *ngIf="formattedOptions.length > 0; else noOptions">
@@ -99,8 +99,13 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary"
-            (click)="onClose()"></button>
-        <button pButton type="button" label="Apply Customisation" icon="pi pi-check" (click)="onSave()"></button>
+        <button class="btn-cancel" type="button" (click)="onClose()">
+            <i class="pi pi-times"></i>
+            Cancel
+        </button>
+        <button class="btn-primary" type="button" (click)="onSave()">
+            <i class="pi pi-check"></i>
+            Apply
+        </button>
     </ng-template>
 </p-dialog>

@@ -24,9 +24,6 @@ export interface DateConfig {
   touchUI: boolean;
   keepInvalid: boolean;
   // Navigation
-  yearNavigator: boolean;
-  monthNavigator: boolean;
-  yearRange: string;
   firstDayOfWeek: number;
   showOtherMonths: boolean;
   selectOtherMonths: boolean;
@@ -70,9 +67,6 @@ export class DateConfigDialogComponent implements OnChanges, DoCheck {
     readonlyInput: false,
     touchUI: false,
     keepInvalid: false,
-    yearNavigator: false,
-    monthNavigator: false,
-    yearRange: '2000:2030',
     firstDayOfWeek: 0,
     showOtherMonths: true,
     selectOtherMonths: false,

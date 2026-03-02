@@ -133,7 +133,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
     private promptService: PromptService,
     private databaseService: DatabaseService,
-    private store: Store
+    private store: Store,
   ) {
     this.initForm();
     this.setupColumnNameSync();
@@ -196,7 +196,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               promptJoin: '',
               promptWhere: '',
             },
-            { emitEvent: false }
+            { emitEvent: false },
           );
 
           // Reset available columns and table columns
@@ -274,7 +274,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
             : `${tableAlias}.${columnName} in ('{value}')`;
         this.promptForm.patchValue(
           { promptWhere: value },
-          { emitEvent: false }
+          { emitEvent: false },
         );
       }
     });
@@ -395,7 +395,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       ConfigPromptActions.loadSchemaData({
         orgId,
         dbId,
-      })
+      }),
     );
 
     const params = {
@@ -418,7 +418,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               orgId,
               dbId,
               data: { schemas: response.data },
-            })
+            }),
           );
 
           this.isLoadingSchema = false;
@@ -432,7 +432,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               orgId,
               dbId,
               error: 'Failed to load schema data',
-            })
+            }),
           );
           this.isLoadingSchema = false;
         }
@@ -444,7 +444,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
             orgId,
             dbId,
             error: error.message || 'Failed to load schema data',
-          })
+          }),
         );
         this.isLoadingSchema = false;
       });
@@ -454,7 +454,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.promptService.getConfig(this.orgId, this.promptId).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         // Fix #1: Add null check for configuration
-        const config = response.data.configuration?.[0];
+        const config = response.data.configuration;
         if (!config) {
           console.warn('No configuration found for this prompt');
           return;
@@ -486,7 +486,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           // Ensure schema data is loaded before proceeding
           if (!this.staticSchemaData || this.staticSchemaData.length === 0) {
             console.error(
-              'Schema data not loaded. Cannot populate table columns.'
+              'Schema data not loaded. Cannot populate table columns.',
             );
             return;
           }
@@ -503,7 +503,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               promptWhere: config.prompt_where,
               promptValues: values.map((v: any) => v.value),
             },
-            { emitEvent: false } // Prevent triggering valueChanges that would clear data
+            { emitEvent: false }, // Prevent triggering valueChanges that would clear data
           );
 
           // Set selected columns now that availableColumns is populated
@@ -512,14 +512,14 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               .split(',')
               .map((c: string) => c.trim());
             const matchedColumns = this.availableColumns.filter((col: any) =>
-              columnStrings.includes(col.fullName)
+              columnStrings.includes(col.fullName),
             );
 
             // If we found matches, use them; otherwise create column objects
             if (matchedColumns.length > 0) {
               this.promptForm.patchValue(
                 { columns: matchedColumns },
-                { emitEvent: false }
+                { emitEvent: false },
               );
             } else {
               // Fallback: create column objects manually
@@ -534,7 +534,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               });
               this.promptForm.patchValue(
                 { columns: columnArray },
-                { emitEvent: false }
+                { emitEvent: false },
               );
             }
           }
@@ -623,7 +623,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
   private loadTablesForSchema(schemaName: string) {
     const schemaData = this.staticSchemaData.find(
-      schema => schema.schema_name === schemaName
+      schema => schema.schema_name === schemaName,
     );
 
     // Clear previous table columns
@@ -768,7 +768,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       // Show column suggestions for valid alias
       if (this.tableColumns[beforeDot]) {
         this.filteredColumns = this.tableColumns[beforeDot].filter(column =>
-          column.name.toLowerCase().includes(filterText)
+          column.name.toLowerCase().includes(filterText),
         );
         this.showSuggestions = true;
         this.selectedSuggestionIndex = this.filteredColumns.length > 0 ? 0 : -1;
@@ -790,7 +790,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         event.preventDefault();
         this.selectedSuggestionIndex = Math.min(
           this.selectedSuggestionIndex + 1,
-          this.filteredColumns.length - 1
+          this.filteredColumns.length - 1,
         );
         break;
 
@@ -798,7 +798,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         event.preventDefault();
         this.selectedSuggestionIndex = Math.max(
           this.selectedSuggestionIndex - 1,
-          0
+          0,
         );
         break;
 
@@ -806,7 +806,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         event.preventDefault();
         if (this.selectedSuggestionIndex >= 0) {
           this.selectSuggestion(
-            this.filteredColumns[this.selectedSuggestionIndex]
+            this.filteredColumns[this.selectedSuggestionIndex],
           );
         }
         break;
@@ -908,7 +908,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         // Show column suggestions for valid alias
         if (this.tableColumns[alias]) {
           this.filteredJoinColumns = this.tableColumns[alias].filter(column =>
-            column.name.toLowerCase().includes(filterText)
+            column.name.toLowerCase().includes(filterText),
           );
           this.showJoinSuggestions = true;
           this.selectedJoinSuggestionIndex =
@@ -939,7 +939,10 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         event.preventDefault();
         this.selectedJoinSuggestionIndex = Math.min(
           this.selectedJoinSuggestionIndex + 1,
-          Math.min(this.filteredJoinColumns.length - 1, this.maxSuggestions - 1)
+          Math.min(
+            this.filteredJoinColumns.length - 1,
+            this.maxSuggestions - 1,
+          ),
         );
         break;
 
@@ -947,7 +950,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         event.preventDefault();
         this.selectedJoinSuggestionIndex = Math.max(
           this.selectedJoinSuggestionIndex - 1,
-          0
+          0,
         );
         break;
 
@@ -955,7 +958,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         if (this.selectedJoinSuggestionIndex >= 0) {
           event.preventDefault();
           this.selectJoinSuggestion(
-            this.filteredJoinColumns[this.selectedJoinSuggestionIndex]
+            this.filteredJoinColumns[this.selectedJoinSuggestionIndex],
           );
         }
         break;
@@ -1042,12 +1045,12 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }
 
     const schemaData = this.staticSchemaData.find(
-      schema => schema.schema_name === currentSchema
+      schema => schema.schema_name === currentSchema,
     );
 
     if (!schemaData) {
       console.warn(
-        `updateTableColumns: Schema '${currentSchema}' not found in staticSchemaData`
+        `updateTableColumns: Schema '${currentSchema}' not found in staticSchemaData`,
       );
       return;
     }
@@ -1055,7 +1058,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     if (schemaData) {
       selectedTables.forEach((selectedTable: any) => {
         const table = schemaData.tables.find(
-          (t: any) => t.table_name === selectedTable.tableName
+          (t: any) => t.table_name === selectedTable.tableName,
         );
         if (table) {
           // Fix #10: Store columns for the selected table's custom alias
@@ -1063,7 +1066,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           this.tableColumns[selectedTable.alias] = table.columns;
         } else {
           console.warn(
-            `updateTableColumns: Table '${selectedTable.tableName}' not found in schema '${currentSchema}'`
+            `updateTableColumns: Table '${selectedTable.tableName}' not found in schema '${currentSchema}'`,
           );
         }
       });
@@ -1088,12 +1091,12 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }
 
     const schemaData = this.staticSchemaData.find(
-      schema => schema.schema_name === currentSchema
+      schema => schema.schema_name === currentSchema,
     );
 
     if (!schemaData) {
       console.warn(
-        `updateAvailableColumns: Schema '${currentSchema}' not found in staticSchemaData`
+        `updateAvailableColumns: Schema '${currentSchema}' not found in staticSchemaData`,
       );
       return;
     }
@@ -1101,7 +1104,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     if (schemaData) {
       selectedTables.forEach((selectedTable: any) => {
         const table = schemaData.tables.find(
-          (t: any) => t.table_name === selectedTable.tableName
+          (t: any) => t.table_name === selectedTable.tableName,
         );
         if (table && table.columns) {
           // Add columns with custom alias prefix for proper column selection
@@ -1116,7 +1119,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           });
         } else if (!table) {
           console.warn(
-            `updateAvailableColumns: Table '${selectedTable.tableName}' not found in schema '${currentSchema}'`
+            `updateAvailableColumns: Table '${selectedTable.tableName}' not found in schema '${currentSchema}'`,
           );
         }
       });
@@ -1139,14 +1142,14 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
     // Filter out columns that belong to deselected tables
     const validColumns = currentSelectedColumns.filter((col: any) =>
-      currentAliases.includes(col.alias)
+      currentAliases.includes(col.alias),
     );
 
     // Update form only if columns were removed
     if (validColumns.length !== currentSelectedColumns.length) {
       this.promptForm.patchValue(
         { columns: validColumns },
-        { emitEvent: false }
+        { emitEvent: false },
       );
     }
   }
@@ -1201,6 +1204,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.dropdownConfig = config;
     this.showDropdownConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1217,6 +1221,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.multiselectConfig = config;
     this.showMultiselectConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1233,6 +1238,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.checkboxConfig = config;
     this.showCheckboxConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1249,6 +1255,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.radioConfig = config;
     this.showRadioConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1265,6 +1272,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.textConfig = config;
     this.showTextConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1281,6 +1289,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.numberConfig = config;
     this.showNumberConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1297,6 +1306,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.dateConfig = config;
     this.showDateConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1313,6 +1323,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.dateRangeConfig = config;
     this.showDateRangeConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1329,6 +1340,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.calendarConfig = config;
     this.showCalendarConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1345,6 +1357,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.rangeSliderConfig = config;
     this.showRangeSliderConfigDialog = false;
     this.promptForm.markAsDirty();
+    this.saveAppearance(config);
   }
 
   /**
@@ -1361,47 +1374,148 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       'date',
       'daterange',
       'calendar',
-      'rangeslider'
+      'rangeslider',
     ];
     return configurableTypes.includes(this.selectedPromptType);
   }
 
   /**
-   * Open config dialog based on prompt type
+   * Open config dialog based on prompt type — fetches saved appearance first
    */
   openConfigDialog(): void {
+    this.promptService
+      .getAppearence(this.orgId, this.promptId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const appearance = response.data?.appearance;
+          if (appearance && Object.keys(appearance).length > 0) {
+            this.patchConfigFromAppearance(appearance);
+          } else {
+            this.clearCurrentConfig();
+          }
+        }
+        this.openSpecificConfigDialog();
+      })
+      .catch(() => {
+        this.openSpecificConfigDialog();
+      });
+  }
+
+  private patchConfigFromAppearance(appearance: any): void {
     switch (this.selectedPromptType) {
       case 'dropdown':
-        this.openDropdownConfigDialog();
+        this.dropdownConfig = appearance;
         break;
       case 'multiselect':
-        this.openMultiselectConfigDialog();
+        this.multiselectConfig = appearance;
         break;
       case 'checkbox':
-        this.openCheckboxConfigDialog();
+        this.checkboxConfig = appearance;
         break;
       case 'radio':
-        this.openRadioConfigDialog();
+        this.radioConfig = appearance;
         break;
       case 'text':
-        this.openTextConfigDialog();
+        this.textConfig = appearance;
         break;
       case 'number':
-        this.openNumberConfigDialog();
+        this.numberConfig = appearance;
         break;
       case 'date':
-        this.openDateConfigDialog();
+        this.dateConfig = appearance;
         break;
       case 'daterange':
-        this.openDateRangeConfigDialog();
+        this.dateRangeConfig = appearance;
         break;
       case 'calendar':
-        this.openCalendarConfigDialog();
+        this.calendarConfig = appearance;
         break;
       case 'rangeslider':
-        this.openRangeSliderConfigDialog();
+        this.rangeSliderConfig = appearance;
         break;
     }
+  }
+
+  private clearCurrentConfig(): void {
+    switch (this.selectedPromptType) {
+      case 'dropdown':
+        this.dropdownConfig = {};
+        break;
+      case 'multiselect':
+        this.multiselectConfig = {};
+        break;
+      case 'checkbox':
+        this.checkboxConfig = {};
+        break;
+      case 'radio':
+        this.radioConfig = {};
+        break;
+      case 'text':
+        this.textConfig = {};
+        break;
+      case 'number':
+        this.numberConfig = {};
+        break;
+      case 'date':
+        this.dateConfig = {};
+        break;
+      case 'daterange':
+        this.dateRangeConfig = {};
+        break;
+      case 'calendar':
+        this.calendarConfig = {};
+        break;
+      case 'rangeslider':
+        this.rangeSliderConfig = {};
+        break;
+    }
+  }
+
+  private openSpecificConfigDialog(): void {
+    switch (this.selectedPromptType) {
+      case 'dropdown':
+        this.showDropdownConfigDialog = true;
+        break;
+      case 'multiselect':
+        this.showMultiselectConfigDialog = true;
+        break;
+      case 'checkbox':
+        this.showCheckboxConfigDialog = true;
+        break;
+      case 'radio':
+        this.showRadioConfigDialog = true;
+        break;
+      case 'text':
+        this.showTextConfigDialog = true;
+        break;
+      case 'number':
+        this.showNumberConfigDialog = true;
+        break;
+      case 'date':
+        this.showDateConfigDialog = true;
+        break;
+      case 'daterange':
+        this.showDateRangeConfigDialog = true;
+        break;
+      case 'calendar':
+        this.showCalendarConfigDialog = true;
+        break;
+      case 'rangeslider':
+        this.showRangeSliderConfigDialog = true;
+        break;
+    }
+  }
+
+  private saveAppearance(config: any): void {
+    this.promptService
+      .updateAppearance({
+        id: this.promptId,
+        orgId: this.orgId,
+        appearance: config,
+      })
+      .then((response: any) => {
+        this.globalService.handleSuccessService(response, true);
+      });
   }
 
   /**

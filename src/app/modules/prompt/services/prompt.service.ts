@@ -154,4 +154,28 @@ export class PromptService {
         return result;
       });
   }
+
+  updateAppearance(params: any) {
+    return this.http
+      .put(PROMPT.UPDATE_APPEARANCE, {
+        id: params.id,
+        organisation: params.orgId,
+        appearence: params.appearance,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  getAppearence(orgId: string, id: string) {
+    return this.http
+      .get(PROMPT.GET_APPEARANCE + `${orgId}/${id}`)
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
 }

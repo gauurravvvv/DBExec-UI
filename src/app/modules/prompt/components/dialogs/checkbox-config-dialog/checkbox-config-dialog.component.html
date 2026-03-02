@@ -1,23 +1,31 @@
 <p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '820px'}" [draggable]="false" [resizable]="false"
-    header="Customise Checkbox" styleClass="checkbox-config-dialog" (onHide)="onClose()">
+    header="Customise Checkbox Group" styleClass="checkbox-config-dialog" (onHide)="onClose()">
 
     <div class="dialog-content">
         <div class="config-panel">
             <div class="panel-header"><i class="pi pi-cog"></i><span>Configuration Options</span></div>
             <div class="config-form">
 
-                <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
+                <div class="section-label"><i class="pi pi-sliders-h"></i> Layout</div>
 
                 <div class="config-group">
-                    <label>Label Text</label>
-                    <input type="text" pInputText [(ngModel)]="config.label" placeholder="e.g., Accept terms" />
+                    <label>Orientation</label>
+                    <p-dropdown [options]="layoutOptions" [(ngModel)]="config.layout" optionLabel="label"
+                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
+                    </p-dropdown>
                 </div>
-                <div class="config-row"><label>Default Checked</label>
-                    <p-inputSwitch [(ngModel)]="config.defaultChecked"
-                        (onChange)="onDefaultCheckedChange($event.checked)"></p-inputSwitch>
+                <div class="config-group">
+                    <label>Columns (grid mode)</label>
+                    <p-dropdown [options]="columnOptions" [(ngModel)]="config.columns" optionLabel="label"
+                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
+                    </p-dropdown>
+                    <small class="hint">Only applies when orientation is Vertical</small>
                 </div>
-                <div class="config-row"><label>Disabled</label>
-                    <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
+                <div class="config-group">
+                    <label>Gap Between Items</label>
+                    <p-dropdown [options]="gapOptions" [(ngModel)]="config.gap" optionLabel="label" optionValue="value"
+                        [style]="{width:'100%'}" appendTo="body">
+                    </p-dropdown>
                 </div>
 
                 <div class="section-label"><i class="pi pi-eye"></i> Appearance</div>
@@ -41,18 +49,10 @@
                     </p-dropdown>
                 </div>
 
-                <div class="section-label"><i class="pi pi-code"></i> Values</div>
+                <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
 
-                <div class="config-row"><label>Binary Mode (true/false)</label>
-                    <p-inputSwitch [(ngModel)]="config.binary"></p-inputSwitch>
-                </div>
-                <div class="config-group" *ngIf="!config.binary">
-                    <label>True Value</label>
-                    <input type="text" pInputText [(ngModel)]="config.trueValue" placeholder="e.g., yes" />
-                </div>
-                <div class="config-group" *ngIf="!config.binary">
-                    <label>False Value</label>
-                    <input type="text" pInputText [(ngModel)]="config.falseValue" placeholder="e.g., no" />
+                <div class="config-row"><label>Disabled</label>
+                    <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
                 </div>
 
             </div>
@@ -61,38 +61,56 @@
         <div class="preview-panel">
             <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
             <div class="preview-content">
-                <div class="preview-label">How it will look:</div>
+                <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <div class="checkbox-preview" [class.reverse]="config.labelPosition === 'left'">
-                        <p-checkbox [(ngModel)]="previewChecked" [binary]="true" [disabled]="config.disabled"
-                            [checkboxIcon]="config.checkboxIcon" inputId="preview-cb">
-                        </p-checkbox>
-                        <label for="preview-cb" class="checkbox-label">
-                            {{ config.label || 'Checkbox label' }}
-                        </label>
+                    <div *ngIf="formattedOptions.length > 0; else noOptions">
+                        <div [ngStyle]="previewGridStyle">
+                            <ng-container *ngFor="let option of formattedOptions">
+                                <div class="checkbox-item" [class.reverse]="config.labelPosition === 'left'">
+                                    <p-checkbox [(ngModel)]="selectedValues" [value]="option.value" name="preview-group"
+                                        [disabled]="config.disabled" [checkboxIcon]="config.checkboxIcon"
+                                        [inputId]="'cb-' + option.value">
+                                    </p-checkbox>
+                                    <label [for]="'cb-' + option.value">{{ option.label }}</label>
+                                </div>
+                            </ng-container>
+                        </div>
+
+                        <div class="preview-actions" *ngIf="selectedValues.length > 0">
+                            <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
+                                icon="pi pi-check" (click)="setAsDefault()"></button>
+                        </div>
                     </div>
                 </ng-container>
 
-                <div class="preview-state">
-                    <span class="state-label">State:</span>
-                    <span class="state-value" [class.checked]="previewChecked">
-                        {{ previewChecked
-                        ? 'Checked' + (!config.binary ? ' → ' + config.trueValue : '')
-                        : 'Unchecked' + (!config.binary ? ' → ' + config.falseValue : '') }}
-                    </span>
+                <ng-template #noOptions>
+                    <div class="preview-hint">
+                        <i class="pi pi-info-circle"></i>
+                        <span>Add prompt values to see the checkbox group preview</span>
+                    </div>
+                </ng-template>
+
+                <div class="default-indicator" *ngIf="config.defaultValues.length > 0">
+                    <i class="pi pi-bookmark"></i>
+                    <span>Default: <strong>{{ config.defaultValues.length }} checked</strong></span>
+                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
+                        (click)="clearDefault()" pTooltip="Clear default"></button>
                 </div>
 
                 <div class="config-summary">
                     <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
                     <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="config.defaultChecked">Default: Checked</span>
-                        <span class="summary-chip" *ngIf="config.disabled">Disabled</span>
+                        <span class="summary-chip" *ngIf="config.layout === 'horizontal'">Horizontal</span>
+                        <span class="summary-chip" *ngIf="config.layout === 'vertical' && config.columns > 1">{{
+                            config.columns }} cols</span>
                         <span class="summary-chip" *ngIf="config.labelPosition === 'left'">Label Left</span>
-                        <span class="summary-chip" *ngIf="!config.binary">Custom Values</span>
+                        <span class="summary-chip" *ngIf="config.gap !== 'medium'">Gap: {{ config.gap }}</span>
                         <span class="summary-chip" *ngIf="config.checkboxIcon !== 'pi pi-check'">Custom Icon</span>
+                        <span class="summary-chip" *ngIf="config.disabled">Disabled</span>
+                        <span class="summary-chip" *ngIf="config.defaultValues.length > 0">{{ config.defaultValues.length }} default</span>
                         <span class="summary-empty"
-                            *ngIf="!config.defaultChecked && !config.disabled && config.labelPosition === 'right' && config.binary && config.checkboxIcon === 'pi pi-check'">
+                            *ngIf="config.layout === 'vertical' && config.columns === 1 && config.labelPosition === 'right' && config.gap === 'medium' && config.checkboxIcon === 'pi pi-check' && !config.disabled && config.defaultValues.length === 0">
                             Default configuration
                         </span>
                     </div>
@@ -102,8 +120,13 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary"
-            (click)="onClose()"></button>
-        <button pButton type="button" label="Apply Customisation" icon="pi pi-check" (click)="onSave()"></button>
+        <button class="btn-cancel" type="button" (click)="onClose()">
+            <i class="pi pi-times"></i>
+            Cancel
+        </button>
+        <button class="btn-primary" type="button" (click)="onSave()">
+            <i class="pi pi-check"></i>
+            Apply
+        </button>
     </ng-template>
 </p-dialog>

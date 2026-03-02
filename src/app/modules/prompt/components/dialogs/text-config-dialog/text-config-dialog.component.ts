@@ -19,22 +19,12 @@ export interface TextConfig {
   minLength: number | null;
   pattern: string;
   // Behaviour
+  disabled: boolean;
   readonly: boolean;
   trim: boolean;
-  autoComplete: 'on' | 'off';
   // Textarea-specific
   rows: number;
   autoResize: boolean;
-  // Formatting
-  keyFilter:
-    | 'alphanum'
-    | 'alpha'
-    | 'num'
-    | 'int'
-    | 'pint'
-    | 'money'
-    | 'email'
-    | 'none';
 }
 
 @Component({
@@ -58,12 +48,11 @@ export class TextConfigDialogComponent implements OnChanges, DoCheck {
     maxLength: null,
     minLength: null,
     pattern: '',
+    disabled: false,
     readonly: false,
     trim: false,
-    autoComplete: 'off',
     rows: 3,
     autoResize: true,
-    keyFilter: 'none',
   };
 
   config: TextConfig = { ...this.defaultConfig };
@@ -82,22 +71,6 @@ export class TextConfigDialogComponent implements OnChanges, DoCheck {
     { label: 'Multi Line (textarea)', value: 'textarea' },
   ];
 
-  readonly keyFilterOptions = [
-    { label: 'None (allow all)', value: 'none' },
-    { label: 'Alphanumeric', value: 'alphanum' },
-    { label: 'Letters only', value: 'alpha' },
-    { label: 'Numbers only', value: 'num' },
-    { label: 'Integers', value: 'int' },
-    { label: 'Positive integers', value: 'pint' },
-    { label: 'Money format', value: 'money' },
-    { label: 'Email format', value: 'email' },
-  ];
-
-  readonly autoCompleteOptions = [
-    { label: 'Off', value: 'off' },
-    { label: 'On', value: 'on' },
-  ];
-
   readonly rowOptions = [
     { label: '2 rows', value: 2 },
     { label: '3 rows', value: 3 },
@@ -105,10 +78,6 @@ export class TextConfigDialogComponent implements OnChanges, DoCheck {
     { label: '8 rows', value: 8 },
     { label: '10 rows', value: 10 },
   ];
-
-  get keyFilterValue(): string | RegExp | null {
-    return this.config.keyFilter === 'none' ? null : this.config.keyFilter;
-  }
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;

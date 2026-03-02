@@ -25,9 +25,6 @@ export interface CalendarConfig {
   // Navigation
   showOtherMonths: boolean;
   selectOtherMonths: boolean;
-  yearNavigator: boolean;
-  monthNavigator: boolean;
-  yearRange: string;
   firstDayOfWeek: number;
 
   // Time
@@ -40,7 +37,7 @@ export interface CalendarConfig {
   stepSecond: number;
 
   // Selection
-  selectionMode: 'single' | 'multiple' | 'range';
+  selectionMode: 'single' | 'multiple';
   readonlyInput: boolean;
 
   // Constraints
@@ -49,7 +46,6 @@ export interface CalendarConfig {
   disabledDays: number[];
 
   // UX
-  touchUI: boolean;
   keepInvalid: boolean;
 }
 
@@ -78,9 +74,6 @@ export class CalendarConfigDialogComponent implements OnChanges, DoCheck {
     view: 'date',
     showOtherMonths: true,
     selectOtherMonths: false,
-    yearNavigator: false,
-    monthNavigator: false,
-    yearRange: '2000:2030',
     firstDayOfWeek: 0,
     showTime: false,
     timeOnly: false,
@@ -94,7 +87,6 @@ export class CalendarConfigDialogComponent implements OnChanges, DoCheck {
     minDate: null,
     maxDate: null,
     disabledDays: [],
-    touchUI: false,
     keepInvalid: false,
   };
 
@@ -128,7 +120,6 @@ export class CalendarConfigDialogComponent implements OnChanges, DoCheck {
   readonly selectionModeOptions = [
     { label: 'Single', value: 'single' },
     { label: 'Multiple', value: 'multiple' },
-    { label: 'Range', value: 'range' },
   ];
 
   readonly firstDayOptions = [

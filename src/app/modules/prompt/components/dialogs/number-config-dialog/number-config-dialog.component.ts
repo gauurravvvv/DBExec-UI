@@ -17,18 +17,11 @@ export interface NumberConfig {
   step: number;
   // Buttons
   showButtons: boolean;
-  buttonLayout: 'stacked' | 'horizontal' | 'vertical';
   // Format
-  useLocale: boolean;
-  mode: 'decimal' | 'currency';
-  currency: string;
-  locale: string;
-  minFractionDigits: number;
-  maxFractionDigits: number;
   prefix: string;
   suffix: string;
   // Behaviour
-  allowEmpty: boolean;
+  disabled: boolean;
   readonly: boolean;
 }
 
@@ -52,56 +45,14 @@ export class NumberConfigDialogComponent implements OnChanges, DoCheck {
     max: null,
     step: 1,
     showButtons: true,
-    buttonLayout: 'horizontal',
-    useLocale: false,
-    mode: 'decimal',
-    currency: 'USD',
-    locale: 'en-US',
-    minFractionDigits: 0,
-    maxFractionDigits: 2,
     prefix: '',
     suffix: '',
-    allowEmpty: true,
+    disabled: false,
     readonly: false,
   };
 
   config: NumberConfig = { ...this.defaultConfig };
   previewValue: number | null = null;
-
-  readonly buttonLayoutOptions = [
-    { label: 'Horizontal (- value +)', value: 'horizontal' },
-    { label: 'Stacked (+ above -)', value: 'stacked' },
-    { label: 'Vertical', value: 'vertical' },
-  ];
-
-  readonly modeOptions = [
-    { label: 'Decimal', value: 'decimal' },
-    { label: 'Currency', value: 'currency' },
-  ];
-
-  readonly currencyOptions = [
-    { label: 'USD ($)', value: 'USD' },
-    { label: 'EUR (€)', value: 'EUR' },
-    { label: 'GBP (£)', value: 'GBP' },
-    { label: 'JPY (¥)', value: 'JPY' },
-    { label: 'INR (₹)', value: 'INR' },
-  ];
-
-  readonly localeOptions = [
-    { label: 'en-US (1,234.56)', value: 'en-US' },
-    { label: 'de-DE (1.234,56)', value: 'de-DE' },
-    { label: 'fr-FR (1 234,56)', value: 'fr-FR' },
-    { label: 'ja-JP (1,234)', value: 'ja-JP' },
-    { label: 'en-IN (1,23,456)', value: 'en-IN' },
-  ];
-
-  readonly fractionOptions = [
-    { label: '0', value: 0 },
-    { label: '1', value: 1 },
-    { label: '2', value: 2 },
-    { label: '3', value: 3 },
-    { label: '4', value: 4 },
-  ];
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
@@ -133,15 +84,8 @@ export class NumberConfigDialogComponent implements OnChanges, DoCheck {
     this.onClose();
   }
 
-  onModeChange(): void {
-    if (this.config.mode === 'currency') {
-      this.config.useLocale = true;
-    }
-  }
-
   setAsDefault(): void {
-    if (this.previewValue !== null)
-      this.config.defaultValue = this.previewValue;
+    if (this.previewValue !== null) this.config.defaultValue = this.previewValue;
   }
 
   clearDefault(): void {

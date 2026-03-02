@@ -41,6 +41,36 @@
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      i { font-size: 0.9rem; }
+
+      &.btn-cancel {
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        &:hover { background: var(--hover-background); transform: translateY(-1px); }
+      }
+
+      &.btn-primary {
+        background: linear-gradient(135deg, #2196f3, #1976d2);
+        color: white;
+        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        &:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4); }
+      }
+    }
   }
 }
 
@@ -189,6 +219,14 @@
   flex: 1;
   overflow-y: auto;
 
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+  }
+
   .preview-label {
     font-size: 0.875rem;
     color: var(--secondary-color);
@@ -196,54 +234,61 @@
     text-transform: uppercase;
     letter-spacing: 0.3px;
   }
+
+  .preview-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .preview-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--hover-background);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+
+    i {
+      color: var(--primary-color);
+    }
+  }
+
+  .default-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(var(--success-color-rgb, 34, 197, 94), 0.1);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: var(--text-color);
+
+    i {
+      color: var(--success-color, #22c55e);
+    }
+    strong {
+      color: var(--success-color, #22c55e);
+    }
+  }
 }
 
-// Checkbox preview with label positioning
-.checkbox-preview {
+// Checkbox item with label positioning
+.checkbox-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: var(--hover-background);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.9375rem;
+    color: var(--text-color);
+    cursor: pointer;
+  }
 
   &.reverse {
     flex-direction: row-reverse;
     justify-content: flex-end;
-  }
-
-  .checkbox-label {
-    font-size: 1rem;
-    color: var(--text-color);
-    cursor: pointer;
-  }
-}
-
-// State indicator
-.preview-state {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background: var(--hover-background);
-  border-radius: 6px;
-  font-size: 0.875rem;
-
-  .state-label {
-    color: var(--secondary-color);
-    font-weight: 500;
-  }
-
-  .state-value {
-    color: var(--secondary-color);
-    font-style: italic;
-
-    &.checked {
-      color: var(--success-color, #22c55e);
-      font-style: normal;
-      font-weight: 600;
-    }
   }
 }
 

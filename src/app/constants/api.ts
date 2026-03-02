@@ -132,6 +132,8 @@ export const PROMPT = {
   GET_CONFIG: '/prompt/getConfig/',
   GET_PROMPT_VALUES_BY_SQL: '/prompt/getValues',
   REFRSH_PROMPT_VALUES_BY_SQL: '/prompt/refreshValues',
+  UPDATE_APPEARANCE: '/prompt/customise',
+  GET_APPEARANCE: '/prompt/getAppearance/',
 };
 
 export const SCREEN = {

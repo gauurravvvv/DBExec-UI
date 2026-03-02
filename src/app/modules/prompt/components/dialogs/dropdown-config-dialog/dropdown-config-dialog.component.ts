@@ -118,6 +118,7 @@ export class DropdownConfigDialogComponent implements OnChanges, DoCheck {
   }
 
   onSave(): void {
+    console.log('Dropdown Config:', { ...this.config });
     this.save.emit({ ...this.config });
     this.onClose();
   }

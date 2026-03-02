@@ -38,52 +38,9 @@
                 <div class="config-row"><label>Show +/- Buttons</label>
                     <p-inputSwitch [(ngModel)]="config.showButtons"></p-inputSwitch>
                 </div>
-                <div class="config-group" *ngIf="config.showButtons">
-                    <label>Button Layout</label>
-                    <p-dropdown [options]="buttonLayoutOptions" [(ngModel)]="config.buttonLayout" optionLabel="label"
-                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
-                    </p-dropdown>
-                </div>
 
-                <div class="section-label"><i class="pi pi-dollar"></i> Format</div>
+                <div class="section-label"><i class="pi pi-tag"></i> Format</div>
 
-                <div class="config-group">
-                    <label>Mode</label>
-                    <p-dropdown [options]="modeOptions" [(ngModel)]="config.mode" optionLabel="label"
-                        optionValue="value" [style]="{width:'100%'}" appendTo="body" (onChange)="onModeChange()">
-                    </p-dropdown>
-                </div>
-                <div class="config-row"><label>Use Locale Formatting</label>
-                    <p-inputSwitch [(ngModel)]="config.useLocale"
-                        [disabled]="config.mode === 'currency'"></p-inputSwitch>
-                </div>
-                <div class="config-group" *ngIf="config.useLocale || config.mode === 'currency'">
-                    <label>Locale</label>
-                    <p-dropdown [options]="localeOptions" [(ngModel)]="config.locale" optionLabel="label"
-                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
-                    </p-dropdown>
-                </div>
-                <div class="config-group" *ngIf="config.mode === 'currency'">
-                    <label>Currency</label>
-                    <p-dropdown [options]="currencyOptions" [(ngModel)]="config.currency" optionLabel="label"
-                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
-                    </p-dropdown>
-                </div>
-                <div class="config-group step-group">
-                    <label>Fraction Digits</label>
-                    <div class="step-row">
-                        <div class="step-field">
-                            <span class="step-label">Min</span>
-                            <p-dropdown [options]="fractionOptions" [(ngModel)]="config.minFractionDigits"
-                                optionLabel="label" optionValue="value" appendTo="body"></p-dropdown>
-                        </div>
-                        <div class="step-field">
-                            <span class="step-label">Max</span>
-                            <p-dropdown [options]="fractionOptions" [(ngModel)]="config.maxFractionDigits"
-                                optionLabel="label" optionValue="value" appendTo="body"></p-dropdown>
-                        </div>
-                    </div>
-                </div>
                 <div class="config-group">
                     <label>Prefix</label>
                     <input type="text" pInputText [(ngModel)]="config.prefix" placeholder="e.g., $" />
@@ -95,8 +52,8 @@
 
                 <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
 
-                <div class="config-row"><label>Allow Empty Value</label>
-                    <p-inputSwitch [(ngModel)]="config.allowEmpty"></p-inputSwitch>
+                <div class="config-row"><label>Disabled</label>
+                    <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
                 </div>
                 <div class="config-row"><label>Read-Only</label>
                     <p-inputSwitch [(ngModel)]="config.readonly"></p-inputSwitch>
@@ -108,17 +65,14 @@
         <div class="preview-panel">
             <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
             <div class="preview-content">
-                <div class="preview-label">How it will look:</div>
+                <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <p-inputNumber [(ngModel)]="previewValue" [placeholder]="config.placeholder" [min]="$any(config.min)"
-                        [max]="$any(config.max)" [step]="config.step" [showButtons]="config.showButtons"
-                        [buttonLayout]="config.buttonLayout" [mode]="config.mode"
-                        [currency]="$any(config.mode === 'currency' ? config.currency : undefined)"
-                        [locale]="$any(config.useLocale || config.mode === 'currency' ? config.locale : undefined)"
-                        [useGrouping]="config.useLocale" [minFractionDigits]="config.minFractionDigits"
-                        [maxFractionDigits]="config.maxFractionDigits" [prefix]="config.prefix" [suffix]="config.suffix"
-                        [readonly]="config.readonly" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                    <p-inputNumber [(ngModel)]="previewValue" [placeholder]="config.placeholder"
+                        [min]="$any(config.min)" [max]="$any(config.max)" [step]="config.step"
+                        [showButtons]="config.showButtons" [prefix]="config.prefix" [suffix]="config.suffix"
+                        [disabled]="config.disabled" [readonly]="config.readonly"
+                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                         [style]="{width:'100%'}">
                     </p-inputNumber>
                 </ng-container>
@@ -138,16 +92,15 @@
                 <div class="config-summary">
                     <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
                     <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="config.showButtons">Buttons ({{ config.buttonLayout }})</span>
-                        <span class="summary-chip" *ngIf="config.mode === 'currency'">{{ config.currency }}</span>
-                        <span class="summary-chip" *ngIf="config.useLocale">Locale: {{ config.locale }}</span>
+                        <span class="summary-chip" *ngIf="config.showButtons">Buttons</span>
                         <span class="summary-chip" *ngIf="config.min !== null">Min: {{ config.min }}</span>
                         <span class="summary-chip" *ngIf="config.max !== null">Max: {{ config.max }}</span>
                         <span class="summary-chip" *ngIf="config.prefix">Prefix</span>
                         <span class="summary-chip" *ngIf="config.suffix">Suffix</span>
+                        <span class="summary-chip" *ngIf="config.disabled">Disabled</span>
                         <span class="summary-chip" *ngIf="config.readonly">Read-only</span>
                         <span class="summary-empty"
-                            *ngIf="!config.showButtons && config.mode === 'decimal' && !config.useLocale && config.min === null && config.max === null && !config.prefix && !config.suffix && !config.readonly">
+                            *ngIf="config.showButtons && config.min === null && config.max === null && !config.prefix && !config.suffix && !config.disabled && !config.readonly">
                             Default configuration
                         </span>
                     </div>
@@ -157,8 +110,13 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary"
-            (click)="onClose()"></button>
-        <button pButton type="button" label="Apply Customisation" icon="pi pi-check" (click)="onSave()"></button>
+        <button class="btn-cancel" type="button" (click)="onClose()">
+            <i class="pi pi-times"></i>
+            Cancel
+        </button>
+        <button class="btn-primary" type="button" (click)="onSave()">
+            <i class="pi pi-check"></i>
+            Apply
+        </button>
     </ng-template>
 </p-dialog>

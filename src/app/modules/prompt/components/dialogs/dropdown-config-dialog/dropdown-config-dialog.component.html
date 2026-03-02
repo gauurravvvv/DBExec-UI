@@ -81,8 +81,8 @@
 
                 <div class="config-group">
                     <label>Panel Scroll Height</label>
-                    <p-dropdown [options]="scrollHeightOptions" [(ngModel)]="config.scrollHeight"
-                        optionLabel="label" optionValue="value" [style]="{width: '100%'}" appendTo="body">
+                    <p-dropdown [options]="scrollHeightOptions" [(ngModel)]="config.scrollHeight" optionLabel="label"
+                        optionValue="value" [style]="{width: '100%'}" appendTo="body">
                     </p-dropdown>
                 </div>
 
@@ -115,8 +115,8 @@
 
                 <div class="config-group" *ngIf="config.virtualScroll">
                     <label>Item Height (px)</label>
-                    <input type="number" pInputText [(ngModel)]="config.virtualScrollItemSize"
-                        placeholder="38" min="24" max="80" />
+                    <input type="number" pInputText [(ngModel)]="config.virtualScrollItemSize" placeholder="38" min="24"
+                        max="80" />
                     <small class="hint">Height of each option row in pixels</small>
                 </div>
 
@@ -131,24 +131,17 @@
             </div>
 
             <div class="preview-content">
-                <div class="preview-label">How it will look:</div>
+                <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
                     <p-dropdown [options]="formattedOptions" [(ngModel)]="selectedValue"
-                        [placeholder]="config.placeholder"
-                        [filter]="config.filter"
-                        [filterPlaceholder]="config.filterPlaceholder"
-                        [filterMatchMode]="config.filterMatchMode"
-                        [resetFilterOnHide]="config.resetFilterOnHide"
-                        [showClear]="config.showClear"
-                        [editable]="config.editable"
-                        [autoDisplayFirst]="config.autoDisplayFirst"
-                        [scrollHeight]="config.scrollHeight"
-                        [emptyMessage]="config.emptyMessage"
-                        [emptyFilterMessage]="config.emptyFilterMessage"
-                        [virtualScroll]="config.virtualScroll"
-                        [virtualScrollItemSize]="config.virtualScrollItemSize"
-                        [style]="{width: '100%'}" appendTo="body"
+                        [placeholder]="config.placeholder" [filter]="config.filter"
+                        [filterPlaceholder]="config.filterPlaceholder" [filterMatchMode]="config.filterMatchMode"
+                        [resetFilterOnHide]="config.resetFilterOnHide" [showClear]="config.showClear"
+                        [editable]="config.editable" [autoDisplayFirst]="config.autoDisplayFirst"
+                        [scrollHeight]="config.scrollHeight" [emptyMessage]="config.emptyMessage"
+                        [emptyFilterMessage]="config.emptyFilterMessage" [virtualScroll]="config.virtualScroll"
+                        [virtualScrollItemSize]="config.virtualScrollItemSize" [style]="{width: '100%'}" appendTo="body"
                         optionLabel="label" optionValue="value">
                     </p-dropdown>
                 </ng-container>
@@ -167,8 +160,7 @@
                 <div class="default-indicator" *ngIf="config.defaultValue != null">
                     <i class="pi pi-bookmark"></i>
                     <span>Default: <strong>{{ config.defaultValue }}</strong></span>
-                    <button pButton type="button" icon="pi pi-times"
-                        class="p-button-text p-button-rounded p-button-sm"
+                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
                         (click)="clearDefault()" pTooltip="Clear default">
                     </button>
                 </div>
@@ -185,7 +177,8 @@
                         <span class="summary-chip" *ngIf="config.editable">Editable</span>
                         <span class="summary-chip" *ngIf="config.autoDisplayFirst">Auto-first</span>
                         <span class="summary-chip" *ngIf="config.virtualScroll">Virtual Scroll</span>
-                        <span class="summary-chip" *ngIf="config.scrollHeight !== '200px'">Height: {{ config.scrollHeight }}</span>
+                        <span class="summary-chip" *ngIf="config.scrollHeight !== '200px'">Height: {{
+                            config.scrollHeight }}</span>
                         <span class="summary-empty"
                             *ngIf="!config.filter && !config.showClear && !config.editable && !config.autoDisplayFirst && !config.virtualScroll && config.scrollHeight === '200px'">
                             Default configuration
@@ -198,10 +191,13 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary"
-            (click)="onClose()">
+        <button class="btn-cancel" type="button" (click)="onClose()">
+            <i class="pi pi-times"></i>
+            Cancel
         </button>
-        <button pButton type="button" label="Apply Customisation" icon="pi pi-check" (click)="onSave()">
+        <button class="btn-primary" type="button" (click)="onSave()">
+            <i class="pi pi-check"></i>
+            Apply
         </button>
     </ng-template>
 </p-dialog>

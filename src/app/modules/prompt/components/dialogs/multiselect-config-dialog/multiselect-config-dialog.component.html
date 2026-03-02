@@ -156,7 +156,7 @@
             </div>
 
             <div class="preview-content">
-                <div class="preview-label">How it will look:</div>
+                <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
                     <p-multiSelect [options]="formattedOptions" [(ngModel)]="selectedValues"
@@ -220,9 +220,13 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        <button class="btn-cancel" type="button" (click)="onClose()">
+            <i class="pi pi-times"></i>
+            Cancel
         </button>
-        <button pButton type="button" label="Apply Customisation" icon="pi pi-check" (click)="onSave()">
+        <button class="btn-primary" type="button" (click)="onSave()">
+            <i class="pi pi-check"></i>
+            Apply
         </button>
     </ng-template>
 </p-dialog>
