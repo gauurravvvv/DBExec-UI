@@ -1,5 +1,6 @@
 import {
   Component,
+  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -10,10 +11,22 @@ import {
 export interface DropdownConfig {
   placeholder: string;
   defaultValue: string | null;
+  // Filter
   filter: boolean;
   filterPlaceholder: string;
+  filterMatchMode: 'contains' | 'startsWith' | 'endsWith' | 'equals';
+  resetFilterOnHide: boolean;
+  // Behaviour
   showClear: boolean;
   editable: boolean;
+  autoDisplayFirst: boolean;
+  // Panel
+  scrollHeight: string;
+  emptyMessage: string;
+  emptyFilterMessage: string;
+  // Performance
+  virtualScroll: boolean;
+  virtualScrollItemSize: number;
 }
 
 @Component({
@@ -21,84 +34,107 @@ export interface DropdownConfig {
   templateUrl: './dropdown-config-dialog.component.html',
   styleUrls: ['./dropdown-config-dialog.component.scss'],
 })
-export class DropdownConfigDialogComponent implements OnChanges {
+export class DropdownConfigDialogComponent implements OnChanges, DoCheck {
   @Input() visible = false;
   @Input() promptValues: any[] = [];
   @Input() currentConfig: Partial<DropdownConfig> = {};
 
+  @Output() visibleChange = new EventEmitter<boolean>();
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<DropdownConfig>();
 
-  // Configuration options with defaults
-  config: DropdownConfig = {
+  readonly defaultConfig: DropdownConfig = {
     placeholder: 'Select an option',
     defaultValue: null,
     filter: true,
     filterPlaceholder: 'Search...',
+    filterMatchMode: 'contains',
+    resetFilterOnHide: false,
     showClear: true,
     editable: false,
+    autoDisplayFirst: false,
+    scrollHeight: '200px',
+    emptyMessage: 'No results found',
+    emptyFilterMessage: 'No results found',
+    virtualScroll: false,
+    virtualScrollItemSize: 38,
   };
+
+  config: DropdownConfig = { ...this.defaultConfig };
 
   // Preview state
   selectedValue: any = null;
 
-  /**
-   * Transform promptValues (strings) to dropdown options format
-   */
+  readonly filterMatchModeOptions = [
+    { label: 'Contains', value: 'contains' },
+    { label: 'Starts With', value: 'startsWith' },
+    { label: 'Ends With', value: 'endsWith' },
+    { label: 'Equals', value: 'equals' },
+  ];
+
+  readonly scrollHeightOptions = [
+    { label: '150px', value: '150px' },
+    { label: '200px (default)', value: '200px' },
+    { label: '300px', value: '300px' },
+    { label: '400px', value: '400px' },
+  ];
+
   get formattedOptions(): any[] {
-    if (!this.promptValues || this.promptValues.length === 0) {
-      return [];
-    }
-    // If values are already objects with label/value, return as-is
-    if (
-      typeof this.promptValues[0] === 'object' &&
-      this.promptValues[0]?.label
-    ) {
+    if (!this.promptValues || this.promptValues.length === 0) return [];
+    if (typeof this.promptValues[0] === 'object' && this.promptValues[0]?.label) {
       return this.promptValues;
     }
-    // Transform strings to {label, value} objects
-    return this.promptValues.map(val => ({ label: val, value: val }));
+    return this.promptValues.map(val => ({ label: String(val), value: val }));
+  }
+
+  _previewArr: number[] = [0];
+  readonly trackPreview = (_i: number, v: number): number => v;
+  private _lastConfigStr = '';
+
+  ngDoCheck(): void {
+    const s = JSON.stringify(this.config);
+    if (s !== this._lastConfigStr) {
+      this._lastConfigStr = s;
+      this._previewArr = [this._previewArr[0] + 1];
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
-      // Reset config to defaults merged with current config
-      this.config = {
-        placeholder: 'Select an option',
-        defaultValue: null,
-        filter: true,
-        filterPlaceholder: 'Search...',
-        showClear: true,
-        editable: false,
-        ...this.currentConfig,
-      };
-      // Set preview to default value if exists
+      this.config = { ...this.defaultConfig, ...this.currentConfig };
+
+      // Validate that defaultValue still exists in options
+      if (!this.isValueInOptions(this.config.defaultValue)) {
+        this.config.defaultValue = null;
+      }
       this.selectedValue = this.config.defaultValue;
     }
   }
 
   onClose(): void {
+    this.visible = false;
+    this.visibleChange.emit(false);
     this.close.emit();
   }
 
   onSave(): void {
     this.save.emit({ ...this.config });
+    this.onClose();
   }
 
-  /**
-   * Set selected value as default
-   */
   setAsDefault(): void {
-    if (this.selectedValue) {
+    if (this.selectedValue != null) {
       this.config.defaultValue = this.selectedValue;
     }
   }
 
-  /**
-   * Clear default value
-   */
   clearDefault(): void {
     this.config.defaultValue = null;
     this.selectedValue = null;
+  }
+
+  private isValueInOptions(value: any): boolean {
+    if (value == null) return false;
+    return this.formattedOptions.some(opt => opt.value === value);
   }
 }

@@ -2,7 +2,7 @@
     header="Customise Dropdown" styleClass="dropdown-config-dialog" (onHide)="onClose()">
 
     <div class="dialog-content">
-        <!-- Configuration Options Panel -->
+        <!-- ===== Configuration Panel ===== -->
         <div class="config-panel">
             <div class="panel-header">
                 <i class="pi pi-cog"></i>
@@ -10,41 +10,120 @@
             </div>
 
             <div class="config-form">
-                <!-- Placeholder -->
+
+                <!-- ── BASIC ── -->
+                <div class="section-label">
+                    <i class="pi pi-sliders-h"></i> Basic
+                </div>
+
                 <div class="config-group">
                     <label>Placeholder Text</label>
                     <input type="text" pInputText [(ngModel)]="config.placeholder"
                         placeholder="e.g., Select an option" />
                 </div>
 
-                <!-- Filter Toggle -->
-                <div class="config-row">
-                    <label>Enable Search Filter</label>
-                    <p-inputSwitch [(ngModel)]="config.filter"></p-inputSwitch>
+                <!-- ── BEHAVIOUR ── -->
+                <div class="section-label">
+                    <i class="pi pi-cog"></i> Behaviour
                 </div>
 
-                <!-- Filter Placeholder (shown only when filter is enabled) -->
-                <div class="config-group" *ngIf="config.filter">
-                    <label>Filter Placeholder</label>
-                    <input type="text" pInputText [(ngModel)]="config.filterPlaceholder"
-                        placeholder="e.g., Search..." />
-                </div>
-
-                <!-- Show Clear Toggle -->
                 <div class="config-row">
                     <label>Show Clear Button</label>
                     <p-inputSwitch [(ngModel)]="config.showClear"></p-inputSwitch>
                 </div>
 
-                <!-- Editable Toggle -->
                 <div class="config-row">
                     <label>Editable (Allow Typing)</label>
                     <p-inputSwitch [(ngModel)]="config.editable"></p-inputSwitch>
                 </div>
+
+                <div class="config-row">
+                    <label>Auto-select First Option</label>
+                    <p-inputSwitch [(ngModel)]="config.autoDisplayFirst"></p-inputSwitch>
+                </div>
+
+                <!-- ── FILTER ── -->
+                <div class="section-label">
+                    <i class="pi pi-search"></i> Filter
+                </div>
+
+                <div class="config-row">
+                    <label>Enable Search Filter</label>
+                    <p-inputSwitch [(ngModel)]="config.filter"></p-inputSwitch>
+                </div>
+
+                <ng-container *ngIf="config.filter">
+                    <div class="config-group">
+                        <label>Filter Placeholder</label>
+                        <input type="text" pInputText [(ngModel)]="config.filterPlaceholder"
+                            placeholder="e.g., Search..." />
+                        <small class="hint">Placeholder inside the search box</small>
+                    </div>
+
+                    <div class="config-group">
+                        <label>Filter Match Mode</label>
+                        <p-dropdown [options]="filterMatchModeOptions" [(ngModel)]="config.filterMatchMode"
+                            optionLabel="label" optionValue="value" [style]="{width: '100%'}" appendTo="body">
+                        </p-dropdown>
+                        <small class="hint">How the search text matches option labels</small>
+                    </div>
+
+                    <div class="config-row">
+                        <label>Reset Filter on Close</label>
+                        <p-inputSwitch [(ngModel)]="config.resetFilterOnHide"></p-inputSwitch>
+                    </div>
+                </ng-container>
+
+                <!-- ── PANEL ── -->
+                <div class="section-label">
+                    <i class="pi pi-list"></i> Panel
+                </div>
+
+                <div class="config-group">
+                    <label>Panel Scroll Height</label>
+                    <p-dropdown [options]="scrollHeightOptions" [(ngModel)]="config.scrollHeight"
+                        optionLabel="label" optionValue="value" [style]="{width: '100%'}" appendTo="body">
+                    </p-dropdown>
+                </div>
+
+                <div class="config-group">
+                    <label>Empty Message</label>
+                    <input type="text" pInputText [(ngModel)]="config.emptyMessage"
+                        placeholder="e.g., No results found" />
+                    <small class="hint">Shown when there are no options</small>
+                </div>
+
+                <div class="config-group" *ngIf="config.filter">
+                    <label>Empty Filter Message</label>
+                    <input type="text" pInputText [(ngModel)]="config.emptyFilterMessage"
+                        placeholder="e.g., No results found" />
+                    <small class="hint">Shown when filter returns no matches</small>
+                </div>
+
+                <!-- ── PERFORMANCE ── -->
+                <div class="section-label">
+                    <i class="pi pi-bolt"></i> Performance
+                </div>
+
+                <div class="config-row">
+                    <div>
+                        <label style="display:block">Virtual Scroll</label>
+                        <small class="hint" style="margin:0">Recommended for 100+ options</small>
+                    </div>
+                    <p-inputSwitch [(ngModel)]="config.virtualScroll"></p-inputSwitch>
+                </div>
+
+                <div class="config-group" *ngIf="config.virtualScroll">
+                    <label>Item Height (px)</label>
+                    <input type="number" pInputText [(ngModel)]="config.virtualScrollItemSize"
+                        placeholder="38" min="24" max="80" />
+                    <small class="hint">Height of each option row in pixels</small>
+                </div>
+
             </div>
         </div>
 
-        <!-- Live Preview Panel -->
+        <!-- ===== Live Preview Panel ===== -->
         <div class="preview-panel">
             <div class="panel-header">
                 <i class="pi pi-eye"></i>
@@ -53,13 +132,28 @@
 
             <div class="preview-content">
                 <div class="preview-label">How it will look:</div>
-                <p-dropdown [options]="formattedOptions" [(ngModel)]="selectedValue" [placeholder]="config.placeholder"
-                    [filter]="config.filter" [filterPlaceholder]="config.filterPlaceholder"
-                    [showClear]="config.showClear" [editable]="config.editable" [style]="{width: '100%'}"
-                    optionLabel="label" optionValue="value">
-                </p-dropdown>
 
-                <div class="preview-actions" *ngIf="selectedValue">
+                <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
+                    <p-dropdown [options]="formattedOptions" [(ngModel)]="selectedValue"
+                        [placeholder]="config.placeholder"
+                        [filter]="config.filter"
+                        [filterPlaceholder]="config.filterPlaceholder"
+                        [filterMatchMode]="config.filterMatchMode"
+                        [resetFilterOnHide]="config.resetFilterOnHide"
+                        [showClear]="config.showClear"
+                        [editable]="config.editable"
+                        [autoDisplayFirst]="config.autoDisplayFirst"
+                        [scrollHeight]="config.scrollHeight"
+                        [emptyMessage]="config.emptyMessage"
+                        [emptyFilterMessage]="config.emptyFilterMessage"
+                        [virtualScroll]="config.virtualScroll"
+                        [virtualScrollItemSize]="config.virtualScrollItemSize"
+                        [style]="{width: '100%'}" appendTo="body"
+                        optionLabel="label" optionValue="value">
+                    </p-dropdown>
+                </ng-container>
+
+                <div class="preview-actions" *ngIf="selectedValue != null">
                     <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
                         icon="pi pi-check" (click)="setAsDefault()">
                     </button>
@@ -70,22 +164,44 @@
                     <span>Add prompt values to see the dropdown preview</span>
                 </div>
 
-                <div class="default-indicator" *ngIf="config.defaultValue">
+                <div class="default-indicator" *ngIf="config.defaultValue != null">
                     <i class="pi pi-bookmark"></i>
-                    <span>Default: <strong>{{config.defaultValue}}</strong></span>
-                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
+                    <span>Default: <strong>{{ config.defaultValue }}</strong></span>
+                    <button pButton type="button" icon="pi pi-times"
+                        class="p-button-text p-button-rounded p-button-sm"
                         (click)="clearDefault()" pTooltip="Clear default">
                     </button>
                 </div>
+
+                <!-- Config Summary -->
+                <div class="config-summary">
+                    <div class="summary-title">
+                        <i class="pi pi-info-circle"></i> Active Settings
+                    </div>
+                    <div class="summary-chips">
+                        <span class="summary-chip" *ngIf="config.filter">Filter ({{ config.filterMatchMode }})</span>
+                        <span class="summary-chip" *ngIf="config.resetFilterOnHide">Auto-reset Filter</span>
+                        <span class="summary-chip" *ngIf="config.showClear">Clear Button</span>
+                        <span class="summary-chip" *ngIf="config.editable">Editable</span>
+                        <span class="summary-chip" *ngIf="config.autoDisplayFirst">Auto-first</span>
+                        <span class="summary-chip" *ngIf="config.virtualScroll">Virtual Scroll</span>
+                        <span class="summary-chip" *ngIf="config.scrollHeight !== '200px'">Height: {{ config.scrollHeight }}</span>
+                        <span class="summary-empty"
+                            *ngIf="!config.filter && !config.showClear && !config.editable && !config.autoDisplayFirst && !config.virtualScroll && config.scrollHeight === '200px'">
+                            Default configuration
+                        </span>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary"
+            (click)="onClose()">
         </button>
-        <button pButton type="button" label="Apply Customisation" (click)="onSave()">
-            <i class="pi pi-check mr-2"></i>
+        <button pButton type="button" label="Apply Customisation" icon="pi pi-check" (click)="onSave()">
         </button>
     </ng-template>
 </p-dialog>

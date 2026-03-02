@@ -1,67 +1,154 @@
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '800px'}" [draggable]="false" [resizable]="false"
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '900px'}" [draggable]="false" [resizable]="false"
     header="Customise Text Input" styleClass="text-config-dialog" (onHide)="onClose()">
 
     <div class="dialog-content">
-        <!-- Configuration Options Panel -->
         <div class="config-panel">
-            <div class="panel-header">
-                <i class="pi pi-cog"></i>
-                <span>Configuration Options</span>
-            </div>
-
+            <div class="panel-header"><i class="pi pi-cog"></i><span>Configuration Options</span></div>
             <div class="config-form">
-                <!-- Placeholder -->
+
+                <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
+
                 <div class="config-group">
                     <label>Placeholder Text</label>
                     <input type="text" pInputText [(ngModel)]="config.placeholder" placeholder="e.g., Enter text" />
                 </div>
+                <div class="config-group">
+                    <label>Input Mode</label>
+                    <p-dropdown [options]="inputModeOptions" [(ngModel)]="config.inputMode" optionLabel="label"
+                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
+                    </p-dropdown>
+                </div>
+                <div class="config-group" *ngIf="config.inputMode === 'input'">
+                    <label>Input Type</label>
+                    <p-dropdown [options]="inputTypeOptions" [(ngModel)]="config.inputType" optionLabel="label"
+                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
+                    </p-dropdown>
+                </div>
 
-                <!-- Max Length -->
+                <div class="section-label"><i class="pi pi-check-circle"></i> Validation</div>
+
                 <div class="config-group">
                     <label>Max Length (optional)</label>
-                    <p-inputNumber [(ngModel)]="config.maxLength" [min]="1" [max]="1000" [showButtons]="true"
-                        placeholder="No limit" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus"
-                        decrementButtonIcon="pi pi-minus">
+                    <p-inputNumber [(ngModel)]="config.maxLength" [min]="1" [max]="10000" [showButtons]="true"
+                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                        placeholder="No limit" [style]="{width:'100%'}">
                     </p-inputNumber>
-                    <small class="hint">Maximum number of characters allowed</small>
                 </div>
+                <div class="config-group">
+                    <label>Min Length (optional)</label>
+                    <p-inputNumber [(ngModel)]="config.minLength" [min]="0" [max]="10000" [showButtons]="true"
+                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                        placeholder="No minimum" [style]="{width:'100%'}">
+                    </p-inputNumber>
+                </div>
+                <div class="config-group">
+                    <label>Pattern (Regex, optional)</label>
+                    <input type="text" pInputText [(ngModel)]="config.pattern" placeholder="e.g., ^[A-Za-z]+$" />
+                    <small class="hint">Leave empty for no pattern validation</small>
+                </div>
+                <div class="config-group">
+                    <label>Key Filter</label>
+                    <p-dropdown [options]="keyFilterOptions" [(ngModel)]="config.keyFilter" optionLabel="label"
+                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
+                    </p-dropdown>
+                    <small class="hint">Restrict which characters can be typed</small>
+                </div>
+
+                <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
+
+                <div class="config-row"><label>Read-Only</label>
+                    <p-inputSwitch [(ngModel)]="config.readonly"></p-inputSwitch>
+                </div>
+                <div class="config-row"><label>Trim Whitespace</label>
+                    <p-inputSwitch [(ngModel)]="config.trim"></p-inputSwitch>
+                </div>
+                <div class="config-group">
+                    <label>Auto Complete</label>
+                    <p-dropdown [options]="autoCompleteOptions" [(ngModel)]="config.autoComplete" optionLabel="label"
+                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
+                    </p-dropdown>
+                </div>
+
+                <ng-container *ngIf="config.inputMode === 'textarea'">
+                    <div class="section-label"><i class="pi pi-align-left"></i> Textarea</div>
+
+                    <div class="config-group">
+                        <label>Rows</label>
+                        <p-dropdown [options]="rowOptions" [(ngModel)]="config.rows" optionLabel="label"
+                            optionValue="value" [style]="{width:'100%'}" appendTo="body">
+                        </p-dropdown>
+                    </div>
+                    <div class="config-row"><label>Auto Resize</label>
+                        <p-inputSwitch [(ngModel)]="config.autoResize"></p-inputSwitch>
+                    </div>
+                </ng-container>
+
             </div>
         </div>
 
-        <!-- Live Preview Panel -->
         <div class="preview-panel">
-            <div class="panel-header">
-                <i class="pi pi-eye"></i>
-                <span>Live Preview</span>
-            </div>
-
+            <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
             <div class="preview-content">
                 <div class="preview-label">How it will look:</div>
-                <input type="text" pInputText [(ngModel)]="previewValue" [placeholder]="config.placeholder"
-                    [maxlength]="config.maxLength ?? null" [style]="{width: '100%'}" />
+
+                <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
+                    <ng-container *ngIf="config.inputMode === 'input'">
+                        <input [type]="config.inputType" pInputText [(ngModel)]="previewValue"
+                            [placeholder]="config.placeholder" [maxlength]="$any(config.maxLength)"
+                            [minlength]="$any(config.minLength)" [pattern]="config.pattern || ''"
+                            [readOnly]="config.readonly" [attr.autocomplete]="config.autoComplete"
+                            [pKeyFilter]="keyFilterValue" [style]="{width:'100%'}" />
+                    </ng-container>
+
+                    <ng-container *ngIf="config.inputMode === 'textarea'">
+                        <textarea pInputTextarea [(ngModel)]="previewValue" [placeholder]="config.placeholder"
+                            [rows]="config.rows" [autoResize]="config.autoResize" [maxlength]="$any(config.maxLength)"
+                            [readOnly]="config.readonly" [style]="{width:'100%'}">
+                        </textarea>
+                    </ng-container>
+                </ng-container>
 
                 <div class="preview-actions" *ngIf="previewValue">
                     <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
-                        icon="pi pi-check" (click)="setAsDefault()">
-                    </button>
+                        icon="pi pi-check" (click)="setAsDefault()"></button>
                 </div>
 
                 <div class="default-indicator" *ngIf="config.defaultValue">
                     <i class="pi pi-bookmark"></i>
-                    <span>Default: <strong>{{config.defaultValue}}</strong></span>
+                    <span>Default: <strong>{{ config.defaultValue }}</strong></span>
                     <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
-                        (click)="clearDefault()" pTooltip="Clear default">
-                    </button>
+                        (click)="clearDefault()" pTooltip="Clear default"></button>
+                </div>
+
+                <div class="config-summary">
+                    <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
+                    <div class="summary-chips">
+                        <span class="summary-chip" *ngIf="config.inputMode === 'textarea'">Textarea</span>
+                        <span class="summary-chip"
+                            *ngIf="config.inputType !== 'text' && config.inputMode === 'input'">{{ config.inputType
+                            }}</span>
+                        <span class="summary-chip" *ngIf="config.readonly">Read-only</span>
+                        <span class="summary-chip" *ngIf="config.trim">Trim</span>
+                        <span class="summary-chip" *ngIf="config.maxLength != null">Max {{ config.maxLength }}</span>
+                        <span class="summary-chip" *ngIf="config.minLength != null">Min {{ config.minLength }}</span>
+                        <span class="summary-chip" *ngIf="config.keyFilter !== 'none'">Filter: {{ config.keyFilter
+                            }}</span>
+                        <span class="summary-chip" *ngIf="config.pattern">Pattern</span>
+                        <span class="summary-chip"
+                            *ngIf="config.autoResize && config.inputMode === 'textarea'">Auto-resize</span>
+                        <span class="summary-empty"
+                            *ngIf="config.inputMode === 'input' && config.inputType === 'text' && !config.readonly && !config.trim && config.maxLength == null && config.minLength == null && config.keyFilter === 'none' && !config.pattern">
+                            Default configuration
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <ng-template pTemplate="footer">
-        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary" (click)="onClose()">
-        </button>
-        <button pButton type="button" label="Apply Customisation" (click)="onSave()">
-            <i class="pi pi-check mr-2"></i>
-        </button>
+        <button pButton type="button" label="Cancel" class="p-button-outlined p-button-secondary"
+            (click)="onClose()"></button>
+        <button pButton type="button" label="Apply Customisation" icon="pi pi-check" (click)="onSave()"></button>
     </ng-template>
 </p-dialog>

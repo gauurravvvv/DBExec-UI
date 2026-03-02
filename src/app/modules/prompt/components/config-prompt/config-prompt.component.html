@@ -8,8 +8,9 @@
                 <h2>Configure Prompt</h2>
             </div>
             <div class="action-buttons">
-                <button pButton type="button" label="Customise" class="p-button-outlined btn-secondary" *ngIf="isConfigurable()"
-                    (click)="openConfigDialog()" pTooltip="Customise prompt display options" tooltipPosition="bottom">
+                <button pButton type="button" label="Customise" class="p-button-outlined btn-secondary"
+                    *ngIf="isConfigurable()" (click)="openConfigDialog()" pTooltip="Customise prompt display options"
+                    tooltipPosition="bottom">
                     <i class="pi pi-cog mr-2"></i>
                 </button>
                 <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
@@ -286,22 +287,22 @@
                                 <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
                                     <button type="button" pButton
                                         class="p-button-text p-button-rounded p-button-success" icon="pi pi-refresh"
-                                        pTooltip="Refresh prompt values" tooltipPosition="left"
+                                        pTooltip="Refresh prompt values" tooltipPosition="bottom"
                                         (click)="refreshPromptValues()">
                                     </button>
                                     <button type="button" pButton
                                         class="p-button-text p-button-rounded p-button-warning" icon="pi pi-bolt"
-                                        pTooltip="Load values from SQL query" tooltipPosition="left"
+                                        pTooltip="Load values from SQL query" tooltipPosition="bottom"
                                         (click)="openSqlDialog()">
                                     </button>
                                     <button type="button" pButton class="p-button-text p-button-rounded p-button-info"
                                         icon="pi pi-upload" pTooltip="Upload values from file (CSV/TXT)"
-                                        tooltipPosition="left" (click)="fileInput.click()">
+                                        tooltipPosition="bottom" (click)="fileInput.click()">
                                     </button>
                                     <input type="file" #fileInput accept=".csv,.txt" style="display: none;"
                                         (change)="onPromptFileUpload($event)">
                                     <button type="button" pButton class="p-button-text p-button-rounded p-button-danger"
-                                        icon="pi pi-trash" pTooltip="Clear all values" tooltipPosition="left"
+                                        icon="pi pi-trash" pTooltip="Clear all values" tooltipPosition="bottom"
                                         (click)="clearPromptValues()"
                                         [disabled]="!promptForm.get('promptValues')?.value?.length">
                                     </button>
@@ -346,54 +347,53 @@
 </app-sql-query-dialog>
 
 <!-- Dropdown Configuration Dialog -->
-<app-dropdown-config-dialog [visible]="showDropdownConfigDialog"
+<app-dropdown-config-dialog [(visible)]="showDropdownConfigDialog"
     [promptValues]="promptForm.get('promptValues')?.value || []" [currentConfig]="dropdownConfig"
     (close)="showDropdownConfigDialog = false" (save)="onDropdownConfigSaved($event)">
 </app-dropdown-config-dialog>
 
 <!-- Multiselect Configuration Dialog -->
-<app-multiselect-config-dialog [visible]="showMultiselectConfigDialog"
+<app-multiselect-config-dialog [(visible)]="showMultiselectConfigDialog"
     [promptValues]="promptForm.get('promptValues')?.value || []" [currentConfig]="multiselectConfig"
     (close)="showMultiselectConfigDialog = false" (save)="onMultiselectConfigSaved($event)">
 </app-multiselect-config-dialog>
 
 <!-- Checkbox Configuration Dialog -->
-<app-checkbox-config-dialog [visible]="showCheckboxConfigDialog" [currentConfig]="checkboxConfig"
+<app-checkbox-config-dialog [(visible)]="showCheckboxConfigDialog" [currentConfig]="checkboxConfig"
     (close)="showCheckboxConfigDialog = false" (save)="onCheckboxConfigSaved($event)">
 </app-checkbox-config-dialog>
 
 <!-- Radio Configuration Dialog -->
-<app-radio-config-dialog [visible]="showRadioConfigDialog"
-    [promptValues]="promptForm.get('promptValues')?.value || []" [currentConfig]="radioConfig"
-    (close)="showRadioConfigDialog = false" (save)="onRadioConfigSaved($event)">
+<app-radio-config-dialog [(visible)]="showRadioConfigDialog" [promptValues]="promptForm.get('promptValues')?.value || []"
+    [currentConfig]="radioConfig" (close)="showRadioConfigDialog = false" (save)="onRadioConfigSaved($event)">
 </app-radio-config-dialog>
 
 <!-- Text Configuration Dialog -->
-<app-text-config-dialog [visible]="showTextConfigDialog" [currentConfig]="textConfig"
+<app-text-config-dialog [(visible)]="showTextConfigDialog" [currentConfig]="textConfig"
     (close)="showTextConfigDialog = false" (save)="onTextConfigSaved($event)">
 </app-text-config-dialog>
 
 <!-- Number Configuration Dialog -->
-<app-number-config-dialog [visible]="showNumberConfigDialog" [currentConfig]="numberConfig"
+<app-number-config-dialog [(visible)]="showNumberConfigDialog" [currentConfig]="numberConfig"
     (close)="showNumberConfigDialog = false" (save)="onNumberConfigSaved($event)">
 </app-number-config-dialog>
 
 <!-- Date Configuration Dialog -->
-<app-date-config-dialog [visible]="showDateConfigDialog" [currentConfig]="dateConfig"
+<app-date-config-dialog [(visible)]="showDateConfigDialog" [currentConfig]="dateConfig"
     (close)="showDateConfigDialog = false" (save)="onDateConfigSaved($event)">
 </app-date-config-dialog>
 
 <!-- Date Range Configuration Dialog -->
-<app-daterange-config-dialog [visible]="showDateRangeConfigDialog" [currentConfig]="dateRangeConfig"
+<app-daterange-config-dialog [(visible)]="showDateRangeConfigDialog" [currentConfig]="dateRangeConfig"
     (close)="showDateRangeConfigDialog = false" (save)="onDateRangeConfigSaved($event)">
 </app-daterange-config-dialog>
 
 <!-- Calendar Configuration Dialog -->
-<app-calendar-config-dialog [visible]="showCalendarConfigDialog" [currentConfig]="calendarConfig"
+<app-calendar-config-dialog [(visible)]="showCalendarConfigDialog" [currentConfig]="calendarConfig"
     (close)="showCalendarConfigDialog = false" (save)="onCalendarConfigSaved($event)">
 </app-calendar-config-dialog>
 
 <!-- Range Slider Configuration Dialog -->
-<app-rangeslider-config-dialog [visible]="showRangeSliderConfigDialog" [currentConfig]="rangeSliderConfig"
+<app-rangeslider-config-dialog [(visible)]="showRangeSliderConfigDialog" [currentConfig]="rangeSliderConfig"
     (close)="showRangeSliderConfigDialog = false" (save)="onRangeSliderConfigSaved($event)">
 </app-rangeslider-config-dialog>

@@ -29,7 +29,6 @@
     font-weight: 500;
     color: var(--text-color);
     display: block;
-    margin-bottom: 4px;
 
     .required {
       color: var(--error-color);
@@ -159,7 +158,10 @@
         border: 0 none;
         background: var(--card-background);
         border-radius: 50%;
-        transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+        transition:
+          background-color 0.2s,
+          color 0.2s,
+          box-shadow 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;

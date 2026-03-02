@@ -1,5 +1,6 @@
 import {
   Component,
+  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -8,12 +9,20 @@ import {
 } from '@angular/core';
 
 export interface RangeSliderConfig {
-  defaultMin: number;
-  defaultMax: number;
+  // Range bounds
   min: number;
   max: number;
   step: number;
+  // Default selection
+  defaultMin: number;
+  defaultMax: number;
+  // Display
   orientation: 'horizontal' | 'vertical';
+  animate: boolean;
+  disabled: boolean;
+  // Labels
+  showValueLabels: boolean;
+  showBoundLabels: boolean;
 }
 
 @Component({
@@ -21,57 +30,77 @@ export interface RangeSliderConfig {
   templateUrl: './rangeslider-config-dialog.component.html',
   styleUrls: ['./rangeslider-config-dialog.component.scss'],
 })
-export class RangeSliderConfigDialogComponent implements OnChanges {
+export class RangeSliderConfigDialogComponent implements OnChanges, DoCheck {
   @Input() visible = false;
   @Input() currentConfig: Partial<RangeSliderConfig> = {};
 
+  @Output() visibleChange = new EventEmitter<boolean>();
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<RangeSliderConfig>();
 
-  // Orientation options
-  orientationOptions = [
+  readonly defaultConfig: RangeSliderConfig = {
+    min: 0,
+    max: 100,
+    step: 1,
+    defaultMin: 0,
+    defaultMax: 100,
+    orientation: 'horizontal',
+    animate: false,
+    disabled: false,
+    showValueLabels: true,
+    showBoundLabels: false,
+  };
+
+  config: RangeSliderConfig = { ...this.defaultConfig };
+  previewRange: number[] = [0, 100];
+
+  readonly orientationOptions = [
     { label: 'Horizontal', value: 'horizontal' },
     { label: 'Vertical', value: 'vertical' },
   ];
 
-  // Configuration options with defaults
-  config: RangeSliderConfig = {
-    defaultMin: 0,
-    defaultMax: 100,
-    min: 0,
-    max: 100,
-    step: 1,
-    orientation: 'horizontal',
-  };
+  readonly stepOptions = [
+    { label: '1', value: 1 },
+    { label: '2', value: 2 },
+    { label: '5', value: 5 },
+    { label: '10', value: 10 },
+    { label: '25', value: 25 },
+    { label: '50', value: 50 },
+    { label: '100', value: 100 },
+  ];
 
-  // Preview state
-  previewRange: number[] = [0, 100];
+  _previewArr: number[] = [0];
+  readonly trackPreview = (_i: number, v: number): number => v;
+  private _lastConfigStr = '';
+
+  ngDoCheck(): void {
+    const s = JSON.stringify(this.config);
+    if (s !== this._lastConfigStr) {
+      this._lastConfigStr = s;
+      this._previewArr = [this._previewArr[0] + 1];
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
-      this.config = {
-        defaultMin: 0,
-        defaultMax: 100,
-        min: 0,
-        max: 100,
-        step: 1,
-        orientation: 'horizontal',
-        ...this.currentConfig,
-      };
+      this.config = { ...this.defaultConfig, ...this.currentConfig };
       this.previewRange = [this.config.defaultMin, this.config.defaultMax];
     }
   }
 
   onClose(): void {
+    this.visible = false;
+    this.visibleChange.emit(false);
     this.close.emit();
   }
 
   onSave(): void {
     this.save.emit({ ...this.config });
+    this.onClose();
   }
 
   setAsDefault(): void {
-    if (this.previewRange && this.previewRange.length === 2) {
+    if (this.previewRange?.length === 2) {
       this.config.defaultMin = this.previewRange[0];
       this.config.defaultMax = this.previewRange[1];
     }
@@ -81,5 +110,19 @@ export class RangeSliderConfigDialogComponent implements OnChanges {
     this.config.defaultMin = this.config.min;
     this.config.defaultMax = this.config.max;
     this.previewRange = [this.config.min, this.config.max];
+  }
+
+  onBoundsChange(): void {
+    // Clamp preview range within new bounds
+    this.previewRange = [
+      Math.max(
+        this.config.min,
+        Math.min(this.previewRange[0], this.config.max),
+      ),
+      Math.min(
+        this.config.max,
+        Math.max(this.previewRange[1], this.config.min),
+      ),
+    ];
   }
 }
