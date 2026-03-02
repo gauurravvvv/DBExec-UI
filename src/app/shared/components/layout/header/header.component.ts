@@ -9,7 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { interval, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Renderer2 } from '@angular/core';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { GlobalSearchService } from '../../../services/global-search.service';
@@ -20,12 +20,10 @@ import { GlobalSearchService } from '../../../services/global-search.service';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  currentTime: Date = new Date();
   organisationName: string = '';
   userInitials: string = '';
   userName: string = '';
   userRole: string = '';
-  private timeSubscription?: Subscription;
   showProfileMenu: boolean = false;
   isDarkMode = false; // Default to light mode
   isAnimating = false;
@@ -112,11 +110,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.userInitials = this.globalService.chipNameProvider(userFullName);
     this.userRole = this.globalService.getTokenDetails('role');
 
-    // Update time every second
-    this.timeSubscription = interval(1000).subscribe(() => {
-      this.currentTime = new Date();
-    });
-
     this.updateUnreadCount();
 
     // Start typewriter effect for announcement
@@ -126,9 +119,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.timeSubscription) {
-      this.timeSubscription.unsubscribe();
-    }
     if (this.typewriterTimer) {
       clearTimeout(this.typewriterTimer);
     }

@@ -1,49 +1,82 @@
 <!-- Search Modal Overlay -->
-<div class="search-modal-overlay" *ngIf="showSearchModal" (click)="closeSearchModal()">
-    <div class="search-modal-content" (click)="$event.stopPropagation()">
-        <div class="search-header">
-            <i class="pi pi-search search-icon"></i>
-            <input #searchInput type="text" [(ngModel)]="searchTerm" (input)="onSearch()"
-                placeholder="Type to search..." class="search-input">
-            <span class="esc-hint">ESC</span>
-            <i class="pi pi-times close-icon" (click)="closeSearchModal()"></i>
+<div class="search-overlay" *ngIf="showSearchModal" (click)="closeSearchModal()">
+  <div class="search-modal" (click)="$event.stopPropagation()">
+
+    <!-- Search Header -->
+    <div class="search-header">
+      <div class="search-input-row">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          #searchInput
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          placeholder="Search anything..."
+          class="search-input"
+          autocomplete="off">
+        <div class="header-actions">
+          <kbd class="key-hint">ESC</kbd>
+          <button class="close-btn" (click)="closeSearchModal()">
+            <i class="pi pi-times"></i>
+          </button>
         </div>
-
-
-        <div class="search-filters" *ngIf="uniqueEntityTypes.length > 0">
-            <button class="filter-pill" [class.active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
-                All
-            </button>
-            <button class="filter-pill" *ngFor="let type of uniqueEntityTypes" [class.active]="activeFilter === type"
-                (click)="setFilter(type)">
-                {{ type }}
-            </button>
-        </div>
-
-        <div class="search-results" *ngIf="searchResults.length > 0">
-            <div class="result-group">
-                <div class="result-item" *ngFor="let result of filteredSearchResults"
-                    (click)="navigateToResult(result)">
-                    <div class="result-icon">
-                        <i [class]="result.icon"></i>
-                    </div>
-                    <div class="result-info">
-                        <div class="result-title">{{ result.title }}</div>
-                        <div class="result-type">{{ result.entityType }}</div>
-                        <div class="result-breadcrumb" *ngIf="result.breadcrumb">
-
-                            {{ result.breadcrumb }}
-                        </div>
-                    </div>
-                    <i class="pi pi-arrow-right action-icon"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0">
-            <i class="pi pi-search"></i>
-            <p>No results found for "{{ searchTerm }}"</p>
-        </div>
-
+      </div>
     </div>
+
+    <!-- Filter Tabs -->
+    <div class="search-filters" *ngIf="uniqueEntityTypes.length > 0">
+      <button class="filter-pill" [class.active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
+        All
+        <span class="pill-count">{{ searchResults.length }}</span>
+      </button>
+      <button class="filter-pill" *ngFor="let type of uniqueEntityTypes"
+        [class.active]="activeFilter === type" (click)="setFilter(type)">
+        {{ type }}
+        <span class="pill-count">{{ getCountForType(type) }}</span>
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div class="search-results" *ngIf="searchResults.length > 0">
+      <div class="result-item" *ngFor="let result of filteredSearchResults"
+        (click)="navigateToResult(result)">
+        <div class="result-icon-wrap">
+          <i [class]="result.icon"></i>
+        </div>
+        <div class="result-body">
+          <div class="result-title">{{ result.title }}</div>
+          <div class="result-meta">
+            <span class="result-type-tag">{{ result.entityType }}</span>
+            <ng-container *ngIf="result.breadcrumb">
+              <span class="breadcrumb-sep"><i class="pi pi-chevron-right"></i></span>
+              <span class="result-breadcrumb">{{ result.breadcrumb }}</span>
+            </ng-container>
+          </div>
+        </div>
+        <i class="pi pi-arrow-right arrow-icon"></i>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0">
+      <div class="empty-icon-wrap">
+        <i class="pi pi-search"></i>
+      </div>
+      <p class="empty-title">No results for <strong>"{{ searchTerm }}"</strong></p>
+      <p class="empty-hint">Try different keywords or check the spelling</p>
+    </div>
+
+    <!-- Idle State (no search yet) -->
+    <div class="idle-state" *ngIf="!searchTerm">
+      <p class="idle-hint">Start typing to search across all entities</p>
+    </div>
+
+    <!-- Footer Shortcuts -->
+    <div class="search-footer">
+      <div class="footer-hint"><kbd>↑</kbd><kbd>↓</kbd> Navigate</div>
+      <div class="footer-hint"><kbd>↵</kbd> Open</div>
+      <div class="footer-hint"><kbd>ESC</kbd> Close</div>
+    </div>
+
+  </div>
 </div>

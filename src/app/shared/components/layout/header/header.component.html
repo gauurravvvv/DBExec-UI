@@ -1,71 +1,86 @@
 <header class="header">
+  <!-- Gradient bottom border -->
+  <div class="header-border"></div>
+
   <div class="header-left">
-    <div class="logo">
-      <div class="logo-container">
-        <i class="ci ci-app-icon logo-icon"></i>
-        <span class="logo-text">DB<span class="highlight">Exec</span></span>
-      </div>
+    <div class="logo-container">
+      <i class="ci ci-app-icon logo-icon"></i>
+      <span class="logo-text">DB<span class="highlight">Exec</span></span>
     </div>
   </div>
 
   <div class="header-center">
     <div class="org-info">
       <h2 class="org-name">{{ organisationName }}</h2>
-      <div class="current-time">{{ currentTime | date : 'medium' }}</div>
     </div>
   </div>
 
   <div class="header-right">
     <div class="header-actions">
+
       <!-- Search Trigger -->
       <div class="search-trigger" (click)="openSearchModal()">
         <i class="pi pi-search"></i>
-        <span class="placeholder">Search...</span>
-        <span class="shortcut">⌘K</span>
+        <span class="placeholder">Search anything...</span>
+        <kbd class="shortcut">⌘K</kbd>
       </div>
-      <!-- Theme toggle disabled for now -->
-      <!-- <button pButton class="p-button-text theme-toggle" (click)="toggleTheme()">
-        <i class="pi" [ngClass]="isDarkMode ? 'pi-sun' : 'pi-moon'"></i>
-      </button> -->
-      <button pButton class="p-button-text fullscreen-btn" (click)="toggleFullscreen()">
+
+      <!-- Fullscreen -->
+      <button class="icon-btn" (click)="toggleFullscreen()" [pTooltip]="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'" tooltipPosition="bottom">
         <i class="pi" [ngClass]="isFullscreen ? 'pi-window-minimize' : 'pi-window-maximize'"></i>
       </button>
-      <button pButton class="p-button-text notification-btn" (click)="toggleNotificationMenu($event)">
+
+      <!-- Notifications -->
+      <button class="icon-btn notification-btn" (click)="toggleNotificationMenu($event)" pTooltip="Notifications" tooltipPosition="bottom">
         <i class="pi pi-bell"></i>
-        <span class="notification-badge" *ngIf="unreadNotifications > 0">{{
-          unreadNotifications
-          }}</span>
+        <span class="badge" *ngIf="unreadNotifications > 0">{{ unreadNotifications }}</span>
       </button>
+
+      <!-- Divider -->
+      <div class="header-divider"></div>
+
+      <!-- User Profile -->
       <div class="user-profile" (click)="toggleProfileMenu($event)">
-        <div class="profile-info">
-          <div class="user-initials">{{ userInitials }}</div>
-          <div class="user-details">
+        <div class="profile-trigger">
+          <div class="avatar">{{ userInitials }}</div>
+          <div class="user-meta">
             <span class="username">{{ userName }}</span>
             <span class="user-role">{{ userRole }}</span>
           </div>
-          <i class="pi pi-chevron-down"></i>
+          <i class="pi pi-chevron-down chevron" [class.open]="showProfileMenu"></i>
         </div>
 
-        <ul class="profile-menu" *ngIf="showProfileMenu">
-          <li class="menu-item">
-            <a>
-              <i class="pi pi-user"></i>
-              <span>Profile</span>
-            </a>
-          </li>
-          <li class="menu-item">
-            <a (click)="logout()">
-              <i class="pi pi-sign-out"></i>
-              <span>Logout</span>
-            </a>
-          </li>
-        </ul>
+        <div class="profile-menu" *ngIf="showProfileMenu">
+          <div class="menu-header">
+            <div class="menu-avatar">{{ userInitials }}</div>
+            <div>
+              <div class="menu-name">{{ userName }}</div>
+              <div class="menu-role-tag">{{ userRole }}</div>
+            </div>
+          </div>
+          <div class="menu-divider"></div>
+          <ul>
+            <li class="menu-item">
+              <a>
+                <i class="pi pi-user"></i>
+                <span>My Profile</span>
+              </a>
+            </li>
+            <li class="menu-item logout">
+              <a (click)="logout()">
+                <i class="pi pi-sign-out"></i>
+                <span>Sign Out</span>
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
+
     </div>
   </div>
 </header>
 
-<!-- Organisation Announcement Banner -->
+<!-- Announcement Banner -->
 <div class="announcement-banner" *ngIf="announcementTitle">
   <div class="banner-shimmer"></div>
   <div class="banner-glow-left"></div>
@@ -79,47 +94,34 @@
       </span>
     </div>
   </div>
-
 </div>
 
-<!-- Announcement Detail Popup -->
+<!-- Announcement Popup -->
 <div class="announcement-popup-backdrop" *ngIf="showAnnouncementOverlay" (click)="showAnnouncementOverlay = false">
   <div class="announcement-popup" (click)="$event.stopPropagation()">
-    <!-- Left accent stripe -->
     <div class="popup-accent"></div>
-
     <div class="popup-inner">
-      <!-- Top row: icon + tag -->
       <div class="popup-header-row">
         <span class="popup-tag">Announcement</span>
       </div>
-
-      <!-- Title -->
       <h3 class="popup-title">{{ announcementTitle }}</h3>
-
-      <!-- Description -->
       <p class="popup-description">{{ announcementDescription }}</p>
-
-      <!-- Footer -->
       <div class="popup-footer-row">
         <label class="do-not-show">
           <p-checkbox [(ngModel)]="doNotShowAgain" [binary]="true"></p-checkbox>
           <span>Do not show again</span>
         </label>
-        <button class="popup-btn" (click)="closeAnnouncementPopup()">
-          Dismiss
-        </button>
+        <button class="popup-btn" (click)="closeAnnouncementPopup()">Dismiss</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Notification Menu -->
 <div class="notification-menu" [class.show]="showNotificationMenu" #notificationMenu>
   <div class="notification-header">
     <h3>Notifications</h3>
-    <button pButton class="p-button-text" *ngIf="hasNotifications" (click)="markAllAsRead()">
-      Mark all as read
-    </button>
+    <button pButton class="p-button-text" *ngIf="hasNotifications" (click)="markAllAsRead()">Mark all read</button>
   </div>
   <div class="notification-list" *ngIf="hasNotifications; else noNotifications">
     <div class="notification-item" *ngFor="let notification of notifications" [class.unread]="!notification.read"
@@ -136,17 +138,14 @@
       </button>
     </div>
   </div>
-  <div class="notification-footer">
-    Showing notifications for the last 30 days
-  </div>
   <ng-template #noNotifications>
     <div class="no-notifications">
       <i class="pi pi-bell-slash"></i>
-      <p>No notifications</p>
+      <p>All caught up</p>
     </div>
   </ng-template>
+  <div class="notification-footer">Showing last 30 days</div>
 </div>
 
-<!-- Global Search Component -->
+<!-- Global Search -->
 <app-global-search></app-global-search>
-<!-- Global Search Refactored -->

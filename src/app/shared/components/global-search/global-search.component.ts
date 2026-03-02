@@ -152,6 +152,10 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
     this.activeFilter = filter;
   }
 
+  getCountForType(type: string): number {
+    return this.searchResults.filter(item => item.entityType === type).length;
+  }
+
   getBreadcrumb(item: any): string {
     const parts: string[] = [];
 
