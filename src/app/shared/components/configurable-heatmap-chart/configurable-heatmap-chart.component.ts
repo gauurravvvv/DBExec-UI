@@ -8,14 +8,8 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import {
-  COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
-  createColorScheme,
-  getLegendPositionEnum,
-} from '../../helpers/chart-config.helper';
+import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
+import { buildHeatMapChartOption } from '../../helpers/echarts-option-builder';
 
 export interface HeatMapSeries {
   name: string;
@@ -60,7 +54,7 @@ export interface HeatMapConfig {
 export class ConfigurableHeatmapChartComponent
   implements OnInit, OnChanges, DoCheck
 {
-  private previousColorScheme: string = '';
+  private previousConfigSnapshot: string = '';
 
   @Input() data: HeatMapSeries[] = [];
   @Input() showConfigPanel: boolean = true;
@@ -68,9 +62,10 @@ export class ConfigurableHeatmapChartComponent
   @Input() chartHeight: number | undefined;
   @Input() chartConfig: HeatMapConfig | undefined;
 
-  view: [number, number] | undefined;
-
   @Output() onSelect = new EventEmitter<any>();
+
+  chartOption: any = {};
+  echartsInstance: any = null;
 
   private defaultConfig: HeatMapConfig = {
     legend: true,
@@ -99,71 +94,36 @@ export class ConfigurableHeatmapChartComponent
     return this.chartConfig || this.defaultConfig;
   }
 
-  colorSchemeObj: Color = {
-    name: 'custom',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
-  };
-
-  // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
-    this.updateColorScheme();
-    this.updateViewDimensions();
-    this.previousColorScheme = this.config.colorScheme;
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartWidth'] || changes['chartHeight']) {
-      this.updateViewDimensions();
-    }
-    if (changes['chartConfig']) {
-      this.updateColorScheme();
-      this.previousColorScheme = this.config.colorScheme;
+    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
 
   ngDoCheck(): void {
-    if (this.config && this.config.colorScheme !== this.previousColorScheme) {
-      this.previousColorScheme = this.config.colorScheme;
-      this.updateColorScheme();
-    }
-  }
-
-  private updateViewDimensions(): void {
-    if (this.chartWidth && this.chartHeight) {
-      const padding = 20;
-      let width = this.chartWidth - padding;
-      let height = this.chartHeight - padding;
-
-      // When legend is below and enabled, subtract space for legend
-      if (this.config.legend && this.config.legendPosition === 'below') {
-        const legendHeight = 80; // Space for legend + spacing
-        height = height - legendHeight;
+    if (this.config) {
+      const snapshot = JSON.stringify(this.config);
+      if (snapshot !== this.previousConfigSnapshot) {
+        this.previousConfigSnapshot = snapshot;
+        this.updateChartOption();
       }
-
-      this.view = [Math.max(width, 100), Math.max(height, 100)];
-    } else {
-      this.view = undefined;
     }
   }
 
-  private updateColorScheme(): void {
-    const palette = this.colorPalettes[this.config.colorScheme];
-    this.colorSchemeObj = {
-      name: 'custom',
-      selectable: true,
-      group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['cool'],
-    };
+  updateChartOption(): void {
+    this.chartOption = buildHeatMapChartOption(this.data, this.config);
   }
 
-  getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below'
-      ? LegendPosition.Below
-      : LegendPosition.Right;
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
   }
 
   onChartSelect(event: any): void {

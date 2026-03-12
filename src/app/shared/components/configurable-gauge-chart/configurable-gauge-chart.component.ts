@@ -8,14 +8,8 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import {
-  COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
-  createColorScheme,
-  getLegendPositionEnum,
-} from '../../helpers/chart-config.helper';
+import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
+import { buildGaugeChartOption } from '../../helpers/echarts-option-builder';
 
 export interface GaugeChartData {
   name: string;
@@ -54,7 +48,7 @@ export interface GaugeChartConfig {
 export class ConfigurableGaugeChartComponent
   implements OnInit, OnChanges, DoCheck
 {
-  private previousColorScheme: string = '';
+  private previousConfigSnapshot: string = '';
 
   @Input() data: GaugeChartData[] = [];
   @Input() showConfigPanel: boolean = true;
@@ -67,11 +61,12 @@ export class ConfigurableGaugeChartComponent
   @Input() value: number = 0;
   @Input() previousValue: number | undefined;
 
-  view: [number, number] | undefined;
-
   @Output() onSelect = new EventEmitter<any>();
   @Output() onActivate = new EventEmitter<any>();
   @Output() onDeactivate = new EventEmitter<any>();
+
+  chartOption: any = {};
+  echartsInstance: any = null;
 
   private defaultConfig: GaugeChartConfig = {
     legend: true,
@@ -95,13 +90,6 @@ export class ConfigurableGaugeChartComponent
     return this.chartConfig || this.defaultConfig;
   }
 
-  colorSchemeObj: Color = {
-    name: 'custom',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
-  };
-
   // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
@@ -110,70 +98,58 @@ export class ConfigurableGaugeChartComponent
     return this.data && this.data.length > 0 ? this.data[0].value : this.value;
   }
 
+  get linearPercentage(): number {
+    const min = this.config.min || 0;
+    const max = this.config.max || 100;
+    const range = max - min;
+    if (range <= 0) return 0;
+    return Math.min(100, Math.max(0, ((this.linearValue - min) / range) * 100));
+  }
+
+  get linearGaugeColor(): string {
+    const colors = this.colorPalettes[this.config.colorScheme] || this.colorPalettes['vivid'];
+    return colors[0] || '#5AA454';
+  }
+
   ngOnInit(): void {
-    this.updateColorScheme();
-    this.updateViewDimensions();
-    this.previousColorScheme = this.config.colorScheme;
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartWidth'] || changes['chartHeight']) {
-      this.updateViewDimensions();
-    }
-    if (changes['chartConfig']) {
-      this.updateColorScheme();
-      this.previousColorScheme = this.config.colorScheme;
+    if (changes['data'] || changes['chartConfig'] || changes['chartType'] ||
+        changes['chartWidth'] || changes['chartHeight'] || changes['value']) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
 
   ngDoCheck(): void {
-    if (this.config && this.config.colorScheme !== this.previousColorScheme) {
-      this.previousColorScheme = this.config.colorScheme;
-      this.updateColorScheme();
-    }
-  }
-
-  private updateViewDimensions(): void {
-    if (this.chartWidth && this.chartHeight) {
-      const padding = 20;
-      let width = this.chartWidth - padding;
-      let height = this.chartHeight - padding;
-
-      // When legend is below and enabled, subtract space for legend
-      if (this.config.legend && this.config.legendPosition === 'below') {
-        const legendHeight = 80; // Space for legend + spacing
-        height = height - legendHeight;
+    if (this.config) {
+      const snapshot = JSON.stringify(this.config);
+      if (snapshot !== this.previousConfigSnapshot) {
+        this.previousConfigSnapshot = snapshot;
+        this.updateChartOption();
       }
-
-      this.view = [Math.max(width, 100), Math.max(height, 100)];
-    } else {
-      this.view = undefined;
     }
   }
 
-  private updateColorScheme(): void {
-    const palette = this.colorPalettes[this.config.colorScheme];
-    this.colorSchemeObj = {
-      name: 'custom',
-      selectable: true,
-      group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['vivid'],
-    };
+  updateChartOption(): void {
+    if (this.chartType === 'gauge') {
+      this.chartOption = buildGaugeChartOption(this.data, this.config);
+    }
+    // Linear gauge uses custom HTML, no chart option needed
   }
 
-  getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below'
-      ? LegendPosition.Below
-      : LegendPosition.Right;
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
   }
 
   onChartSelect(event: any): void {
     this.onSelect.emit(event);
   }
-  onChartActivate(event: any): void {
-    this.onActivate.emit(event);
-  }
-  onChartDeactivate(event: any): void {
-    this.onDeactivate.emit(event);
+
+  onLinearGaugeClick(): void {
+    this.onSelect.emit({ name: '', value: this.linearValue });
   }
 }

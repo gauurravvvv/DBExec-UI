@@ -16,6 +16,20 @@ export type PromptType =
   | 'rangeslider'
   | 'text';
 
+// Prompt config from API
+export interface PromptConfig {
+  id: number;
+  promptId: number;
+  prompt_schema: string;
+  prompt_table: string;
+  prompt_column: string;
+  prompt_join: string;
+  prompt_where: string;
+  prompt_sql: string;
+  prompt_values_sql: string;
+  appearance: Record<string, any>;
+}
+
 // API response for prompt values
 export interface PromptValue {
   id: number;
@@ -36,8 +50,11 @@ export interface ExecutePrompt {
   promptControlName: string;
   sequence: number;
   values: PromptValue[];
+  config: PromptConfig | null;
   // Internal tracking
   formControlName: string;
+  // Cached options for dropdown/multiselect/radio/checkbox
+  options: { label: string; value: string }[];
 }
 
 // Section model for execute screen
@@ -154,6 +171,7 @@ export interface PromptApiResponse {
   createdOn: string;
   promptSequence: number;
   values: PromptValue[];
+  config: PromptConfig | null;
 }
 
 // Type guards
@@ -217,6 +235,8 @@ export function transformPromptResponse(
     promptControlName: prompt.promptControlName,
     sequence: prompt.promptSequence || prompt.sequence,
     values: prompt.values || [],
+    config: prompt.config || null,
     formControlName: `prompt_${prompt.id}`,
+    options: (prompt.values || []).map(v => ({ label: v.value, value: v.value })),
   };
 }

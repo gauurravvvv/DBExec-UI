@@ -1,37 +1,15 @@
 <div class="line-chart-container">
-    <!-- Chart Section -->
     <div class="chart-wrapper">
-        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
-            <ngx-charts-line-chart *ngIf="view; else autoSizeChart" [view]="view" [results]="data"
-                [scheme]="colorSchemeObj" [legend]="config.legend" [legendTitle]="config.legendTitle"
-                [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
-                [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
-                [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
-                [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel"
-                [trimXAxisTicks]="config.trimXAxisTicks" [trimYAxisTicks]="config.trimYAxisTicks"
-                [rotateXAxisTicks]="config.rotateXAxisTicks" [maxXAxisTickLength]="config.maxXAxisTickLength"
-                [maxYAxisTickLength]="config.maxYAxisTickLength" [wrapTicks]="config.wrapTicks"
-                [autoScale]="config.autoScale" [timeline]="config.timeline" [gradient]="config.gradient"
-                [animations]="config.animations" [rangeFillOpacity]="config.rangeFillOpacity"
-                [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
-                (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
-            </ngx-charts-line-chart>
-
-            <ng-template #autoSizeChart>
-                <ngx-charts-line-chart [results]="data" [scheme]="colorSchemeObj" [legend]="config.legend"
-                    [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [xAxis]="config.xAxis"
-                    [yAxis]="config.yAxis" [showGridLines]="config.showGridLines" [roundDomains]="config.roundDomains"
-                    [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
-                    [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel"
-                    [trimXAxisTicks]="config.trimXAxisTicks" [trimYAxisTicks]="config.trimYAxisTicks"
-                    [rotateXAxisTicks]="config.rotateXAxisTicks" [maxXAxisTickLength]="config.maxXAxisTickLength"
-                    [maxYAxisTickLength]="config.maxYAxisTickLength" [wrapTicks]="config.wrapTicks"
-                    [autoScale]="config.autoScale" [timeline]="config.timeline" [gradient]="config.gradient"
-                    [animations]="config.animations" [rangeFillOpacity]="config.rangeFillOpacity"
-                    [tooltipDisabled]="config.tooltipDisabled" [curve]="getCurve()" (select)="onChartSelect($event)"
-                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
-                </ngx-charts-line-chart>
-            </ng-template>
+        <div class="chart-section">
+            <div echarts [options]="chartOption" [autoResize]="true"
+                class="echart-container"
+                [style.width.px]="chartWidth ? chartWidth - 20 : null"
+                [style.height.px]="chartHeight ? chartHeight - 45 : null"
+                (chartInit)="onChartInit($event)"
+                (chartClick)="onChartSelect($event)"
+                (chartMouseOver)="onChartMouseOver($event)"
+                (chartMouseOut)="onChartMouseOut($event)">
+            </div>
         </div>
     </div>
 </div>

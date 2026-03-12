@@ -8,21 +8,8 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import {
-  COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
-  createColorScheme,
-  getLegendPositionEnum,
-} from '../../helpers/chart-config.helper';
-import {
-  curveLinear,
-  curveMonotoneX,
-  curveStep,
-  curveBasis,
-  curveCardinal,
-} from 'd3-shape';
+import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
+import { buildAreaChartOption } from '../../helpers/echarts-option-builder';
 
 export interface AreaChartSeries {
   name: string;
@@ -73,7 +60,7 @@ export interface AreaChartConfig {
 export class ConfigurableAreaChartComponent
   implements OnInit, OnChanges, DoCheck
 {
-  private previousColorScheme: string = '';
+  private previousConfigSnapshot: string = '';
 
   @Input() data: AreaChartSeries[] = [];
   @Input() showConfigPanel: boolean = true;
@@ -82,11 +69,12 @@ export class ConfigurableAreaChartComponent
   @Input() chartConfig: AreaChartConfig | undefined;
   @Input() chartType: string = 'area'; // 'area', 'area-stacked', 'area-normalized'
 
-  view: [number, number] | undefined;
-
   @Output() onSelect = new EventEmitter<any>();
   @Output() onActivate = new EventEmitter<any>();
   @Output() onDeactivate = new EventEmitter<any>();
+
+  chartOption: any = {};
+  echartsInstance: any = null;
 
   private defaultConfig: AreaChartConfig = {
     legend: false,
@@ -100,7 +88,6 @@ export class ConfigurableAreaChartComponent
     showYAxisLabel: true,
     xAxisLabel: 'X Axis',
     yAxisLabel: 'Y Axis',
-    // Tick formatting defaults
     trimXAxisTicks: true,
     trimYAxisTicks: true,
     rotateXAxisTicks: true,
@@ -120,14 +107,6 @@ export class ConfigurableAreaChartComponent
     return this.chartConfig || this.defaultConfig;
   }
 
-  colorSchemeObj: Color = {
-    name: 'custom',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
-  };
-
-  // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
   curveTypes = [
@@ -139,85 +118,45 @@ export class ConfigurableAreaChartComponent
   ];
 
   ngOnInit(): void {
-    this.updateColorScheme();
-    this.updateViewDimensions();
-    this.previousColorScheme = this.config.colorScheme;
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartWidth'] || changes['chartHeight']) {
-      this.updateViewDimensions();
-    }
-    if (changes['chartConfig']) {
-      this.updateColorScheme();
-      this.previousColorScheme = this.config.colorScheme;
+    if (changes['data'] || changes['chartConfig'] || changes['chartType'] ||
+        changes['chartWidth'] || changes['chartHeight']) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
 
   ngDoCheck(): void {
-    if (this.config && this.config.colorScheme !== this.previousColorScheme) {
-      this.previousColorScheme = this.config.colorScheme;
-      this.updateColorScheme();
-    }
-  }
-
-  private updateViewDimensions(): void {
-    if (this.chartWidth && this.chartHeight) {
-      // Minimal padding - let ngx-charts handle internal layout
-      const padding = 10;
-      let width = this.chartWidth - padding;
-      let height = this.chartHeight - padding;
-
-      // When legend is below and enabled, subtract space for legend
-      if (this.config.legend && this.config.legendPosition === 'below') {
-        const legendHeight = 80; // Space for legend + spacing
-        height = height - legendHeight;
+    if (this.config) {
+      const snapshot = JSON.stringify(this.config);
+      if (snapshot !== this.previousConfigSnapshot) {
+        this.previousConfigSnapshot = snapshot;
+        this.updateChartOption();
       }
-
-      this.view = [Math.max(width, 100), Math.max(height, 100)];
-    } else {
-      this.view = undefined;
     }
   }
 
-  private updateColorScheme(): void {
-    const palette = this.colorPalettes[this.config.colorScheme];
-    this.colorSchemeObj = {
-      name: 'custom',
-      selectable: true,
-      group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['vivid'],
-    };
+  updateChartOption(): void {
+    this.chartOption = buildAreaChartOption(this.data, this.config, this.chartType);
   }
 
-  getCurve(): any {
-    switch (this.config.curveType) {
-      case 'monotoneX':
-        return curveMonotoneX;
-      case 'step':
-        return curveStep;
-      case 'basis':
-        return curveBasis;
-      case 'cardinal':
-        return curveCardinal;
-      default:
-        return curveLinear;
-    }
-  }
-
-  getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below'
-      ? LegendPosition.Below
-      : LegendPosition.Right;
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
   }
 
   onChartSelect(event: any): void {
     this.onSelect.emit(event);
   }
-  onChartActivate(event: any): void {
+
+  onChartMouseOver(event: any): void {
     this.onActivate.emit(event);
   }
-  onChartDeactivate(event: any): void {
+
+  onChartMouseOut(event: any): void {
     this.onDeactivate.emit(event);
   }
 }

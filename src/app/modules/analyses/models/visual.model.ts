@@ -89,6 +89,9 @@ export interface Visual {
 
   /** Chart configuration options */
   config: any;
+
+  /** Whether to use dummy data for testing */
+  useDummyData?: boolean;
 }
 
 /**

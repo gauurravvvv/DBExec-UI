@@ -10,116 +10,16 @@
     <!-- Main Content Area -->
     <div class="chart-wrapper" [class.with-config]="showConfigPanel && !isConfigPanelCollapsed">
         <!-- Chart Section -->
-        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
-            <!-- Bar Vertical -->
-            <ng-container *ngIf="chartType === 'bar-vertical'">
-                <ngx-charts-bar-vertical [results]="data" [view]="view!" [scheme]="colorSchemeObj"
-                    [legend]="config.legend" [legendPosition]="getLegendPosition()" [legendTitle]="config.legendTitle"
-                    [xAxis]="config.xAxis" [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
-                    [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
-                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                    [yAxisLabel]="config.yAxisLabel" [trimXAxisTicks]="config.trimXAxisTicks"
-                    [trimYAxisTicks]="config.trimYAxisTicks" [rotateXAxisTicks]="config.rotateXAxisTicks"
-                    [maxXAxisTickLength]="config.maxXAxisTickLength" [maxYAxisTickLength]="config.maxYAxisTickLength"
-                    [wrapTicks]="config.wrapTicks" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
-                    [animations]="config.animations" [barPadding]="config.barPadding" [roundEdges]="config.roundEdges"
-                    [noBarWhenZero]="config.noBarWhenZero" [tooltipDisabled]="config.tooltipDisabled"
-                    (select)="handleSelect($event)" (activate)="handleActivate($event)"
-                    (deactivate)="handleDeactivate($event)">
-                </ngx-charts-bar-vertical>
-            </ng-container>
-
-            <!-- Bar Horizontal -->
-            <ng-container *ngIf="chartType === 'bar-horizontal'">
-                <ngx-charts-bar-horizontal [results]="data" [view]="view!" [scheme]="colorSchemeObj"
-                    [legend]="config.legend" [legendPosition]="getLegendPosition()" [legendTitle]="config.legendTitle"
-                    [xAxis]="config.xAxis" [yAxis]="config.yAxis" [showGridLines]="config.showGridLines"
-                    [roundDomains]="config.roundDomains" [showXAxisLabel]="config.showXAxisLabel"
-                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                    [yAxisLabel]="config.yAxisLabel" [trimXAxisTicks]="config.trimXAxisTicks"
-                    [trimYAxisTicks]="config.trimYAxisTicks" [rotateXAxisTicks]="config.rotateXAxisTicks"
-                    [maxXAxisTickLength]="config.maxXAxisTickLength" [maxYAxisTickLength]="config.maxYAxisTickLength"
-                    [wrapTicks]="config.wrapTicks" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
-                    [animations]="config.animations" [barPadding]="config.barPadding" [roundEdges]="config.roundEdges"
-                    [noBarWhenZero]="config.noBarWhenZero" [tooltipDisabled]="config.tooltipDisabled"
-                    (select)="handleSelect($event)" (activate)="handleActivate($event)"
-                    (deactivate)="handleDeactivate($event)">
-                </ngx-charts-bar-horizontal>
-            </ng-container>
-
-            <!-- Bar Vertical Grouped (2D) -->
-            <ng-container *ngIf="chartType === 'bar-vertical-2d'">
-                <ngx-charts-bar-vertical-2d [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
-                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
-                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
-                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
-                    [animations]="config.animations" [barPadding]="config.barPadding" [groupPadding]="16"
-                    (select)="handleSelect($event)" (activate)="handleActivate($event)"
-                    (deactivate)="handleDeactivate($event)">
-                </ngx-charts-bar-vertical-2d>
-            </ng-container>
-
-            <!-- Bar Horizontal Grouped (2D) -->
-            <ng-container *ngIf="chartType === 'bar-horizontal-2d'">
-                <ngx-charts-bar-horizontal-2d [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
-                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
-                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
-                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
-                    [animations]="config.animations" [barPadding]="config.barPadding" [groupPadding]="16"
-                    (select)="handleSelect($event)" (activate)="handleActivate($event)"
-                    (deactivate)="handleDeactivate($event)">
-                </ngx-charts-bar-horizontal-2d>
-            </ng-container>
-
-            <!-- Bar Vertical Stacked -->
-            <ng-container *ngIf="chartType === 'bar-vertical-stacked'">
-                <ngx-charts-bar-vertical-stacked [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
-                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
-                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
-                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
-                    [animations]="config.animations" [barPadding]="config.barPadding" (select)="handleSelect($event)"
-                    (activate)="handleActivate($event)" (deactivate)="handleDeactivate($event)">
-                </ngx-charts-bar-vertical-stacked>
-            </ng-container>
-
-            <!-- Bar Horizontal Stacked -->
-            <ng-container *ngIf="chartType === 'bar-horizontal-stacked'">
-                <ngx-charts-bar-horizontal-stacked [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
-                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
-                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
-                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                    [yAxisLabel]="config.yAxisLabel" [showDataLabel]="config.showDataLabel" [gradient]="config.gradient"
-                    [animations]="config.animations" [barPadding]="config.barPadding" (select)="handleSelect($event)"
-                    (activate)="handleActivate($event)" (deactivate)="handleDeactivate($event)">
-                </ngx-charts-bar-horizontal-stacked>
-            </ng-container>
-
-            <!-- Bar Vertical Normalized -->
-            <ng-container *ngIf="chartType === 'bar-vertical-normalized'">
-                <ngx-charts-bar-vertical-normalized [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
-                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
-                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
-                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                    [yAxisLabel]="config.yAxisLabel" [gradient]="config.gradient" [animations]="config.animations"
-                    [barPadding]="config.barPadding" (select)="handleSelect($event)" (activate)="handleActivate($event)"
-                    (deactivate)="handleDeactivate($event)">
-                </ngx-charts-bar-vertical-normalized>
-            </ng-container>
-
-            <!-- Bar Horizontal Normalized -->
-            <ng-container *ngIf="chartType === 'bar-horizontal-normalized'">
-                <ngx-charts-bar-horizontal-normalized [results]="multiData" [view]="view!" [scheme]="colorSchemeObj"
-                    [legend]="config.legend" [xAxis]="config.xAxis" [yAxis]="config.yAxis"
-                    [showGridLines]="config.showGridLines" [showXAxisLabel]="config.showXAxisLabel"
-                    [showYAxisLabel]="config.showYAxisLabel" [xAxisLabel]="config.xAxisLabel"
-                    [yAxisLabel]="config.yAxisLabel" [gradient]="config.gradient" [animations]="config.animations"
-                    [barPadding]="config.barPadding" (select)="handleSelect($event)" (activate)="handleActivate($event)"
-                    (deactivate)="handleDeactivate($event)">
-                </ngx-charts-bar-horizontal-normalized>
-            </ng-container>
+        <div class="chart-section">
+            <div echarts [options]="chartOption" [autoResize]="true"
+                class="echart-container"
+                [style.width.px]="chartWidth ? chartWidth - 20 : null"
+                [style.height.px]="chartHeight ? chartHeight - 45 : null"
+                (chartInit)="onChartInit($event)"
+                (chartClick)="handleSelect($event)"
+                (chartMouseOver)="handleActivate($event)"
+                (chartMouseOut)="handleDeactivate($event)">
+            </div>
         </div>
 
         <!-- Configuration Panel -->

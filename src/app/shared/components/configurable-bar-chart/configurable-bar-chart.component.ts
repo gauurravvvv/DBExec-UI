@@ -8,16 +8,13 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
 import {
   COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
   DUMMY_MULTI_SERIES,
   DEFAULT_BAR_CHART_CONFIG,
   BarChartConfig,
-  createColorScheme,
-  getLegendPositionEnum,
 } from '../../helpers/chart-config.helper';
+import { buildBarChartOption } from '../../helpers/echarts-option-builder';
 
 export interface BarChartData {
   name: string;
@@ -34,10 +31,9 @@ export interface BarChartData {
 export class ConfigurableBarChartComponent
   implements OnInit, OnChanges, DoCheck
 {
-  // Track previous color scheme to detect changes
-  private previousColorScheme: string = '';
-  private previousLegendPosition: string = 'right';
-  private previousLegendEnabled: boolean = false;
+  // Track previous config snapshot to detect any property change
+  private previousConfigSnapshot: string = '';
+
   // Data input
   @Input() data: BarChartData[] = [];
 
@@ -51,16 +47,17 @@ export class ConfigurableBarChartComponent
   // External config input (from parent component)
   @Input() chartConfig: BarChartConfig | undefined;
 
-  // Chart type variant (bar-vertical, bar-horizontal, bar-vertical-2d, etc.)
+  // Chart type variant
   @Input() chartType: string = 'bar-vertical';
-
-  // View dimensions for ngx-charts [width, height]
-  view: [number, number] | undefined;
 
   // Output events
   @Output() onSelect = new EventEmitter<any>();
   @Output() onActivate = new EventEmitter<any>();
   @Output() onDeactivate = new EventEmitter<any>();
+
+  // ECharts
+  chartOption: any = {};
+  echartsInstance: any = null;
 
   // Internal configuration state (uses imported default from helper)
   private defaultConfig: BarChartConfig = { ...DEFAULT_BAR_CHART_CONFIG };
@@ -72,14 +69,6 @@ export class ConfigurableBarChartComponent
 
   // Configuration panel collapsed state
   isConfigPanelCollapsed: boolean = false;
-
-  // Color scheme object for ngx-charts
-  colorSchemeObj: Color = {
-    name: 'custom',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: [],
-  };
 
   // Available color schemes
   colorSchemes = [
@@ -100,71 +89,38 @@ export class ConfigurableBarChartComponent
     { label: 'Night Lights', value: 'nightLights' },
   ];
 
-  // Color scheme palettes (using imported constants)
-  private colorPalettes = COLOR_PALETTES;
-
   // Multi-series data for grouped/stacked/normalized charts
   multiData = DUMMY_MULTI_SERIES;
 
   ngOnInit(): void {
-    this.updateColorScheme();
-    this.updateViewDimensions();
-    this.previousColorScheme = this.config.colorScheme;
-    this.previousLegendPosition = this.config.legendPosition;
-    this.previousLegendEnabled = this.config.legend;
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartWidth'] || changes['chartHeight']) {
-      this.updateViewDimensions();
-    }
-    if (changes['chartConfig']) {
-      this.updateColorScheme();
-      this.updateViewDimensions(); // Recalculate for legend changes
-      this.previousColorScheme = this.config.colorScheme;
-      this.previousLegendPosition = this.config.legendPosition;
-      this.previousLegendEnabled = this.config.legend;
+    if (changes['data'] || changes['chartConfig'] || changes['chartType'] ||
+        changes['chartWidth'] || changes['chartHeight']) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
 
   ngDoCheck(): void {
-    // Detect changes to colorScheme within the config object
-    if (this.config && this.config.colorScheme !== this.previousColorScheme) {
-      this.previousColorScheme = this.config.colorScheme;
-      this.updateColorScheme();
-    }
-    // Detect changes to legend settings
-    if (
-      this.config &&
-      (this.config.legendPosition !== this.previousLegendPosition ||
-        this.config.legend !== this.previousLegendEnabled)
-    ) {
-      this.previousLegendPosition = this.config.legendPosition;
-      this.previousLegendEnabled = this.config.legend;
-      this.updateViewDimensions();
+    if (this.config) {
+      const snapshot = JSON.stringify(this.config);
+      if (snapshot !== this.previousConfigSnapshot) {
+        this.previousConfigSnapshot = snapshot;
+        this.updateChartOption();
+      }
     }
   }
 
-  private updateViewDimensions(): void {
-    if (this.chartWidth && this.chartHeight) {
-      // Minimal padding - let ngx-charts handle internal layout
-      const padding = 10;
-      let width = this.chartWidth - padding;
-      let height = this.chartHeight - padding;
+  updateChartOption(): void {
+    this.chartOption = buildBarChartOption(this.data, this.config, this.chartType, this.multiData);
+  }
 
-      // When legend is below and enabled, subtract space for legend
-      // This makes ngx-charts render a smaller chart, leaving room for the legend
-      if (this.config.legend && this.config.legendPosition === 'below') {
-        const legendHeight = 80; // Space for legend + spacing
-        height = height - legendHeight;
-      }
-
-      // Ensure minimum dimensions
-      this.view = [Math.max(width, 100), Math.max(height, 100)];
-    } else {
-      // Let ngx-charts auto-size
-      this.view = undefined;
-    }
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
   }
 
   toggleConfigPanel(): void {
@@ -172,17 +128,7 @@ export class ConfigurableBarChartComponent
   }
 
   onColorSchemeChange(): void {
-    this.updateColorScheme();
-  }
-
-  private updateColorScheme(): void {
-    const palette = this.colorPalettes[this.config.colorScheme];
-    this.colorSchemeObj = {
-      name: 'custom',
-      selectable: true,
-      group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['vivid'],
-    };
+    this.updateChartOption();
   }
 
   handleSelect(event: any): void {
@@ -195,9 +141,5 @@ export class ConfigurableBarChartComponent
 
   handleDeactivate(event: any): void {
     this.onDeactivate.emit(event);
-  }
-
-  getLegendPosition(): LegendPosition {
-    return getLegendPositionEnum(this.config.legendPosition);
   }
 }

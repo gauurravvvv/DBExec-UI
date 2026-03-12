@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { SCREEN } from 'src/app/constants/api';
+import { SCREEN, TAB, SECTION } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -97,6 +97,44 @@ export class ScreenService {
   getScreenConfiguration(orgId: string, id: string) {
     return this.http
       .get(SCREEN.GET_SCREEN_CONFIGURATION + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  getScreenTabs(orgId: string, screenId: string) {
+    return this.http
+      .get(SCREEN.GET_TABS + `${orgId}/${screenId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  getTabSections(orgId: string, screenId: string, tabId: string) {
+    return this.http
+      .get(TAB.GET_SECTIONS + `${orgId}/${screenId}/${tabId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  getSectionPrompts(
+    orgId: string,
+    screenId: string,
+    tabId: string,
+    sectionId: string
+  ) {
+    return this.http
+      .get(
+        SECTION.GET_PROMPTS +
+          `${orgId}/${screenId}/${tabId}/${sectionId}`
+      )
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

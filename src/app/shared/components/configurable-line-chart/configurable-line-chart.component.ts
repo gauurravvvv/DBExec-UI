@@ -8,21 +8,8 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import {
-  COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
-  createColorScheme,
-  getLegendPositionEnum,
-} from '../../helpers/chart-config.helper';
-import {
-  curveLinear,
-  curveMonotoneX,
-  curveStep,
-  curveBasis,
-  curveCardinal,
-} from 'd3-shape';
+import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
+import { buildLineChartOption } from '../../helpers/echarts-option-builder';
 
 export interface LineChartSeries {
   name: string;
@@ -76,33 +63,22 @@ export interface LineChartConfig {
 export class ConfigurableLineChartComponent
   implements OnInit, OnChanges, DoCheck
 {
-  // Track previous color scheme to detect changes
-  private previousColorScheme: string = '';
-  private previousLegendPosition: string = 'right';
-  private previousLegendEnabled: boolean = false;
+  private previousConfigSnapshot: string = '';
 
-  // Data input
   @Input() data: LineChartSeries[] = [];
-
-  // Whether to show the configuration panel
   @Input() showConfigPanel: boolean = true;
-
-  // Dynamic sizing inputs
   @Input() chartWidth: number | undefined;
   @Input() chartHeight: number | undefined;
-
-  // External config input (from parent component)
   @Input() chartConfig: LineChartConfig | undefined;
+  @Input() chartType: string = 'line';
 
-  // View dimensions for ngx-charts [width, height]
-  view: [number, number] | undefined;
-
-  // Output events
   @Output() onSelect = new EventEmitter<any>();
   @Output() onActivate = new EventEmitter<any>();
   @Output() onDeactivate = new EventEmitter<any>();
 
-  // Internal configuration state (used when chartConfig not provided)
+  chartOption: any = {};
+  echartsInstance: any = null;
+
   private defaultConfig: LineChartConfig = {
     legend: false,
     legendPosition: 'right',
@@ -115,7 +91,6 @@ export class ConfigurableLineChartComponent
     showYAxisLabel: true,
     xAxisLabel: 'X Axis',
     yAxisLabel: 'Y Axis',
-    // Axis tick formatting
     trimXAxisTicks: true,
     trimYAxisTicks: true,
     rotateXAxisTicks: true,
@@ -133,23 +108,12 @@ export class ConfigurableLineChartComponent
     colorScheme: 'vivid',
   };
 
-  // Active config - use input if provided, else use default
   get config(): LineChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
 
-  // Color scheme object for ngx-charts
-  colorSchemeObj: Color = {
-    name: 'custom',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
-  };
-
-  // Available color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
-  // Curve types
   curveTypes = [
     { label: 'Linear', value: 'linear' },
     { label: 'Smooth', value: 'monotoneX' },
@@ -158,109 +122,50 @@ export class ConfigurableLineChartComponent
     { label: 'Cardinal', value: 'cardinal' },
   ];
 
-  // Legend positions
   legendPositions = [
     { label: 'Right', value: 'right' },
     { label: 'Below', value: 'below' },
   ];
 
   ngOnInit(): void {
-    this.updateColorScheme();
-    this.updateViewDimensions();
-    this.previousColorScheme = this.config.colorScheme;
-    this.previousLegendPosition = this.config.legendPosition;
-    this.previousLegendEnabled = this.config.legend;
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartWidth'] || changes['chartHeight']) {
-      this.updateViewDimensions();
-    }
-    if (changes['chartConfig']) {
-      this.updateColorScheme();
-      this.updateViewDimensions();
-      this.previousColorScheme = this.config.colorScheme;
-      this.previousLegendPosition = this.config.legendPosition;
-      this.previousLegendEnabled = this.config.legend;
+    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
 
   ngDoCheck(): void {
-    if (this.config && this.config.colorScheme !== this.previousColorScheme) {
-      this.previousColorScheme = this.config.colorScheme;
-      this.updateColorScheme();
-    }
-    if (
-      this.config &&
-      (this.config.legendPosition !== this.previousLegendPosition ||
-        this.config.legend !== this.previousLegendEnabled)
-    ) {
-      this.previousLegendPosition = this.config.legendPosition;
-      this.previousLegendEnabled = this.config.legend;
-      this.updateViewDimensions();
-    }
-  }
-
-  private updateViewDimensions(): void {
-    if (this.chartWidth && this.chartHeight) {
-      // Minimal padding - let ngx-charts handle internal layout
-      const padding = 10;
-      let width = this.chartWidth - padding;
-      let height = this.chartHeight - padding;
-
-      // When legend is below and enabled, subtract space for legend
-      // This makes ngx-charts render a smaller chart, leaving room for the legend
-      if (this.config.legend && this.config.legendPosition === 'below') {
-        const legendHeight = 80; // Space for legend + spacing
-        height = height - legendHeight;
+    if (this.config) {
+      const snapshot = JSON.stringify(this.config);
+      if (snapshot !== this.previousConfigSnapshot) {
+        this.previousConfigSnapshot = snapshot;
+        this.updateChartOption();
       }
-
-      this.view = [Math.max(width, 100), Math.max(height, 100)];
-    } else {
-      this.view = undefined;
     }
   }
 
-  private updateColorScheme(): void {
-    const palette = this.colorPalettes[this.config.colorScheme];
-    this.colorSchemeObj = {
-      name: 'custom',
-      selectable: true,
-      group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['vivid'],
-    };
+  updateChartOption(): void {
+    this.chartOption = buildLineChartOption(this.data, this.config, this.chartType);
   }
 
-  getCurve(): any {
-    switch (this.config.curveType) {
-      case 'monotoneX':
-        return curveMonotoneX;
-      case 'step':
-        return curveStep;
-      case 'basis':
-        return curveBasis;
-      case 'cardinal':
-        return curveCardinal;
-      default:
-        return curveLinear;
-    }
-  }
-
-  getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below'
-      ? LegendPosition.Below
-      : LegendPosition.Right;
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
   }
 
   onChartSelect(event: any): void {
     this.onSelect.emit(event);
   }
 
-  onChartActivate(event: any): void {
+  onChartMouseOver(event: any): void {
     this.onActivate.emit(event);
   }
 
-  onChartDeactivate(event: any): void {
+  onChartMouseOut(event: any): void {
     this.onDeactivate.emit(event);
   }
 }

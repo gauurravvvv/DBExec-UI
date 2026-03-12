@@ -112,6 +112,7 @@ export const TAB = {
   VIEW: '/tab/get/',
   UPDATE: '/tab/update',
   GET_ALL: '/tab/listAll',
+  GET_SECTIONS: '/tab/getSections/',
 };
 
 export const SECTION = {
@@ -120,6 +121,7 @@ export const SECTION = {
   DELETE: '/section/delete/',
   VIEW: '/section/get/',
   UPDATE: '/section/update',
+  GET_PROMPTS: '/section/getPrompts/',
 };
 
 export const PROMPT = {
@@ -144,6 +146,7 @@ export const SCREEN = {
   UPDATE: '/screen/update',
   SAVE_CONFIGURATION: '/screen/config',
   GET_SCREEN_CONFIGURATION: '/screen/getConfig/',
+  GET_TABS: '/screen/getTabs/',
 };
 
 export const QUERY = {

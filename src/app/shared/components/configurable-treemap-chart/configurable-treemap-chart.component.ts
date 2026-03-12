@@ -8,14 +8,8 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType } from '@swimlane/ngx-charts';
-import {
-  COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
-  createColorScheme,
-  getLegendPositionEnum,
-} from '../../helpers/chart-config.helper';
+import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
+import { buildTreeMapChartOption } from '../../helpers/echarts-option-builder';
 
 export interface TreeMapData {
   name: string;
@@ -40,7 +34,7 @@ export interface TreeMapConfig {
 export class ConfigurableTreemapChartComponent
   implements OnInit, OnChanges, DoCheck
 {
-  private previousColorScheme: string = '';
+  private previousConfigSnapshot: string = '';
 
   @Input() data: TreeMapData[] = [];
   @Input() showConfigPanel: boolean = true;
@@ -48,9 +42,10 @@ export class ConfigurableTreemapChartComponent
   @Input() chartHeight: number | undefined;
   @Input() chartConfig: TreeMapConfig | undefined;
 
-  view: [number, number] | undefined;
-
   @Output() onSelect = new EventEmitter<any>();
+
+  chartOption: any = {};
+  echartsInstance: any = null;
 
   private defaultConfig: TreeMapConfig = {
     gradient: false,
@@ -63,58 +58,37 @@ export class ConfigurableTreemapChartComponent
     return this.chartConfig || this.defaultConfig;
   }
 
-  colorSchemeObj: Color = {
-    name: 'custom',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
-  };
-
   // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
-    this.updateColorScheme();
-    this.updateViewDimensions();
-    this.previousColorScheme = this.config.colorScheme;
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartWidth'] || changes['chartHeight']) {
-      this.updateViewDimensions();
-    }
-    if (changes['chartConfig']) {
-      this.updateColorScheme();
-      this.previousColorScheme = this.config.colorScheme;
+    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
 
   ngDoCheck(): void {
-    if (this.config && this.config.colorScheme !== this.previousColorScheme) {
-      this.previousColorScheme = this.config.colorScheme;
-      this.updateColorScheme();
+    if (this.config) {
+      const snapshot = JSON.stringify(this.config);
+      if (snapshot !== this.previousConfigSnapshot) {
+        this.previousConfigSnapshot = snapshot;
+        this.updateChartOption();
+      }
     }
   }
 
-  private updateViewDimensions(): void {
-    if (this.chartWidth && this.chartHeight) {
-      const padding = 20;
-      const width = this.chartWidth - padding;
-      const height = this.chartHeight - padding;
-      this.view = [Math.max(width, 100), Math.max(height, 100)];
-    } else {
-      this.view = undefined;
-    }
+  updateChartOption(): void {
+    this.chartOption = buildTreeMapChartOption(this.data, this.config);
   }
 
-  private updateColorScheme(): void {
-    const palette = this.colorPalettes[this.config.colorScheme];
-    this.colorSchemeObj = {
-      name: 'custom',
-      selectable: true,
-      group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['vivid'],
-    };
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
   }
 
   onChartSelect(event: any): void {

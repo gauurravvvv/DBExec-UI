@@ -37,8 +37,24 @@ export function createPromptFormControl(prompt: ExecutePrompt): FormControl {
       break;
   }
 
-  const defaultValue = getDefaultValue(prompt.type);
+  const defaultValue = getDefaultValueFromConfig(prompt) ?? getDefaultValue(prompt.type);
   return new FormControl(defaultValue, validators);
+}
+
+/**
+ * Get default value from appearance config if available
+ */
+function getDefaultValueFromConfig(prompt: ExecutePrompt): any {
+  const appearance = prompt.config?.appearance;
+  if (!appearance) return null;
+
+  if (prompt.type === 'rangeslider') {
+    const min = appearance.defaultMin ?? appearance.min ?? 0;
+    const max = appearance.defaultMax ?? appearance.max ?? 100;
+    return [min, max];
+  }
+
+  return appearance.defaultValue ?? null;
 }
 
 /**

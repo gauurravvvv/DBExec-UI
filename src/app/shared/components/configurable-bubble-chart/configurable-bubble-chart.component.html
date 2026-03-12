@@ -1,15 +1,15 @@
 <div class="bubble-chart-container">
     <div class="chart-wrapper">
-        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
-            <ngx-charts-bubble-chart [results]="data" [view]="view!" [scheme]="colorSchemeObj" [xAxis]="config.xAxis"
-                [yAxis]="config.yAxis" [showXAxisLabel]="config.showXAxisLabel" [showYAxisLabel]="config.showYAxisLabel"
-                [xAxisLabel]="config.xAxisLabel" [yAxisLabel]="config.yAxisLabel" [legend]="config.legend"
-                [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()"
-                [showGridLines]="config.showGridLines" [autoScale]="config.autoScale" [minRadius]="config.minRadius"
-                [maxRadius]="config.maxRadius" [tooltipDisabled]="config.tooltipDisabled"
-                (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
-                (deactivate)="onChartDeactivate($event)">
-            </ngx-charts-bubble-chart>
+        <div class="chart-section">
+            <div echarts [options]="chartOption" [autoResize]="true"
+                class="echart-container"
+                [style.width.px]="chartWidth ? chartWidth - 20 : null"
+                [style.height.px]="chartHeight ? chartHeight - 45 : null"
+                (chartInit)="onChartInit($event)"
+                (chartClick)="onChartSelect($event)"
+                (chartMouseOver)="onChartMouseOver($event)"
+                (chartMouseOut)="onChartMouseOut($event)">
+            </div>
         </div>
     </div>
 </div>

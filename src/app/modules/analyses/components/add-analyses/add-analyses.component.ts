@@ -18,18 +18,69 @@ import { DatasetService } from '../../../dataset/services/dataset.service';
 import {
   CHART_TYPES,
   COLOR_SCHEMES,
-  CURVE_TYPES,
   LEGEND_POSITIONS,
+  LEGEND_TYPES,
+  LABEL_POSITIONS,
+  TOOLTIP_TRIGGERS,
+  AXIS_POINTER_TYPES,
+  GRID_LINE_STYLES,
+  EMPHASIS_MODES,
+  ANIMATION_EASINGS,
+  LINE_STEP_OPTIONS,
+  LINE_STYLE_TYPES,
+  SYMBOL_SHAPES,
+  PIE_LABEL_POSITIONS,
+  PIE_SELECTED_MODES,
+  PIE_ROSE_TYPES,
+  FUNNEL_SORT_OPTIONS,
+  FUNNEL_ALIGN_OPTIONS,
+  RADAR_SHAPES,
+  GRAPH_LAYOUTS,
+  TREE_ORIENTATIONS,
+  TREE_LAYOUTS,
+  SANKEY_ORIENTATIONS,
+  PICTORIAL_SYMBOLS,
   getDefaultChartConfig,
+  getDummyData,
   hasAxisLabels,
+  is3DCoordinateChartType,
   isAreaChartType,
   isBarChartType,
+  isBubbleChartType,
+  isBoxChartType,
   isCardChartType,
   isGaugeChartType,
   isHeatMapChartType,
   isPieChartType,
+  isPolarChartType,
   isTreeMapChartType,
+  isLineChartType,
+  isScatterChartType,
+  isFunnelChartType,
+  isSankeyChartType,
+  isSunburstChartType,
+  isWaterfallChartType,
+  isGraphChartType,
+  isTreeChartType,
+  isThemeRiverChartType,
+  isPictorialBarChartType,
+  isPolarBarChartType,
+  isRadarChartType,
+  isCandlestickChartType,
+  isParallelChartType,
+  isBar3dChartType,
+  isLine3dChartType,
+  isScatter3dChartType,
+  isSurfaceChartType,
+  isGlobeChartType,
+  isGraphGlChartType,
+  isScatterGlChartType,
+  isLinesGlChartType,
+  isMap3dChartType,
+  isFlowGlChartType,
   supportsGradient,
+  supportsDataZoom,
+  supportsDataLabel,
 } from '../../constants/charts.constants';
 import { Visual, createVisual } from '../../models';
 import { AnalysesService } from '../../service/analyses.service';
@@ -114,17 +165,33 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   isConfigSidebarOpen: boolean = false; // Right-click opens config sidebar
   showSaveDialog: boolean = false; // Show save analysis dialog
 
-  // Available chart types from ngx-charts
+  // Available chart types
   chartTypes = CHART_TYPES;
 
-  // Color schemes for chart configuration
+  // ECharts dropdown options
   colorSchemes = COLOR_SCHEMES;
-
-  // Curve types for line charts
-  curveTypes = CURVE_TYPES;
-
-  // Legend positions
   legendPositions = LEGEND_POSITIONS;
+  legendTypes = LEGEND_TYPES;
+  labelPositions = LABEL_POSITIONS;
+  tooltipTriggers = TOOLTIP_TRIGGERS;
+  axisPointerTypes = AXIS_POINTER_TYPES;
+  gridLineStyles = GRID_LINE_STYLES;
+  emphasisModes = EMPHASIS_MODES;
+  animationEasings = ANIMATION_EASINGS;
+  lineStepOptions = LINE_STEP_OPTIONS;
+  lineStyleTypes = LINE_STYLE_TYPES;
+  symbolShapes = SYMBOL_SHAPES;
+  pieLabelPositions = PIE_LABEL_POSITIONS;
+  pieSelectedModes = PIE_SELECTED_MODES;
+  pieRoseTypes = PIE_ROSE_TYPES;
+  funnelSortOptions = FUNNEL_SORT_OPTIONS;
+  funnelAlignOptions = FUNNEL_ALIGN_OPTIONS;
+  radarShapes = RADAR_SHAPES;
+  graphLayouts = GRAPH_LAYOUTS;
+  treeOrientations = TREE_ORIENTATIONS;
+  treeLayouts = TREE_LAYOUTS;
+  sankeyOrientations = SANKEY_ORIENTATIONS;
+  pictorialSymbols = PICTORIAL_SYMBOLS;
 
   // Dragging
   draggingVisual: any = null;
@@ -679,7 +746,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Check if a chart type supports legend
    * Advanced pie and pie grid have built-in displays and don't use legend property
-   * Tree map doesn't support legend in ngx-charts
+   * Tree map doesn't support legend
    */
   supportsLegend(chartType: string | null): boolean {
     if (!chartType) return false;
@@ -688,35 +755,169 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       'pie-grid',
       'tree-map',
       'number-card',
+      'sankey',
+      'sunburst',
+      'waterfall',
+      'graph',
+      'tree',
+      'theme-river',
     ];
     return !noLegendTypes.includes(chartType);
   }
 
   isBubbleChartType(chartType: string | null): boolean {
-    return chartType === 'bubble';
+    return isBubbleChartType(chartType);
   }
 
   isBoxChartType(chartType: string | null): boolean {
-    return chartType === 'box-chart';
+    return isBoxChartType(chartType);
+  }
+
+  isPolarChartType(chartType: string | null): boolean {
+    return isPolarChartType(chartType);
+  }
+
+  isScatterChartType(chartType: string | null): boolean {
+    return isScatterChartType(chartType);
+  }
+
+  isFunnelChartType(chartType: string | null): boolean {
+    return isFunnelChartType(chartType);
+  }
+
+  isSankeyChartType(chartType: string | null): boolean {
+    return isSankeyChartType(chartType);
+  }
+
+  isSunburstChartType(chartType: string | null): boolean {
+    return isSunburstChartType(chartType);
+  }
+
+  isWaterfallChartType(chartType: string | null): boolean {
+    return isWaterfallChartType(chartType);
+  }
+
+  isLineChartType(chartType: string | null): boolean {
+    return isLineChartType(chartType);
+  }
+
+  isGraphChartType(chartType: string | null): boolean {
+    return isGraphChartType(chartType);
+  }
+
+  isTreeChartType(chartType: string | null): boolean {
+    return isTreeChartType(chartType);
+  }
+
+  isThemeRiverChartType(chartType: string | null): boolean {
+    return isThemeRiverChartType(chartType);
+  }
+
+  isPictorialBarChartType(chartType: string | null): boolean {
+    return isPictorialBarChartType(chartType);
+  }
+
+  isPolarBarChartType(chartType: string | null): boolean {
+    return isPolarBarChartType(chartType);
+  }
+
+  isRadarChartType(chartType: string | null): boolean {
+    return isRadarChartType(chartType);
+  }
+
+  isCandlestickChartType(chartType: string | null): boolean {
+    return isCandlestickChartType(chartType);
+  }
+
+  isParallelChartType(chartType: string | null): boolean {
+    return isParallelChartType(chartType);
+  }
+
+  isBar3dChartType(chartType: string | null): boolean {
+    return isBar3dChartType(chartType);
+  }
+
+  isLine3dChartType(chartType: string | null): boolean {
+    return isLine3dChartType(chartType);
+  }
+
+  isScatter3dChartType(chartType: string | null): boolean {
+    return isScatter3dChartType(chartType);
+  }
+
+  isSurfaceChartType(chartType: string | null): boolean {
+    return isSurfaceChartType(chartType);
+  }
+
+  isGlobeChartType(chartType: string | null): boolean {
+    return isGlobeChartType(chartType);
+  }
+
+  isGraphGlChartType(chartType: string | null): boolean {
+    return isGraphGlChartType(chartType);
+  }
+
+  isScatterGlChartType(chartType: string | null): boolean {
+    return isScatterGlChartType(chartType);
+  }
+
+  isLinesGlChartType(chartType: string | null): boolean {
+    return isLinesGlChartType(chartType);
+  }
+
+  isMap3dChartType(chartType: string | null): boolean {
+    return isMap3dChartType(chartType);
+  }
+
+  isFlowGlChartType(chartType: string | null): boolean {
+    return isFlowGlChartType(chartType);
+  }
+
+  supportsDataZoom(chartType: string | null): boolean {
+    return supportsDataZoom(chartType);
+  }
+
+  supportsDataLabel(chartType: string | null): boolean {
+    return supportsDataLabel(chartType);
   }
 
   /**
-   * Check if a visual has all required fields mapped for its chart type
-   * For heat maps: requires x, y, and z axis columns
-   * For other charts: requires x and y axis columns
+   * Check if a visual has all required fields mapped for its chart type.
+   * No-axis charts (pie, gauge, card, funnel, sunburst, tree, etc.) only need dummy data or single column.
+   * Heat map / sankey / graph require x, y, and z axis columns.
+   * Standard axis charts require x and y axis columns.
    */
   hasRequiredChartFields(visual: Visual): boolean {
     if (!visual.chartType) return false;
 
-    if (this.isHeatMapChartType(visual.chartType)) {
+    // Charts using dummy data bypass field requirements
+    if (visual.useDummyData) return true;
+
+    // 3D coordinate charts need x + y + z
+    if (is3DCoordinateChartType(visual.chartType)) {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
     }
 
+    // No-axis charts only need at least one field mapped (or none for some)
+    if (!hasAxisLabels(visual.chartType)) {
+      return !!(visual.xAxisColumn || visual.yAxisColumn);
+    }
+
+    // 3-axis charts: heat-map, sankey, graph need x + y + z
+    if (this.isHeatMapChartType(visual.chartType) || this.isSankeyChartType(visual.chartType) || this.isGraphChartType(visual.chartType)) {
+      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
+    }
+
+    // Standard axis charts need x + y
     return !!(visual.xAxisColumn && visual.yAxisColumn);
   }
 
   hasAxisLabels(chartType: string | null): boolean {
     return hasAxisLabels(chartType);
+  }
+
+  is3DCoordinateChartType(chartType: string | null): boolean {
+    return is3DCoordinateChartType(chartType);
   }
 
   supportsGradient(chartType: string | null): boolean {
@@ -739,13 +940,30 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  toggleDummyData(visual: Visual): void {
+    if (visual.useDummyData) {
+      visual.chartData = getDummyData(visual.chartType || '');
+    } else {
+      // Restore real data if axes are mapped, otherwise clear
+      if (visual.xAxisColumn && visual.yAxisColumn) {
+        this.updateVisualChartData(visual);
+      } else {
+        visual.chartData = [];
+      }
+    }
+  }
+
   setVisualChartType(chartType: any): void {
     const visual = this.getFocusedVisual();
     if (visual) {
       visual.chartType = chartType.id;
       visual.title = chartType.name;
       // Recompute chart data for new chart type (different types need different formats)
-      this.updateVisualChartData(visual);
+      if (visual.useDummyData) {
+        visual.chartData = getDummyData(chartType.id);
+      } else {
+        this.updateVisualChartData(visual);
+      }
     }
   }
 

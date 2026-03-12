@@ -1,11 +1,24 @@
 <div class="card-chart-container">
     <div class="chart-wrapper">
-        <div class="chart-section">
-            <ngx-charts-number-card [results]="data" [view]="view!" [scheme]="colorSchemeObj"
-                [cardColor]="config.cardColor" [bandColor]="config.bandColor" [textColor]="config.textColor"
-                [emptyColor]="config.emptyColor" [innerPadding]="config.innerPadding" [animations]="config.animations"
-                (select)="onChartSelect($event)">
-            </ngx-charts-number-card>
+        <div class="card-grid" [style.gap.px]="config.innerPadding">
+            <div *ngFor="let item of data; let i = index"
+                class="card-item"
+                [class.animated]="config.animations"
+                [style.background-color]="getCardColor(i)"
+                (click)="onCardSelect(item)">
+                <div class="card-band" [style.background-color]="getBandColor(i)"></div>
+                <div class="card-content">
+                    <div class="card-value" [style.color]="getTextColor()">
+                        {{ formatValue(item.value) }}
+                    </div>
+                    <div class="card-label" [style.color]="getTextColor()">
+                        {{ item.name }}
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="data.length === 0" class="card-empty">
+                No data available
+            </div>
         </div>
     </div>
 </div>

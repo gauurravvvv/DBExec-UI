@@ -56,6 +56,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   staticSchemaData: any[] = [];
   separator: string = ','; // Use comma as separator
   editingChipIndex: number = -1;
+  editingChipValue: string | null = null;
   @ViewChild('chipInput') chipInput!: ElementRef;
   configData: any = null;
   columnNameControl = new FormControl('');
@@ -65,6 +66,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   tableColumns: { [key: string]: any[] } = {};
   isLoadingSchema = false;
   availableColumns: any[] = [];
+  cachedAvailableTables: any[] = [];
+  sqlPreview: string = '';
 
   // Enhanced autocomplete properties (WHERE)
   maxSuggestions = 50;
@@ -153,6 +156,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         if (this.isCancelClicked) {
           this.isCancelClicked = false;
         }
+        this.sqlPreview = this.generateSqlPreview();
       });
   }
 
@@ -205,6 +209,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
           // Load tables for the new schema
           this.loadTablesForSchema(schema.name);
+          this.cachedAvailableTables = this.tables[schema.name] || [];
         }
       });
 
@@ -541,6 +546,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
           // Mark form as pristine since we just loaded saved data
           this.promptForm.markAsPristine();
+          this.sqlPreview = this.generateSqlPreview();
         }
       }
     });
@@ -648,6 +654,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     } else {
       this.tables[schemaName] = [];
     }
+    this.cachedAvailableTables = this.tables[schemaName] || [];
   }
 
   getAvailableTables(schema: any): any[] {
@@ -671,6 +678,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     const item = event.value;
     const values = this.promptForm.get('promptValues')?.value || [];
     this.editingChipIndex = values.indexOf(item);
+    this.editingChipValue = item;
     setTimeout(() => {
       if (this.chipInput) {
         this.chipInput.nativeElement.focus();
@@ -689,11 +697,13 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         event.target.style.width = `${newValue.length}ch`;
       }
       this.editingChipIndex = -1;
+      this.editingChipValue = null;
     }
   }
 
   cancelEdit(): void {
     this.editingChipIndex = -1;
+    this.editingChipValue = null;
   }
 
   /**

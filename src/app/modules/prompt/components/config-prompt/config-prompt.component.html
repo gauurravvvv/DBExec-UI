@@ -18,14 +18,14 @@
                     <i class="pi pi-times"></i>
                     Cancel
                 </button>
-                <button class="btn-primary" type="submit" (click)="onSubmit()"
+                <button class="btn-primary" type="button" (click)="onSubmit()"
                     [disabled]="promptForm.invalid || !isFormDirty">
                     <i class="pi pi-save"></i>
                     Save
                 </button>
             </div>
         </div>
-        <form [formGroup]="promptForm" class="admin-form" #formContainer>
+        <form [formGroup]="promptForm" class="admin-form" #formContainer (submit)="$event.preventDefault()">
             <div class="form-container">
                 <div class="form-grid left-column">
                     <div class="form-row full-width">
@@ -97,7 +97,7 @@
                         <div class="form-field">
                             <app-custom-multiselect formControlName="tables" label="Table(s)"
                                 placeholder="Select Tables"
-                                [options]="getAvailableTables(promptForm.get('schema')?.value)" optionLabel="name"
+                                [options]="cachedAvailableTables" optionLabel="name"
                                 optionValue="value" [filter]="true" filterBy="name" display="chip" [required]="true"
                                 [showError]="!!(promptForm.get('tables')?.invalid && promptForm.get('tables')?.touched)"
                                 errorMessage="At least one table is required">
@@ -266,7 +266,7 @@
                                 </button>
                             </div>
                             <div class="sql-preview-container">
-                                <pre class="sql-preview-code"><code>{{ generateSqlPreview() }}</code></pre>
+                                <pre class="sql-preview-code"><code>{{ sqlPreview }}</code></pre>
                             </div>
                         </div>
                     </div>
@@ -314,20 +314,18 @@
                             <p-chips id="promptValues" formControlName="promptValues" [addOnBlur]="true"
                                 [addOnTab]="true" [allowDuplicate]="false" [separator]="separator"
                                 placeholder="Enter values and press Enter or Comma"
-                                (onChipDoubleClick)="onChipDoubleClick($event)"
                                 [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptValues')?.invalid && promptForm.get('promptValues')?.touched}">
                                 <ng-template let-item pTemplate="item">
-                                    <span
-                                        [class.editing]="editingChipIndex === promptForm.get('promptValues')?.value?.indexOf(item)"
+                                    <span [class.editing]="editingChipValue === item"
                                         (dblclick)="onChipDoubleClick({value: item})">
-                                        <span
-                                            *ngIf="editingChipIndex !== promptForm.get('promptValues')?.value?.indexOf(item)">
+                                        <span *ngIf="editingChipValue !== item">
                                             {{item}}
                                         </span>
-                                        <input
-                                            *ngIf="editingChipIndex === promptForm.get('promptValues')?.value?.indexOf(item)"
-                                            #chipInput type="text" [value]="item" (keydown.enter)="updateChip($event)"
-                                            (keydown.escape)="cancelEdit()" (blur)="updateChip($event)">
+                                        <input *ngIf="editingChipValue === item"
+                                            #chipInput type="text" [value]="item"
+                                            (keydown.enter)="updateChip($event)"
+                                            (keydown.escape)="cancelEdit()"
+                                            (blur)="updateChip($event)">
                                     </span>
                                 </ng-template>
                             </p-chips>

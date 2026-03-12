@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ScreenService } from '../../services/screen.service';
+import { PromptService } from '../../../prompt/services/prompt.service';
 import {
   ExecuteTab,
   ExecuteSection,
@@ -14,17 +14,13 @@ import {
   transformTabResponse,
   transformSectionResponse,
   transformPromptResponse,
-  TabApiResponse,
-  SectionApiResponse,
-  PromptApiResponse,
 } from './models/execute-screen.models';
 import {
   createPromptFormControl,
-  markAllAsTouched,
 } from './helpers/form.helper';
 import {
   createPromptSubmission,
-  transformValuesToOptions,
+  getPlaceholder,
 } from './helpers/prompt-renderer.helper';
 
 @Component({
@@ -33,11 +29,11 @@ import {
   styleUrls: ['./execute-screen.component.scss'],
 })
 export class ExecuteScreenComponent implements OnInit, OnDestroy {
-  // Route params
-  orgId: string = '';
-  databaseId: string = '';
-  screenId: string = '';
-  screenName: string = '';
+  // Route params — hardcoded as per requirement
+  orgId = '2';
+  databaseId = '3';
+  screenId = '2';
+  screenName = '';
 
   // Data
   tabs: ExecuteTab[] = [];
@@ -57,22 +53,22 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
   // Cleanup
   private destroy$ = new Subject<void>();
 
-  // Skeleton counts for loading display
-  readonly SKELETON_TAB_COUNT = 3;
-  readonly SKELETON_SECTION_COUNT = 3;
-  readonly SKELETON_PROMPT_COUNT = 4;
+  // Skeleton arrays (cached to avoid recreating in template)
+  readonly skeletonTabs = Array.from({ length: 3 }, (_, i) => i);
+  readonly skeletonSections = Array.from({ length: 3 }, (_, i) => i);
+  readonly skeletonPrompts = Array.from({ length: 4 }, (_, i) => i);
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
     private globalService: GlobalService,
-    private screenService: ScreenService
+    private screenService: ScreenService,
+    private promptService: PromptService
   ) {}
 
   ngOnInit(): void {
     this.initForm();
-    this.loadRouteParams();
+    this.loadTabs();
   }
 
   ngOnDestroy(): void {
@@ -80,226 +76,41 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Initialize empty form group
-   */
   private initForm(): void {
     this.promptForm = this.fb.group({});
   }
 
   /**
-   * Extract route parameters and load tabs
-   */
-  private loadRouteParams(): void {
-    this.orgId = this.route.snapshot.paramMap.get('orgId') || '';
-    this.databaseId = this.route.snapshot.paramMap.get('dbId') || '';
-    this.screenId = this.route.snapshot.paramMap.get('screenId') || '';
-
-    if (this.screenId) {
-      this.loadTabs();
-    } else {
-      this.tabError = 'Invalid screen ID';
-      this.loadingTabs = false;
-    }
-  }
-
-  /**
-   * Load screen tabs from API
+   * Step 1: Load screen tabs from API
    */
   loadTabs(): void {
     this.loadingTabs = true;
     this.tabError = null;
 
-    // TODO: Replace with actual API call
-    // this.screenService.getScreenTabs(this.orgId, this.databaseId, this.screenId)
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({...});
+    this.screenService
+      .getScreenTabs(this.orgId, this.screenId)
+      .then((response: any) => {
+        if (response.status) {
+          this.tabs = (response.data || []).map(transformTabResponse);
+          this.loadingTabs = false;
 
-    // Mock data - Multiple tabs for testing
-    setTimeout(() => {
-      const mockTabs: TabApiResponse[] = [
-        {
-          id: 1,
-          name: 'General Info',
-          description: 'General information tab',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'generalInfoTabControl',
-          sequence: 1,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 1,
-        },
-        {
-          id: 2,
-          name: 'Filters',
-          description: 'Filter options',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'filtersTabControl',
-          sequence: 2,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 2,
-        },
-        {
-          id: 3,
-          name: 'Date Range',
-          description: 'Date range selection',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'dateRangeTabControl',
-          sequence: 3,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 3,
-        },
-        {
-          id: 4,
-          name: 'Advanced Options',
-          description: 'Advanced options',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'advancedTabControl',
-          sequence: 4,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 4,
-        },
-        {
-          id: 5,
-          name: 'Report Settings',
-          description: 'Configure report settings',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'reportSettingsTabControl',
-          sequence: 5,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 5,
-        },
-        {
-          id: 6,
-          name: 'Export Options',
-          description: 'Export configuration',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'exportOptionsTabControl',
-          sequence: 6,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 6,
-        },
-        {
-          id: 7,
-          name: 'Notifications',
-          description: 'Notification settings',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'notificationsTabControl',
-          sequence: 7,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 7,
-        },
-        {
-          id: 8,
-          name: 'Schedule',
-          description: 'Schedule options',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'scheduleTabControl',
-          sequence: 8,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 8,
-        },
-        {
-          id: 9,
-          name: 'Schyguijedule',
-          description: 'Schedule options',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'scheduleTabControl',
-          sequence: 8,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 8,
-        },
-        {
-          id: 10,
-          name: 'Screrrhedule',
-          description: 'Schedule options',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'scheduleTabControl',
-          sequence: 8,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 8,
-        },
-        {
-          id: 11,
-          name: 'Schedasdasdadule',
-          description: 'Schedule options',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'scheduleTabControl',
-          sequence: 8,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 8,
-        },
-        {
-          id: 12,
-          name: 'Schesaddule',
-          description: 'Schedule options',
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          tabControlName: 'scheduleTabControl',
-          sequence: 8,
-          status: 1,
-          createdOn: '2025-12-29T13:26:29.918Z',
-          tabSequence: 8,
-        },
-      ];
-
-      this.tabs = mockTabs.map(transformTabResponse);
-      this.loadingTabs = false;
-
-      // Auto-load sections for first tab
-      if (this.tabs.length > 0) {
-        this.loadSections(this.tabs[0]);
-      }
-    }, 1000);
+          // Auto-load sections for first tab
+          if (this.tabs.length > 0) {
+            this.loadSections(this.tabs[0]);
+          }
+        } else {
+          this.tabError = response.message || 'Failed to load tabs';
+          this.loadingTabs = false;
+        }
+      })
+      .catch(() => {
+        this.tabError = 'Failed to load tabs';
+        this.loadingTabs = false;
+      });
   }
 
   /**
-   * Load sections for a tab
+   * Step 2: Load sections for a tab
    */
   loadSections(tab: ExecuteTab): void {
     if (tab.loaded || tab.loading) return;
@@ -307,150 +118,72 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     tab.loading = true;
     tab.error = null;
 
-    // TODO: Replace with actual API call
-    // this.screenService.getTabSections(this.orgId, tab.id)
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({...});
+    this.screenService
+      .getTabSections(this.orgId, this.screenId, String(tab.id))
+      .then((response: any) => {
+        if (response.status) {
+          tab.sections = (response.data || []).map(transformSectionResponse);
+          tab.loaded = true;
+          tab.loading = false;
 
-    // Mock data - Multiple sections per tab
-    setTimeout(() => {
-      const mockSections: SectionApiResponse[] = [
-        {
-          id: tab.id * 100 + 1,
-          name: 'Basic Information',
-          description: 'Enter basic information',
-          tabId: tab.id,
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          status: 1,
-          sequence: 1,
-          createdOn: '2025-12-29T13:26:47.974Z',
-          sectionControlName: 'basicInfoSection',
-          sectionSequence: 1,
-        },
-        {
-          id: tab.id * 100 + 2,
-          name: 'Additional Details',
-          description: 'Provide additional details',
-          tabId: tab.id,
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          status: 1,
-          sequence: 2,
-          createdOn: '2025-12-29T13:26:47.974Z',
-          sectionControlName: 'additionalDetailsSection',
-          sectionSequence: 2,
-        },
-        {
-          id: tab.id * 100 + 3,
-          name: 'Configuration Options',
-          description: 'Configure options for this section',
-          tabId: tab.id,
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          status: 1,
-          sequence: 3,
-          createdOn: '2025-12-29T13:26:47.974Z',
-          sectionControlName: 'configOptionsSection',
-          sectionSequence: 3,
-        },
-      ];
-
-      tab.sections = mockSections.map(transformSectionResponse);
-      tab.loaded = true;
-      tab.loading = false;
-
-      // Auto-expand first section
-      if (tab.sections.length > 0) {
-        tab.sections[0].expanded = true;
-      }
-    }, 800);
+          // Auto-expand first section and load its prompts
+          if (tab.sections.length > 0) {
+            tab.sections[0].expanded = true;
+            this.loadPrompts(tab.sections[0], tab);
+          }
+        } else {
+          tab.error = response.message || 'Failed to load sections';
+          tab.loading = false;
+        }
+      })
+      .catch(() => {
+        tab.error = 'Failed to load sections';
+        tab.loading = false;
+      });
   }
 
   /**
-   * Load prompts for a section
+   * Step 3: Load prompts for a section
    */
-  loadPrompts(section: ExecuteSection): void {
+  loadPrompts(section: ExecuteSection, tab?: ExecuteTab): void {
     if (section.loaded || section.loading) return;
 
     section.loading = true;
     section.error = null;
 
-    // TODO: Replace with actual API call
-    // this.screenService.getSectionPrompts(this.orgId, section.id)
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({...});
+    // Find parent tab to get tabId
+    const parentTab = tab || this.tabs.find(t => t.sections.includes(section));
+    const tabId = parentTab ? String(parentTab.id) : '';
 
-    // Mock data for now
-    setTimeout(() => {
-      const mockPrompts: PromptApiResponse[] = [
-        {
-          id: 1,
-          name: 'Date Input',
-          description: 'Select a date',
-          sectionId: section.id,
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          status: 1,
-          type: 'date',
-          validation: null,
-          mandatory: 1,
-          isGroup: false,
-          groupId: null,
-          promptControlName: 'dateInputControl',
-          sequence: 1,
-          createdOn: '2025-12-31T07:23:41.605Z',
-          promptSequence: 0,
-          values: [],
-        },
-        {
-          id: 2,
-          name: 'Department',
-          description: 'Select department',
-          sectionId: section.id,
-          organisationId: 2,
-          organisationName: 'OrgOne',
-          databaseId: 3,
-          databaseName: 'FirstDB',
-          status: 1,
-          type: 'dropdown',
-          validation: null,
-          mandatory: 0,
-          isGroup: false,
-          groupId: null,
-          promptControlName: 'departmentControl',
-          sequence: 2,
-          createdOn: '2025-12-31T07:23:41.605Z',
-          promptSequence: 1,
-          values: [
-            { id: 14, promptId: 2, value: 'Engineering' },
-            { id: 15, promptId: 2, value: 'HR' },
-            { id: 16, promptId: 2, value: 'Finance' },
-            { id: 17, promptId: 2, value: 'Marketing' },
-          ],
-        },
-      ];
+    this.screenService
+      .getSectionPrompts(
+        this.orgId,
+        this.screenId,
+        tabId,
+        String(section.id)
+      )
+      .then((response: any) => {
+        if (response.status) {
+          section.prompts = (response.data || []).map(transformPromptResponse);
+          section.loaded = true;
+          section.loading = false;
 
-      section.prompts = mockPrompts.map(transformPromptResponse);
-      section.loaded = true;
-      section.loading = false;
+          // Add controls to form
+          this.addPromptControls(section.prompts);
 
-      // Add controls to form
-      this.addPromptControls(section.prompts);
-    }, 600);
+          // Load dynamic options for selection-based prompts
+          this.loadDynamicOptions(section.prompts);
+        } else {
+          section.error = response.message || 'Failed to load prompts';
+          section.loading = false;
+        }
+      })
+      .catch(() => {
+        section.error = 'Failed to load prompts';
+        section.loading = false;
+      });
   }
 
-  /**
-   * Add prompt form controls
-   */
   private addPromptControls(prompts: ExecutePrompt[]): void {
     prompts.forEach(prompt => {
       if (!this.promptForm.contains(prompt.formControlName)) {
@@ -463,15 +196,44 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get form control for a prompt
+   * Load dynamic options for prompts that have prompt_values_sql configured
    */
+  private loadDynamicOptions(prompts: ExecutePrompt[]): void {
+    const selectionTypes = ['dropdown', 'multiselect', 'checkbox', 'radio'];
+
+    prompts.forEach(prompt => {
+      if (
+        selectionTypes.includes(prompt.type) &&
+        prompt.config?.prompt_values_sql
+      ) {
+        this.promptService
+          .getPromptValuesBySQL({
+            orgId: this.orgId,
+            databaseId: this.databaseId,
+            query: prompt.config.prompt_values_sql,
+          })
+          .then((response: any) => {
+            if (response.status && response.data) {
+              prompt.options = (response.data || []).map((row: any) => {
+                // API returns rows — use first two columns as value/label
+                const keys = Object.keys(row);
+                const value = String(row[keys[0]] ?? '');
+                const label = keys.length > 1 ? String(row[keys[1]] ?? value) : value;
+                return { label, value };
+              });
+            }
+          })
+          .catch(() => {
+            // Keep existing static options on failure
+          });
+      }
+    });
+  }
+
   getPromptControl(prompt: ExecutePrompt): FormControl {
     return this.promptForm.get(prompt.formControlName) as FormControl;
   }
 
-  /**
-   * Handle tab change
-   */
   onTabChange(event: { index: number }): void {
     this.activeTabIndex = event.index;
     const tab = this.tabs[event.index];
@@ -480,9 +242,6 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Handle section accordion toggle
-   */
   onSectionToggle(section: ExecuteSection, expanded: boolean): void {
     section.expanded = expanded;
     if (expanded && !section.loaded && !section.loading) {
@@ -490,26 +249,16 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Get PrimeNG options for a prompt
-   */
-  getPromptOptions(prompt: ExecutePrompt): any[] {
-    return transformValuesToOptions(prompt.values);
+  getPlaceholder(prompt: ExecutePrompt): string {
+    return getPlaceholder(prompt.type);
   }
 
-  /**
-   * Check if form is valid
-   */
   isFormValid(): boolean {
     return this.promptForm.valid;
   }
 
-  /**
-   * Submit all prompt values
-   */
   onSubmit(): void {
     if (!this.isFormValid()) {
-      // Mark all controls as touched to show validation errors
       Object.keys(this.promptForm.controls).forEach(key => {
         this.promptForm.get(key)?.markAsTouched();
       });
@@ -522,7 +271,7 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     const payload = this.collectFormValues();
     console.log('Submission payload:', payload);
 
-    // TODO: Replace with actual API call
+    // TODO: Replace with actual execute API call
     setTimeout(() => {
       this.isSubmitting = false;
       this.globalService.handleSuccessService(
@@ -532,9 +281,6 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  /**
-   * Collect all form values for submission
-   */
   private collectFormValues(): SubmissionPayload {
     const payload: SubmissionPayload = {
       screenId: this.screenId,
@@ -546,8 +292,7 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
         section.prompts.forEach(prompt => {
           const control = this.getPromptControl(prompt);
           if (control) {
-            const rawValue = control.value;
-            payload.prompts.push(createPromptSubmission(prompt, rawValue));
+            payload.prompts.push(createPromptSubmission(prompt, control.value));
           }
         });
       });
@@ -556,24 +301,11 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     return payload;
   }
 
-  /**
-   * Navigate back to screen list
-   */
   onBack(): void {
     this.router.navigate(['/app/screen']);
   }
 
-  /**
-   * Reset all form values
-   */
   onReset(): void {
     this.promptForm.reset();
-  }
-
-  /**
-   * Generate array for skeleton loader
-   */
-  getSkeletonArray(count: number): number[] {
-    return Array.from({ length: count }, (_, i) => i);
   }
 }

@@ -8,14 +8,8 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
-import {
-  COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
-  createColorScheme,
-  getLegendPositionEnum,
-} from '../../helpers/chart-config.helper';
+import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
+import { buildPieChartOption } from '../../helpers/echarts-option-builder';
 
 export interface PieChartData {
   name: string;
@@ -52,20 +46,21 @@ export interface PieChartConfig {
 export class ConfigurablePieChartComponent
   implements OnInit, OnChanges, DoCheck
 {
-  private previousColorScheme: string = '';
+  private previousConfigSnapshot: string = '';
 
   @Input() data: PieChartData[] = [];
   @Input() showConfigPanel: boolean = true;
   @Input() chartWidth: number | undefined;
   @Input() chartHeight: number | undefined;
   @Input() chartConfig: PieChartConfig | undefined;
-  @Input() chartType: string = 'pie'; // pie, advanced-pie, pie-grid
-
-  view: [number, number] | undefined;
+  @Input() chartType: string = 'pie'; // pie, donut, pie-advanced, pie-grid
 
   @Output() onSelect = new EventEmitter<any>();
   @Output() onActivate = new EventEmitter<any>();
   @Output() onDeactivate = new EventEmitter<any>();
+
+  chartOption: any = {};
+  echartsInstance: any = null;
 
   private defaultConfig: PieChartConfig = {
     legend: true,
@@ -87,81 +82,48 @@ export class ConfigurablePieChartComponent
     return this.chartConfig || this.defaultConfig;
   }
 
-  colorSchemeObj: Color = {
-    name: 'custom',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
-  };
-
-  // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
-    this.updateColorScheme();
-    this.updateViewDimensions();
-    this.previousColorScheme = this.config.colorScheme;
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartWidth'] || changes['chartHeight']) {
-      this.updateViewDimensions();
-    }
-    if (changes['chartConfig']) {
-      this.updateColorScheme();
-      this.previousColorScheme = this.config.colorScheme;
+    if (changes['data'] || changes['chartConfig'] || changes['chartType'] ||
+        changes['chartWidth'] || changes['chartHeight']) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
 
   ngDoCheck(): void {
-    if (this.config && this.config.colorScheme !== this.previousColorScheme) {
-      this.previousColorScheme = this.config.colorScheme;
-      this.updateColorScheme();
-    }
-  }
-
-  private updateViewDimensions(): void {
-    if (this.chartWidth && this.chartHeight) {
-      // Minimal padding - let ngx-charts handle internal layout
-      const padding = 10;
-      let width = this.chartWidth - padding;
-      let height = this.chartHeight - padding;
-
-      // When legend is below and enabled, subtract space for legend
-      if (this.config.legend && this.config.legendPosition === 'below') {
-        const legendHeight = 80; // Space for legend + spacing
-        height = height - legendHeight;
+    if (this.config) {
+      const snapshot = JSON.stringify(this.config);
+      if (snapshot !== this.previousConfigSnapshot) {
+        this.previousConfigSnapshot = snapshot;
+        this.updateChartOption();
       }
-
-      this.view = [Math.max(width, 100), Math.max(height, 100)];
-    } else {
-      this.view = undefined;
     }
   }
 
-  private updateColorScheme(): void {
-    const palette = this.colorPalettes[this.config.colorScheme];
-    this.colorSchemeObj = {
-      name: 'custom',
-      selectable: true,
-      group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['vivid'],
-    };
+  updateChartOption(): void {
+    this.chartOption = buildPieChartOption(this.data, this.config, this.chartType);
   }
 
-  getLegendPosition(): LegendPosition {
-    return this.config.legendPosition === 'below'
-      ? LegendPosition.Below
-      : LegendPosition.Right;
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
   }
 
   onChartSelect(event: any): void {
     this.onSelect.emit(event);
   }
-  onChartActivate(event: any): void {
+
+  onChartMouseOver(event: any): void {
     this.onActivate.emit(event);
   }
-  onChartDeactivate(event: any): void {
+
+  onChartMouseOut(event: any): void {
     this.onDeactivate.emit(event);
   }
 }

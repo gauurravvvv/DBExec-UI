@@ -1,0 +1,13 @@
+<div class="radar-chart-container">
+    <div class="chart-wrapper">
+        <div class="chart-section">
+            <div echarts [options]="chartOption" [autoResize]="true"
+                class="echart-container"
+                [style.width.px]="chartWidth ? chartWidth - 20 : null"
+                [style.height.px]="chartHeight ? chartHeight - 45 : null"
+                (chartInit)="onChartInit($event)"
+                (chartClick)="onChartSelect($event)">
+            </div>
+        </div>
+    </div>
+</div>

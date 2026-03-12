@@ -8,14 +8,7 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { Color, ScaleType } from '@swimlane/ngx-charts';
-import {
-  COLOR_PALETTES,
-  DUMMY_SINGLE_SERIES,
-  DUMMY_MULTI_SERIES,
-  createColorScheme,
-  getLegendPositionEnum,
-} from '../../helpers/chart-config.helper';
+import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 
 export interface CardChartData {
   name: string;
@@ -44,7 +37,7 @@ export interface CardChartConfig {
 export class ConfigurableCardChartComponent
   implements OnInit, OnChanges, DoCheck
 {
-  private previousColorScheme: string = '';
+  private previousConfigSnapshot: string = '';
 
   @Input() data: CardChartData[] = [];
   @Input() showConfigPanel: boolean = true;
@@ -52,9 +45,9 @@ export class ConfigurableCardChartComponent
   @Input() chartHeight: number | undefined;
   @Input() chartConfig: CardChartConfig | undefined;
 
-  view: [number, number] | undefined;
-
   @Output() onSelect = new EventEmitter<any>();
+
+  colors: string[] = [];
 
   private defaultConfig: CardChartConfig = {
     cardColor: '',
@@ -70,61 +63,58 @@ export class ConfigurableCardChartComponent
     return this.chartConfig || this.defaultConfig;
   }
 
-  colorSchemeObj: Color = {
-    name: 'custom',
-    selectable: true,
-    group: ScaleType.Ordinal,
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
-  };
-
   // Color palettes (using imported constants)
   colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
-    this.updateColorScheme();
-    this.updateViewDimensions();
-    this.previousColorScheme = this.config.colorScheme;
+    this.updateColors();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartWidth'] || changes['chartHeight']) {
-      this.updateViewDimensions();
-    }
-    if (changes['chartConfig']) {
-      this.updateColorScheme();
-      this.previousColorScheme = this.config.colorScheme;
+    if (changes['chartConfig'] || changes['data']) {
+      this.updateColors();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
 
   ngDoCheck(): void {
-    if (this.config && this.config.colorScheme !== this.previousColorScheme) {
-      this.previousColorScheme = this.config.colorScheme;
-      this.updateColorScheme();
+    if (this.config) {
+      const snapshot = JSON.stringify(this.config);
+      if (snapshot !== this.previousConfigSnapshot) {
+        this.previousConfigSnapshot = snapshot;
+        this.updateColors();
+      }
     }
   }
 
-  private updateViewDimensions(): void {
-    if (this.chartWidth && this.chartHeight) {
-      const padding = 20;
-      const width = this.chartWidth - padding;
-      const height = this.chartHeight - padding;
-      this.view = [Math.max(width, 100), Math.max(height, 100)];
-    } else {
-      this.view = undefined;
-    }
+  private updateColors(): void {
+    this.colors = this.colorPalettes[this.config.colorScheme] || this.colorPalettes['vivid'];
   }
 
-  private updateColorScheme(): void {
-    const palette = this.colorPalettes[this.config.colorScheme];
-    this.colorSchemeObj = {
-      name: 'custom',
-      selectable: true,
-      group: ScaleType.Ordinal,
-      domain: palette || this.colorPalettes['vivid'],
-    };
+  getCardColor(index: number): string {
+    if (this.config.cardColor) return this.config.cardColor;
+    return this.colors[index % this.colors.length];
   }
 
-  onChartSelect(event: any): void {
-    this.onSelect.emit(event);
+  getBandColor(index: number): string {
+    if (this.config.bandColor) return this.config.bandColor;
+    const color = this.colors[index % this.colors.length];
+    // Darken slightly for band
+    return color;
+  }
+
+  getTextColor(): string {
+    return this.config.textColor || '#ffffff';
+  }
+
+  formatValue(value: number): string {
+    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+    if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+    return String(value);
+  }
+
+  onCardSelect(item: CardChartData): void {
+    this.onSelect.emit(item);
   }
 }

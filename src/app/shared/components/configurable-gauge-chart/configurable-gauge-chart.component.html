@@ -1,24 +1,33 @@
 <div class="gauge-chart-container">
     <div class="chart-wrapper">
-        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
+        <div class="chart-section">
             <!-- Standard Gauge Chart -->
             <ng-container *ngIf="chartType === 'gauge'">
-                <ngx-charts-gauge [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"
-                    [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [min]="config.min"
-                    [max]="config.max" [units]="config.units" [bigSegments]="config.bigSegments"
-                    [smallSegments]="config.smallSegments" [showAxis]="config.showAxis" [angleSpan]="config.angleSpan"
-                    [startAngle]="config.startAngle" [showText]="config.showText" [animations]="config.animations"
-                    [tooltipDisabled]="config.tooltipDisabled" (select)="onChartSelect($event)"
-                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
-                </ngx-charts-gauge>
+                <div echarts [options]="chartOption" [autoResize]="true"
+                    class="echart-container"
+                    [style.width.px]="chartWidth ? chartWidth - 20 : null"
+                    [style.height.px]="chartHeight ? chartHeight - 45 : null"
+                    (chartInit)="onChartInit($event)"
+                    (chartClick)="onChartSelect($event)">
+                </div>
             </ng-container>
 
-            <!-- Linear Gauge Chart -->
+            <!-- Linear Gauge Chart (Custom HTML) -->
             <ng-container *ngIf="chartType === 'linear-gauge'">
-                <ngx-charts-linear-gauge [view]="view!" [scheme]="colorSchemeObj" [value]="linearValue"
-                    [min]="config.min" [max]="config.max" [units]="config.units" [animations]="config.animations"
-                    (select)="onChartSelect($event)">
-                </ngx-charts-linear-gauge>
+                <div class="linear-gauge-wrapper" (click)="onLinearGaugeClick()">
+                    <div class="linear-gauge-label">{{ config.units }}</div>
+                    <div class="linear-gauge-track">
+                        <div class="linear-gauge-fill"
+                            [style.width.%]="linearPercentage"
+                            [style.background-color]="linearGaugeColor">
+                        </div>
+                    </div>
+                    <div class="linear-gauge-values">
+                        <span class="linear-gauge-min">{{ config.min }}</span>
+                        <span class="linear-gauge-current">{{ linearValue }}</span>
+                        <span class="linear-gauge-max">{{ config.max }}</span>
+                    </div>
+                </div>
             </ng-container>
         </div>
     </div>

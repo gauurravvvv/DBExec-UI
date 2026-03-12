@@ -1,45 +1,15 @@
 <div class="pie-chart-container">
     <div class="chart-wrapper">
-        <div class="chart-section" [class.legend-below]="config.legend && config.legendPosition === 'below'">
-            <!-- Standard Pie Chart -->
-            <ng-container *ngIf="chartType === 'pie'">
-                <ngx-charts-pie-chart [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"
-                    [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [labels]="config.labels"
-                    [trimLabels]="config.trimLabels" [maxLabelLength]="config.maxLabelLength"
-                    [doughnut]="config.doughnut" [arcWidth]="config.arcWidth" [explodeSlices]="config.explodeSlices"
-                    [gradient]="config.gradient" [animations]="config.animations"
-                    [tooltipDisabled]="config.tooltipDisabled" (select)="onChartSelect($event)"
-                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
-                </ngx-charts-pie-chart>
-            </ng-container>
-
-            <!-- Donut Chart (Pie with doughnut=true) -->
-            <ng-container *ngIf="chartType === 'donut'">
-                <ngx-charts-pie-chart [results]="data" [view]="view!" [scheme]="colorSchemeObj" [legend]="config.legend"
-                    [legendTitle]="config.legendTitle" [legendPosition]="getLegendPosition()" [labels]="config.labels"
-                    [trimLabels]="config.trimLabels" [maxLabelLength]="config.maxLabelLength" [doughnut]="true"
-                    [arcWidth]="config.arcWidth" [explodeSlices]="config.explodeSlices" [gradient]="config.gradient"
-                    [animations]="config.animations" [tooltipDisabled]="config.tooltipDisabled"
-                    (select)="onChartSelect($event)" (activate)="onChartActivate($event)"
-                    (deactivate)="onChartDeactivate($event)">
-                </ngx-charts-pie-chart>
-            </ng-container>
-
-            <!-- Advanced Pie Chart (ID: pie-advanced) -->
-            <ng-container *ngIf="chartType === 'pie-advanced'">
-                <ngx-charts-advanced-pie-chart [results]="data" [view]="view!" [scheme]="colorSchemeObj"
-                    [gradient]="config.gradient" [animations]="config.animations"
-                    [tooltipDisabled]="config.tooltipDisabled" [label]="'Total'" (select)="onChartSelect($event)"
-                    (activate)="onChartActivate($event)" (deactivate)="onChartDeactivate($event)">
-                </ngx-charts-advanced-pie-chart>
-            </ng-container>
-
-            <!-- Pie Grid -->
-            <ng-container *ngIf="chartType === 'pie-grid'">
-                <ngx-charts-pie-grid [results]="data" [view]="view!" [scheme]="colorSchemeObj"
-                    [tooltipDisabled]="config.tooltipDisabled" [label]="'Total'" (select)="onChartSelect($event)">
-                </ngx-charts-pie-grid>
-            </ng-container>
+        <div class="chart-section">
+            <div echarts [options]="chartOption" [autoResize]="true"
+                class="echart-container"
+                [style.width.px]="chartWidth ? chartWidth - 20 : null"
+                [style.height.px]="chartHeight ? chartHeight - 45 : null"
+                (chartInit)="onChartInit($event)"
+                (chartClick)="onChartSelect($event)"
+                (chartMouseOver)="onChartMouseOver($event)"
+                (chartMouseOut)="onChartMouseOut($event)">
+            </div>
         </div>
     </div>
 </div>

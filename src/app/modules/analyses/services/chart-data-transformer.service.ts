@@ -14,6 +14,8 @@ import {
  */
 const MULTI_SERIES_CHART_TYPES = [
   'line',
+  'line-stacked',
+  'line-step',
   'area',
   'area-stacked',
   'area-normalized',
@@ -22,6 +24,9 @@ const MULTI_SERIES_CHART_TYPES = [
 const HEAT_MAP_CHART_TYPE = 'heat-map';
 const BUBBLE_CHART_TYPE = 'bubble';
 const BOX_CHART_TYPE = 'box-chart';
+const SANKEY_CHART_TYPE = 'sankey';
+const GRAPH_CHART_TYPE = 'graph';
+const THREE_D_CHART_TYPES = ['bar3d', 'line3d', 'scatter3d'];
 
 /**
  * Maximum label length for chart categories (prevents overflow)
@@ -73,6 +78,21 @@ export class ChartDataTransformerService {
       // Box plot requires statistical data format
       if (chartType === BOX_CHART_TYPE) {
         return this.transformToBoxPlotFormat(rawData, mapping);
+      }
+
+      // Sankey chart requires source, target, value format
+      if (chartType === SANKEY_CHART_TYPE) {
+        return this.transformToSankeyFormat(rawData, mapping);
+      }
+
+      // Graph chart uses same 3-field format as sankey
+      if (chartType === GRAPH_CHART_TYPE) {
+        return this.transformToSankeyFormat(rawData, mapping);
+      }
+
+      // 3D charts need [[x, y, z], ...] coordinate format
+      if (THREE_D_CHART_TYPES.includes(chartType)) {
+        return this.transformTo3DFormat(rawData, mapping);
       }
 
       // Standard 2-field transformation
@@ -435,11 +455,91 @@ export class ChartDataTransformerService {
   }
 
   /**
+   * Transform data to sankey format (source → target with value)
+   * Sankey needs: { nodes: [{name}], links: [{source, target, value}] }
+   * Uses x-axis for source, y-axis for target, z-axis for value
+   */
+  private transformToSankeyFormat(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any {
+    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
+      return { nodes: [], links: [] };
+    }
+
+    const nodeSet = new Set<string>();
+    const linkMap = new Map<string, number>();
+
+    const hasValue = !!mapping.zAxisColumn;
+    const isZNumeric = hasValue
+      ? this.isColumnNumeric(rawData, mapping.zAxisColumn!)
+      : false;
+
+    rawData.forEach(row => {
+      const source = this.formatLabelValue(row[mapping.xAxisColumn!]);
+      const target = this.formatLabelValue(row[mapping.yAxisColumn!]);
+      if (source === target) return; // Skip self-loops
+
+      nodeSet.add(source);
+      nodeSet.add(target);
+
+      const linkKey = `${source}→${target}`;
+      const value =
+        hasValue && isZNumeric
+          ? this.toNumber(row[mapping.zAxisColumn!])
+          : 1;
+
+      const existing = linkMap.get(linkKey) || 0;
+      linkMap.set(linkKey, existing + value);
+    });
+
+    const nodes = Array.from(nodeSet).map(name => ({ name }));
+    const links = Array.from(linkMap.entries()).map(([key, value]) => {
+      const [source, target] = key.split('→');
+      return { source, target, value };
+    });
+
+    return { nodes, links };
+  }
+
+  /**
+   * Transform data to 3D coordinate format: [[x, y, z], ...]
+   * Used for bar3d, line3d, scatter3d chart types
+   */
+  private transformTo3DFormat(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any[] {
+    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
+      return [];
+    }
+
+    return rawData
+      .map(row => {
+        const x = this.toNumber(row[mapping.xAxisColumn!]);
+        const y = this.toNumber(row[mapping.yAxisColumn!]);
+        const z = mapping.zAxisColumn
+          ? this.toNumber(row[mapping.zAxisColumn])
+          : 0;
+        return [x, y, z];
+      })
+      .filter(
+        ([x, y, z]) => isFinite(x) && isFinite(y) && isFinite(z),
+      );
+  }
+
+  /**
    * Check if chart type requires a third dimension (z-axis)
-   * Heat map and bubble charts benefit from a third dimension
+   * Heat map, bubble, sankey, graph, and 3D charts benefit from a third dimension
    */
   requiresThirdDimension(chartType: string | null): boolean {
-    return this.isHeatMapChart(chartType) || chartType === BUBBLE_CHART_TYPE;
+    return (
+      this.isHeatMapChart(chartType) ||
+      chartType === BUBBLE_CHART_TYPE ||
+      chartType === SANKEY_CHART_TYPE ||
+      chartType === GRAPH_CHART_TYPE ||
+      (!!chartType && THREE_D_CHART_TYPES.includes(chartType))
+    );
   }
 
   /**
@@ -463,16 +563,32 @@ export class ChartDataTransformerService {
       return { field1: 'Category', field2: 'Values' };
     }
 
+    if (chartType === SANKEY_CHART_TYPE || chartType === GRAPH_CHART_TYPE) {
+      return { field1: 'Source', field2: 'Target', field3: 'Value' };
+    }
+
+    if (chartType && THREE_D_CHART_TYPES.includes(chartType)) {
+      return { field1: 'X-Axis', field2: 'Y-Axis', field3: 'Z-Axis' };
+    }
+
     // Check if it's a chart with axes (bar, line, area, etc.)
     const NO_AXIS_CHART_TYPES = [
       'pie',
       'pie-advanced',
       'pie-grid',
       'donut',
+      'half-donut',
+      'nested-pie',
+      'rose',
       'gauge',
       'linear-gauge',
       'number-card',
       'tree-map',
+      'funnel',
+      'sunburst',
+      'tree',
+      'theme-river',
+      'bar-polar',
     ];
 
     if (!chartType || NO_AXIS_CHART_TYPES.includes(chartType)) {

@@ -522,4 +522,119 @@
       }
     }
   }
+
+  // =========================================
+  // Prompt Form Grid
+  // =========================================
+  .prompt-form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 8px 0;
+
+    @media (max-width: 1400px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+
+    .prompt-field {
+      &--full {
+        grid-column: 1 / -1;
+      }
+
+      &--half {
+        grid-column: span 1;
+      }
+    }
+
+    .prompt-field-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .prompt-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-color);
+
+        .required-marker {
+          color: var(--error-color);
+          margin-left: 2px;
+        }
+      }
+    }
+
+    .prompt-error {
+      margin-top: 4px;
+
+      .p-error {
+        font-size: 12px;
+      }
+    }
+
+    .radio-group,
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 4px 0;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+  }
+
+  .prompt-skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px 0;
+
+    .prompt-skeleton-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+  }
+
+  // Input/Calendar full width
+  .p-inputnumber,
+  .p-calendar {
+    &.w-full {
+      width: 100%;
+
+      .p-inputtext {
+        width: 100%;
+      }
+    }
+  }
+
+  .p-slider {
+    &.w-full {
+      width: 100%;
+      margin-top: 8px;
+    }
+  }
+
+  // Normalize multiselect height to match dropdown/calendar/input
+  .p-multiselect {
+    min-height: 40px;
+
+    .p-multiselect-label {
+      padding: 0.625rem 0.75rem;
+    }
+  }
 }

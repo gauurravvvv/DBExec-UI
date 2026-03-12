@@ -16,16 +16,43 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import {
   CHART_TYPES,
   COLOR_SCHEMES,
-  CURVE_TYPES,
   LEGEND_POSITIONS,
   getDefaultChartConfig,
+  is3DCoordinateChartType,
   isBarChartType,
+  isLineChartType,
   isAreaChartType,
   isPieChartType,
   isGaugeChartType,
   isCardChartType,
   isHeatMapChartType,
   isTreeMapChartType,
+  isBubbleChartType,
+  isBoxChartType,
+  isPolarChartType,
+  isScatterChartType,
+  isFunnelChartType,
+  isSankeyChartType,
+  isSunburstChartType,
+  isWaterfallChartType,
+  isGraphChartType,
+  isTreeChartType,
+  isThemeRiverChartType,
+  isPictorialBarChartType,
+  isPolarBarChartType,
+  isRadarChartType,
+  isCandlestickChartType,
+  isParallelChartType,
+  isBar3dChartType,
+  isLine3dChartType,
+  isScatter3dChartType,
+  isSurfaceChartType,
+  isGlobeChartType,
+  isGraphGlChartType,
+  isScatterGlChartType,
+  isLinesGlChartType,
+  isMap3dChartType,
+  isFlowGlChartType,
   hasAxisLabels,
   supportsGradient,
 } from '../../constants/charts.constants';
@@ -74,9 +101,6 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Color schemes
   colorSchemes = COLOR_SCHEMES;
-
-  // Curve types
-  curveTypes = CURVE_TYPES;
 
   // Legend positions
   legendPositions = LEGEND_POSITIONS;
@@ -618,10 +642,20 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Check if visual has required fields for chart
   hasRequiredChartFields(visual: any): boolean {
     if (!visual.chartType) return false;
-    if (isHeatMapChartType(visual.chartType)) {
-      return visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn;
+    if (visual.useDummyData) return true;
+    // 3D coordinate charts need x + y + z
+    if (is3DCoordinateChartType(visual.chartType)) {
+      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
     }
-    return visual.xAxisColumn && visual.yAxisColumn;
+    // No-axis charts (pie, gauge, card, funnel, sunburst, etc.) only need one field
+    if (!hasAxisLabels(visual.chartType)) {
+      return !!(visual.xAxisColumn || visual.yAxisColumn);
+    }
+    // 3-axis charts need all three fields
+    if (isHeatMapChartType(visual.chartType) || isSankeyChartType(visual.chartType) || isGraphChartType(visual.chartType)) {
+      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
+    }
+    return !!(visual.xAxisColumn && visual.yAxisColumn);
   }
 
   getChartCategories(): string[] {
@@ -663,7 +697,111 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   isBubbleChartType(chartType: string | null): boolean {
-    return chartType === 'bubble';
+    return isBubbleChartType(chartType);
+  }
+
+  isBoxChartType(chartType: string | null): boolean {
+    return isBoxChartType(chartType);
+  }
+
+  isPolarChartType(chartType: string | null): boolean {
+    return isPolarChartType(chartType);
+  }
+
+  isLineChartType(chartType: string | null): boolean {
+    return isLineChartType(chartType);
+  }
+
+  isScatterChartType(chartType: string | null): boolean {
+    return isScatterChartType(chartType);
+  }
+
+  isFunnelChartType(chartType: string | null): boolean {
+    return isFunnelChartType(chartType);
+  }
+
+  isSankeyChartType(chartType: string | null): boolean {
+    return isSankeyChartType(chartType);
+  }
+
+  isSunburstChartType(chartType: string | null): boolean {
+    return isSunburstChartType(chartType);
+  }
+
+  isWaterfallChartType(chartType: string | null): boolean {
+    return isWaterfallChartType(chartType);
+  }
+
+  isGraphChartType(chartType: string | null): boolean {
+    return isGraphChartType(chartType);
+  }
+
+  isTreeChartType(chartType: string | null): boolean {
+    return isTreeChartType(chartType);
+  }
+
+  isThemeRiverChartType(chartType: string | null): boolean {
+    return isThemeRiverChartType(chartType);
+  }
+
+  isPictorialBarChartType(chartType: string | null): boolean {
+    return isPictorialBarChartType(chartType);
+  }
+
+  isPolarBarChartType(chartType: string | null): boolean {
+    return isPolarBarChartType(chartType);
+  }
+
+  isRadarChartType(chartType: string | null): boolean {
+    return isRadarChartType(chartType);
+  }
+
+  isCandlestickChartType(chartType: string | null): boolean {
+    return isCandlestickChartType(chartType);
+  }
+
+  isParallelChartType(chartType: string | null): boolean {
+    return isParallelChartType(chartType);
+  }
+
+  isBar3dChartType(chartType: string | null): boolean {
+    return isBar3dChartType(chartType);
+  }
+
+  isLine3dChartType(chartType: string | null): boolean {
+    return isLine3dChartType(chartType);
+  }
+
+  isScatter3dChartType(chartType: string | null): boolean {
+    return isScatter3dChartType(chartType);
+  }
+
+  isSurfaceChartType(chartType: string | null): boolean {
+    return isSurfaceChartType(chartType);
+  }
+
+  isGlobeChartType(chartType: string | null): boolean {
+    return isGlobeChartType(chartType);
+  }
+
+  isGraphGlChartType(chartType: string | null): boolean {
+    return isGraphGlChartType(chartType);
+  }
+
+  isScatterGlChartType(chartType: string | null): boolean {
+    return isScatterGlChartType(chartType);
+  }
+
+  isLinesGlChartType(chartType: string | null): boolean {
+    return isLinesGlChartType(chartType);
+  }
+
+  isMap3dChartType(chartType: string | null): boolean {
+    return isMap3dChartType(chartType);
+  }
+
+  isFlowGlChartType(chartType: string | null): boolean {
+    return isFlowGlChartType(chartType);
   }
 
   hasAxisLabels(chartType: string | null): boolean {
