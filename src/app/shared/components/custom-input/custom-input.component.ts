@@ -20,6 +20,13 @@ export class CustomInputComponent implements ControlValueAccessor {
   @Input() required = false;
   @Input() errorMessage = '';
   @Input() type = 'text';
+  @Input() inputMode: 'input' | 'textarea' = 'input';
+  @Input() maxLength: number | null = null;
+  @Input() minLength: number | null = null;
+  @Input() readonly = false;
+  @Input() rows = 3;
+  @Input() autoResize = false;
+  @Input() inputDisabled = false;
   @Input() showError = false;
 
   value = '';

@@ -1,6 +1,5 @@
 import {
   Component,
-  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -30,7 +29,7 @@ export interface NumberConfig {
   templateUrl: './number-config-dialog.component.html',
   styleUrls: ['./number-config-dialog.component.scss'],
 })
-export class NumberConfigDialogComponent implements OnChanges, DoCheck {
+export class NumberConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() currentConfig: Partial<NumberConfig> = {};
 
@@ -52,25 +51,24 @@ export class NumberConfigDialogComponent implements OnChanges, DoCheck {
   };
 
   config: NumberConfig = { ...this.defaultConfig };
+  previewConfig: NumberConfig = { ...this.defaultConfig };
   previewValue: number | null = null;
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
-  private _lastConfigStr = '';
-
-  ngDoCheck(): void {
-    const s = JSON.stringify(this.config);
-    if (s !== this._lastConfigStr) {
-      this._lastConfigStr = s;
-      this._previewArr = [this._previewArr[0] + 1];
-    }
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
       this.config = { ...this.defaultConfig, ...this.currentConfig };
+      this.previewConfig = { ...this.config };
+      this._previewArr = [this._previewArr[0] + 1];
       this.previewValue = this.config.defaultValue;
     }
+  }
+
+  applyPreview(): void {
+    this.previewConfig = { ...this.config };
+    this._previewArr = [this._previewArr[0] + 1];
   }
 
   onClose(): void {

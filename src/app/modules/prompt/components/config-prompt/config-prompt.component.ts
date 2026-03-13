@@ -113,10 +113,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   showNumberConfigDialog = false;
   numberConfig: any = {};
 
-  // Date Configuration Dialog
-  showDateConfigDialog = false;
-  dateConfig: any = {};
-
   // Date Range Configuration Dialog
   showDateRangeConfigDialog = false;
   dateRangeConfig: any = {};
@@ -220,7 +216,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       .subscribe(type => {
         this.selectedPromptType = type;
         const promptValuesControl = this.promptForm.get('promptValues');
-        if (['dropdown', 'multiselect', 'checkbox'].includes(type)) {
+        const typeLC = (type || '').toLowerCase();
+        if (['dropdown', 'multiselect', 'checkbox', 'radio'].includes(typeLC)) {
           promptValuesControl?.setValidators([Validators.required]);
         } else {
           promptValuesControl?.clearValidators();
@@ -317,7 +314,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         this.showAddPromptValues =
           this.selectedPromptType === 'dropdown' ||
           this.selectedPromptType === 'multiselect' ||
-          this.selectedPromptType === 'checkbox';
+          this.selectedPromptType === 'checkbox' ||
+          this.selectedPromptType === 'radio';
 
         if (this.showAddPromptValues) {
           this.promptForm
@@ -1299,23 +1297,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Open date configuration dialog
-   */
-  openDateConfigDialog(): void {
-    this.showDateConfigDialog = true;
-  }
-
-  /**
-   * Handle date config saved
-   */
-  onDateConfigSaved(config: any): void {
-    this.dateConfig = config;
-    this.showDateConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
    * Open date range configuration dialog
    */
   openDateRangeConfigDialog(): void {
@@ -1377,7 +1358,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       'radio',
       'text',
       'number',
-      'date',
       'daterange',
       'calendar',
       'rangeslider',
@@ -1427,9 +1407,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       case 'number':
         this.numberConfig = appearance;
         break;
-      case 'date':
-        this.dateConfig = appearance;
-        break;
       case 'daterange':
         this.dateRangeConfig = appearance;
         break;
@@ -1462,9 +1439,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       case 'number':
         this.numberConfig = {};
         break;
-      case 'date':
-        this.dateConfig = {};
-        break;
       case 'daterange':
         this.dateRangeConfig = {};
         break;
@@ -1496,9 +1470,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         break;
       case 'number':
         this.showNumberConfigDialog = true;
-        break;
-      case 'date':
-        this.showDateConfigDialog = true;
         break;
       case 'daterange':
         this.showDateRangeConfigDialog = true;

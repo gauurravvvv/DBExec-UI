@@ -1,6 +1,5 @@
 import {
   Component,
-  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -34,7 +33,7 @@ export interface DropdownConfig {
   templateUrl: './dropdown-config-dialog.component.html',
   styleUrls: ['./dropdown-config-dialog.component.scss'],
 })
-export class DropdownConfigDialogComponent implements OnChanges, DoCheck {
+export class DropdownConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() promptValues: any[] = [];
   @Input() currentConfig: Partial<DropdownConfig> = {};
@@ -61,6 +60,7 @@ export class DropdownConfigDialogComponent implements OnChanges, DoCheck {
   };
 
   config: DropdownConfig = { ...this.defaultConfig };
+  previewConfig: DropdownConfig = { ...this.defaultConfig };
 
   // Preview state
   selectedValue: any = null;
@@ -89,15 +89,6 @@ export class DropdownConfigDialogComponent implements OnChanges, DoCheck {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
-  private _lastConfigStr = '';
-
-  ngDoCheck(): void {
-    const s = JSON.stringify(this.config);
-    if (s !== this._lastConfigStr) {
-      this._lastConfigStr = s;
-      this._previewArr = [this._previewArr[0] + 1];
-    }
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
@@ -108,7 +99,14 @@ export class DropdownConfigDialogComponent implements OnChanges, DoCheck {
         this.config.defaultValue = null;
       }
       this.selectedValue = this.config.defaultValue;
+      this.previewConfig = { ...this.config };
+      this._previewArr = [this._previewArr[0] + 1];
     }
+  }
+
+  applyPreview(): void {
+    this.previewConfig = { ...this.config };
+    this._previewArr = [this._previewArr[0] + 1];
   }
 
   onClose(): void {
@@ -118,7 +116,6 @@ export class DropdownConfigDialogComponent implements OnChanges, DoCheck {
   }
 
   onSave(): void {
-    console.log('Dropdown Config:', { ...this.config });
     this.save.emit({ ...this.config });
     this.onClose();
   }

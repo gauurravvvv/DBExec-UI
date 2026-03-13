@@ -1,135 +1,132 @@
-app-custom-calendar {
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 0;
+
+  .p-float-label {
+    display: block;
     width: 100%;
-    margin-bottom: 0;
 
-    .p-float-label {
-      display: block;
-      width: 100%;
-
-      label {
-        font-weight: 500;
-        color: var(--text-color);
-        opacity: 0.6;
-        background: var(--card-background);
-        padding: 0 8px;
-        margin-left: -4px;
-        z-index: 1;
-
-        .required {
-          color: var(--error-color);
-          margin-left: 4px;
-        }
-      }
-    }
-
-    .normal-label {
+    label {
       font-weight: 500;
       color: var(--text-color);
-      display: block;
+      opacity: 0.6;
+      background: var(--card-background);
+      padding: 0 8px;
+      margin-left: -4px;
+      z-index: 1;
 
       .required {
         color: var(--error-color);
         margin-left: 4px;
       }
     }
+  }
 
-    .error-message {
+  .normal-label {
+    font-weight: 500;
+    color: var(--text-color);
+    display: block;
+
+    .required {
       color: var(--error-color);
-      font-size: 12px;
+      margin-left: 4px;
     }
   }
 
-  .p-calendar {
+  .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+  }
+}
+
+:host ::ng-deep .p-calendar {
+  width: 100%;
+
+  .p-inputtext {
     width: 100%;
+    background: var(--hover-background) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+    border-radius: 6px !important;
+    font-size: 0.9375rem;
+    padding: 0.75rem 1rem;
 
-    .p-inputtext {
-      width: 100%;
-      background: var(--card-background);
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      padding: 0.5rem 0.75rem;
+    &::placeholder {
+      color: var(--secondary-color) !important;
+    }
+
+    &:enabled:focus {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.15) !important;
+    }
+  }
+
+  .p-datepicker-trigger {
+    background: var(--hover-background) !important;
+    border: 1px solid var(--border-color) !important;
+    border-left: none !important;
+    color: var(--secondary-color) !important;
+    border-radius: 0 6px 6px 0 !important;
+
+    &:hover {
+      border-color: var(--primary-color) !important;
+      color: var(--primary-color) !important;
+    }
+
+    .pi {
       font-size: 0.875rem;
-
-      &::placeholder {
-        color: var(--text-color);
-        opacity: 0.4;
-      }
-
-      &:enabled:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 1px var(--primary-color-transparent);
-      }
     }
+  }
 
-    .p-datepicker-trigger {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      border-left: none;
-      color: var(--text-color);
-      opacity: 0.7;
-      padding: 0.5rem;
-
-      &:hover {
-        background: var(--hover-background);
-        color: var(--text-color);
-      }
-
-      .pi {
-        font-size: 0.875rem;
-      }
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty {
+    .p-inputtext {
+      border-color: var(--error-color) !important;
     }
+  }
 
-    &.ng-invalid.ng-touched,
-    &.ng-invalid.ng-dirty {
-      .p-inputtext {
-        border-color: var(--error-color);
-      }
-    }
-
-    &.p-calendar-disabled {
-      opacity: 0.6;
-    }
+  &.p-calendar-disabled {
+    opacity: 0.6;
   }
 }
 
 // Overlay appended to body — scoped via panelStyleClass
 .p-datepicker.custom-calendar-panel {
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  background: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
   padding: 0.5rem;
   font-size: 0.85rem;
 
   .p-datepicker-header {
-    background: var(--card-background);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--card-background) !important;
+    border-bottom: 1px solid var(--border-color) !important;
     padding: 0.35rem 0;
 
     .p-datepicker-title {
       .p-datepicker-month,
       .p-datepicker-year {
-        color: var(--text-color);
+        color: var(--text-color) !important;
         font-size: 0.85rem;
         padding: 0.25rem 0.5rem;
 
         &:hover {
-          color: var(--primary-color);
+          color: var(--primary-color) !important;
         }
       }
     }
 
     .p-datepicker-prev,
     .p-datepicker-next {
-      color: var(--text-color);
+      color: var(--text-color) !important;
       width: 1.75rem;
       height: 1.75rem;
 
       &:hover {
-        background: var(--hover-background);
+        background: var(--hover-background) !important;
       }
 
       .pi {
@@ -144,7 +141,7 @@ app-custom-calendar {
 
     th {
       padding: 0.25rem;
-      color: var(--secondary-color);
+      color: var(--secondary-color) !important;
       font-size: 0.75rem;
 
       span {
@@ -160,27 +157,27 @@ app-custom-calendar {
         width: 1.85rem;
         height: 1.85rem;
         font-size: 0.8rem;
-        color: var(--text-color);
+        color: var(--text-color) !important;
         border-radius: 6px;
 
         &:hover {
-          background: var(--hover-background);
+          background: var(--hover-background) !important;
         }
 
         &.p-highlight {
-          background: var(--primary-color);
-          color: white;
+          background: var(--primary-color) !important;
+          color: white !important;
         }
       }
 
       &.p-datepicker-today {
         span {
-          background: var(--hover-background);
-          color: var(--primary-color);
+          background: var(--hover-background) !important;
+          color: var(--primary-color) !important;
 
           &.p-highlight {
-            background: var(--primary-color);
-            color: white;
+            background: var(--primary-color) !important;
+            color: white !important;
           }
         }
       }
@@ -188,21 +185,21 @@ app-custom-calendar {
   }
 
   .p-timepicker {
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color) !important;
     padding: 0.35rem 0;
 
     span {
       font-size: 0.85rem;
-      color: var(--text-color);
+      color: var(--text-color) !important;
     }
 
     button {
-      color: var(--text-color);
+      color: var(--text-color) !important;
       width: 1.5rem;
       height: 1.5rem;
 
       &:hover {
-        background: var(--hover-background);
+        background: var(--hover-background) !important;
       }
 
       .pi {
@@ -226,15 +223,32 @@ app-custom-calendar {
     .p-yearpicker-year {
       padding: 0.3rem;
       font-size: 0.8rem;
-      color: var(--text-color);
+      color: var(--text-color) !important;
 
       &:hover {
-        background: var(--hover-background);
+        background: var(--hover-background) !important;
       }
 
       &.p-highlight {
-        background: var(--primary-color);
-        color: white;
+        background: var(--primary-color) !important;
+        color: white !important;
+      }
+    }
+  }
+
+  // Button bar (Today / Clear)
+  .p-datepicker-buttonbar {
+    border-top: 1px solid var(--border-color) !important;
+    padding: 0.35rem 0;
+
+    .p-button {
+      background: transparent !important;
+      border: none !important;
+      color: var(--primary-color) !important;
+      font-size: 0.85rem;
+
+      &:hover {
+        background: var(--hover-background) !important;
       }
     }
   }

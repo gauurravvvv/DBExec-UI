@@ -1,0 +1,218 @@
+app-custom-daterange {
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .normal-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-color);
+
+      .required {
+        color: var(--error-color);
+        margin-left: 2px;
+      }
+    }
+
+    .error-message {
+      color: var(--error-color);
+      font-size: 12px;
+    }
+  }
+
+  .p-calendar {
+    width: 100%;
+
+    .p-inputtext {
+      width: 100%;
+      background: var(--hover-background) !important;
+      border: 1px solid var(--border-color) !important;
+      color: var(--text-color) !important;
+      border-radius: 6px !important;
+      font-size: 0.9375rem;
+      padding: 0.75rem 1rem;
+
+      &::placeholder {
+        color: var(--secondary-color) !important;
+      }
+
+      &:focus {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.15) !important;
+      }
+    }
+
+    .p-button {
+      background: var(--hover-background) !important;
+      border: 1px solid var(--border-color) !important;
+      color: var(--secondary-color) !important;
+
+      &:hover {
+        border-color: var(--primary-color) !important;
+        color: var(--primary-color) !important;
+      }
+    }
+  }
+}
+
+// Overlay appended to body — scoped via panelStyleClass
+.p-datepicker.custom-daterange-panel {
+  background: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+
+  .p-datepicker-header {
+    background: var(--card-background) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 0.35rem 0;
+
+    .p-datepicker-title {
+      .p-datepicker-month,
+      .p-datepicker-year {
+        color: var(--text-color) !important;
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+
+        &:hover {
+          color: var(--primary-color) !important;
+        }
+      }
+    }
+
+    .p-datepicker-prev,
+    .p-datepicker-next {
+      color: var(--text-color) !important;
+      width: 1.75rem;
+      height: 1.75rem;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      .pi {
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  table {
+    font-size: 0.8rem;
+    margin: 0;
+
+    th {
+      padding: 0.25rem;
+      color: var(--secondary-color) !important;
+      font-size: 0.75rem;
+
+      span {
+        width: 1.85rem;
+        height: 1.85rem;
+      }
+    }
+
+    td {
+      padding: 0.12rem;
+
+      span {
+        width: 1.85rem;
+        height: 1.85rem;
+        font-size: 0.8rem;
+        color: var(--text-color) !important;
+        border-radius: 6px;
+
+        &:hover {
+          background: var(--hover-background) !important;
+        }
+
+        &.p-highlight {
+          background: var(--primary-color) !important;
+          color: white !important;
+        }
+      }
+
+      &.p-datepicker-today {
+        span {
+          background: var(--hover-background) !important;
+          color: var(--primary-color) !important;
+
+          &.p-highlight {
+            background: var(--primary-color) !important;
+            color: white !important;
+          }
+        }
+      }
+    }
+  }
+
+  .p-timepicker {
+    border-top: 1px solid var(--border-color) !important;
+    padding: 0.35rem 0;
+
+    span {
+      font-size: 0.85rem;
+      color: var(--text-color) !important;
+    }
+
+    button {
+      color: var(--text-color) !important;
+      width: 1.5rem;
+      height: 1.5rem;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      .pi {
+        font-size: 0.7rem;
+      }
+    }
+
+    .p-separator {
+      min-width: 0;
+      padding: 0 0.2rem;
+    }
+
+    > div {
+      padding: 0 0.25rem;
+    }
+  }
+
+  .p-monthpicker,
+  .p-yearpicker {
+    .p-monthpicker-month,
+    .p-yearpicker-year {
+      padding: 0.3rem;
+      font-size: 0.8rem;
+      color: var(--text-color) !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      &.p-highlight {
+        background: var(--primary-color) !important;
+        color: white !important;
+      }
+    }
+  }
+
+  // Button bar (Today / Clear)
+  .p-datepicker-buttonbar {
+    border-top: 1px solid var(--border-color) !important;
+    padding: 0.35rem 0;
+
+    .p-button {
+      background: transparent !important;
+      border: none !important;
+      color: var(--primary-color) !important;
+      font-size: 0.85rem;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+    }
+  }
+}

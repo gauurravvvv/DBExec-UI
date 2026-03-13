@@ -1,6 +1,5 @@
 import {
   Component,
-  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -32,7 +31,7 @@ export interface TextConfig {
   templateUrl: './text-config-dialog.component.html',
   styleUrls: ['./text-config-dialog.component.scss'],
 })
-export class TextConfigDialogComponent implements OnChanges, DoCheck {
+export class TextConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() currentConfig: Partial<TextConfig> = {};
 
@@ -56,6 +55,7 @@ export class TextConfigDialogComponent implements OnChanges, DoCheck {
   };
 
   config: TextConfig = { ...this.defaultConfig };
+  previewConfig: TextConfig = { ...this.defaultConfig };
   previewValue: string = '';
 
   readonly inputTypeOptions = [
@@ -81,21 +81,19 @@ export class TextConfigDialogComponent implements OnChanges, DoCheck {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
-  private _lastConfigStr = '';
-
-  ngDoCheck(): void {
-    const s = JSON.stringify(this.config);
-    if (s !== this._lastConfigStr) {
-      this._lastConfigStr = s;
-      this._previewArr = [this._previewArr[0] + 1];
-    }
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
       this.config = { ...this.defaultConfig, ...this.currentConfig };
       this.previewValue = this.config.defaultValue;
+      this.previewConfig = { ...this.config };
+      this._previewArr = [this._previewArr[0] + 1];
     }
+  }
+
+  applyPreview(): void {
+    this.previewConfig = { ...this.config };
+    this._previewArr = [this._previewArr[0] + 1];
   }
 
   onClose(): void {
@@ -116,5 +114,11 @@ export class TextConfigDialogComponent implements OnChanges, DoCheck {
   clearDefault(): void {
     this.config.defaultValue = '';
     this.previewValue = '';
+  }
+
+  onPreviewBlur(): void {
+    if (this.previewConfig.trim && this.previewValue) {
+      this.previewValue = this.previewValue.trim();
+    }
   }
 }

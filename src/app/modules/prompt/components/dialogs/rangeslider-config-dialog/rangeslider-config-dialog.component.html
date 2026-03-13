@@ -71,49 +71,29 @@
                     <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
                 </div>
 
+
+            </div>
+            <div class="apply-preview-action">
+                <button class="btn-primary" type="button" (click)="applyPreview()">
+                    <i class="pi pi-refresh"></i>
+                    Apply Preview
+                </button>
             </div>
         </div>
 
         <div class="preview-panel">
-            <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
+            <div class="panel-header"><i class="pi pi-eye"></i><span>Preview</span></div>
             <div class="preview-content">
                 <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <div class="slider-preview" [class.vertical]="config.orientation === 'vertical'">
-
-                        <div class="bound-labels" *ngIf="config.showBoundLabels && config.orientation === 'horizontal'">
-                            <span>{{ config.min }}</span>
-                            <span>{{ config.max }}</span>
-                        </div>
-
-                        <div class="slider-with-bound" [class.vertical-layout]="config.orientation === 'vertical'">
-                            <span class="bound-label-side"
-                                *ngIf="config.showBoundLabels && config.orientation === 'vertical'">
-                                {{ config.max }}
-                            </span>
-                            <p-slider [(ngModel)]="previewRange" [min]="config.min" [max]="config.max"
-                                [step]="config.step" [range]="true" [animate]="config.animate"
-                                [disabled]="config.disabled" [orientation]="config.orientation">
-                            </p-slider>
-                            <span class="bound-label-side"
-                                *ngIf="config.showBoundLabels && config.orientation === 'vertical'">
-                                {{ config.min }}
-                            </span>
-                        </div>
-
-                        <div class="range-values" *ngIf="config.showValueLabels">
-                            <span class="range-val">
-                                <i class="pi pi-angle-left"></i>
-                                <strong>{{ previewRange[0] }}</strong>
-                            </span>
-                            <span class="range-separator">—</span>
-                            <span class="range-val">
-                                <strong>{{ previewRange[1] }}</strong>
-                                <i class="pi pi-angle-right"></i>
-                            </span>
-                        </div>
-                    </div>
+                    <app-custom-rangeslider [(ngModel)]="previewRange"
+                        [min]="previewConfig.min" [max]="previewConfig.max"
+                        [step]="previewConfig.step" [orientation]="previewConfig.orientation"
+                        [animate]="previewConfig.animate" [sliderDisabled]="previewConfig.disabled"
+                        [showValueLabels]="previewConfig.showValueLabels"
+                        [showBoundLabels]="previewConfig.showBoundLabels">
+                    </app-custom-rangeslider>
                 </ng-container>
 
                 <div class="preview-actions">
@@ -133,13 +113,13 @@
                 <div class="config-summary">
                     <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
                     <div class="summary-chips">
-                        <span class="summary-chip">{{ config.min }} – {{ config.max }}</span>
-                        <span class="summary-chip" *ngIf="config.step !== 1">Step: {{ config.step }}</span>
-                        <span class="summary-chip" *ngIf="config.orientation === 'vertical'">Vertical</span>
-                        <span class="summary-chip" *ngIf="config.animate">Animated</span>
-                        <span class="summary-chip" *ngIf="config.disabled">Disabled</span>
-                        <span class="summary-chip" *ngIf="config.showBoundLabels">Bound Labels</span>
-                        <span class="summary-chip" *ngIf="!config.showValueLabels">No Value Labels</span>
+                        <span class="summary-chip">{{ previewConfig.min }} – {{ previewConfig.max }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.step !== 1">Step: {{ previewConfig.step }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.orientation === 'vertical'">Vertical</span>
+                        <span class="summary-chip" *ngIf="previewConfig.animate">Animated</span>
+                        <span class="summary-chip" *ngIf="previewConfig.disabled">Disabled</span>
+                        <span class="summary-chip" *ngIf="previewConfig.showBoundLabels">Bound Labels</span>
+                        <span class="summary-chip" *ngIf="!previewConfig.showValueLabels">No Value Labels</span>
                     </div>
                 </div>
             </div>

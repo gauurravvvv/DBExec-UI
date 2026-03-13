@@ -1,0 +1,27 @@
+<div class="form-field">
+    <label class="normal-label" *ngIf="label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+    </label>
+    <div class="radio-group"
+        [ngClass]="{
+            'radio-group--vertical': layout === 'vertical',
+            'radio-group--columns': columns > 1,
+            'radio-group--label-left': labelPosition === 'left'
+        }"
+        [ngStyle]="{
+            'grid-template-columns': gridColumns,
+            'gap': gapValue
+        }">
+        <div class="radio-option" *ngFor="let opt of options">
+            <p-radioButton [name]="name"
+                [value]="opt[optionValue]" [label]="opt[optionLabel]"
+                [ngModel]="value" [disabled]="disabled"
+                (onClick)="onValueChange(opt[optionValue])">
+            </p-radioButton>
+        </div>
+    </div>
+    <small class="error-message" *ngIf="showError && errorMessage">
+        {{ errorMessage }}
+    </small>
+</div>

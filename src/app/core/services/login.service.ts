@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { AUTH } from 'src/app/constants/api';
-import { SessionStorageType, StorageType } from 'src/app/constants/storageType';
+import { StorageType } from 'src/app/constants/storageType';
 import { ROLES } from 'src/app/constants/user.constant';
 import { StorageService } from 'src/app/core/services/storage.service';
 
@@ -31,13 +31,13 @@ export class LoginService {
           // Then store other details
           StorageService.set(StorageType.ROLE, result.data.user.role);
 
-          StorageService.setSessionVal(
-            SessionStorageType.ORGANISATION_ID,
+          StorageService.set(
+            StorageType.ORGANISATION_ID,
             result.data.user.organisationId
           );
 
-          StorageService.setSessionVal(
-            SessionStorageType.ORGANISATION,
+          StorageService.set(
+            StorageType.ORGANISATION,
             result.data.user.organisationName
           );
         }

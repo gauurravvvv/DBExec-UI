@@ -383,12 +383,6 @@
     (close)="showNumberConfigDialog = false" (save)="onNumberConfigSaved($event)">
 </app-number-config-dialog>
 
-<!-- Date Configuration Dialog -->
-<app-date-config-dialog *ngIf="showDateConfigDialog" [(visible)]="showDateConfigDialog"
-    [currentConfig]="dateConfig"
-    (close)="showDateConfigDialog = false" (save)="onDateConfigSaved($event)">
-</app-date-config-dialog>
-
 <!-- Date Range Configuration Dialog -->
 <app-daterange-config-dialog *ngIf="showDateRangeConfigDialog" [(visible)]="showDateRangeConfigDialog"
     [currentConfig]="dateRangeConfig"

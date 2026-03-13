@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -23,7 +23,6 @@ import { CheckboxConfigDialogComponent } from './components/dialogs/checkbox-con
 import { RadioConfigDialogComponent } from './components/dialogs/radio-config-dialog/radio-config-dialog.component';
 import { TextConfigDialogComponent } from './components/dialogs/text-config-dialog/text-config-dialog.component';
 import { NumberConfigDialogComponent } from './components/dialogs/number-config-dialog/number-config-dialog.component';
-import { DateConfigDialogComponent } from './components/dialogs/date-config-dialog/date-config-dialog.component';
 import { DateRangeConfigDialogComponent } from './components/dialogs/daterange-config-dialog/daterange-config-dialog.component';
 import { CalendarConfigDialogComponent } from './components/dialogs/calendar-config-dialog/calendar-config-dialog.component';
 import { RangeSliderConfigDialogComponent } from './components/dialogs/rangeslider-config-dialog/rangeslider-config-dialog.component';
@@ -43,13 +42,13 @@ import { SharedModule } from 'src/app/shared';
     RadioConfigDialogComponent,
     TextConfigDialogComponent,
     NumberConfigDialogComponent,
-    DateConfigDialogComponent,
     DateRangeConfigDialogComponent,
     CalendarConfigDialogComponent,
     RangeSliderConfigDialogComponent,
   ],
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     InputTextModule,
     PasswordModule,

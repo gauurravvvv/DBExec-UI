@@ -1,6 +1,5 @@
 import {
   Component,
-  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -37,7 +36,7 @@ export interface MultiselectConfig {
   templateUrl: './multiselect-config-dialog.component.html',
   styleUrls: ['./multiselect-config-dialog.component.scss'],
 })
-export class MultiselectConfigDialogComponent implements OnChanges, DoCheck {
+export class MultiselectConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() promptValues: any[] = [];
   @Input() currentConfig: Partial<MultiselectConfig> = {};
@@ -66,6 +65,7 @@ export class MultiselectConfigDialogComponent implements OnChanges, DoCheck {
   };
 
   config: MultiselectConfig = { ...this.defaultConfig };
+  previewConfig: MultiselectConfig = { ...this.defaultConfig };
 
   // Preview state
   selectedValues: any[] = [];
@@ -105,22 +105,20 @@ export class MultiselectConfigDialogComponent implements OnChanges, DoCheck {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
-  private _lastConfigStr = '';
-
-  ngDoCheck(): void {
-    const s = JSON.stringify(this.config);
-    if (s !== this._lastConfigStr) {
-      this._lastConfigStr = s;
-      this._previewArr = [this._previewArr[0] + 1];
-    }
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
       this.config = { ...this.defaultConfig, ...this.currentConfig };
       this.limitEnabled = this.config.selectionLimit != null;
       this.selectedValues = [...(this.config.defaultValues || [])];
+      this.previewConfig = { ...this.config };
+      this._previewArr = [this._previewArr[0] + 1];
     }
+  }
+
+  applyPreview(): void {
+    this.previewConfig = { ...this.config };
+    this._previewArr = [this._previewArr[0] + 1];
   }
 
   onClose(): void {

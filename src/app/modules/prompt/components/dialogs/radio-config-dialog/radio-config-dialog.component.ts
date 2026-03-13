@@ -1,6 +1,5 @@
 import {
   Component,
-  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -21,7 +20,7 @@ export interface RadioConfig {
   templateUrl: './radio-config-dialog.component.html',
   styleUrls: ['./radio-config-dialog.component.scss'],
 })
-export class RadioConfigDialogComponent implements OnChanges, DoCheck {
+export class RadioConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() promptValues: any[] = [];
   @Input() currentConfig: Partial<RadioConfig> = {};
@@ -39,6 +38,7 @@ export class RadioConfigDialogComponent implements OnChanges, DoCheck {
   };
 
   config: RadioConfig = { ...this.defaultConfig };
+  previewConfig: RadioConfig = { ...this.defaultConfig };
   selectedValue: any = null;
 
   readonly layoutOptions = [
@@ -64,51 +64,59 @@ export class RadioConfigDialogComponent implements OnChanges, DoCheck {
     { label: 'Large (1.5rem)', value: 'large' },
   ];
 
-  get formattedOptions(): any[] {
-    if (!this.promptValues || this.promptValues.length === 0) return [];
-    if (
-      typeof this.promptValues[0] === 'object' &&
-      this.promptValues[0]?.label
-    ) {
-      return this.promptValues;
-    }
-    return this.promptValues.map(val => ({ label: String(val), value: val }));
-  }
+  formattedOptions: any[] = [];
 
   get previewGridStyle(): any {
     const gapMap = { small: '0.5rem', medium: '1rem', large: '1.5rem' };
-    if (this.config.layout === 'horizontal') {
+    if (this.previewConfig.layout === 'horizontal') {
       return {
         display: 'flex',
         flexWrap: 'wrap',
-        gap: gapMap[this.config.gap],
+        gap: gapMap[this.previewConfig.gap],
         flexDirection: 'row',
       };
     }
     return {
       display: 'grid',
-      gridTemplateColumns: `repeat(${this.config.columns}, 1fr)`,
-      gap: gapMap[this.config.gap],
+      gridTemplateColumns: `repeat(${this.previewConfig.columns}, 1fr)`,
+      gap: gapMap[this.previewConfig.gap],
     };
   }
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
-  private _lastConfigStr = '';
 
-  ngDoCheck(): void {
-    const s = JSON.stringify(this.config);
-    if (s !== this._lastConfigStr) {
-      this._lastConfigStr = s;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['promptValues']) {
+      this.updateFormattedOptions();
+    }
+    if (changes['visible'] && this.visible) {
+      this.updateFormattedOptions();
+      this.config = { ...this.defaultConfig, ...this.currentConfig };
+      this.selectedValue = this.config.defaultValue;
+      this.previewConfig = { ...this.config };
       this._previewArr = [this._previewArr[0] + 1];
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['visible'] && this.visible) {
-      this.config = { ...this.defaultConfig, ...this.currentConfig };
-      this.selectedValue = this.config.defaultValue;
+  private updateFormattedOptions(): void {
+    if (!this.promptValues || this.promptValues.length === 0) {
+      this.formattedOptions = [];
+      return;
     }
+    if (
+      typeof this.promptValues[0] === 'object' &&
+      this.promptValues[0]?.label
+    ) {
+      this.formattedOptions = this.promptValues;
+      return;
+    }
+    this.formattedOptions = this.promptValues.map(val => ({ label: String(val), value: val }));
+  }
+
+  applyPreview(): void {
+    this.previewConfig = { ...this.config };
+    this._previewArr = [this._previewArr[0] + 1];
   }
 
   onClose(): void {

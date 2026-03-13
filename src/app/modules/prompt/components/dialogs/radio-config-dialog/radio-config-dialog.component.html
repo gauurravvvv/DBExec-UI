@@ -37,26 +37,27 @@
                     </p-dropdown>
                 </div>
 
+
+            </div>
+            <div class="apply-preview-action">
+                <button class="btn-primary" type="button" (click)="applyPreview()">
+                    <i class="pi pi-refresh"></i>
+                    Apply Preview
+                </button>
             </div>
         </div>
 
         <div class="preview-panel">
-            <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
+            <div class="panel-header"><i class="pi pi-eye"></i><span>Preview</span></div>
             <div class="preview-content">
                 <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
                     <div *ngIf="formattedOptions.length > 0; else noOptions">
-                        <div [ngStyle]="previewGridStyle">
-                            <ng-container *ngFor="let option of formattedOptions">
-                                <div class="radio-item" [class.reverse]="config.labelPosition === 'left'">
-                                    <p-radioButton [value]="option.value" [(ngModel)]="selectedValue"
-                                        [inputId]="'radio-' + option.value">
-                                    </p-radioButton>
-                                    <label [for]="'radio-' + option.value">{{ option.label }}</label>
-                                </div>
-                            </ng-container>
-                        </div>
+                        <app-custom-radio [options]="formattedOptions" [(ngModel)]="selectedValue"
+                            [layout]="previewConfig.layout" [columns]="previewConfig.columns"
+                            [gap]="previewConfig.gap" [labelPosition]="previewConfig.labelPosition">
+                        </app-custom-radio>
 
                         <div class="preview-actions" *ngIf="selectedValue != null">
                             <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
@@ -82,14 +83,14 @@
                 <div class="config-summary">
                     <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
                     <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="config.layout === 'horizontal'">Horizontal</span>
-                        <span class="summary-chip" *ngIf="config.layout === 'vertical' && config.columns > 1">{{
-                            config.columns }} cols</span>
-                        <span class="summary-chip" *ngIf="config.labelPosition === 'left'">Label Left</span>
-                        <span class="summary-chip" *ngIf="config.gap !== 'medium'">Gap: {{ config.gap }}</span>
-                        <span class="summary-chip" *ngIf="config.defaultValue != null">Has Default</span>
+                        <span class="summary-chip" *ngIf="previewConfig.layout === 'horizontal'">Horizontal</span>
+                        <span class="summary-chip" *ngIf="previewConfig.layout === 'vertical' && previewConfig.columns > 1">{{
+                            previewConfig.columns }} cols</span>
+                        <span class="summary-chip" *ngIf="previewConfig.labelPosition === 'left'">Label Left</span>
+                        <span class="summary-chip" *ngIf="previewConfig.gap !== 'medium'">Gap: {{ previewConfig.gap }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.defaultValue != null">Has Default</span>
                         <span class="summary-empty"
-                            *ngIf="config.layout === 'vertical' && config.columns === 1 && config.labelPosition === 'right' && config.gap === 'medium' && config.defaultValue == null">
+                            *ngIf="previewConfig.layout === 'vertical' && previewConfig.columns === 1 && previewConfig.labelPosition === 'right' && previewConfig.gap === 'medium' && previewConfig.defaultValue == null">
                             Default configuration
                         </span>
                     </div>

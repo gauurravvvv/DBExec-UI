@@ -1,0 +1,24 @@
+<div class="form-field">
+    <label class="normal-label" *ngIf="label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+    </label>
+    <div class="slider-value-labels" *ngIf="showValueLabels && value">
+        <span>{{ value[0] }}</span>
+        <span>-</span>
+        <span>{{ value[1] }}</span>
+    </div>
+    <p-slider [(ngModel)]="value" [range]="true"
+        [min]="min" [max]="max" [step]="step"
+        [orientation]="orientation" [animate]="animate"
+        [disabled]="disabled || sliderDisabled" styleClass="w-full"
+        (onSlideEnd)="onValueChange()">
+    </p-slider>
+    <div class="slider-bound-labels" *ngIf="showBoundLabels">
+        <span>{{ min }}</span>
+        <span>{{ max }}</span>
+    </div>
+    <small class="error-message" *ngIf="showError && errorMessage">
+        {{ errorMessage }}
+    </small>
+</div>

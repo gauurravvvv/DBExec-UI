@@ -3,10 +3,16 @@
         <!-- Floating Label -->
         <span class="p-float-label" *ngIf="floatingLabel">
             <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="$any(optionValue)"
-                [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
-                [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
-                [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)"
-                (onBlur)="onBlur()" [inputId]="inputId">
+                [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel"
+                [filterPlaceholder]="filterPlaceholder" [filterMatchMode]="filterMatchMode"
+                [resetFilterOnHide]="resetFilterOnHide" [showClear]="showClear" [editable]="editable"
+                [autoDisplayFirst]="autoDisplayFirst" [scrollHeight]="scrollHeight"
+                [emptyMessage]="emptyMessage" [emptyFilterMessage]="emptyFilterMessage"
+                [virtualScroll]="virtualScroll" [virtualScrollItemSize]="virtualScrollItemSize"
+                [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}" [placeholder]="placeholder"
+                [disabled]="disabled" [ngClass]="{'ng-invalid ng-dirty': showError}"
+                (onChange)="onValueChange($event.value)" (onBlur)="onBlur()" [inputId]="inputId"
+                [appendTo]="appendTo">
             </p-dropdown>
             <label [for]="inputId">
                 {{ label }}
@@ -20,18 +26,29 @@
                 <span class="required" *ngIf="required">*</span>
             </label>
             <p-dropdown [options]="options" [optionLabel]="optionLabel" [optionValue]="$any(optionValue)"
-                [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
-                [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
-                [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)"
-                (onBlur)="onBlur()">
+                [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel"
+                [filterPlaceholder]="filterPlaceholder" [filterMatchMode]="filterMatchMode"
+                [resetFilterOnHide]="resetFilterOnHide" [showClear]="showClear" [editable]="editable"
+                [autoDisplayFirst]="autoDisplayFirst" [scrollHeight]="scrollHeight"
+                [emptyMessage]="emptyMessage" [emptyFilterMessage]="emptyFilterMessage"
+                [virtualScroll]="virtualScroll" [virtualScrollItemSize]="virtualScrollItemSize"
+                [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}" [placeholder]="placeholder"
+                [disabled]="disabled" [ngClass]="{'ng-invalid ng-dirty': showError}"
+                (onChange)="onValueChange($event.value)" (onBlur)="onBlur()" [appendTo]="appendTo">
             </p-dropdown>
         </ng-container>
     </ng-container>
     <!-- No Label -->
     <p-dropdown *ngIf="!label" [options]="options" [optionLabel]="optionLabel" [optionValue]="$any(optionValue)"
-        [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel" [style]="{'width':'100%'}"
-        [panelStyle]="{'width':'100%'}" [placeholder]="placeholder" [disabled]="disabled"
-        [ngClass]="{'ng-invalid ng-dirty': showError}" (onChange)="onValueChange($event.value)" (onBlur)="onBlur()">
+        [(ngModel)]="value" [filter]="filter" [filterBy]="filterBy || optionLabel"
+        [filterPlaceholder]="filterPlaceholder" [filterMatchMode]="filterMatchMode"
+        [resetFilterOnHide]="resetFilterOnHide" [showClear]="showClear" [editable]="editable"
+        [autoDisplayFirst]="autoDisplayFirst" [scrollHeight]="scrollHeight"
+        [emptyMessage]="emptyMessage" [emptyFilterMessage]="emptyFilterMessage"
+        [virtualScroll]="virtualScroll" [virtualScrollItemSize]="virtualScrollItemSize"
+        [style]="{'width':'100%'}" [panelStyle]="{'width':'100%'}" [placeholder]="placeholder"
+        [disabled]="disabled" [ngClass]="{'ng-invalid ng-dirty': showError}"
+        (onChange)="onValueChange($event.value)" (onBlur)="onBlur()" [appendTo]="appendTo">
     </p-dropdown>
     <small class="error-message" *ngIf="showError && errorMessage">
         {{ errorMessage }}

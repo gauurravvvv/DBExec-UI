@@ -1,6 +1,5 @@
 import {
   Component,
-  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -30,7 +29,7 @@ export interface RangeSliderConfig {
   templateUrl: './rangeslider-config-dialog.component.html',
   styleUrls: ['./rangeslider-config-dialog.component.scss'],
 })
-export class RangeSliderConfigDialogComponent implements OnChanges, DoCheck {
+export class RangeSliderConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() currentConfig: Partial<RangeSliderConfig> = {};
 
@@ -52,6 +51,7 @@ export class RangeSliderConfigDialogComponent implements OnChanges, DoCheck {
   };
 
   config: RangeSliderConfig = { ...this.defaultConfig };
+  previewConfig: RangeSliderConfig = { ...this.defaultConfig };
   previewRange: number[] = [0, 100];
 
   readonly orientationOptions = [
@@ -71,21 +71,20 @@ export class RangeSliderConfigDialogComponent implements OnChanges, DoCheck {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
-  private _lastConfigStr = '';
-
-  ngDoCheck(): void {
-    const s = JSON.stringify(this.config);
-    if (s !== this._lastConfigStr) {
-      this._lastConfigStr = s;
-      this._previewArr = [this._previewArr[0] + 1];
-    }
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
       this.config = { ...this.defaultConfig, ...this.currentConfig };
+      this.previewConfig = { ...this.config };
+      this._previewArr = [this._previewArr[0] + 1];
       this.previewRange = [this.config.defaultMin, this.config.defaultMax];
     }
+  }
+
+  applyPreview(): void {
+    this.previewConfig = { ...this.config };
+    this.previewRange = [this.config.defaultMin, this.config.defaultMax];
+    this._previewArr = [this._previewArr[0] + 1];
   }
 
   onClose(): void {

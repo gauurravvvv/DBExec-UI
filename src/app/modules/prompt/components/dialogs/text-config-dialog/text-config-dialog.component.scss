@@ -135,6 +135,32 @@
   }
 }
 
+.apply-preview-action {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+    i { font-size: 0.9rem; }
+    &:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4); }
+  }
+}
+
 .section-label {
   display: flex;
   align-items: center;

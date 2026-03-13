@@ -1,0 +1,66 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .normal-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color);
+
+    .required {
+      color: var(--error-color);
+      margin-left: 2px;
+    }
+  }
+
+  .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+  }
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 4px 0;
+
+  &--vertical {
+    flex-direction: column;
+  }
+
+  &--columns {
+    display: grid;
+  }
+
+  &--label-left {
+    .radio-option {
+      direction: rtl;
+
+      * {
+        direction: ltr;
+      }
+    }
+  }
+}
+
+:host ::ng-deep .p-radiobutton {
+  .p-radiobutton-box {
+    border-color: var(--border-color) !important;
+    background: var(--hover-background) !important;
+
+    &:hover {
+      border-color: var(--primary-color) !important;
+    }
+
+    &.p-highlight {
+      border-color: var(--primary-color) !important;
+      background: var(--primary-color) !important;
+
+      .p-radiobutton-icon {
+        background: var(--card-background) !important;
+      }
+    }
+  }
+}

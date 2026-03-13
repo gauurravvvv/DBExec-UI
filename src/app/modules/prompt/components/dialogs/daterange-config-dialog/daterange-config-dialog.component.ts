@@ -1,6 +1,5 @@
 import {
   Component,
-  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -40,7 +39,7 @@ export interface DateRangeConfig {
   templateUrl: './daterange-config-dialog.component.html',
   styleUrls: ['./daterange-config-dialog.component.scss'],
 })
-export class DateRangeConfigDialogComponent implements OnChanges, DoCheck {
+export class DateRangeConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() currentConfig: Partial<DateRangeConfig> = {};
 
@@ -71,6 +70,7 @@ export class DateRangeConfigDialogComponent implements OnChanges, DoCheck {
   };
 
   config: DateRangeConfig = { ...this.defaultConfig };
+  previewConfig: DateRangeConfig = { ...this.defaultConfig };
 
   // Preview state
   previewRange: Date[] | null = null;
@@ -118,19 +118,27 @@ export class DateRangeConfigDialogComponent implements OnChanges, DoCheck {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
-  private _lastConfigStr = '';
 
-  ngDoCheck(): void {
-    const s = JSON.stringify(this.config);
-    if (s !== this._lastConfigStr) {
-      this._lastConfigStr = s;
-      this._previewArr = [this._previewArr[0] + 1];
+  private toDate(val: any): Date | null {
+    if (val == null) return null;
+    if (val instanceof Date) return val;
+    if (typeof val === 'string' || typeof val === 'number') {
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? null : d;
     }
+    return null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
       this.config = { ...this.defaultConfig, ...this.currentConfig };
+      // Parse date strings to Date objects
+      this.config.minDate = this.toDate(this.config.minDate);
+      this.config.maxDate = this.toDate(this.config.maxDate);
+      this.config.defaultStartDate = this.toDate(this.config.defaultStartDate);
+      this.config.defaultEndDate = this.toDate(this.config.defaultEndDate);
+      this.previewConfig = { ...this.config };
+      this._previewArr = [this._previewArr[0] + 1];
       if (this.config.defaultStartDate && this.config.defaultEndDate) {
         this.previewRange = [
           this.config.defaultStartDate,
@@ -140,6 +148,11 @@ export class DateRangeConfigDialogComponent implements OnChanges, DoCheck {
         this.previewRange = null;
       }
     }
+  }
+
+  applyPreview(): void {
+    this.previewConfig = { ...this.config };
+    this._previewArr = [this._previewArr[0] + 1];
   }
 
   onClose(): void {

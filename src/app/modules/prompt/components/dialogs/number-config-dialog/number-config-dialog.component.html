@@ -59,22 +59,27 @@
                     <p-inputSwitch [(ngModel)]="config.readonly"></p-inputSwitch>
                 </div>
 
+
+            </div>
+            <div class="apply-preview-action">
+                <button class="btn-primary" type="button" (click)="applyPreview()">
+                    <i class="pi pi-refresh"></i>
+                    Apply Preview
+                </button>
             </div>
         </div>
 
         <div class="preview-panel">
-            <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
+            <div class="panel-header"><i class="pi pi-eye"></i><span>Preview</span></div>
             <div class="preview-content">
                 <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <p-inputNumber [(ngModel)]="previewValue" [placeholder]="config.placeholder"
-                        [min]="$any(config.min)" [max]="$any(config.max)" [step]="config.step"
-                        [showButtons]="config.showButtons" [prefix]="config.prefix" [suffix]="config.suffix"
-                        [disabled]="config.disabled" [readonly]="config.readonly"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
-                        [style]="{width:'100%'}">
-                    </p-inputNumber>
+                    <app-custom-number [(ngModel)]="previewValue" [placeholder]="previewConfig.placeholder"
+                        [min]="$any(previewConfig.min)" [max]="$any(previewConfig.max)" [step]="previewConfig.step"
+                        [showButtons]="previewConfig.showButtons" [prefix]="previewConfig.prefix" [suffix]="previewConfig.suffix"
+                        [readonly]="previewConfig.readonly" [numberDisabled]="previewConfig.disabled">
+                    </app-custom-number>
                 </ng-container>
 
                 <div class="preview-actions" *ngIf="previewValue !== null">
@@ -92,15 +97,15 @@
                 <div class="config-summary">
                     <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
                     <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="config.showButtons">Buttons</span>
-                        <span class="summary-chip" *ngIf="config.min !== null">Min: {{ config.min }}</span>
-                        <span class="summary-chip" *ngIf="config.max !== null">Max: {{ config.max }}</span>
-                        <span class="summary-chip" *ngIf="config.prefix">Prefix</span>
-                        <span class="summary-chip" *ngIf="config.suffix">Suffix</span>
-                        <span class="summary-chip" *ngIf="config.disabled">Disabled</span>
-                        <span class="summary-chip" *ngIf="config.readonly">Read-only</span>
+                        <span class="summary-chip" *ngIf="previewConfig.showButtons">Buttons</span>
+                        <span class="summary-chip" *ngIf="previewConfig.min !== null">Min: {{ previewConfig.min }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.max !== null">Max: {{ previewConfig.max }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.prefix">Prefix</span>
+                        <span class="summary-chip" *ngIf="previewConfig.suffix">Suffix</span>
+                        <span class="summary-chip" *ngIf="previewConfig.disabled">Disabled</span>
+                        <span class="summary-chip" *ngIf="previewConfig.readonly">Read-only</span>
                         <span class="summary-empty"
-                            *ngIf="config.showButtons && config.min === null && config.max === null && !config.prefix && !config.suffix && !config.disabled && !config.readonly">
+                            *ngIf="previewConfig.showButtons && previewConfig.min === null && previewConfig.max === null && !previewConfig.prefix && !previewConfig.suffix && !previewConfig.disabled && !previewConfig.readonly">
                             Default configuration
                         </span>
                     </div>

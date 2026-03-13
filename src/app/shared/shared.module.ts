@@ -38,9 +38,14 @@ import { ConfigurableLinesGlChartComponent } from './components/configurable-lin
 import { ConfigurableMap3dChartComponent } from './components/configurable-map3d-chart/configurable-map3d-chart.component';
 import { ConfigurableFlowGlChartComponent } from './components/configurable-flowgl-chart/configurable-flowgl-chart.component';
 import { CustomCalendarComponent } from './components/custom-calendar/custom-calendar.component';
+import { CustomCheckboxComponent } from './components/custom-checkbox/custom-checkbox.component';
+import { CustomDaterangeComponent } from './components/custom-daterange/custom-daterange.component';
 import { CustomDropdownComponent } from './components/custom-dropdown/custom-dropdown.component';
 import { CustomInputComponent } from './components/custom-input/custom-input.component';
 import { CustomMultiselectComponent } from './components/custom-multiselect/custom-multiselect.component';
+import { CustomNumberComponent } from './components/custom-number/custom-number.component';
+import { CustomRadioComponent } from './components/custom-radio/custom-radio.component';
+import { CustomRangesliderComponent } from './components/custom-rangeslider/custom-rangeslider.component';
 import { CustomTextareaComponent } from './components/custom-textarea/custom-textarea.component';
 import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.component';
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
@@ -84,9 +89,14 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     ConfigurableMap3dChartComponent,
     ConfigurableFlowGlChartComponent,
     CustomCalendarComponent,
+    CustomCheckboxComponent,
+    CustomDaterangeComponent,
     CustomInputComponent,
     CustomDropdownComponent,
     CustomMultiselectComponent,
+    CustomNumberComponent,
+    CustomRadioComponent,
+    CustomRangesliderComponent,
     CustomTextareaComponent,
     CustomToggleComponent,
     GlobalSearchComponent,
@@ -140,9 +150,14 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     ConfigurableMap3dChartComponent,
     ConfigurableFlowGlChartComponent,
     CustomCalendarComponent,
+    CustomCheckboxComponent,
+    CustomDaterangeComponent,
     CustomInputComponent,
     CustomDropdownComponent,
     CustomMultiselectComponent,
+    CustomNumberComponent,
+    CustomRadioComponent,
+    CustomRangesliderComponent,
     CustomTextareaComponent,
     CustomToggleComponent,
     GlobalSearchComponent,

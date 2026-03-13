@@ -120,6 +120,13 @@
                     <small class="hint">Height of each option row in pixels</small>
                 </div>
 
+
+            </div>
+            <div class="apply-preview-action">
+                <button class="btn-primary" type="button" (click)="applyPreview()">
+                    <i class="pi pi-refresh"></i>
+                    Apply Preview
+                </button>
             </div>
         </div>
 
@@ -127,23 +134,23 @@
         <div class="preview-panel">
             <div class="panel-header">
                 <i class="pi pi-eye"></i>
-                <span>Live Preview</span>
+                <span>Preview</span>
             </div>
 
             <div class="preview-content">
                 <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <p-dropdown [options]="formattedOptions" [(ngModel)]="selectedValue"
-                        [placeholder]="config.placeholder" [filter]="config.filter"
-                        [filterPlaceholder]="config.filterPlaceholder" [filterMatchMode]="config.filterMatchMode"
-                        [resetFilterOnHide]="config.resetFilterOnHide" [showClear]="config.showClear"
-                        [editable]="config.editable" [autoDisplayFirst]="config.autoDisplayFirst"
-                        [scrollHeight]="config.scrollHeight" [emptyMessage]="config.emptyMessage"
-                        [emptyFilterMessage]="config.emptyFilterMessage" [virtualScroll]="config.virtualScroll"
-                        [virtualScrollItemSize]="config.virtualScrollItemSize" [style]="{width: '100%'}" appendTo="body"
-                        optionLabel="label" optionValue="value">
-                    </p-dropdown>
+                    <app-custom-dropdown [options]="formattedOptions" [(ngModel)]="selectedValue"
+                        [placeholder]="previewConfig.placeholder" [filter]="previewConfig.filter"
+                        [filterPlaceholder]="previewConfig.filterPlaceholder" [filterMatchMode]="previewConfig.filterMatchMode"
+                        [resetFilterOnHide]="previewConfig.resetFilterOnHide" [showClear]="previewConfig.showClear"
+                        [editable]="previewConfig.editable" [autoDisplayFirst]="previewConfig.autoDisplayFirst"
+                        [scrollHeight]="previewConfig.scrollHeight" [emptyMessage]="previewConfig.emptyMessage"
+                        [emptyFilterMessage]="previewConfig.emptyFilterMessage" [virtualScroll]="previewConfig.virtualScroll"
+                        [virtualScrollItemSize]="previewConfig.virtualScrollItemSize"
+                        optionLabel="label" optionValue="value" appendTo="body">
+                    </app-custom-dropdown>
                 </ng-container>
 
                 <div class="preview-actions" *ngIf="selectedValue != null">
@@ -171,16 +178,16 @@
                         <i class="pi pi-info-circle"></i> Active Settings
                     </div>
                     <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="config.filter">Filter ({{ config.filterMatchMode }})</span>
-                        <span class="summary-chip" *ngIf="config.resetFilterOnHide">Auto-reset Filter</span>
-                        <span class="summary-chip" *ngIf="config.showClear">Clear Button</span>
-                        <span class="summary-chip" *ngIf="config.editable">Editable</span>
-                        <span class="summary-chip" *ngIf="config.autoDisplayFirst">Auto-first</span>
-                        <span class="summary-chip" *ngIf="config.virtualScroll">Virtual Scroll</span>
-                        <span class="summary-chip" *ngIf="config.scrollHeight !== '200px'">Height: {{
-                            config.scrollHeight }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.filter">Filter ({{ previewConfig.filterMatchMode }})</span>
+                        <span class="summary-chip" *ngIf="previewConfig.resetFilterOnHide">Auto-reset Filter</span>
+                        <span class="summary-chip" *ngIf="previewConfig.showClear">Clear Button</span>
+                        <span class="summary-chip" *ngIf="previewConfig.editable">Editable</span>
+                        <span class="summary-chip" *ngIf="previewConfig.autoDisplayFirst">Auto-first</span>
+                        <span class="summary-chip" *ngIf="previewConfig.virtualScroll">Virtual Scroll</span>
+                        <span class="summary-chip" *ngIf="previewConfig.scrollHeight !== '200px'">Height: {{
+                            previewConfig.scrollHeight }}</span>
                         <span class="summary-empty"
-                            *ngIf="!config.filter && !config.showClear && !config.editable && !config.autoDisplayFirst && !config.virtualScroll && config.scrollHeight === '200px'">
+                            *ngIf="!previewConfig.filter && !previewConfig.showClear && !previewConfig.editable && !previewConfig.autoDisplayFirst && !previewConfig.virtualScroll && previewConfig.scrollHeight === '200px'">
                             Default configuration
                         </span>
                     </div>

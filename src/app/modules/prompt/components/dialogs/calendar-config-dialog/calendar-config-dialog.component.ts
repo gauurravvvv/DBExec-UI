@@ -1,6 +1,5 @@
 import {
   Component,
-  DoCheck,
   EventEmitter,
   Input,
   OnChanges,
@@ -54,7 +53,7 @@ export interface CalendarConfig {
   templateUrl: './calendar-config-dialog.component.html',
   styleUrls: ['./calendar-config-dialog.component.scss'],
 })
-export class CalendarConfigDialogComponent implements OnChanges, DoCheck {
+export class CalendarConfigDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() currentConfig: Partial<CalendarConfig> = {};
 
@@ -91,6 +90,7 @@ export class CalendarConfigDialogComponent implements OnChanges, DoCheck {
   };
 
   config: CalendarConfig = { ...this.defaultConfig };
+  previewConfig: CalendarConfig = { ...this.defaultConfig };
 
   // Preview state
   previewValue: Date | Date[] | null = null;
@@ -159,14 +159,15 @@ export class CalendarConfigDialogComponent implements OnChanges, DoCheck {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
-  private _lastConfigStr = '';
 
-  ngDoCheck(): void {
-    const s = JSON.stringify(this.config);
-    if (s !== this._lastConfigStr) {
-      this._lastConfigStr = s;
-      this._previewArr = [this._previewArr[0] + 1];
+  private toDate(val: any): Date | null {
+    if (val == null) return null;
+    if (val instanceof Date) return val;
+    if (typeof val === 'string' || typeof val === 'number') {
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? null : d;
     }
+    return null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -175,8 +176,19 @@ export class CalendarConfigDialogComponent implements OnChanges, DoCheck {
         ...this.defaultConfig,
         ...this.currentConfig,
       };
+      // Parse date strings to Date objects
+      this.config.minDate = this.toDate(this.config.minDate);
+      this.config.maxDate = this.toDate(this.config.maxDate);
+      this.config.defaultValue = this.toDate(this.config.defaultValue);
+      this.previewConfig = { ...this.config };
+      this._previewArr = [this._previewArr[0] + 1];
       this.previewValue = this.config.defaultValue;
     }
+  }
+
+  applyPreview(): void {
+    this.previewConfig = { ...this.config };
+    this._previewArr = [this._previewArr[0] + 1];
   }
 
   onClose(): void {

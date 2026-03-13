@@ -1,0 +1,27 @@
+<div class="form-field">
+    <label class="normal-label" *ngIf="label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+    </label>
+    <div class="checkbox-group"
+        [ngClass]="{
+            'checkbox-group--vertical': layout === 'vertical',
+            'checkbox-group--columns': columns > 1,
+            'checkbox-group--label-left': labelPosition === 'left'
+        }"
+        [ngStyle]="{
+            'grid-template-columns': gridColumns,
+            'gap': gapValue
+        }">
+        <div class="checkbox-option" *ngFor="let opt of options">
+            <p-checkbox [value]="opt[optionValue]" [label]="opt[optionLabel]"
+                [(ngModel)]="value" [disabled]="disabled || checkboxDisabled"
+                [checkboxIcon]="checkboxIcon"
+                (onChange)="onValueChange()">
+            </p-checkbox>
+        </div>
+    </div>
+    <small class="error-message" *ngIf="showError && errorMessage">
+        {{ errorMessage }}
+    </small>
+</div>

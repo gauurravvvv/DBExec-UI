@@ -112,121 +112,125 @@
                                             <app-custom-input [label]="prompt.name"
                                                 [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
                                                 [required]="prompt.mandatory"
+                                                [type]="prompt.config?.appearance?.inputType || 'text'"
+                                                [inputMode]="prompt.config?.appearance?.inputMode || 'input'"
+                                                [maxLength]="prompt.config?.appearance?.maxLength ?? null"
+                                                [minLength]="prompt.config?.appearance?.minLength ?? null"
+                                                [readonly]="prompt.config?.appearance?.readonly || false"
+                                                [rows]="prompt.config?.appearance?.rows || 3"
+                                                [autoResize]="prompt.config?.appearance?.autoResize || false"
                                                 [formControlName]="prompt.formControlName">
                                             </app-custom-input>
                                         </ng-container>
 
                                         <!-- Number -->
                                         <ng-container *ngSwitchCase="'number'">
-                                            <div class="prompt-field-wrapper">
-                                                <label class="prompt-label">
-                                                    {{ prompt.name }}
-                                                    <span class="required-marker" *ngIf="prompt.mandatory">*</span>
-                                                </label>
-                                                <p-inputNumber [formControlName]="prompt.formControlName"
-                                                    [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                    [useGrouping]="false"
-                                                    [min]="prompt.config?.appearance?.min ?? null"
-                                                    [max]="prompt.config?.appearance?.max ?? null"
-                                                    [step]="prompt.config?.appearance?.step ?? 1"
-                                                    styleClass="w-full">
-                                                </p-inputNumber>
-                                            </div>
+                                            <app-custom-number [label]="prompt.name"
+                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
+                                                [required]="prompt.mandatory"
+                                                [min]="prompt.config?.appearance?.min ?? null"
+                                                [max]="prompt.config?.appearance?.max ?? null"
+                                                [step]="prompt.config?.appearance?.step ?? 1"
+                                                [showButtons]="prompt.config?.appearance?.showButtons || false"
+                                                [prefix]="prompt.config?.appearance?.prefix || ''"
+                                                [suffix]="prompt.config?.appearance?.suffix || ''"
+                                                [readonly]="prompt.config?.appearance?.readonly || false"
+                                                [formControlName]="prompt.formControlName">
+                                            </app-custom-number>
                                         </ng-container>
 
                                         <!-- Date -->
                                         <ng-container *ngSwitchCase="'date'">
-                                            <div class="prompt-field-wrapper">
-                                                <label class="prompt-label">
-                                                    {{ prompt.name }}
-                                                    <span class="required-marker" *ngIf="prompt.mandatory">*</span>
-                                                </label>
-                                                <p-calendar [formControlName]="prompt.formControlName"
-                                                    [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                    [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
-                                                    [showIcon]="prompt.config?.appearance?.showIcon !== false"
-                                                    [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
-                                                    [showWeek]="prompt.config?.appearance?.showWeek || false"
-                                                    [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 1"
-                                                    [view]="prompt.config?.appearance?.view || 'date'"
-                                                    [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
-                                                    [selectOtherMonths]="prompt.config?.appearance?.selectOtherMonths || false"
-                                                    [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
-                                                    [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
-                                                    [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
-                                                    [firstDayOfWeek]="prompt.config?.appearance?.firstDayOfWeek || 0"
-                                                    [showTime]="false"
-                                                    [readonlyInput]="prompt.config?.appearance?.readonlyInput || false"
-                                                    [touchUI]="prompt.config?.appearance?.touchUI || false"
-                                                    [keepInvalid]="prompt.config?.appearance?.keepInvalid || false"
-                                                    [inline]="prompt.config?.appearance?.inline || false"
-                                                    appendTo="body" styleClass="w-full">
-                                                </p-calendar>
-                                            </div>
+                                            <app-custom-calendar [label]="prompt.name"
+                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
+                                                [required]="prompt.mandatory"
+                                                [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
+                                                [showIcon]="prompt.config?.appearance?.showIcon !== false"
+                                                [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
+                                                [showWeek]="prompt.config?.appearance?.showWeek || false"
+                                                [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 1"
+                                                [view]="prompt.config?.appearance?.view || 'date'"
+                                                [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
+                                                [selectOtherMonths]="prompt.config?.appearance?.selectOtherMonths || false"
+                                                [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
+                                                [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
+                                                [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
+                                                [firstDayOfWeek]="prompt.config?.appearance?.firstDayOfWeek || 0"
+                                                [showTime]="false"
+                                                [readonlyInput]="prompt.config?.appearance?.readonlyInput || false"
+                                                [touchUI]="prompt.config?.appearance?.touchUI || false"
+                                                [keepInvalid]="prompt.config?.appearance?.keepInvalid || false"
+                                                [inline]="prompt.config?.appearance?.inline || false"
+                                                [minDate]="prompt.config?.appearance?.minDate || null"
+                                                [maxDate]="prompt.config?.appearance?.maxDate || null"
+                                                [disabledDays]="prompt.config?.appearance?.disabledDays || []"
+                                                [formControlName]="prompt.formControlName">
+                                            </app-custom-calendar>
                                         </ng-container>
 
                                         <!-- Calendar (date + time) -->
                                         <ng-container *ngSwitchCase="'calendar'">
-                                            <div class="prompt-field-wrapper">
-                                                <label class="prompt-label">
-                                                    {{ prompt.name }}
-                                                    <span class="required-marker" *ngIf="prompt.mandatory">*</span>
-                                                </label>
-                                                <p-calendar [formControlName]="prompt.formControlName"
-                                                    [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                    [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
-                                                    [showIcon]="prompt.config?.appearance?.showIcon !== false"
-                                                    [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
-                                                    [showWeek]="prompt.config?.appearance?.showWeek || false"
-                                                    [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 1"
-                                                    [view]="prompt.config?.appearance?.view || 'date'"
-                                                    [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
-                                                    [selectOtherMonths]="prompt.config?.appearance?.selectOtherMonths || false"
-                                                    [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
-                                                    [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
-                                                    [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
-                                                    [firstDayOfWeek]="prompt.config?.appearance?.firstDayOfWeek || 0"
-                                                    [showTime]="prompt.config?.appearance?.showTime !== false"
-                                                    [timeOnly]="prompt.config?.appearance?.timeOnly || false"
-                                                    [hourFormat]="prompt.config?.appearance?.hourFormat || '12'"
-                                                    [showSeconds]="prompt.config?.appearance?.showSeconds || false"
-                                                    [stepHour]="prompt.config?.appearance?.stepHour || 1"
-                                                    [stepMinute]="prompt.config?.appearance?.stepMinute || 1"
-                                                    [stepSecond]="prompt.config?.appearance?.stepSecond || 1"
-                                                    [selectionMode]="prompt.config?.appearance?.selectionMode || 'single'"
-                                                    [readonlyInput]="prompt.config?.appearance?.readonlyInput || false"
-                                                    [touchUI]="prompt.config?.appearance?.touchUI || false"
-                                                    [keepInvalid]="prompt.config?.appearance?.keepInvalid || false"
-                                                    [inline]="prompt.config?.appearance?.inline || false"
-                                                    appendTo="body" styleClass="w-full">
-                                                </p-calendar>
-                                            </div>
+                                            <app-custom-calendar [label]="prompt.name"
+                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
+                                                [required]="prompt.mandatory"
+                                                [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
+                                                [showIcon]="prompt.config?.appearance?.showIcon !== false"
+                                                [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
+                                                [showWeek]="prompt.config?.appearance?.showWeek || false"
+                                                [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 1"
+                                                [view]="prompt.config?.appearance?.view || 'date'"
+                                                [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
+                                                [selectOtherMonths]="prompt.config?.appearance?.selectOtherMonths || false"
+                                                [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
+                                                [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
+                                                [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
+                                                [firstDayOfWeek]="prompt.config?.appearance?.firstDayOfWeek || 0"
+                                                [showTime]="prompt.config?.appearance?.showTime !== false"
+                                                [timeOnly]="prompt.config?.appearance?.timeOnly || false"
+                                                [hourFormat]="prompt.config?.appearance?.hourFormat || '12'"
+                                                [showSeconds]="prompt.config?.appearance?.showSeconds || false"
+                                                [stepHour]="prompt.config?.appearance?.stepHour || 1"
+                                                [stepMinute]="prompt.config?.appearance?.stepMinute || 1"
+                                                [stepSecond]="prompt.config?.appearance?.stepSecond || 1"
+                                                [selectionMode]="prompt.config?.appearance?.selectionMode || 'single'"
+                                                [readonlyInput]="prompt.config?.appearance?.readonlyInput || false"
+                                                [touchUI]="prompt.config?.appearance?.touchUI || false"
+                                                [keepInvalid]="prompt.config?.appearance?.keepInvalid || false"
+                                                [inline]="prompt.config?.appearance?.inline || false"
+                                                [minDate]="prompt.config?.appearance?.minDate || null"
+                                                [maxDate]="prompt.config?.appearance?.maxDate || null"
+                                                [disabledDays]="prompt.config?.appearance?.disabledDays || []"
+                                                [formControlName]="prompt.formControlName">
+                                            </app-custom-calendar>
                                         </ng-container>
 
                                         <!-- Date Range -->
                                         <ng-container *ngSwitchCase="'daterange'">
-                                            <div class="prompt-field-wrapper">
-                                                <label class="prompt-label">
-                                                    {{ prompt.name }}
-                                                    <span class="required-marker" *ngIf="prompt.mandatory">*</span>
-                                                </label>
-                                                <p-calendar [formControlName]="prompt.formControlName"
-                                                    selectionMode="range"
-                                                    [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                    [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
-                                                    [showIcon]="prompt.config?.appearance?.showIcon !== false"
-                                                    [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
-                                                    [showWeek]="prompt.config?.appearance?.showWeek || false"
-                                                    [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 2"
-                                                    [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
-                                                    [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
-                                                    [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
-                                                    [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
-                                                    [readonlyInput]="prompt.config?.appearance?.readonlyInput !== false"
-                                                    [touchUI]="prompt.config?.appearance?.touchUI || false"
-                                                    appendTo="body" styleClass="w-full">
-                                                </p-calendar>
-                                            </div>
+                                            <app-custom-daterange [label]="prompt.name"
+                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
+                                                [required]="prompt.mandatory"
+                                                [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
+                                                [showIcon]="prompt.config?.appearance?.showIcon !== false"
+                                                [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
+                                                [showWeek]="prompt.config?.appearance?.showWeek || false"
+                                                [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 2"
+                                                [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
+                                                [selectOtherMonths]="prompt.config?.appearance?.selectOtherMonths || false"
+                                                [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
+                                                [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
+                                                [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
+                                                [firstDayOfWeek]="prompt.config?.appearance?.firstDayOfWeek || 0"
+                                                [readonlyInput]="prompt.config?.appearance?.readonlyInput !== false"
+                                                [touchUI]="prompt.config?.appearance?.touchUI || false"
+                                                [showTime]="prompt.config?.appearance?.showTime || false"
+                                                [hourFormat]="prompt.config?.appearance?.hourFormat || '12'"
+                                                [showSeconds]="prompt.config?.appearance?.showSeconds || false"
+                                                [inline]="prompt.config?.appearance?.inline || false"
+                                                [minDate]="prompt.config?.appearance?.minDate || null"
+                                                [maxDate]="prompt.config?.appearance?.maxDate || null"
+                                                [disabledDays]="prompt.config?.appearance?.disabledDays || []"
+                                                [formControlName]="prompt.formControlName">
+                                            </app-custom-daterange>
                                         </ng-container>
 
                                         <!-- Dropdown -->
@@ -236,7 +240,19 @@
                                                 [options]="prompt.options" optionLabel="label"
                                                 optionValue="value" [required]="prompt.mandatory"
                                                 [filter]="prompt.config?.appearance?.filter !== false"
-                                                [formControlName]="prompt.formControlName">
+                                                [filterPlaceholder]="prompt.config?.appearance?.filterPlaceholder || ''"
+                                                [filterMatchMode]="prompt.config?.appearance?.filterMatchMode || 'contains'"
+                                                [resetFilterOnHide]="prompt.config?.appearance?.resetFilterOnHide || false"
+                                                [showClear]="prompt.config?.appearance?.showClear || false"
+                                                [editable]="prompt.config?.appearance?.editable || false"
+                                                [autoDisplayFirst]="prompt.config?.appearance?.autoDisplayFirst !== false"
+                                                [scrollHeight]="prompt.config?.appearance?.scrollHeight || '200px'"
+                                                [emptyMessage]="prompt.config?.appearance?.emptyMessage || 'No results found'"
+                                                [emptyFilterMessage]="prompt.config?.appearance?.emptyFilterMessage || 'No results found'"
+                                                [virtualScroll]="prompt.config?.appearance?.virtualScroll || false"
+                                                [virtualScrollItemSize]="prompt.config?.appearance?.virtualScrollItemSize || 38"
+                                                [formControlName]="prompt.formControlName"
+                                                appendTo="body">
                                             </app-custom-dropdown>
                                         </ng-container>
 
@@ -247,69 +263,64 @@
                                                 [options]="prompt.options" optionLabel="label"
                                                 optionValue="value" [required]="prompt.mandatory"
                                                 [filter]="prompt.config?.appearance?.filter !== false"
-                                                [display]="prompt.config?.appearance?.display || 'chip'"
-                                                [formControlName]="prompt.formControlName">
+                                                [filterMatchMode]="prompt.config?.appearance?.filterMatchMode || 'contains'"
+                                                [resetFilterOnHide]="prompt.config?.appearance?.resetFilterOnHide || false"
+                                                [display]="prompt.config?.appearance?.displayMode || prompt.config?.appearance?.display || 'chip'"
+                                                [showToggleAll]="prompt.config?.appearance?.showToggleAll !== false"
+                                                [showHeader]="prompt.config?.appearance?.showHeader !== false"
+                                                [maxSelectedLabels]="prompt.config?.appearance?.maxSelectedLabels ?? 3"
+                                                [selectedItemsLabel]="prompt.config?.appearance?.selectedItemsLabel || '{0} items selected'"
+                                                [selectionLimit]="prompt.config?.appearance?.selectionLimit ?? null"
+                                                [scrollHeight]="prompt.config?.appearance?.scrollHeight || '200px'"
+                                                [emptyMessage]="prompt.config?.appearance?.emptyMessage || 'No results found'"
+                                                [emptyFilterMessage]="prompt.config?.appearance?.emptyFilterMessage || 'No results found'"
+                                                [virtualScroll]="prompt.config?.appearance?.virtualScroll || false"
+                                                [virtualScrollItemSize]="prompt.config?.appearance?.virtualScrollItemSize || 38"
+                                                [formControlName]="prompt.formControlName"
+                                                appendTo="body">
                                             </app-custom-multiselect>
                                         </ng-container>
 
                                         <!-- Radio -->
                                         <ng-container *ngSwitchCase="'radio'">
-                                            <div class="prompt-field-wrapper">
-                                                <label class="prompt-label">
-                                                    {{ prompt.name }}
-                                                    <span class="required-marker" *ngIf="prompt.mandatory">*</span>
-                                                </label>
-                                                <div class="radio-group">
-                                                    <div class="radio-option"
-                                                        *ngFor="let opt of prompt.options">
-                                                        <p-radioButton [name]="prompt.formControlName"
-                                                            [value]="opt.value" [label]="opt.label"
-                                                            [formControlName]="prompt.formControlName">
-                                                        </p-radioButton>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <app-custom-radio [label]="prompt.name"
+                                                [required]="prompt.mandatory"
+                                                [options]="prompt.options"
+                                                [layout]="prompt.config?.appearance?.layout || 'horizontal'"
+                                                [columns]="prompt.config?.appearance?.columns || 0"
+                                                [gap]="prompt.config?.appearance?.gap || 'medium'"
+                                                [labelPosition]="prompt.config?.appearance?.labelPosition || 'right'"
+                                                [formControlName]="prompt.formControlName">
+                                            </app-custom-radio>
                                         </ng-container>
 
                                         <!-- Checkbox -->
                                         <ng-container *ngSwitchCase="'checkbox'">
-                                            <div class="prompt-field-wrapper">
-                                                <label class="prompt-label">
-                                                    {{ prompt.name }}
-                                                    <span class="required-marker" *ngIf="prompt.mandatory">*</span>
-                                                </label>
-                                                <div class="checkbox-group">
-                                                    <div class="checkbox-option"
-                                                        *ngFor="let opt of prompt.options">
-                                                        <p-checkbox [value]="opt.value" [label]="opt.label"
-                                                            [formControlName]="prompt.formControlName">
-                                                        </p-checkbox>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <app-custom-checkbox [label]="prompt.name"
+                                                [required]="prompt.mandatory"
+                                                [options]="prompt.options"
+                                                [layout]="prompt.config?.appearance?.layout || 'horizontal'"
+                                                [columns]="prompt.config?.appearance?.columns || 0"
+                                                [gap]="prompt.config?.appearance?.gap || 'medium'"
+                                                [labelPosition]="prompt.config?.appearance?.labelPosition || 'right'"
+                                                [checkboxDisabled]="prompt.config?.appearance?.disabled || false"
+                                                [formControlName]="prompt.formControlName">
+                                            </app-custom-checkbox>
                                         </ng-container>
 
                                         <!-- Range Slider -->
                                         <ng-container *ngSwitchCase="'rangeslider'">
-                                            <div class="prompt-field-wrapper">
-                                                <label class="prompt-label">
-                                                    {{ prompt.name }}
-                                                    <span class="required-marker" *ngIf="prompt.mandatory">*</span>
-                                                </label>
-                                                <p-slider [formControlName]="prompt.formControlName" [range]="true"
-                                                    [min]="prompt.config?.appearance?.min ?? 0"
-                                                    [max]="prompt.config?.appearance?.max ?? 100"
-                                                    [step]="prompt.config?.appearance?.step ?? 1"
-                                                    [orientation]="prompt.config?.appearance?.orientation || 'horizontal'"
-                                                    [animate]="prompt.config?.appearance?.animate || false"
-                                                    [disabled]="prompt.config?.appearance?.disabled || false"
-                                                    styleClass="w-full">
-                                                </p-slider>
-                                                <div class="slider-labels" *ngIf="prompt.config?.appearance?.showBoundLabels">
-                                                    <span>{{ prompt.config?.appearance?.min ?? 0 }}</span>
-                                                    <span>{{ prompt.config?.appearance?.max ?? 100 }}</span>
-                                                </div>
-                                            </div>
+                                            <app-custom-rangeslider [label]="prompt.name"
+                                                [required]="prompt.mandatory"
+                                                [min]="prompt.config?.appearance?.min ?? 0"
+                                                [max]="prompt.config?.appearance?.max ?? 100"
+                                                [step]="prompt.config?.appearance?.step ?? 1"
+                                                [orientation]="prompt.config?.appearance?.orientation || 'horizontal'"
+                                                [animate]="prompt.config?.appearance?.animate || false"
+                                                [showValueLabels]="prompt.config?.appearance?.showValueLabels || false"
+                                                [showBoundLabels]="prompt.config?.appearance?.showBoundLabels || false"
+                                                [formControlName]="prompt.formControlName">
+                                            </app-custom-rangeslider>
                                         </ng-container>
 
                                         <!-- Validation Error -->

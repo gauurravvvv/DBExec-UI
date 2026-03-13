@@ -71,30 +71,29 @@
                     </div>
                 </ng-container>
 
+
+            </div>
+            <div class="apply-preview-action">
+                <button class="btn-primary" type="button" (click)="applyPreview()">
+                    <i class="pi pi-refresh"></i>
+                    Apply Preview
+                </button>
             </div>
         </div>
 
         <div class="preview-panel">
-            <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
+            <div class="panel-header"><i class="pi pi-eye"></i><span>Preview</span></div>
             <div class="preview-content">
                 <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <ng-container *ngIf="config.inputMode === 'input'">
-                        <input [type]="config.inputType" pInputText [(ngModel)]="previewValue"
-                            [placeholder]="config.placeholder" [maxlength]="$any(config.maxLength)"
-                            [minlength]="$any(config.minLength)" [pattern]="config.pattern || ''"
-                            [disabled]="config.disabled" [readOnly]="config.readonly"
-                            [style]="{width:'100%'}" />
-                    </ng-container>
-
-                    <ng-container *ngIf="config.inputMode === 'textarea'">
-                        <textarea pInputTextarea [(ngModel)]="previewValue" [placeholder]="config.placeholder"
-                            [rows]="config.rows" [autoResize]="config.autoResize" [maxlength]="$any(config.maxLength)"
-                            [disabled]="config.disabled" [readOnly]="config.readonly"
-                            [style]="{width:'100%'}">
-                        </textarea>
-                    </ng-container>
+                    <app-custom-input [(ngModel)]="previewValue"
+                        [type]="previewConfig.inputType" [inputMode]="previewConfig.inputMode"
+                        [placeholder]="previewConfig.placeholder"
+                        [maxLength]="previewConfig.maxLength" [minLength]="previewConfig.minLength"
+                        [readonly]="previewConfig.readonly" [inputDisabled]="previewConfig.disabled"
+                        [rows]="previewConfig.rows" [autoResize]="previewConfig.autoResize">
+                    </app-custom-input>
                 </ng-container>
 
                 <div class="preview-actions" *ngIf="previewValue">
@@ -112,20 +111,20 @@
                 <div class="config-summary">
                     <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
                     <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="config.inputMode === 'textarea'">Textarea</span>
+                        <span class="summary-chip" *ngIf="previewConfig.inputMode === 'textarea'">Textarea</span>
                         <span class="summary-chip"
-                            *ngIf="config.inputType !== 'text' && config.inputMode === 'input'">{{ config.inputType
+                            *ngIf="previewConfig.inputType !== 'text' && previewConfig.inputMode === 'input'">{{ previewConfig.inputType
                             }}</span>
-                        <span class="summary-chip" *ngIf="config.disabled">Disabled</span>
-                        <span class="summary-chip" *ngIf="config.readonly">Read-only</span>
-                        <span class="summary-chip" *ngIf="config.trim">Trim</span>
-                        <span class="summary-chip" *ngIf="config.maxLength != null">Max {{ config.maxLength }}</span>
-                        <span class="summary-chip" *ngIf="config.minLength != null">Min {{ config.minLength }}</span>
-                        <span class="summary-chip" *ngIf="config.pattern">Pattern</span>
+                        <span class="summary-chip" *ngIf="previewConfig.disabled">Disabled</span>
+                        <span class="summary-chip" *ngIf="previewConfig.readonly">Read-only</span>
+                        <span class="summary-chip" *ngIf="previewConfig.trim">Trim</span>
+                        <span class="summary-chip" *ngIf="previewConfig.maxLength != null">Max {{ previewConfig.maxLength }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.minLength != null">Min {{ previewConfig.minLength }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.pattern">Pattern</span>
                         <span class="summary-chip"
-                            *ngIf="config.autoResize && config.inputMode === 'textarea'">Auto-resize</span>
+                            *ngIf="previewConfig.autoResize && previewConfig.inputMode === 'textarea'">Auto-resize</span>
                         <span class="summary-empty"
-                            *ngIf="config.inputMode === 'input' && config.inputType === 'text' && !config.disabled && !config.readonly && !config.trim && config.maxLength == null && config.minLength == null && !config.pattern">
+                            *ngIf="previewConfig.inputMode === 'input' && previewConfig.inputType === 'text' && !previewConfig.disabled && !previewConfig.readonly && !previewConfig.trim && previewConfig.maxLength == null && previewConfig.minLength == null && !previewConfig.pattern">
                             Default configuration
                         </span>
                     </div>

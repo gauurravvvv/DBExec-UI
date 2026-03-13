@@ -1,6 +1,7 @@
 export enum StorageType {
   ACCESS_TOKEN = 'access-token',
   ORGANISATION = 'organisation',
+  ORGANISATION_ID = 'organisation_id',
   LABEL = 'label',
   ROLE = 'role',
   SAVED_CREDS = 'savedCredentials',

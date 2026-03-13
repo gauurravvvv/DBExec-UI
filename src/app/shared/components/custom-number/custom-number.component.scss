@@ -1,0 +1,55 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .normal-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color);
+
+    .required {
+      color: var(--error-color);
+      margin-left: 2px;
+    }
+  }
+
+  .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+  }
+}
+
+:host ::ng-deep .p-inputnumber {
+  width: 100%;
+
+  .p-inputtext {
+    background: var(--hover-background) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+    border-radius: 6px !important;
+    font-size: 0.9375rem;
+    padding: 0.625rem 1rem;
+
+    &::placeholder {
+      color: var(--secondary-color) !important;
+    }
+
+    &:focus {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.15) !important;
+    }
+  }
+
+  .p-button {
+    background: var(--hover-background) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--secondary-color) !important;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--primary-color) !important;
+      color: var(--primary-color) !important;
+    }
+  }
+}

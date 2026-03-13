@@ -28,9 +28,21 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() required = false;
   @Input() filter = true;
   @Input() filterBy = '';
+  @Input() filterPlaceholder = '';
+  @Input() filterMatchMode = 'contains';
+  @Input() resetFilterOnHide = false;
+  @Input() showClear = false;
+  @Input() editable = false;
+  @Input() autoDisplayFirst = true;
+  @Input() scrollHeight = '200px';
+  @Input() emptyMessage = 'No results found';
+  @Input() emptyFilterMessage = 'No results found';
+  @Input() virtualScroll = false;
+  @Input() virtualScrollItemSize = 38;
   @Input() errorMessage = '';
   @Input() showError = false;
   @Input() floatingLabel = false;
+  @Input() appendTo: any = null;
   @Output() onChangeEvent = new EventEmitter<any>();
 
   value: any = null;

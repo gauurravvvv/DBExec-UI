@@ -22,11 +22,23 @@ export class CustomMultiselectComponent implements ControlValueAccessor {
   @Input() required = false;
   @Input() filter = true;
   @Input() filterBy = '';
+  @Input() filterMatchMode = 'contains';
+  @Input() resetFilterOnHide = false;
   @Input() display: 'chip' | 'comma' = 'chip';
+  @Input() showToggleAll = true;
+  @Input() showHeader = true;
+  @Input() maxSelectedLabels: number = 3;
+  @Input() selectedItemsLabel = '{0} items selected';
+  @Input() selectionLimit!: number;
+  @Input() scrollHeight = '200px';
+  @Input() emptyMessage = 'No results found';
+  @Input() emptyFilterMessage = 'No results found';
+  @Input() virtualScroll = false;
+  @Input() virtualScrollItemSize = 38;
   @Input() errorMessage = '';
   @Input() showError = false;
   @Input() floatingLabel = false;
-  @Input() showToggleAll = true;
+  @Input() appendTo: any = null;
 
   value: any[] = [];
   disabled = false;

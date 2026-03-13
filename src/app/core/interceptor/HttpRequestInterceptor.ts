@@ -13,7 +13,7 @@ import { catchError, retry, map, finalize } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LoadingService } from '../services/loading.service';
 import { Router } from '@angular/router';
-import { SessionStorageType, StorageType } from 'src/app/constants/storageType';
+import { StorageType } from 'src/app/constants/storageType';
 import { StorageService } from '../services/storage.service';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     this.accessToken = StorageService.get(StorageType.ACCESS_TOKEN) || '';
     this.organisation_id =
-      StorageService.getSessionVal(SessionStorageType.ORGANISATION_ID) || '';
+      StorageService.get(StorageType.ORGANISATION_ID) || '';
 
     if (req.url.includes('assets')) {
       if (!skipLoader) {
@@ -91,6 +91,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     evt: HttpEvent<any>
   ): HttpEvent<any> {
     if (evt instanceof HttpResponse) {
+      if (evt.body.code === 440) {
+        this.handleSessionExpired();
+        return evt;
+      }
       if (evt.body.code === 501 || evt.body.code === 503) {
         window.location.href = '';
         StorageService.remove(StorageType.ACCESS_TOKEN);
@@ -101,6 +105,14 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
+    if (error.status === 440) {
+      this.handleSessionExpired();
+    }
     return throwError(error);
+  }
+
+  private handleSessionExpired(): void {
+    StorageService.clear();
+    this.router.navigate(['/login']);
   }
 }

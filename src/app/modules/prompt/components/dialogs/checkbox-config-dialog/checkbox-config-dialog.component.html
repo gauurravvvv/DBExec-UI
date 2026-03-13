@@ -55,27 +55,28 @@
                     <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
                 </div>
 
+
+            </div>
+            <div class="apply-preview-action">
+                <button class="btn-primary" type="button" (click)="applyPreview()">
+                    <i class="pi pi-refresh"></i>
+                    Apply Preview
+                </button>
             </div>
         </div>
 
         <div class="preview-panel">
-            <div class="panel-header"><i class="pi pi-eye"></i><span>Live Preview</span></div>
+            <div class="panel-header"><i class="pi pi-eye"></i><span>Preview</span></div>
             <div class="preview-content">
                 <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
                     <div *ngIf="formattedOptions.length > 0; else noOptions">
-                        <div [ngStyle]="previewGridStyle">
-                            <ng-container *ngFor="let option of formattedOptions">
-                                <div class="checkbox-item" [class.reverse]="config.labelPosition === 'left'">
-                                    <p-checkbox [(ngModel)]="selectedValues" [value]="option.value" name="preview-group"
-                                        [disabled]="config.disabled" [checkboxIcon]="config.checkboxIcon"
-                                        [inputId]="'cb-' + option.value">
-                                    </p-checkbox>
-                                    <label [for]="'cb-' + option.value">{{ option.label }}</label>
-                                </div>
-                            </ng-container>
-                        </div>
+                        <app-custom-checkbox [options]="formattedOptions" [(ngModel)]="selectedValues"
+                            [layout]="previewConfig.layout" [columns]="previewConfig.columns"
+                            [gap]="previewConfig.gap" [labelPosition]="previewConfig.labelPosition"
+                            [checkboxIcon]="previewConfig.checkboxIcon" [checkboxDisabled]="previewConfig.disabled">
+                        </app-custom-checkbox>
 
                         <div class="preview-actions" *ngIf="selectedValues.length > 0">
                             <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
@@ -101,16 +102,16 @@
                 <div class="config-summary">
                     <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
                     <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="config.layout === 'horizontal'">Horizontal</span>
-                        <span class="summary-chip" *ngIf="config.layout === 'vertical' && config.columns > 1">{{
-                            config.columns }} cols</span>
-                        <span class="summary-chip" *ngIf="config.labelPosition === 'left'">Label Left</span>
-                        <span class="summary-chip" *ngIf="config.gap !== 'medium'">Gap: {{ config.gap }}</span>
-                        <span class="summary-chip" *ngIf="config.checkboxIcon !== 'pi pi-check'">Custom Icon</span>
-                        <span class="summary-chip" *ngIf="config.disabled">Disabled</span>
-                        <span class="summary-chip" *ngIf="config.defaultValues.length > 0">{{ config.defaultValues.length }} default</span>
+                        <span class="summary-chip" *ngIf="previewConfig.layout === 'horizontal'">Horizontal</span>
+                        <span class="summary-chip" *ngIf="previewConfig.layout === 'vertical' && previewConfig.columns > 1">{{
+                            previewConfig.columns }} cols</span>
+                        <span class="summary-chip" *ngIf="previewConfig.labelPosition === 'left'">Label Left</span>
+                        <span class="summary-chip" *ngIf="previewConfig.gap !== 'medium'">Gap: {{ previewConfig.gap }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.checkboxIcon !== 'pi pi-check'">Custom Icon</span>
+                        <span class="summary-chip" *ngIf="previewConfig.disabled">Disabled</span>
+                        <span class="summary-chip" *ngIf="previewConfig.defaultValues.length > 0">{{ previewConfig.defaultValues.length }} default</span>
                         <span class="summary-empty"
-                            *ngIf="config.layout === 'vertical' && config.columns === 1 && config.labelPosition === 'right' && config.gap === 'medium' && config.checkboxIcon === 'pi pi-check' && !config.disabled && config.defaultValues.length === 0">
+                            *ngIf="previewConfig.layout === 'vertical' && previewConfig.columns === 1 && previewConfig.labelPosition === 'right' && previewConfig.gap === 'medium' && previewConfig.checkboxIcon === 'pi pi-check' && !previewConfig.disabled && previewConfig.defaultValues.length === 0">
                             Default configuration
                         </span>
                     </div>

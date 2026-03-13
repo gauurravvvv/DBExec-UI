@@ -145,6 +145,13 @@
                         max="80" />
                 </div>
 
+
+            </div>
+            <div class="apply-preview-action">
+                <button class="btn-primary" type="button" (click)="applyPreview()">
+                    <i class="pi pi-refresh"></i>
+                    Apply Preview
+                </button>
             </div>
         </div>
 
@@ -152,24 +159,24 @@
         <div class="preview-panel">
             <div class="panel-header">
                 <i class="pi pi-eye"></i>
-                <span>Live Preview</span>
+                <span>Preview</span>
             </div>
 
             <div class="preview-content">
                 <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <p-multiSelect [options]="formattedOptions" [(ngModel)]="selectedValues"
-                        [placeholder]="config.placeholder" [filter]="config.filter"
-                        [filterMatchMode]="config.filterMatchMode" [resetFilterOnHide]="config.resetFilterOnHide"
-                        [display]="config.displayMode" [showToggleAll]="config.showToggleAll"
-                        [showHeader]="config.showHeader" [maxSelectedLabels]="config.maxSelectedLabels"
-                        [selectedItemsLabel]="config.selectedItemsLabel" [selectionLimit]="$any(config.selectionLimit)"
-                        [scrollHeight]="config.scrollHeight" [emptyMessage]="config.emptyMessage"
-                        [emptyFilterMessage]="config.emptyFilterMessage" [virtualScroll]="config.virtualScroll"
-                        [virtualScrollItemSize]="config.virtualScrollItemSize" appendTo="body" [style]="{width: '100%'}"
-                        optionLabel="label" optionValue="value">
-                    </p-multiSelect>
+                    <app-custom-multiselect [options]="formattedOptions" [(ngModel)]="selectedValues"
+                        [placeholder]="previewConfig.placeholder" [filter]="previewConfig.filter"
+                        [filterMatchMode]="previewConfig.filterMatchMode" [resetFilterOnHide]="previewConfig.resetFilterOnHide"
+                        [display]="previewConfig.displayMode" [showToggleAll]="previewConfig.showToggleAll"
+                        [showHeader]="previewConfig.showHeader" [maxSelectedLabels]="previewConfig.maxSelectedLabels"
+                        [selectedItemsLabel]="previewConfig.selectedItemsLabel" [selectionLimit]="$any(previewConfig.selectionLimit)"
+                        [scrollHeight]="previewConfig.scrollHeight" [emptyMessage]="previewConfig.emptyMessage"
+                        [emptyFilterMessage]="previewConfig.emptyFilterMessage" [virtualScroll]="previewConfig.virtualScroll"
+                        [virtualScrollItemSize]="previewConfig.virtualScrollItemSize"
+                        optionLabel="label" optionValue="value" appendTo="body">
+                    </app-custom-multiselect>
                 </ng-container>
 
                 <div class="preview-actions" *ngIf="selectedValues && selectedValues.length > 0">
@@ -202,16 +209,16 @@
                         <i class="pi pi-info-circle"></i> Active Settings
                     </div>
                     <div class="summary-chips">
-                        <span class="summary-chip">{{ config.displayMode === 'chip' ? 'Chips' : 'Comma' }}</span>
-                        <span class="summary-chip" *ngIf="config.filter">Filter ({{ config.filterMatchMode }})</span>
-                        <span class="summary-chip" *ngIf="config.resetFilterOnHide">Auto-reset Filter</span>
-                        <span class="summary-chip" *ngIf="config.showToggleAll">Toggle All</span>
-                        <span class="summary-chip" *ngIf="!config.showHeader">No Header</span>
-                        <span class="summary-chip" *ngIf="config.selectionLimit != null">Limit: {{ config.selectionLimit
+                        <span class="summary-chip">{{ previewConfig.displayMode === 'chip' ? 'Chips' : 'Comma' }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.filter">Filter ({{ previewConfig.filterMatchMode }})</span>
+                        <span class="summary-chip" *ngIf="previewConfig.resetFilterOnHide">Auto-reset Filter</span>
+                        <span class="summary-chip" *ngIf="previewConfig.showToggleAll">Toggle All</span>
+                        <span class="summary-chip" *ngIf="!previewConfig.showHeader">No Header</span>
+                        <span class="summary-chip" *ngIf="previewConfig.selectionLimit != null">Limit: {{ previewConfig.selectionLimit
                             }}</span>
-                        <span class="summary-chip" *ngIf="config.virtualScroll">Virtual Scroll</span>
-                        <span class="summary-chip" *ngIf="config.scrollHeight !== '200px'">Height: {{
-                            config.scrollHeight }}</span>
+                        <span class="summary-chip" *ngIf="previewConfig.virtualScroll">Virtual Scroll</span>
+                        <span class="summary-chip" *ngIf="previewConfig.scrollHeight !== '200px'">Height: {{
+                            previewConfig.scrollHeight }}</span>
                     </div>
                 </div>
 

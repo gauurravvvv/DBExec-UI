@@ -220,9 +220,34 @@ export function transformSectionResponse(
   };
 }
 
+/**
+ * Convert ISO date strings in appearance config to Date objects
+ * so PrimeNG calendar components can use them directly.
+ */
+function parseAppearanceDates(appearance: Record<string, any>): Record<string, any> {
+  if (!appearance) return appearance;
+
+  const dateFields = ['minDate', 'maxDate', 'defaultValue', 'defaultStartDate', 'defaultEndDate'];
+  const parsed = { ...appearance };
+
+  dateFields.forEach(field => {
+    if (parsed[field] && typeof parsed[field] === 'string') {
+      const date = new Date(parsed[field]);
+      parsed[field] = isNaN(date.getTime()) ? null : date;
+    }
+  });
+
+  return parsed;
+}
+
 export function transformPromptResponse(
   prompt: PromptApiResponse
 ): ExecutePrompt {
+  const config = prompt.config ? { ...prompt.config } : null;
+  if (config?.appearance) {
+    config.appearance = parseAppearanceDates(config.appearance);
+  }
+
   return {
     id: prompt.id,
     name: prompt.name,
@@ -235,7 +260,7 @@ export function transformPromptResponse(
     promptControlName: prompt.promptControlName,
     sequence: prompt.promptSequence || prompt.sequence,
     values: prompt.values || [],
-    config: prompt.config || null,
+    config,
     formControlName: `prompt_${prompt.id}`,
     options: (prompt.values || []).map(v => ({ label: v.value, value: v.value })),
   };

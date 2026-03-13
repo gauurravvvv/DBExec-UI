@@ -195,6 +195,13 @@
                     <small class="hint">Selected days will be disabled in the calendar</small>
                 </div>
 
+
+            </div>
+            <div class="apply-preview-action">
+                <button class="btn-primary" type="button" (click)="applyPreview()">
+                    <i class="pi pi-refresh"></i>
+                    Apply Preview
+                </button>
             </div>
         </div>
 
@@ -202,29 +209,29 @@
         <div class="preview-panel">
             <div class="panel-header">
                 <i class="pi pi-eye"></i>
-                <span>Live Preview</span>
+                <span>Preview</span>
             </div>
 
             <div class="preview-content">
                 <div class="preview-label">Try it out:</div>
 
                 <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <p-calendar [(ngModel)]="previewValue" [placeholder]="config.placeholder"
-                        [dateFormat]="config.dateFormat" [view]="config.view" [selectionMode]="config.selectionMode"
-                        [inline]="config.inline" [showIcon]="config.showIcon && !config.inline"
-                        [showButtonBar]="config.showButtonBar" [showWeek]="config.showWeek"
-                        [showOtherMonths]="config.showOtherMonths" [selectOtherMonths]="config.selectOtherMonths"
-                        [numberOfMonths]="config.numberOfMonths"
-                        [firstDayOfWeek]="config.firstDayOfWeek" [showTime]="config.showTime"
-                        [timeOnly]="config.timeOnly" [hourFormat]="config.hourFormat" [showSeconds]="config.showSeconds"
-                        [stepHour]="config.stepHour" [stepMinute]="config.stepMinute" [stepSecond]="config.stepSecond"
-                        [readonlyInput]="config.readonlyInput" [minDate]="$any(config.minDate)"
-                        [maxDate]="$any(config.maxDate)" [disabledDays]="config.disabledDays"
-                        [keepInvalid]="config.keepInvalid" [style]="{width: '100%'}" appendTo="body">
-                    </p-calendar>
+                    <app-custom-calendar [(ngModel)]="previewValue" [placeholder]="previewConfig.placeholder"
+                        [dateFormat]="previewConfig.dateFormat" [view]="previewConfig.view" [selectionMode]="previewConfig.selectionMode"
+                        [inline]="previewConfig.inline" [showIcon]="previewConfig.showIcon && !previewConfig.inline"
+                        [showButtonBar]="previewConfig.showButtonBar" [showWeek]="previewConfig.showWeek"
+                        [showOtherMonths]="previewConfig.showOtherMonths" [selectOtherMonths]="previewConfig.selectOtherMonths"
+                        [numberOfMonths]="previewConfig.numberOfMonths"
+                        [firstDayOfWeek]="previewConfig.firstDayOfWeek" [showTime]="previewConfig.showTime"
+                        [timeOnly]="previewConfig.timeOnly" [hourFormat]="previewConfig.hourFormat" [showSeconds]="previewConfig.showSeconds"
+                        [stepHour]="previewConfig.stepHour" [stepMinute]="previewConfig.stepMinute" [stepSecond]="previewConfig.stepSecond"
+                        [readonlyInput]="previewConfig.readonlyInput" [minDate]="$any(previewConfig.minDate)"
+                        [maxDate]="$any(previewConfig.maxDate)" [disabledDays]="previewConfig.disabledDays"
+                        [keepInvalid]="previewConfig.keepInvalid">
+                    </app-custom-calendar>
                 </ng-container>
 
-                <div class="preview-actions" *ngIf="previewValue != null && !config.inline">
+                <div class="preview-actions" *ngIf="previewValue != null && !previewConfig.inline">
                     <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
                         icon="pi pi-check" (click)="setAsDefault()">
                     </button>
@@ -244,23 +251,23 @@
                         <i class="pi pi-info-circle"></i> Active Settings
                     </div>
                     <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="config.showTime">Time Picker</span>
-                        <span class="summary-chip" *ngIf="config.timeOnly">Time Only</span>
-                        <span class="summary-chip" *ngIf="config.showSeconds">Seconds</span>
-                        <span class="summary-chip" *ngIf="config.inline">Inline</span>
-                        <span class="summary-chip" *ngIf="config.showButtonBar">Button Bar</span>
-                        <span class="summary-chip" *ngIf="config.showWeek">Week Numbers</span>
-                        <span class="summary-chip" *ngIf="config.readonlyInput">Read-only</span>
-                        <span class="summary-chip" *ngIf="config.selectionMode !== 'single'">{{ config.selectionMode |
+                        <span class="summary-chip" *ngIf="previewConfig.showTime">Time Picker</span>
+                        <span class="summary-chip" *ngIf="previewConfig.timeOnly">Time Only</span>
+                        <span class="summary-chip" *ngIf="previewConfig.showSeconds">Seconds</span>
+                        <span class="summary-chip" *ngIf="previewConfig.inline">Inline</span>
+                        <span class="summary-chip" *ngIf="previewConfig.showButtonBar">Button Bar</span>
+                        <span class="summary-chip" *ngIf="previewConfig.showWeek">Week Numbers</span>
+                        <span class="summary-chip" *ngIf="previewConfig.readonlyInput">Read-only</span>
+                        <span class="summary-chip" *ngIf="previewConfig.selectionMode !== 'single'">{{ previewConfig.selectionMode |
                             titlecase }}</span>
-                        <span class="summary-chip" *ngIf="config.numberOfMonths > 1">{{ config.numberOfMonths }}
+                        <span class="summary-chip" *ngIf="previewConfig.numberOfMonths > 1">{{ previewConfig.numberOfMonths }}
                             months</span>
-                        <span class="summary-chip" *ngIf="config.disabledDays.length > 0">{{ config.disabledDays.length
+                        <span class="summary-chip" *ngIf="previewConfig.disabledDays.length > 0">{{ previewConfig.disabledDays.length
                             }} day(s) disabled</span>
-                        <span class="summary-chip" *ngIf="config.minDate">Min date set</span>
-                        <span class="summary-chip" *ngIf="config.maxDate">Max date set</span>
+                        <span class="summary-chip" *ngIf="previewConfig.minDate">Min date set</span>
+                        <span class="summary-chip" *ngIf="previewConfig.maxDate">Max date set</span>
                         <span class="summary-empty"
-                            *ngIf="!config.showTime && !config.inline && !config.showButtonBar && !config.showWeek && !config.readonlyInput && config.selectionMode === 'single' && config.numberOfMonths === 1 && config.disabledDays.length === 0 && !config.minDate && !config.maxDate">
+                            *ngIf="!previewConfig.showTime && !previewConfig.inline && !previewConfig.showButtonBar && !previewConfig.showWeek && !previewConfig.readonlyInput && previewConfig.selectionMode === 'single' && previewConfig.numberOfMonths === 1 && previewConfig.disabledDays.length === 0 && !previewConfig.minDate && !previewConfig.maxDate">
                             Default configuration
                         </span>
                     </div>
