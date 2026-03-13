@@ -40,6 +40,21 @@ import {
   TREE_LAYOUTS,
   SANKEY_ORIENTATIONS,
   PICTORIAL_SYMBOLS,
+  TREE_EDGE_SHAPES,
+  GRAPH_EDGE_SYMBOLS,
+  TREEMAP_NODE_CLICK_OPTIONS,
+  SUNBURST_NODE_CLICK_OPTIONS,
+  BOXPLOT_LAYOUTS,
+  PICTORIAL_SYMBOL_POSITIONS,
+  EFFECT_SHOW_ON_OPTIONS,
+  SANKEY_NODE_ALIGNS,
+  SAMPLING_OPTIONS,
+  SHOW_ALL_SYMBOL_OPTIONS,
+  STACK_STRATEGY_OPTIONS,
+  RIPPLE_BRUSH_TYPE_OPTIONS,
+  FUNNEL_ORIENT_OPTIONS,
+  SUNBURST_SORT_OPTIONS,
+  PICTORIAL_REPEAT_DIRECTION_OPTIONS,
   getDefaultChartConfig,
   getDummyData,
   hasAxisLabels,
@@ -81,6 +96,11 @@ import {
   supportsGradient,
   supportsDataZoom,
   supportsDataLabel,
+  supportsLegend,
+  supportsEmphasis,
+  supportsToolbox,
+  supportsTooltip,
+  supportsAnimation,
 } from '../../constants/charts.constants';
 import { Visual, createVisual } from '../../models';
 import { AnalysesService } from '../../service/analyses.service';
@@ -192,6 +212,21 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   treeLayouts = TREE_LAYOUTS;
   sankeyOrientations = SANKEY_ORIENTATIONS;
   pictorialSymbols = PICTORIAL_SYMBOLS;
+  treeEdgeShapes = TREE_EDGE_SHAPES;
+  graphEdgeSymbols = GRAPH_EDGE_SYMBOLS;
+  treemapNodeClickOptions = TREEMAP_NODE_CLICK_OPTIONS;
+  sunburstNodeClickOptions = SUNBURST_NODE_CLICK_OPTIONS;
+  boxplotLayouts = BOXPLOT_LAYOUTS;
+  pictorialSymbolPositions = PICTORIAL_SYMBOL_POSITIONS;
+  effectShowOnOptions = EFFECT_SHOW_ON_OPTIONS;
+  sankeyNodeAligns = SANKEY_NODE_ALIGNS;
+  samplingOptions = SAMPLING_OPTIONS;
+  showAllSymbolOptions = SHOW_ALL_SYMBOL_OPTIONS;
+  stackStrategyOptions = STACK_STRATEGY_OPTIONS;
+  rippleBrushTypeOptions = RIPPLE_BRUSH_TYPE_OPTIONS;
+  funnelOrientOptions = FUNNEL_ORIENT_OPTIONS;
+  sunburstSortOptions = SUNBURST_SORT_OPTIONS;
+  pictorialRepeatDirectionOptions = PICTORIAL_REPEAT_DIRECTION_OPTIONS;
 
   // Dragging
   draggingVisual: any = null;
@@ -627,6 +662,46 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
+   * Create one visual for every chart type with dummy data
+   */
+  plotAllCharts(): void {
+    // Clear existing visuals
+    this.visuals = [];
+    this.visualCounter = 0;
+    this.focusedVisualId = null;
+
+    const gap = this.canvasHeight > 0 ? 10 / this.canvasHeight : 0.02;
+    const heightRatio = 0.45;
+    const widthRatio = 0.5;
+
+    CHART_TYPES.forEach((chartDef, index) => {
+      this.visualCounter++;
+      const visual = createVisual(this.visualCounter, getDefaultChartConfig());
+      visual.chartType = chartDef.id;
+      visual.title = chartDef.name;
+      visual.useDummyData = true;
+      visual.chartData = getDummyData(chartDef.id);
+
+      // 2-column grid layout
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      visual.xRatio = col * widthRatio;
+      visual.yRatio = row * (heightRatio + gap);
+      visual.widthRatio = widthRatio;
+      visual.heightRatio = heightRatio;
+
+      this.computeVisualDimensions(visual);
+      this.visuals.push(visual);
+    });
+
+    // Focus the first visual
+    if (this.visuals.length > 0) {
+      this.focusedVisualId = this.visuals[0].id;
+    }
+    this.cdr.detectChanges();
+  }
+
+  /**
    * Calculate next available position for a new visual in grid layout
    * Grid: 2 columns (50% width each), rows stack vertically
    */
@@ -743,26 +818,24 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     return isTreeMapChartType(chartType);
   }
 
-  /**
-   * Check if a chart type supports legend
-   * Advanced pie and pie grid have built-in displays and don't use legend property
-   * Tree map doesn't support legend
-   */
   supportsLegend(chartType: string | null): boolean {
-    if (!chartType) return false;
-    const noLegendTypes = [
-      'pie-advanced',
-      'pie-grid',
-      'tree-map',
-      'number-card',
-      'sankey',
-      'sunburst',
-      'waterfall',
-      'graph',
-      'tree',
-      'theme-river',
-    ];
-    return !noLegendTypes.includes(chartType);
+    return supportsLegend(chartType);
+  }
+
+  supportsEmphasis(chartType: string | null): boolean {
+    return supportsEmphasis(chartType);
+  }
+
+  supportsToolbox(chartType: string | null): boolean {
+    return supportsToolbox(chartType);
+  }
+
+  supportsTooltip(chartType: string | null): boolean {
+    return supportsTooltip(chartType);
+  }
+
+  supportsAnimation(chartType: string | null): boolean {
+    return supportsAnimation(chartType);
   }
 
   isBubbleChartType(chartType: string | null): boolean {

@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildGaugeChartOption } from '../../helpers/echarts-option-builder';
 
 export interface GaugeChartData {
@@ -83,15 +82,12 @@ export class ConfigurableGaugeChartComponent
     showText: true,
     animations: true,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
   };
 
   get config(): GaugeChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  // Color palettes (using imported constants)
-  colorPalettes = COLOR_PALETTES;
 
   // For linear gauge, use a single value
   get linearValue(): number {
@@ -107,8 +103,7 @@ export class ConfigurableGaugeChartComponent
   }
 
   get linearGaugeColor(): string {
-    const colors = this.colorPalettes[this.config.colorScheme] || this.colorPalettes['vivid'];
-    return colors[0] || '#5AA454';
+    return '#5470c6';
   }
 
   ngOnInit(): void {

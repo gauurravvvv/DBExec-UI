@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildPieChartOption } from '../../helpers/echarts-option-builder';
 
 export interface PieChartData {
@@ -75,14 +74,12 @@ export class ConfigurablePieChartComponent
     gradient: false,
     animations: false,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
   };
 
   get config(): PieChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

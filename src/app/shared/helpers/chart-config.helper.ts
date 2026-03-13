@@ -1,100 +1,72 @@
 // ========= Color Palettes =========
-// Modern, vibrant palettes designed for data visualization with 10+ colors each
+// Color palettes extracted from ECharts built-in themes — applied via the color option
+// so only series/bar colors change (not the chart background).
 export const COLOR_PALETTES: { [key: string]: string[] } = {
-  vivid: [
+  default: [
     '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de',
     '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#48b8d0',
-    '#6fde8e', '#f4a261', '#a78bfa', '#fb7185',
   ],
-  natural: [
-    '#264653', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51',
-    '#606c38', '#dda15e', '#bc6c25', '#283618', '#fefae0',
-  ],
-  cool: [
-    '#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#818cf8',
-    '#7dd3fc', '#38bdf8', '#0ea5e9', '#06b6d4', '#22d3ee',
-  ],
-  fire: [
-    '#dc2626', '#ea580c', '#f97316', '#fb923c', '#fdba74',
-    '#fbbf24', '#f59e0b', '#d97706', '#b91c1c', '#9a3412',
-  ],
-  solar: [
-    '#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#d97706',
-    '#b45309', '#92400e', '#78350f', '#facc15', '#eab308',
-  ],
-  air: [
-    '#e0f2fe', '#bae6fd', '#7dd3fc', '#38bdf8', '#0ea5e9',
-    '#0284c7', '#0369a1', '#075985', '#0c4a6e', '#dbeafe',
-  ],
-  aqua: [
-    '#06b6d4', '#22d3ee', '#67e8f9', '#0891b2', '#0e7490',
-    '#155e75', '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4',
-  ],
-  flame: [
-    '#ef4444', '#f97316', '#eab308', '#f43f5e', '#ec4899',
-    '#e11d48', '#dc2626', '#c2410c', '#a16207', '#be185d',
-  ],
-  ocean: [
-    '#0077b6', '#00b4d8', '#90e0ef', '#023e8a', '#0096c7',
-    '#48cae4', '#ade8f4', '#caf0f8', '#03045e', '#0077b6',
-  ],
-  forest: [
-    '#14532d', '#166534', '#15803d', '#16a34a', '#22c55e',
-    '#4ade80', '#86efac', '#bbf7d0', '#052e16', '#365314',
-  ],
-  horizon: [
-    '#4361ee', '#4cc9f0', '#7209b7', '#f72585', '#3a0ca3',
-    '#560bad', '#480ca8', '#b5179e', '#4895ef', '#4361ee',
-  ],
-  neons: [
-    '#f72585', '#7209b7', '#3a0ca3', '#4361ee', '#4cc9f0',
-    '#06d6a0', '#ffd166', '#ef476f', '#118ab2', '#073b4c',
-  ],
-  macarons: [
-    '#2ec7c9', '#b6a2de', '#5ab1ef', '#ffb980', '#d87a80',
-    '#8d98b3', '#e5cf0d', '#97b552', '#95706d', '#dc69aa',
-  ],
-  walden: [
-    '#3fb1e3', '#6be6c1', '#626c91', '#a0a7e6', '#c4ebad',
-    '#96dee8', '#3fb1e3', '#6be6c1', '#626c91', '#a0a7e6',
+  dark: [
+    '#4992ff', '#7cffb2', '#fddd60', '#ff6e76', '#58d9f9',
+    '#05c091', '#ff8a45', '#8d48e3', '#dd79ff',
   ],
   vintage: [
     '#d87c7c', '#919e8b', '#d7ab82', '#6e7074', '#61a0a8',
     '#efa18d', '#787464', '#cc7e63', '#724e58', '#4b565b',
   ],
-  dark: [
-    '#dd6b66', '#759aa0', '#e69d87', '#8dc1a9', '#ea7e53',
-    '#eedd78', '#73a373', '#73b9bc', '#7289ab', '#91ca8c',
-  ],
-  roma: [
-    '#e01f54', '#001852', '#f5e8c8', '#0098d9', '#95706d',
-    '#dc69aa', '#07a2a4', '#9a7fd1', '#588dd5', '#f5994e',
+  macarons: [
+    '#2ec7c9', '#b6a2de', '#5ab1ef', '#ffb980', '#d87a80',
+    '#8d98b3', '#e5cf0d', '#97b552', '#95706d', '#dc69aa',
   ],
   infographic: [
-    '#c1232b', '#27727b', '#fcce10', '#e87c25', '#b5c334',
-    '#fe8463', '#9bca63', '#fad860', '#f3a43b', '#60c0dd',
-  ],
-  picnic: [
-    '#ffc6ff', '#bdb2ff', '#a0c4ff', '#9bf6ff', '#caffbf',
-    '#fdffb6', '#ffd6a5', '#ffadad', '#d0f4de', '#a9def9',
-  ],
-  night: [
-    '#fc97af', '#87f7cf', '#f7f494', '#72ccff', '#f7c5a0',
-    '#d4a4eb', '#76f2f2', '#7eb0d5', '#fd7f6f', '#b2e061',
-  ],
-  nightLights: [
-    '#4a266a', '#8e44ad', '#e74c3c', '#f39c12', '#f1c40f',
-    '#2ecc71', '#1abc9c', '#3498db', '#9b59b6', '#e67e22',
+    '#C1232B', '#27727B', '#FCCE10', '#E87C25', '#B5C334',
+    '#FE8463', '#9BCA63', '#FAD860', '#F3A43B', '#60C0DD',
   ],
   shine: [
     '#c12e34', '#e6b600', '#0098d9', '#2b821d', '#005eaa',
-    '#339ca8', '#cda819', '#32a487', '#3fb1e3', '#6be6c1',
+    '#339ca8', '#cda819', '#32a487',
   ],
-  westeros: [
-    '#516b91', '#59c4e6', '#edafda', '#93b7e3', '#a5e7f0',
-    '#cbb0e3', '#516b91', '#59c4e6', '#edafda', '#93b7e3',
+  roma: [
+    '#E01F54', '#001852', '#f5e8c8', '#b8d2c7', '#c6b38e',
+    '#a4d8c2', '#f3d999', '#d3758f', '#dcc392', '#2e4783',
+  ],
+  azul: [
+    '#f2385a', '#f5a503', '#4ad9d9', '#f7879c', '#c1d7a8',
+    '#4dffd2', '#fccfd7', '#d5f6f6',
+  ],
+  royal: [
+    '#3f7ea6', '#993366', '#408000', '#8c6f56', '#a65149',
+    '#731f17', '#adc2eb', '#d9c3b0',
+  ],
+  sakura: [
+    '#e52c3c', '#f7b1ab', '#fa506c', '#f59288', '#f8c4d8',
+    '#e54f5c', '#f06d5c', '#e54f80', '#f29c9f', '#eeb5b7',
+  ],
+  'tech-blue': [
+    '#4d4d4d', '#3a5897', '#007bb6', '#7094db', '#0080ff',
+    '#b3b3ff', '#00bdec', '#33ccff', '#ccddff',
+  ],
+  'dark-bold': [
+    '#458c6b', '#f2da87', '#d9a86c', '#d94436', '#a62424',
+    '#76bc9b', '#cce6da',
   ],
 };
+
+// Theme dropdown options for the UI
+export const ECHARTS_THEME_OPTIONS = [
+  { label: 'Default', value: 'default' },
+  { label: 'Dark', value: 'dark' },
+  { label: 'Vintage', value: 'vintage' },
+  { label: 'Macarons', value: 'macarons' },
+  { label: 'Infographic', value: 'infographic' },
+  { label: 'Shine', value: 'shine' },
+  { label: 'Roma', value: 'roma' },
+  { label: 'Azul', value: 'azul' },
+  { label: 'Royal', value: 'royal' },
+  { label: 'Sakura', value: 'sakura' },
+  { label: 'Tech Blue', value: 'tech-blue' },
+  { label: 'Dark Bold', value: 'dark-bold' },
+];
 
 // ========= Dummy Data =========
 export const DUMMY_SINGLE_SERIES = [
@@ -148,12 +120,12 @@ export interface BaseChartConfig {
 }
 
 export const DEFAULT_BASE_CONFIG: BaseChartConfig = {
-  legend: false,
+  legend: true,
   legendTitle: 'Legend',
   legendPosition: 'right',
   animations: true,
   tooltipDisabled: false,
-  colorScheme: 'vivid',
+  colorScheme: 'default',
   gradient: false,
 };
 
@@ -172,6 +144,8 @@ export interface AxisConfig {
   maxXAxisTickLength: number;
   maxYAxisTickLength: number;
   wrapTicks: boolean;
+  inverseX: boolean;
+  inverseY: boolean;
 }
 
 export const DEFAULT_AXIS_CONFIG: AxisConfig = {
@@ -189,6 +163,8 @@ export const DEFAULT_AXIS_CONFIG: AxisConfig = {
   maxXAxisTickLength: 16,
   maxYAxisTickLength: 16,
   wrapTicks: false,
+  inverseX: false,
+  inverseY: false,
 };
 
 export interface BarChartConfig extends BaseChartConfig, AxisConfig {
@@ -331,7 +307,7 @@ export const DEFAULT_CARD_CHART_CONFIG: CardChartConfig = {
   emptyColor: 'rgba(0, 0, 0, 0)',
   innerPadding: 15,
   animations: true,
-  colorScheme: 'vivid',
+  colorScheme: 'default',
 };
 
 export interface HeatMapConfig extends BaseChartConfig, AxisConfig {
@@ -367,5 +343,5 @@ export const DEFAULT_TREE_MAP_CONFIG: TreeMapConfig = {
   gradient: false,
   animations: true,
   tooltipDisabled: false,
-  colorScheme: 'vivid',
+  colorScheme: 'default',
 };

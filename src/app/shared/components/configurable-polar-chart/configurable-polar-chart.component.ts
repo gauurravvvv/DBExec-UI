@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildPolarChartOption } from '../../helpers/echarts-option-builder';
 
 export interface PolarChartSeries {
@@ -93,14 +92,12 @@ export class ConfigurablePolarChartComponent
     labelTrimSize: 10,
     tooltipDisabled: false,
     showSeriesOnHover: true,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
   };
 
   get config(): PolarChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

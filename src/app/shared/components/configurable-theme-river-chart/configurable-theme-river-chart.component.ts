@@ -1,5 +1,4 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildThemeRiverChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -17,9 +16,8 @@ export class ConfigurableThemeRiverChartComponent implements OnInit, OnChanges, 
   @Output() onSelect = new EventEmitter<any>();
   chartOption: any = {};
   echartsInstance: any = null;
-  private defaultConfig: any = { animations: true, tooltipDisabled: false, colorScheme: 'vivid', labels: true, toolbox: false };
+  private defaultConfig: any = { animations: true, tooltipDisabled: false, colorScheme: 'default', labels: true, toolbox: false };
   get config(): any { return this.chartConfig || this.defaultConfig; }
-  colorPalettes = COLOR_PALETTES;
   ngOnInit(): void { this.updateChartOption(); this.previousConfigSnapshot = JSON.stringify(this.config); }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {

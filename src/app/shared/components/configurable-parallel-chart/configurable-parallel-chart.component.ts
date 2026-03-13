@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildParallelChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -35,15 +34,13 @@ export class ConfigurableParallelChartComponent implements OnInit, OnChanges, Do
     gradient: false,
     animations: true,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
     parallelSmooth: false,
   };
 
   get config(): any {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

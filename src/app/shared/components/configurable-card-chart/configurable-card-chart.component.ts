@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 
 export interface CardChartData {
   name: string;
@@ -49,6 +48,12 @@ export class ConfigurableCardChartComponent
 
   colors: string[] = [];
 
+  // Default ECharts palette for card coloring
+  private defaultColors: string[] = [
+    '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de',
+    '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#48b8d0',
+  ];
+
   private defaultConfig: CardChartConfig = {
     cardColor: '',
     bandColor: '',
@@ -56,15 +61,12 @@ export class ConfigurableCardChartComponent
     emptyColor: 'rgba(0, 0, 0, 0)',
     innerPadding: 15,
     animations: true,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
   };
 
   get config(): CardChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  // Color palettes (using imported constants)
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateColors();
@@ -89,7 +91,7 @@ export class ConfigurableCardChartComponent
   }
 
   private updateColors(): void {
-    this.colors = this.colorPalettes[this.config.colorScheme] || this.colorPalettes['vivid'];
+    this.colors = this.defaultColors;
   }
 
   getCardColor(index: number): string {

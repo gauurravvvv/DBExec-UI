@@ -1,7 +1,6 @@
 import {
   Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildGraphChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -26,7 +25,7 @@ export class ConfigurableGraphChartComponent implements OnInit, OnChanges, DoChe
   private defaultConfig: any = {
     animations: true,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
     labels: true,
     graphLayout: 'force',
     graphRepulsion: 200,
@@ -37,8 +36,6 @@ export class ConfigurableGraphChartComponent implements OnInit, OnChanges, DoChe
   get config(): any {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

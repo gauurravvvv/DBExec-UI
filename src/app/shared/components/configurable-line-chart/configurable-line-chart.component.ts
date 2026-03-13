@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildLineChartOption } from '../../helpers/echarts-option-builder';
 
 export interface LineChartSeries {
@@ -80,7 +79,7 @@ export class ConfigurableLineChartComponent
   echartsInstance: any = null;
 
   private defaultConfig: LineChartConfig = {
-    legend: false,
+    legend: true,
     legendPosition: 'right',
     legendTitle: 'Legend',
     xAxis: true,
@@ -105,14 +104,12 @@ export class ConfigurableLineChartComponent
     rangeFillOpacity: 0.15,
     curveType: 'linear',
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
   };
 
   get config(): LineChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   curveTypes = [
     { label: 'Linear', value: 'linear' },

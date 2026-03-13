@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildHeatMapChartOption } from '../../helpers/echarts-option-builder';
 
 export interface HeatMapSeries {
@@ -93,8 +92,6 @@ export class ConfigurableHeatmapChartComponent
   get config(): HeatMapConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

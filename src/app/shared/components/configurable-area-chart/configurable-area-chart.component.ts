@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildAreaChartOption } from '../../helpers/echarts-option-builder';
 
 export interface AreaChartSeries {
@@ -77,7 +76,7 @@ export class ConfigurableAreaChartComponent
   echartsInstance: any = null;
 
   private defaultConfig: AreaChartConfig = {
-    legend: false,
+    legend: true,
     legendTitle: 'Legend',
     legendPosition: 'right',
     xAxis: true,
@@ -100,14 +99,12 @@ export class ConfigurableAreaChartComponent
     animations: false,
     curveType: 'linear',
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
   };
 
   get config(): AreaChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   curveTypes = [
     { label: 'Linear', value: 'linear' },

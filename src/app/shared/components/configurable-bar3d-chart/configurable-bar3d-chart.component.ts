@@ -1,7 +1,6 @@
 import {
   Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildBar3DChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -27,15 +26,13 @@ export class ConfigurableBar3dChartComponent implements OnInit, OnChanges, DoChe
   private defaultConfig: any = {
     animations: true,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
-    legend: false,
+    colorScheme: 'default',
+    legend: true,
   };
 
   get config(): any {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

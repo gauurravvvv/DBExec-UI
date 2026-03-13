@@ -1,7 +1,6 @@
 import {
   Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildWaterfallChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -26,7 +25,7 @@ export class ConfigurableWaterfallChartComponent implements OnInit, OnChanges, D
   private defaultConfig: any = {
     animations: true,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
     showDataLabel: false,
     roundEdges: false,
     xAxis: true,
@@ -44,8 +43,6 @@ export class ConfigurableWaterfallChartComponent implements OnInit, OnChanges, D
   get config(): any {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

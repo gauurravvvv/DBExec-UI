@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildBoxPlotChartOption } from '../../helpers/echarts-option-builder';
 
 export interface BoxChartConfig {
@@ -64,21 +63,19 @@ export class ConfigurableBoxChartComponent
     showYAxisLabel: true,
     xAxisLabel: 'Category',
     yAxisLabel: 'Value',
-    legend: false,
+    legend: true,
     legendTitle: 'Legend',
     legendPosition: 'right',
     gradient: false,
     animations: false,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
     roundDomains: false,
   };
 
   get config(): BoxChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

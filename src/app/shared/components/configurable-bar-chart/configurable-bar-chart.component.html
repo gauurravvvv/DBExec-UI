@@ -13,8 +13,8 @@
         <div class="chart-section">
             <div echarts [options]="chartOption" [autoResize]="true"
                 class="echart-container"
-                [style.width.px]="chartWidth ? chartWidth - 20 : null"
-                [style.height.px]="chartHeight ? chartHeight - 45 : null"
+                [style.width.px]="chartWidth ? chartWidth - 10 : null"
+                [style.height.px]="chartHeight ? chartHeight - 10 : null"
                 (chartInit)="onChartInit($event)"
                 (chartClick)="handleSelect($event)"
                 (chartMouseOver)="handleActivate($event)"
@@ -32,7 +32,7 @@
             <div class="config-content">
                 <!-- Color Scheme -->
                 <div class="config-group">
-                    <label>Color Scheme</label>
+                    <label>Theme</label>
                     <p-dropdown [options]="colorSchemes" [(ngModel)]="config.colorScheme"
                         (onChange)="onColorSchemeChange()" optionLabel="label" optionValue="value"
                         [style]="{'width': '100%'}">

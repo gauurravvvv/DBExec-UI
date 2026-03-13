@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildRadarChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -35,7 +34,7 @@ export class ConfigurableRadarChartComponent implements OnInit, OnChanges, DoChe
     gradient: false,
     animations: true,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
     legend: true,
     legendPosition: 'right',
     radarShape: 'polygon',
@@ -45,8 +44,6 @@ export class ConfigurableRadarChartComponent implements OnInit, OnChanges, DoChe
   get config(): any {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

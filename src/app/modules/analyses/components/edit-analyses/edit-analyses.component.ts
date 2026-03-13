@@ -18,6 +18,43 @@ import {
   CHART_TYPES,
   COLOR_SCHEMES,
   LEGEND_POSITIONS,
+  LEGEND_TYPES,
+  getDummyData,
+  LABEL_POSITIONS,
+  TOOLTIP_TRIGGERS,
+  AXIS_POINTER_TYPES,
+  GRID_LINE_STYLES,
+  EMPHASIS_MODES,
+  ANIMATION_EASINGS,
+  LINE_STEP_OPTIONS,
+  LINE_STYLE_TYPES,
+  SYMBOL_SHAPES,
+  PIE_LABEL_POSITIONS,
+  PIE_SELECTED_MODES,
+  PIE_ROSE_TYPES,
+  FUNNEL_SORT_OPTIONS,
+  FUNNEL_ALIGN_OPTIONS,
+  RADAR_SHAPES,
+  GRAPH_LAYOUTS,
+  TREE_ORIENTATIONS,
+  TREE_LAYOUTS,
+  SANKEY_ORIENTATIONS,
+  PICTORIAL_SYMBOLS,
+  TREE_EDGE_SHAPES,
+  GRAPH_EDGE_SYMBOLS,
+  TREEMAP_NODE_CLICK_OPTIONS,
+  SUNBURST_NODE_CLICK_OPTIONS,
+  BOXPLOT_LAYOUTS,
+  PICTORIAL_SYMBOL_POSITIONS,
+  EFFECT_SHOW_ON_OPTIONS,
+  SANKEY_NODE_ALIGNS,
+  SAMPLING_OPTIONS,
+  SHOW_ALL_SYMBOL_OPTIONS,
+  STACK_STRATEGY_OPTIONS,
+  RIPPLE_BRUSH_TYPE_OPTIONS,
+  FUNNEL_ORIENT_OPTIONS,
+  SUNBURST_SORT_OPTIONS,
+  PICTORIAL_REPEAT_DIRECTION_OPTIONS,
   getDefaultChartConfig,
   hasAxisLabels,
   is3DCoordinateChartType,
@@ -56,6 +93,13 @@ import {
   isMap3dChartType,
   isFlowGlChartType,
   supportsGradient,
+  supportsDataLabel,
+  supportsLegend,
+  supportsEmphasis,
+  supportsToolbox,
+  supportsTooltip,
+  supportsAnimation,
+  supportsDataZoom,
 } from '../../constants/charts.constants';
 import { Visual } from '../../models';
 import { AnalysesService } from '../../service/analyses.service';
@@ -148,8 +192,44 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Color schemes
   colorSchemes = COLOR_SCHEMES;
 
-  // Legend positions
+  // Dropdown options
   legendPositions = LEGEND_POSITIONS;
+  legendTypes = LEGEND_TYPES;
+  labelPositions = LABEL_POSITIONS;
+  tooltipTriggers = TOOLTIP_TRIGGERS;
+  axisPointerTypes = AXIS_POINTER_TYPES;
+  gridLineStyles = GRID_LINE_STYLES;
+  emphasisModes = EMPHASIS_MODES;
+  animationEasings = ANIMATION_EASINGS;
+  lineStepOptions = LINE_STEP_OPTIONS;
+  lineStyleTypes = LINE_STYLE_TYPES;
+  symbolShapes = SYMBOL_SHAPES;
+  pieLabelPositions = PIE_LABEL_POSITIONS;
+  pieSelectedModes = PIE_SELECTED_MODES;
+  pieRoseTypes = PIE_ROSE_TYPES;
+  funnelSortOptions = FUNNEL_SORT_OPTIONS;
+  funnelAlignOptions = FUNNEL_ALIGN_OPTIONS;
+  radarShapes = RADAR_SHAPES;
+  graphLayouts = GRAPH_LAYOUTS;
+  treeOrientations = TREE_ORIENTATIONS;
+  treeLayouts = TREE_LAYOUTS;
+  sankeyOrientations = SANKEY_ORIENTATIONS;
+  pictorialSymbols = PICTORIAL_SYMBOLS;
+  treeEdgeShapes = TREE_EDGE_SHAPES;
+  graphEdgeSymbols = GRAPH_EDGE_SYMBOLS;
+  treemapNodeClickOptions = TREEMAP_NODE_CLICK_OPTIONS;
+  sunburstNodeClickOptions = SUNBURST_NODE_CLICK_OPTIONS;
+  boxplotLayouts = BOXPLOT_LAYOUTS;
+  pictorialSymbolPositions = PICTORIAL_SYMBOL_POSITIONS;
+  effectShowOnOptions = EFFECT_SHOW_ON_OPTIONS;
+  sankeyNodeAligns = SANKEY_NODE_ALIGNS;
+  samplingOptions = SAMPLING_OPTIONS;
+  showAllSymbolOptions = SHOW_ALL_SYMBOL_OPTIONS;
+  stackStrategyOptions = STACK_STRATEGY_OPTIONS;
+  rippleBrushTypeOptions = RIPPLE_BRUSH_TYPE_OPTIONS;
+  funnelOrientOptions = FUNNEL_ORIENT_OPTIONS;
+  sunburstSortOptions = SUNBURST_SORT_OPTIONS;
+  pictorialRepeatDirectionOptions = PICTORIAL_REPEAT_DIRECTION_OPTIONS;
 
   // Dragging
   draggingVisual: any = null;
@@ -801,6 +881,46 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
+  plotAllCharts(): void {
+    this.visuals = [];
+    this.visualCounter = 0;
+    this.focusedVisualId = null;
+
+    const gap = this.canvasHeight > 0 ? 10 / this.canvasHeight : 0.02;
+    const heightRatio = 0.45;
+    const widthRatio = 0.5;
+
+    CHART_TYPES.forEach((chartDef: any, index: number) => {
+      this.visualCounter++;
+      const visual: any = {
+        id: this.visualCounter,
+        title: chartDef.name,
+        x: 0,
+        y: 0,
+        xRatio: (index % 2) * widthRatio,
+        yRatio: Math.floor(index / 2) * (heightRatio + gap),
+        width: 400,
+        height: 350,
+        widthRatio,
+        heightRatio,
+        chartType: chartDef.id,
+        xAxisColumn: null,
+        yAxisColumn: null,
+        zAxisColumn: null,
+        config: getDefaultChartConfig(),
+        chartData: getDummyData(chartDef.id),
+        useDummyData: true,
+      };
+      this.computeVisualDimensions(visual);
+      this.visuals.push(visual);
+    });
+
+    if (this.visuals.length > 0) {
+      this.focusedVisualId = this.visuals[0].id;
+    }
+    this.cdr.detectChanges();
+  }
+
   /**
    * Calculate next available position for a new visual in grid layout
    * Grid: 2 columns (50% width each), rows stack vertically
@@ -1027,7 +1147,31 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   supportsLegend(chartType: string | null): boolean {
-    return chartType !== 'card';
+    return supportsLegend(chartType);
+  }
+
+  supportsEmphasis(chartType: string | null): boolean {
+    return supportsEmphasis(chartType);
+  }
+
+  supportsToolbox(chartType: string | null): boolean {
+    return supportsToolbox(chartType);
+  }
+
+  supportsTooltip(chartType: string | null): boolean {
+    return supportsTooltip(chartType);
+  }
+
+  supportsAnimation(chartType: string | null): boolean {
+    return supportsAnimation(chartType);
+  }
+
+  supportsDataLabel(chartType: string | null): boolean {
+    return supportsDataLabel(chartType);
+  }
+
+  supportsDataZoom(chartType: string | null): boolean {
+    return supportsDataZoom(chartType);
   }
 
   hasRequiredChartFields(visual: any): boolean {

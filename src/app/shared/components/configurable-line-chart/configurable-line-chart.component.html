@@ -3,8 +3,8 @@
         <div class="chart-section">
             <div echarts [options]="chartOption" [autoResize]="true"
                 class="echart-container"
-                [style.width.px]="chartWidth ? chartWidth - 20 : null"
-                [style.height.px]="chartHeight ? chartHeight - 45 : null"
+                [style.width.px]="chartWidth ? chartWidth - 10 : null"
+                [style.height.px]="chartHeight ? chartHeight - 10 : null"
                 (chartInit)="onChartInit($event)"
                 (chartClick)="onChartSelect($event)"
                 (chartMouseOver)="onChartMouseOver($event)"

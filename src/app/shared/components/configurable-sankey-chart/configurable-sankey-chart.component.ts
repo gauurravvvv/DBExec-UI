@@ -1,7 +1,6 @@
 import {
   Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildSankeyChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -26,7 +25,7 @@ export class ConfigurableSankeyChartComponent implements OnInit, OnChanges, DoCh
   private defaultConfig: any = {
     animations: true,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
     labels: true,
     sankeyNodeWidth: 20,
     sankeyNodeGap: 8,
@@ -37,8 +36,6 @@ export class ConfigurableSankeyChartComponent implements OnInit, OnChanges, DoCh
   get config(): any {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

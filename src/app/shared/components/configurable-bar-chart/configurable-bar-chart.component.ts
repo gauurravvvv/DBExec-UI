@@ -9,10 +9,10 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {
-  COLOR_PALETTES,
   DUMMY_MULTI_SERIES,
   DEFAULT_BAR_CHART_CONFIG,
   BarChartConfig,
+  ECHARTS_THEME_OPTIONS,
 } from '../../helpers/chart-config.helper';
 import { buildBarChartOption } from '../../helpers/echarts-option-builder';
 
@@ -71,23 +71,7 @@ export class ConfigurableBarChartComponent
   isConfigPanelCollapsed: boolean = false;
 
   // Available color schemes
-  colorSchemes = [
-    { label: 'Vivid', value: 'vivid' },
-    { label: 'Natural', value: 'natural' },
-    { label: 'Cool', value: 'cool' },
-    { label: 'Fire', value: 'fire' },
-    { label: 'Solar', value: 'solar' },
-    { label: 'Air', value: 'air' },
-    { label: 'Aqua', value: 'aqua' },
-    { label: 'Flame', value: 'flame' },
-    { label: 'Ocean', value: 'ocean' },
-    { label: 'Forest', value: 'forest' },
-    { label: 'Horizon', value: 'horizon' },
-    { label: 'Neons', value: 'neons' },
-    { label: 'Picnic', value: 'picnic' },
-    { label: 'Night', value: 'night' },
-    { label: 'Night Lights', value: 'nightLights' },
-  ];
+  colorSchemes = ECHARTS_THEME_OPTIONS;
 
   // Multi-series data for grouped/stacked/normalized charts
   multiData = DUMMY_MULTI_SERIES;

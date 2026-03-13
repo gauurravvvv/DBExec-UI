@@ -449,31 +449,7 @@ export const CHART_TYPES = [
   },
 ];
 
-export const COLOR_SCHEMES = [
-  { label: 'Vivid', value: 'vivid' },
-  { label: 'Natural', value: 'natural' },
-  { label: 'Cool', value: 'cool' },
-  { label: 'Fire', value: 'fire' },
-  { label: 'Solar', value: 'solar' },
-  { label: 'Air', value: 'air' },
-  { label: 'Aqua', value: 'aqua' },
-  { label: 'Flame', value: 'flame' },
-  { label: 'Ocean', value: 'ocean' },
-  { label: 'Forest', value: 'forest' },
-  { label: 'Horizon', value: 'horizon' },
-  { label: 'Neons', value: 'neons' },
-  { label: 'Macarons', value: 'macarons' },
-  { label: 'Walden', value: 'walden' },
-  { label: 'Vintage', value: 'vintage' },
-  { label: 'Dark', value: 'dark' },
-  { label: 'Roma', value: 'roma' },
-  { label: 'Infographic', value: 'infographic' },
-  { label: 'Picnic', value: 'picnic' },
-  { label: 'Night', value: 'night' },
-  { label: 'Night Lights', value: 'nightLights' },
-  { label: 'Shine', value: 'shine' },
-  { label: 'Westeros', value: 'westeros' },
-];
+export { ECHARTS_THEME_OPTIONS as COLOR_SCHEMES } from '../../../shared/helpers/chart-config.helper';
 
 // ECharts-native dropdown options
 
@@ -624,6 +600,109 @@ export const SANKEY_ORIENTATIONS = [
   { label: 'Vertical', value: 'vertical' },
 ];
 
+// Tree chart edge shapes
+export const TREE_EDGE_SHAPES = [
+  { label: 'Curve', value: 'curve' },
+  { label: 'Polyline', value: 'polyline' },
+];
+
+// Graph chart edge symbols
+export const GRAPH_EDGE_SYMBOLS = [
+  { label: 'None', value: 'none' },
+  { label: 'Circle', value: 'circle' },
+  { label: 'Arrow', value: 'arrow' },
+];
+
+// Treemap node click actions
+export const TREEMAP_NODE_CLICK_OPTIONS = [
+  { label: 'Disabled', value: 'false' },
+  { label: 'Zoom In', value: 'zoomToNode' },
+  { label: 'Link', value: 'link' },
+];
+
+// Sunburst node click actions
+export const SUNBURST_NODE_CLICK_OPTIONS = [
+  { label: 'Disabled', value: 'false' },
+  { label: 'Root to Node', value: 'rootToNode' },
+  { label: 'Link', value: 'link' },
+];
+
+// Box plot layout orientations
+export const BOXPLOT_LAYOUTS = [
+  { label: 'Horizontal', value: 'horizontal' },
+  { label: 'Vertical', value: 'vertical' },
+];
+
+// Pictorial bar symbol positions
+export const PICTORIAL_SYMBOL_POSITIONS = [
+  { label: 'Start', value: 'start' },
+  { label: 'Center', value: 'center' },
+  { label: 'End', value: 'end' },
+];
+
+// Effect scatter show-on options
+export const EFFECT_SHOW_ON_OPTIONS = [
+  { label: 'Render', value: 'render' },
+  { label: 'Emphasis', value: 'emphasis' },
+];
+
+// Sankey node alignment options
+export const SANKEY_NODE_ALIGNS = [
+  { label: 'Justify', value: 'justify' },
+  { label: 'Left', value: 'left' },
+  { label: 'Right', value: 'right' },
+];
+
+// Line/Area sampling options
+export const SAMPLING_OPTIONS = [
+  { label: 'None', value: 'none' },
+  { label: 'LTTB', value: 'lttb' },
+  { label: 'Average', value: 'average' },
+  { label: 'Max', value: 'max' },
+  { label: 'Min', value: 'min' },
+  { label: 'Sum', value: 'sum' },
+];
+
+// Line/Area showAllSymbol options
+export const SHOW_ALL_SYMBOL_OPTIONS = [
+  { label: 'Auto', value: 'auto' },
+  { label: 'Yes', value: 'true' },
+  { label: 'No', value: 'false' },
+];
+
+// Bar stack strategy options
+export const STACK_STRATEGY_OPTIONS = [
+  { label: 'Same Sign', value: 'samesign' },
+  { label: 'All', value: 'all' },
+  { label: 'Positive', value: 'positive' },
+  { label: 'Negative', value: 'negative' },
+];
+
+// Scatter ripple brush type options
+export const RIPPLE_BRUSH_TYPE_OPTIONS = [
+  { label: 'Stroke', value: 'stroke' },
+  { label: 'Fill', value: 'fill' },
+];
+
+// Funnel orientation options
+export const FUNNEL_ORIENT_OPTIONS = [
+  { label: 'Vertical', value: 'vertical' },
+  { label: 'Horizontal', value: 'horizontal' },
+];
+
+// Sunburst sort options
+export const SUNBURST_SORT_OPTIONS = [
+  { label: 'Descending', value: 'desc' },
+  { label: 'Ascending', value: 'asc' },
+  { label: 'None', value: 'none' },
+];
+
+// Pictorial bar symbol repeat direction
+export const PICTORIAL_REPEAT_DIRECTION_OPTIONS = [
+  { label: 'Start', value: 'start' },
+  { label: 'End', value: 'end' },
+];
+
 // Pictorial bar chart options
 export const PICTORIAL_SYMBOLS = [
   { label: 'Round Rect', value: 'roundRect' },
@@ -637,7 +716,7 @@ export const PICTORIAL_SYMBOLS = [
 // Default chart configuration with all possible ECharts options
 export const DEFAULT_CHART_CONFIG = {
   // === Global ===
-  colorScheme: 'vivid',
+  colorScheme: 'default',
 
   // === Axis (ECharts xAxis/yAxis) ===
   xAxis: true,
@@ -663,7 +742,7 @@ export const DEFAULT_CHART_CONFIG = {
 
   // === Legend (ECharts legend) ===
   legend: false,
-  legendTitle: 'Legend',
+  legendTitle: 'Legend',           // not used by ECharts (kept for backward compat)
   legendPosition: 'right',       // legend orient + position
   legendType: 'scroll',          // legend.type: 'plain' | 'scroll'
 
@@ -686,8 +765,12 @@ export const DEFAULT_CHART_CONFIG = {
 
   // === Bar Chart (ECharts series type: 'bar') ===
   barWidth: '',                  // series.barWidth (px or %, empty = auto)
+  barMaxWidth: '',               // series.barMaxWidth (px or %, empty = auto)
   barGap: '30%',                 // series.barGap
   barCategoryGap: '20%',         // series.barCategoryGap
+  barMinWidth: '',               // series.barMinWidth (auto if empty)
+  barMinHeight: 0,               // series.barMinHeight
+  stackStrategy: 'samesign',    // series.stackStrategy: 'samesign' | 'all' | 'positive' | 'negative'
   roundEdges: false,             // series.itemStyle.borderRadius
   showBackground: false,         // series.showBackground
 
@@ -702,6 +785,9 @@ export const DEFAULT_CHART_CONFIG = {
   lineWidth: 2,                  // series.lineStyle.width
   connectNulls: false,           // series.connectNulls
   rangeFillOpacity: 0.15,        // series.areaStyle.opacity (for line with area)
+  endLabel: false,               // series.endLabel.show
+  sampling: 'none',              // series.sampling: 'none' | 'lttb' | 'average' | 'max' | 'min' | 'sum'
+  showAllSymbol: 'auto',         // series.showAllSymbol: 'auto' | true | false
 
   // === Area Chart (extends Line) ===
   areaOpacity: 0.7,              // series.areaStyle.opacity
@@ -710,6 +796,8 @@ export const DEFAULT_CHART_CONFIG = {
   labels: true,                  // series.label.show
   pieLabelPosition: 'outside',   // series.label.position
   pieLabelLine: true,            // series.labelLine.show
+  pieMinAngle: 0,                // series.minAngle (min sector angle in degrees)
+  pieAvoidLabelOverlap: true,    // series.avoidLabelOverlap
   pieInnerRadius: 0,             // series.radius[0] (%)
   pieOuterRadius: 70,            // series.radius[1] (%)
   pieStartAngle: 90,             // series.startAngle
@@ -717,6 +805,9 @@ export const DEFAULT_CHART_CONFIG = {
   pieSelectedMode: 'none',       // series.selectedMode
   pieSelectedOffset: 10,         // series.selectedOffset
   pieBorderRadius: 0,            // series.itemStyle.borderRadius
+  pieClockwise: true,            // series.clockwise
+  pieEndAngle: null,             // series.endAngle (null = full circle)
+  piePercentPrecision: 2,        // series.percentPrecision
   roseType: 'none',              // series.roseType
   trimLabels: true,
   maxLabelLength: 10,
@@ -724,6 +815,9 @@ export const DEFAULT_CHART_CONFIG = {
   // === Polar/Radar Chart (ECharts type: 'radar') ===
   radarShape: 'polygon',         // radar.shape: 'polygon' | 'circle'
   radarAreaOpacity: 0.15,        // series.areaStyle.opacity
+  radarSymbol: 'circle',         // series.symbol
+  radarSymbolSize: 4,            // series.symbolSize
+  radarLineWidth: 2,             // series.lineStyle.width
   labelTrim: true,
   labelTrimSize: 10,
 
@@ -741,6 +835,10 @@ export const DEFAULT_CHART_CONFIG = {
   gaugePointerLength: 60,        // pointer.length (%)
   gaugeShowProgress: false,      // progress.show
   gaugeAxisLineWidth: 15,        // axisLine.lineStyle.width
+  gaugePointerWidth: 6,          // pointer.width
+  gaugePointerIcon: '',          // pointer.icon (empty = default, or symbol name)
+  gaugeProgressRoundCap: false,  // progress.roundCap
+  gaugeAxisLineRoundCap: false,  // axisLine.roundCap
 
   // === Card chart specific ===
   cardColor: '',
@@ -764,16 +862,27 @@ export const DEFAULT_CHART_CONFIG = {
   scatterSymbolSize: 10,         // series.symbolSize
   scatterSymbolShape: 'circle',  // series.symbol
   effectRippleScale: 3,          // series.rippleEffect.scale (for effect-scatter)
+  effectShowOn: 'render',        // series.showEffectOn: 'render' | 'emphasis'
+  effectRippleBrushType: 'stroke', // series.rippleEffect.brushType: 'stroke' | 'fill'
+  effectRippleNumber: 3,         // series.rippleEffect.number
+  effectRipplePeriod: 4,         // series.rippleEffect.period (seconds)
 
   // === Funnel Chart (ECharts series type: 'funnel') ===
   funnelSort: 'descending',      // series.sort
   funnelAlign: 'center',         // series.funnelAlign
   funnelGap: 2,                  // series.gap
+  funnelMinSize: '0%',           // series.minSize
+  funnelMaxSize: '100%',         // series.maxSize
+  funnelOrient: 'vertical',      // series.orient: 'vertical' | 'horizontal'
 
   // === Sankey Chart (ECharts series type: 'sankey') ===
   sankeyNodeWidth: 20,           // series.nodeWidth
   sankeyNodeGap: 8,              // series.nodeGap
   sankeyOrient: 'horizontal',    // series.orient
+  sankeyNodeAlign: 'justify',    // series.nodeAlign: 'justify' | 'left' | 'right'
+  sankeyDraggable: true,         // series.draggable
+  sankeyEdgeLabel: false,        // series.edgeLabel.show
+  sankeyCurveness: 0.5,          // series.lineStyle.curveness
 
   // === Waterfall Chart (stacked bar) ===
   waterfallShowTotal: true,
@@ -782,23 +891,89 @@ export const DEFAULT_CHART_CONFIG = {
   treemapShowLabels: true,       // series.label.show
   treemapRoam: false,            // series.roam
   treemapBreadcrumb: false,      // series.breadcrumb.show
+  treemapLeafDepth: 1,           // series.leafDepth (drill-down depth)
+  treemapNodeClick: 'zoomToNode', // series.nodeClick: false | 'zoomToNode' | 'link'
+  treemapVisualDimension: 0,     // series.visualDimension
 
   // === Graph Chart (ECharts series type: 'graph') ===
   graphLayout: 'force',          // series.layout
   graphRepulsion: 200,           // series.force.repulsion
   graphEdgeLength: 100,          // series.force.edgeLength
   graphGravity: 0.1,             // series.force.gravity
+  graphEdgeSymbol: 'none',       // series.edgeSymbol: 'none' | 'circle' | 'arrow'
+  graphEdgeSymbolSize: 10,       // series.edgeSymbolSize
+  graphDraggable: true,          // series.draggable
+  graphForceFriction: 0.6,       // series.force.friction
+  graphEdgeLabel: false,         // series.edgeLabel.show
 
   // === Tree Chart (ECharts series type: 'tree') ===
   treeOrient: 'TB',              // series.orient
   treeLayout: 'orthogonal',      // series.layout
+  treeEdgeShape: 'curve',        // series.edgeShape: 'curve' | 'polyline'
+  treeExpandAndCollapse: true,   // series.expandAndCollapse
+  treeInitialDepth: 3,           // series.initialTreeDepth
+  treeRoam: false,               // series.roam
+  treeEdgeForkPosition: '50%',   // series.edgeForkPosition
 
   // === Pictorial Bar (ECharts series type: 'pictorialBar') ===
   pictorialSymbol: 'roundRect',  // series.symbol
   pictorialRepeat: false,        // series.symbolRepeat
+  pictorialSymbolPosition: 'start', // series.symbolPosition: 'start' | 'center' | 'end'
+  pictorialSymbolClip: true,     // series.symbolClip
+  pictorialSymbolRepeatDirection: 'start', // series.symbolRepeatDirection: 'start' | 'end'
+  pictorialSymbolMargin: 'auto', // series.symbolMargin
 
   // === Polar Bar (ECharts bar in polar coordinates) ===
   polarBarInnerRadius: 15,       // polar.radius[0] (%)
+
+  // === Parallel Chart (ECharts series type: 'parallel') ===
+  parallelSmooth: false,         // series.smooth
+  parallelLineWidth: 1,          // series.lineStyle.width
+  parallelLineOpacity: 0.5,      // series.lineStyle.opacity
+  parallelActiveOpacity: 1,      // series.activeOpacity
+  parallelInactiveOpacity: 0.1,  // series.inactiveOpacity
+  parallelRealtime: true,        // series.realtime
+
+  // === Candlestick Chart (ECharts series type: 'candlestick') ===
+  candleBullColor: '#ec0000',    // series.itemStyle.color (bullish/up candle)
+  candleBearColor: '#00da3c',    // series.itemStyle.color0 (bearish/down candle)
+  candleBullBorderColor: '#ec0000', // series.itemStyle.borderColor
+  candleBearBorderColor: '#00da3c', // series.itemStyle.borderColor0
+  candleBarWidth: '',            // series.barWidth (auto if empty)
+
+  // === Sunburst Chart (ECharts series type: 'sunburst') ===
+  sunburstRadius: '90%',         // series.radius[1] (outer radius %)
+  sunburstNodeClick: 'rootToNode', // series.nodeClick: false | 'rootToNode' | 'link'
+  sunburstSort: 'desc',          // series.sort: 'desc' | 'asc' | null
+  sunburstStartAngle: 90,        // series.startAngle
+
+  // === Box Plot (ECharts series type: 'boxplot') ===
+  boxplotLayout: 'horizontal',   // series.layout: 'horizontal' | 'vertical'
+  boxplotBoxWidth: 7,            // series.boxWidth (min box width px)
+  boxplotBoxMaxWidth: 50,        // series.boxWidth max
+
+  // === 3D Charts (require echarts-gl) ===
+  autoRotate: false,             // grid3D.viewControl.autoRotate
+  autoRotateSpeed: 10,           // viewControl.autoRotateSpeed (globe)
+  grid3DBoxWidth: 100,           // grid3D.boxWidth
+  grid3DBoxDepth: 100,           // grid3D.boxDepth
+  grid3DBoxHeight: 100,          // grid3D.boxHeight
+  zAxisLabel: '',                // zAxis3D.name
+  shading: 'lambert',            // series.shading
+  itemOpacity: 0.8,              // series.itemStyle.opacity
+  lineOpacity: 1,                // series.lineStyle.opacity (3D lines)
+  viewAlpha: 20,                 // grid3D.viewControl.alpha
+  viewBeta: 40,                  // grid3D.viewControl.beta
+
+  // === Surface Chart ===
+  wireframe: true,               // series.wireframe.show
+  showVisualMap: false,           // visualMap.show
+
+  // === Globe Chart ===
+  globeBaseColor: '#304156',     // globe.baseColor
+
+  // === GL Charts ===
+  nodeSize: 10,                  // graphGL node symbolSize
 };
 
 // ============================================================
@@ -1808,7 +1983,7 @@ export function hasAxisLabels(chartType: string | null): boolean {
 
 export function is3DCoordinateChartType(chartType: string | null): boolean {
   if (!chartType) return false;
-  return ['bar3d', 'line3d', 'scatter3d'].includes(chartType);
+  return ['bar3d', 'line3d', 'scatter3d', 'surface', 'map3d'].includes(chartType);
 }
 
 export function supportsGradient(chartType: string | null): boolean {
@@ -1820,16 +1995,72 @@ export function supportsDataZoom(chartType: string | null): boolean {
   if (!chartType) return false;
   const zoomTypes = [
     ...BAR_CHART_TYPES, ...LINE_CHART_TYPES, ...AREA_CHART_TYPES,
-    'scatter', 'effect-scatter', 'bubble',
-    'waterfall', 'heat-map', 'box-chart', 'pictorial-bar',
+    'scatter', 'effect-scatter',
+    'waterfall', 'candlestick',
   ];
   return zoomTypes.includes(chartType);
 }
 
 export function supportsDataLabel(chartType: string | null): boolean {
   if (!chartType) return false;
-  const noLabelTypes = ['number-card', 'sankey'];
-  return !noLabelTypes.includes(chartType);
+  // Only axis-based charts with standard series support data labels.
+  // Charts with their own label config (pie, funnel, sunburst, sankey, graph, treemap)
+  // or charts where labels don't apply (gauge, card, 3D, GL) are excluded.
+  const supported = [
+    ...BAR_CHART_TYPES, ...LINE_CHART_TYPES, ...AREA_CHART_TYPES,
+    'scatter', 'effect-scatter', 'bubble',
+    'waterfall', 'pictorial-bar',
+  ];
+  return supported.includes(chartType);
+}
+
+export function supportsLegend(chartType: string | null): boolean {
+  if (!chartType) return false;
+  const noLegendTypes = [
+    'number-card', 'tree-map', 'sunburst', 'tree',
+    'gauge', 'linear-gauge', 'sankey', 'waterfall',
+    'theme-river', 'pictorial-bar',
+    'bar3d', 'line3d', 'scatter3d',
+    'graphgl', 'scattergl', 'linesgl', 'flowgl',
+    'globe', 'surface', 'map3d',
+  ];
+  return !noLegendTypes.includes(chartType);
+}
+
+export function supportsEmphasis(chartType: string | null): boolean {
+  if (!chartType) return false;
+  const noEmphasisTypes = [
+    'number-card', 'gauge', 'linear-gauge', 'radar', 'parallel',
+    'tree-map', 'sunburst', 'sankey', 'waterfall', 'box-chart',
+    'tree', 'pictorial-bar', 'bar-polar', 'candlestick',
+    'bar3d', 'line3d', 'scatter3d',
+    'graphgl', 'scattergl', 'linesgl', 'flowgl',
+    'globe', 'surface', 'map3d',
+  ];
+  return !noEmphasisTypes.includes(chartType);
+}
+
+export function supportsToolbox(chartType: string | null): boolean {
+  if (!chartType) return false;
+  const supported = [
+    ...BAR_CHART_TYPES, ...LINE_CHART_TYPES, ...AREA_CHART_TYPES,
+    ...PIE_CHART_TYPES,
+    'scatter', 'effect-scatter',
+    'waterfall', 'pictorial-bar',
+    'funnel', 'bar-polar',
+    'sunburst', 'sankey', 'graph', 'tree', 'theme-river',
+  ];
+  return supported.includes(chartType);
+}
+
+export function supportsTooltip(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return chartType !== 'number-card';
+}
+
+export function supportsAnimation(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return chartType !== 'number-card';
 }
 
 // Get a fresh copy of default chart config

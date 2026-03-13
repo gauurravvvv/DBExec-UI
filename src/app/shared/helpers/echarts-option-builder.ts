@@ -1,9 +1,42 @@
+import * as echarts from 'echarts';
 import { COLOR_PALETTES } from './chart-config.helper';
 
 // ========= Helper Functions =========
 
 function getColors(colorScheme: string): string[] {
-  return COLOR_PALETTES[colorScheme] || COLOR_PALETTES['vivid'];
+  return COLOR_PALETTES[colorScheme] || COLOR_PALETTES['default'];
+}
+
+/**
+ * Creates a vertical linear gradient from a base color.
+ * Lightens the color for the top stop, uses original for the bottom.
+ */
+function makeGradient(color: string, direction: 'vertical' | 'horizontal' = 'vertical'): any {
+  const [x, y, x2, y2] = direction === 'vertical' ? [0, 0, 0, 1] : [0, 0, 1, 0];
+  return new echarts.graphic.LinearGradient(x, y, x2, y2, [
+    { offset: 0, color: color },
+    { offset: 1, color: adjustColorOpacity(color, 0.3) },
+  ]);
+}
+
+function adjustColorOpacity(hex: string, opacity: number): string {
+  // Convert hex to rgba
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  if (isNaN(r)) return hex;
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+/**
+ * Apply gradient colors to series when config.gradient is true.
+ * Mutates the series array in place.
+ */
+function applyGradient(series: any[], colors: string[], direction: 'vertical' | 'horizontal' = 'vertical'): void {
+  series.forEach((s: any, i: number) => {
+    if (!s.itemStyle) s.itemStyle = {};
+    s.itemStyle.color = makeGradient(colors[i % colors.length], direction);
+  });
 }
 
 function buildLegend(config: any): any {
@@ -45,6 +78,45 @@ function buildLegend(config: any): any {
   return legend;
 }
 
+function buildLegendWithTitle(config: any): any {
+  const result: any = { legend: buildLegend(config) };
+  if (config.legend && config.legendTitle) {
+    const titleEl: any = {
+      type: 'text',
+      style: {
+        text: config.legendTitle,
+        font: 'bold 11px sans-serif',
+        fill: '#999',
+      },
+    };
+    switch (config.legendPosition) {
+      case 'below':
+        titleEl.left = 'center';
+        titleEl.bottom = 22;
+        break;
+      case 'top':
+        titleEl.left = 'center';
+        titleEl.top = 0;
+        // shift legend down to make room for title
+        result.legend.top = 16;
+        break;
+      case 'left':
+        titleEl.left = 10;
+        titleEl.top = 15;
+        result.legend.top = 30;
+        break;
+      case 'right':
+      default:
+        titleEl.right = 10;
+        titleEl.top = 15;
+        result.legend.top = 30;
+        break;
+    }
+    result.graphic = { elements: [titleEl] };
+  }
+  return result;
+}
+
 function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
   const trigger = config.tooltipTrigger || defaultTrigger;
   const tooltip: any = {
@@ -75,10 +147,10 @@ function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
 
 function buildGrid(config: any): any {
   return {
-    left: 60,
-    right: config.legend && config.legendPosition !== 'below' && config.legendPosition !== 'top' ? 150 : 30,
-    bottom: config.showXAxisLabel ? 60 : 40,
-    top: config.legend && config.legendPosition === 'top' ? 50 : 30,
+    left: 50,
+    right: config.legend && config.legendPosition !== 'below' && config.legendPosition !== 'top' ? 140 : 20,
+    bottom: config.showXAxisLabel ? 50 : 30,
+    top: config.legend && config.legendPosition === 'top' ? 50 : 20,
     containLabel: true,
   };
 }
@@ -244,7 +316,6 @@ function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
 
 // ========= Bar Chart =========
 export function buildBarChartOption(data: any[], config: any, chartType: string, multiData?: any[]): any {
-  const colors = getColors(config.colorScheme);
   const isHorizontal = chartType.includes('horizontal');
   const isMulti = chartType.includes('2d') || chartType.includes('stacked') || chartType.includes('normalized');
   const isStacked = chartType.includes('stacked') || chartType.includes('normalized');
@@ -255,16 +326,19 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
     : undefined;
 
   const option: any = {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config, isMulti ? 'axis' : 'item'),
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     grid: buildGrid(config),
     toolbox: buildToolbox(config),
   };
 
   const barSeriesBase: any = {};
   if (config.barWidth) barSeriesBase.barWidth = config.barWidth;
+  if (config.barMaxWidth) barSeriesBase.barMaxWidth = config.barMaxWidth;
+  if (config.barMinWidth) barSeriesBase.barMinWidth = config.barMinWidth;
+  if (config.barMinHeight) barSeriesBase.barMinHeight = config.barMinHeight;
   if (config.showBackground) barSeriesBase.showBackground = true;
 
   if (isMulti) {
@@ -297,7 +371,7 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
         ...barSeriesBase,
         name: s.name,
         type: 'bar',
-        ...(isStacked ? { stack: 'total' } : {}),
+        ...(isStacked ? { stack: 'total', stackStrategy: config.stackStrategy || 'samesign' } : {}),
         data: s.values,
         emphasis: { focus: config.emphasis || 'series' },
         label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
@@ -337,6 +411,11 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
     }
   }
 
+  if (config.gradient && option.series) {
+    const colors = getColors(config.colorScheme);
+    applyGradient(option.series, colors, isHorizontal ? 'horizontal' : 'vertical');
+  }
+
   const barZoom = buildDataZoom(config, isHorizontal ? 'y' : 'x');
   if (barZoom.length) {
     option.dataZoom = barZoom;
@@ -348,7 +427,6 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
 
 // ========= Line Chart =========
 export function buildLineChartOption(data: any[], config: any, chartType: string = 'line'): any {
-  const colors = getColors(config.colorScheme);
   const { categories, seriesList } = convertMultiSeries(data);
   const isStacked = chartType === 'line-stacked';
   const isStep = chartType === 'line-step';
@@ -356,10 +434,10 @@ export function buildLineChartOption(data: any[], config: any, chartType: string
   const step = isStep ? (config.lineStep !== 'none' ? config.lineStep || 'middle' : 'middle') : getStep(config);
 
   const option: any = {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config, 'axis'),
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     grid: buildGrid(config),
     toolbox: buildToolbox(config),
     xAxis: buildCategoryAxis(config, categories, 'x'),
@@ -382,8 +460,16 @@ export function buildLineChartOption(data: any[], config: any, chartType: string
       label: buildDataLabel(config),
       areaStyle: config.rangeFillOpacity > 0 ? { opacity: config.rangeFillOpacity } : undefined,
       emphasis: { focus: config.emphasis || 'series' },
+      ...(config.endLabel ? { endLabel: { show: true } } : {}),
+      ...(config.sampling && config.sampling !== 'none' ? { sampling: config.sampling } : {}),
+      showAllSymbol: config.showAllSymbol === 'true' ? true : (config.showAllSymbol === 'false' ? false : 'auto'),
     })),
   };
+
+  if (config.gradient && option.series) {
+    const colors = getColors(config.colorScheme);
+    applyGradient(option.series, colors);
+  }
 
   if (config.dataZoom) {
     option.dataZoom = buildDataZoom(config);
@@ -395,7 +481,6 @@ export function buildLineChartOption(data: any[], config: any, chartType: string
 
 // ========= Area Chart =========
 export function buildAreaChartOption(data: any[], config: any, chartType: string): any {
-  const colors = getColors(config.colorScheme);
   const { categories, seriesList } = convertMultiSeries(data);
   const isStacked = chartType === 'area-stacked' || chartType === 'area-normalized';
   const isNormalized = chartType === 'area-normalized';
@@ -405,10 +490,10 @@ export function buildAreaChartOption(data: any[], config: any, chartType: string
   const areaOpacity = config.areaOpacity ?? (isStacked ? 0.7 : 0.4);
 
   const option: any = {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config, 'axis'),
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     grid: buildGrid(config),
     toolbox: buildToolbox(config),
     xAxis: buildCategoryAxis(config, categories, 'x'),
@@ -425,6 +510,9 @@ export function buildAreaChartOption(data: any[], config: any, chartType: string
       type: config.lineStyleType || 'solid',
     },
     emphasis: { focus: config.emphasis || 'series' },
+    ...(config.endLabel ? { endLabel: { show: true } } : {}),
+    ...(config.sampling && config.sampling !== 'none' ? { sampling: config.sampling } : {}),
+    showAllSymbol: config.showAllSymbol === 'true' ? true : (config.showAllSymbol === 'false' ? false : 'auto'),
   };
 
   if (isNormalized) {
@@ -456,6 +544,11 @@ export function buildAreaChartOption(data: any[], config: any, chartType: string
     }));
   }
 
+  if (config.gradient && option.series) {
+    const colors = getColors(config.colorScheme);
+    applyGradient(option.series, colors);
+  }
+
   if (config.dataZoom) {
     option.dataZoom = buildDataZoom(config);
     option.grid.bottom = 80;
@@ -466,7 +559,6 @@ export function buildAreaChartOption(data: any[], config: any, chartType: string
 
 // ========= Pie Chart =========
 export function buildPieChartOption(data: any[], config: any, chartType: string): any {
-  const colors = getColors(config.colorScheme);
   const isDonut = chartType === 'donut';
   const isAdvanced = chartType === 'pie-advanced';
   const isGrid = chartType === 'pie-grid';
@@ -520,10 +612,10 @@ export function buildPieChartOption(data: any[], config: any, chartType: string)
     : false;
 
   const option: any = {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config),
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     toolbox: buildToolbox(config),
     series: [{
       type: 'pie',
@@ -532,7 +624,12 @@ export function buildPieChartOption(data: any[], config: any, chartType: string)
       label: labelConfig,
       labelLine: { show: config.pieLabelLine !== false },
       roseType: roseType,
+      clockwise: config.pieClockwise !== false,
       startAngle: config.pieStartAngle ?? 90,
+      ...(config.pieEndAngle != null ? { endAngle: config.pieEndAngle } : {}),
+      percentPrecision: config.piePercentPrecision ?? 2,
+      minAngle: config.pieMinAngle ?? 0,
+      avoidLabelOverlap: config.pieAvoidLabelOverlap !== false,
       padAngle: config.piePadAngle ?? 0,
       selectedMode: selectedMode,
       selectedOffset: config.pieSelectedOffset ?? 10,
@@ -564,7 +661,6 @@ export function buildPieChartOption(data: any[], config: any, chartType: string)
   // Pie grid: center the pie
   if (isGrid) {
     option.series[0].center = ['50%', '50%'];
-    option.series[0].roseType = 'area';
   }
 
   // Rose chart
@@ -596,12 +692,26 @@ export function buildPieChartOption(data: any[], config: any, chartType: string)
     });
   }
 
+  if (config.gradient && option.series) {
+    const colors = getColors(config.colorScheme);
+    option.series.forEach((s: any) => {
+      if (s.data) {
+        s.data = s.data.map((d: any, i: number) => ({
+          ...d,
+          itemStyle: {
+            ...(d.itemStyle || {}),
+            color: makeGradient(colors[i % colors.length]),
+          },
+        }));
+      }
+    });
+  }
+
   return option;
 }
 
 // ========= Polar / Radar Chart =========
 export function buildPolarChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
   const { categories, seriesList } = convertMultiSeries(data);
 
   // Compute max for each category (indicator)
@@ -617,10 +727,10 @@ export function buildPolarChartOption(data: any[], config: any): any {
   });
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config),
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     radar: {
       indicator,
       shape: config.radarShape || 'polygon',
@@ -631,6 +741,11 @@ export function buildPolarChartOption(data: any[], config: any): any {
     },
     series: [{
       type: 'radar',
+      symbol: config.radarSymbol || 'circle',
+      symbolSize: config.radarSymbolSize ?? 4,
+      lineStyle: {
+        width: config.radarLineWidth ?? 2,
+      },
       data: seriesList.map(s => ({
         name: s.name,
         value: s.values,
@@ -645,15 +760,13 @@ export function buildPolarChartOption(data: any[], config: any): any {
 
 // ========= Gauge Chart =========
 export function buildGaugeChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   const gaugeData = data.map(d => ({
     name: String(d.name),
     value: d.value,
   }));
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config),
     series: [{
@@ -669,9 +782,9 @@ export function buildGaugeChartOption(data: any[], config: any): any {
       },
       axisLine: {
         show: true,
+        roundCap: config.gaugeAxisLineRoundCap || false,
         lineStyle: {
           width: config.gaugeAxisLineWidth ?? 15,
-          color: [[1, colors[0] || '#5AA454']],
         },
       },
       axisLabel: {
@@ -686,11 +799,13 @@ export function buildGaugeChartOption(data: any[], config: any): any {
       pointer: {
         show: config.gaugeShowPointer !== false,
         length: `${config.gaugePointerLength ?? 60}%`,
-        width: 6,
+        width: config.gaugePointerWidth ?? 6,
+        ...(config.gaugePointerIcon ? { icon: config.gaugePointerIcon } : {}),
       },
       progress: {
         show: config.gaugeShowProgress || false,
         width: config.gaugeAxisLineWidth ?? 15,
+        roundCap: config.gaugeProgressRoundCap || false,
       },
       detail: {
         show: config.gaugeShowValue !== false,
@@ -706,8 +821,6 @@ export function buildGaugeChartOption(data: any[], config: any): any {
 
 // ========= Heat Map Chart =========
 export function buildHeatMapChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   const yCategories: string[] = [];
   const xCategorySet = new Set<string>();
   const heatData: number[][] = [];
@@ -741,6 +854,7 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
   if (maxVal === -Infinity) maxVal = 1;
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -750,7 +864,7 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
         return `${xCategories[d[0]]} / ${yCategories[d[1]]}: ${d[2]}`;
       },
     },
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     grid: {
       ...buildGrid(config),
       top: 30,
@@ -790,16 +904,11 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
       orient: 'horizontal',
       left: 'center',
       bottom: 0,
-      inRange: {
-        color: colors.length >= 2
-          ? [colors[colors.length - 1], colors[0]]
-          : ['#f5f5f5', colors[0] || '#3b82f6'],
-      },
     },
     series: [{
       type: 'heatmap',
       data: heatData,
-      label: { show: config.heatmapShowLabels !== false },
+      label: { show: (config.heatmapShowLabels !== false) || config.showDataLabel, fontSize: config.labelFontSize || 11 },
       emphasis: {
         itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
       },
@@ -809,14 +918,13 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
 
 // ========= Tree Map Chart =========
 export function buildTreeMapChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
   const treeData = data.map(d => ({
     name: String(d.name),
     value: d.value,
   }));
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -826,7 +934,9 @@ export function buildTreeMapChartOption(data: any[], config: any): any {
       type: 'treemap',
       data: treeData,
       roam: config.treemapRoam || false,
-      nodeClick: false,
+      nodeClick: config.treemapNodeClick === 'false' ? false : (config.treemapNodeClick || 'zoomToNode'),
+      leafDepth: config.treemapLeafDepth ?? 1,
+      visualDimension: config.treemapVisualDimension ?? 0,
       breadcrumb: { show: config.treemapBreadcrumb || false },
       label: {
         show: config.treemapShowLabels !== false,
@@ -850,7 +960,6 @@ export function buildTreeMapChartOption(data: any[], config: any): any {
 
 // ========= Bubble Chart =========
 export function buildBubbleChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
   const minR = config.minRadius || 3;
   const maxR = config.maxRadius || 20;
 
@@ -877,8 +986,13 @@ export function buildBubbleChartOption(data: any[], config: any): any {
     emphasis: { focus: config.emphasis || 'series' },
   }));
 
+  if (config.gradient) {
+    const colors = getColors(config.colorScheme);
+    applyGradient(series, colors);
+  }
+
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -887,7 +1001,7 @@ export function buildBubbleChartOption(data: any[], config: any): any {
         return `${params.seriesName}<br/>X: ${d[0]}, Y: ${d[1]}, Size: ${d[2]}`;
       },
     },
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     grid: buildGrid(config),
     xAxis: buildValueAxis(config, 'x'),
     yAxis: buildValueAxis(config, 'y'),
@@ -898,7 +1012,6 @@ export function buildBubbleChartOption(data: any[], config: any): any {
 // ========= Scatter Chart =========
 export function buildScatterChartOption(data: any[], config: any, chartType: string = 'scatter'): any {
   const isEffect = chartType === 'effect-scatter';
-  const colors = getColors(config.colorScheme);
 
   const scatterData = data.map(d => ({
     name: String(d.name),
@@ -908,7 +1021,7 @@ export function buildScatterChartOption(data: any[], config: any, chartType: str
   const categories = data.map(d => String(d.name));
 
   const option: any = {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -918,7 +1031,7 @@ export function buildScatterChartOption(data: any[], config: any, chartType: str
         return `${d.name}: ${d.value[1]}`;
       },
     },
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     grid: buildGrid(config),
     toolbox: buildToolbox(config),
     xAxis: buildCategoryAxis(config, categories, 'x'),
@@ -929,8 +1042,13 @@ export function buildScatterChartOption(data: any[], config: any, chartType: str
       symbol: config.scatterSymbolShape || 'circle',
       symbolSize: config.scatterSymbolSize || 10,
       ...(isEffect ? {
-        rippleEffect: { brushType: 'stroke', scale: config.effectRippleScale ?? 3 },
-        showEffectOn: 'render',
+        rippleEffect: {
+          brushType: config.effectRippleBrushType || 'stroke',
+          scale: config.effectRippleScale ?? 3,
+          number: config.effectRippleNumber ?? 3,
+          period: config.effectRipplePeriod ?? 4,
+        },
+        showEffectOn: config.effectShowOn || 'render',
       } : {}),
       label: buildDataLabel(config),
       emphasis: {
@@ -939,6 +1057,11 @@ export function buildScatterChartOption(data: any[], config: any, chartType: str
       },
     }],
   };
+
+  if (config.gradient && option.series) {
+    const colors = getColors(config.colorScheme);
+    applyGradient(option.series, colors);
+  }
 
   const zoom = buildDataZoom(config, 'x');
   if (zoom.length) {
@@ -951,14 +1074,13 @@ export function buildScatterChartOption(data: any[], config: any, chartType: str
 
 // ========= Funnel Chart =========
 export function buildFunnelChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
   const funnelData = data.map(d => ({ name: String(d.name), value: d.value }));
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config),
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     toolbox: buildToolbox(config),
     series: [{
       type: 'funnel',
@@ -968,9 +1090,10 @@ export function buildFunnelChartOption(data: any[], config: any): any {
       width: '80%',
       min: 0,
       max: Math.max(...data.map(d => d.value), 100),
-      minSize: '0%',
-      maxSize: '100%',
+      minSize: config.funnelMinSize || '0%',
+      maxSize: config.funnelMaxSize || '100%',
       sort: config.funnelSort || 'descending',
+      orient: config.funnelOrient || 'vertical',
       funnelAlign: config.funnelAlign || 'center',
       gap: config.funnelGap ?? 2,
       label: {
@@ -994,15 +1117,13 @@ export function buildFunnelChartOption(data: any[], config: any): any {
 
 // ========= Sunburst Chart =========
 export function buildSunburstChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   const sunburstData = data.map(d => ({
     name: String(d.name),
     value: d.value,
   }));
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -1012,7 +1133,10 @@ export function buildSunburstChartOption(data: any[], config: any): any {
     series: [{
       type: 'sunburst',
       data: sunburstData,
-      radius: ['15%', '90%'],
+      radius: ['15%', config.sunburstRadius || '90%'],
+      nodeClick: config.sunburstNodeClick === 'false' ? false : (config.sunburstNodeClick || 'rootToNode'),
+      sort: config.sunburstSort === 'none' ? null : (config.sunburstSort || 'desc'),
+      startAngle: config.sunburstStartAngle ?? 90,
       label: {
         show: config.labels !== false,
         rotate: 'radial',
@@ -1038,10 +1162,8 @@ export function buildSunburstChartOption(data: any[], config: any): any {
 
 // ========= Sankey Chart =========
 export function buildSankeyChartOption(nodes: any[], links: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -1056,17 +1178,23 @@ export function buildSankeyChartOption(nodes: any[], links: any[], config: any):
       orient: config.sankeyOrient || 'horizontal',
       nodeWidth: config.sankeyNodeWidth || 20,
       nodeGap: config.sankeyNodeGap || 8,
+      nodeAlign: config.sankeyNodeAlign || 'justify',
+      draggable: config.sankeyDraggable !== false,
       layoutIterations: 32,
       emphasis: {
         focus: 'adjacency',
       },
       lineStyle: {
         color: 'gradient',
-        curveness: 0.5,
+        curveness: config.sankeyCurveness ?? 0.5,
       },
       label: {
         show: config.labels !== false,
         fontSize: config.labelFontSize || 11,
+      },
+      edgeLabel: {
+        show: config.sankeyEdgeLabel || false,
+        fontSize: 10,
       },
     }],
   };
@@ -1074,7 +1202,6 @@ export function buildSankeyChartOption(nodes: any[], links: any[], config: any):
 
 // ========= Waterfall Chart =========
 export function buildWaterfallChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
   const categories: string[] = [];
   const positiveData: (number | string)[] = [];
   const negativeData: (number | string)[] = [];
@@ -1108,7 +1235,7 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
   const borderRadius = config.roundEdges ? [4, 4, 0, 0] : undefined;
 
   const option: any = {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -1143,7 +1270,7 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
         stack: 'waterfall',
         data: positiveData,
         itemStyle: {
-          color: colors[0] || '#5AA454',
+          color: '#5AA454',
           ...(borderRadius ? { borderRadius } : {}),
         },
         label: buildDataLabel(config, 'top'),
@@ -1154,7 +1281,7 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
         stack: 'waterfall',
         data: negativeData,
         itemStyle: {
-          color: colors[1] || '#C62828',
+          color: '#C62828',
           ...(borderRadius ? { borderRadius } : {}),
         },
         label: buildDataLabel(config, 'bottom'),
@@ -1173,8 +1300,6 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
 
 // ========= Box Plot Chart =========
 export function buildBoxPlotChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   const categories: string[] = [];
   const boxData: number[][] = [];
 
@@ -1216,8 +1341,10 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
     }
   });
 
-  return {
-    color: colors,
+  const isVerticalLayout = config.boxplotLayout === 'vertical';
+
+  const option: any = {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -1227,41 +1354,45 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
         return `${params.name}<br/>Min: ${d[0]}<br/>Q1: ${d[1]}<br/>Median: ${d[2]}<br/>Q3: ${d[3]}<br/>Max: ${d[4]}`;
       },
     },
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     grid: buildGrid(config),
-    xAxis: buildCategoryAxis(config, categories, 'x'),
-    yAxis: {
-      ...buildValueAxis(config, 'y'),
-      nice: true,
-    },
     series: [{
       type: 'boxplot',
       data: boxData,
-      itemStyle: {
-        color: colors[0] || '#5AA454',
-        borderColor: colors[1] || '#333',
-      },
+      layout: config.boxplotLayout || 'horizontal',
+      boxWidth: [config.boxplotBoxWidth ?? 7, config.boxplotBoxMaxWidth ?? 50],
     }],
   };
+
+  if (isVerticalLayout) {
+    option.yAxis = buildCategoryAxis(config, categories, 'y');
+    option.xAxis = { ...buildValueAxis(config, 'x'), nice: true };
+  } else {
+    option.xAxis = buildCategoryAxis(config, categories, 'x');
+    option.yAxis = { ...buildValueAxis(config, 'y'), nice: true };
+  }
+
+  return option;
 }
 
 // ========= Graph / Network Chart =========
 export function buildGraphChartOption(nodes: any[], links: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
     },
     toolbox: buildToolbox(config),
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     series: [{
       type: 'graph',
       layout: config.graphLayout || 'force',
       roam: true,
-      draggable: true,
+      draggable: config.graphDraggable !== false,
+      edgeSymbol: config.graphEdgeSymbol && config.graphEdgeSymbol !== 'none'
+        ? ['circle', config.graphEdgeSymbol] : undefined,
+      edgeSymbolSize: config.graphEdgeSymbolSize ?? 10,
       data: nodes.map((n: any) => ({
         ...n,
         symbolSize: Math.max(10, Math.min(n.value || 20, 60)),
@@ -1273,6 +1404,11 @@ export function buildGraphChartOption(nodes: any[], links: any[], config: any): 
         repulsion: config.graphRepulsion || 200,
         edgeLength: config.graphEdgeLength || 100,
         gravity: config.graphGravity ?? 0.1,
+        friction: config.graphForceFriction ?? 0.6,
+      },
+      edgeLabel: {
+        show: config.graphEdgeLabel || false,
+        fontSize: 10,
       },
       lineStyle: {
         color: 'source',
@@ -1289,8 +1425,6 @@ export function buildGraphChartOption(nodes: any[], links: any[], config: any): 
 
 // ========= Tree Chart =========
 export function buildTreeChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   const treeData = {
     name: 'Root',
     children: data.map(d => ({
@@ -1300,7 +1434,7 @@ export function buildTreeChartOption(data: any[], config: any): any {
   };
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -1313,6 +1447,9 @@ export function buildTreeChartOption(data: any[], config: any): any {
       data: [treeData],
       orient: config.treeOrient || 'TB',
       layout: config.treeLayout || 'orthogonal',
+      edgeShape: config.treeEdgeShape || 'curve',
+      edgeForkPosition: config.treeEdgeForkPosition || '50%',
+      roam: config.treeRoam || false,
       symbol: 'circle',
       symbolSize: 10,
       label: {
@@ -1325,22 +1462,20 @@ export function buildTreeChartOption(data: any[], config: any): any {
           position: config.treeOrient === 'LR' || config.treeOrient === 'RL' ? 'right' : 'bottom',
         },
       },
-      expandAndCollapse: true,
+      expandAndCollapse: config.treeExpandAndCollapse !== false,
       animationDuration: 550,
       animationDurationUpdate: 750,
-      initialTreeDepth: 3,
+      initialTreeDepth: config.treeInitialDepth ?? 3,
     }],
   };
 }
 
 // ========= Theme River Chart =========
 export function buildThemeRiverChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   const riverData = data.map((d, i) => [i, d.value, String(d.name)]);
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -1367,14 +1502,13 @@ export function buildThemeRiverChartOption(data: any[], config: any): any {
 
 // ========= Pictorial Bar Chart =========
 export function buildPictorialBarChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
   const categories = data.map(d => String(d.name));
   const values = data.map(d => d.value);
 
   const symbol = config.pictorialSymbol || 'roundRect';
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config, 'axis'),
     toolbox: buildToolbox(config),
@@ -1387,7 +1521,10 @@ export function buildPictorialBarChartOption(data: any[], config: any): any {
       symbol: symbol,
       symbolRepeat: config.pictorialRepeat || false,
       symbolSize: config.pictorialRepeat ? [20, 6] : ['100%', '100%'],
-      symbolClip: !config.pictorialRepeat,
+      symbolPosition: config.pictorialSymbolPosition || 'start',
+      symbolClip: config.pictorialRepeat ? false : (config.pictorialSymbolClip !== false),
+      symbolRepeatDirection: config.pictorialSymbolRepeatDirection || 'start',
+      symbolMargin: config.pictorialSymbolMargin || 'auto',
       barCategoryGap: '40%',
       label: buildDataLabel(config, 'top'),
     }],
@@ -1396,16 +1533,15 @@ export function buildPictorialBarChartOption(data: any[], config: any): any {
 
 // ========= Polar Bar Chart =========
 export function buildPolarBarChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
   const categories = data.map(d => String(d.name));
   const values = data.map(d => d.value);
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config),
     toolbox: buildToolbox(config),
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     angleAxis: {
       type: 'category',
       data: categories,
@@ -1437,8 +1573,6 @@ export function buildRadarChartOption(data: any[], config: any): any {
 
 // ========= Candlestick Chart =========
 export function buildCandlestickChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Data format: each item = [open, close, low, high] or { name, value: [open, close, low, high] }
   let categories: string[] = [];
   let values: number[][] = [];
@@ -1453,8 +1587,8 @@ export function buildCandlestickChartOption(data: any[], config: any): any {
     return {};
   }
 
-  return {
-    color: colors,
+  const option: any = {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       ...buildTooltip(config, 'axis'),
@@ -1464,7 +1598,7 @@ export function buildCandlestickChartOption(data: any[], config: any): any {
         return `${d.name}<br/>Open: ${d.data[0]}<br/>Close: ${d.data[1]}<br/>Low: ${d.data[2]}<br/>High: ${d.data[3]}`;
       },
     },
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     grid: buildGrid(config),
     xAxis: {
       type: 'category',
@@ -1477,27 +1611,34 @@ export function buildCandlestickChartOption(data: any[], config: any): any {
     yAxis: {
       type: 'value',
       show: config.yAxis !== false,
-      scale: config.niceScale !== false,
+      scale: config.autoScale || false,
       splitLine: { show: config.showGridLines !== false },
+      nice: config.niceScale || false,
     },
-    dataZoom: buildDataZoom(config),
     series: [{
       type: 'candlestick',
       data: values,
       itemStyle: {
-        color: colors[0] || '#ec0000',
-        color0: colors[1] || '#00da3c',
-        borderColor: colors[0] || '#ec0000',
-        borderColor0: colors[1] || '#00da3c',
+        color: config.candleBullColor || '#ec0000',
+        color0: config.candleBearColor || '#00da3c',
+        borderColor: config.candleBullBorderColor || config.candleBullColor || '#ec0000',
+        borderColor0: config.candleBearBorderColor || config.candleBearColor || '#00da3c',
       },
+      ...(config.candleBarWidth ? { barWidth: config.candleBarWidth } : {}),
     }],
   };
+
+  const zoom = buildDataZoom(config);
+  if (zoom.length) {
+    option.dataZoom = zoom;
+    option.grid.bottom = 80;
+  }
+
+  return option;
 }
 
 // ========= Parallel Chart =========
 export function buildParallelChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Data format: { dimensions: ['dim1', 'dim2', ...], data: [[v1, v2, ...], ...] }
   // Or array of objects with named fields
   let dimensions: string[] = [];
@@ -1520,10 +1661,10 @@ export function buildParallelChartOption(data: any[], config: any): any {
   }));
 
   return {
-    color: colors,
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
-    legend: buildLegend(config),
+    ...buildLegendWithTitle(config),
     parallelAxis,
     parallel: {
       left: 80,
@@ -1544,6 +1685,9 @@ export function buildParallelChartOption(data: any[], config: any): any {
         opacity: config.parallelLineOpacity ?? 0.5,
       },
       smooth: config.parallelSmooth || false,
+      activeOpacity: config.parallelActiveOpacity ?? 1,
+      inactiveOpacity: config.parallelInactiveOpacity ?? 0.1,
+      realtime: config.parallelRealtime !== false,
       data: seriesData,
     }],
   };
@@ -1553,8 +1697,6 @@ export function buildParallelChartOption(data: any[], config: any): any {
 
 // ========= Bar 3D Chart =========
 export function buildBar3DChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Data format: [[x, y, z], ...] or [{ name, value: [x, y, z] }, ...]
   let seriesData: any[] = [];
   if (data.length > 0 && Array.isArray(data[0])) {
@@ -1566,11 +1708,11 @@ export function buildBar3DChartOption(data: any[], config: any): any {
   const maxVal = Math.max(...seriesData.map(d => d[2] || 0), 1);
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
     visualMap: {
       max: maxVal,
-      inRange: { color: colors.slice(0, 5) },
       show: false,
     },
     xAxis3D: { type: 'category', name: config.xAxisLabel || '' },
@@ -1580,7 +1722,7 @@ export function buildBar3DChartOption(data: any[], config: any): any {
       boxWidth: config.grid3DBoxWidth || 100,
       boxDepth: config.grid3DBoxDepth || 100,
       boxHeight: config.grid3DBoxHeight || 100,
-      viewControl: { autoRotate: config.autoRotate || false },
+      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
     },
     series: [{
       type: 'bar3D',
@@ -1594,8 +1736,6 @@ export function buildBar3DChartOption(data: any[], config: any): any {
 
 // ========= Line 3D Chart =========
 export function buildLine3DChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Data format: [[x, y, z], ...]
   let seriesData: any[] = [];
   if (data.length > 0 && Array.isArray(data[0])) {
@@ -1605,20 +1745,20 @@ export function buildLine3DChartOption(data: any[], config: any): any {
   }
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
     xAxis3D: { type: 'value', name: config.xAxisLabel || '' },
     yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
     zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
     grid3D: {
-      viewControl: { autoRotate: config.autoRotate || false },
+      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
     },
     series: [{
       type: 'line3D',
       data: seriesData,
       lineStyle: {
         width: config.lineWidth || 2,
-        color: colors[0],
         opacity: config.lineOpacity ?? 1,
       },
     }],
@@ -1627,8 +1767,6 @@ export function buildLine3DChartOption(data: any[], config: any): any {
 
 // ========= Scatter 3D Chart =========
 export function buildScatter3DChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   let seriesData: any[] = [];
   if (data.length > 0 && Array.isArray(data[0])) {
     seriesData = data;
@@ -1637,20 +1775,20 @@ export function buildScatter3DChartOption(data: any[], config: any): any {
   }
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
     xAxis3D: { type: 'value', name: config.xAxisLabel || '' },
     yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
     zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
     grid3D: {
-      viewControl: { autoRotate: config.autoRotate || false },
+      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
     },
     series: [{
       type: 'scatter3D',
       data: seriesData,
       symbolSize: config.scatterSymbolSize || 10,
       itemStyle: {
-        color: colors[0],
         opacity: config.itemOpacity ?? 0.8,
       },
     }],
@@ -1659,8 +1797,6 @@ export function buildScatter3DChartOption(data: any[], config: any): any {
 
 // ========= Surface Chart =========
 export function buildSurfaceChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Data format: [[x, y, z], ...] coordinate grid
   let seriesData: any[] = [];
   if (data.length > 0 && Array.isArray(data[0])) {
@@ -1670,18 +1806,18 @@ export function buildSurfaceChartOption(data: any[], config: any): any {
   }
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
     visualMap: {
       show: config.showVisualMap || false,
       dimension: 2,
-      inRange: { color: colors.slice(0, 5) },
     },
     xAxis3D: { type: 'value', name: config.xAxisLabel || '' },
     yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
     zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
     grid3D: {
-      viewControl: { autoRotate: config.autoRotate || false },
+      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
     },
     series: [{
       type: 'surface',
@@ -1695,8 +1831,6 @@ export function buildSurfaceChartOption(data: any[], config: any): any {
 
 // ========= Globe Chart =========
 export function buildGlobeChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Data format: [{ name, value: [lng, lat, value] }, ...]
   let seriesData: any[] = [];
   let tooltipNames: string[] = [];
@@ -1708,6 +1842,7 @@ export function buildGlobeChartOption(data: any[], config: any): any {
   }
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -1747,7 +1882,6 @@ export function buildGlobeChartOption(data: any[], config: any): any {
         fontSize: 10,
       },
       itemStyle: {
-        color: colors[0],
         opacity: 0.9,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.4)',
@@ -1758,8 +1892,6 @@ export function buildGlobeChartOption(data: any[], config: any): any {
 
 // ========= Graph GL Chart =========
 export function buildGraphGLChartOption(nodes: any[], links: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Handle multiple data formats:
   // 1. Object with nodes/links: { nodes: [...], links: [...] }
   // 2. Array where first element has nodes/links
@@ -1783,6 +1915,7 @@ export function buildGraphGLChartOption(nodes: any[], links: any[], config: any)
   if (!graphNodes.length) return {};
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
     series: [{
@@ -1791,14 +1924,15 @@ export function buildGraphGLChartOption(nodes: any[], links: any[], config: any)
         name: String(n.name || n.id || i),
         value: n.value || 1,
         symbolSize: n.symbolSize || config.nodeSize || 10,
-        itemStyle: { color: colors[i % colors.length] },
+        x: Math.random() * 200 - 100,
+        y: Math.random() * 200 - 100,
       })),
       edges: graphLinks.map((l: any) => ({
         source: String(l.source),
         target: String(l.target),
       })),
       forceAtlas2: {
-        steps: 5,
+        steps: 100,
         gravity: config.graphGravity || 0.1,
         edgeWeightInfluence: 1,
       },
@@ -1808,8 +1942,6 @@ export function buildGraphGLChartOption(nodes: any[], links: any[], config: any)
 
 // ========= Scatter GL Chart =========
 export function buildScatterGLChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   let seriesData: any[] = [];
   if (data.length > 0 && Array.isArray(data[0])) {
     seriesData = data;
@@ -1820,6 +1952,7 @@ export function buildScatterGLChartOption(data: any[], config: any): any {
   }
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
     xAxis: { type: 'value', show: config.xAxis !== false, splitLine: { show: config.showGridLines !== false } },
@@ -1829,7 +1962,6 @@ export function buildScatterGLChartOption(data: any[], config: any): any {
       data: seriesData,
       symbolSize: config.scatterSymbolSize || 5,
       itemStyle: {
-        color: colors[0],
         opacity: config.itemOpacity ?? 0.6,
       },
     }],
@@ -1838,39 +1970,43 @@ export function buildScatterGLChartOption(data: any[], config: any): any {
 
 // ========= Lines GL Chart =========
 export function buildLinesGLChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Data format: [{ coords: [[x1, y1], [x2, y2], ...] }, ...]
-  let seriesData: any[] = [];
+  // 'lines' and 'linesGL' series types require geo coordinates,
+  // so we render each polyline as a separate 'line' series on cartesian2d.
+  let polylines: number[][][] = [];
   if (data.length > 0 && data[0].coords) {
-    seriesData = data;
+    polylines = data.map((d: any) => d.coords);
   } else if (data.length > 0 && Array.isArray(data[0])) {
-    seriesData = data.map(d => ({ coords: d }));
+    polylines = data;
   }
 
+  const colors = getColors(config.colorScheme);
+  const series = polylines.map((coords: number[][], i: number) => ({
+    type: 'line',
+    data: coords,
+    showSymbol: false,
+    lineStyle: {
+      width: config.lineWidth || 1,
+      opacity: config.lineOpacity ?? 0.5,
+    },
+    color: colors[i % colors.length],
+    silent: true,
+  }));
+
   return {
+    color: colors,
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
-    xAxis: { type: 'value', show: config.xAxis !== false },
-    yAxis: { type: 'value', show: config.yAxis !== false },
-    series: [{
-      type: 'linesGL',
-      polyline: true,
-      data: seriesData,
-      lineStyle: {
-        color: colors[0],
-        width: config.lineWidth || 1,
-        opacity: config.lineOpacity ?? 0.5,
-      },
-    }],
+    tooltip: { show: !config.tooltipDisabled, trigger: 'axis' },
+    xAxis: { type: 'value', show: config.xAxis !== false, splitLine: { show: config.showGridLines !== false } },
+    yAxis: { type: 'value', show: config.yAxis !== false, splitLine: { show: config.showGridLines !== false } },
+    legend: { show: false },
+    series,
   };
 }
 
 // ========= Map 3D Chart =========
 // Renders as a 3D bar chart with region labels since map GeoJSON registration is not available.
 export function buildMap3DChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
   // Data format: [{ name: 'region', value: number }, ...]
   const seriesData = data.map(d => ({
     name: String(d.name),
@@ -1882,6 +2018,7 @@ export function buildMap3DChartOption(data: any[], config: any): any {
   const maxVal = Math.max(...seriesData.map(d => d.value || 0), 1);
 
   return {
+    color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
@@ -1891,7 +2028,6 @@ export function buildMap3DChartOption(data: any[], config: any): any {
       show: config.showVisualMap !== false,
       min: 0,
       max: maxVal,
-      inRange: { color: colors.slice(0, 5) },
     },
     xAxis3D: {
       type: 'category',
@@ -1903,7 +2039,7 @@ export function buildMap3DChartOption(data: any[], config: any): any {
     grid3D: {
       boxWidth: 120,
       boxDepth: 40,
-      viewControl: { autoRotate: config.autoRotate || false },
+      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
       light: {
         main: { intensity: 1.2 },
         ambient: { intensity: 0.3 },
@@ -1920,12 +2056,9 @@ export function buildMap3DChartOption(data: any[], config: any): any {
 }
 
 // ========= Flow GL Chart =========
-// FlowGL requires a vector field. Since it needs specific texture/function format,
-// we render as a scatter chart with arrows to visualize the vector field.
+// Renders a vector field as directional arrows on a cartesian grid.
+// Data format: [{ data: [[x, y, vx, vy], ...] }]
 export function buildFlowGLChartOption(data: any[], config: any): any {
-  const colors = getColors(config.colorScheme);
-
-  // Extract vector field data: [x, y, vx, vy]
   let vectorData: any[] = [];
   if (data.length > 0 && data[0].data) {
     vectorData = data[0].data;
@@ -1933,40 +2066,75 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
     vectorData = data;
   }
 
-  // Convert vector field to scatter + line overlay for visualization
-  const scatterData = vectorData.map((v: any) => [v[0], v[1]]);
-  const lineData = vectorData.map((v: any) => ({
-    coords: [
-      [v[0], v[1]],
-      [v[0] + (v[2] || 0) * 0.05, v[1] + (v[3] || 0) * 0.05],
-    ],
+  if (vectorData.length === 0) {
+    return { series: [] };
+  }
+
+  const colors = getColors(config.colorScheme);
+
+  // Compute velocity magnitudes for sizing
+  let maxMag = 0;
+  const processed = vectorData.map((v: any) => {
+    const vx = v[2] || 0;
+    const vy = v[3] || 0;
+    const mag = Math.sqrt(vx * vx + vy * vy);
+    if (mag > maxMag) maxMag = mag;
+    // angle in degrees: 0° = right, 90° = up; ECharts rotates CW so negate
+    const angle = -Math.atan2(vy, vx) * 180 / Math.PI;
+    return { x: v[0], y: v[1], mag, angle };
+  });
+  if (maxMag === 0) maxMag = 1;
+
+  // Arrow data: each point gets size based on magnitude, rotation based on direction
+  const arrowData = processed.map(p => ({
+    value: [p.x, p.y, p.mag],
+    symbolRotate: p.angle,
   }));
 
   return {
+    color: colors,
     ...buildAnimation(config),
-    tooltip: { show: !config.tooltipDisabled },
-    xAxis: { type: 'value', show: true, splitLine: { show: false } },
-    yAxis: { type: 'value', show: true, splitLine: { show: false } },
-    series: [
-      {
-        type: 'scatter',
-        data: scatterData,
-        symbolSize: 4,
-        itemStyle: { color: colors[0], opacity: 0.8 },
+    tooltip: {
+      show: !config.tooltipDisabled,
+      formatter: (params: any) => {
+        const d = params.data?.value || params.value;
+        return `Position: (${d[0].toFixed(2)}, ${d[1].toFixed(2)})<br/>Magnitude: ${d[2].toFixed(3)}`;
       },
-      {
-        type: 'lines',
-        polyline: false,
-        data: lineData,
-        lineStyle: { color: colors[1] || colors[0], width: 1.5, opacity: 0.6 },
-        effect: {
-          show: true,
-          period: 4,
-          trailLength: 0.3,
-          symbolSize: 3,
-          color: colors[2] || colors[0],
-        },
+    },
+    grid: { left: 50, right: 20, top: 20, bottom: 40, containLabel: true },
+    xAxis: {
+      type: 'value',
+      show: true,
+      splitLine: { show: true, lineStyle: { type: 'dashed', color: '#e8e8e8' } },
+    },
+    yAxis: {
+      type: 'value',
+      show: true,
+      splitLine: { show: true, lineStyle: { type: 'dashed', color: '#e8e8e8' } },
+    },
+    visualMap: {
+      show: true,
+      min: 0,
+      max: +(maxMag.toFixed(3)),
+      dimension: 2,
+      orient: 'vertical',
+      right: 0,
+      top: 'center',
+      text: ['High', 'Low'],
+      calculable: true,
+      inRange: {
+        color: colors.length >= 2 ? [colors[1], colors[0]] : ['#50a3ba', '#eac736', '#d94e5d'],
       },
-    ],
+    },
+    series: [{
+      type: 'scatter',
+      data: arrowData,
+      symbol: 'arrow',
+      symbolSize: (val: any) => {
+        const mag = val[2] || 0;
+        return Math.max(6, (mag / maxMag) * 22);
+      },
+      itemStyle: { opacity: 0.85 },
+    }],
   };
 }

@@ -8,7 +8,6 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildBubbleChartOption } from '../../helpers/echarts-option-builder';
 
 export interface BubbleChartConfig {
@@ -70,7 +69,7 @@ export class ConfigurableBubbleChartComponent
     legendTitle: 'Legend',
     legendPosition: 'right',
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
     autoScale: true,
     minRadius: 3,
     maxRadius: 20,
@@ -79,8 +78,6 @@ export class ConfigurableBubbleChartComponent
   get config(): BubbleChartConfig {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();

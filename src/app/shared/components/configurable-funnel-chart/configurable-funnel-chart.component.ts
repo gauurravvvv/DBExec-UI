@@ -1,7 +1,6 @@
 import {
   Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
 } from '@angular/core';
-import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 import { buildFunnelChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -26,12 +25,12 @@ export class ConfigurableFunnelChartComponent implements OnInit, OnChanges, DoCh
   private defaultConfig: any = {
     animations: true,
     tooltipDisabled: false,
-    colorScheme: 'vivid',
+    colorScheme: 'default',
     labels: true,
     funnelSort: 'descending',
     funnelAlign: 'center',
     funnelGap: 2,
-    legend: false,
+    legend: true,
     legendPosition: 'right',
     toolbox: false,
   };
@@ -39,8 +38,6 @@ export class ConfigurableFunnelChartComponent implements OnInit, OnChanges, DoCh
   get config(): any {
     return this.chartConfig || this.defaultConfig;
   }
-
-  colorPalettes = COLOR_PALETTES;
 
   ngOnInit(): void {
     this.updateChartOption();
