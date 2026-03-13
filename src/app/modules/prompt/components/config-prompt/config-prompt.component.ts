@@ -67,7 +67,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   isLoadingSchema = false;
   availableColumns: any[] = [];
   cachedAvailableTables: any[] = [];
-  sqlPreview: string = '';
+
 
   // Enhanced autocomplete properties (WHERE)
   maxSuggestions = 50;
@@ -156,7 +156,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         if (this.isCancelClicked) {
           this.isCancelClicked = false;
         }
-        this.sqlPreview = this.generateSqlPreview();
       });
   }
 
@@ -458,10 +457,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   loadConfigData() {
     this.promptService.getConfig(this.orgId, this.promptId).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        // Fix #1: Add null check for configuration
         const config = response.data.configuration;
         if (!config) {
-          console.warn('No configuration found for this prompt');
           return;
         }
 
@@ -508,7 +505,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               promptWhere: config.prompt_where,
               promptValues: values.map((v: any) => v.value),
             },
-            { emitEvent: false }, // Prevent triggering valueChanges that would clear data
+            { emitEvent: false },
           );
 
           // Set selected columns now that availableColumns is populated
@@ -546,7 +543,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
           // Mark form as pristine since we just loaded saved data
           this.promptForm.markAsPristine();
-          this.sqlPreview = this.generateSqlPreview();
         }
       }
     });
