@@ -1451,6 +1451,11 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer.setData('text/html', visual.id.toString());
+      const visualBox = (event.target as HTMLElement).closest('.visual-box');
+      if (visualBox) {
+        const rect = visualBox.getBoundingClientRect();
+        event.dataTransfer.setDragImage(visualBox, event.clientX - rect.left, event.clientY - rect.top);
+      }
     }
   }
 

@@ -1410,13 +1410,14 @@
   }
 }
 
-// Inline Title (replaces visual-header)
+// Inline Title (drag handle for reordering visuals)
 .visual-inline-title {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 10px 14px 5px;
   position: relative;
+  cursor: grab;
 
   .inline-title-text {
     font-size: 14px;

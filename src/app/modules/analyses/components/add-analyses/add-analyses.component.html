@@ -429,12 +429,12 @@
                 <div class="visual-box" *ngFor="let visual of visuals" [class.focused]="focusedVisualId === visual.id"
                     [class.disabled]="focusedVisualId !== null && focusedVisualId !== visual.id"
                     [class.dragging]="draggingVisual === visual" [style.width.px]="visual.width"
-                    [style.height.px]="visual.height" draggable="true" (dragstart)="startDrag($event, visual)"
+                    [style.height.px]="visual.height"
                     (dragover)="onDragOver($event, visual)" (drop)="onDrop($event, visual)"
                     (dragend)="onDragEnd($event)" (click)="onVisualClick($event, visual.id)"
                     (contextmenu)="onVisualRightClick($event, visual.id)">
-                    <!-- Inline Title (shown above chart) - editable via config sidebar only -->
-                    <div class="visual-inline-title">
+                    <!-- Inline Title (drag handle for reordering) -->
+                    <div class="visual-inline-title" draggable="true" (dragstart)="startDrag($event, visual)">
                         <span class="inline-title-text">{{visual.title}}</span>
                         <!-- Chart type and action buttons -->
                         <div class="visual-action-buttons">
