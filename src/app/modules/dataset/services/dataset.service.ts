@@ -47,6 +47,26 @@ export class DatasetService {
       });
   }
 
+  addDatasetViaBuilder(payload: any) {
+    return this.http
+      .post(DATASET.ADD_VIA_BUILDER, payload)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  updateDatasetViaBuilder(payload: any) {
+    return this.http
+      .put(DATASET.UPDATE_VIA_BUILDER, payload)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   viewSuperAdmin(id: string) {
     return this.http
       .get(SUPER_ADMIN.VIEW + `${id}`)

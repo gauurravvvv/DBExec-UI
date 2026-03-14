@@ -314,18 +314,20 @@
                             <p-chips id="promptValues" formControlName="promptValues" [addOnBlur]="true"
                                 [addOnTab]="true" [allowDuplicate]="false" [separator]="separator"
                                 placeholder="Enter values and press Enter or Comma"
+                                (onAdd)="onChipAdd($event)"
                                 [ngClass]="{'ng-invalid ng-dirty': promptForm.get('promptValues')?.invalid && promptForm.get('promptValues')?.touched}">
                                 <ng-template let-item pTemplate="item">
                                     <span [class.editing]="editingChipValue === item"
                                         (dblclick)="onChipDoubleClick({value: item})">
                                         <span *ngIf="editingChipValue !== item">
-                                            {{item}}
+                                            {{item.value || item}}
                                         </span>
                                         <input *ngIf="editingChipValue === item"
-                                            #chipInput type="text" [value]="item"
+                                            #chipInput type="text" [value]="item.value || item"
                                             (keydown.enter)="updateChip($event)"
                                             (keydown.escape)="cancelEdit()"
-                                            (blur)="updateChip($event)">
+                                            (blur)="updateChip($event)"
+                                            (input)="$any($event.target).style.width = ($any($event.target).value.length + 2) + 'ch'">
                                     </span>
                                 </ng-template>
                             </p-chips>

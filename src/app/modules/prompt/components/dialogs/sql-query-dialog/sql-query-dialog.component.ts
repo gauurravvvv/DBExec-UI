@@ -114,6 +114,7 @@ export class SqlQueryDialogComponent
   editor: any = null;
   private completionProviderDisposable: any = null;
   private hoverProviderDisposable: any = null;
+  private signatureHelpDisposable: any = null;
   isLoadingEditor = true;
   monacoLoadFailed = false;
   private currentTheme: string = 'vs-dark';
@@ -143,6 +144,9 @@ export class SqlQueryDialogComponent
     }
     if (this.hoverProviderDisposable) {
       this.hoverProviderDisposable.dispose();
+    }
+    if (this.signatureHelpDisposable) {
+      this.signatureHelpDisposable.dispose();
     }
 
     // Cleanup theme observer
@@ -349,6 +353,10 @@ export class SqlQueryDialogComponent
     // Register hover provider using the service
     this.hoverProviderDisposable =
       this.monacoIntelliSenseService.registerHoverProvider(databases);
+
+    // Register signature help provider
+    this.signatureHelpDisposable =
+      this.monacoIntelliSenseService.registerSignatureHelpProvider();
   }
 
   /**

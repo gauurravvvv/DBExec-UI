@@ -77,12 +77,62 @@
                     </div>
                 </div>
 
+                <!-- Query Builder Configuration (Type 2 only) -->
+                <div class="info-section full-width" *ngIf="datasetData.type === 2 && datasetData.screenId">
+                    <div class="section-header">
+                        <h3>
+                            <i class="pi pi-sliders-h mr-2"></i>
+                            Query Builder Configuration
+                        </h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Query Builder</label>
+                            <p class="with-icon">
+                                <i class="pi pi-sitemap mr-2"></i>
+                                {{ datasetData.screenName || 'Screen #' + datasetData.screenId }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Grouped Display: Tab + Accordion (matches Execution Config popup) -->
+                    <div class="qb-config-display" *ngIf="datasetData.promptConfig?.display?.length > 0">
+                        <p-tabView [scrollable]="true" styleClass="qb-config-tabs">
+                            <p-tabPanel *ngFor="let tab of datasetData.promptConfig.display"
+                                [header]="tab.tabName">
+                                <p-accordion [multiple]="true">
+                                    <p-accordionTab *ngFor="let section of tab.sections"
+                                        [header]="section.sectionName" [selected]="true">
+                                        <div class="result-table">
+                                            <div class="result-row" *ngFor="let prompt of section.prompts">
+                                                <span class="result-name">{{ prompt.name }}</span>
+                                                <span class="result-value">{{ formatPromptValue(prompt) }}</span>
+                                            </div>
+                                        </div>
+                                    </p-accordionTab>
+                                </p-accordion>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+
+                    <!-- Fallback: flat prompts list (old format without display grouping) -->
+                    <div class="qb-config-display"
+                        *ngIf="!datasetData.promptConfig?.display && datasetData.promptConfig?.prompts?.length > 0">
+                        <div class="result-table">
+                            <div class="result-row" *ngFor="let p of datasetData.promptConfig.prompts">
+                                <span class="result-name">{{ p.name || 'Prompt #' + p.promptId }}</span>
+                                <span class="result-value">{{ formatPromptValue(p) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- SQL Query -->
                 <div class="info-section full-width">
                     <div class="section-header">
                         <h3>
                             <i class="pi pi-code mr-2"></i>
-                            SQL Query
+                            {{ datasetData.type === 2 ? 'Generated SQL Query' : 'SQL Query' }}
                         </h3>
                         <div class="sql-actions">
                             <button pButton class="p-button-text btn-export" (click)="copySQLToClipboard()"

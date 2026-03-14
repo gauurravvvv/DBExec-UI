@@ -1349,6 +1349,7 @@ $radius-sm: 8px;
         border-top: 1px solid var(--border-color);
         justify-content: flex-end;
         padding: 0.75rem 1.5rem;
+        overflow: visible;
 
         .p-paginator-page,
         .p-paginator-next,
@@ -1370,6 +1371,14 @@ $radius-sm: 8px;
           &.p-highlight {
             background: var(--primary-color);
             color: #fff;
+          }
+        }
+
+        .p-dropdown {
+          overflow: visible;
+
+          .p-dropdown-panel {
+            z-index: 1100 !important;
           }
         }
       }

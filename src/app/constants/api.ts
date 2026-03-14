@@ -93,11 +93,13 @@ export const SECRET = {
 
 export const DATASET = {
   ADD: '/dataset/add',
+  ADD_VIA_BUILDER: '/dataset/add/builder',
   LIST: '/dataset/list',
   DELETE: '/dataset/delete/',
   VIEW: '/dataset/get/',
   VIEW_FIELD: '/dataset/get/field/',
   UPDATE: '/dataset/update',
+  UPDATE_VIA_BUILDER: '/dataset/update/builder',
   UPDATE_FIELD: '/dataset/update/field',
   DELETE_FIELD: '/dataset/delete/field/',
   VALIDATE_FIELD: '/dataset/validate/field',
@@ -147,6 +149,8 @@ export const SCREEN = {
   SAVE_CONFIGURATION: '/screen/config',
   GET_SCREEN_CONFIGURATION: '/screen/getConfig/',
   GET_TABS: '/screen/getTabs/',
+  GET_STRUCTURE: '/screen/getStructure/',
+  EXECUTE: '/screen/execute',
 };
 
 export const QUERY = {

@@ -566,6 +566,13 @@ export class AddCustomFieldDialogComponent
     );
   }
 
+  getFilteredFunctionCount(): number {
+    return this.filteredCategories.reduce(
+      (total: number, cat: FunctionCategory) => total + cat.functions.length,
+      0
+    );
+  }
+
   toggleCategory(categoryId: string) {
     this.expandedCategories[categoryId] = !this.expandedCategories[categoryId];
   }
@@ -584,17 +591,30 @@ export class AddCustomFieldDialogComponent
     }
 
     this.filteredCategories = this.functionCategories
-      .map((category: FunctionCategory) => ({
-        ...category,
-        functions: category.functions.filter(
-          (fn: FunctionDefinition) =>
-            fn.name.toLowerCase().includes(query) ||
-            fn.description.toLowerCase().includes(query)
-        ),
-      }))
+      .map((category: FunctionCategory) => {
+        const nameMatches: FunctionDefinition[] = [];
+        const otherMatches: FunctionDefinition[] = [];
+
+        category.functions.forEach((fn: FunctionDefinition) => {
+          if (fn.name.toLowerCase().includes(query)) {
+            nameMatches.push(fn);
+          } else if (
+            fn.usage.toLowerCase().includes(query) ||
+            category.name.toLowerCase().includes(query)
+          ) {
+            otherMatches.push(fn);
+          }
+        });
+
+        return {
+          ...category,
+          functions: [...nameMatches, ...otherMatches],
+        };
+      })
       .filter((category: FunctionCategory) => category.functions.length > 0);
 
     // Auto-expand categories that have results
+    this.expandedCategories = {};
     this.filteredCategories.forEach((cat: FunctionCategory) => {
       this.expandedCategories[cat.id] = true;
     });

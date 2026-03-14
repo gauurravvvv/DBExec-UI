@@ -54,7 +54,7 @@ export interface ExecutePrompt {
   // Internal tracking
   formControlName: string;
   // Cached options for dropdown/multiselect/radio/checkbox
-  options: { label: string; value: string }[];
+  options: { label: string; value: number }[];
 }
 
 // Section model for execute screen
@@ -262,6 +262,6 @@ export function transformPromptResponse(
     values: prompt.values || [],
     config,
     formControlName: `prompt_${prompt.id}`,
-    options: (prompt.values || []).map(v => ({ label: v.value, value: v.value })),
+    options: (prompt.values || []).map(v => ({ label: v.value, value: v.id })),
   };
 }

@@ -123,7 +123,7 @@
                         <i class="pi pi-book mr-2"></i>
                         Functions Reference
                     </h4>
-                    <span class="function-count">{{ getTotalFunctionCount() }} functions</span>
+                    <span class="function-count">{{ functionSearchQuery ? getFilteredFunctionCount() + ' / ' + getTotalFunctionCount() : getTotalFunctionCount() }} functions</span>
                 </div>
 
                 <div class="search-box">

@@ -76,7 +76,7 @@ export function getDefaultValue(type: PromptType): any {
     case 'calendar':
       return null;
     case 'daterange':
-      return [null, null];
+      return null;
     case 'rangeslider':
       return [0, 100];
     default:

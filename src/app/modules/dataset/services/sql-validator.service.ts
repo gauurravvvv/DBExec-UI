@@ -83,28 +83,32 @@ export class SqlValidatorService {
     const errors: SqlError[] = [];
     const lines = sql.split('\n');
 
-    // Check for unclosed parentheses
-    const parenError = this.checkUnclosedParentheses(sql, lines);
+    // Strip strings and comments for structural checks (preserves line/column positions)
+    const stripped = this.stripStringsAndComments(sql);
+    const strippedLines = stripped.split('\n');
+
+    // Check for unclosed parentheses (use stripped to ignore parens in strings/comments)
+    const parenError = this.checkUnclosedParentheses(stripped, strippedLines);
     if (parenError) errors.push(parenError);
 
-    // Check for unclosed strings
+    // Check for unclosed strings (use original - this check needs the actual strings)
     const stringErrors = this.checkUnclosedStrings(sql, lines);
     errors.push(...stringErrors);
 
-    // Check for missing FROM in SELECT
-    const fromError = this.checkMissingFrom(sql, lines);
+    // Check for missing FROM in SELECT (use stripped to ignore keywords in strings)
+    const fromError = this.checkMissingFrom(stripped, strippedLines);
     if (fromError) errors.push(fromError);
 
-    // Check for dangling operators
-    const operatorErrors = this.checkDanglingOperators(lines);
+    // Check for dangling operators (use stripped)
+    const operatorErrors = this.checkDanglingOperators(strippedLines);
     errors.push(...operatorErrors);
 
-    // Check for empty IN clause
-    const inErrors = this.checkEmptyInClause(sql, lines);
+    // Check for empty IN clause (use stripped)
+    const inErrors = this.checkEmptyInClause(stripped, strippedLines);
     errors.push(...inErrors);
 
-    // Check for invalid clause order
-    const orderErrors = this.checkClauseOrder(sql, lines);
+    // Check for invalid clause order (use stripped to avoid matching keywords in strings/subqueries)
+    const orderErrors = this.checkClauseOrder(stripped, strippedLines);
     errors.push(...orderErrors);
 
     // Check for missing semicolon at end (warning only)
@@ -112,6 +116,62 @@ export class SqlValidatorService {
     if (semicolonError) errors.push(semicolonError);
 
     return errors;
+  }
+
+  /**
+   * Replace string literals and comments with spaces (preserving line/column positions).
+   * This prevents false positives from keywords/parentheses inside strings or comments.
+   */
+  private stripStringsAndComments(sql: string): string {
+    const result: string[] = [];
+    let i = 0;
+
+    while (i < sql.length) {
+      // Single-line comment: -- ...
+      if (sql[i] === '-' && sql[i + 1] === '-') {
+        while (i < sql.length && sql[i] !== '\n') {
+          result.push(' ');
+          i++;
+        }
+      }
+      // Block comment: /* ... */
+      else if (sql[i] === '/' && sql[i + 1] === '*') {
+        result.push(' '); i++; // /
+        result.push(' '); i++; // *
+        while (i < sql.length) {
+          if (sql[i] === '*' && sql[i + 1] === '/') {
+            result.push(' '); i++; // *
+            result.push(' '); i++; // /
+            break;
+          }
+          result.push(sql[i] === '\n' ? '\n' : ' ');
+          i++;
+        }
+      }
+      // String literal: '...' (with '' escape)
+      else if (sql[i] === "'") {
+        result.push(' '); i++; // opening quote
+        while (i < sql.length) {
+          if (sql[i] === "'" && sql[i + 1] === "'") {
+            result.push(' '); i++; // escaped quote
+            result.push(' '); i++;
+          } else if (sql[i] === "'") {
+            result.push(' '); i++; // closing quote
+            break;
+          } else {
+            result.push(sql[i] === '\n' ? '\n' : ' ');
+            i++;
+          }
+        }
+      }
+      // Normal character
+      else {
+        result.push(sql[i]);
+        i++;
+      }
+    }
+
+    return result.join('');
   }
 
   /**
@@ -219,14 +279,30 @@ export class SqlValidatorService {
   }
 
   /**
-   * Check for SELECT without FROM (except COUNT(*) and similar)
+   * Check for SELECT without FROM (except standalone expressions)
    */
   private checkMissingFrom(sql: string, lines: string[]): SqlError | null {
     const upperSql = sql.toUpperCase();
 
-    // Skip if it's a function-only SELECT (like SELECT NOW(), SELECT 1+1)
-    if (/SELECT\s+(?:NOW\s*\(|CURRENT_|1\s*[\+\-\*/]|\d+\s*;)/i.test(sql)) {
+    // Skip if it's a standalone expression SELECT (no table needed)
+    // Matches: SELECT 1, SELECT 1+1, SELECT NOW(), SELECT CURRENT_*, SELECT 'text', etc.
+    if (/^\s*SELECT\s+(?:NOW\s*\(|CURRENT_|VERSION\s*\(|\d[\d\s\+\-\*\/\.]*[;\s]*$)/im.test(sql)) {
       return null;
+    }
+
+    // Skip if the SELECT clause only contains literals, functions, or expressions (no column/table refs)
+    // This handles: SELECT 1; SELECT 1+2; SELECT UPPER('abc'); etc.
+    const afterSelect = sql.replace(/^\s*SELECT\s+/i, '').trim();
+    if (/^[\d\s\+\-\*\/\.\(\)',]+;?\s*$/i.test(afterSelect)) {
+      return null;
+    }
+
+    // Skip if the SELECT has a function call pattern (e.g., SELECT gen_random_uuid())
+    if (/^\s*SELECT\s+\w+\s*\(/im.test(sql) && !/\bFROM\b/i.test(sql)) {
+      // Only skip if there are no column-like identifiers after FROM-expecting patterns
+      if (!/\b(WHERE|JOIN|GROUP|ORDER|HAVING)\b/i.test(sql)) {
+        return null;
+      }
     }
 
     // Check if SELECT exists but FROM doesn't
@@ -247,8 +323,8 @@ export class SqlValidatorService {
         }
       }
 
-      // Only warn if SQL looks like a table SELECT
-      if (/SELECT\s+[\w\*,\s\.]+\s*$/i.test(sql.trim())) {
+      // Only warn if SQL looks like a table SELECT (has identifiers that look like column/table names)
+      if (/SELECT\s+[\w\*][\w\*,\s\.]+\s*;?\s*$/i.test(sql.trim())) {
         return {
           line: selectLine,
           column: selectColumn,

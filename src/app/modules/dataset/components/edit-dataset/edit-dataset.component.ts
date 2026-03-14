@@ -100,12 +100,13 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
   private lastResultsLazyEvent: any = null;
 
   get isPaginationEnabled(): boolean {
-    return !!this.queryResult && this.queryResult.rowCount > this.resultRows;
+    return !!this.queryResult;
   }
 
   // IntelliSense provider disposables
   private completionProviderDisposable: any = null;
   private hoverProviderDisposable: any = null;
+  private signatureHelpDisposable: any = null;
 
   // Organisation Management
   selectedOrg: any = {};
@@ -157,7 +158,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
       // Show schema if its name matches or if any of its tables match
       const schemaNameMatches = schema.name.toLowerCase().includes(search);
       const hasMatchingTable = schema.tables.some((table: any) =>
-        table.name.toLowerCase().includes(search)
+        table.name.toLowerCase().includes(search),
       );
       return schemaNameMatches || hasMatchingTable;
     });
@@ -170,7 +171,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private route: ActivatedRoute,
     private messageService: MessageService,
-    private store: Store
+    private store: Store,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -192,7 +193,12 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
 
-      this.executeQueryForDatabase(this.lastExecutedQuery, 1, this.resultRows, filter);
+      this.executeQueryForDatabase(
+        this.lastExecutedQuery,
+        1,
+        this.resultRows,
+        filter,
+      );
     });
 
     // Fetch orgId and datasetId from route params
@@ -228,7 +234,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
       AddDatasetActions.refreshSchemaData({
         orgId,
         dbId: dbIdStr,
-      })
+      }),
     );
 
     // Collapse this database's tree (schemas and tables)
@@ -324,6 +330,9 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     if (this.hoverProviderDisposable) {
       this.hoverProviderDisposable.dispose();
+    }
+    if (this.signatureHelpDisposable) {
+      this.signatureHelpDisposable.dispose();
     }
 
     // Cleanup theme observer
@@ -432,7 +441,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
           monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
           () => {
             this.executeQuery();
-          }
+          },
         );
 
         // Focus the editor
@@ -449,7 +458,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
         // Add keyboard shortcuts via service
         this.monacoIntelliSenseService.registerKeyboardShortcuts(
           this.editor,
-          () => this.executeQuery()
+          () => this.executeQuery(),
         );
 
         // Add custom context menu items
@@ -498,16 +507,21 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.hoverProviderDisposable) {
       this.hoverProviderDisposable.dispose();
     }
+    if (this.signatureHelpDisposable) {
+      this.signatureHelpDisposable.dispose();
+    }
 
     // Register new providers and store disposables
     if (this.editor) {
       this.completionProviderDisposable =
         this.monacoIntelliSenseService.registerSQLCompletions(
           this.databases,
-          this.editor
+          this.editor,
         );
       this.hoverProviderDisposable =
         this.monacoIntelliSenseService.registerHoverProvider(this.databases);
+      this.signatureHelpDisposable =
+        this.monacoIntelliSenseService.registerSignatureHelpProvider();
     }
   }
 
@@ -580,7 +594,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
       AddDatasetActions.loadSchemaData({
         orgId,
         dbId: dbIdStr,
-      })
+      }),
     );
 
     return new Promise((resolve, reject) => {
@@ -599,7 +613,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
                     orgId,
                     dbId: dbIdStr,
                     data: schemaData[0],
-                  })
+                  }),
                 );
 
                 // Store schema data by database ID
@@ -622,7 +636,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
                   orgId,
                   dbId: dbIdStr,
                   error: error.message || 'Failed to load schema',
-                })
+                }),
               );
 
               this.loadingDatabases[dbId] = false;
@@ -636,7 +650,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
             orgId,
             dbId: dbIdStr,
             error: error.message || 'Failed to load schema',
-          })
+          }),
         );
 
         this.loadingDatabases[dbId] = false;
@@ -824,7 +838,12 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   exportResultsAsCsv(): void {
-    if (!this.lastExecutedQuery || !this.selectedDatabaseObj?.id || !this.selectedOrg?.id) return;
+    if (
+      !this.lastExecutedQuery ||
+      !this.selectedDatabaseObj?.id ||
+      !this.selectedOrg?.id
+    )
+      return;
 
     this.isExportingResults = true;
 
@@ -863,7 +882,10 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Export Failed',
-          detail: error.error?.message || error.message || 'Failed to export query results',
+          detail:
+            error.error?.message ||
+            error.message ||
+            'Failed to export query results',
           key: 'topRight',
           life: 3000,
           styleClass: 'custom-toast',
@@ -878,7 +900,8 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onResultsLazyLoad(event: any): void {
     this.lastResultsLazyEvent = event;
-    const page = Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
+    const page =
+      Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
     const limit = event.rows || this.resultRows;
 
     if (!this.lastExecutedQuery) return;
@@ -897,7 +920,12 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     this.executeQueryForDatabase(this.lastExecutedQuery, page, limit, filter);
   }
 
-  private executeQueryForDatabase(query: string, page: number = 1, limit: number = this.resultRows, filter: { [key: string]: string } = {}): void {
+  private executeQueryForDatabase(
+    query: string,
+    page: number = 1,
+    limit: number = this.resultRows,
+    filter: { [key: string]: string } = {},
+  ): void {
     if (!query.trim()) {
       return;
     }
@@ -923,105 +951,101 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
       payload.filter = JSON.stringify(filter);
     }
 
-    this.queryService
-      .executeQuery(payload)
-      .subscribe({
-        next: (response: any) => {
-          // Check if response indicates an error (status: false)
-          if (response.status === false) {
-            const executionTime = `${Date.now() - startTime}ms`;
-            this.queryResult = {
-              columns: [],
-              rows: [],
-              rowCount: 0,
-              executionTime: executionTime,
-              error: response.message || 'Query execution failed',
-            };
-            this.isExecutingQuery = false;
-            return;
-          }
-
-          // Handle string-based response
-          if (typeof response === 'string') {
-            this.queryResult = {
-              columns: [],
-              rows: [],
-              rowCount: 0,
-              executionTime: `${Date.now() - startTime}ms`,
-              message: response,
-            };
-            this.isExecutingQuery = false;
-            return;
-          }
-
-          // Extract the actual data object from response
-          const dataObj = response.data || response;
-
-          // Extract execution time
-          let executionTime = dataObj.executionTime || response.executionTime;
-
-          if (executionTime && typeof executionTime === 'string') {
-            executionTime = executionTime;
-          } else if (executionTime && typeof executionTime === 'number') {
-            executionTime = `${executionTime}ms`;
-          } else {
-            const calculatedTime = Date.now() - startTime;
-            executionTime = `${calculatedTime}ms`;
-          }
-
-          // Extract columns and rows from API response
-          const data = dataObj.data || dataObj.rows || [];
-          const columns =
-            dataObj.columns ||
-            (Array.isArray(data) && data.length > 0
-              ? Object.keys(data[0])
-              : []);
-          const rowCount =
-            dataObj.rowCount !== undefined
-              ? dataObj.rowCount
-              : Array.isArray(data)
-              ? data.length
-              : 0;
-
-          this.queryResult = {
-            columns: columns,
-            rows: Array.isArray(data) ? data : [],
-            rowCount: rowCount,
-            executionTime: executionTime,
-            query: dataObj.query || response.query,
-          };
-
-          // Auto-open results popup if there are columns
-          if (this.queryResult.columns.length > 0) {
-            this.showResultsPopup = true;
-          }
-
-          this.isExecutingQuery = false;
-        },
-        error: (error: any) => {
+    this.queryService.executeQuery(payload).subscribe({
+      next: (response: any) => {
+        // Check if response indicates an error (status: false)
+        if (response.status === false) {
           const executionTime = `${Date.now() - startTime}ms`;
-
-          // Extract error message
-          let errorMessage = 'Query execution failed';
-          if (error.error?.message) {
-            errorMessage = error.error.message;
-          } else if (error.message) {
-            errorMessage = error.message;
-          } else if (typeof error.error === 'string') {
-            errorMessage = error.error;
-          }
-
           this.queryResult = {
             columns: [],
             rows: [],
             rowCount: 0,
             executionTime: executionTime,
-            error: errorMessage,
+            error: response.message || 'Query execution failed',
           };
-
           this.isExecutingQuery = false;
-        },
-      });
+          return;
+        }
+
+        // Handle string-based response
+        if (typeof response === 'string') {
+          this.queryResult = {
+            columns: [],
+            rows: [],
+            rowCount: 0,
+            executionTime: `${Date.now() - startTime}ms`,
+            message: response,
+          };
+          this.isExecutingQuery = false;
+          return;
+        }
+
+        // Extract the actual data object from response
+        const dataObj = response.data || response;
+
+        // Extract execution time
+        let executionTime = dataObj.executionTime || response.executionTime;
+
+        if (executionTime && typeof executionTime === 'string') {
+          executionTime = executionTime;
+        } else if (executionTime && typeof executionTime === 'number') {
+          executionTime = `${executionTime}ms`;
+        } else {
+          const calculatedTime = Date.now() - startTime;
+          executionTime = `${calculatedTime}ms`;
+        }
+
+        // Extract columns and rows from API response
+        const data = dataObj.data || dataObj.rows || [];
+        const columns =
+          dataObj.columns ||
+          (Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []);
+        const rowCount =
+          dataObj.rowCount !== undefined
+            ? dataObj.rowCount
+            : Array.isArray(data)
+              ? data.length
+              : 0;
+
+        this.queryResult = {
+          columns: columns,
+          rows: Array.isArray(data) ? data : [],
+          rowCount: rowCount,
+          executionTime: executionTime,
+          query: dataObj.query || response.query,
+        };
+
+        // Auto-open results popup if there are columns
+        if (this.queryResult.columns.length > 0) {
+          this.showResultsPopup = true;
+        }
+
+        this.isExecutingQuery = false;
+      },
+      error: (error: any) => {
+        const executionTime = `${Date.now() - startTime}ms`;
+
+        // Extract error message
+        let errorMessage = 'Query execution failed';
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        }
+
+        this.queryResult = {
+          columns: [],
+          rows: [],
+          rowCount: 0,
+          executionTime: executionTime,
+          error: errorMessage,
+        };
+
+        this.isExecutingQuery = false;
+      },
+    });
   }
 
   onDatasetDialogClose(formData: DatasetFormData | null): void {
@@ -1118,7 +1142,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
   isTableExpanded(
     dbId: string,
     schemaName: string,
-    tableName: string
+    tableName: string,
   ): boolean {
     const key = `${dbId}.${schemaName}.${tableName}`;
     return this.expandedTables[key] || false;
@@ -1128,7 +1152,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     dbId: string,
     schemaName: string,
     tableName: string,
-    columnName: string
+    columnName: string,
   ): void {
     if (!this.editor) return;
 
@@ -1193,6 +1217,26 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
 
         if (this.globalService.handleSuccessService(response, false)) {
           const dataset = response.data;
+
+          // Type 2 (Prompt-based): redirect to execute-screen in edit mode
+          if (dataset.type === 2 && dataset.screenId) {
+            this.router.navigate(
+              [
+                '/app/screen/execute',
+                dataset.organisationId,
+                dataset.databaseId,
+                dataset.screenId,
+              ],
+              {
+                queryParams: {
+                  editDatasetId: dataset.id,
+                  editDatasetName: dataset.name,
+                },
+                replaceUrl: true,
+              },
+            );
+            return;
+          }
 
           // Store dataset details
           this.datasetName = dataset.name || '';

@@ -262,9 +262,8 @@
             </div>
             <div class="popup-header-right">
                 <button pButton label="Export CSV" icon="pi pi-download"
-                    class="p-button-outlined p-button-success p-button-sm export-csv-btn"
-                    (click)="exportResultsAsCsv()" [disabled]="isExportingResults"
-                    *ngIf="!queryResult.error && queryResult.columns.length > 0">
+                    class="p-button-outlined p-button-success p-button-sm export-csv-btn" (click)="exportResultsAsCsv()"
+                    [disabled]="isExportingResults" *ngIf="!queryResult.error && queryResult.columns.length > 0">
                 </button>
                 <button pButton label="Clear Filters" icon="pi pi-filter-slash"
                     class="p-button-outlined p-button-danger p-button-sm clear-filters-btn"
@@ -307,13 +306,23 @@
                 </div>
             </div>
 
+            <!-- Empty Results -->
+            <div class="results-empty-card"
+                *ngIf="!queryResult.error && !queryResult.message && queryResult.columns.length === 0 && queryResult.rows.length === 0">
+                <div class="empty-icon-wrapper">
+                    <i class="pi pi-inbox"></i>
+                </div>
+                <h4>No Results Found</h4>
+                <p>The query returned 0 rows.</p>
+            </div>
+
             <!-- Results Table with PrimeNG -->
             <div class="results-table-container" *ngIf="!queryResult.error && queryResult.columns.length > 0">
                 <p-table #resultsTable [value]="queryResult.rows" [rows]="resultRows" [paginator]="isPaginationEnabled"
                     [lazy]="isPaginationEnabled" (onLazyLoad)="onResultsLazyLoad($event)"
                     [totalRecords]="queryResult.rowCount" [rowHover]="true"
                     currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
-                    [rowsPerPageOptions]="[10, 50, 100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
+                    [rowsPerPageOptions]="[10, 50, 100]" paginatorDropdownAppendTo="body" styleClass="p-datatable-sm modern-table" [scrollable]="true"
                     scrollHeight="calc(80vh - 200px)">
 
                     <ng-template pTemplate="header">

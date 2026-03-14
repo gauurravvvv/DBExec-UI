@@ -1990,3 +1990,8 @@ body {
     }
   }
 }
+
+// Fixed width for organisation/database dropdowns in toolbar areas
+.card-toolbar .dropdown-field {
+  min-width: 200px;
+}

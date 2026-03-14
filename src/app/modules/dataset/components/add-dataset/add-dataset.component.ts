@@ -76,6 +76,9 @@ export class AddDatasetComponent
   private themeObserver: MutationObserver | null = null;
   private currentTheme: string = 'vs-dark';
 
+  // Bound listener reference (for proper removeEventListener)
+  private boundCloseContextMenu = this.closeContextMenu.bind(this);
+
   // Database sidebar
   showDatabaseSidebar = true;
   expandedDatabases: { [key: string]: boolean } = {};
@@ -105,7 +108,7 @@ export class AddDatasetComponent
   private lastResultsLazyEvent: any = null;
 
   get isPaginationEnabled(): boolean {
-    return !!this.queryResult && this.queryResult.rowCount > this.resultRows;
+    return !!this.queryResult;
   }
 
   // Change Confirmation Dialog
@@ -116,6 +119,7 @@ export class AddDatasetComponent
   // IntelliSense provider disposables
   private completionProviderDisposable: any = null;
   private hoverProviderDisposable: any = null;
+  private signatureHelpDisposable: any = null;
 
   // Organisation Management
   organisations: any[] = [];
@@ -210,7 +214,12 @@ export class AddDatasetComponent
         }
       }
 
-      this.executeQueryForDatabase(this.lastExecutedQuery, 1, this.resultRows, filter);
+      this.executeQueryForDatabase(
+        this.lastExecutedQuery,
+        1,
+        this.resultRows,
+        filter,
+      );
     });
 
     // Load organisations if super admin
@@ -230,7 +239,7 @@ export class AddDatasetComponent
     this.setupThemeObserver();
 
     // Close context menus on click outside
-    document.addEventListener('click', this.closeContextMenu.bind(this));
+    document.addEventListener('click', this.boundCloseContextMenu);
   }
 
   loadOrganisations(): void {
@@ -499,6 +508,9 @@ export class AddDatasetComponent
     if (this.hoverProviderDisposable) {
       this.hoverProviderDisposable.dispose();
     }
+    if (this.signatureHelpDisposable) {
+      this.signatureHelpDisposable.dispose();
+    }
 
     // Dispose formatter and validator
     this.sqlFormatterService.dispose();
@@ -511,7 +523,7 @@ export class AddDatasetComponent
     }
 
     // Remove context menu listener
-    document.removeEventListener('click', this.closeContextMenu.bind(this));
+    document.removeEventListener('click', this.boundCloseContextMenu);
   }
 
   private loadMonacoEditor(): void {
@@ -605,14 +617,6 @@ export class AddDatasetComponent
           theme: this.currentTheme,
         });
 
-        // Add Ctrl+Enter handler for query execution
-        this.editor.addCommand(
-          monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-          () => {
-            this.executeQuery();
-          },
-        );
-
         // Focus the editor
         this.editor.focus();
 
@@ -685,6 +689,9 @@ export class AddDatasetComponent
     if (this.hoverProviderDisposable) {
       this.hoverProviderDisposable.dispose();
     }
+    if (this.signatureHelpDisposable) {
+      this.signatureHelpDisposable.dispose();
+    }
 
     // Register new providers and store disposables
     if (this.editor) {
@@ -695,6 +702,8 @@ export class AddDatasetComponent
         );
       this.hoverProviderDisposable =
         this.monacoIntelliSenseService.registerHoverProvider(this.databases);
+      this.signatureHelpDisposable =
+        this.monacoIntelliSenseService.registerSignatureHelpProvider();
     }
   }
 
@@ -1031,7 +1040,12 @@ export class AddDatasetComponent
   }
 
   exportResultsAsCsv(): void {
-    if (!this.lastExecutedQuery || !this.selectedDatabaseObj?.id || !this.selectedOrg?.id) return;
+    if (
+      !this.lastExecutedQuery ||
+      !this.selectedDatabaseObj?.id ||
+      !this.selectedOrg?.id
+    )
+      return;
 
     this.isExportingResults = true;
 
@@ -1070,7 +1084,10 @@ export class AddDatasetComponent
         this.messageService.add({
           severity: 'error',
           summary: 'Export Failed',
-          detail: error.error?.message || error.message || 'Failed to export query results',
+          detail:
+            error.error?.message ||
+            error.message ||
+            'Failed to export query results',
           key: 'topRight',
           life: 3000,
           styleClass: 'custom-toast',
@@ -1085,7 +1102,8 @@ export class AddDatasetComponent
 
   onResultsLazyLoad(event: any): void {
     this.lastResultsLazyEvent = event;
-    const page = Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
+    const page =
+      Math.floor((event.first || 0) / (event.rows || this.resultRows)) + 1;
     const limit = event.rows || this.resultRows;
 
     if (!this.lastExecutedQuery) return;
@@ -1104,7 +1122,12 @@ export class AddDatasetComponent
     this.executeQueryForDatabase(this.lastExecutedQuery, page, limit, filter);
   }
 
-  private executeQueryForDatabase(query: string, page: number = 1, limit: number = this.resultRows, filter: { [key: string]: string } = {}): void {
+  private executeQueryForDatabase(
+    query: string,
+    page: number = 1,
+    limit: number = this.resultRows,
+    filter: { [key: string]: string } = {},
+  ): void {
     if (!query.trim()) {
       return;
     }
@@ -1130,105 +1153,101 @@ export class AddDatasetComponent
       payload.filter = JSON.stringify(filter);
     }
 
-    this.queryService
-      .executeQuery(payload)
-      .subscribe({
-        next: (response: any) => {
-          // Check if response indicates an error (status: false)
-          if (response.status === false) {
-            const executionTime = `${Date.now() - startTime}ms`;
-            this.queryResult = {
-              columns: [],
-              rows: [],
-              rowCount: 0,
-              executionTime: executionTime,
-              error: response.message || 'Query execution failed',
-            };
-            this.isExecutingQuery = false;
-            return;
-          }
-
-          // Handle string-based response
-          if (typeof response === 'string') {
-            this.queryResult = {
-              columns: [],
-              rows: [],
-              rowCount: 0,
-              executionTime: `${Date.now() - startTime}ms`,
-              message: response,
-            };
-            this.isExecutingQuery = false;
-            return;
-          }
-
-          // Extract the actual data object from response
-          const dataObj = response.data || response;
-
-          // Extract execution time
-          let executionTime = dataObj.executionTime || response.executionTime;
-
-          if (executionTime && typeof executionTime === 'string') {
-            executionTime = executionTime;
-          } else if (executionTime && typeof executionTime === 'number') {
-            executionTime = `${executionTime}ms`;
-          } else {
-            const calculatedTime = Date.now() - startTime;
-            executionTime = `${calculatedTime}ms`;
-          }
-
-          // Extract columns and rows from API response
-          const data = dataObj.data || dataObj.rows || [];
-          const columns =
-            dataObj.columns ||
-            (Array.isArray(data) && data.length > 0
-              ? Object.keys(data[0])
-              : []);
-          const rowCount =
-            dataObj.rowCount !== undefined
-              ? dataObj.rowCount
-              : Array.isArray(data)
-                ? data.length
-                : 0;
-
-          this.queryResult = {
-            columns: columns,
-            rows: Array.isArray(data) ? data : [],
-            rowCount: rowCount,
-            executionTime: executionTime,
-            query: dataObj.query || response.query,
-          };
-
-          // Auto-open results popup if there are columns (even with 0 rows)
-          if (this.queryResult.columns.length > 0) {
-            this.showResultsPopup = true;
-          }
-
-          this.isExecutingQuery = false;
-        },
-        error: (error: any) => {
+    this.queryService.executeQuery(payload).subscribe({
+      next: (response: any) => {
+        // Check if response indicates an error (status: false)
+        if (response.status === false) {
           const executionTime = `${Date.now() - startTime}ms`;
-
-          // Extract error message
-          let errorMessage = 'Query execution failed';
-          if (error.error?.message) {
-            errorMessage = error.error.message;
-          } else if (error.message) {
-            errorMessage = error.message;
-          } else if (typeof error.error === 'string') {
-            errorMessage = error.error;
-          }
-
           this.queryResult = {
             columns: [],
             rows: [],
             rowCount: 0,
             executionTime: executionTime,
-            error: errorMessage,
+            error: response.message || 'Query execution failed',
           };
-
           this.isExecutingQuery = false;
-        },
-      });
+          return;
+        }
+
+        // Handle string-based response
+        if (typeof response === 'string') {
+          this.queryResult = {
+            columns: [],
+            rows: [],
+            rowCount: 0,
+            executionTime: `${Date.now() - startTime}ms`,
+            message: response,
+          };
+          this.isExecutingQuery = false;
+          return;
+        }
+
+        // Extract the actual data object from response
+        const dataObj = response.data || response;
+
+        // Extract execution time
+        let executionTime = dataObj.executionTime || response.executionTime;
+
+        if (executionTime && typeof executionTime === 'string') {
+          executionTime = executionTime;
+        } else if (executionTime && typeof executionTime === 'number') {
+          executionTime = `${executionTime}ms`;
+        } else {
+          const calculatedTime = Date.now() - startTime;
+          executionTime = `${calculatedTime}ms`;
+        }
+
+        // Extract columns and rows from API response
+        const data = dataObj.data || dataObj.rows || [];
+        const columns =
+          dataObj.columns ||
+          (Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []);
+        const rowCount =
+          dataObj.rowCount !== undefined
+            ? dataObj.rowCount
+            : Array.isArray(data)
+              ? data.length
+              : 0;
+
+        this.queryResult = {
+          columns: columns,
+          rows: Array.isArray(data) ? data : [],
+          rowCount: rowCount,
+          executionTime: executionTime,
+          query: dataObj.query || response.query,
+        };
+
+        // Auto-open results popup if there are columns (even with 0 rows)
+        if (this.queryResult.columns.length > 0) {
+          this.showResultsPopup = true;
+        }
+
+        this.isExecutingQuery = false;
+      },
+      error: (error: any) => {
+        const executionTime = `${Date.now() - startTime}ms`;
+
+        // Extract error message
+        let errorMessage = 'Query execution failed';
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        }
+
+        this.queryResult = {
+          columns: [],
+          rows: [],
+          rowCount: 0,
+          executionTime: executionTime,
+          error: errorMessage,
+        };
+
+        this.isExecutingQuery = false;
+      },
+    });
   }
 
   onDatasetDialogClose(formData: DatasetFormData | null): void {
@@ -1350,7 +1369,9 @@ export class AddDatasetComponent
     if (!this.editor) return;
 
     const selection = this.editor.getSelection();
-    const text = `${schemaName}.${tableName}.${columnName}`;
+    const text = schemaName.toLowerCase() === 'public'
+      ? `${tableName}.${columnName}`
+      : `${schemaName}.${tableName}.${columnName}`;
 
     this.editor.executeEdits('insert-column', [
       {

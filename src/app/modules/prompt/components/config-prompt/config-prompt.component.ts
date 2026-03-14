@@ -501,7 +501,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               tables: parsedTables,
               promptJoin: config.prompt_join,
               promptWhere: config.prompt_where,
-              promptValues: values.map((v: any) => v.value),
+              promptValues: values.map((v: any) => ({ id: v.id, value: v.value })),
             },
             { emitEvent: false },
           );
@@ -668,31 +668,76 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * When p-chips adds a new value, it adds a plain string.
+   * Convert it to {id: null, value: string} object to keep format consistent.
+   */
+  onChipAdd(event: any): void {
+    const addedValue = event.value;
+    // p-chips already pushed the raw string into the array — replace it with an object
+    const values = [...(this.promptForm.get('promptValues')?.value || [])];
+    const idx = values.lastIndexOf(addedValue);
+    if (idx > -1 && typeof addedValue === 'string') {
+      // Check for duplicates by value string
+      const isDuplicate = values.some(
+        (v: any, i: number) => i !== idx && (typeof v === 'object' ? v.value : v) === addedValue,
+      );
+      if (isDuplicate) {
+        values.splice(idx, 1);
+      } else {
+        values[idx] = { id: null, value: addedValue };
+      }
+      this.promptForm.patchValue({ promptValues: values }, { emitEvent: false });
+    }
+  }
+
   onChipDoubleClick(event: any): void {
     const item = event.value;
     const values = this.promptForm.get('promptValues')?.value || [];
     this.editingChipIndex = values.indexOf(item);
     this.editingChipValue = item;
+    const displayValue = typeof item === 'object' ? item.value : item;
     setTimeout(() => {
       if (this.chipInput) {
-        this.chipInput.nativeElement.focus();
-        this.chipInput.nativeElement.style.width = `${item.length}ch`;
+        const input = this.chipInput.nativeElement;
+        input.style.width = `${Math.max(displayValue.length + 2, 4)}ch`;
+        input.focus();
+        input.select();
       }
     });
   }
 
   updateChip(event: any): void {
+    if (this.editingChipIndex < 0) return;
+
     const newValue = event.target.value.trim();
-    if (this.editingChipIndex > -1) {
-      const values = [...(this.promptForm.get('promptValues')?.value || [])];
-      if (newValue && !values.includes(newValue)) {
-        values[this.editingChipIndex] = newValue;
-        this.promptForm.patchValue({ promptValues: values });
-        event.target.style.width = `${newValue.length}ch`;
-      }
+    const values = [...(this.promptForm.get('promptValues')?.value || [])];
+    const existing = values[this.editingChipIndex];
+    const oldValue = typeof existing === 'object' ? existing.value : existing;
+
+    // No change — just close edit mode
+    if (!newValue || newValue === oldValue) {
       this.editingChipIndex = -1;
       this.editingChipValue = null;
+      return;
     }
+
+    // Check duplicate by value string
+    const isDuplicate = values.some(
+      (v: any, i: number) =>
+        i !== this.editingChipIndex && (typeof v === 'object' ? v.value : v) === newValue,
+    );
+
+    if (!isDuplicate) {
+      // Preserve the ID if editing an existing value (case 4: value text updated)
+      const existingId = typeof existing === 'object' ? existing.id : null;
+      values[this.editingChipIndex] = { id: existingId, value: newValue };
+      this.promptForm.patchValue({ promptValues: values });
+      this.promptForm.markAsDirty();
+    }
+
+    this.editingChipIndex = -1;
+    this.editingChipValue = null;
   }
 
   cancelEdit(): void {
@@ -1169,11 +1214,19 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         .split(/,|\n|\r|\|/)
         .map(v => v.trim())
         .filter(v => v.length > 0);
-      // Get current values
-      let currentValues = this.promptForm.get('promptValues')?.value || [];
-      // Merge and keep only unique values
-      let merged = Array.from(new Set([...currentValues, ...newValues]));
-      this.promptForm.patchValue({ promptValues: merged });
+      // Get current values as {id, value} objects
+      let currentValues: any[] = this.promptForm.get('promptValues')?.value || [];
+      const existingStrings = new Set(
+        currentValues.map((v: any) => (typeof v === 'object' ? v.value : v)),
+      );
+      // Add only truly new values as {id: null, value} objects
+      newValues.forEach(val => {
+        if (!existingStrings.has(val)) {
+          currentValues.push({ id: null, value: val });
+          existingStrings.add(val);
+        }
+      });
+      this.promptForm.patchValue({ promptValues: [...currentValues] });
       // Reset file input so user can re-upload same file if needed
       event.target.value = '';
     };
@@ -1535,9 +1588,9 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         }
 
         if (newValues.length > 0) {
-          // Replace previous values with new values from query
+          // Replace previous values with new values from query (as {id: null, value} objects)
           this.promptForm.patchValue({
-            promptValues: newValues,
+            promptValues: newValues.map(v => ({ id: null, value: v })),
             promptValueSQL: response.data.query,
           });
 
@@ -1669,7 +1722,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
           if (newValues.length > 0) {
             this.promptForm.patchValue({
-              promptValues: newValues,
+              promptValues: newValues.map(v => ({ id: null, value: v })),
               promptValueSQL: response.data.query,
             });
           }

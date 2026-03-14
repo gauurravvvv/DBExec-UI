@@ -5,7 +5,7 @@
         <button pButton class="p-button-text" routerLink="/app/screen">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Configure Screen</h2>
+        <h2>Configure Query Builder</h2>
       </div>
       <div class="action-buttons">
         <button pButton type="button" label="Clear Groups" class="p-button-outlined p-button-danger"
@@ -53,7 +53,7 @@
           <div class="sidebar-footer" *ngIf="isFreeze && !isSidebarCollapsed">
             <div class="helper-note">
               <i class="pi pi-info-circle"></i>
-              <span>Unlock screen to modify</span>
+              <span>Unlock to modify</span>
             </div>
           </div>
         </div>
@@ -67,7 +67,7 @@
 
       <div class="main-content" [class.expanded]="isSidebarCollapsed">
         <div class="helper-text-container" *ngIf="!openTabs.length">
-          <div class="helper-text">Click on tab to configure screen</div>
+          <div class="helper-text">Click on tab to configure query builder</div>
         </div>
 
         <div class="tab-container" *ngIf="openTabs.length">

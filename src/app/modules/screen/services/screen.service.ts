@@ -3,6 +3,19 @@ import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { SCREEN, TAB, SECTION } from 'src/app/constants/api';
 
+export interface ExecuteScreenRequest {
+  screenId: string;
+  organisation: string;
+  prompts: {
+    promptId: number;
+    type: string;
+    value: any;
+    isRange: boolean;
+    startValue: any;
+    endValue: any;
+  }[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -128,13 +141,30 @@ export class ScreenService {
     orgId: string,
     screenId: string,
     tabId: string,
-    sectionId: string
+    sectionId: string,
   ) {
     return this.http
-      .get(
-        SECTION.GET_PROMPTS +
-          `${orgId}/${screenId}/${tabId}/${sectionId}`
-      )
+      .get(SECTION.GET_PROMPTS + `${orgId}/${screenId}/${tabId}/${sectionId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  getScreenStructure(orgId: string, screenId: string) {
+    return this.http
+      .get(SCREEN.GET_STRUCTURE + `${orgId}/${screenId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  executeScreen(payload: ExecuteScreenRequest) {
+    return this.http
+      .post(SCREEN.EXECUTE, payload)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

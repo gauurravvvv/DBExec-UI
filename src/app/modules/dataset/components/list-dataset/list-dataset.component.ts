@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -10,6 +10,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatasetService } from '../../services/dataset.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { ScreenService } from 'src/app/modules/screen/services/screen.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
@@ -19,6 +20,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 })
 export class ListDatasetComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
+  @ViewChild('qbSearchInput') qbSearchInput!: ElementRef;
 
   limit = 10;
   totalRecords = 0;
@@ -29,6 +31,12 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   showDeleteConfirm = false;
   datasetToDelete: string | null = null;
+  showQueryBuilderPopup = false;
+  queryBuilders: any[] = [];
+  loadingQueryBuilders = false;
+  qbSearchTerm = '';
+  qbTotalRecords = 0;
+  qbActiveIndex = -1;
   organisations: any[] = [];
   databases: any[] = [];
   selectedOrg: any = null;
@@ -46,13 +54,17 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   private filter$ = new Subject<void>();
   private filterSubscription!: Subscription;
 
+  // Debouncing for QB search
+  private qbFilter$ = new Subject<void>();
+  private qbFilterSubscription!: Subscription;
+
   get isFilterActive(): boolean {
     return !!this.filterValues.name || !!this.filterValues.description;
   }
 
   addDatasetItems: MenuItem[] = [
     {
-      label: 'via Prompts',
+      label: 'via Query Builder',
       icon: 'pi pi-comments',
       command: () => this.onAddViaPrompts(),
     },
@@ -64,6 +76,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
     private datasetService: DatasetService,
     private databaseService: DatabaseService,
+    private screenService: ScreenService,
     private route: ActivatedRoute,
   ) {}
 
@@ -73,6 +86,13 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       .pipe(debounceTime(400))
       .subscribe(() => {
         this.loadDatasets();
+      });
+
+    // Setup debounced QB search
+    this.qbFilterSubscription = this.qbFilter$
+      .pipe(debounceTime(400))
+      .subscribe(() => {
+        this.loadQueryBuilders();
       });
 
     this.route.queryParams.subscribe(params => {
@@ -129,6 +149,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.filterSubscription) {
       this.filterSubscription.unsubscribe();
+    }
+    if (this.qbFilterSubscription) {
+      this.qbFilterSubscription.unsubscribe();
     }
   }
 
@@ -305,7 +328,94 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   }
 
   onAddViaPrompts() {
-    console.log('Add Dataset via Prompts clicked');
+    this.qbSearchTerm = '';
+    this.qbActiveIndex = -1;
+    this.showQueryBuilderPopup = true;
+    this.loadQueryBuilders();
+    setTimeout(() => this.qbSearchInput?.nativeElement?.focus());
+  }
+
+  closeQueryBuilderPopup() {
+    this.showQueryBuilderPopup = false;
+    this.qbSearchTerm = '';
+    this.qbActiveIndex = -1;
+  }
+
+  onQbSearch() {
+    this.qbActiveIndex = -1;
+    this.qbFilter$.next();
+  }
+
+  onQbKeydown(event: KeyboardEvent) {
+    const len = this.queryBuilders.length;
+    if (!len) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.qbActiveIndex = this.qbActiveIndex < len - 1 ? this.qbActiveIndex + 1 : 0;
+      this.scrollQbActiveIntoView();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.qbActiveIndex = this.qbActiveIndex > 0 ? this.qbActiveIndex - 1 : len - 1;
+      this.scrollQbActiveIntoView();
+    } else if (event.key === 'Enter' && this.qbActiveIndex >= 0) {
+      event.preventDefault();
+      this.onQueryBuilderSelect(this.queryBuilders[this.qbActiveIndex]);
+    } else if (event.key === 'Escape') {
+      this.closeQueryBuilderPopup();
+    }
+  }
+
+  private scrollQbActiveIntoView() {
+    setTimeout(() => {
+      const el = document.querySelector('.cmd-row.active');
+      el?.scrollIntoView({ block: 'nearest' });
+    });
+  }
+
+  private loadQueryBuilders() {
+    if (!this.selectedOrg || !this.selectedDatabase) return;
+
+    this.loadingQueryBuilders = true;
+    const params: any = {
+      orgId: this.selectedOrg,
+      databaseId: this.selectedDatabase,
+      page: 1,
+      limit: MAX_LIMIT,
+    };
+
+    const term = this.qbSearchTerm.trim();
+    if (term) {
+      params.filter = JSON.stringify({ name: term });
+    }
+
+    this.screenService
+      .listScreen(params)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.queryBuilders = response.data?.screens || [];
+          this.qbTotalRecords = response.data?.count || this.queryBuilders.length;
+        } else {
+          this.queryBuilders = [];
+          this.qbTotalRecords = 0;
+        }
+        this.loadingQueryBuilders = false;
+      })
+      .catch(() => {
+        this.queryBuilders = [];
+        this.qbTotalRecords = 0;
+        this.loadingQueryBuilders = false;
+      });
+  }
+
+  onQueryBuilderSelect(screen: any) {
+    this.showQueryBuilderPopup = false;
+    this.router.navigate([
+      '/app/screen/execute',
+      this.selectedOrg,
+      this.selectedDatabase,
+      screen.id,
+    ]);
   }
 
   onEdit(id: string) {

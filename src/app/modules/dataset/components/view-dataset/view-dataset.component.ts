@@ -28,6 +28,28 @@ export class ViewDatasetComponent implements OnInit {
     private globalService: GlobalService
   ) {}
 
+  isArray = Array.isArray;
+
+  /**
+   * Format prompt value for display.
+   * Handles enriched {id, value} objects, plain arrays, and scalars.
+   */
+  formatPromptValue(prompt: any): string {
+    if (prompt.isRange) {
+      return `${prompt.startValue ?? '-'} to ${prompt.endValue ?? '-'}`;
+    }
+    if (prompt.value == null) return '-';
+    if (Array.isArray(prompt.value)) {
+      return prompt.value
+        .map((v: any) => (typeof v === 'object' && v?.value != null) ? v.value : v)
+        .join(', ');
+    }
+    if (typeof prompt.value === 'object' && prompt.value?.value != null) {
+      return prompt.value.value;
+    }
+    return String(prompt.value);
+  }
+
   ngOnInit() {
     this.loadDatasetData();
   }
@@ -48,11 +70,30 @@ export class ViewDatasetComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([
-      DATASET.EDIT,
-      this.datasetData.organisationId,
-      this.datasetData.id,
-    ]);
+    if (this.datasetData.type === 2 && this.datasetData.screenId) {
+      // Type 2 (Prompt-based): navigate to execute-screen in edit mode
+      this.router.navigate(
+        [
+          '/app/screen/execute',
+          this.datasetData.organisationId,
+          this.datasetData.databaseId,
+          this.datasetData.screenId,
+        ],
+        {
+          queryParams: {
+            editDatasetId: this.datasetData.id,
+            editDatasetName: this.datasetData.name,
+          },
+        },
+      );
+    } else {
+      // Type 1 (SQL-based): navigate to standard edit
+      this.router.navigate([
+        DATASET.EDIT,
+        this.datasetData.organisationId,
+        this.datasetData.id,
+      ]);
+    }
   }
 
   confirmDelete() {
