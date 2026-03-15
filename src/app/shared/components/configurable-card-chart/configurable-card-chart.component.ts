@@ -8,6 +8,7 @@ import {
   DoCheck,
   SimpleChanges,
 } from '@angular/core';
+import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 
 export interface CardChartData {
   name: string;
@@ -48,12 +49,6 @@ export class ConfigurableCardChartComponent
 
   colors: string[] = [];
 
-  // Default ECharts palette for card coloring
-  private defaultColors: string[] = [
-    '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de',
-    '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#48b8d0',
-  ];
-
   private defaultConfig: CardChartConfig = {
     cardColor: '',
     bandColor: '',
@@ -91,7 +86,8 @@ export class ConfigurableCardChartComponent
   }
 
   private updateColors(): void {
-    this.colors = this.defaultColors;
+    const scheme = this.config.colorScheme || 'default';
+    this.colors = COLOR_PALETTES[scheme] || COLOR_PALETTES['default'];
   }
 
   getCardColor(index: number): string {
@@ -106,8 +102,22 @@ export class ConfigurableCardChartComponent
     return color;
   }
 
-  getTextColor(): string {
-    return this.config.textColor || '#ffffff';
+  getTextColor(index: number): string {
+    if (this.config.textColor) return this.config.textColor;
+    // Auto-detect text color based on card background brightness
+    const bgColor = this.getCardColor(index);
+    return this.isLightColor(bgColor) ? '#333333' : '#ffffff';
+  }
+
+  private isLightColor(hex: string): boolean {
+    const color = hex.replace('#', '');
+    if (color.length !== 6) return false;
+    const r = parseInt(color.slice(0, 2), 16);
+    const g = parseInt(color.slice(2, 4), 16);
+    const b = parseInt(color.slice(4, 6), 16);
+    // Perceived brightness (ITU-R BT.709)
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 150;
   }
 
   formatValue(value: number): string {

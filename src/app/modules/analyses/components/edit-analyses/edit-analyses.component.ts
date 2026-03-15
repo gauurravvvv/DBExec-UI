@@ -19,7 +19,6 @@ import {
   COLOR_SCHEMES,
   LEGEND_POSITIONS,
   LEGEND_TYPES,
-  getDummyData,
   LABEL_POSITIONS,
   TOOLTIP_TRIGGERS,
   AXIS_POINTER_TYPES,
@@ -168,8 +167,8 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   resizingVisual: any = null;
   resizeStartX: number = 0;
   resizeStartY: number = 0;
-  resizeStartWidth: number = 0;
-  resizeStartHeight: number = 0;
+  resizeStartColSpan: number = 0;
+  resizeStartRowSpan: number = 0;
   resizeDirection: string = '';
   isResizing: boolean = false;
   isConfigSidebarOpen: boolean = false;
@@ -248,6 +247,15 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   canvasWidth: number = 1000; // Default fallback
   canvasHeight: number = 600; // Default fallback
 
+  // Auto-scroll for resize
+  private autoScrollRafId: number | null = null;
+  private autoScrollClientY: number = 0;
+
+  // Grid constants
+  private readonly GRID_COLUMNS = 24;
+  private readonly ROW_HEIGHT = 50;
+  private readonly GRID_GAP = 12;
+
   // Reference canvas size for legacy visuals (pixels to ratio conversion)
   private readonly REFERENCE_CANVAS_WIDTH = 1200;
   private readonly REFERENCE_CANVAS_HEIGHT = 600;
@@ -286,6 +294,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+    this.stopAutoScroll();
   }
 
   /**
@@ -327,11 +336,11 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Recalculate all visual pixel dimensions from their ratios
+   * Recalculate all visual pixel dimensions from their grid spans
    */
   private recalculateAllVisualDimensions(): void {
     this.visuals.forEach(visual => {
-      if (visual.widthRatio && visual.heightRatio) {
+      if (visual.colSpan && visual.rowSpan) {
         this.computeVisualDimensions(visual);
       }
     });
@@ -339,46 +348,54 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Compute pixel dimensions from ratios for a single visual.
-   * For flexbox layout, widthRatio represents the fraction of total row width.
-   * Examples: 0.5 = half width (2 per row), 1.0 = full width (1 per row)
+   * Compute pixel dimensions from grid spans for a single visual.
+   * Uses CSS Grid math: colSpan/rowSpan determine size.
    */
   private computeVisualDimensions(visual: any): void {
-    // Canvas has 20px padding on each side
     const CANVAS_PADDING = 40;
-    // Flexbox gap between visuals
-    const GAP = 20;
-    // Scrollbar width (always visible now to prevent resize oscillation)
     const SCROLLBAR_WIDTH = 17;
+    const contentWidth = Math.max(0, this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH);
+    const fr = (contentWidth - (this.GRID_COLUMNS - 1) * this.GRID_GAP) / this.GRID_COLUMNS;
+    visual.width = Math.max(100, Math.round(visual.colSpan * fr + (visual.colSpan - 1) * this.GRID_GAP));
+    visual.height = Math.max(100, Math.round(visual.rowSpan * this.ROW_HEIGHT + (visual.rowSpan - 1) * this.GRID_GAP));
+    visual.widthRatio = visual.colSpan / this.GRID_COLUMNS;
+    visual.heightRatio = (visual.rowSpan * this.ROW_HEIGHT) / Math.max(1, this.canvasHeight);
+  }
 
-    // Calculate content width (canvas minus padding and scrollbar)
-    const contentWidth = Math.max(
-      0,
-      this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH,
-    );
+  private placeVisualsOnGrid(): void {
+    const occupied = new Set<string>();
+    for (const visual of this.visuals) {
+      const colSpan = Math.min(visual.colSpan, this.GRID_COLUMNS);
+      let placed = false;
+      for (let row = 0; !placed && row < 500; row++) {
+        for (let col = 0; col <= this.GRID_COLUMNS - colSpan; col++) {
+          if (this.canPlaceAt(occupied, row, col, colSpan, visual.rowSpan)) {
+            visual.gridRow = row;
+            visual.gridCol = col;
+            this.markGridCells(occupied, row, col, colSpan, visual.rowSpan);
+            placed = true;
+            break;
+          }
+        }
+      }
+    }
+  }
 
-    // For a visual with widthRatio, we need to account for gaps
-    // If widthRatio = 0.5, there are 2 visuals per row, so 1 gap
-    // If widthRatio = 0.33, there are 3 visuals per row, so 2 gaps
-    const numVisualsInRow = Math.max(1, Math.round(1 / visual.widthRatio));
-    const gapsInRow = numVisualsInRow - 1;
+  private canPlaceAt(occupied: Set<string>, row: number, col: number, colSpan: number, rowSpan: number): boolean {
+    for (let r = row; r < row + rowSpan; r++) {
+      for (let c = col; c < col + colSpan; c++) {
+        if (occupied.has(`${r},${c}`)) return false;
+      }
+    }
+    return true;
+  }
 
-    // Available width for visuals after accounting for gaps
-    const availableForVisuals = contentWidth - gapsInRow * GAP;
-
-    // Each visual gets its ratio of the available space
-    visual.width = Math.max(
-      300,
-      Math.round(visual.widthRatio * availableForVisuals),
-    );
-    visual.height = Math.max(
-      250,
-      Math.round(visual.heightRatio * this.canvasHeight),
-    );
-
-    // Position (for absolute positioning if needed later)
-    visual.x = Math.round((visual.xRatio || 0) * this.canvasWidth);
-    visual.y = Math.round((visual.yRatio || 0) * this.canvasHeight);
+  private markGridCells(occupied: Set<string>, row: number, col: number, colSpan: number, rowSpan: number): void {
+    for (let r = row; r < row + rowSpan; r++) {
+      for (let c = col; c < col + colSpan; c++) {
+        occupied.add(`${r},${c}`);
+      }
+    }
   }
 
   /**
@@ -625,11 +642,24 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
               );
             }
 
+            // Ensure grid properties exist
+            if (!visual.colSpan) {
+              visual.colSpan = Math.max(4, Math.min(24, Math.round((visual.widthRatio || 0.5) * 24)));
+            }
+            if (!visual.rowSpan) {
+              visual.rowSpan = Math.max(3, Math.round((visual.heightRatio || 0.45) * 600 / 50));
+            }
+            visual.gridCol = 0;
+            visual.gridRow = 0;
+
             // Compute pixel dimensions from ratios based on current canvas
             this.computeVisualDimensions(visual);
 
             return visual;
           });
+
+          // Place visuals on grid after all are loaded
+          this.placeVisualsOnGrid();
 
           // Set visual counter
           if (this.visuals.length > 0) {
@@ -830,6 +860,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       height: 350, // Will be computed from ratios
       widthRatio: 0.5, // 50% of available space (2 visuals per row)
       heightRatio: 0.45, // 45% of canvas height
+      colSpan: 12,
+      rowSpan: 6,
+      gridCol: 0,
+      gridRow: 0,
       chartType: null,
       xAxisColumn: null,
       yAxisColumn: null,
@@ -840,6 +874,8 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Compute pixel dimensions from ratios
     this.computeVisualDimensions(visual);
     this.visuals.push(visual);
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
     this.focusedVisualId = this.visualCounter;
 
     // Scroll to the new visual (scoped to canvas container only)
@@ -879,46 +915,6 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
         }, 1000);
       }
     }, 100);
-  }
-
-  plotAllCharts(): void {
-    this.visuals = [];
-    this.visualCounter = 0;
-    this.focusedVisualId = null;
-
-    const gap = this.canvasHeight > 0 ? 10 / this.canvasHeight : 0.02;
-    const heightRatio = 0.45;
-    const widthRatio = 0.5;
-
-    CHART_TYPES.forEach((chartDef: any, index: number) => {
-      this.visualCounter++;
-      const visual: any = {
-        id: this.visualCounter,
-        title: chartDef.name,
-        x: 0,
-        y: 0,
-        xRatio: (index % 2) * widthRatio,
-        yRatio: Math.floor(index / 2) * (heightRatio + gap),
-        width: 400,
-        height: 350,
-        widthRatio,
-        heightRatio,
-        chartType: chartDef.id,
-        xAxisColumn: null,
-        yAxisColumn: null,
-        zAxisColumn: null,
-        config: getDefaultChartConfig(),
-        chartData: getDummyData(chartDef.id),
-        useDummyData: true,
-      };
-      this.computeVisualDimensions(visual);
-      this.visuals.push(visual);
-    });
-
-    if (this.visuals.length > 0) {
-      this.focusedVisualId = this.visuals[0].id;
-    }
-    this.cdr.detectChanges();
   }
 
   /**
@@ -1176,7 +1172,6 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   hasRequiredChartFields(visual: any): boolean {
     if (!visual.chartType) return false;
-    if (visual.useDummyData) return true;
     // 3D coordinate charts need x + y + z
     if (is3DCoordinateChartType(visual.chartType)) {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
@@ -1206,6 +1201,8 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.focusedVisualId === id) {
       this.focusedVisualId = null;
     }
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
   }
 
   clearChartType(): void {
@@ -1386,8 +1383,8 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resizeDirection = direction;
     this.resizeStartX = event.clientX;
     this.resizeStartY = event.clientY;
-    this.resizeStartWidth = visual.width;
-    this.resizeStartHeight = visual.height;
+    this.resizeStartColSpan = visual.colSpan;
+    this.resizeStartRowSpan = visual.rowSpan;
 
     const mouseMoveHandler = (e: MouseEvent) => this.onResize(e);
     const mouseUpHandler = () =>
@@ -1403,43 +1400,46 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     const deltaX = event.clientX - this.resizeStartX;
     const deltaY = event.clientY - this.resizeStartY;
 
+    const CANVAS_PADDING = 40;
+    const SCROLLBAR_WIDTH = 17;
+    const contentWidth = Math.max(0, this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH);
+    const fr = (contentWidth - (this.GRID_COLUMNS - 1) * this.GRID_GAP) / this.GRID_COLUMNS;
+    const colUnit = fr + this.GRID_GAP;
+    const rowUnit = this.ROW_HEIGHT + this.GRID_GAP;
+
+    let newColSpan = this.resizeStartColSpan;
+    let newRowSpan = this.resizeStartRowSpan;
+
     if (this.resizeDirection.includes('right')) {
-      this.resizingVisual.width = Math.max(300, this.resizeStartWidth + deltaX);
-    } else if (this.resizeDirection.includes('left')) {
-      this.resizingVisual.width = Math.max(300, this.resizeStartWidth - deltaX);
+      const maxCols = this.GRID_COLUMNS - this.resizingVisual.gridCol;
+      newColSpan = Math.max(4, Math.min(maxCols, this.resizeStartColSpan + Math.round(deltaX / colUnit)));
     }
 
     if (this.resizeDirection.includes('bottom')) {
-      this.resizingVisual.height = Math.max(
-        250,
-        this.resizeStartHeight + deltaY,
-      );
-    } else if (this.resizeDirection.includes('top')) {
-      this.resizingVisual.height = Math.max(
-        250,
-        this.resizeStartHeight - deltaY,
-      );
+      newRowSpan = Math.max(3, this.resizeStartRowSpan + Math.round(deltaY / rowUnit));
     }
 
-    // Update ratios based on new pixel dimensions
-    this.resizingVisual.widthRatio =
-      this.resizingVisual.width / this.canvasWidth;
-    this.resizingVisual.heightRatio =
-      this.resizingVisual.height / this.canvasHeight;
+    if (newColSpan !== this.resizingVisual.colSpan || newRowSpan !== this.resizingVisual.rowSpan) {
+      this.resizingVisual.colSpan = newColSpan;
+      this.resizingVisual.rowSpan = newRowSpan;
+      this.placeVisualsOnGrid();
+      this.recalculateAllVisualDimensions();
+    }
+
+    this.autoScrollNearEdge(event.clientY);
   }
 
   stopResize(mouseMoveHandler: any, mouseUpHandler: any): void {
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
 
-    // Log final ratio values for debugging
     if (this.resizingVisual) {
-      console.log(
-        `Visual resized: ${(this.resizingVisual.widthRatio * 100).toFixed(1)}% × ${(this.resizingVisual.heightRatio * 100).toFixed(1)}%`,
-      );
+      this.placeVisualsOnGrid();
+      this.recalculateAllVisualDimensions();
     }
 
     this.resizingVisual = null;
+    this.stopAutoScroll();
     setTimeout(() => {
       this.isResizing = false;
     }, 100);
@@ -1476,10 +1476,52 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.visuals.splice(targetIndex, 0, this.draggingVisual);
     }
     this.draggingVisual = null;
+    this.stopAutoScroll();
   }
 
   onDragEnd(event: DragEvent): void {
     this.draggingVisual = null;
+    this.stopAutoScroll();
+  }
+
+  private autoScrollNearEdge(clientY: number): void {
+    this.autoScrollClientY = clientY;
+    if (!this.autoScrollRafId) {
+      this.startAutoScrollLoop();
+    }
+  }
+
+  private startAutoScrollLoop(): void {
+    const tick = () => {
+      const container = this.canvasContainer?.nativeElement?.querySelector('.canvas-area') as HTMLElement;
+      if (!container) { this.autoScrollRafId = null; return; }
+      const rect = container.getBoundingClientRect();
+      const EDGE = 80;
+      const MAX_SPEED = 18;
+      let scrolled = false;
+      if (this.autoScrollClientY > rect.bottom - EDGE) {
+        const ratio = Math.min(1, (this.autoScrollClientY - (rect.bottom - EDGE)) / EDGE);
+        container.scrollTop += Math.ceil(MAX_SPEED * ratio);
+        scrolled = true;
+      } else if (this.autoScrollClientY < rect.top + EDGE) {
+        const ratio = Math.min(1, ((rect.top + EDGE) - this.autoScrollClientY) / EDGE);
+        container.scrollTop -= Math.ceil(MAX_SPEED * ratio);
+        scrolled = true;
+      }
+      if (scrolled) {
+        this.autoScrollRafId = requestAnimationFrame(tick);
+      } else {
+        this.autoScrollRafId = null;
+      }
+    };
+    this.autoScrollRafId = requestAnimationFrame(tick);
+  }
+
+  private stopAutoScroll(): void {
+    if (this.autoScrollRafId) {
+      cancelAnimationFrame(this.autoScrollRafId);
+      this.autoScrollRafId = null;
+    }
   }
 
   saveAnalysis(): void {
@@ -1496,6 +1538,9 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       const visualConfigurations = this.visuals.map(visual => ({
         id: visual.id,
         title: visual.title,
+        // Grid spans for responsive sizing
+        colSpan: visual.colSpan,
+        rowSpan: visual.rowSpan,
         // Ratios for responsive positioning and sizing
         widthRatio: visual.widthRatio,
         heightRatio: visual.heightRatio,

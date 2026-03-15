@@ -72,6 +72,18 @@ export interface Visual {
   /** Y position as ratio of canvas height (0-1) */
   yRatio: number;
 
+  /** Number of grid columns this visual spans (1-12 in a 12-column grid) */
+  colSpan: number;
+
+  /** Number of grid rows this visual spans */
+  rowSpan: number;
+
+  /** Computed grid column position (0-based, set by placement algorithm) */
+  gridCol: number;
+
+  /** Computed grid row position (0-based, set by placement algorithm) */
+  gridRow: number;
+
   /** Chart type identifier (e.g., 'bar-vertical', 'line', 'pie') */
   chartType: string | null;
 
@@ -89,9 +101,6 @@ export interface Visual {
 
   /** Chart configuration options */
   config: any;
-
-  /** Whether to use dummy data for testing */
-  useDummyData?: boolean;
 }
 
 /**
@@ -145,6 +154,10 @@ export function createVisual(id: number, config: any): Visual {
     y: 0,
     xRatio: 0,
     yRatio: 0,
+    colSpan: 12,    // Half of 24-column grid (2 visuals per row)
+    rowSpan: 6,     // 6 grid rows (300px at 50px/row)
+    gridCol: 0,     // Set by placement algorithm
+    gridRow: 0,     // Set by placement algorithm
     chartType: null,
     xAxisColumn: null,
     yAxisColumn: null,

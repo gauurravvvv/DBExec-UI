@@ -8,10 +8,10 @@
                 (click)="onCardSelect(item)">
                 <div class="card-band" [style.background-color]="getBandColor(i)"></div>
                 <div class="card-content">
-                    <div class="card-value" [style.color]="getTextColor()">
+                    <div class="card-value" [style.color]="getTextColor(i)">
                         {{ formatValue(item.value) }}
                     </div>
-                    <div class="card-label" [style.color]="getTextColor()">
+                    <div class="card-label" [style.color]="getTextColor(i)">
                         {{ item.name }}
                     </div>
                 </div>

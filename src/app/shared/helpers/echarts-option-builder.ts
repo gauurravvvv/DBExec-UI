@@ -146,10 +146,18 @@ function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
 }
 
 function buildGrid(config: any): any {
+  // Compute bottom margin: account for axis name + rotated labels
+  let bottom = config.showXAxisLabel ? 50 : 30;
+  const rotation = config.xAxisLabelRotate || 0;
+  if (rotation > 0) {
+    const extraBottom = Math.sin((rotation * Math.PI) / 180) * Math.min((config.maxXAxisTickLength || 16) * 7, 80);
+    bottom += Math.ceil(extraBottom);
+  }
+
   return {
     left: 50,
     right: config.legend && config.legendPosition !== 'below' && config.legendPosition !== 'top' ? 140 : 20,
-    bottom: config.showXAxisLabel ? 50 : 30,
+    bottom,
     top: config.legend && config.legendPosition === 'top' ? 50 : 20,
     containLabel: true,
   };
@@ -179,13 +187,26 @@ function buildCategoryAxis(config: any, categories: string[], axis: 'x' | 'y'): 
   const showAxis = isX ? config.xAxis !== false : config.yAxis !== false;
   const showLabel = isX ? config.showXAxisLabel : config.showYAxisLabel;
   const label = isX ? config.xAxisLabel : config.yAxisLabel;
+
+  // Dynamically compute nameGap for X-axis based on label rotation
+  let nameGap = isX ? 35 : 55;
+  if (isX && showLabel) {
+    const rotation = config.xAxisLabelRotate || 0;
+    if (rotation > 0) {
+      // Estimate extra space needed: at 90° a ~8-char label needs ~60px more gap
+      const maxLabelLen = (config.maxXAxisTickLength || 16) * 7;
+      const extraGap = Math.sin((rotation * Math.PI) / 180) * Math.min(maxLabelLen, 80);
+      nameGap = 35 + Math.ceil(extraGap);
+    }
+  }
+
   const result: any = {
     type: 'category',
     data: categories,
     show: showAxis,
     name: showLabel ? label : '',
     nameLocation: 'middle',
-    nameGap: isX ? 35 : 55,
+    nameGap,
     nameTextStyle: { color: '#666', fontSize: 12, fontWeight: 500 },
     boundaryGap: config.boundaryGap !== false,
     axisTick: { alignWithLabel: true, lineStyle: { color: '#d1d5db' } },
@@ -301,9 +322,11 @@ function buildToolbox(config: any): any {
 function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
   if (!config.dataZoom) return [];
   const index = axis === 'x' ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
+  // Position the slider outside the grid with enough room
+  const positionProp = axis === 'y' ? { right: 5, width: 20 } : { bottom: 8, height: 22 };
   return [
     {
-      type: 'slider', ...index, bottom: 5, height: 20,
+      type: 'slider', ...index, ...positionProp,
       borderColor: '#e5e7eb',
       backgroundColor: '#fafafa',
       fillerColor: 'rgba(99, 102, 241, 0.12)',
@@ -392,15 +415,39 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
     const categories = data.map(d => String(d.name));
     const values = data.map(d => d.value);
 
+    // Use colorful bars by assigning per-item colors from palette
+    const colors = getColors(config.colorScheme);
+    const coloredValues = values.map((v, i) => ({
+      value: v,
+      itemStyle: config.gradient
+        ? { color: makeGradient(colors[i % colors.length], isHorizontal ? 'horizontal' : 'vertical') }
+        : { color: colors[i % colors.length] },
+    }));
+
     option.series = [{
       ...barSeriesBase,
+      name: 'Value',
       type: 'bar',
-      data: values,
+      data: coloredValues,
       label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
       barGap: config.barGap || '30%',
       barCategoryGap: config.barCategoryGap || '20%',
       itemStyle: borderRadius ? { borderRadius } : undefined,
     }];
+
+    // Provide legend data from categories so legend shows entries for each bar
+    if (config.legend) {
+      option.legend = {
+        ...option.legend,
+        data: categories,
+      };
+      // Override series data to include name for legend matching
+      option.series[0].data = values.map((v, i) => ({
+        value: v,
+        name: categories[i],
+        itemStyle: coloredValues[i].itemStyle,
+      }));
+    }
 
     if (isHorizontal) {
       option.yAxis = buildCategoryAxis(config, categories, 'y');
@@ -411,7 +458,7 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
     }
   }
 
-  if (config.gradient && option.series) {
+  if (config.gradient && isMulti && option.series) {
     const colors = getColors(config.colorScheme);
     applyGradient(option.series, colors, isHorizontal ? 'horizontal' : 'vertical');
   }
@@ -419,7 +466,10 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
   const barZoom = buildDataZoom(config, isHorizontal ? 'y' : 'x');
   if (barZoom.length) {
     option.dataZoom = barZoom;
-    option.grid.bottom = 80;
+    // Add space for the dataZoom slider below the grid
+    if (!isHorizontal) {
+      option.grid.bottom = (option.grid.bottom || 30) + 40;
+    }
   }
 
   return option;
@@ -473,7 +523,7 @@ export function buildLineChartOption(data: any[], config: any, chartType: string
 
   if (config.dataZoom) {
     option.dataZoom = buildDataZoom(config);
-    option.grid.bottom = 80;
+    option.grid.bottom = (option.grid.bottom || 30) + 40;
   }
 
   return option;
@@ -551,7 +601,7 @@ export function buildAreaChartOption(data: any[], config: any, chartType: string
 
   if (config.dataZoom) {
     option.dataZoom = buildDataZoom(config);
-    option.grid.bottom = 80;
+    option.grid.bottom = (option.grid.bottom || 30) + 40;
   }
 
   return option;
@@ -870,20 +920,28 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
       top: 30,
       bottom: config.showXAxisLabel ? 60 : 40,
     },
-    xAxis: {
-      type: 'category',
-      data: xCategories,
-      show: config.xAxis !== false,
-      name: config.showXAxisLabel ? config.xAxisLabel : '',
-      nameLocation: 'middle',
-      nameGap: 35,
-      splitArea: { show: true },
-      axisLabel: {
-        rotate: config.xAxisLabelRotate || 0,
-        overflow: config.trimXAxisTicks ? 'truncate' : 'none',
-        width: (config.maxXAxisTickLength || 16) * 7,
-      },
-    },
+    xAxis: (() => {
+      const rotation = config.xAxisLabelRotate || 0;
+      let nameGap = 35;
+      if (rotation > 0 && config.showXAxisLabel) {
+        const maxLabelLen = (config.maxXAxisTickLength || 16) * 7;
+        nameGap = 35 + Math.ceil(Math.sin((rotation * Math.PI) / 180) * Math.min(maxLabelLen, 80));
+      }
+      return {
+        type: 'category',
+        data: xCategories,
+        show: config.xAxis !== false,
+        name: config.showXAxisLabel ? config.xAxisLabel : '',
+        nameLocation: 'middle',
+        nameGap,
+        splitArea: { show: true },
+        axisLabel: {
+          rotate: rotation,
+          overflow: config.trimXAxisTicks ? 'truncate' : 'none',
+          width: (config.maxXAxisTickLength || 16) * 7,
+        },
+      };
+    })(),
     yAxis: {
       type: 'category',
       data: yCategories,
@@ -1066,7 +1124,7 @@ export function buildScatterChartOption(data: any[], config: any, chartType: str
   const zoom = buildDataZoom(config, 'x');
   if (zoom.length) {
     option.dataZoom = zoom;
-    option.grid.bottom = 80;
+    option.grid.bottom = (option.grid.bottom || 30) + 40;
   }
 
   return option;
@@ -1292,7 +1350,7 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
   const zoom = buildDataZoom(config, 'x');
   if (zoom.length) {
     option.dataZoom = zoom;
-    option.grid.bottom = 80;
+    option.grid.bottom = (option.grid.bottom || 30) + 40;
   }
 
   return option;
@@ -1631,7 +1689,7 @@ export function buildCandlestickChartOption(data: any[], config: any): any {
   const zoom = buildDataZoom(config);
   if (zoom.length) {
     option.dataZoom = zoom;
-    option.grid.bottom = 80;
+    option.grid.bottom = (option.grid.bottom || 30) + 40;
   }
 
   return option;

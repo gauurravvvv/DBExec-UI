@@ -851,139 +851,29 @@ $radius-sm: 8px;
 .canvas-area {
   flex: 1;
   padding: 20px;
-  // Use scroll for y to always show scrollbar (prevents width changes when scrollbar appears/disappears)
-  // Use hidden for x to prevent horizontal overflow from affecting width calculations
   overflow-y: scroll;
   overflow-x: hidden;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  grid-auto-rows: 50px;
+  gap: 12px;
   align-content: start;
 }
 
 .visual-box {
   position: relative;
   background-color: var(--card-background);
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden; // Keep content inside the box
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-  cursor: pointer;
-  min-width: 300px;
-  min-height: 250px;
-  contain: layout style;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
 
   &:hover {
-    border-color: var(--primary-color);
-
-    .resize-handle-top,
-    .resize-handle-right,
-    .resize-handle-bottom,
-    .resize-handle-left,
-    .resize-handle-corner-br {
-      opacity: 1;
-    }
-  }
-
-  &.focused {
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 10;
-  }
-
-  &.disabled {
-    opacity: 0.3;
-    pointer-events: none;
-    filter: grayscale(50%);
-  }
-
-  &.dragging {
-    opacity: 0.5;
-    cursor: move;
-  }
-}
-
-// Resize Handles
-.resize-handle-top,
-.resize-handle-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 6px;
-  cursor: ns-resize;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 10;
-
-  &:hover {
-    opacity: 1;
-    background-color: rgba(var(--primary-color-rgb), 0.3);
-  }
-}
-
-.resize-handle-top {
-  top: 0;
-}
-
-.resize-handle-bottom {
-  bottom: 0;
-}
-
-.resize-handle-left,
-.resize-handle-right {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  cursor: ew-resize;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 10;
-
-  &:hover {
-    opacity: 1;
-    background-color: rgba(var(--primary-color-rgb), 0.3);
-  }
-}
-
-.resize-handle-left {
-  left: 0;
-}
-
-.resize-handle-right {
-  right: 0;
-}
-
-.resize-handle-corner-br {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 16px;
-  height: 16px;
-  background-color: var(--primary-color);
-  border-radius: 8px 0 6px 0;
-  cursor: nwse-resize;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 11;
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 10px;
-    height: 10px;
-    border-right: 2px solid white;
-    border-bottom: 2px solid white;
-  }
-
-  &:hover {
-    opacity: 1 !important;
+    border-color: rgba(var(--primary-color-rgb), 0.4);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(var(--primary-color-rgb), 0.08);
   }
 }
 
@@ -992,80 +882,45 @@ $radius-sm: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 14px 5px;
+  padding: 8px 12px 4px;
   position: relative;
+  border-bottom: 1px solid rgba(var(--primary-color-rgb), 0.06);
 
   .inline-title-text {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-color);
-    cursor: pointer;
-    padding: 4px 60px; // Extra padding for action buttons (refresh + close)
+    padding: 3px 50px 3px 8px;
     border-radius: 4px;
     text-align: center;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: normal;
-    max-width: calc(100% - 20px); // Prevent overflow into buttons area
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 16px);
     line-height: 1.4;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: rgba(var(--primary-color-rgb), 0.1);
-    }
-  }
-
-  .title-input {
-    border: 1px solid var(--primary-color);
-    background-color: var(--card-background);
-    color: var(--text-color);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-    outline: none;
-    width: 250px;
-
-    &:focus {
-      box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
-    }
-  }
-
-  .title-edit-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .char-counter {
-    font-size: 11px;
-    color: var(--text-color-secondary);
-    opacity: 0.7;
   }
 
   .visual-action-buttons {
     position: absolute;
-    right: 8px;
+    right: 6px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
-    gap: 2px;
+    gap: 0;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.15s ease;
 
     .action-btn {
-      color: var(--text-color-secondary);
-      padding: 4px;
+      color: var(--secondary-color);
+      padding: 3px;
+      font-size: 12px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
 
       &:hover {
         color: var(--primary-color);
+        background-color: rgba(var(--primary-color-rgb), 0.08);
       }
-    }
-
-    .close-btn:hover {
-      color: var(--danger-color, #ff5252) !important;
     }
   }
 }

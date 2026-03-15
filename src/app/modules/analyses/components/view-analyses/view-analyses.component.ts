@@ -113,6 +113,11 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   canvasWidth: number = 1000; // Default fallback
   canvasHeight: number = 600; // Default fallback
 
+  // Grid layout constants
+  private readonly GRID_COLUMNS = 24;
+  private readonly ROW_HEIGHT = 50;
+  private readonly GRID_GAP = 12;
+
   // Reference canvas size for legacy visuals (pixels to ratio conversion)
   private readonly REFERENCE_CANVAS_WIDTH = 1200;
   private readonly REFERENCE_CANVAS_HEIGHT = 600;
@@ -190,55 +195,67 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Recalculate all visual pixel dimensions from their ratios
    */
   private recalculateAllVisualDimensions(): void {
+    this.placeVisualsOnGrid();
     this.visuals.forEach(visual => {
-      if (visual.widthRatio && visual.heightRatio) {
-        this.computeVisualDimensions(visual);
-      }
+      this.computeVisualDimensions(visual);
     });
     this.cdr.detectChanges();
   }
 
   /**
-   * Compute pixel dimensions from ratios for a single visual.
-   * For flexbox layout, widthRatio represents the fraction of total row width.
-   * Examples: 0.5 = half width (2 per row), 1.0 = full width (1 per row)
+   * Compute pixel dimensions from grid span values for a single visual.
+   * Uses CSS Grid math: colSpan columns + (colSpan-1) gaps for width,
+   * rowSpan rows + (rowSpan-1) gaps for height.
    */
   private computeVisualDimensions(visual: any): void {
-    // Canvas has 20px padding on each side
     const CANVAS_PADDING = 40;
-    // Flexbox gap between visuals
-    const GAP = 20;
-    // Scrollbar width (always visible now to prevent resize oscillation)
     const SCROLLBAR_WIDTH = 17;
+    const contentWidth = Math.max(0, this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH);
+    const fr = (contentWidth - (this.GRID_COLUMNS - 1) * this.GRID_GAP) / this.GRID_COLUMNS;
+    visual.width = Math.max(100, Math.round(visual.colSpan * fr + (visual.colSpan - 1) * this.GRID_GAP));
+    visual.height = Math.max(100, Math.round(visual.rowSpan * this.ROW_HEIGHT + (visual.rowSpan - 1) * this.GRID_GAP));
+    visual.widthRatio = visual.colSpan / this.GRID_COLUMNS;
+    visual.heightRatio = (visual.rowSpan * this.ROW_HEIGHT) / Math.max(1, this.canvasHeight);
+  }
 
-    // Calculate content width (canvas minus padding and scrollbar)
-    const contentWidth = Math.max(
-      0,
-      this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH,
-    );
+  /**
+   * Place visuals on a virtual grid using first-fit algorithm.
+   * Assigns gridRow and gridCol to each visual.
+   */
+  private placeVisualsOnGrid(): void {
+    const occupied = new Set<string>();
+    for (const visual of this.visuals) {
+      const colSpan = Math.min(visual.colSpan, this.GRID_COLUMNS);
+      let placed = false;
+      for (let row = 0; !placed && row < 500; row++) {
+        for (let col = 0; col <= this.GRID_COLUMNS - colSpan; col++) {
+          if (this.canPlaceAt(occupied, row, col, colSpan, visual.rowSpan)) {
+            visual.gridRow = row;
+            visual.gridCol = col;
+            this.markGridCells(occupied, row, col, colSpan, visual.rowSpan);
+            placed = true;
+            break;
+          }
+        }
+      }
+    }
+  }
 
-    // For a visual with widthRatio, we need to account for gaps
-    // If widthRatio = 0.5, there are 2 visuals per row, so 1 gap
-    // If widthRatio = 0.33, there are 3 visuals per row, so 2 gaps
-    const numVisualsInRow = Math.max(1, Math.round(1 / visual.widthRatio));
-    const gapsInRow = numVisualsInRow - 1;
+  private canPlaceAt(occupied: Set<string>, row: number, col: number, colSpan: number, rowSpan: number): boolean {
+    for (let r = row; r < row + rowSpan; r++) {
+      for (let c = col; c < col + colSpan; c++) {
+        if (occupied.has(`${r},${c}`)) return false;
+      }
+    }
+    return true;
+  }
 
-    // Available width for visuals after accounting for gaps
-    const availableForVisuals = contentWidth - gapsInRow * GAP;
-
-    // Each visual gets its ratio of the available space
-    visual.width = Math.max(
-      300,
-      Math.round(visual.widthRatio * availableForVisuals),
-    );
-    visual.height = Math.max(
-      250,
-      Math.round(visual.heightRatio * this.canvasHeight),
-    );
-
-    // Position (for absolute positioning if needed later)
-    visual.x = Math.round((visual.xRatio || 0) * this.canvasWidth);
-    visual.y = Math.round((visual.yRatio || 0) * this.canvasHeight);
+  private markGridCells(occupied: Set<string>, row: number, col: number, colSpan: number, rowSpan: number): void {
+    for (let r = row; r < row + rowSpan; r++) {
+      for (let c = col; c < col + colSpan; c++) {
+        occupied.add(`${r},${c}`);
+      }
+    }
   }
 
   /**
@@ -475,11 +492,24 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
               this.calculateRatiosFromLegacy(visual);
             }
 
+            // Set grid properties from ratios
+            if (!visual.colSpan) {
+              visual.colSpan = Math.max(4, Math.min(24, Math.round((visual.widthRatio || 0.5) * 24)));
+            }
+            if (!visual.rowSpan) {
+              visual.rowSpan = Math.max(3, Math.round((visual.heightRatio || 0.45) * 600 / 50));
+            }
+            visual.gridCol = 0;
+            visual.gridRow = 0;
+
             // Compute initial pixel dimensions based on current canvas size
             this.computeVisualDimensions(visual);
 
             return visual;
           });
+
+          // Place visuals on grid after all are created
+          this.placeVisualsOnGrid();
 
           // Set visual counter
           if (this.visuals.length > 0) {
@@ -642,7 +672,6 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Check if visual has required fields for chart
   hasRequiredChartFields(visual: any): boolean {
     if (!visual.chartType) return false;
-    if (visual.useDummyData) return true;
     // 3D coordinate charts need x + y + z
     if (is3DCoordinateChartType(visual.chartType)) {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);

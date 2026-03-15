@@ -75,8 +75,9 @@
         <!-- Center Container - Canvas (Read-only)-->
         <div class="editor-container" #canvasContainer>
             <div class="canvas-area read-only" *ngIf="visuals.length > 0">
-                <div class="visual-box" *ngFor="let visual of visuals" [style.width.px]="visual.width"
-                    [style.height.px]="visual.height">
+                <div class="visual-box" *ngFor="let visual of visuals"
+                    [style.grid-column]="(visual.gridCol + 1) + ' / span ' + visual.colSpan"
+                    [style.grid-row]="(visual.gridRow + 1) + ' / span ' + visual.rowSpan">
 
                     <!-- Visual Title (Read-only) with action buttons -->
                     <div class="visual-inline-title">

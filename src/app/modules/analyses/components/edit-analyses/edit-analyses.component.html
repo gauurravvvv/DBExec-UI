@@ -137,11 +137,6 @@
                     <div class="add-visual-section">
                         <button pButton label="Add Visual" icon="pi pi-plus" class="p-button-outlined add-visual-button"
                             (click)="addVisual()"></button>
-                        <button pButton label="Plot All Charts" icon="pi pi-th-large"
-                            class="p-button-outlined add-visual-button" style="margin-top: 8px;"
-                            (click)="plotAllCharts()"
-                            pTooltip="Create all 53 chart types with dummy data"
-                            tooltipPosition="bottom"></button>
                     </div>
 
                     <!-- Chart Type Grid (when visual is focused but no chart type selected) -->
@@ -408,8 +403,10 @@
             <div class="canvas-area" *ngIf="visuals.length > 0" (click)="clearFocus()">
                 <div class="visual-box" *ngFor="let visual of visuals" [class.focused]="focusedVisualId === visual.id"
                     [class.disabled]="focusedVisualId !== null && focusedVisualId !== visual.id"
-                    [class.dragging]="draggingVisual === visual" [style.width.px]="visual.width"
-                    [style.height.px]="visual.height"
+                    [class.dragging]="draggingVisual === visual"
+                    [class.resizing]="resizingVisual?.id === visual.id"
+                    [style.grid-column]="(visual.gridCol + 1) + ' / span ' + visual.colSpan"
+                    [style.grid-row]="(visual.gridRow + 1) + ' / span ' + visual.rowSpan"
                     (dragover)="onDragOver($event, visual)" (drop)="onDrop($event, visual)"
                     (dragend)="onDragEnd($event)" (click)="onVisualClick($event, visual.id)"
                     (contextmenu)="onVisualRightClick($event, visual.id)">
@@ -689,12 +686,9 @@
                         </ng-container>
                     </div>
                     <!-- Resize Handles -->
-                    <div class="resize-handle-top" (mousedown)="startResize($event, visual, 'top')"></div>
                     <div class="resize-handle-right" (mousedown)="startResize($event, visual, 'right')"></div>
                     <div class="resize-handle-bottom" (mousedown)="startResize($event, visual, 'bottom')"></div>
-                    <div class="resize-handle-left" (mousedown)="startResize($event, visual, 'left')"></div>
-                    <div class="resize-handle-corner-br" (mousedown)="startResize($event, visual, 'bottom-right')">
-                    </div>
+                    <div class="resize-handle-corner-br" (mousedown)="startResize($event, visual, 'bottom-right')"></div>
                 </div>
             </div>
 

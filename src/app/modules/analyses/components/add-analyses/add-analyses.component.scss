@@ -1224,48 +1224,53 @@
 .canvas-area {
   flex: 1;
   padding: 20px;
-  // Use scroll for y to always show scrollbar (prevents width changes when scrollbar appears/disappears)
-  // Use hidden for x to prevent horizontal overflow from affecting width calculations
   overflow-y: scroll;
   overflow-x: hidden;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  grid-auto-rows: 50px;
+  gap: 12px;
   align-content: start;
 }
 
+// ---- Visual Box — clean card design ----
 .visual-box {
   position: relative;
   background-color: var(--card-background);
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden; // Keep content inside the box
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
-  cursor: pointer;
-  min-width: 300px;
-  min-height: 250px;
-  contain: layout style;
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+  cursor: default;
 
+  // Hover: subtle lift, show corner grip only
   &:hover {
-    border-color: var(--primary-color);
+    border-color: rgba(var(--primary-color-rgb), 0.4);
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(var(--primary-color-rgb), 0.08);
 
-    .resize-handle-top,
-    .resize-handle-right,
-    .resize-handle-bottom,
-    .resize-handle-left,
     .resize-handle-corner-br {
-      opacity: 1;
+      opacity: 0.5;
     }
   }
 
+  // Focused: strong primary outline, show corner grip
   &.focused {
     border-color: var(--primary-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow:
+      0 0 0 1px var(--primary-color),
+      0 4px 20px rgba(var(--primary-color-rgb), 0.15);
     z-index: 10;
+
+    .resize-handle-corner-br {
+      opacity: 0.7;
+    }
   }
 
   &.disabled {
@@ -1274,9 +1279,38 @@
     filter: grayscale(50%);
   }
 
+  // Resizing: elevated state
+  &.resizing {
+    z-index: 50;
+    border-color: var(--primary-color);
+    box-shadow:
+      0 0 0 2px var(--primary-color),
+      0 8px 30px rgba(var(--primary-color-rgb), 0.2);
+    transition: none;
+
+    .resize-handle-corner-br {
+      opacity: 1;
+    }
+  }
+
   &.dragging {
-    opacity: 0.5;
+    opacity: 0.4;
+    transform: scale(0.97);
     cursor: move;
+  }
+
+  // Drop target glow when another visual is being dragged
+  &.drop-target {
+    border-style: dashed;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      border-color: var(--primary-color);
+      background-color: rgba(var(--primary-color-rgb), 0.04);
+      box-shadow: inset 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+    }
   }
 
   &.blinking-visual {
@@ -1330,112 +1364,99 @@
   }
 }
 
-// Resize Handles
-.resize-handle-top,
+// ---- Resize Handles — invisible hit areas, cursor-only feedback ----
 .resize-handle-bottom {
   position: absolute;
   left: 0;
   right: 0;
-  height: 6px;
+  bottom: 0;
+  height: 8px;
   cursor: ns-resize;
-  opacity: 0;
-  transition: opacity 0.2s ease;
   z-index: 10;
-
-  &:hover {
-    opacity: 1;
-    background-color: rgba(var(--primary-color-rgb), 0.3);
-  }
+  background: transparent;
 }
 
-.resize-handle-top {
-  top: 0;
-}
-
-.resize-handle-bottom {
-  bottom: 0;
-}
-
-.resize-handle-left,
 .resize-handle-right {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 6px;
-  cursor: ew-resize;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  z-index: 10;
-
-  &:hover {
-    opacity: 1;
-    background-color: rgba(var(--primary-color-rgb), 0.3);
-  }
-}
-
-.resize-handle-left {
-  left: 0;
-}
-
-.resize-handle-right {
   right: 0;
+  width: 8px;
+  cursor: ew-resize;
+  z-index: 10;
+  background: transparent;
 }
 
 .resize-handle-corner-br {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 16px;
-  height: 16px;
-  background-color: var(--primary-color);
-  border-radius: 8px 0 6px 0;
+  width: 18px;
+  height: 18px;
   cursor: nwse-resize;
   opacity: 0;
-  transition: opacity 0.2s ease;
   z-index: 11;
+  transition: opacity 0.2s ease;
 
-  &::before {
+  // Three diagonal grip dots
+  &::after {
     content: '';
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 10px;
-    height: 10px;
-    border-right: 2px solid white;
-    border-bottom: 2px solid white;
+    bottom: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
+    background:
+      radial-gradient(circle, var(--secondary-color) 1.2px, transparent 1.2px) 0 0 / 3px 3px no-repeat,
+      radial-gradient(circle, var(--secondary-color) 1.2px, transparent 1.2px) 3px 3px / 3px 3px no-repeat,
+      radial-gradient(circle, var(--secondary-color) 1.2px, transparent 1.2px) 0 3px / 3px 3px no-repeat;
   }
 
   &:hover {
     opacity: 1 !important;
+
+    &::after {
+      background:
+        radial-gradient(circle, var(--primary-color) 1.2px, transparent 1.2px) 0 0 / 3px 3px no-repeat,
+        radial-gradient(circle, var(--primary-color) 1.2px, transparent 1.2px) 3px 3px / 3px 3px no-repeat,
+        radial-gradient(circle, var(--primary-color) 1.2px, transparent 1.2px) 0 3px / 3px 3px no-repeat;
+    }
   }
 }
 
-// Inline Title (drag handle for reordering visuals)
+// ---- Title bar — clean minimal design ----
 .visual-inline-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 14px 5px;
+  padding: 8px 12px 4px;
   position: relative;
   cursor: grab;
+  border-bottom: 1px solid rgba(var(--primary-color-rgb), 0.06);
+
+  &:active {
+    cursor: grabbing;
+  }
 
   .inline-title-text {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-color);
     cursor: pointer;
-    padding: 4px 60px; // Extra padding for action buttons (refresh + close)
+    padding: 3px 50px 3px 8px;
     border-radius: 4px;
     text-align: center;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    white-space: normal;
-    max-width: calc(100% - 20px); // Prevent overflow into buttons area
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 16px);
     line-height: 1.4;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.15s ease;
 
     &:hover {
-      background-color: rgba(var(--primary-color-rgb), 0.1);
+      background-color: rgba(var(--primary-color-rgb), 0.06);
     }
   }
 
@@ -1443,9 +1464,9 @@
     border: 1px solid var(--primary-color);
     background-color: var(--card-background);
     color: var(--text-color);
-    padding: 4px 8px;
+    padding: 3px 8px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     text-align: center;
     outline: none;
@@ -1471,31 +1492,37 @@
 
   .visual-action-buttons {
     position: absolute;
-    right: 8px;
+    right: 6px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
-    gap: 2px;
+    gap: 0;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.15s ease;
 
     .action-btn {
-      color: var(--text-color-secondary);
-      padding: 4px;
+      color: var(--secondary-color);
+      padding: 3px;
+      font-size: 12px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
 
       &:hover {
         color: var(--primary-color);
+        background-color: rgba(var(--primary-color-rgb), 0.08);
       }
     }
 
     .close-btn:hover {
-      color: var(--danger-color, #ff5252) !important;
+      color: var(--danger-color, #ef4444) !important;
+      background-color: rgba(239, 68, 68, 0.08) !important;
     }
   }
 }
 
-// Show action buttons on visual hover
-.visual-box:hover .visual-inline-title .visual-action-buttons {
+// Show action buttons on visual hover or focus
+.visual-box:hover .visual-inline-title .visual-action-buttons,
+.visual-box.focused .visual-inline-title .visual-action-buttons {
   opacity: 1;
 }
 
