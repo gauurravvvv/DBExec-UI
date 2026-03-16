@@ -8,25 +8,40 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 
-import { Observable, throwError } from 'rxjs';
-import { catchError, retry, map, finalize } from 'rxjs/operators';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import {
+  catchError,
+  filter,
+  take,
+  switchMap,
+  map,
+  finalize,
+} from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LoadingService } from '../services/loading.service';
 import { Router } from '@angular/router';
 import { StorageType } from 'src/app/constants/storageType';
 import { StorageService } from '../services/storage.service';
+import { LoginService } from '../services/login.service';
+import { AUTH } from 'src/app/constants/api';
+import { SessionExpiredService } from '../services/session-expired.service';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
-  accessToken!: string;
-  organisation_id!: string;
-  appAccessToken!: string | null;
+  private isRefreshing = false;
+  private refreshTokenSubject: BehaviorSubject<string | null> =
+    new BehaviorSubject<string | null>(null);
 
-  constructor(private loadingService: LoadingService, private router: Router) {}
+  constructor(
+    private loadingService: LoadingService,
+    private router: Router,
+    private loginService: LoginService,
+    private sessionExpiredService: SessionExpiredService,
+  ) {}
 
   intercept(
     req: HttpRequest<any>,
-    next: HttpHandler
+    next: HttpHandler,
   ): Observable<HttpEvent<any>> {
     // Check if we should skip the loader for this request
     const skipLoader = req.headers.has('X-Skip-Loader');
@@ -35,10 +50,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       this.loadingService.showLoader();
     }
 
-    this.accessToken = StorageService.get(StorageType.ACCESS_TOKEN) || '';
-    this.organisation_id =
-      StorageService.get(StorageType.ORGANISATION_ID) || '';
-
     if (req.url.includes('assets')) {
       if (!skipLoader) {
         this.loadingService.hideLoader();
@@ -46,7 +57,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    // Determine server based on custom header
+    // Build the full URL
     const serverType = req.headers.get('X-Server-Type');
     let serverUrl: string;
 
@@ -58,10 +69,14 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     const URL = serverUrl + req.url;
 
-    // Remove the custom headers before sending the request
+    // Attach auth headers
+    const accessToken = StorageService.get(StorageType.ACCESS_TOKEN) || '';
+    const organisationId =
+      StorageService.get(StorageType.ORGANISATION_ID) || '';
+
     let headers = req.headers
-      .set('x-auth-token', this.accessToken)
-      .set('x-organization-id', this.organisation_id);
+      .set('x-auth-token', accessToken)
+      .set('x-organization-id', organisationId);
     if (headers.has('X-Server-Type')) {
       headers = headers.delete('X-Server-Type');
     }
@@ -69,33 +84,36 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       headers = headers.delete('X-Skip-Loader');
     }
 
-    req = req.clone({
-      url: URL,
-      headers: headers,
-    });
+    req = req.clone({ url: URL, headers });
 
     return next.handle(req).pipe(
-      retry(2),
-      map(evt => this.handleSuccess(req, evt)),
-      catchError(error => this.handleError(error)),
+      map(evt => this.handleSuccess(req, evt, next)),
+      catchError(error => this.handleError(req, error, next)),
       finalize(() => {
         if (!skipLoader) {
           this.loadingService.hideLoader();
         }
-      })
+      }),
     );
   }
 
   private handleSuccess(
     req: HttpRequest<any>,
-    evt: HttpEvent<any>
+    evt: HttpEvent<any>,
+    next: HttpHandler,
   ): HttpEvent<any> {
     if (evt instanceof HttpResponse) {
-      if (evt.body.code === 440) {
-        this.handleSessionExpired();
-        return evt;
+      // Session expired returned as 200 with code 440 in body
+      if (evt.body?.code === 440) {
+        // Don't attempt refresh for the refresh endpoint itself
+        if (req.url.includes(AUTH.REFRESH_TOKEN)) {
+          this.handleSessionExpired();
+          return evt;
+        }
+        // Trigger token refresh — handled via catchError path by throwing
+        throw new HttpErrorResponse({ status: 440, url: req.url });
       }
-      if (evt.body.code === 501 || evt.body.code === 503) {
+      if (evt.body?.code === 501 || evt.body?.code === 503) {
         window.location.href = '';
         StorageService.remove(StorageType.ACCESS_TOKEN);
         return evt;
@@ -104,15 +122,70 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     return evt;
   }
 
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    if (error.status === 440) {
-      this.handleSessionExpired();
+  private handleError(
+    req: HttpRequest<any>,
+    error: HttpErrorResponse | any,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
+    if (error instanceof HttpErrorResponse && error.status === 440) {
+      // Don't attempt refresh for the refresh endpoint itself
+      if (req.url.includes(AUTH.REFRESH_TOKEN)) {
+        this.handleSessionExpired();
+        return throwError(error);
+      }
+      return this.handle440Error(req, next);
     }
     return throwError(error);
   }
 
+  private handle440Error(
+    req: HttpRequest<any>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshTokenSubject.next(null);
+
+      return this.loginService.refreshAccessToken().pipe(
+        switchMap((response: any) => {
+          this.isRefreshing = false;
+
+          if (response.status && response.data?.accessToken) {
+            const newToken = response.data.accessToken;
+            this.loginService.setAccessToken(newToken);
+            this.refreshTokenSubject.next(newToken);
+            // Retry the original request with the new token
+            return next.handle(this.addToken(req, newToken));
+          } else {
+            // Refresh failed — let catchError handle logout
+            return throwError('Refresh token failed');
+          }
+        }),
+        catchError(err => {
+          this.isRefreshing = false;
+          this.handleSessionExpired();
+          return throwError(err);
+        }),
+      );
+    } else {
+      // Another request is already refreshing — wait for the new token
+      return this.refreshTokenSubject.pipe(
+        filter(token => token !== null),
+        take(1),
+        switchMap(token => next.handle(this.addToken(req, token!))),
+      );
+    }
+  }
+
+  private addToken(req: HttpRequest<any>, token: string): HttpRequest<any> {
+    return req.clone({
+      headers: req.headers.set('x-auth-token', token),
+    });
+  }
+
   private handleSessionExpired(): void {
+    this.isRefreshing = false;
     StorageService.clear();
-    this.router.navigate(['/login']);
+    this.sessionExpiredService.trigger();
   }
 }

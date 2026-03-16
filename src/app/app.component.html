@@ -4,3 +4,35 @@
   <div class="spinner"></div>
 </div>
 <p-toast key="topRight" position="top-right"></p-toast>
+
+<div class="session-expired-popup" *ngIf="showSessionExpiredDialog">
+    <div class="popup-content">
+        <div class="popup-header">
+            <div class="popup-icon">
+                <i class="pi pi-sign-out"></i>
+            </div>
+            <h3>Session Expired</h3>
+        </div>
+        <div class="popup-body">
+            <p class="popup-message">
+                Your session has ended. This may be because you logged in from another location.
+            </p>
+            <ul class="popup-info-list">
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>Only one active session is allowed per user</span>
+                </li>
+                <li>
+                    <i class="pi pi-info-circle"></i>
+                    <span>Please log in again to continue</span>
+                </li>
+            </ul>
+        </div>
+        <div class="popup-actions">
+            <button class="btn-confirm" (click)="onSessionExpiredOk()">
+                <i class="pi pi-sign-in"></i>
+                Go to Login
+            </button>
+        </div>
+    </div>
+</div>

@@ -5,6 +5,7 @@ import { AUTH } from 'src/app/constants/api';
 import { StorageType } from 'src/app/constants/storageType';
 import { ROLES } from 'src/app/constants/user.constant';
 import { StorageService } from 'src/app/core/services/storage.service';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -25,10 +26,11 @@ export class LoginService {
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         if (result.status) {
-          // First set the access token
-          this.setAccessToken(result.data.token);
+          // Store access token and refresh token
+          this.setAccessToken(result.data.accessToken);
+          this.setRefreshToken(result.data.refreshToken);
 
-          // Then store other details
+          // Store other details
           StorageService.set(StorageType.ROLE, result.data.user.role);
 
           StorageService.set(
@@ -75,8 +77,21 @@ export class LoginService {
       });
   }
 
+  refreshAccessToken(): Observable<any> {
+    const refreshToken = StorageService.get(StorageType.REFRESH_TOKEN);
+    const organisation = StorageService.get(StorageType.ORGANISATION);
+    return this.http.post(AUTH.REFRESH_TOKEN, {
+      refreshToken,
+      organisation,
+    });
+  }
+
   public setAccessToken(accessToken: string) {
     StorageService.set(StorageType.ACCESS_TOKEN, accessToken);
+  }
+
+  public setRefreshToken(refreshToken: string) {
+    StorageService.set(StorageType.REFRESH_TOKEN, refreshToken);
   }
 
   public isLoggedIn() {
