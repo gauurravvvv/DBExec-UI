@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs';
 import { Renderer2 } from '@angular/core';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { GlobalSearchService } from '../../../services/global-search.service';
+import { LoginService } from 'src/app/core/services/login.service';
 
 @Component({
   selector: 'app-header',
@@ -93,6 +94,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private store: Store,
     private globalSearchService: GlobalSearchService,
+    private loginService: LoginService,
   ) {
     // Always use light mode (theming disabled)
     this.isDarkMode = false;
@@ -125,9 +127,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    // Clear NgRx store data
-    this.store.dispatch(AddAnalysesActions.clearAllDatasets());
+    this.loginService.logout().subscribe({
+      next: () => this.clearSessionAndNavigate(),
+      error: () => this.clearSessionAndNavigate(),
+    });
+  }
 
+  private clearSessionAndNavigate() {
+    this.store.dispatch(AddAnalysesActions.clearAllDatasets());
     localStorage.clear();
     sessionStorage.clear();
     this.router.navigate(['/login']);

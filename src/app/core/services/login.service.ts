@@ -77,6 +77,10 @@ export class LoginService {
       });
   }
 
+  logout(): Observable<any> {
+    return this.http.post(AUTH.LOGOUT, {});
+  }
+
   refreshAccessToken(): Observable<any> {
     const refreshToken = StorageService.get(StorageType.REFRESH_TOKEN);
     const organisation = StorageService.get(StorageType.ORGANISATION);
