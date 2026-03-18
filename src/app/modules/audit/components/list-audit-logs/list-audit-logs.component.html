@@ -1,0 +1,298 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <!-- Header Section -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>Audit Logs</h2>
+        <p class="subtitle">
+          Track all system actions across modules — creates, updates, deletes
+          and sensitive operations
+        </p>
+      </div>
+    </div>
+
+    <!-- Unified Toolbar & Content Card -->
+    <div class="content-card">
+      <div class="card-toolbar">
+        <div class="toolbar-left">
+          <div class="dropdown-field" *ngIf="isSuperAdmin">
+            <app-custom-dropdown
+              [(ngModel)]="filterValues.organisationId"
+              [options]="organisationOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterBy="label"
+              label="Organisation"
+              [floatingLabel]="true"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              placeholder="Select Organisation"
+              (onChangeEvent)="onOrganisationChange()"
+            ></app-custom-dropdown>
+          </div>
+
+          <div class="dropdown-field">
+            <app-custom-dropdown
+              [(ngModel)]="filterValues.module"
+              [options]="moduleOptions"
+              optionLabel="label"
+              optionValue="value"
+              label="Log Type"
+              [floatingLabel]="true"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              placeholder="All Modules"
+              (onChangeEvent)="onFilterChange()"
+            ></app-custom-dropdown>
+          </div>
+
+          <div class="dropdown-field">
+            <app-custom-dropdown
+              [(ngModel)]="filterValues.action"
+              [options]="actionOptions"
+              optionLabel="label"
+              optionValue="value"
+              label="Action Type"
+              [floatingLabel]="true"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              placeholder="All Actions"
+              (onChangeEvent)="onFilterChange()"
+            ></app-custom-dropdown>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <button
+            pButton
+            icon="pi pi-refresh"
+            pTooltip="Refresh"
+            tooltipPosition="top"
+            (click)="refreshLogs()"
+            class="p-button-outlined modern-button"
+          ></button>
+          <button
+            pButton
+            label="Clear Filters"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <p-table
+          #dt
+          [value]="logs"
+          [rows]="25"
+          [paginator]="true"
+          [lazy]="true"
+          (onLazyLoad)="loadLogs($event)"
+          [totalRecords]="totalItems"
+          [rowHover]="true"
+          dataKey="id"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[25, 50, 100]"
+          styleClass="p-datatable-sm modern-table"
+          [scrollable]="true"
+          scrollHeight="calc(100vh - 440px)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="min-width: 140px" pFrozenColumn>
+                <div class="th-content">Name</div>
+              </th>
+              <th style="min-width: 140px">
+                <div class="th-content">Performed By</div>
+              </th>
+              <th style="min-width: 110px">
+                <div class="th-content">Action</div>
+              </th>
+              <th style="min-width: 70px">
+                <div class="th-content">Version</div>
+              </th>
+              <th style="min-width: 100px">
+                <div class="th-content">Status</div>
+              </th>
+              <th style="min-width: 160px">
+                <div class="th-content">Timestamp</div>
+              </th>
+              <th style="min-width: 120px">
+                <div class="th-content">IP Address</div>
+              </th>
+            </tr>
+            <!-- Filter Row -->
+            <tr>
+              <th pFrozenColumn>
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.entityName"
+                  (input)="onFilterChange()"
+                  placeholder="Search"
+                  class="w-full p-column-filter"
+                />
+              </th>
+              <th>
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.username"
+                  (input)="onFilterChange()"
+                  placeholder="Search"
+                  class="w-full p-column-filter"
+                />
+              </th>
+              <th><!-- Dropdown in toolbar --></th>
+              <th><!-- No filter --></th>
+              <th><!-- No filter --></th>
+              <th><!-- No filter --></th>
+              <th><!-- No filter --></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-log>
+            <tr class="modern-row">
+              <td pFrozenColumn>
+                <span
+                  class="entity-link font-semibold"
+                  (click)="showDetail(log)"
+                  [title]="log.entityName"
+                >
+                  {{ log.entityName || '-' }}
+                </span>
+              </td>
+              <td>
+                <span class="description-text" [title]="log.username">{{
+                  log.username || '-'
+                }}</span>
+              </td>
+              <td>
+                <span class="action-badge" [ngClass]="getActionClass(log.action)">
+                  {{ log.action }}
+                </span>
+              </td>
+              <td>
+                <span class="version-badge">v{{ log.version || 1 }}</span>
+              </td>
+              <td>
+                <span
+                  class="status-indicator"
+                  [ngClass]="{
+                    active: log.responseSuccess,
+                    inactive: !log.responseSuccess,
+                  }"
+                >
+                  <span class="dot"></span>
+                  {{ log.responseSuccess ? 'Success' : 'Failed' }}
+                </span>
+              </td>
+              <td>
+                <span class="date-text">{{
+                  log.createdOn | date: 'medium'
+                }}</span>
+              </td>
+              <td>
+                <span class="description-text">{{
+                  log.ipAddress || '-'
+                }}</span>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="empty-message-cell text-center">
+                No audit logs found
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Popup -->
+<div class="detail-popup" *ngIf="showDetailDialog">
+  <div class="popup-content" *ngIf="selectedLog">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-title-row">
+        <span class="popup-entity">{{ selectedLog.entityName || '-' }}</span>
+        <span class="action-badge" [ngClass]="getActionClass(selectedLog.action)">{{ selectedLog.action }}</span>
+        <span class="version-badge">v{{ selectedLog.version || 1 }}</span>
+      </div>
+      <button class="popup-close" (click)="showDetailDialog = false">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Key info -->
+    <div class="popup-info-grid">
+      <div class="info-item">
+        <span class="info-label">Performed By</span>
+        <span class="info-value">{{ selectedLog.username || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Module</span>
+        <span class="info-value capitalize">{{ selectedLog.module }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Timestamp</span>
+        <span class="info-value">{{ selectedLog.createdOn | date: 'medium' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Status</span>
+        <span class="info-value" [class.val-success]="selectedLog.responseSuccess" [class.val-error]="!selectedLog.responseSuccess">
+          {{ selectedLog.responseSuccess ? 'Success' : 'Failed' }}
+        </span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">IP Address</span>
+        <span class="info-value">{{ selectedLog.ipAddress || '-' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Role</span>
+        <span class="info-value capitalize">{{ selectedLog.userRole || '-' }}</span>
+      </div>
+    </div>
+
+    <!-- Changes table (UPDATE actions with oldValues/newValues) -->
+    <div class="popup-section" *ngIf="hasChangeComparison()">
+      <div class="section-title">Changes</div>
+      <table class="changes-table">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Old Value</th>
+            <th>New Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of getChangeRows()" [class.changed]="row.changed">
+            <td class="field-cell">{{ row.field }}</td>
+            <td class="old-cell">{{ row.oldVal }}</td>
+            <td class="new-cell">{{ row.newVal }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Entity details (CREATE / DELETE — flat kv list) -->
+    <div class="popup-section" *ngIf="!hasChangeComparison() && getEntityDetails().length">
+      <div class="section-title">Entity Details</div>
+      <table class="details-table">
+        <tbody>
+          <tr *ngFor="let item of getEntityDetails()">
+            <td class="dt-label">{{ item.key }}</td>
+            <td class="dt-value">{{ item.value }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

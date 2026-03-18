@@ -62,11 +62,12 @@ export class LoginService {
       });
   }
 
-  resetPassword(loginForm: UntypedFormGroup, id: number) {
+  resetPassword(loginForm: UntypedFormGroup, id: number, orgId: string) {
     const { otp, newPassword } = loginForm.value;
     return this.http
       .post(AUTH.RESET_PASSWORD, {
         id: id,
+        orgId: orgId,
         otp: +otp,
         password: newPassword,
       })

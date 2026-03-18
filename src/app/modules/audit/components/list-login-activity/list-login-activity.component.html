@@ -1,0 +1,196 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <!-- Header Section -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>Login Activity</h2>
+        <p class="subtitle">
+          Monitor login attempts, logouts, token refreshes and authentication
+          events across all users
+        </p>
+      </div>
+    </div>
+
+    <!-- Unified Toolbar & Content Card -->
+    <div class="content-card">
+      <div class="card-toolbar">
+        <div class="toolbar-left">
+          <div class="dropdown-field" *ngIf="isSuperAdmin">
+            <app-custom-dropdown
+              [(ngModel)]="filterValues.organisationId"
+              [options]="organisationOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterBy="label"
+              label="Organisation"
+              [floatingLabel]="true"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              placeholder="Select Organisation"
+              (onChangeEvent)="onOrganisationChange()"
+            ></app-custom-dropdown>
+          </div>
+
+          <div class="dropdown-field">
+            <app-custom-dropdown
+              [(ngModel)]="filterValues.eventType"
+              [options]="eventTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              label="Event Type"
+              [floatingLabel]="true"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              placeholder="All Events"
+              (onChangeEvent)="onFilterChange()"
+            ></app-custom-dropdown>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <button
+            pButton
+            icon="pi pi-refresh"
+            pTooltip="Refresh"
+            tooltipPosition="top"
+            (click)="refreshActivities()"
+            class="p-button-outlined modern-button"
+          ></button>
+          <button
+            pButton
+            label="Clear Filters"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <p-table
+          #dt
+          [value]="activities"
+          [rows]="25"
+          [paginator]="true"
+          [lazy]="true"
+          (onLazyLoad)="loadActivities($event)"
+          [totalRecords]="totalItems"
+          [rowHover]="true"
+          dataKey="id"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[25, 50, 100]"
+          styleClass="p-datatable-sm modern-table"
+          [scrollable]="true"
+          scrollHeight="calc(100vh - 440px)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="min-width: 140px" pFrozenColumn>
+                <div class="th-content">Username</div>
+              </th>
+              <th style="min-width: 150px">
+                <div class="th-content">Event</div>
+              </th>
+              <th style="min-width: 140px">
+                <div class="th-content">Organisation</div>
+              </th>
+              <th style="min-width: 160px">
+                <div class="th-content">Failure Reason</div>
+              </th>
+              <th style="min-width: 160px">
+                <div class="th-content">Timestamp</div>
+              </th>
+              <th style="min-width: 120px">
+                <div class="th-content">IP Address</div>
+              </th>
+              <th style="min-width: 200px">
+                <div class="th-content">User Agent</div>
+              </th>
+            </tr>
+            <!-- Filter Row -->
+            <tr>
+              <th pFrozenColumn>
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.username"
+                  (input)="onFilterChange()"
+                  placeholder="Search"
+                  class="w-full p-column-filter"
+                />
+              </th>
+              <th><!-- Dropdown in toolbar --></th>
+              <th><!-- Organisation filter in toolbar --></th>
+              <th><!-- No filter --></th>
+              <th><!-- No filter --></th>
+              <th><!-- No filter --></th>
+              <th><!-- No filter --></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-activity>
+            <tr class="modern-row">
+              <td pFrozenColumn>
+                <span class="description-text font-semibold">{{
+                  activity.username
+                }}</span>
+              </td>
+              <td>
+                <span
+                  class="event-badge"
+                  [ngClass]="getEventClass(activity.eventType)"
+                >
+                  {{ formatEventType(activity.eventType) }}
+                </span>
+              </td>
+              <td>
+                <span class="description-text">{{
+                  activity.organisationName || '-'
+                }}</span>
+              </td>
+              <td>
+                <span
+                  class="description-text"
+                  *ngIf="activity.failureReason"
+                  [title]="activity.failureReason"
+                >
+                  {{ activity.failureReason?.replace('_', ' ') }}
+                </span>
+                <span class="description-text" *ngIf="!activity.failureReason"
+                  >-</span
+                >
+              </td>
+              <td>
+                <span class="date-text">{{
+                  activity.createdOn | date: 'medium'
+                }}</span>
+              </td>
+              <td>
+                <span class="description-text">{{
+                  activity.ipAddress || '-'
+                }}</span>
+              </td>
+              <td>
+                <span
+                  class="description-text"
+                  [title]="activity.userAgent"
+                  >{{ activity.userAgent ? (activity.userAgent | slice: 0:40) + '...' : '-' }}</span
+                >
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="empty-message-cell text-center">
+                No login activity found
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -74,6 +74,7 @@ export class ForgotPasswordComponent implements OnInit {
               replaceUrl: true,
               queryParams: {
                 id: res.data.userId,
+                orgId: res.data.orgId,
               },
             });
           }

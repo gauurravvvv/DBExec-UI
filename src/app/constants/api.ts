@@ -211,3 +211,8 @@ export const ANNOUNCEMENT = {
   CONFIGURE: '/announcement/configure',
   GET: '/announcement/get/',
 };
+
+export const AUDIT = {
+  LIST: '/audit/list',
+  LOGIN_ACTIVITY: '/audit/login-activity',
+};

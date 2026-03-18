@@ -152,6 +152,18 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/screen/screen.module').then(m => m.ScreenModule),
       },
+      {
+        path: 'audit-logs',
+        loadChildren: () =>
+          import('./modules/audit/audit.module').then(m => m.AuditModule),
+      },
+      {
+        path: 'login-activity',
+        loadChildren: () =>
+          import('./modules/audit/login-activity.module').then(
+            m => m.LoginActivityModule,
+          ),
+      },
     ],
   },
   {

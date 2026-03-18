@@ -148,6 +148,12 @@ $icon-url: '../icons/';
     &.ci-audit-logs {
       content: url($icon-url + 'audit-logs.svg');
     }
+    &.ci-login-activity {
+      content: url($icon-url + 'login-activity.svg');
+    }
+    &.ci-clipboard-list {
+      content: url($icon-url + 'clipboard-list.svg');
+    }
   }
 }
 

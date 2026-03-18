@@ -17,6 +17,7 @@ export class ResetPasswordComponent implements OnInit {
   showPassword = false;
   features = RESET_PASSWORD_PAGE_OPTIONS;
   userId!: number;
+  orgId!: string;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -46,8 +47,8 @@ export class ResetPasswordComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.userId = +params['id'];
-      if (!this.userId) {
-        // Redirect back to forgot-password if ID is missing
+      this.orgId = params['orgId'];
+      if (!this.userId || !this.orgId) {
         this.router.navigate([AUTH.LOGIN]);
       }
     });
@@ -62,7 +63,7 @@ export class ResetPasswordComponent implements OnInit {
   onSubmit() {
     if (this.resetPasswordForm.valid) {
       this.loginService
-        .resetPassword(this.resetPasswordForm, this.userId)
+        .resetPassword(this.resetPasswordForm, this.userId, this.orgId)
         .then(res => {
           if (this.globalService.handleSuccessService(res)) {
             // On success, navigate to login page

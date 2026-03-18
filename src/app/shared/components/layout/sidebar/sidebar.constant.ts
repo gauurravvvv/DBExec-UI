@@ -115,6 +115,8 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'dbFunction', route: '/home/system/dbFunction' },
   { value: 'dbStoredProcedure', route: '/home/system/dbStoredProcedure' },
   { value: 'dbTrigger', route: '/home/system/dbTrigger' },
+  { value: 'auditLogs', route: '/app/audit-logs' },
+  { value: 'loginActivity', route: '/app/login-activity' },
 ];
 
 export const DASHBOARD_ROUTES = {
