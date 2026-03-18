@@ -97,9 +97,9 @@
     "noUsers": "ユーザーが見つかりませんでした",
     "noGroups": "グループが見つかりませんでした",
     "refresh": "リフレッシュ",
-    "notApplicable":"該当なし",
-    "caseNumberUpdated":"更新された事件番号",
-    "totalCaseNumbers": "ケースの合計数" ,
+    "notApplicable": "該当なし",
+    "caseNumberUpdated": "更新された事件番号",
+    "totalCaseNumbers": "ケースの合計数",
     "caseSeriesFor": "ケースシリーズ用"
   },
   "modeDropdownOptions": {

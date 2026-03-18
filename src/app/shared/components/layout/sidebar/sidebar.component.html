@@ -1,13 +1,34 @@
-<aside class="sidebar" [class.collapsed]="!isExpanded" [class.mobile]="isMobile" role="navigation"
-  aria-label="Main Navigation">
+<aside
+  class="sidebar"
+  [class.collapsed]="!isExpanded"
+  [class.mobile]="isMobile"
+  role="navigation"
+  aria-label="Main Navigation"
+>
   <div class="sidebar-header" *ngIf="!isExpanded">
     <button class="toggle-btn" (click)="toggleSidebar()">
-      <i class="pi" [ngClass]="{'pi-chevron-right': !isExpanded, 'pi-chevron-left': isExpanded}"></i>
+      <i
+        class="pi"
+        [ngClass]="{
+          'pi-chevron-right': !isExpanded,
+          'pi-chevron-left': isExpanded,
+        }"
+      ></i>
     </button>
   </div>
 
-  <button *ngIf="isExpanded" class="toggle-btn outside" (click)="collapseAllAndToggle()">
-    <i class="pi" [ngClass]="{'pi-chevron-right': !isExpanded, 'pi-chevron-left': isExpanded}"></i>
+  <button
+    *ngIf="isExpanded"
+    class="toggle-btn outside"
+    (click)="collapseAllAndToggle()"
+  >
+    <i
+      class="pi"
+      [ngClass]="{
+        'pi-chevron-right': !isExpanded,
+        'pi-chevron-left': isExpanded,
+      }"
+    ></i>
   </button>
 
   <div class="sidebar-content">
@@ -15,51 +36,94 @@
       <ul class="nav-list">
         <li *ngFor="let item of menuItems" class="nav-item">
           <!-- Menu item with subPermissions -->
-          <div *ngIf="item.subPermissions?.length" class="nav-link expandable" (click)="toggleSubmenuAndExpand(item)"
-            [class.expanded]="item.isExpanded">
+          <div
+            *ngIf="item.subPermissions?.length"
+            class="nav-link expandable"
+            (click)="toggleSubmenuAndExpand(item)"
+            [class.expanded]="item.isExpanded"
+          >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text" [class.hidden]="!isExpanded">{{ item.label }}</span>
+              <span class="nav-text" [class.hidden]="!isExpanded">{{
+                item.label
+              }}</span>
             </div>
             <i class="pi pi-chevron-down submenu-arrow" *ngIf="isExpanded"></i>
             <!-- Add tooltip for collapsed state -->
             <div class="sidebar-tooltip" *ngIf="!isExpanded">
               {{ item.label }}
-              <span class="tooltip-arrow" *ngIf="item.subPermissions?.length">&rsaquo;</span>
+              <span class="tooltip-arrow" *ngIf="item.subPermissions?.length"
+                >&rsaquo;</span
+              >
             </div>
           </div>
 
           <!-- Menu item without subPermissions -->
-          <a *ngIf="!item.subPermissions?.length" [routerLink]="item.route" routerLinkActive="active" class="nav-link">
+          <a
+            *ngIf="!item.subPermissions?.length"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            class="nav-link"
+          >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text" [class.hidden]="!isExpanded">{{ item.label }}</span>
+              <span class="nav-text" [class.hidden]="!isExpanded">{{
+                item.label
+              }}</span>
             </div>
           </a>
 
           <!-- Submenu -->
-          <ul class="submenu" [class.expanded]="item.isExpanded" *ngIf="item.subPermissions">
-            <li *ngFor="let subItem of item.subPermissions" class="submenu-item" [class.visible]="item.isExpanded">
+          <ul
+            class="submenu"
+            [class.expanded]="item.isExpanded"
+            *ngIf="item.subPermissions"
+          >
+            <li
+              *ngFor="let subItem of item.subPermissions"
+              class="submenu-item"
+              [class.visible]="item.isExpanded"
+            >
               <!-- Submenu item with children -->
-              <div *ngIf="subItem.subPermissions?.length" class="submenu-link" (click)="toggleSubmenuAndExpand(subItem)"
-                [class.expanded]="subItem.isExpanded">
+              <div
+                *ngIf="subItem.subPermissions?.length"
+                class="submenu-link"
+                (click)="toggleSubmenuAndExpand(subItem)"
+                [class.expanded]="subItem.isExpanded"
+              >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text" [class.hidden]="!isExpanded">{{ subItem.label }}</span>
+                  <span class="nav-text" [class.hidden]="!isExpanded">{{
+                    subItem.label
+                  }}</span>
                 </div>
-                <i class="pi pi-chevron-down submenu-arrow" *ngIf="isExpanded"></i>
+                <i
+                  class="pi pi-chevron-down submenu-arrow"
+                  *ngIf="isExpanded"
+                ></i>
               </div>
 
               <!-- Submenu item without children -->
-              <a *ngIf="!subItem.subPermissions?.length" [routerLink]="subItem.route" routerLinkActive="active">
+              <a
+                *ngIf="!subItem.subPermissions?.length"
+                [routerLink]="subItem.route"
+                routerLinkActive="active"
+              >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text" [class.hidden]="!isExpanded">{{ subItem.label }}</span>
+                  <span class="nav-text" [class.hidden]="!isExpanded">{{
+                    subItem.label
+                  }}</span>
                 </div>
               </a>
 
               <!-- Nested submenu -->
-              <ng-container *ngTemplateOutlet="nestedSubmenu; context: { $implicit: subItem }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="
+                  nestedSubmenu;
+                  context: { $implicit: subItem }
+                "
+              ></ng-container>
             </li>
           </ul>
         </li>
@@ -70,29 +134,50 @@
 
 <!-- Template for nested submenus -->
 <ng-template #nestedSubmenu let-item>
-  <ul class="nested-submenu" [class.expanded]="item.isExpanded" *ngIf="item.subPermissions">
-    <li *ngFor="let nestedItem of item.subPermissions" class="nested-submenu-item" [class.visible]="item.isExpanded">
-
+  <ul
+    class="nested-submenu"
+    [class.expanded]="item.isExpanded"
+    *ngIf="item.subPermissions"
+  >
+    <li
+      *ngFor="let nestedItem of item.subPermissions"
+      class="nested-submenu-item"
+      [class.visible]="item.isExpanded"
+    >
       <!-- Nested item with children -->
-      <div *ngIf="nestedItem.subPermissions?.length" class="submenu-link" (click)="toggleSubmenuAndExpand(nestedItem)"
-        [class.expanded]="nestedItem.isExpanded">
+      <div
+        *ngIf="nestedItem.subPermissions?.length"
+        class="submenu-link"
+        (click)="toggleSubmenuAndExpand(nestedItem)"
+        [class.expanded]="nestedItem.isExpanded"
+      >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text" [class.hidden]="!isExpanded">{{ nestedItem.label }}</span>
+          <span class="nav-text" [class.hidden]="!isExpanded">{{
+            nestedItem.label
+          }}</span>
         </div>
         <i class="pi pi-chevron-down submenu-arrow" *ngIf="isExpanded"></i>
       </div>
 
       <!-- Nested item without children -->
-      <a *ngIf="!nestedItem.subPermissions?.length" [routerLink]="nestedItem.route" routerLinkActive="active">
+      <a
+        *ngIf="!nestedItem.subPermissions?.length"
+        [routerLink]="nestedItem.route"
+        routerLinkActive="active"
+      >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text" [class.hidden]="!isExpanded">{{ nestedItem.label }}</span>
+          <span class="nav-text" [class.hidden]="!isExpanded">{{
+            nestedItem.label
+          }}</span>
         </div>
       </a>
 
       <!-- Recursively handle deeper levels -->
-      <ng-container *ngTemplateOutlet="nestedSubmenu; context: { $implicit: nestedItem }"></ng-container>
+      <ng-container
+        *ngTemplateOutlet="nestedSubmenu; context: { $implicit: nestedItem }"
+      ></ng-container>
     </li>
   </ul>
 </ng-template>

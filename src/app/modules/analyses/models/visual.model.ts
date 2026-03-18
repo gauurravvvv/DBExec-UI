@@ -154,10 +154,10 @@ export function createVisual(id: number, config: any): Visual {
     y: 0,
     xRatio: 0,
     yRatio: 0,
-    colSpan: 12,    // Half of 24-column grid (2 visuals per row)
-    rowSpan: 6,     // 6 grid rows (300px at 50px/row)
-    gridCol: 0,     // Set by placement algorithm
-    gridRow: 0,     // Set by placement algorithm
+    colSpan: 12, // Half of 24-column grid (2 visuals per row)
+    rowSpan: 6, // 6 grid rows (300px at 50px/row)
+    gridCol: 0, // Set by placement algorithm
+    gridRow: 0, // Set by placement algorithm
     chartType: null,
     xAxisColumn: null,
     yAxisColumn: null,

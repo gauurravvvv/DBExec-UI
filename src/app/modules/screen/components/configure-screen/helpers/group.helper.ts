@@ -15,7 +15,7 @@ import {
  */
 export function canGroupPrompts(
   selectedPrompts: { [sectionId: string]: Prompt[] },
-  sectionId: string | number
+  sectionId: string | number,
 ): boolean {
   return selectedPrompts[sectionId]?.length >= 2 || false;
 }
@@ -26,7 +26,7 @@ export function canGroupPrompts(
 export function isPromptSelected(
   prompt: Prompt,
   section: Section,
-  selectedPrompts: { [sectionId: string]: Prompt[] }
+  selectedPrompts: { [sectionId: string]: Prompt[] },
 ): boolean {
   return (
     selectedPrompts[section.id]?.some((p: Prompt) => p.id === prompt.id) ||
@@ -39,7 +39,7 @@ export function isPromptSelected(
  */
 export function isGroupActiveInSection(
   section: Section,
-  groupId: number
+  groupId: number,
 ): boolean {
   return section.prompts.some((p: Prompt) => p.groupId === groupId);
 }
@@ -49,7 +49,7 @@ export function isGroupActiveInSection(
  */
 export function hasSectionGroups(section: Section): boolean {
   return section.prompts.some(
-    (prompt: Prompt) => prompt.groupId !== undefined && prompt.groupId !== null
+    (prompt: Prompt) => prompt.groupId !== undefined && prompt.groupId !== null,
   );
 }
 
@@ -61,9 +61,9 @@ export function hasAnyGroups(tabs: TabData[]): boolean {
     tab.sections.some((section: Section) =>
       section.prompts.some(
         (prompt: Prompt) =>
-          prompt.groupId !== undefined && prompt.groupId !== null
-      )
-    )
+          prompt.groupId !== undefined && prompt.groupId !== null,
+      ),
+    ),
   );
 }
 
@@ -74,10 +74,10 @@ export function hasAnyGroups(tabs: TabData[]): boolean {
 export function validateAndCleanupGroup(
   section: Section,
   groupId: number,
-  activeGroupId: number | null
+  activeGroupId: number | null,
 ): { needsCleanup: boolean; cleanedGroupId: number | null } {
   const promptsInGroup = section.prompts.filter(
-    (p: Prompt) => p.groupId === groupId
+    (p: Prompt) => p.groupId === groupId,
   );
 
   if (promptsInGroup.length < 2) {
@@ -190,12 +190,12 @@ export function getNextAvailableColorIndex(tabs: TabData[]): number | null {
 export function getColorIndexForGroup(
   groupId: number,
   section: Section | undefined,
-  tabs: TabData[]
+  tabs: TabData[],
 ): number | null {
   if (section) {
     const existingPrompt = section.prompts.find(
       (prompt: Prompt) =>
-        prompt.groupId === groupId && prompt.colorIndex !== undefined
+        prompt.groupId === groupId && prompt.colorIndex !== undefined,
     );
     if (existingPrompt && existingPrompt.colorIndex !== undefined) {
       return existingPrompt.colorIndex;
@@ -211,8 +211,10 @@ export function getColorIndexForGroup(
 export function isColorInUse(tabs: TabData[], colorIndex: number): boolean {
   return tabs.some((tab: TabData) =>
     tab.sections.some((section: Section) =>
-      section.prompts.some((prompt: Prompt) => prompt.colorIndex === colorIndex)
-    )
+      section.prompts.some(
+        (prompt: Prompt) => prompt.colorIndex === colorIndex,
+      ),
+    ),
   );
 }
 
@@ -222,7 +224,7 @@ export function isColorInUse(tabs: TabData[], colorIndex: number): boolean {
 export function assignColorToGroup(
   tabs: TabData[],
   groupId: number,
-  colorIndex: number
+  colorIndex: number,
 ): void {
   tabs.forEach((tab: TabData) => {
     tab.sections.forEach((section: Section) => {
@@ -256,7 +258,7 @@ export function toggleMandatoryInGroup(prompt: Prompt, section: Section): void {
  */
 export function findSectionContainingPrompt(
   tabs: TabData[],
-  prompt: Prompt
+  prompt: Prompt,
 ): Section | null {
   for (const tab of tabs) {
     for (const section of tab.sections) {
@@ -274,7 +276,7 @@ export function findSectionContainingPrompt(
 export function groupPrompts(
   selectedPrompts: Prompt[],
   groupId: number,
-  colorIndex: number
+  colorIndex: number,
 ): void {
   // Check if any prompt is mandatory
   const hasMandatoryPrompt = selectedPrompts.some((p: Prompt) => p.isMandatory);
@@ -296,13 +298,13 @@ export function addPromptToGroup(
   prompt: Prompt,
   section: Section,
   groupId: number,
-  colorIndex: number | undefined
+  colorIndex: number | undefined,
 ): number | undefined {
   const oldGroupId = prompt.groupId;
 
   // Check if group has mandatory prompts
   const isGroupMandatory = section.prompts.some(
-    (p: Prompt) => p.groupId === groupId && p.isMandatory
+    (p: Prompt) => p.groupId === groupId && p.isMandatory,
   );
 
   prompt.groupId = groupId;

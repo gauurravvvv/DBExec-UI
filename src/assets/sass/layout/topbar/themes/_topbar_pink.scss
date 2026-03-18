@@ -1,13 +1,13 @@
 .layout-topbar-pink {
-    $topbarBgColor: #AD1457;
-    $topbarLeftBgColor: #880E4F;
+  $topbarBgColor: #ad1457;
+  $topbarLeftBgColor: #880e4f;
 
-    $topbarMenuButtonBgColor:#F9A825;
-    $topbarMenuButtonTextColor:#212121;
+  $topbarMenuButtonBgColor: #f9a825;
+  $topbarMenuButtonTextColor: #212121;
 
-    $topbarItemTextColor: #ffffff;
-    $topbarItemTextHoverBgColor: rgba(255,255,255,.12);
+  $topbarItemTextColor: #ffffff;
+  $topbarItemTextHoverBgColor: rgba(255, 255, 255, 0.12);
 
-    @import '../_topbar_exports';
-    @import '../_topbar_theme';
+  @import '../_topbar_exports';
+  @import '../_topbar_theme';
 }

@@ -23,7 +23,10 @@ export class SidebarComponent implements OnInit {
   isMobile = false;
   menuItems: MenuItem[] = [];
 
-  constructor(private globalService: GlobalService, public router: Router) {
+  constructor(
+    private globalService: GlobalService,
+    public router: Router,
+  ) {
     const permissions = this.globalService.getTokenDetails('permission');
     this.menuItems = this.processMenuItems(permissions);
     // Set initial expanded state based on current route
@@ -52,7 +55,7 @@ export class SidebarComponent implements OnInit {
 
   appendRouteToMenu(item: MenuItem): string {
     const route = SIDEBAR_ITEMS_ROUTES.find(
-      ir => ir.value === item.value
+      ir => ir.value === item.value,
     )?.route;
     return route || '';
   }

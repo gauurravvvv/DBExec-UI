@@ -1,149 +1,273 @@
 <div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text" routerLink="/app/database">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-                <h2>Edit Database</h2>
-            </div>
-            <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
-                    [disabled]="!isFormDirty" (click)="onCancel()">
-                </button>
-                <button pButton class="p-button-outlined" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="databaseForm.invalid">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Form Section -->
-        <div class="warning-container" *ngIf="isMasterDatabase" @slideDown>
-            <div class="warning-message" (click)="toggleWarning()">
-                <div class="warning-header">
-                    <i class="pi pi-exclamation-triangle"></i>
-                    <span class="warning-title">Master Database Configuration</span>
-                    <i class="pi"
-                        [ngClass]="{'pi-chevron-down': !isWarningExpanded, 'pi-chevron-up': isWarningExpanded}"></i>
-                </div>
-                <div class="warning-content" [@expandCollapse]="isWarningExpanded ? 'expanded' : 'collapsed'">
-                    <div class="warning-text">
-                        <p><i class="pi pi-circle-fill"></i>This is a master database that manages core system
-                            operations.</p>
-                        <p><i class="pi pi-circle-fill"></i>Any modifications may affect system functionality and could
-                            potentially result in data loss.
-                        </p>
-                        <p><i class="pi pi-circle-fill"></i>Please ensure all changes are carefully reviewed and backed
-                            up before saving.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <form [formGroup]="databaseForm" class="admin-form">
-            <div class="form-grid">
-                <!-- Name Field -->
-                <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-database"
-                    [required]="true"
-                    [showError]="!!(databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched)"
-                    [errorMessage]="getErrorMessage('name')">
-                </app-custom-input>
-
-                <!-- Description Field -->
-                <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
-                    icon="pi-align-left" [required]="true"
-                    [showError]="!!(databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched)"
-                    [errorMessage]="getErrorMessage('description')">
-                </app-custom-input>
-
-                <!-- Organisation Field (readonly) -->
-                <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-building"></i>
-                        <input id="organisation" type="text" pInputText [value]="organisationName" readonly
-                            class="readonly">
-                    </span>
-                </div>
-
-                <!-- Type Field (readonly) -->
-                <div class="form-field">
-                    <label for="type">Type</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-database"></i>
-                        <input id="type" pInputText formControlName="type" readonly class="readonly">
-                    </span>
-                </div>
-
-                <!-- Host Field -->
-                <app-custom-input formControlName="host" label="Host" placeholder="Enter database host"
-                    icon="pi-desktop" [required]="true"
-                    [showError]="!!(databaseForm.get('host')?.invalid && databaseForm.get('host')?.touched)"
-                    [errorMessage]="getErrorMessage('host')">
-                </app-custom-input>
-
-                <!-- Port Field -->
-                <div class="form-field">
-                    <label for="port">Port<span class="required">*</span></label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-hashtag"></i>
-                        <input id="port" type="number" pInputText formControlName="port"
-                            placeholder="Enter database port" min="1" max="65535" (keypress)="onPortKeyPress($event)"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('port')?.invalid && databaseForm.get('port')?.touched}">
-                    </span>
-                    <small class="error-message"
-                        *ngIf="databaseForm.get('port')?.invalid && databaseForm.get('port')?.touched">
-                        {{ getErrorMessage('port') }}
-                    </small>
-                </div>
-
-                <!-- Database Name Field -->
-                <app-custom-input formControlName="database" label="Database Name" placeholder="Enter database name"
-                    icon="pi-database" [required]="true"
-                    [showError]="!!(databaseForm.get('database')?.invalid && databaseForm.get('database')?.touched)"
-                    [errorMessage]="getErrorMessage('database')">
-                </app-custom-input>
-
-                <!-- Username Field -->
-                <app-custom-input formControlName="username" label="Username" placeholder="Enter database username"
-                    icon="pi-user" [required]="true"
-                    [showError]="!!(databaseForm.get('username')?.invalid && databaseForm.get('username')?.touched)"
-                    [errorMessage]="getErrorMessage('username')">
-                </app-custom-input>
-
-                <!-- Password Field -->
-                <div class="form-field">
-                    <label for="password">Password<span class="required">*</span></label>
-                    <span class="p-input-icon-left p-input-icon-right">
-                        <i class="pi pi-lock"></i>
-                        <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
-                            formControlName="password" placeholder="Enter database password"
-                            [ngClass]="{'ng-invalid ng-dirty': databaseForm.get('password')?.invalid && databaseForm.get('password')?.touched}">
-                        <i class="pi pi-eye" style="cursor: pointer;" (click)="togglePassword($event)"></i>
-                    </span>
-                    <small class="error-message"
-                        *ngIf="databaseForm.get('password')?.invalid && databaseForm.get('password')?.touched">
-                        {{ getErrorMessage('password') }}
-                    </small>
-                </div>
-
-                <!-- Status Field (special handling for master database) -->
-                <div class="form-field">
-                    <label for="status">Status</label>
-                    <div class="status-toggle ml-3">
-                        <p-inputSwitch [formControlName]="'status'" [disabled]="isMasterDatabase"
-                            (onChange)="onStatusChange($event)">
-                        </p-inputSwitch>
-                        <span class="status-label">{{ databaseForm.get('status')?.value ? 'Active' : 'Inactive'
-                            }}</span>
-                        <span class="master-db-note" *ngIf="isMasterDatabase">
-                            <i class="pi pi-info-circle"></i>
-                            Master database must remain active for system operations
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </form>
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" routerLink="/app/database">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Edit Database</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-danger"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-outlined"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="databaseForm.invalid"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
     </div>
+
+    <!-- Form Section -->
+    <div class="warning-container" *ngIf="isMasterDatabase" @slideDown>
+      <div class="warning-message" (click)="toggleWarning()">
+        <div class="warning-header">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span class="warning-title">Master Database Configuration</span>
+          <i
+            class="pi"
+            [ngClass]="{
+              'pi-chevron-down': !isWarningExpanded,
+              'pi-chevron-up': isWarningExpanded,
+            }"
+          ></i>
+        </div>
+        <div
+          class="warning-content"
+          [@expandCollapse]="isWarningExpanded ? 'expanded' : 'collapsed'"
+        >
+          <div class="warning-text">
+            <p>
+              <i class="pi pi-circle-fill"></i>This is a master database that
+              manages core system operations.
+            </p>
+            <p>
+              <i class="pi pi-circle-fill"></i>Any modifications may affect
+              system functionality and could potentially result in data loss.
+            </p>
+            <p>
+              <i class="pi pi-circle-fill"></i>Please ensure all changes are
+              carefully reviewed and backed up before saving.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <form [formGroup]="databaseForm" class="admin-form">
+      <div class="form-grid">
+        <!-- Name Field -->
+        <app-custom-input
+          formControlName="name"
+          label="Name"
+          placeholder="Enter name"
+          icon="pi-database"
+          [required]="true"
+          [showError]="
+            !!(
+              databaseForm.get('name')?.invalid &&
+              databaseForm.get('name')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('name')"
+        >
+        </app-custom-input>
+
+        <!-- Description Field -->
+        <app-custom-input
+          formControlName="description"
+          label="Description"
+          placeholder="Enter description"
+          icon="pi-align-left"
+          [showError]="
+            !!(
+              databaseForm.get('description')?.invalid &&
+              databaseForm.get('description')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('description')"
+        >
+        </app-custom-input>
+
+        <!-- Organisation Field (readonly) -->
+        <div class="form-field" *ngIf="showOrganisationDropdown">
+          <label for="organisation">Organisation</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-building"></i>
+            <input
+              id="organisation"
+              type="text"
+              pInputText
+              [value]="organisationName"
+              readonly
+              class="readonly"
+            />
+          </span>
+        </div>
+
+        <!-- Type Field (readonly) -->
+        <div class="form-field">
+          <label for="type">Type</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-database"></i>
+            <input
+              id="type"
+              pInputText
+              formControlName="type"
+              readonly
+              class="readonly"
+            />
+          </span>
+        </div>
+
+        <!-- Host Field -->
+        <app-custom-input
+          formControlName="host"
+          label="Host"
+          placeholder="Enter database host"
+          icon="pi-desktop"
+          [required]="true"
+          [showError]="
+            !!(
+              databaseForm.get('host')?.invalid &&
+              databaseForm.get('host')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('host')"
+        >
+        </app-custom-input>
+
+        <!-- Port Field -->
+        <div class="form-field">
+          <label for="port">Port<span class="required">*</span></label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-hashtag"></i>
+            <input
+              id="port"
+              type="number"
+              pInputText
+              formControlName="port"
+              placeholder="Enter database port"
+              min="1"
+              max="65535"
+              (keypress)="onPortKeyPress($event)"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  databaseForm.get('port')?.invalid &&
+                  databaseForm.get('port')?.touched,
+              }"
+            />
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              databaseForm.get('port')?.invalid &&
+              databaseForm.get('port')?.touched
+            "
+          >
+            {{ getErrorMessage('port') }}
+          </small>
+        </div>
+
+        <!-- Database Name Field -->
+        <app-custom-input
+          formControlName="database"
+          label="Database Name"
+          placeholder="Enter database name"
+          icon="pi-database"
+          [required]="true"
+          [showError]="
+            !!(
+              databaseForm.get('database')?.invalid &&
+              databaseForm.get('database')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('database')"
+        >
+        </app-custom-input>
+
+        <!-- Username Field -->
+        <app-custom-input
+          formControlName="username"
+          label="Username"
+          placeholder="Enter database username"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              databaseForm.get('username')?.invalid &&
+              databaseForm.get('username')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('username')"
+        >
+        </app-custom-input>
+
+        <!-- Password Field -->
+        <div class="form-field">
+          <label for="password">Password<span class="required">*</span></label>
+          <span class="p-input-icon-left p-input-icon-right">
+            <i class="pi pi-lock"></i>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              pInputText
+              formControlName="password"
+              placeholder="Enter database password"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  databaseForm.get('password')?.invalid &&
+                  databaseForm.get('password')?.touched,
+              }"
+            />
+            <i
+              class="pi pi-eye"
+              style="cursor: pointer"
+              (click)="togglePassword($event)"
+            ></i>
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              databaseForm.get('password')?.invalid &&
+              databaseForm.get('password')?.touched
+            "
+          >
+            {{ getErrorMessage('password') }}
+          </small>
+        </div>
+
+        <!-- Status Field (special handling for master database) -->
+        <div class="form-field">
+          <label for="status">Status</label>
+          <div class="status-toggle ml-3">
+            <p-inputSwitch
+              [formControlName]="'status'"
+              [disabled]="isMasterDatabase"
+              (onChange)="onStatusChange($event)"
+            >
+            </p-inputSwitch>
+            <span class="status-label">{{
+              databaseForm.get('status')?.value ? 'Active' : 'Inactive'
+            }}</span>
+            <span class="master-db-note" *ngIf="isMasterDatabase">
+              <i class="pi pi-info-circle"></i>
+              Master database must remain active for system operations
+            </span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

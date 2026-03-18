@@ -49,7 +49,7 @@ export class ListRoleComponent implements OnInit {
     private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
-    private roleService: RoleService
+    private roleService: RoleService,
   ) {}
 
   ngOnInit() {
@@ -131,7 +131,7 @@ export class ListRoleComponent implements OnInit {
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
       filtered = filtered.filter(role =>
-        role.name.toLowerCase().includes(search)
+        role.name.toLowerCase().includes(search),
       );
     }
 

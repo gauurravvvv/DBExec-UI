@@ -18,17 +18,17 @@
     "nameOfContact": "Name",
     "email": "Email ID",
     "phone": "Phone",
-    "timezone":"Timezone",
-    "state":"State",
-    "identifier":"Client Identifier",
-    "details":"Details",
-    "language":"Language"
+    "timezone": "Timezone",
+    "state": "State",
+    "identifier": "Client Identifier",
+    "details": "Details",
+    "language": "Language"
   },
   "license": {
     "heading": "Licensing information",
     "startDate": "Start date",
     "volume": "Case volume",
     "maxUsers": "Max users allowed",
-    "endDate":"Expiry date"
+    "endDate": "Expiry date"
   }
 }

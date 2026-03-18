@@ -72,9 +72,9 @@
     },
     "noRecords": "No records found",
     "copyWorkflow": "Copy Workflow",
-    "newWorkflowPlaceholder":"New Workflow Name",
-    "selectWorkflow":"Select Workflow",
-    "save":"Save"
+    "newWorkflowPlaceholder": "New Workflow Name",
+    "selectWorkflow": "Select Workflow",
+    "save": "Save"
   },
   "createEditWorkflow": {
     "save": "Save",
@@ -106,7 +106,7 @@
     "workflow": {
       "workflowName": {
         "required": "Please enter valid workflow name",
-        "minlength":"Minimum 2 characters are required"
+        "minlength": "Minimum 2 characters are required"
       },
       "fromState": {
         "required": "Please enter valid state",

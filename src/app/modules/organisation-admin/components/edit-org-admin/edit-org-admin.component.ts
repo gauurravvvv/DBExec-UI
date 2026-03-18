@@ -28,7 +28,7 @@ export class EditOrgAdminComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private orgAdminService: OrganisationAdminService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     this.initForm();
   }
@@ -50,7 +50,7 @@ export class EditOrgAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.firstName),
         ],
@@ -59,7 +59,7 @@ export class EditOrgAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.lastName),
         ],
@@ -122,6 +122,29 @@ export class EditOrgAdminComponent implements OnInit {
     this.selectedOrgName = this.adminData.organisationName;
     this.isCancelClicked = true;
     this.adminForm.markAsPristine();
-    this.isCancelClicked = true;
+  }
+
+  getFirstNameError(): string {
+    const control = this.adminForm.get('firstName');
+    if (control?.errors?.['required']) return 'First name is required';
+    if (control?.errors?.['minlength'])
+      return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `First name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'First name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+    return '';
+  }
+
+  getLastNameError(): string {
+    const control = this.adminForm.get('lastName');
+    if (control?.errors?.['required']) return 'Last name is required';
+    if (control?.errors?.['minlength'])
+      return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Last name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+    return '';
   }
 }

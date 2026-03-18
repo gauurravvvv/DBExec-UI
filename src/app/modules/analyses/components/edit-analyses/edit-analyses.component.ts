@@ -354,12 +354,26 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   private computeVisualDimensions(visual: any): void {
     const CANVAS_PADDING = 40;
     const SCROLLBAR_WIDTH = 17;
-    const contentWidth = Math.max(0, this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH);
-    const fr = (contentWidth - (this.GRID_COLUMNS - 1) * this.GRID_GAP) / this.GRID_COLUMNS;
-    visual.width = Math.max(100, Math.round(visual.colSpan * fr + (visual.colSpan - 1) * this.GRID_GAP));
-    visual.height = Math.max(100, Math.round(visual.rowSpan * this.ROW_HEIGHT + (visual.rowSpan - 1) * this.GRID_GAP));
+    const contentWidth = Math.max(
+      0,
+      this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH,
+    );
+    const fr =
+      (contentWidth - (this.GRID_COLUMNS - 1) * this.GRID_GAP) /
+      this.GRID_COLUMNS;
+    visual.width = Math.max(
+      100,
+      Math.round(visual.colSpan * fr + (visual.colSpan - 1) * this.GRID_GAP),
+    );
+    visual.height = Math.max(
+      100,
+      Math.round(
+        visual.rowSpan * this.ROW_HEIGHT + (visual.rowSpan - 1) * this.GRID_GAP,
+      ),
+    );
     visual.widthRatio = visual.colSpan / this.GRID_COLUMNS;
-    visual.heightRatio = (visual.rowSpan * this.ROW_HEIGHT) / Math.max(1, this.canvasHeight);
+    visual.heightRatio =
+      (visual.rowSpan * this.ROW_HEIGHT) / Math.max(1, this.canvasHeight);
   }
 
   private placeVisualsOnGrid(): void {
@@ -381,7 +395,13 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private canPlaceAt(occupied: Set<string>, row: number, col: number, colSpan: number, rowSpan: number): boolean {
+  private canPlaceAt(
+    occupied: Set<string>,
+    row: number,
+    col: number,
+    colSpan: number,
+    rowSpan: number,
+  ): boolean {
     for (let r = row; r < row + rowSpan; r++) {
       for (let c = col; c < col + colSpan; c++) {
         if (occupied.has(`${r},${c}`)) return false;
@@ -390,7 +410,13 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     return true;
   }
 
-  private markGridCells(occupied: Set<string>, row: number, col: number, colSpan: number, rowSpan: number): void {
+  private markGridCells(
+    occupied: Set<string>,
+    row: number,
+    col: number,
+    colSpan: number,
+    rowSpan: number,
+  ): void {
     for (let r = row; r < row + rowSpan; r++) {
       for (let c = col; c < col + colSpan; c++) {
         occupied.add(`${r},${c}`);
@@ -644,10 +670,16 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
             // Ensure grid properties exist
             if (!visual.colSpan) {
-              visual.colSpan = Math.max(4, Math.min(24, Math.round((visual.widthRatio || 0.5) * 24)));
+              visual.colSpan = Math.max(
+                4,
+                Math.min(24, Math.round((visual.widthRatio || 0.5) * 24)),
+              );
             }
             if (!visual.rowSpan) {
-              visual.rowSpan = Math.max(3, Math.round((visual.heightRatio || 0.45) * 600 / 50));
+              visual.rowSpan = Math.max(
+                3,
+                Math.round(((visual.heightRatio || 0.45) * 600) / 50),
+              );
             }
             visual.gridCol = 0;
             visual.gridRow = 0;
@@ -1181,7 +1213,11 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       return !!(visual.xAxisColumn || visual.yAxisColumn);
     }
     // 3-axis charts: heat-map, sankey, graph need x + y + z
-    if (isHeatMapChartType(visual.chartType) || isSankeyChartType(visual.chartType) || isGraphChartType(visual.chartType)) {
+    if (
+      isHeatMapChartType(visual.chartType) ||
+      isSankeyChartType(visual.chartType) ||
+      isGraphChartType(visual.chartType)
+    ) {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
     }
     return !!(visual.xAxisColumn && visual.yAxisColumn);
@@ -1402,8 +1438,13 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const CANVAS_PADDING = 40;
     const SCROLLBAR_WIDTH = 17;
-    const contentWidth = Math.max(0, this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH);
-    const fr = (contentWidth - (this.GRID_COLUMNS - 1) * this.GRID_GAP) / this.GRID_COLUMNS;
+    const contentWidth = Math.max(
+      0,
+      this.canvasWidth - CANVAS_PADDING - SCROLLBAR_WIDTH,
+    );
+    const fr =
+      (contentWidth - (this.GRID_COLUMNS - 1) * this.GRID_GAP) /
+      this.GRID_COLUMNS;
     const colUnit = fr + this.GRID_GAP;
     const rowUnit = this.ROW_HEIGHT + this.GRID_GAP;
 
@@ -1412,14 +1453,26 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.resizeDirection.includes('right')) {
       const maxCols = this.GRID_COLUMNS - this.resizingVisual.gridCol;
-      newColSpan = Math.max(4, Math.min(maxCols, this.resizeStartColSpan + Math.round(deltaX / colUnit)));
+      newColSpan = Math.max(
+        4,
+        Math.min(
+          maxCols,
+          this.resizeStartColSpan + Math.round(deltaX / colUnit),
+        ),
+      );
     }
 
     if (this.resizeDirection.includes('bottom')) {
-      newRowSpan = Math.max(3, this.resizeStartRowSpan + Math.round(deltaY / rowUnit));
+      newRowSpan = Math.max(
+        3,
+        this.resizeStartRowSpan + Math.round(deltaY / rowUnit),
+      );
     }
 
-    if (newColSpan !== this.resizingVisual.colSpan || newRowSpan !== this.resizingVisual.rowSpan) {
+    if (
+      newColSpan !== this.resizingVisual.colSpan ||
+      newRowSpan !== this.resizingVisual.rowSpan
+    ) {
       this.resizingVisual.colSpan = newColSpan;
       this.resizingVisual.rowSpan = newRowSpan;
       this.placeVisualsOnGrid();
@@ -1454,7 +1507,11 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       const visualBox = (event.target as HTMLElement).closest('.visual-box');
       if (visualBox) {
         const rect = visualBox.getBoundingClientRect();
-        event.dataTransfer.setDragImage(visualBox, event.clientX - rect.left, event.clientY - rect.top);
+        event.dataTransfer.setDragImage(
+          visualBox,
+          event.clientX - rect.left,
+          event.clientY - rect.top,
+        );
       }
     }
   }
@@ -1493,18 +1550,29 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private startAutoScrollLoop(): void {
     const tick = () => {
-      const container = this.canvasContainer?.nativeElement?.querySelector('.canvas-area') as HTMLElement;
-      if (!container) { this.autoScrollRafId = null; return; }
+      const container = this.canvasContainer?.nativeElement?.querySelector(
+        '.canvas-area',
+      ) as HTMLElement;
+      if (!container) {
+        this.autoScrollRafId = null;
+        return;
+      }
       const rect = container.getBoundingClientRect();
       const EDGE = 80;
       const MAX_SPEED = 18;
       let scrolled = false;
       if (this.autoScrollClientY > rect.bottom - EDGE) {
-        const ratio = Math.min(1, (this.autoScrollClientY - (rect.bottom - EDGE)) / EDGE);
+        const ratio = Math.min(
+          1,
+          (this.autoScrollClientY - (rect.bottom - EDGE)) / EDGE,
+        );
         container.scrollTop += Math.ceil(MAX_SPEED * ratio);
         scrolled = true;
       } else if (this.autoScrollClientY < rect.top + EDGE) {
-        const ratio = Math.min(1, ((rect.top + EDGE) - this.autoScrollClientY) / EDGE);
+        const ratio = Math.min(
+          1,
+          (rect.top + EDGE - this.autoScrollClientY) / EDGE,
+        );
         container.scrollTop -= Math.ceil(MAX_SPEED * ratio);
         scrolled = true;
       }

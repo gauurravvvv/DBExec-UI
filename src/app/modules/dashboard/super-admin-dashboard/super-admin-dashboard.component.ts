@@ -15,7 +15,7 @@ import { DashboardService } from '../services/dashboard.service';
         style({ transform: 'translateY(20px)', opacity: 0 }),
         animate(
           '0.4s ease-out',
-          style({ transform: 'translateY(0)', opacity: 1 })
+          style({ transform: 'translateY(0)', opacity: 1 }),
         ),
       ]),
     ]),
@@ -76,7 +76,7 @@ export class SuperAdminDashboardComponent implements OnInit {
     private route: ActivatedRoute,
     private globalService: GlobalService,
     // private orgService: OrganisationService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
   ) {}
 
   ngOnInit(): void {

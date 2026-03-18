@@ -1,13 +1,13 @@
 .layout-topbar-purple {
-    $topbarBgColor: #6A1B9A;
-    $topbarLeftBgColor: #4A148C;
+  $topbarBgColor: #6a1b9a;
+  $topbarLeftBgColor: #4a148c;
 
-    $topbarMenuButtonBgColor:#F9A825;
-    $topbarMenuButtonTextColor:#212121;
+  $topbarMenuButtonBgColor: #f9a825;
+  $topbarMenuButtonTextColor: #212121;
 
-    $topbarItemTextColor: #ffffff;
-    $topbarItemTextHoverBgColor: rgba(255,255,255,.12);
+  $topbarItemTextColor: #ffffff;
+  $topbarItemTextHoverBgColor: rgba(255, 255, 255, 0.12);
 
-    @import '../_topbar_exports';
-    @import '../_topbar_theme';
+  @import '../_topbar_exports';
+  @import '../_topbar_theme';
 }

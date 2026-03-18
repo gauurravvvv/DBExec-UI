@@ -1,57 +1,61 @@
 <div class="form-field">
-    <label *ngIf="label">
-        {{ label }}
-        <span class="required" *ngIf="required">*</span>
-    </label>
-    <!-- Textarea Mode -->
-    <ng-container *ngIf="inputMode === 'textarea'; else inputBlock">
-        <textarea pInputTextarea
-            [placeholder]="placeholder"
-            [value]="value"
-            [disabled]="disabled || inputDisabled"
-            [readonly]="readonly"
-            [rows]="rows"
-            [autoResize]="autoResize"
-            [attr.maxlength]="maxLength"
-            [attr.minlength]="minLength"
-            [ngClass]="{'ng-invalid ng-dirty': showError}"
-            (input)="onInputChange($event)"
-            (blur)="onBlur()">
-        </textarea>
-    </ng-container>
-    <!-- Input Mode -->
-    <ng-template #inputBlock>
-        <span class="p-input-icon-left" *ngIf="icon; else noIconInput">
-            <i class="pi {{ icon }}"></i>
-            <input
-                [type]="type"
-                pInputText
-                [placeholder]="placeholder"
-                [value]="value"
-                [disabled]="disabled || inputDisabled"
-                [readonly]="readonly"
-                [attr.maxlength]="maxLength"
-                [attr.minlength]="minLength"
-                [ngClass]="{'ng-invalid ng-dirty': showError}"
-                (input)="onInputChange($event)"
-                (blur)="onBlur()">
-        </span>
-        <ng-template #noIconInput>
-            <input
-                [type]="type"
-                pInputText
-                [placeholder]="placeholder"
-                [value]="value"
-                [disabled]="disabled || inputDisabled"
-                [readonly]="readonly"
-                [attr.maxlength]="maxLength"
-                [attr.minlength]="minLength"
-                [ngClass]="{'ng-invalid ng-dirty': showError}"
-                (input)="onInputChange($event)"
-                (blur)="onBlur()">
-        </ng-template>
+  <label *ngIf="label">
+    {{ label }}
+    <span class="required" *ngIf="required">*</span>
+  </label>
+  <!-- Textarea Mode -->
+  <ng-container *ngIf="inputMode === 'textarea'; else inputBlock">
+    <textarea
+      pInputTextarea
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled || inputDisabled"
+      [readonly]="readonly"
+      [rows]="rows"
+      [autoResize]="autoResize"
+      [attr.maxlength]="maxLength"
+      [attr.minlength]="minLength"
+      [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+      (input)="onInputChange($event)"
+      (blur)="onBlur()"
+    >
+    </textarea>
+  </ng-container>
+  <!-- Input Mode -->
+  <ng-template #inputBlock>
+    <span class="p-input-icon-left" *ngIf="icon; else noIconInput">
+      <i class="pi {{ icon }}"></i>
+      <input
+        [type]="type"
+        pInputText
+        [placeholder]="placeholder"
+        [value]="value"
+        [disabled]="disabled || inputDisabled"
+        [readonly]="readonly"
+        [attr.maxlength]="maxLength"
+        [attr.minlength]="minLength"
+        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        (input)="onInputChange($event)"
+        (blur)="onBlur()"
+      />
+    </span>
+    <ng-template #noIconInput>
+      <input
+        [type]="type"
+        pInputText
+        [placeholder]="placeholder"
+        [value]="value"
+        [disabled]="disabled || inputDisabled"
+        [readonly]="readonly"
+        [attr.maxlength]="maxLength"
+        [attr.minlength]="minLength"
+        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        (input)="onInputChange($event)"
+        (blur)="onBlur()"
+      />
     </ng-template>
-    <small class="error-message" *ngIf="showError && errorMessage">
-        {{ errorMessage }}
-    </small>
+  </ng-template>
+  <small class="error-message" *ngIf="showError && errorMessage">
+    {{ errorMessage }}
+  </small>
 </div>

@@ -1,13 +1,13 @@
 .layout-topbar-indigo {
-    $topbarBgColor: #3F51B5;
-    $topbarLeftBgColor: #283593;
+  $topbarBgColor: #3f51b5;
+  $topbarLeftBgColor: #283593;
 
-    $topbarMenuButtonBgColor:#E91E63;
-    $topbarMenuButtonTextColor:#ffffff;
+  $topbarMenuButtonBgColor: #e91e63;
+  $topbarMenuButtonTextColor: #ffffff;
 
-    $topbarItemTextColor: #ffffff;
-    $topbarItemTextHoverBgColor: rgba(255,255,255,.12);
+  $topbarItemTextColor: #ffffff;
+  $topbarItemTextHoverBgColor: rgba(255, 255, 255, 0.12);
 
-    @import '../_topbar_exports';
-    @import '../_topbar_theme';
+  @import '../_topbar_exports';
+  @import '../_topbar_theme';
 }

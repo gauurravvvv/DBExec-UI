@@ -1,13 +1,13 @@
 .layout-topbar-lightgreen {
-    $topbarBgColor: #689F38;
-    $topbarLeftBgColor: #558B2F;
+  $topbarBgColor: #689f38;
+  $topbarLeftBgColor: #558b2f;
 
-    $topbarMenuButtonBgColor:#F57C00;
-    $topbarMenuButtonTextColor:#ffffff;
+  $topbarMenuButtonBgColor: #f57c00;
+  $topbarMenuButtonTextColor: #ffffff;
 
-    $topbarItemTextColor: #ffffff;
-    $topbarItemTextHoverBgColor: rgba(255,255,255,.12);
+  $topbarItemTextColor: #ffffff;
+  $topbarItemTextHoverBgColor: rgba(255, 255, 255, 0.12);
 
-    @import '../_topbar_exports';
-    @import '../_topbar_theme';
+  @import '../_topbar_exports';
+  @import '../_topbar_theme';
 }

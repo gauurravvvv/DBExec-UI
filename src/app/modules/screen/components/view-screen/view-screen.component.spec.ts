@@ -8,9 +8,8 @@ describe('ViewScreenComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ViewScreenComponent ]
-    })
-    .compileComponents();
+      declarations: [ViewScreenComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ViewScreenComponent);
     component = fixture.componentInstance;

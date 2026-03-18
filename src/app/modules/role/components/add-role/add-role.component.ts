@@ -37,7 +37,7 @@ export class AddRoleComponent implements OnInit {
     private router: Router,
     private roleService: RoleService,
     private organisationService: OrganisationService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     this.initForm();
   }
@@ -190,7 +190,7 @@ export class AddRoleComponent implements OnInit {
   private updateParentPermission(permission: any) {
     const parent = this.findPermissionById(
       this.permissions,
-      permission.parentId
+      permission.parentId,
     );
     if (parent && this.permissionControls[parent.value]) {
       this.permissionControls[parent.value].setValue(true, {

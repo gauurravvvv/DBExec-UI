@@ -16,7 +16,7 @@ export class TabManagementHelper {
     closeCallback: () => void,
     closeOthersCallback: () => void,
     closeToRightCallback: () => void,
-    closeToLeftCallback: () => void
+    closeToLeftCallback: () => void,
   ): ContextMenuItem[] {
     return [
       {
@@ -56,7 +56,7 @@ export class TabManagementHelper {
   static getDatabaseContextMenuItems(
     newScriptCallback: () => void,
     refreshCallback: () => void,
-    isNewScriptDisabled: boolean = false
+    isNewScriptDisabled: boolean = false,
   ): ContextMenuItem[] {
     return [
       {
@@ -80,7 +80,7 @@ export class TabManagementHelper {
     tabCounter: number,
     title: string,
     databaseId?: number,
-    databaseName: string = 'database'
+    databaseName: string = 'database',
   ): QueryTab {
     const tabId = `tab_${tabCounter}`;
     return {

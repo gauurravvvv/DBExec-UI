@@ -203,7 +203,7 @@ export function transformTabResponse(tab: TabApiResponse): ExecuteTab {
 }
 
 export function transformSectionResponse(
-  section: SectionApiResponse
+  section: SectionApiResponse,
 ): ExecuteSection {
   return {
     id: section.id,
@@ -224,10 +224,18 @@ export function transformSectionResponse(
  * Convert ISO date strings in appearance config to Date objects
  * so PrimeNG calendar components can use them directly.
  */
-function parseAppearanceDates(appearance: Record<string, any>): Record<string, any> {
+function parseAppearanceDates(
+  appearance: Record<string, any>,
+): Record<string, any> {
   if (!appearance) return appearance;
 
-  const dateFields = ['minDate', 'maxDate', 'defaultValue', 'defaultStartDate', 'defaultEndDate'];
+  const dateFields = [
+    'minDate',
+    'maxDate',
+    'defaultValue',
+    'defaultStartDate',
+    'defaultEndDate',
+  ];
   const parsed = { ...appearance };
 
   dateFields.forEach(field => {
@@ -241,7 +249,7 @@ function parseAppearanceDates(appearance: Record<string, any>): Record<string, a
 }
 
 export function transformPromptResponse(
-  prompt: PromptApiResponse
+  prompt: PromptApiResponse,
 ): ExecutePrompt {
   const config = prompt.config ? { ...prompt.config } : null;
   if (config?.appearance) {

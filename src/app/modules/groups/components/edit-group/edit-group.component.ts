@@ -12,6 +12,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { GroupService } from '../../services/group.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-edit-group',
@@ -51,7 +52,15 @@ export class EditGroupComponent implements OnInit {
   initForm(): void {
     this.groupForm = this.fb.group({
       id: [''],
-      name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s-]+$')]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: [''],
       organisation: ['', Validators.required],
       users: ['', [Validators.required, this.minUsersValidator(2)]],
@@ -116,16 +125,6 @@ export class EditGroupComponent implements OnInit {
     });
   }
 
-  getFieldErrorMessage(field: any): string {
-    if (field.get('name')?.errors?.['required']) {
-      return 'Field name is required';
-    }
-    if (field.get('name')?.errors?.['pattern']) {
-      return 'Field name can only contain letters and spaces';
-    }
-    return '';
-  }
-
   canSubmit(): boolean {
     const users = this.groupForm.get('users')?.value || [];
     return this.groupForm.valid && users.length > 1 && this.isFormDirty;
@@ -156,5 +155,17 @@ export class EditGroupComponent implements OnInit {
     const currentValue = this.groupForm.value;
     this.isFormDirty =
       JSON.stringify(this.originalFormValue) !== JSON.stringify(currentValue);
+  }
+
+  getNameError(): string {
+    const control = this.groupForm.get('name');
+    if (control?.errors?.['required']) return 'Group name is required';
+    if (control?.errors?.['minlength'])
+      return `Group name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Group name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Group name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 }

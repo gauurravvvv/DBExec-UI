@@ -83,7 +83,8 @@ export class NumberConfigDialogComponent implements OnChanges {
   }
 
   setAsDefault(): void {
-    if (this.previewValue !== null) this.config.defaultValue = this.previewValue;
+    if (this.previewValue !== null)
+      this.config.defaultValue = this.previewValue;
   }
 
   clearDefault(): void {

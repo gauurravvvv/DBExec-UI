@@ -1,13 +1,13 @@
 @keyframes overlayEnter {
-    from {
-        opacity: 0;
-        transform: scaleY(0.8);
-    }
+  from {
+    opacity: 0;
+    transform: scaleY(0.8);
+  }
 
-    to {
-        opacity: 1;
-        transform: none;
-    }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes fadeInDown {
@@ -34,26 +34,30 @@
 }
 
 @keyframes fadeinmask {
-    from { opacity: 0; }
-    to   { opacity: .8; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
 }
 
 .fadeInDown {
-    animation-name: fadeInDown;
+  animation-name: fadeInDown;
 }
 
 .fadeOutUp {
-    animation-name: fadeOutUp;
+  animation-name: fadeOutUp;
 }
 
 @keyframes modal-in {
   from {
-      background-color: transparent;
-    }
+    background-color: transparent;
+  }
 
-    to {
-        background-color: rgba(0,0,0,0.6);
-    }
+  to {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
 }
 
 .modal-in {
@@ -61,10 +65,10 @@
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(359deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
 }

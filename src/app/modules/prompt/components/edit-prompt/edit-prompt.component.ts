@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { PromptService } from '../../services/prompt.service';
@@ -61,7 +62,15 @@ export class EditPromptComponent implements OnInit {
   initForm(): void {
     this.promptForm = this.fb.group({
       id: [''],
-      name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s-]+$')]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: [''],
       organisation: [''],
       database: [''],
@@ -109,6 +118,18 @@ export class EditPromptComponent implements OnInit {
         this.sections = response.data;
       }
     });
+  }
+
+  getNameError(): string {
+    const control = this.promptForm.get('name');
+    if (control?.errors?.['required']) return 'Prompt name is required';
+    if (control?.errors?.['minlength'])
+      return `Prompt name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Prompt name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Prompt name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 
   onSubmit(): void {

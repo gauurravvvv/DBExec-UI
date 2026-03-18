@@ -111,7 +111,10 @@ export class RadioConfigDialogComponent implements OnChanges {
       this.formattedOptions = this.promptValues;
       return;
     }
-    this.formattedOptions = this.promptValues.map(val => ({ label: String(val), value: val }));
+    this.formattedOptions = this.promptValues.map(val => ({
+      label: String(val),
+      value: val,
+    }));
   }
 
   applyPreview(): void {

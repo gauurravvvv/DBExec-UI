@@ -1,7 +1,10 @@
 <!-- Search Modal Overlay -->
-<div class="search-overlay" *ngIf="showSearchModal" (click)="closeSearchModal()">
+<div
+  class="search-overlay"
+  *ngIf="showSearchModal"
+  (click)="closeSearchModal()"
+>
   <div class="search-modal" (click)="$event.stopPropagation()">
-
     <!-- Search Header -->
     <div class="search-header">
       <div class="search-input-row">
@@ -13,7 +16,8 @@
           (input)="onSearch()"
           placeholder="Search anything..."
           class="search-input"
-          autocomplete="off">
+          autocomplete="off"
+        />
         <div class="header-actions">
           <kbd class="key-hint">ESC</kbd>
           <button class="close-btn" (click)="closeSearchModal()">
@@ -25,12 +29,20 @@
 
     <!-- Filter Tabs -->
     <div class="search-filters" *ngIf="uniqueEntityTypes.length > 0">
-      <button class="filter-pill" [class.active]="activeFilter === 'ALL'" (click)="setFilter('ALL')">
+      <button
+        class="filter-pill"
+        [class.active]="activeFilter === 'ALL'"
+        (click)="setFilter('ALL')"
+      >
         All
         <span class="pill-count">{{ searchResults.length }}</span>
       </button>
-      <button class="filter-pill" *ngFor="let type of uniqueEntityTypes"
-        [class.active]="activeFilter === type" (click)="setFilter(type)">
+      <button
+        class="filter-pill"
+        *ngFor="let type of uniqueEntityTypes"
+        [class.active]="activeFilter === type"
+        (click)="setFilter(type)"
+      >
         {{ type }}
         <span class="pill-count">{{ getCountForType(type) }}</span>
       </button>
@@ -38,8 +50,11 @@
 
     <!-- Results -->
     <div class="search-results" *ngIf="searchResults.length > 0">
-      <div class="result-item" *ngFor="let result of filteredSearchResults"
-        (click)="navigateToResult(result)">
+      <div
+        class="result-item"
+        *ngFor="let result of filteredSearchResults"
+        (click)="navigateToResult(result)"
+      >
         <div class="result-icon-wrap">
           <i [class]="result.icon"></i>
         </div>
@@ -48,7 +63,9 @@
           <div class="result-meta">
             <span class="result-type-tag">{{ result.entityType }}</span>
             <ng-container *ngIf="result.breadcrumb">
-              <span class="breadcrumb-sep"><i class="pi pi-chevron-right"></i></span>
+              <span class="breadcrumb-sep"
+                ><i class="pi pi-chevron-right"></i
+              ></span>
               <span class="result-breadcrumb">{{ result.breadcrumb }}</span>
             </ng-container>
           </div>
@@ -62,7 +79,9 @@
       <div class="empty-icon-wrap">
         <i class="pi pi-search"></i>
       </div>
-      <p class="empty-title">No results for <strong>"{{ searchTerm }}"</strong></p>
+      <p class="empty-title">
+        No results for <strong>"{{ searchTerm }}"</strong>
+      </p>
       <p class="empty-hint">Try different keywords or check the spelling</p>
     </div>
 
@@ -77,6 +96,5 @@
       <div class="footer-hint"><kbd>↵</kbd> Open</div>
       <div class="footer-hint"><kbd>ESC</kbd> Close</div>
     </div>
-
   </div>
 </div>

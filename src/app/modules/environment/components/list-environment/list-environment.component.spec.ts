@@ -8,9 +8,8 @@ describe('ListEnvironmentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ListEnvironmentComponent ]
-    })
-    .compileComponents();
+      declarations: [ListEnvironmentComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ListEnvironmentComponent);
     component = fixture.componentInstance;

@@ -50,7 +50,15 @@ export class AddConnectionComponent implements OnInit {
 
   private initForm() {
     this.connectionForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: [''],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
@@ -106,8 +114,6 @@ export class AddConnectionComponent implements OnInit {
 
   onSubmit() {
     if (this.connectionForm.valid) {
-      const formValue = this.connectionForm.value;
-
       this.connectionService
         .addConnection(this.connectionForm)
         .then(response => {
@@ -135,5 +141,17 @@ export class AddConnectionComponent implements OnInit {
       this.connectionForm.dirty ||
       this.connectionForm.get('organisation')?.value !== '' ||
       this.connectionForm.get('database')?.value !== '';
+  }
+
+  getNameError(): string {
+    const control = this.connectionForm.get('name');
+    if (control?.errors?.['required']) return 'Connection name is required';
+    if (control?.errors?.['minlength'])
+      return `Connection name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Connection name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 }

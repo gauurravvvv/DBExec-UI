@@ -14,7 +14,7 @@ export class DashboardService {
       map((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
         return result;
-      })
+      }),
     );
   }
 }

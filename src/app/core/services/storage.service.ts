@@ -1,4 +1,4 @@
-import { StorageType, SessionStorageType } from "src/app/constants/storageType";
+import { StorageType, SessionStorageType } from 'src/app/constants/storageType';
 
 export class StorageService {
   static localStorage = window.localStorage;

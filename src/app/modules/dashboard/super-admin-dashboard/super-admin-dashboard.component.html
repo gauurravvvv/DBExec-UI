@@ -10,8 +10,14 @@
         Organisation:
       </label>
       <div class="custom-select">
-        <select id="organization" class="form-control" (change)="onOrganizationChange($event)">
-          <option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</option>
+        <select
+          id="organization"
+          class="form-control"
+          (change)="onOrganizationChange($event)"
+        >
+          <option *ngFor="let org of organizations" [value]="org.id">
+            {{ org.name }}
+          </option>
         </select>
         <i class="fas fa-chevron-down"></i>
       </div>
@@ -21,7 +27,11 @@
   <div class="dashboard-content">
     <div class="overview-section">
       <div class="overview-cards">
-        <div class="overview-card" *ngFor="let overview of overviews; let i = index" [@fadeInUp]>
+        <div
+          class="overview-card"
+          *ngFor="let overview of overviews; let i = index"
+          [@fadeInUp]
+        >
           <div class="card-icon" [ngClass]="'bg-' + (i + 1)">
             <i [class]="getOverviewIcon(overview.title)"></i>
           </div>
@@ -29,7 +39,10 @@
             <h4>{{ overview.title }}</h4>
             <p class="value">{{ overview.value }}</p>
             <div class="progress-bar">
-              <div class="progress" [style.width.%]="getProgressValue(overview)"></div>
+              <div
+                class="progress"
+                [style.width.%]="getProgressValue(overview)"
+              ></div>
             </div>
           </div>
         </div>
@@ -62,7 +75,10 @@
                 <span class="value">{{ stat.value }}</span>
               </div>
               <div class="progress-bar">
-                <div class="progress" [style.width.%]="getProgressPercentage(stat.value)"></div>
+                <div
+                  class="progress"
+                  [style.width.%]="getProgressPercentage(stat.value)"
+                ></div>
               </div>
             </div>
           </div>

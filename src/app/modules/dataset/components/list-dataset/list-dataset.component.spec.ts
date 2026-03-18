@@ -8,9 +8,8 @@ describe('ListDatasetComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ListDatasetComponent ]
-    })
-    .compileComponents();
+      declarations: [ListDatasetComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ListDatasetComponent);
     component = fixture.componentInstance;

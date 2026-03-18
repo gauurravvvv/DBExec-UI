@@ -27,7 +27,10 @@ export class GlobalService {
   visualizationUrl!: SafeResourceUrl;
   search!: string;
 
-  constructor(private router: Router, private messageService: MessageService) {}
+  constructor(
+    private router: Router,
+    private messageService: MessageService,
+  ) {}
 
   chipNameProvider(fullName: string | undefined | null) {
     const splitNameArray: string[] | undefined = fullName?.trim()?.split(' ');
@@ -164,7 +167,7 @@ export class GlobalService {
   handleSuccessService(
     result: IAPIResponse,
     showToast = true,
-    showErrorToast = true
+    showErrorToast = true,
   ) {
     if (result.code == 200) {
       if (showToast)

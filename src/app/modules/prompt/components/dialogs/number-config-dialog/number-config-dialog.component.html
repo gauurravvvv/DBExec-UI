@@ -1,127 +1,222 @@
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '900px'}" [draggable]="false" [resizable]="false"
-    header="Customise Number Input" styleClass="number-config-dialog" (onHide)="onClose()">
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '900px' }"
+  [draggable]="false"
+  [resizable]="false"
+  header="Customise Number Input"
+  styleClass="number-config-dialog"
+  (onHide)="onClose()"
+>
+  <div class="dialog-content">
+    <div class="config-panel">
+      <div class="panel-header">
+        <i class="pi pi-cog"></i><span>Configuration Options</span>
+      </div>
+      <div class="config-form">
+        <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
 
-    <div class="dialog-content">
-        <div class="config-panel">
-            <div class="panel-header"><i class="pi pi-cog"></i><span>Configuration Options</span></div>
-            <div class="config-form">
-
-                <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
-
-                <div class="config-group">
-                    <label>Placeholder Text</label>
-                    <input type="text" pInputText [(ngModel)]="config.placeholder" placeholder="e.g., Enter number" />
-                </div>
-                <div class="config-group">
-                    <label>Minimum Value (optional)</label>
-                    <p-inputNumber [(ngModel)]="config.min" placeholder="No minimum" [showButtons]="true"
-                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
-                        [style]="{width:'100%'}">
-                    </p-inputNumber>
-                </div>
-                <div class="config-group">
-                    <label>Maximum Value (optional)</label>
-                    <p-inputNumber [(ngModel)]="config.max" placeholder="No maximum" [showButtons]="true"
-                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
-                        [style]="{width:'100%'}">
-                    </p-inputNumber>
-                </div>
-                <div class="config-group">
-                    <label>Step Increment</label>
-                    <p-inputNumber [(ngModel)]="config.step" [min]="0.01" [showButtons]="true" buttonLayout="horizontal"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" [style]="{width:'100%'}">
-                    </p-inputNumber>
-                </div>
-
-                <div class="section-label"><i class="pi pi-sort-alt"></i> Spinner Buttons</div>
-
-                <div class="config-row"><label>Show +/- Buttons</label>
-                    <p-inputSwitch [(ngModel)]="config.showButtons"></p-inputSwitch>
-                </div>
-
-                <div class="section-label"><i class="pi pi-tag"></i> Format</div>
-
-                <div class="config-group">
-                    <label>Prefix</label>
-                    <input type="text" pInputText [(ngModel)]="config.prefix" placeholder="e.g., $" />
-                </div>
-                <div class="config-group">
-                    <label>Suffix</label>
-                    <input type="text" pInputText [(ngModel)]="config.suffix" placeholder="e.g., kg" />
-                </div>
-
-                <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
-
-                <div class="config-row"><label>Disabled</label>
-                    <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
-                </div>
-                <div class="config-row"><label>Read-Only</label>
-                    <p-inputSwitch [(ngModel)]="config.readonly"></p-inputSwitch>
-                </div>
-
-
-            </div>
-            <div class="apply-preview-action">
-                <button class="btn-primary" type="button" (click)="applyPreview()">
-                    <i class="pi pi-refresh"></i>
-                    Apply Preview
-                </button>
-            </div>
+        <div class="config-group">
+          <label>Placeholder Text</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="config.placeholder"
+            placeholder="e.g., Enter number"
+          />
+        </div>
+        <div class="config-group">
+          <label>Minimum Value (optional)</label>
+          <p-inputNumber
+            [(ngModel)]="config.min"
+            placeholder="No minimum"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus"
+            [style]="{ width: '100%' }"
+          >
+          </p-inputNumber>
+        </div>
+        <div class="config-group">
+          <label>Maximum Value (optional)</label>
+          <p-inputNumber
+            [(ngModel)]="config.max"
+            placeholder="No maximum"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus"
+            [style]="{ width: '100%' }"
+          >
+          </p-inputNumber>
+        </div>
+        <div class="config-group">
+          <label>Step Increment</label>
+          <p-inputNumber
+            [(ngModel)]="config.step"
+            [min]="0.01"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus"
+            [style]="{ width: '100%' }"
+          >
+          </p-inputNumber>
         </div>
 
-        <div class="preview-panel">
-            <div class="panel-header"><i class="pi pi-eye"></i><span>Preview</span></div>
-            <div class="preview-content">
-                <div class="preview-label">Try it out:</div>
-
-                <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <app-custom-number [(ngModel)]="previewValue" [placeholder]="previewConfig.placeholder"
-                        [min]="$any(previewConfig.min)" [max]="$any(previewConfig.max)" [step]="previewConfig.step"
-                        [showButtons]="previewConfig.showButtons" [prefix]="previewConfig.prefix" [suffix]="previewConfig.suffix"
-                        [readonly]="previewConfig.readonly" [numberDisabled]="previewConfig.disabled">
-                    </app-custom-number>
-                </ng-container>
-
-                <div class="preview-actions" *ngIf="previewValue !== null">
-                    <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
-                        icon="pi pi-check" (click)="setAsDefault()"></button>
-                </div>
-
-                <div class="default-indicator" *ngIf="config.defaultValue !== null">
-                    <i class="pi pi-bookmark"></i>
-                    <span>Default: <strong>{{ config.defaultValue }}</strong></span>
-                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
-                        (click)="clearDefault()" pTooltip="Clear default"></button>
-                </div>
-
-                <div class="config-summary">
-                    <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
-                    <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="previewConfig.showButtons">Buttons</span>
-                        <span class="summary-chip" *ngIf="previewConfig.min !== null">Min: {{ previewConfig.min }}</span>
-                        <span class="summary-chip" *ngIf="previewConfig.max !== null">Max: {{ previewConfig.max }}</span>
-                        <span class="summary-chip" *ngIf="previewConfig.prefix">Prefix</span>
-                        <span class="summary-chip" *ngIf="previewConfig.suffix">Suffix</span>
-                        <span class="summary-chip" *ngIf="previewConfig.disabled">Disabled</span>
-                        <span class="summary-chip" *ngIf="previewConfig.readonly">Read-only</span>
-                        <span class="summary-empty"
-                            *ngIf="previewConfig.showButtons && previewConfig.min === null && previewConfig.max === null && !previewConfig.prefix && !previewConfig.suffix && !previewConfig.disabled && !previewConfig.readonly">
-                            Default configuration
-                        </span>
-                    </div>
-                </div>
-            </div>
+        <div class="section-label">
+          <i class="pi pi-sort-alt"></i> Spinner Buttons
         </div>
+
+        <div class="config-row">
+          <label>Show +/- Buttons</label>
+          <p-inputSwitch [(ngModel)]="config.showButtons"></p-inputSwitch>
+        </div>
+
+        <div class="section-label"><i class="pi pi-tag"></i> Format</div>
+
+        <div class="config-group">
+          <label>Prefix</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="config.prefix"
+            placeholder="e.g., $"
+          />
+        </div>
+        <div class="config-group">
+          <label>Suffix</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="config.suffix"
+            placeholder="e.g., kg"
+          />
+        </div>
+
+        <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
+
+        <div class="config-row">
+          <label>Disabled</label>
+          <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
+        </div>
+        <div class="config-row">
+          <label>Read-Only</label>
+          <p-inputSwitch [(ngModel)]="config.readonly"></p-inputSwitch>
+        </div>
+      </div>
+      <div class="apply-preview-action">
+        <button class="btn-primary" type="button" (click)="applyPreview()">
+          <i class="pi pi-refresh"></i>
+          Apply Preview
+        </button>
+      </div>
     </div>
 
-    <ng-template pTemplate="footer">
-        <button class="btn-cancel" type="button" (click)="onClose()">
-            <i class="pi pi-times"></i>
-            Cancel
-        </button>
-        <button class="btn-primary" type="button" (click)="onSave()">
-            <i class="pi pi-check"></i>
-            Apply
-        </button>
-    </ng-template>
+    <div class="preview-panel">
+      <div class="panel-header">
+        <i class="pi pi-eye"></i><span>Preview</span>
+      </div>
+      <div class="preview-content">
+        <div class="preview-label">Try it out:</div>
+
+        <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
+          <app-custom-number
+            [(ngModel)]="previewValue"
+            [placeholder]="previewConfig.placeholder"
+            [min]="$any(previewConfig.min)"
+            [max]="$any(previewConfig.max)"
+            [step]="previewConfig.step"
+            [showButtons]="previewConfig.showButtons"
+            [prefix]="previewConfig.prefix"
+            [suffix]="previewConfig.suffix"
+            [readonly]="previewConfig.readonly"
+            [numberDisabled]="previewConfig.disabled"
+          >
+          </app-custom-number>
+        </ng-container>
+
+        <div class="preview-actions" *ngIf="previewValue !== null">
+          <button
+            pButton
+            type="button"
+            label="Set as Default"
+            class="p-button-text p-button-sm"
+            icon="pi pi-check"
+            (click)="setAsDefault()"
+          ></button>
+        </div>
+
+        <div class="default-indicator" *ngIf="config.defaultValue !== null">
+          <i class="pi pi-bookmark"></i>
+          <span
+            >Default: <strong>{{ config.defaultValue }}</strong></span
+          >
+          <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="p-button-text p-button-rounded p-button-sm"
+            (click)="clearDefault()"
+            pTooltip="Clear default"
+          ></button>
+        </div>
+
+        <div class="config-summary">
+          <div class="summary-title">
+            <i class="pi pi-info-circle"></i> Active Settings
+          </div>
+          <div class="summary-chips">
+            <span class="summary-chip" *ngIf="previewConfig.showButtons"
+              >Buttons</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.min !== null"
+              >Min: {{ previewConfig.min }}</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.max !== null"
+              >Max: {{ previewConfig.max }}</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.prefix"
+              >Prefix</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.suffix"
+              >Suffix</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.disabled"
+              >Disabled</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.readonly"
+              >Read-only</span
+            >
+            <span
+              class="summary-empty"
+              *ngIf="
+                previewConfig.showButtons &&
+                previewConfig.min === null &&
+                previewConfig.max === null &&
+                !previewConfig.prefix &&
+                !previewConfig.suffix &&
+                !previewConfig.disabled &&
+                !previewConfig.readonly
+              "
+            >
+              Default configuration
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button class="btn-cancel" type="button" (click)="onClose()">
+      <i class="pi pi-times"></i>
+      Cancel
+    </button>
+    <button class="btn-primary" type="button" (click)="onSave()">
+      <i class="pi pi-check"></i>
+      Apply
+    </button>
+  </ng-template>
 </p-dialog>

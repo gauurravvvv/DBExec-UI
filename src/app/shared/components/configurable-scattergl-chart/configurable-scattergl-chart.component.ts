@@ -1,5 +1,12 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
 } from '@angular/core';
 import { buildScatterGLChartOption } from '../../helpers/echarts-option-builder';
 
@@ -8,7 +15,9 @@ import { buildScatterGLChartOption } from '../../helpers/echarts-option-builder'
   templateUrl: './configurable-scattergl-chart.component.html',
   styleUrls: ['./configurable-scattergl-chart.component.scss'],
 })
-export class ConfigurableScatterGlChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableScatterGlChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
 
   @Input() data: any[] = [];
@@ -40,7 +49,12 @@ export class ConfigurableScatterGlChartComponent implements OnInit, OnChanges, D
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }

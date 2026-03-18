@@ -15,7 +15,9 @@ import { buildCandlestickChartOption } from '../../helpers/echarts-option-builde
   templateUrl: './configurable-candlestick-chart.component.html',
   styleUrls: ['./configurable-candlestick-chart.component.scss'],
 })
-export class ConfigurableCandlestickChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableCandlestickChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
 
   @Input() data: any[] = [];
@@ -50,7 +52,12 @@ export class ConfigurableCandlestickChartComponent implements OnInit, OnChanges,
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }

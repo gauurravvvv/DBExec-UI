@@ -50,7 +50,7 @@ export class ListEnvironmentComponent implements OnInit {
     private environmentService: EnvironmentService,
     private organisationService: OrganisationService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -132,7 +132,7 @@ export class ListEnvironmentComponent implements OnInit {
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
       filtered = filtered.filter(env =>
-        env.name.toLowerCase().includes(search)
+        env.name.toLowerCase().includes(search),
       );
     }
 

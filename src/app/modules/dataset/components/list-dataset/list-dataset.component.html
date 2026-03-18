@@ -1,271 +1,367 @@
 <div class="dataset-page-wrapper">
-    <div class="dataset-content-container">
-
-        <!-- Header Section -->
-        <div class="page-header-section">
-            <div class="header-content">
-                <h2>Datasets</h2>
-                <p class="subtitle">Manage datasets required for creating analyses</p>
-            </div>
-        </div>
-
-        <!-- Unified Toolbar & Content Card -->
-        <div class="content-card">
-            <div class="card-toolbar">
-                <div class="toolbar-left">
-                    <!-- Organisation Dropdown -->
-                    <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-                        <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name"
-                            optionValue="id" [filter]="true" label="Organisation" [floatingLabel]="true" filterBy="name"
-                            (onChangeEvent)="onOrgChange($event)">
-                        </app-custom-dropdown>
-                    </div>
-
-                    <!-- Database Dropdown -->
-                    <div class="dropdown-field">
-                        <app-custom-dropdown [(ngModel)]="selectedDatabase" placeholder="Select Database"
-                            [options]="databases" optionLabel="name" optionValue="id" [filter]="true"
-                            [floatingLabel]="true" label="Database" filterBy="name"
-                            (onChangeEvent)="onDBChange($event)">
-                        </app-custom-dropdown>
-                    </div>
-                </div>
-
-                <div class="toolbar-right">
-                    <!-- Clear Filters Button -->
-                    <button pButton label="Clear Filters" icon="pi pi-filter-slash" (click)="clearFilters()"
-                        [disabled]="!isFilterActive" class="p-button-outlined p-button-danger modern-button mr-2">
-                    </button>
-
-                    <!-- Add Button -->
-                    <p-splitButton label="Add" icon="pi pi-plus" (onClick)="onAddNewAdmin()" [model]="addDatasetItems"
-                        styleClass="p-button-raised p-button-primary modern-split-button" appendTo="body">
-                    </p-splitButton>
-                </div>
-            </div>
-
-            <!-- Table -->
-            <div class="table-wrapper">
-                <p-table #dt [value]="datasets" [rows]="10" [paginator]="true" [lazy]="true"
-                    (onLazyLoad)="loadDatasets($event)" [totalRecords]="totalRecords"
-                    [globalFilterFields]="['name','description','status']" [rowHover]="true" dataKey="id"
-                    currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
-                    [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
-                    scrollHeight="calc(100vh - 440px)">
-
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th style="width: 30%" pFrozenColumn>
-                                <div class="th-content">
-                                    Name
-                                </div>
-                            </th>
-                            <th style="width: 35%">
-                                <div class="th-content">
-                                    Description
-                                </div>
-                            </th>
-                            <th style="width: 10%">
-                                <div class="th-content">
-                                    Status
-                                </div>
-                            </th>
-                            <th style="width: 15%">
-                                <div class="th-content">
-                                    Created
-                                </div>
-                            </th>
-                            <th style="width: 10%">
-                                <div class="th-content">
-                                    Actions
-                                </div>
-                            </th>
-                        </tr>
-                        <!-- Filter Row -->
-                        <tr>
-                            <th pFrozenColumn>
-                                <input pInputText type="text" [(ngModel)]="filterValues.name" (input)="onFilterChange()"
-                                    placeholder="Search Name" class="w-full p-column-filter">
-                            </th>
-                            <th>
-                                <input pInputText type="text" [(ngModel)]="filterValues.description"
-                                    (input)="onFilterChange()" placeholder="Search Description"
-                                    class="w-full p-column-filter">
-                            </th>
-                            <th>
-                                <!-- No filter for Created -->
-                            </th>
-                            <th>
-                                <!-- No filter for Status -->
-                            </th>
-                            <th>
-                                <!-- No filter for Actions -->
-                            </th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-dataset>
-                        <tr class="modern-row">
-                            <td pFrozenColumn>
-                                <a class="dataset-name-link"
-                                    [routerLink]="['/app/dataset/view', selectedOrg, dataset.id]">
-                                    {{ dataset.name }}
-                                </a>
-                            </td>
-                            <td>
-                                <span class="description-text" [title]="dataset.description">{{ dataset.description
-                                    }}</span>
-                            </td>
-                            <td>
-                                <span class="status-indicator"
-                                    [ngClass]="{'active': dataset.status === 1, 'inactive': dataset.status !== 1}">
-                                    <span class="dot"></span>
-                                    {{ dataset.status === 1 ? 'Active' : 'Inactive' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="date-text">{{ dataset.createdOn | date:'medium' }}</span>
-                            </td>
-                            <td>
-                                <div class="row-actions">
-                                    <button class="icon-btn edit-btn" (click)="useAsAnalysis(dataset.id)"
-                                        pTooltip="Create Analysis" tooltipPosition="bottom">
-                                        <i class="pi pi-chart-bar"></i>
-                                    </button>
-                                    <button class="icon-btn edit-btn" (click)="onEdit(dataset.id)" pTooltip="Edit"
-                                        tooltipPosition="bottom">
-                                        <i class="pi pi-pencil"></i>
-                                    </button>
-                                    <button class="icon-btn delete-btn" (click)="confirmDelete(dataset.id)"
-                                        pTooltip="Delete" tooltipPosition="bottom">
-                                        <i class="pi pi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="emptymessage">
-                        <tr>
-                            <td colspan="5" class="empty-message-cell text-center">
-                                No such record found
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </div>
-        </div>
+  <div class="dataset-content-container">
+    <!-- Header Section -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>Datasets</h2>
+        <p class="subtitle">Manage datasets required for creating analyses</p>
+      </div>
     </div>
+
+    <!-- Unified Toolbar & Content Card -->
+    <div class="content-card">
+      <div class="card-toolbar">
+        <div class="toolbar-left">
+          <!-- Organisation Dropdown -->
+          <div class="dropdown-field" *ngIf="showOrganisationDropdown">
+            <app-custom-dropdown
+              [(ngModel)]="selectedOrg"
+              [options]="organisations"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              label="Organisation"
+              [floatingLabel]="true"
+              filterBy="name"
+              (onChangeEvent)="onOrgChange($event)"
+            >
+            </app-custom-dropdown>
+          </div>
+
+          <!-- Database Dropdown -->
+          <div class="dropdown-field">
+            <app-custom-dropdown
+              [(ngModel)]="selectedDatabase"
+              placeholder="Select Database"
+              [options]="databases"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [floatingLabel]="true"
+              label="Database"
+              filterBy="name"
+              (onChangeEvent)="onDBChange($event)"
+            >
+            </app-custom-dropdown>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <!-- Clear Filters Button -->
+          <button
+            pButton
+            label="Clear Filters"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button mr-2"
+          ></button>
+
+          <!-- Add Button -->
+          <p-splitButton
+            label="Add"
+            icon="pi pi-plus"
+            (onClick)="onAddNewAdmin()"
+            [model]="addDatasetItems"
+            styleClass="p-button-raised p-button-primary modern-split-button"
+            appendTo="body"
+          >
+          </p-splitButton>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <p-table
+          #dt
+          [value]="datasets"
+          [rows]="10"
+          [paginator]="true"
+          [lazy]="true"
+          (onLazyLoad)="loadDatasets($event)"
+          [totalRecords]="totalRecords"
+          [globalFilterFields]="['name', 'description', 'status']"
+          [rowHover]="true"
+          dataKey="id"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10, 25, 50, 100]"
+          styleClass="p-datatable-sm modern-table"
+          [scrollable]="true"
+          scrollHeight="calc(100vh - 440px)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 30%" pFrozenColumn>
+                <div class="th-content">Name</div>
+              </th>
+              <th style="width: 35%">
+                <div class="th-content">Description</div>
+              </th>
+              <th style="width: 10%">
+                <div class="th-content">Status</div>
+              </th>
+              <th style="width: 15%">
+                <div class="th-content">Created</div>
+              </th>
+              <th style="width: 10%">
+                <div class="th-content">Actions</div>
+              </th>
+            </tr>
+            <!-- Filter Row -->
+            <tr>
+              <th pFrozenColumn>
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.name"
+                  (input)="onFilterChange()"
+                  placeholder="Search Name"
+                  class="w-full p-column-filter"
+                />
+              </th>
+              <th>
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.description"
+                  (input)="onFilterChange()"
+                  placeholder="Search Description"
+                  class="w-full p-column-filter"
+                />
+              </th>
+              <th>
+                <!-- No filter for Created -->
+              </th>
+              <th>
+                <!-- No filter for Status -->
+              </th>
+              <th>
+                <!-- No filter for Actions -->
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-dataset>
+            <tr class="modern-row">
+              <td pFrozenColumn>
+                <a
+                  class="dataset-name-link"
+                  [routerLink]="['/app/dataset/view', selectedOrg, dataset.id]"
+                >
+                  {{ dataset.name }}
+                </a>
+              </td>
+              <td>
+                <span class="description-text" [title]="dataset.description">{{
+                  dataset.description
+                }}</span>
+              </td>
+              <td>
+                <span
+                  class="status-indicator"
+                  [ngClass]="{
+                    active: dataset.status === 1,
+                    inactive: dataset.status !== 1,
+                  }"
+                >
+                  <span class="dot"></span>
+                  {{ dataset.status === 1 ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <span class="date-text">{{
+                  dataset.createdOn | date: 'medium'
+                }}</span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button
+                    class="icon-btn edit-btn"
+                    (click)="useAsAnalysis(dataset.id)"
+                    pTooltip="Create Analysis"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-chart-bar"></i>
+                  </button>
+                  <button
+                    class="icon-btn edit-btn"
+                    (click)="onEdit(dataset.id)"
+                    pTooltip="Edit"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button
+                    class="icon-btn delete-btn"
+                    (click)="confirmDelete(dataset.id)"
+                    pTooltip="Delete"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" class="empty-message-cell text-center">
+                No such record found
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-    <div class="popup-content">
-        <!-- Header -->
-        <div class="popup-header">
-            <div class="popup-icon">
-                <i class="pi pi-trash"></i>
-            </div>
-            <h3>Confirm Delete</h3>
-        </div>
-
-        <!-- Delete Info Section -->
-        <div class="standard-delete-section">
-            <p class="delete-intro">
-                Are you sure you want to delete this dataset?
-            </p>
-
-            <ul class="delete-info-list">
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>All associated analyses will be affected</span>
-                </li>
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>Dataset configurations will be removed</span>
-                </li>
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>This action cannot be undone</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Actions -->
-        <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">
-                <i class="pi pi-times"></i>
-                Cancel
-            </button>
-            <button class="btn-confirm" (click)="proceedDelete()">
-                <i class="pi pi-trash"></i>
-                Delete
-            </button>
-        </div>
+  <div class="popup-content">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3>Confirm Delete</h3>
     </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">Are you sure you want to delete this dataset?</p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>All associated analyses will be affected</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>Dataset configurations will be removed</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()">
+        <i class="pi pi-trash"></i>
+        Delete
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Command Palette: Query Builder Selection -->
-<div class="cmd-overlay" *ngIf="showQueryBuilderPopup" (click)="closeQueryBuilderPopup()">
-    <div class="cmd-palette" (click)="$event.stopPropagation()">
-        <!-- Search Input -->
-        <div class="cmd-search">
-            <i class="pi pi-search cmd-search-icon"></i>
-            <input #qbSearchInput type="text" [(ngModel)]="qbSearchTerm" (input)="onQbSearch()"
-                (keydown)="onQbKeydown($event)" placeholder="Search query builders..."
-                class="cmd-search-input" autocomplete="off" />
-            <span class="cmd-badge" *ngIf="!loadingQueryBuilders && qbTotalRecords > 0">{{ qbTotalRecords }}</span>
-            <i class="pi pi-spin pi-spinner cmd-search-spinner" *ngIf="loadingQueryBuilders"></i>
-            <kbd class="cmd-esc" (click)="closeQueryBuilderPopup()">ESC</kbd>
-        </div>
-
-        <!-- Results -->
-        <div class="cmd-results">
-            <!-- Loading (only on first load when no results yet) -->
-            <div class="cmd-empty" *ngIf="loadingQueryBuilders && queryBuilders.length === 0">
-                <i class="pi pi-spin pi-spinner"></i>
-                <span>Searching...</span>
-            </div>
-
-            <!-- No data -->
-            <div class="cmd-empty" *ngIf="!loadingQueryBuilders && queryBuilders.length === 0 && !qbSearchTerm">
-                <i class="pi pi-inbox"></i>
-                <span>No query builders for this database</span>
-            </div>
-
-            <!-- No search results -->
-            <div class="cmd-empty" *ngIf="!loadingQueryBuilders && queryBuilders.length === 0 && qbSearchTerm">
-                <i class="pi pi-search"></i>
-                <span>No results for "{{ qbSearchTerm }}"</span>
-            </div>
-
-            <!-- Result rows -->
-            <div class="cmd-row" *ngFor="let screen of queryBuilders; let i = index"
-                [class.active]="i === qbActiveIndex" (click)="onQueryBuilderSelect(screen)"
-                (mouseenter)="qbActiveIndex = i">
-                <div class="cmd-row-icon">
-                    <i class="pi pi-database"></i>
-                </div>
-                <div class="cmd-row-content">
-                    <span class="cmd-row-name">{{ screen.name }}</span>
-                    <span class="cmd-row-desc" *ngIf="screen.description">{{ screen.description }}</span>
-                </div>
-                <span class="cmd-row-status"
-                    [ngClass]="{'active': screen.status === 1, 'inactive': screen.status !== 1}">
-                    {{ screen.status === 1 ? 'Active' : 'Inactive' }}
-                </span>
-                <i class="pi pi-arrow-right cmd-row-arrow"></i>
-            </div>
-        </div>
-
-        <!-- Footer hints -->
-        <div class="cmd-footer">
-            <div class="cmd-hint">
-                <kbd>&uarr;</kbd><kbd>&darr;</kbd> <span>navigate</span>
-            </div>
-            <div class="cmd-hint">
-                <kbd>&crarr;</kbd> <span>select</span>
-            </div>
-            <div class="cmd-hint">
-                <kbd>esc</kbd> <span>close</span>
-            </div>
-        </div>
+<div
+  class="cmd-overlay"
+  *ngIf="showQueryBuilderPopup"
+  (click)="closeQueryBuilderPopup()"
+>
+  <div class="cmd-palette" (click)="$event.stopPropagation()">
+    <!-- Search Input -->
+    <div class="cmd-search">
+      <i class="pi pi-search cmd-search-icon"></i>
+      <input
+        #qbSearchInput
+        type="text"
+        [(ngModel)]="qbSearchTerm"
+        (input)="onQbSearch()"
+        (keydown)="onQbKeydown($event)"
+        placeholder="Search query builders..."
+        class="cmd-search-input"
+        autocomplete="off"
+      />
+      <span
+        class="cmd-badge"
+        *ngIf="!loadingQueryBuilders && qbTotalRecords > 0"
+        >{{ qbTotalRecords }}</span
+      >
+      <i
+        class="pi pi-spin pi-spinner cmd-search-spinner"
+        *ngIf="loadingQueryBuilders"
+      ></i>
+      <kbd class="cmd-esc" (click)="closeQueryBuilderPopup()">ESC</kbd>
     </div>
+
+    <!-- Results -->
+    <div class="cmd-results">
+      <!-- Loading (only on first load when no results yet) -->
+      <div
+        class="cmd-empty"
+        *ngIf="loadingQueryBuilders && queryBuilders.length === 0"
+      >
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Searching...</span>
+      </div>
+
+      <!-- No data -->
+      <div
+        class="cmd-empty"
+        *ngIf="
+          !loadingQueryBuilders && queryBuilders.length === 0 && !qbSearchTerm
+        "
+      >
+        <i class="pi pi-inbox"></i>
+        <span>No query builders for this database</span>
+      </div>
+
+      <!-- No search results -->
+      <div
+        class="cmd-empty"
+        *ngIf="
+          !loadingQueryBuilders && queryBuilders.length === 0 && qbSearchTerm
+        "
+      >
+        <i class="pi pi-search"></i>
+        <span>No results for "{{ qbSearchTerm }}"</span>
+      </div>
+
+      <!-- Result rows -->
+      <div
+        class="cmd-row"
+        *ngFor="let screen of queryBuilders; let i = index"
+        [class.active]="i === qbActiveIndex"
+        (click)="onQueryBuilderSelect(screen)"
+        (mouseenter)="qbActiveIndex = i"
+      >
+        <div class="cmd-row-icon">
+          <i class="pi pi-database"></i>
+        </div>
+        <div class="cmd-row-content">
+          <span class="cmd-row-name">{{ screen.name }}</span>
+          <span class="cmd-row-desc" *ngIf="screen.description">{{
+            screen.description
+          }}</span>
+        </div>
+        <span
+          class="cmd-row-status"
+          [ngClass]="{
+            active: screen.status === 1,
+            inactive: screen.status !== 1,
+          }"
+        >
+          {{ screen.status === 1 ? 'Active' : 'Inactive' }}
+        </span>
+        <i class="pi pi-arrow-right cmd-row-arrow"></i>
+      </div>
+    </div>
+
+    <!-- Footer hints -->
+    <div class="cmd-footer">
+      <div class="cmd-hint">
+        <kbd>&uarr;</kbd><kbd>&darr;</kbd> <span>navigate</span>
+      </div>
+      <div class="cmd-hint"><kbd>&crarr;</kbd> <span>select</span></div>
+      <div class="cmd-hint"><kbd>esc</kbd> <span>close</span></div>
+    </div>
+  </div>
 </div>

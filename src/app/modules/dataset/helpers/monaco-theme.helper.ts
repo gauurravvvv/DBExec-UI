@@ -6,7 +6,6 @@
 declare const monaco: any;
 
 export class MonacoThemeHelper {
-  
   /**
    * Define custom Monaco themes with pleasant colors
    */
@@ -32,8 +31,8 @@ export class MonacoThemeHelper {
         'editor.lineHighlightBackground': '#f6f8fa',
         'editorLineNumber.foreground': '#959da5',
         'editor.selectionBackground': '#c8e1ff',
-        'editor.inactiveSelectionBackground': '#e8f2ff'
-      }
+        'editor.inactiveSelectionBackground': '#e8f2ff',
+      },
     });
 
     // Custom dark theme with pleasant string color
@@ -55,8 +54,8 @@ export class MonacoThemeHelper {
         'editor.lineHighlightBackground': '#161b22',
         'editorLineNumber.foreground': '#6e7681',
         'editor.selectionBackground': '#1f4788',
-        'editor.inactiveSelectionBackground': '#1c2938'
-      }
+        'editor.inactiveSelectionBackground': '#1c2938',
+      },
     });
   }
 

@@ -218,7 +218,6 @@
           flex-direction: column;
         }
 
-
         // Custom scrollbar styling
         &::-webkit-scrollbar {
           width: 8px;
@@ -524,9 +523,15 @@
         }
 
         @keyframes tabGlow {
-          0% { background: rgba(33, 150, 243, 0.08); }
-          50% { background: rgba(33, 150, 243, 0.03); }
-          100% { background: transparent; }
+          0% {
+            background: rgba(33, 150, 243, 0.08);
+          }
+          50% {
+            background: rgba(33, 150, 243, 0.03);
+          }
+          100% {
+            background: transparent;
+          }
         }
       }
     }
@@ -684,7 +689,6 @@
       &:last-child {
         margin-bottom: 0 !important;
       }
-
     }
 
     // Direct DOM highlight for accordion sections via nav tree
@@ -811,8 +815,12 @@
     }
 
     @keyframes shimmerSweep {
-      0% { left: -60%; }
-      100% { left: 120%; }
+      0% {
+        left: -60%;
+      }
+      100% {
+        left: 120%;
+      }
     }
 
     .prompt-error {
@@ -1588,15 +1596,21 @@
   animation: resultsFadeIn 0.2s ease-out;
 
   @keyframes resultsFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 
 .results-popup-container {
   background: var(--card-background);
   border-radius: 8px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-color);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px var(--border-color);
   width: 90vw;
   max-width: 1200px;
   height: 85vh;

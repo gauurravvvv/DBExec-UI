@@ -23,7 +23,7 @@ export class ResetPasswordComponent implements OnInit {
     private router: Router,
     private loginService: LoginService,
     private globalService: GlobalService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     this.resetPasswordForm = this.fb.group(
       {
@@ -39,7 +39,7 @@ export class ResetPasswordComponent implements OnInit {
       },
       {
         validator: this.passwordMatchValidator,
-      }
+      },
     );
   }
 
@@ -70,6 +70,28 @@ export class ResetPasswordComponent implements OnInit {
           }
         });
     }
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.resetPasswordForm.get(fieldName);
+    if (!control?.errors) return '';
+    if (control.errors['required']) {
+      switch (fieldName) {
+        case 'otp':
+          return 'OTP is required';
+        case 'newPassword':
+          return 'Password is required';
+        case 'confirmPassword':
+          return 'Please confirm your password';
+        default:
+          return 'This field is required';
+      }
+    }
+    if (control.errors['pattern']) {
+      if (fieldName === 'otp') return 'OTP must be a 6-digit number';
+      return 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character';
+    }
+    return '';
   }
 
   onlyNumbers(event: KeyboardEvent): boolean {

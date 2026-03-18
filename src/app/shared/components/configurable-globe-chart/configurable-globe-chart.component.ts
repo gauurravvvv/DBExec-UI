@@ -1,5 +1,12 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
 } from '@angular/core';
 import { buildGlobeChartOption } from '../../helpers/echarts-option-builder';
 
@@ -8,7 +15,9 @@ import { buildGlobeChartOption } from '../../helpers/echarts-option-builder';
   templateUrl: './configurable-globe-chart.component.html',
   styleUrls: ['./configurable-globe-chart.component.scss'],
 })
-export class ConfigurableGlobeChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableGlobeChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
 
   @Input() data: any[] = [];
@@ -39,7 +48,12 @@ export class ConfigurableGlobeChartComponent implements OnInit, OnChanges, DoChe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }

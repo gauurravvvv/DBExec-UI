@@ -33,7 +33,7 @@ export class EditCategoryComponent implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private globalService: GlobalService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -77,7 +77,7 @@ export class EditCategoryComponent implements OnInit {
             description: categoryData.description,
             organisation: categoryData.organisationId,
             environments: categoryData.categoryMappings.map(
-              (mapping: any) => mapping.environmentId
+              (mapping: any) => mapping.environmentId,
             ),
             status: categoryData.status,
           });
@@ -106,7 +106,7 @@ export class EditCategoryComponent implements OnInit {
           ) {
             // Sort by sequence if needed
             const sortedConfigs = [...categoryData.configurations].sort(
-              (a, b) => a.sequence - b.sequence
+              (a, b) => a.sequence - b.sequence,
             );
 
             sortedConfigs.forEach((config: any) => {
@@ -119,7 +119,7 @@ export class EditCategoryComponent implements OnInit {
                       Validators.pattern('^[a-zA-Z][a-zA-Z0-9_]*$'),
                     ],
                   ],
-                })
+                }),
               );
             });
           } else {
@@ -211,7 +211,7 @@ export class EditCategoryComponent implements OnInit {
     setTimeout(() => {
       const formElement = document.querySelector('.admin-form');
       const newField = document.getElementById(
-        `field-${this.config.length - 1}`
+        `field-${this.config.length - 1}`,
       );
 
       if (formElement && newField) {

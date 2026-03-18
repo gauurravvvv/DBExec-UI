@@ -5,6 +5,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SuperAdminService } from '../../services/superAdmin.service';
+import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
 
 @Component({
   selector: 'app-add-super-admin',
@@ -24,7 +25,7 @@ export class AddSuperAdminComponent implements OnInit {
     private fb: FormBuilder,
     private superAdminService: SuperAdminService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +38,7 @@ export class AddSuperAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.firstName),
         ],
@@ -46,7 +47,7 @@ export class AddSuperAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.lastName),
         ],
@@ -60,7 +61,7 @@ export class AddSuperAdminComponent implements OnInit {
           Validators.pattern(REGEX.username),
         ],
       ],
-      password: ['', [Validators.required, Validators.pattern(REGEX.password)]],
+      password: ['', [Validators.required, passwordStrengthValidator()]],
       email: ['', [Validators.required, Validators.email]],
     });
   }
@@ -101,8 +102,10 @@ export class AddSuperAdminComponent implements OnInit {
     if (control?.errors?.['required']) return 'First name is required';
     if (control?.errors?.['minlength'])
       return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `First name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
-      return 'First name can only contain letters and hyphens';
+      return 'First name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
     return '';
   }
 
@@ -111,8 +114,10 @@ export class AddSuperAdminComponent implements OnInit {
     if (control?.errors?.['required']) return 'Last name is required';
     if (control?.errors?.['minlength'])
       return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Last name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
-      return 'Last name can only contain letters and hyphens';
+      return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
     return '';
   }
 
@@ -122,9 +127,29 @@ export class AddSuperAdminComponent implements OnInit {
     if (control?.errors?.['minlength'])
       return `Username must be at least ${control.errors['minlength'].requiredLength} characters`;
     if (control?.errors?.['maxlength'])
-      return `Username cannot exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return `Username must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
-      return 'Username can only contain letters, numbers, dots, hyphens and underscores';
+      return 'Username must start with a letter and can only contain letters, numbers, dots, hyphens and underscores';
+    return '';
+  }
+
+  getPasswordError(): string {
+    const control = this.adminForm.get('password');
+    if (control?.errors?.['required']) return 'Password is required';
+    if (control?.errors?.['passwordMinLength'])
+      return `Password must be at least ${control.errors['passwordMinLength'].requiredLength} characters`;
+    if (control?.errors?.['passwordMaxLength'])
+      return `Password must not exceed ${control.errors['passwordMaxLength'].requiredLength} characters`;
+    if (control?.errors?.['passwordNoSpaces'])
+      return 'Password must not contain spaces';
+    if (control?.errors?.['passwordLowercase'])
+      return 'Password must contain at least one lowercase letter';
+    if (control?.errors?.['passwordUppercase'])
+      return 'Password must contain at least one uppercase letter';
+    if (control?.errors?.['passwordDigit'])
+      return 'Password must contain at least one number';
+    if (control?.errors?.['passwordSpecial'])
+      return 'Password must contain at least one special character (e.g., @$!%*?&)';
     return '';
   }
 }

@@ -3,16 +3,32 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" routerLink="/app/super-admin">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/super-admin"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Add Super Admin</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" [disabled]="!isFormDirty"
-          (click)="onCancel()"></button>
-        <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-          [disabled]="adminForm.invalid">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="adminForm.invalid"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -22,28 +38,77 @@
     <form [formGroup]="adminForm" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
-        <app-custom-input formControlName="firstName" label="First Name" placeholder="Enter first name" icon="pi-user"
-          [required]="true" [showError]="!!(adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched)"
-          [errorMessage]="getFirstNameError()">
+        <app-custom-input
+          formControlName="firstName"
+          label="First Name"
+          placeholder="Enter first name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              adminForm.get('firstName')?.invalid &&
+              adminForm.get('firstName')?.touched
+            )
+          "
+          [errorMessage]="getFirstNameError()"
+        >
         </app-custom-input>
 
         <!-- Last Name -->
-        <app-custom-input formControlName="lastName" label="Last Name" placeholder="Enter last name" icon="pi-user"
-          [required]="true" [showError]="!!(adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched)"
-          [errorMessage]="getLastNameError()">
+        <app-custom-input
+          formControlName="lastName"
+          label="Last Name"
+          placeholder="Enter last name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              adminForm.get('lastName')?.invalid &&
+              adminForm.get('lastName')?.touched
+            )
+          "
+          [errorMessage]="getLastNameError()"
+        >
         </app-custom-input>
 
         <!-- Username -->
-        <app-custom-input formControlName="username" label="Username" placeholder="Enter username" icon="pi-user-edit"
-          [required]="true" [showError]="!!(adminForm.get('username')?.invalid && adminForm.get('username')?.touched)"
-          [errorMessage]="getUsernameError()">
+        <app-custom-input
+          formControlName="username"
+          label="Username"
+          placeholder="Enter username"
+          icon="pi-user-edit"
+          [required]="true"
+          [showError]="
+            !!(
+              adminForm.get('username')?.invalid &&
+              adminForm.get('username')?.touched
+            )
+          "
+          [errorMessage]="getUsernameError()"
+        >
         </app-custom-input>
 
         <!-- Email -->
-        <app-custom-input formControlName="email" label="Email" placeholder="Enter email address" icon="pi-envelope"
-          type="email" [required]="true"
-          [showError]="!!(adminForm.get('email')?.invalid && adminForm.get('email')?.touched)" [errorMessage]="adminForm.get('email')?.errors?.['required'] ? 'Email is required' : 
-                         adminForm.get('email')?.errors?.['email'] ? 'Please enter a valid email' : ''">
+        <app-custom-input
+          formControlName="email"
+          label="Email"
+          placeholder="Enter email address"
+          icon="pi-envelope"
+          type="email"
+          [required]="true"
+          [showError]="
+            !!(
+              adminForm.get('email')?.invalid && adminForm.get('email')?.touched
+            )
+          "
+          [errorMessage]="
+            adminForm.get('email')?.errors?.['required']
+              ? 'Email is required'
+              : adminForm.get('email')?.errors?.['email']
+                ? 'Please enter a valid email'
+                : ''
+          "
+        >
         </app-custom-input>
 
         <!-- Password -->
@@ -51,20 +116,32 @@
           <label for="password">Password <span class="required">*</span></label>
           <span class="p-input-icon-left p-input-icon-right">
             <i class="pi pi-lock"></i>
-            <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText formControlName="password"
-              placeholder="Enter password" [ngClass]="{
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              pInputText
+              formControlName="password"
+              placeholder="Enter password"
+              [ngClass]="{
                 'ng-invalid ng-dirty':
                   adminForm.get('password')?.invalid &&
-                  adminForm.get('password')?.touched
-              }" />
-            <i class="pi pi-eye" style="cursor: pointer" (click)="togglePassword($event)"></i>
+                  adminForm.get('password')?.touched,
+              }"
+            />
+            <i
+              class="pi pi-eye"
+              style="cursor: pointer"
+              (click)="togglePassword($event)"
+            ></i>
           </span>
-          <small class="error-message" *ngIf="
+          <small
+            class="error-message"
+            *ngIf="
               adminForm.get('password')?.invalid &&
               adminForm.get('password')?.touched
-            ">
-            Password must contain at least 8 characters, one uppercase letter,
-            one lowercase letter, one number and one special character
+            "
+          >
+            {{ getPasswordError() }}
           </small>
         </div>
       </div>

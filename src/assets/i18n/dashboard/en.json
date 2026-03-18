@@ -83,7 +83,7 @@
     "paused": "Paused",
     "taskType": "Task Type",
     "notScheduled": "Not Scheduled",
-    "nextRunTime":"Next Run Time",
+    "nextRunTime": "Next Run Time",
     "allTime": "All Time",
     "last7Days": "Last 7 Days",
     "last15Days": "Last 15 Days",
@@ -91,4 +91,3 @@
     "lastYear": "Last Year"
   }
 }
-

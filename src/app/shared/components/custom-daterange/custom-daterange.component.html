@@ -1,55 +1,120 @@
 <div class="form-field">
-    <ng-container *ngIf="label">
-        <span class="p-float-label" *ngIf="floatingLabel">
-            <p-calendar [ngModel]="value" selectionMode="range"
-                [showIcon]="showIcon" [dateFormat]="dateFormat"
-                [showButtonBar]="showButtonBar" [showWeek]="showWeek" [numberOfMonths]="numberOfMonths"
-                [showOtherMonths]="showOtherMonths" [selectOtherMonths]="selectOtherMonths"
-                [yearNavigator]="yearNavigator" [monthNavigator]="monthNavigator" [yearRange]="yearRange"
-                [firstDayOfWeek]="firstDayOfWeek" [readonlyInput]="readonlyInput" [touchUI]="touchUI"
-                [showTime]="showTime" [hourFormat]="hourFormat" [showSeconds]="showSeconds" [inline]="inline"
-                [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)" [maxDate]="$any(maxDate)" [disabledDays]="disabledDays"
-                [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
-                (ngModelChange)="onValueChange($event)" (onBlur)="onBlur()" [inputId]="inputId"
-                [appendTo]="appendTo" panelStyleClass="custom-daterange-panel">
-            </p-calendar>
-            <label [for]="inputId">
-                {{ label }}
-                <span class="required" *ngIf="required">*</span>
-            </label>
-        </span>
-        <ng-container *ngIf="!floatingLabel">
-            <label class="normal-label">
-                {{ label }}
-                <span class="required" *ngIf="required">*</span>
-            </label>
-            <p-calendar [ngModel]="value" selectionMode="range"
-                [showIcon]="showIcon" [dateFormat]="dateFormat"
-                [showButtonBar]="showButtonBar" [showWeek]="showWeek" [numberOfMonths]="numberOfMonths"
-                [showOtherMonths]="showOtherMonths" [selectOtherMonths]="selectOtherMonths"
-                [yearNavigator]="yearNavigator" [monthNavigator]="monthNavigator" [yearRange]="yearRange"
-                [firstDayOfWeek]="firstDayOfWeek" [readonlyInput]="readonlyInput" [touchUI]="touchUI"
-                [showTime]="showTime" [hourFormat]="hourFormat" [showSeconds]="showSeconds" [inline]="inline"
-                [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)" [maxDate]="$any(maxDate)" [disabledDays]="disabledDays"
-                [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
-                (ngModelChange)="onValueChange($event)" (onBlur)="onBlur()" [appendTo]="appendTo"
-                panelStyleClass="custom-daterange-panel">
-            </p-calendar>
-        </ng-container>
+  <ng-container *ngIf="label">
+    <span class="p-float-label" *ngIf="floatingLabel">
+      <p-calendar
+        [ngModel]="value"
+        selectionMode="range"
+        [showIcon]="showIcon"
+        [dateFormat]="dateFormat"
+        [showButtonBar]="showButtonBar"
+        [showWeek]="showWeek"
+        [numberOfMonths]="numberOfMonths"
+        [showOtherMonths]="showOtherMonths"
+        [selectOtherMonths]="selectOtherMonths"
+        [yearNavigator]="yearNavigator"
+        [monthNavigator]="monthNavigator"
+        [yearRange]="yearRange"
+        [firstDayOfWeek]="firstDayOfWeek"
+        [readonlyInput]="readonlyInput"
+        [touchUI]="touchUI"
+        [showTime]="showTime"
+        [hourFormat]="hourFormat"
+        [showSeconds]="showSeconds"
+        [inline]="inline"
+        [placeholder]="placeholder"
+        [disabled]="disabled"
+        [minDate]="$any(minDate)"
+        [maxDate]="$any(maxDate)"
+        [disabledDays]="disabledDays"
+        [style]="{ width: '100%' }"
+        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        (ngModelChange)="onValueChange($event)"
+        (onBlur)="onBlur()"
+        [inputId]="inputId"
+        [appendTo]="appendTo"
+        panelStyleClass="custom-daterange-panel"
+      >
+      </p-calendar>
+      <label [for]="inputId">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+      </label>
+    </span>
+    <ng-container *ngIf="!floatingLabel">
+      <label class="normal-label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+      </label>
+      <p-calendar
+        [ngModel]="value"
+        selectionMode="range"
+        [showIcon]="showIcon"
+        [dateFormat]="dateFormat"
+        [showButtonBar]="showButtonBar"
+        [showWeek]="showWeek"
+        [numberOfMonths]="numberOfMonths"
+        [showOtherMonths]="showOtherMonths"
+        [selectOtherMonths]="selectOtherMonths"
+        [yearNavigator]="yearNavigator"
+        [monthNavigator]="monthNavigator"
+        [yearRange]="yearRange"
+        [firstDayOfWeek]="firstDayOfWeek"
+        [readonlyInput]="readonlyInput"
+        [touchUI]="touchUI"
+        [showTime]="showTime"
+        [hourFormat]="hourFormat"
+        [showSeconds]="showSeconds"
+        [inline]="inline"
+        [placeholder]="placeholder"
+        [disabled]="disabled"
+        [minDate]="$any(minDate)"
+        [maxDate]="$any(maxDate)"
+        [disabledDays]="disabledDays"
+        [style]="{ width: '100%' }"
+        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        (ngModelChange)="onValueChange($event)"
+        (onBlur)="onBlur()"
+        [appendTo]="appendTo"
+        panelStyleClass="custom-daterange-panel"
+      >
+      </p-calendar>
     </ng-container>
-    <p-calendar *ngIf="!label" [ngModel]="value" selectionMode="range"
-        [showIcon]="showIcon" [dateFormat]="dateFormat"
-        [showButtonBar]="showButtonBar" [showWeek]="showWeek" [numberOfMonths]="numberOfMonths"
-        [showOtherMonths]="showOtherMonths" [selectOtherMonths]="selectOtherMonths"
-        [yearNavigator]="yearNavigator" [monthNavigator]="monthNavigator" [yearRange]="yearRange"
-        [firstDayOfWeek]="firstDayOfWeek" [readonlyInput]="readonlyInput" [touchUI]="touchUI"
-        [showTime]="showTime" [hourFormat]="hourFormat" [showSeconds]="showSeconds" [inline]="inline"
-        [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)" [maxDate]="$any(maxDate)" [disabledDays]="disabledDays"
-        [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
-        (ngModelChange)="onValueChange($event)" (onBlur)="onBlur()" [appendTo]="appendTo"
-        panelStyleClass="custom-daterange-panel">
-    </p-calendar>
-    <small class="error-message" *ngIf="showError && errorMessage">
-        {{ errorMessage }}
-    </small>
+  </ng-container>
+  <p-calendar
+    *ngIf="!label"
+    [ngModel]="value"
+    selectionMode="range"
+    [showIcon]="showIcon"
+    [dateFormat]="dateFormat"
+    [showButtonBar]="showButtonBar"
+    [showWeek]="showWeek"
+    [numberOfMonths]="numberOfMonths"
+    [showOtherMonths]="showOtherMonths"
+    [selectOtherMonths]="selectOtherMonths"
+    [yearNavigator]="yearNavigator"
+    [monthNavigator]="monthNavigator"
+    [yearRange]="yearRange"
+    [firstDayOfWeek]="firstDayOfWeek"
+    [readonlyInput]="readonlyInput"
+    [touchUI]="touchUI"
+    [showTime]="showTime"
+    [hourFormat]="hourFormat"
+    [showSeconds]="showSeconds"
+    [inline]="inline"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [minDate]="$any(minDate)"
+    [maxDate]="$any(maxDate)"
+    [disabledDays]="disabledDays"
+    [style]="{ width: '100%' }"
+    [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+    (ngModelChange)="onValueChange($event)"
+    (onBlur)="onBlur()"
+    [appendTo]="appendTo"
+    panelStyleClass="custom-daterange-panel"
+  >
+  </p-calendar>
+  <small class="error-message" *ngIf="showError && errorMessage">
+    {{ errorMessage }}
+  </small>
 </div>

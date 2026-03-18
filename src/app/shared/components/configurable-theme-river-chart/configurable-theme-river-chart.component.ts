@@ -1,4 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
+} from '@angular/core';
 import { buildThemeRiverChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -6,7 +15,9 @@ import { buildThemeRiverChartOption } from '../../helpers/echarts-option-builder
   templateUrl: './configurable-theme-river-chart.component.html',
   styleUrls: ['./configurable-theme-river-chart.component.scss'],
 })
-export class ConfigurableThemeRiverChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableThemeRiverChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
   @Input() data: any[] = [];
   @Input() showConfigPanel: boolean = true;
@@ -16,12 +27,29 @@ export class ConfigurableThemeRiverChartComponent implements OnInit, OnChanges, 
   @Output() onSelect = new EventEmitter<any>();
   chartOption: any = {};
   echartsInstance: any = null;
-  private defaultConfig: any = { animations: true, tooltipDisabled: false, colorScheme: 'default', labels: true, toolbox: false };
-  get config(): any { return this.chartConfig || this.defaultConfig; }
-  ngOnInit(): void { this.updateChartOption(); this.previousConfigSnapshot = JSON.stringify(this.config); }
+  private defaultConfig: any = {
+    animations: true,
+    tooltipDisabled: false,
+    colorScheme: 'default',
+    labels: true,
+    toolbox: false,
+  };
+  get config(): any {
+    return this.chartConfig || this.defaultConfig;
+  }
+  ngOnInit(): void {
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
+  }
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
-      this.updateChartOption(); this.previousConfigSnapshot = JSON.stringify(this.config);
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
   ngDoCheck(): void {
@@ -33,7 +61,13 @@ export class ConfigurableThemeRiverChartComponent implements OnInit, OnChanges, 
       }
     }
   }
-  updateChartOption(): void { this.chartOption = buildThemeRiverChartOption(this.data, this.config); }
-  onChartInit(ec: any): void { this.echartsInstance = ec; }
-  onChartSelect(event: any): void { this.onSelect.emit(event); }
+  updateChartOption(): void {
+    this.chartOption = buildThemeRiverChartOption(this.data, this.config);
+  }
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
+  }
+  onChartSelect(event: any): void {
+    this.onSelect.emit(event);
+  }
 }

@@ -8,9 +8,8 @@ describe('ViewOrgAdminComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ViewOrgAdminComponent ]
-    })
-    .compileComponents();
+      declarations: [ViewOrgAdminComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ViewOrgAdminComponent);
     component = fixture.componentInstance;

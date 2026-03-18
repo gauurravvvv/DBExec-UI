@@ -8,9 +8,8 @@ describe('GrantAccessComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GrantAccessComponent ]
-    })
-    .compileComponents();
+      declarations: [GrantAccessComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(GrantAccessComponent);
     component = fixture.componentInstance;

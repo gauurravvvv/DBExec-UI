@@ -727,7 +727,7 @@ export function getAllFunctions(): FunctionDefinition[] {
   return FUNCTION_CATEGORIES.reduce(
     (acc: FunctionDefinition[], cat: FunctionCategory) =>
       acc.concat(cat.functions),
-    []
+    [],
   );
 }
 
@@ -737,6 +737,6 @@ export function searchFunctions(query: string): FunctionDefinition[] {
   return getAllFunctions().filter(
     (fn: FunctionDefinition) =>
       fn.name.toLowerCase().includes(lowerQuery) ||
-      fn.description.toLowerCase().includes(lowerQuery)
+      fn.description.toLowerCase().includes(lowerQuery),
   );
 }

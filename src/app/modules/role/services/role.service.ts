@@ -13,7 +13,9 @@ export class RoleService {
   listRoles(params: IParams) {
     return this.http
       .get(
-        ROLE.LIST + `/${params.orgId}` + `/${params.pageNumber}/${params.limit}`
+        ROLE.LIST +
+          `/${params.orgId}` +
+          `/${params.pageNumber}/${params.limit}`,
       )
       .toPromise()
       .then((response: any) => {

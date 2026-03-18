@@ -120,8 +120,13 @@ export class ConfigurableAreaChartComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartType'] ||
-        changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartType'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }
@@ -138,7 +143,11 @@ export class ConfigurableAreaChartComponent
   }
 
   updateChartOption(): void {
-    this.chartOption = buildAreaChartOption(this.data, this.config, this.chartType);
+    this.chartOption = buildAreaChartOption(
+      this.data,
+      this.config,
+      this.chartType,
+    );
   }
 
   onChartInit(ec: any): void {

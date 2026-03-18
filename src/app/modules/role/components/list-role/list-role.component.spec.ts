@@ -8,9 +8,8 @@ describe('ListRoleComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ListRoleComponent ]
-    })
-    .compileComponents();
+      declarations: [ListRoleComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ListRoleComponent);
     component = fixture.componentInstance;

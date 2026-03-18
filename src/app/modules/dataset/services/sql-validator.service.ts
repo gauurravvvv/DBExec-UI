@@ -136,12 +136,16 @@ export class SqlValidatorService {
       }
       // Block comment: /* ... */
       else if (sql[i] === '/' && sql[i + 1] === '*') {
-        result.push(' '); i++; // /
-        result.push(' '); i++; // *
+        result.push(' ');
+        i++; // /
+        result.push(' ');
+        i++; // *
         while (i < sql.length) {
           if (sql[i] === '*' && sql[i + 1] === '/') {
-            result.push(' '); i++; // *
-            result.push(' '); i++; // /
+            result.push(' ');
+            i++; // *
+            result.push(' ');
+            i++; // /
             break;
           }
           result.push(sql[i] === '\n' ? '\n' : ' ');
@@ -150,13 +154,17 @@ export class SqlValidatorService {
       }
       // String literal: '...' (with '' escape)
       else if (sql[i] === "'") {
-        result.push(' '); i++; // opening quote
+        result.push(' ');
+        i++; // opening quote
         while (i < sql.length) {
           if (sql[i] === "'" && sql[i + 1] === "'") {
-            result.push(' '); i++; // escaped quote
-            result.push(' '); i++;
+            result.push(' ');
+            i++; // escaped quote
+            result.push(' ');
+            i++;
           } else if (sql[i] === "'") {
-            result.push(' '); i++; // closing quote
+            result.push(' ');
+            i++; // closing quote
             break;
           } else {
             result.push(sql[i] === '\n' ? '\n' : ' ');
@@ -179,7 +187,7 @@ export class SqlValidatorService {
    */
   private checkUnclosedParentheses(
     sql: string,
-    lines: string[]
+    lines: string[],
   ): SqlError | null {
     let openCount = 0;
     let closeCount = 0;
@@ -286,7 +294,11 @@ export class SqlValidatorService {
 
     // Skip if it's a standalone expression SELECT (no table needed)
     // Matches: SELECT 1, SELECT 1+1, SELECT NOW(), SELECT CURRENT_*, SELECT 'text', etc.
-    if (/^\s*SELECT\s+(?:NOW\s*\(|CURRENT_|VERSION\s*\(|\d[\d\s\+\-\*\/\.]*[;\s]*$)/im.test(sql)) {
+    if (
+      /^\s*SELECT\s+(?:NOW\s*\(|CURRENT_|VERSION\s*\(|\d[\d\s\+\-\*\/\.]*[;\s]*$)/im.test(
+        sql,
+      )
+    ) {
       return null;
     }
 
@@ -469,7 +481,7 @@ export class SqlValidatorService {
    */
   private getLineAndColumn(
     sql: string,
-    index: number
+    index: number,
   ): { line: number; column: number } {
     const lines = sql.substring(0, index).split('\n');
     return {

@@ -12,7 +12,7 @@
   "poc": "Primary Point of Contact (POC)",
   "username": "User Name",
   "name": "First Name",
-  "lastName":"Last Name",
+  "lastName": "Last Name",
   "language": "Language",
   "password": "Password",
   "phNumber": "Phone Number",

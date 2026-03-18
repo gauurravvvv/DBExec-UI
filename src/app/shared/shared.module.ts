@@ -107,10 +107,11 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     ReactiveFormsModule,
     AppPrimeNGModule,
     NgxEchartsModule.forRoot({
-      echarts: () => import('echarts').then(async (ec) => {
-        await import('echarts-gl');
-        return ec;
-      }),
+      echarts: () =>
+        import('echarts').then(async ec => {
+          await import('echarts-gl');
+          return ec;
+        }),
     }),
   ],
   exports: [

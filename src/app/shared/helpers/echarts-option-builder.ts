@@ -11,7 +11,10 @@ function getColors(colorScheme: string): string[] {
  * Creates a vertical linear gradient from a base color.
  * Lightens the color for the top stop, uses original for the bottom.
  */
-function makeGradient(color: string, direction: 'vertical' | 'horizontal' = 'vertical'): any {
+function makeGradient(
+  color: string,
+  direction: 'vertical' | 'horizontal' = 'vertical',
+): any {
   const [x, y, x2, y2] = direction === 'vertical' ? [0, 0, 0, 1] : [0, 0, 1, 0];
   return new echarts.graphic.LinearGradient(x, y, x2, y2, [
     { offset: 0, color: color },
@@ -32,7 +35,11 @@ function adjustColorOpacity(hex: string, opacity: number): string {
  * Apply gradient colors to series when config.gradient is true.
  * Mutates the series array in place.
  */
-function applyGradient(series: any[], colors: string[], direction: 'vertical' | 'horizontal' = 'vertical'): void {
+function applyGradient(
+  series: any[],
+  colors: string[],
+  direction: 'vertical' | 'horizontal' = 'vertical',
+): void {
   series.forEach((s: any, i: number) => {
     if (!s.itemStyle) s.itemStyle = {};
     s.itemStyle.color = makeGradient(colors[i % colors.length], direction);
@@ -150,13 +157,20 @@ function buildGrid(config: any): any {
   let bottom = config.showXAxisLabel ? 50 : 30;
   const rotation = config.xAxisLabelRotate || 0;
   if (rotation > 0) {
-    const extraBottom = Math.sin((rotation * Math.PI) / 180) * Math.min((config.maxXAxisTickLength || 16) * 7, 80);
+    const extraBottom =
+      Math.sin((rotation * Math.PI) / 180) *
+      Math.min((config.maxXAxisTickLength || 16) * 7, 80);
     bottom += Math.ceil(extraBottom);
   }
 
   return {
     left: 50,
-    right: config.legend && config.legendPosition !== 'below' && config.legendPosition !== 'top' ? 140 : 20,
+    right:
+      config.legend &&
+      config.legendPosition !== 'below' &&
+      config.legendPosition !== 'top'
+        ? 140
+        : 20,
     bottom,
     top: config.legend && config.legendPosition === 'top' ? 50 : 20,
     containLabel: true,
@@ -182,7 +196,11 @@ function buildDataLabel(config: any, defaultPosition?: string): any {
   };
 }
 
-function buildCategoryAxis(config: any, categories: string[], axis: 'x' | 'y'): any {
+function buildCategoryAxis(
+  config: any,
+  categories: string[],
+  axis: 'x' | 'y',
+): any {
   const isX = axis === 'x';
   const showAxis = isX ? config.xAxis !== false : config.yAxis !== false;
   const showLabel = isX ? config.showXAxisLabel : config.showYAxisLabel;
@@ -195,7 +213,8 @@ function buildCategoryAxis(config: any, categories: string[], axis: 'x' | 'y'): 
     if (rotation > 0) {
       // Estimate extra space needed: at 90° a ~8-char label needs ~60px more gap
       const maxLabelLen = (config.maxXAxisTickLength || 16) * 7;
-      const extraGap = Math.sin((rotation * Math.PI) / 180) * Math.min(maxLabelLen, 80);
+      const extraGap =
+        Math.sin((rotation * Math.PI) / 180) * Math.min(maxLabelLen, 80);
       nameGap = 35 + Math.ceil(extraGap);
     }
   }
@@ -212,9 +231,13 @@ function buildCategoryAxis(config: any, categories: string[], axis: 'x' | 'y'): 
     axisTick: { alignWithLabel: true, lineStyle: { color: '#d1d5db' } },
     axisLine: { lineStyle: { color: '#d1d5db' } },
     axisLabel: {
-      rotate: isX ? (config.xAxisLabelRotate || 0) : 0,
-      overflow: (isX ? config.trimXAxisTicks : config.trimYAxisTicks) ? 'truncate' : 'none',
-      width: ((isX ? config.maxXAxisTickLength : config.maxYAxisTickLength) || 16) * 7,
+      rotate: isX ? config.xAxisLabelRotate || 0 : 0,
+      overflow: (isX ? config.trimXAxisTicks : config.trimYAxisTicks)
+        ? 'truncate'
+        : 'none',
+      width:
+        ((isX ? config.maxXAxisTickLength : config.maxYAxisTickLength) || 16) *
+        7,
       color: '#666',
       fontSize: 11,
     },
@@ -260,7 +283,12 @@ function buildValueAxis(config: any, axis: 'x' | 'y'): any {
 function getSmooth(config: any): boolean | number {
   if (!config.lineSmooth) return false;
   const smoothness = config.lineSmoothness;
-  if (smoothness !== undefined && smoothness !== null && smoothness > 0 && smoothness < 1) {
+  if (
+    smoothness !== undefined &&
+    smoothness !== null &&
+    smoothness > 0 &&
+    smoothness < 1
+  ) {
     return smoothness;
   }
   return true;
@@ -274,7 +302,10 @@ function getStep(config: any): string | false {
 }
 
 // Convert multi-series data to categories + series list
-function convertMultiSeries(data: any[]): { categories: string[]; seriesList: { name: string; values: number[] }[] } {
+function convertMultiSeries(data: any[]): {
+  categories: string[];
+  seriesList: { name: string; values: number[] }[];
+} {
   if (!data || data.length === 0) return { categories: [], seriesList: [] };
   const categorySet = new Set<string>();
   data.forEach(group => {
@@ -286,7 +317,9 @@ function convertMultiSeries(data: any[]): { categories: string[]; seriesList: { 
   const seriesList = data.map(group => {
     const valueMap = new Map<string, number>();
     if (group.series) {
-      group.series.forEach((item: any) => valueMap.set(String(item.name), item.value));
+      group.series.forEach((item: any) =>
+        valueMap.set(String(item.name), item.value),
+      );
     }
     return {
       name: String(group.name),
@@ -303,7 +336,11 @@ function buildToolbox(config: any): any {
     show: true,
     feature: {
       saveAsImage: { title: 'Save', pixelRatio: 2 },
-      dataView: { title: 'Data', readOnly: true, lang: ['Data View', 'Close', 'Refresh'] },
+      dataView: {
+        title: 'Data',
+        readOnly: true,
+        lang: ['Data View', 'Close', 'Refresh'],
+      },
       restore: { title: 'Reset' },
       dataZoom: { title: { zoom: 'Zoom', back: 'Reset Zoom' } },
     },
@@ -323,10 +360,13 @@ function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
   if (!config.dataZoom) return [];
   const index = axis === 'x' ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
   // Position the slider outside the grid with enough room
-  const positionProp = axis === 'y' ? { right: 5, width: 20 } : { bottom: 8, height: 22 };
+  const positionProp =
+    axis === 'y' ? { right: 5, width: 20 } : { bottom: 8, height: 22 };
   return [
     {
-      type: 'slider', ...index, ...positionProp,
+      type: 'slider',
+      ...index,
+      ...positionProp,
       borderColor: '#e5e7eb',
       backgroundColor: '#fafafa',
       fillerColor: 'rgba(99, 102, 241, 0.12)',
@@ -338,14 +378,25 @@ function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
 }
 
 // ========= Bar Chart =========
-export function buildBarChartOption(data: any[], config: any, chartType: string, multiData?: any[]): any {
+export function buildBarChartOption(
+  data: any[],
+  config: any,
+  chartType: string,
+  multiData?: any[],
+): any {
   const isHorizontal = chartType.includes('horizontal');
-  const isMulti = chartType.includes('2d') || chartType.includes('stacked') || chartType.includes('normalized');
-  const isStacked = chartType.includes('stacked') || chartType.includes('normalized');
+  const isMulti =
+    chartType.includes('2d') ||
+    chartType.includes('stacked') ||
+    chartType.includes('normalized');
+  const isStacked =
+    chartType.includes('stacked') || chartType.includes('normalized');
   const isNormalized = chartType.includes('normalized');
 
   const borderRadius = config.roundEdges
-    ? (isHorizontal ? [0, 4, 4, 0] : [4, 4, 0, 0])
+    ? isHorizontal
+      ? [0, 4, 4, 0]
+      : [4, 4, 0, 0]
     : undefined;
 
   const option: any = {
@@ -370,7 +421,7 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
 
     if (isNormalized) {
       const totals = categories.map((_, i) =>
-        seriesList.reduce((sum, s) => sum + (s.values[i] || 0), 0)
+        seriesList.reduce((sum, s) => sum + (s.values[i] || 0), 0),
       );
       option.series = seriesList.map(s => ({
         ...barSeriesBase,
@@ -378,23 +429,44 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
         type: 'bar',
         stack: 'total',
         emphasis: { focus: config.emphasis || 'series' },
-        data: s.values.map((v, i) => (totals[i] ? +((v / totals[i]) * 100).toFixed(1) : 0)),
-        label: config.showDataLabel ? { show: true, formatter: '{c}%', fontSize: config.labelFontSize || 12 } : undefined,
+        data: s.values.map((v, i) =>
+          totals[i] ? +((v / totals[i]) * 100).toFixed(1) : 0,
+        ),
+        label: config.showDataLabel
+          ? {
+              show: true,
+              formatter: '{c}%',
+              fontSize: config.labelFontSize || 12,
+            }
+          : undefined,
         itemStyle: borderRadius ? { borderRadius } : undefined,
       }));
       if (isHorizontal) {
         option.yAxis = { type: 'category', data: categories };
-        option.xAxis = { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } };
+        option.xAxis = {
+          type: 'value',
+          max: 100,
+          axisLabel: { formatter: '{value}%' },
+        };
       } else {
         option.xAxis = { type: 'category', data: categories };
-        option.yAxis = { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } };
+        option.yAxis = {
+          type: 'value',
+          max: 100,
+          axisLabel: { formatter: '{value}%' },
+        };
       }
     } else {
       option.series = seriesList.map(s => ({
         ...barSeriesBase,
         name: s.name,
         type: 'bar',
-        ...(isStacked ? { stack: 'total', stackStrategy: config.stackStrategy || 'samesign' } : {}),
+        ...(isStacked
+          ? {
+              stack: 'total',
+              stackStrategy: config.stackStrategy || 'samesign',
+            }
+          : {}),
         data: s.values,
         emphasis: { focus: config.emphasis || 'series' },
         label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
@@ -420,20 +492,27 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
     const coloredValues = values.map((v, i) => ({
       value: v,
       itemStyle: config.gradient
-        ? { color: makeGradient(colors[i % colors.length], isHorizontal ? 'horizontal' : 'vertical') }
+        ? {
+            color: makeGradient(
+              colors[i % colors.length],
+              isHorizontal ? 'horizontal' : 'vertical',
+            ),
+          }
         : { color: colors[i % colors.length] },
     }));
 
-    option.series = [{
-      ...barSeriesBase,
-      name: 'Value',
-      type: 'bar',
-      data: coloredValues,
-      label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
-      barGap: config.barGap || '30%',
-      barCategoryGap: config.barCategoryGap || '20%',
-      itemStyle: borderRadius ? { borderRadius } : undefined,
-    }];
+    option.series = [
+      {
+        ...barSeriesBase,
+        name: 'Value',
+        type: 'bar',
+        data: coloredValues,
+        label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
+        barGap: config.barGap || '30%',
+        barCategoryGap: config.barCategoryGap || '20%',
+        itemStyle: borderRadius ? { borderRadius } : undefined,
+      },
+    ];
 
     // Provide legend data from categories so legend shows entries for each bar
     if (config.legend) {
@@ -460,7 +539,11 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
 
   if (config.gradient && isMulti && option.series) {
     const colors = getColors(config.colorScheme);
-    applyGradient(option.series, colors, isHorizontal ? 'horizontal' : 'vertical');
+    applyGradient(
+      option.series,
+      colors,
+      isHorizontal ? 'horizontal' : 'vertical',
+    );
   }
 
   const barZoom = buildDataZoom(config, isHorizontal ? 'y' : 'x');
@@ -476,12 +559,20 @@ export function buildBarChartOption(data: any[], config: any, chartType: string,
 }
 
 // ========= Line Chart =========
-export function buildLineChartOption(data: any[], config: any, chartType: string = 'line'): any {
+export function buildLineChartOption(
+  data: any[],
+  config: any,
+  chartType: string = 'line',
+): any {
   const { categories, seriesList } = convertMultiSeries(data);
   const isStacked = chartType === 'line-stacked';
   const isStep = chartType === 'line-step';
   const smooth = isStep ? false : getSmooth(config);
-  const step = isStep ? (config.lineStep !== 'none' ? config.lineStep || 'middle' : 'middle') : getStep(config);
+  const step = isStep
+    ? config.lineStep !== 'none'
+      ? config.lineStep || 'middle'
+      : 'middle'
+    : getStep(config);
 
   const option: any = {
     color: getColors(config.colorScheme),
@@ -508,11 +599,21 @@ export function buildLineChartOption(data: any[], config: any, chartType: string
         type: config.lineStyleType || 'solid',
       },
       label: buildDataLabel(config),
-      areaStyle: config.rangeFillOpacity > 0 ? { opacity: config.rangeFillOpacity } : undefined,
+      areaStyle:
+        config.rangeFillOpacity > 0
+          ? { opacity: config.rangeFillOpacity }
+          : undefined,
       emphasis: { focus: config.emphasis || 'series' },
       ...(config.endLabel ? { endLabel: { show: true } } : {}),
-      ...(config.sampling && config.sampling !== 'none' ? { sampling: config.sampling } : {}),
-      showAllSymbol: config.showAllSymbol === 'true' ? true : (config.showAllSymbol === 'false' ? false : 'auto'),
+      ...(config.sampling && config.sampling !== 'none'
+        ? { sampling: config.sampling }
+        : {}),
+      showAllSymbol:
+        config.showAllSymbol === 'true'
+          ? true
+          : config.showAllSymbol === 'false'
+            ? false
+            : 'auto',
     })),
   };
 
@@ -530,9 +631,14 @@ export function buildLineChartOption(data: any[], config: any, chartType: string
 }
 
 // ========= Area Chart =========
-export function buildAreaChartOption(data: any[], config: any, chartType: string): any {
+export function buildAreaChartOption(
+  data: any[],
+  config: any,
+  chartType: string,
+): any {
   const { categories, seriesList } = convertMultiSeries(data);
-  const isStacked = chartType === 'area-stacked' || chartType === 'area-normalized';
+  const isStacked =
+    chartType === 'area-stacked' || chartType === 'area-normalized';
   const isNormalized = chartType === 'area-normalized';
   const smooth = getSmooth(config);
   const step = getStep(config);
@@ -561,13 +667,20 @@ export function buildAreaChartOption(data: any[], config: any, chartType: string
     },
     emphasis: { focus: config.emphasis || 'series' },
     ...(config.endLabel ? { endLabel: { show: true } } : {}),
-    ...(config.sampling && config.sampling !== 'none' ? { sampling: config.sampling } : {}),
-    showAllSymbol: config.showAllSymbol === 'true' ? true : (config.showAllSymbol === 'false' ? false : 'auto'),
+    ...(config.sampling && config.sampling !== 'none'
+      ? { sampling: config.sampling }
+      : {}),
+    showAllSymbol:
+      config.showAllSymbol === 'true'
+        ? true
+        : config.showAllSymbol === 'false'
+          ? false
+          : 'auto',
   };
 
   if (isNormalized) {
     const totals = categories.map((_, i) =>
-      seriesList.reduce((sum, s) => sum + (s.values[i] || 0), 0)
+      seriesList.reduce((sum, s) => sum + (s.values[i] || 0), 0),
     );
     option.yAxis.max = 100;
     option.yAxis.axisLabel = { formatter: '{value}%' };
@@ -577,7 +690,9 @@ export function buildAreaChartOption(data: any[], config: any, chartType: string
       type: 'line',
       stack: 'total',
       areaStyle: { opacity: 0.8 },
-      data: s.values.map((v, i) => (totals[i] ? +((v / totals[i]) * 100).toFixed(1) : 0)),
+      data: s.values.map((v, i) =>
+        totals[i] ? +((v / totals[i]) * 100).toFixed(1) : 0,
+      ),
       smooth: step ? false : smooth,
       step: step || undefined,
     }));
@@ -608,7 +723,11 @@ export function buildAreaChartOption(data: any[], config: any, chartType: string
 }
 
 // ========= Pie Chart =========
-export function buildPieChartOption(data: any[], config: any, chartType: string): any {
+export function buildPieChartOption(
+  data: any[],
+  config: any,
+  chartType: string,
+): any {
   const isDonut = chartType === 'donut';
   const isAdvanced = chartType === 'pie-advanced';
   const isGrid = chartType === 'pie-grid';
@@ -654,12 +773,14 @@ export function buildPieChartOption(data: any[], config: any, chartType: string)
   }
 
   // Rose type support
-  const roseType = config.roseType && config.roseType !== 'none' ? config.roseType : undefined;
+  const roseType =
+    config.roseType && config.roseType !== 'none' ? config.roseType : undefined;
 
   // Selected mode
-  const selectedMode = config.pieSelectedMode && config.pieSelectedMode !== 'none'
-    ? config.pieSelectedMode
-    : false;
+  const selectedMode =
+    config.pieSelectedMode && config.pieSelectedMode !== 'none'
+      ? config.pieSelectedMode
+      : false;
 
   const option: any = {
     color: getColors(config.colorScheme),
@@ -667,29 +788,31 @@ export function buildPieChartOption(data: any[], config: any, chartType: string)
     tooltip: buildTooltip(config),
     ...buildLegendWithTitle(config),
     toolbox: buildToolbox(config),
-    series: [{
-      type: 'pie',
-      radius,
-      data: pieData,
-      label: labelConfig,
-      labelLine: { show: config.pieLabelLine !== false },
-      roseType: roseType,
-      clockwise: config.pieClockwise !== false,
-      startAngle: config.pieStartAngle ?? 90,
-      ...(config.pieEndAngle != null ? { endAngle: config.pieEndAngle } : {}),
-      percentPrecision: config.piePercentPrecision ?? 2,
-      minAngle: config.pieMinAngle ?? 0,
-      avoidLabelOverlap: config.pieAvoidLabelOverlap !== false,
-      padAngle: config.piePadAngle ?? 0,
-      selectedMode: selectedMode,
-      selectedOffset: config.pieSelectedOffset ?? 10,
-      itemStyle: {
-        borderRadius: config.pieBorderRadius ?? 0,
+    series: [
+      {
+        type: 'pie',
+        radius,
+        data: pieData,
+        label: labelConfig,
+        labelLine: { show: config.pieLabelLine !== false },
+        roseType: roseType,
+        clockwise: config.pieClockwise !== false,
+        startAngle: config.pieStartAngle ?? 90,
+        ...(config.pieEndAngle != null ? { endAngle: config.pieEndAngle } : {}),
+        percentPrecision: config.piePercentPrecision ?? 2,
+        minAngle: config.pieMinAngle ?? 0,
+        avoidLabelOverlap: config.pieAvoidLabelOverlap !== false,
+        padAngle: config.piePadAngle ?? 0,
+        selectedMode: selectedMode,
+        selectedOffset: config.pieSelectedOffset ?? 10,
+        itemStyle: {
+          borderRadius: config.pieBorderRadius ?? 0,
+        },
+        emphasis: {
+          itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.2)' },
+        },
       },
-      emphasis: {
-        itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.2)' },
-      },
-    }],
+    ],
   };
 
   // Advanced pie: add detail legend with values
@@ -765,15 +888,19 @@ export function buildPolarChartOption(data: any[], config: any): any {
   const { categories, seriesList } = convertMultiSeries(data);
 
   // Compute max for each category (indicator)
-  const maxValues = categories.map((_, i) =>
-    Math.max(...seriesList.map(s => s.values[i] || 0)) * 1.2
+  const maxValues = categories.map(
+    (_, i) => Math.max(...seriesList.map(s => s.values[i] || 0)) * 1.2,
   );
 
   const indicator = categories.map((name, i) => {
-    const displayName = config.labelTrim && name.length > (config.labelTrimSize || 10)
-      ? name.substring(0, config.labelTrimSize || 10) + '...'
-      : name;
-    return { name: displayName, max: config.autoScale ? maxValues[i] : undefined };
+    const displayName =
+      config.labelTrim && name.length > (config.labelTrimSize || 10)
+        ? name.substring(0, config.labelTrimSize || 10) + '...'
+        : name;
+    return {
+      name: displayName,
+      max: config.autoScale ? maxValues[i] : undefined,
+    };
   });
 
   return {
@@ -784,27 +911,32 @@ export function buildPolarChartOption(data: any[], config: any): any {
     radar: {
       indicator,
       shape: config.radarShape || 'polygon',
-      splitArea: { show: config.showGridLines !== false, areaStyle: { opacity: 0.1 } },
+      splitArea: {
+        show: config.showGridLines !== false,
+        areaStyle: { opacity: 0.1 },
+      },
       splitLine: { show: config.showGridLines !== false },
       axisLine: { show: config.xAxis !== false },
       axisName: { show: config.xAxis !== false },
     },
-    series: [{
-      type: 'radar',
-      symbol: config.radarSymbol || 'circle',
-      symbolSize: config.radarSymbolSize ?? 4,
-      lineStyle: {
-        width: config.radarLineWidth ?? 2,
+    series: [
+      {
+        type: 'radar',
+        symbol: config.radarSymbol || 'circle',
+        symbolSize: config.radarSymbolSize ?? 4,
+        lineStyle: {
+          width: config.radarLineWidth ?? 2,
+        },
+        data: seriesList.map(s => ({
+          name: s.name,
+          value: s.values,
+          areaStyle: { opacity: config.radarAreaOpacity ?? 0.15 },
+        })),
+        emphasis: {
+          lineStyle: { width: 3 },
+        },
       },
-      data: seriesList.map(s => ({
-        name: s.name,
-        value: s.values,
-        areaStyle: { opacity: config.radarAreaOpacity ?? 0.15 },
-      })),
-      emphasis: {
-        lineStyle: { width: 3 },
-      },
-    }],
+    ],
   };
 }
 
@@ -819,53 +951,55 @@ export function buildGaugeChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: buildTooltip(config),
-    series: [{
-      type: 'gauge',
-      min: config.min || 0,
-      max: config.max || 100,
-      startAngle: config.gaugeStartAngle ?? 225,
-      endAngle: config.gaugeEndAngle ?? -45,
-      splitNumber: config.splitNumber ?? 10,
-      axisTick: {
-        show: config.gaugeShowScale !== false,
-        splitNumber: config.tickSplitNumber ?? 5,
-      },
-      axisLine: {
-        show: true,
-        roundCap: config.gaugeAxisLineRoundCap || false,
-        lineStyle: {
-          width: config.gaugeAxisLineWidth ?? 15,
+    series: [
+      {
+        type: 'gauge',
+        min: config.min || 0,
+        max: config.max || 100,
+        startAngle: config.gaugeStartAngle ?? 225,
+        endAngle: config.gaugeEndAngle ?? -45,
+        splitNumber: config.splitNumber ?? 10,
+        axisTick: {
+          show: config.gaugeShowScale !== false,
+          splitNumber: config.tickSplitNumber ?? 5,
         },
+        axisLine: {
+          show: true,
+          roundCap: config.gaugeAxisLineRoundCap || false,
+          lineStyle: {
+            width: config.gaugeAxisLineWidth ?? 15,
+          },
+        },
+        axisLabel: {
+          show: config.gaugeShowScale !== false,
+          distance: 25,
+          fontSize: 11,
+        },
+        splitLine: {
+          show: config.gaugeShowScale !== false,
+          length: 15,
+        },
+        pointer: {
+          show: config.gaugeShowPointer !== false,
+          length: `${config.gaugePointerLength ?? 60}%`,
+          width: config.gaugePointerWidth ?? 6,
+          ...(config.gaugePointerIcon ? { icon: config.gaugePointerIcon } : {}),
+        },
+        progress: {
+          show: config.gaugeShowProgress || false,
+          width: config.gaugeAxisLineWidth ?? 15,
+          roundCap: config.gaugeProgressRoundCap || false,
+        },
+        detail: {
+          show: config.gaugeShowValue !== false,
+          formatter: config.units ? `{value} ${config.units}` : '{value}',
+          fontSize: 20,
+          offsetCenter: [0, '70%'],
+        },
+        title: { show: true, offsetCenter: [0, '90%'], fontSize: 14 },
+        data: gaugeData.length > 0 ? [gaugeData[0]] : [{ value: 0, name: '' }],
       },
-      axisLabel: {
-        show: config.gaugeShowScale !== false,
-        distance: 25,
-        fontSize: 11,
-      },
-      splitLine: {
-        show: config.gaugeShowScale !== false,
-        length: 15,
-      },
-      pointer: {
-        show: config.gaugeShowPointer !== false,
-        length: `${config.gaugePointerLength ?? 60}%`,
-        width: config.gaugePointerWidth ?? 6,
-        ...(config.gaugePointerIcon ? { icon: config.gaugePointerIcon } : {}),
-      },
-      progress: {
-        show: config.gaugeShowProgress || false,
-        width: config.gaugeAxisLineWidth ?? 15,
-        roundCap: config.gaugeProgressRoundCap || false,
-      },
-      detail: {
-        show: config.gaugeShowValue !== false,
-        formatter: config.units ? `{value} ${config.units}` : '{value}',
-        fontSize: 20,
-        offsetCenter: [0, '70%'],
-      },
-      title: { show: true, offsetCenter: [0, '90%'], fontSize: 14 },
-      data: gaugeData.length > 0 ? [gaugeData[0]] : [{ value: 0, name: '' }],
-    }],
+    ],
   };
 }
 
@@ -925,7 +1059,11 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
       let nameGap = 35;
       if (rotation > 0 && config.showXAxisLabel) {
         const maxLabelLen = (config.maxXAxisTickLength || 16) * 7;
-        nameGap = 35 + Math.ceil(Math.sin((rotation * Math.PI) / 180) * Math.min(maxLabelLen, 80));
+        nameGap =
+          35 +
+          Math.ceil(
+            Math.sin((rotation * Math.PI) / 180) * Math.min(maxLabelLen, 80),
+          );
       }
       return {
         type: 'category',
@@ -963,14 +1101,19 @@ export function buildHeatMapChartOption(data: any[], config: any): any {
       left: 'center',
       bottom: 0,
     },
-    series: [{
-      type: 'heatmap',
-      data: heatData,
-      label: { show: (config.heatmapShowLabels !== false) || config.showDataLabel, fontSize: config.labelFontSize || 11 },
-      emphasis: {
-        itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
+    series: [
+      {
+        type: 'heatmap',
+        data: heatData,
+        label: {
+          show: config.heatmapShowLabels !== false || config.showDataLabel,
+          fontSize: config.labelFontSize || 11,
+        },
+        emphasis: {
+          itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
+        },
       },
-    }],
+    ],
   };
 }
 
@@ -988,31 +1131,38 @@ export function buildTreeMapChartOption(data: any[], config: any): any {
       show: !config.tooltipDisabled,
       formatter: (params: any) => `${params.name}: ${params.value}`,
     },
-    series: [{
-      type: 'treemap',
-      data: treeData,
-      roam: config.treemapRoam || false,
-      nodeClick: config.treemapNodeClick === 'false' ? false : (config.treemapNodeClick || 'zoomToNode'),
-      leafDepth: config.treemapLeafDepth ?? 1,
-      visualDimension: config.treemapVisualDimension ?? 0,
-      breadcrumb: { show: config.treemapBreadcrumb || false },
-      label: {
-        show: config.treemapShowLabels !== false,
-        formatter: '{b}',
-        color: '#fff',
-        fontSize: config.labelFontSize || 12,
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowBlur: 3,
+    series: [
+      {
+        type: 'treemap',
+        data: treeData,
+        roam: config.treemapRoam || false,
+        nodeClick:
+          config.treemapNodeClick === 'false'
+            ? false
+            : config.treemapNodeClick || 'zoomToNode',
+        leafDepth: config.treemapLeafDepth ?? 1,
+        visualDimension: config.treemapVisualDimension ?? 0,
+        breadcrumb: { show: config.treemapBreadcrumb || false },
+        label: {
+          show: config.treemapShowLabels !== false,
+          formatter: '{b}',
+          color: '#fff',
+          fontSize: config.labelFontSize || 12,
+          textShadowColor: 'rgba(0,0,0,0.5)',
+          textShadowBlur: 3,
+        },
+        itemStyle: {
+          borderWidth: 1,
+          borderColor: '#fff',
+          gapWidth: 2,
+        },
+        levels: [
+          {
+            itemStyle: { borderWidth: 2, borderColor: '#fff', gapWidth: 3 },
+          },
+        ],
       },
-      itemStyle: {
-        borderWidth: 1,
-        borderColor: '#fff',
-        gapWidth: 2,
-      },
-      levels: [{
-        itemStyle: { borderWidth: 2, borderColor: '#fff', gapWidth: 3 },
-      }],
-    }],
+    ],
   };
 }
 
@@ -1035,7 +1185,11 @@ export function buildBubbleChartOption(data: any[], config: any): any {
   const series = data.map((group, idx) => ({
     name: String(group.name),
     type: 'scatter',
-    data: (group.series || []).map((pt: any) => [pt.x, pt.y, pt.r || pt.value || 0]),
+    data: (group.series || []).map((pt: any) => [
+      pt.x,
+      pt.y,
+      pt.r || pt.value || 0,
+    ]),
     symbolSize: (val: any) => {
       const r = val[2] || 0;
       if (rMax === rMin) return (minR + maxR) / 2;
@@ -1068,7 +1222,11 @@ export function buildBubbleChartOption(data: any[], config: any): any {
 }
 
 // ========= Scatter Chart =========
-export function buildScatterChartOption(data: any[], config: any, chartType: string = 'scatter'): any {
+export function buildScatterChartOption(
+  data: any[],
+  config: any,
+  chartType: string = 'scatter',
+): any {
   const isEffect = chartType === 'effect-scatter';
 
   const scatterData = data.map(d => ({
@@ -1094,26 +1252,30 @@ export function buildScatterChartOption(data: any[], config: any, chartType: str
     toolbox: buildToolbox(config),
     xAxis: buildCategoryAxis(config, categories, 'x'),
     yAxis: buildValueAxis(config, 'y'),
-    series: [{
-      type: isEffect ? 'effectScatter' : 'scatter',
-      data: scatterData,
-      symbol: config.scatterSymbolShape || 'circle',
-      symbolSize: config.scatterSymbolSize || 10,
-      ...(isEffect ? {
-        rippleEffect: {
-          brushType: config.effectRippleBrushType || 'stroke',
-          scale: config.effectRippleScale ?? 3,
-          number: config.effectRippleNumber ?? 3,
-          period: config.effectRipplePeriod ?? 4,
+    series: [
+      {
+        type: isEffect ? 'effectScatter' : 'scatter',
+        data: scatterData,
+        symbol: config.scatterSymbolShape || 'circle',
+        symbolSize: config.scatterSymbolSize || 10,
+        ...(isEffect
+          ? {
+              rippleEffect: {
+                brushType: config.effectRippleBrushType || 'stroke',
+                scale: config.effectRippleScale ?? 3,
+                number: config.effectRippleNumber ?? 3,
+                period: config.effectRipplePeriod ?? 4,
+              },
+              showEffectOn: config.effectShowOn || 'render',
+            }
+          : {}),
+        label: buildDataLabel(config),
+        emphasis: {
+          focus: config.emphasis || 'series',
+          itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
         },
-        showEffectOn: config.effectShowOn || 'render',
-      } : {}),
-      label: buildDataLabel(config),
-      emphasis: {
-        focus: config.emphasis || 'series',
-        itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
       },
-    }],
+    ],
   };
 
   if (config.gradient && option.series) {
@@ -1140,36 +1302,38 @@ export function buildFunnelChartOption(data: any[], config: any): any {
     tooltip: buildTooltip(config),
     ...buildLegendWithTitle(config),
     toolbox: buildToolbox(config),
-    series: [{
-      type: 'funnel',
-      left: '10%',
-      top: 40,
-      bottom: 20,
-      width: '80%',
-      min: 0,
-      max: Math.max(...data.map(d => d.value), 100),
-      minSize: config.funnelMinSize || '0%',
-      maxSize: config.funnelMaxSize || '100%',
-      sort: config.funnelSort || 'descending',
-      orient: config.funnelOrient || 'vertical',
-      funnelAlign: config.funnelAlign || 'center',
-      gap: config.funnelGap ?? 2,
-      label: {
-        show: config.labels !== false,
-        position: 'inside',
-        formatter: '{b}: {c}',
-        fontSize: config.labelFontSize || 12,
+    series: [
+      {
+        type: 'funnel',
+        left: '10%',
+        top: 40,
+        bottom: 20,
+        width: '80%',
+        min: 0,
+        max: Math.max(...data.map(d => d.value), 100),
+        minSize: config.funnelMinSize || '0%',
+        maxSize: config.funnelMaxSize || '100%',
+        sort: config.funnelSort || 'descending',
+        orient: config.funnelOrient || 'vertical',
+        funnelAlign: config.funnelAlign || 'center',
+        gap: config.funnelGap ?? 2,
+        label: {
+          show: config.labels !== false,
+          position: 'inside',
+          formatter: '{b}: {c}',
+          fontSize: config.labelFontSize || 12,
+        },
+        labelLine: { show: false },
+        itemStyle: {
+          borderColor: '#fff',
+          borderWidth: 1,
+        },
+        emphasis: {
+          label: { fontSize: 14, fontWeight: 'bold' },
+        },
+        data: funnelData,
       },
-      labelLine: { show: false },
-      itemStyle: {
-        borderColor: '#fff',
-        borderWidth: 1,
-      },
-      emphasis: {
-        label: { fontSize: 14, fontWeight: 'bold' },
-      },
-      data: funnelData,
-    }],
+    ],
   };
 }
 
@@ -1188,38 +1352,52 @@ export function buildSunburstChartOption(data: any[], config: any): any {
       formatter: (params: any) => `${params.name}: ${params.value}`,
     },
     toolbox: buildToolbox(config),
-    series: [{
-      type: 'sunburst',
-      data: sunburstData,
-      radius: ['15%', config.sunburstRadius || '90%'],
-      nodeClick: config.sunburstNodeClick === 'false' ? false : (config.sunburstNodeClick || 'rootToNode'),
-      sort: config.sunburstSort === 'none' ? null : (config.sunburstSort || 'desc'),
-      startAngle: config.sunburstStartAngle ?? 90,
-      label: {
-        show: config.labels !== false,
-        rotate: 'radial',
-        fontSize: config.labelFontSize || 10,
+    series: [
+      {
+        type: 'sunburst',
+        data: sunburstData,
+        radius: ['15%', config.sunburstRadius || '90%'],
+        nodeClick:
+          config.sunburstNodeClick === 'false'
+            ? false
+            : config.sunburstNodeClick || 'rootToNode',
+        sort:
+          config.sunburstSort === 'none' ? null : config.sunburstSort || 'desc',
+        startAngle: config.sunburstStartAngle ?? 90,
+        label: {
+          show: config.labels !== false,
+          rotate: 'radial',
+          fontSize: config.labelFontSize || 10,
+        },
+        itemStyle: {
+          borderWidth: 2,
+          borderColor: '#fff',
+        },
+        emphasis: {
+          focus: 'ancestor',
+          itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
+        },
+        levels: [
+          {},
+          { r0: '15%', r: '50%', label: { rotate: 'tangential' } },
+          { r0: '50%', r: '70%', label: { align: 'right' } },
+          {
+            r0: '70%',
+            r: '90%',
+            label: { position: 'outside', padding: 3, silent: false },
+          },
+        ],
       },
-      itemStyle: {
-        borderWidth: 2,
-        borderColor: '#fff',
-      },
-      emphasis: {
-        focus: 'ancestor',
-        itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.3)' },
-      },
-      levels: [
-        {},
-        { r0: '15%', r: '50%', label: { rotate: 'tangential' } },
-        { r0: '50%', r: '70%', label: { align: 'right' } },
-        { r0: '70%', r: '90%', label: { position: 'outside', padding: 3, silent: false } },
-      ],
-    }],
+    ],
   };
 }
 
 // ========= Sankey Chart =========
-export function buildSankeyChartOption(nodes: any[], links: any[], config: any): any {
+export function buildSankeyChartOption(
+  nodes: any[],
+  links: any[],
+  config: any,
+): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
@@ -1229,32 +1407,34 @@ export function buildSankeyChartOption(nodes: any[], links: any[], config: any):
       triggerOn: 'mousemove',
     },
     toolbox: buildToolbox(config),
-    series: [{
-      type: 'sankey',
-      data: nodes,
-      links: links,
-      orient: config.sankeyOrient || 'horizontal',
-      nodeWidth: config.sankeyNodeWidth || 20,
-      nodeGap: config.sankeyNodeGap || 8,
-      nodeAlign: config.sankeyNodeAlign || 'justify',
-      draggable: config.sankeyDraggable !== false,
-      layoutIterations: 32,
-      emphasis: {
-        focus: 'adjacency',
+    series: [
+      {
+        type: 'sankey',
+        data: nodes,
+        links: links,
+        orient: config.sankeyOrient || 'horizontal',
+        nodeWidth: config.sankeyNodeWidth || 20,
+        nodeGap: config.sankeyNodeGap || 8,
+        nodeAlign: config.sankeyNodeAlign || 'justify',
+        draggable: config.sankeyDraggable !== false,
+        layoutIterations: 32,
+        emphasis: {
+          focus: 'adjacency',
+        },
+        lineStyle: {
+          color: 'gradient',
+          curveness: config.sankeyCurveness ?? 0.5,
+        },
+        label: {
+          show: config.labels !== false,
+          fontSize: config.labelFontSize || 11,
+        },
+        edgeLabel: {
+          show: config.sankeyEdgeLabel || false,
+          fontSize: 10,
+        },
       },
-      lineStyle: {
-        color: 'gradient',
-        curveness: config.sankeyCurveness ?? 0.5,
-      },
-      label: {
-        show: config.labels !== false,
-        fontSize: config.labelFontSize || 11,
-      },
-      edgeLabel: {
-        show: config.sankeyEdgeLabel || false,
-        fontSize: 10,
-      },
-    }],
+    ],
   };
 }
 
@@ -1302,8 +1482,10 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
       formatter: (params: any) => {
         const idx = params[0].dataIndex;
         const cat = categories[idx];
-        const pos = typeof positiveData[idx] === 'number' ? positiveData[idx] : 0;
-        const neg = typeof negativeData[idx] === 'number' ? negativeData[idx] : 0;
+        const pos =
+          typeof positiveData[idx] === 'number' ? positiveData[idx] : 0;
+        const neg =
+          typeof negativeData[idx] === 'number' ? negativeData[idx] : 0;
         const val = (pos as number) - (neg as number);
         return `${cat}: ${val >= 0 ? '+' : ''}${val}`;
       },
@@ -1319,7 +1501,9 @@ export function buildWaterfallChartOption(data: any[], config: any): any {
         type: 'bar',
         stack: 'waterfall',
         itemStyle: { borderColor: 'transparent', color: 'transparent' },
-        emphasis: { itemStyle: { borderColor: 'transparent', color: 'transparent' } },
+        emphasis: {
+          itemStyle: { borderColor: 'transparent', color: 'transparent' },
+        },
         data: transparentData,
       },
       {
@@ -1384,7 +1568,9 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
         boxData.push([sorted[0], q1, median, q3, sorted[len - 1]]);
       }
     } else if (item.series && Array.isArray(item.series)) {
-      const values = item.series.map((s: any) => s.value).sort((a: number, b: number) => a - b);
+      const values = item.series
+        .map((s: any) => s.value)
+        .sort((a: number, b: number) => a - b);
       const len = values.length;
       if (len === 0) {
         boxData.push([0, 0, 0, 0, 0]);
@@ -1395,7 +1581,13 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
         boxData.push([values[0], q1, median, q3, values[len - 1]]);
       }
     } else if (item.value !== undefined) {
-      boxData.push([item.value, item.value, item.value, item.value, item.value]);
+      boxData.push([
+        item.value,
+        item.value,
+        item.value,
+        item.value,
+        item.value,
+      ]);
     }
   });
 
@@ -1414,12 +1606,17 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
     },
     ...buildLegendWithTitle(config),
     grid: buildGrid(config),
-    series: [{
-      type: 'boxplot',
-      data: boxData,
-      layout: config.boxplotLayout || 'horizontal',
-      boxWidth: [config.boxplotBoxWidth ?? 7, config.boxplotBoxMaxWidth ?? 50],
-    }],
+    series: [
+      {
+        type: 'boxplot',
+        data: boxData,
+        layout: config.boxplotLayout || 'horizontal',
+        boxWidth: [
+          config.boxplotBoxWidth ?? 7,
+          config.boxplotBoxMaxWidth ?? 50,
+        ],
+      },
+    ],
   };
 
   if (isVerticalLayout) {
@@ -1434,7 +1631,11 @@ export function buildBoxPlotChartOption(data: any[], config: any): any {
 }
 
 // ========= Graph / Network Chart =========
-export function buildGraphChartOption(nodes: any[], links: any[], config: any): any {
+export function buildGraphChartOption(
+  nodes: any[],
+  links: any[],
+  config: any,
+): any {
   return {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
@@ -1443,41 +1644,48 @@ export function buildGraphChartOption(nodes: any[], links: any[], config: any): 
     },
     toolbox: buildToolbox(config),
     ...buildLegendWithTitle(config),
-    series: [{
-      type: 'graph',
-      layout: config.graphLayout || 'force',
-      roam: true,
-      draggable: config.graphDraggable !== false,
-      edgeSymbol: config.graphEdgeSymbol && config.graphEdgeSymbol !== 'none'
-        ? ['circle', config.graphEdgeSymbol] : undefined,
-      edgeSymbolSize: config.graphEdgeSymbolSize ?? 10,
-      data: nodes.map((n: any) => ({
-        ...n,
-        symbolSize: Math.max(10, Math.min(n.value || 20, 60)),
-        label: { show: config.labels !== false, fontSize: config.labelFontSize || 11 },
-      })),
-      links: links,
-      categories: [],
-      force: {
-        repulsion: config.graphRepulsion || 200,
-        edgeLength: config.graphEdgeLength || 100,
-        gravity: config.graphGravity ?? 0.1,
-        friction: config.graphForceFriction ?? 0.6,
+    series: [
+      {
+        type: 'graph',
+        layout: config.graphLayout || 'force',
+        roam: true,
+        draggable: config.graphDraggable !== false,
+        edgeSymbol:
+          config.graphEdgeSymbol && config.graphEdgeSymbol !== 'none'
+            ? ['circle', config.graphEdgeSymbol]
+            : undefined,
+        edgeSymbolSize: config.graphEdgeSymbolSize ?? 10,
+        data: nodes.map((n: any) => ({
+          ...n,
+          symbolSize: Math.max(10, Math.min(n.value || 20, 60)),
+          label: {
+            show: config.labels !== false,
+            fontSize: config.labelFontSize || 11,
+          },
+        })),
+        links: links,
+        categories: [],
+        force: {
+          repulsion: config.graphRepulsion || 200,
+          edgeLength: config.graphEdgeLength || 100,
+          gravity: config.graphGravity ?? 0.1,
+          friction: config.graphForceFriction ?? 0.6,
+        },
+        edgeLabel: {
+          show: config.graphEdgeLabel || false,
+          fontSize: 10,
+        },
+        lineStyle: {
+          color: 'source',
+          curveness: 0.3,
+          opacity: 0.6,
+        },
+        emphasis: {
+          focus: 'adjacency',
+          lineStyle: { width: 3 },
+        },
       },
-      edgeLabel: {
-        show: config.graphEdgeLabel || false,
-        fontSize: 10,
-      },
-      lineStyle: {
-        color: 'source',
-        curveness: 0.3,
-        opacity: 0.6,
-      },
-      emphasis: {
-        focus: 'adjacency',
-        lineStyle: { width: 3 },
-      },
-    }],
+    ],
   };
 }
 
@@ -1497,34 +1705,43 @@ export function buildTreeChartOption(data: any[], config: any): any {
     tooltip: {
       show: !config.tooltipDisabled,
       trigger: 'item',
-      formatter: (params: any) => `${params.name}${params.value ? ': ' + params.value : ''}`,
+      formatter: (params: any) =>
+        `${params.name}${params.value ? ': ' + params.value : ''}`,
     },
     toolbox: buildToolbox(config),
-    series: [{
-      type: 'tree',
-      data: [treeData],
-      orient: config.treeOrient || 'TB',
-      layout: config.treeLayout || 'orthogonal',
-      edgeShape: config.treeEdgeShape || 'curve',
-      edgeForkPosition: config.treeEdgeForkPosition || '50%',
-      roam: config.treeRoam || false,
-      symbol: 'circle',
-      symbolSize: 10,
-      label: {
-        show: config.labels !== false,
-        position: config.treeOrient === 'LR' || config.treeOrient === 'RL' ? 'right' : 'top',
-        fontSize: config.labelFontSize || 11,
-      },
-      leaves: {
+    series: [
+      {
+        type: 'tree',
+        data: [treeData],
+        orient: config.treeOrient || 'TB',
+        layout: config.treeLayout || 'orthogonal',
+        edgeShape: config.treeEdgeShape || 'curve',
+        edgeForkPosition: config.treeEdgeForkPosition || '50%',
+        roam: config.treeRoam || false,
+        symbol: 'circle',
+        symbolSize: 10,
         label: {
-          position: config.treeOrient === 'LR' || config.treeOrient === 'RL' ? 'right' : 'bottom',
+          show: config.labels !== false,
+          position:
+            config.treeOrient === 'LR' || config.treeOrient === 'RL'
+              ? 'right'
+              : 'top',
+          fontSize: config.labelFontSize || 11,
         },
+        leaves: {
+          label: {
+            position:
+              config.treeOrient === 'LR' || config.treeOrient === 'RL'
+                ? 'right'
+                : 'bottom',
+          },
+        },
+        expandAndCollapse: config.treeExpandAndCollapse !== false,
+        animationDuration: 550,
+        animationDurationUpdate: 750,
+        initialTreeDepth: config.treeInitialDepth ?? 3,
       },
-      expandAndCollapse: config.treeExpandAndCollapse !== false,
-      animationDuration: 550,
-      animationDurationUpdate: 750,
-      initialTreeDepth: config.treeInitialDepth ?? 3,
-    }],
+    ],
   };
 }
 
@@ -1544,17 +1761,19 @@ export function buildThemeRiverChartOption(data: any[], config: any): any {
       type: 'value',
       bottom: 30,
     },
-    series: [{
-      type: 'themeRiver',
-      data: riverData,
-      label: {
-        show: config.labels !== false,
-        fontSize: config.labelFontSize || 11,
+    series: [
+      {
+        type: 'themeRiver',
+        data: riverData,
+        label: {
+          show: config.labels !== false,
+          fontSize: config.labelFontSize || 11,
+        },
+        emphasis: {
+          itemStyle: { shadowBlur: 20, shadowColor: 'rgba(0, 0, 0, 0.3)' },
+        },
       },
-      emphasis: {
-        itemStyle: { shadowBlur: 20, shadowColor: 'rgba(0, 0, 0, 0.3)' },
-      },
-    }],
+    ],
   };
 }
 
@@ -1573,19 +1792,23 @@ export function buildPictorialBarChartOption(data: any[], config: any): any {
     grid: buildGrid(config),
     xAxis: buildCategoryAxis(config, categories, 'x'),
     yAxis: buildValueAxis(config, 'y'),
-    series: [{
-      type: 'pictorialBar',
-      data: values,
-      symbol: symbol,
-      symbolRepeat: config.pictorialRepeat || false,
-      symbolSize: config.pictorialRepeat ? [20, 6] : ['100%', '100%'],
-      symbolPosition: config.pictorialSymbolPosition || 'start',
-      symbolClip: config.pictorialRepeat ? false : (config.pictorialSymbolClip !== false),
-      symbolRepeatDirection: config.pictorialSymbolRepeatDirection || 'start',
-      symbolMargin: config.pictorialSymbolMargin || 'auto',
-      barCategoryGap: '40%',
-      label: buildDataLabel(config, 'top'),
-    }],
+    series: [
+      {
+        type: 'pictorialBar',
+        data: values,
+        symbol: symbol,
+        symbolRepeat: config.pictorialRepeat || false,
+        symbolSize: config.pictorialRepeat ? [20, 6] : ['100%', '100%'],
+        symbolPosition: config.pictorialSymbolPosition || 'start',
+        symbolClip: config.pictorialRepeat
+          ? false
+          : config.pictorialSymbolClip !== false,
+        symbolRepeatDirection: config.pictorialSymbolRepeatDirection || 'start',
+        symbolMargin: config.pictorialSymbolMargin || 'auto',
+        barCategoryGap: '40%',
+        label: buildDataLabel(config, 'top'),
+      },
+    ],
   };
 }
 
@@ -1611,15 +1834,17 @@ export function buildPolarBarChartOption(data: any[], config: any): any {
     polar: {
       radius: [`${config.polarBarInnerRadius ?? 15}%`, '80%'],
     },
-    series: [{
-      type: 'bar',
-      data: values,
-      coordinateSystem: 'polar',
-      label: buildDataLabel(config, 'middle'),
-      itemStyle: {
-        borderRadius: config.roundEdges ? 4 : 0,
+    series: [
+      {
+        type: 'bar',
+        data: values,
+        coordinateSystem: 'polar',
+        label: buildDataLabel(config, 'middle'),
+        itemStyle: {
+          borderRadius: config.roundEdges ? 4 : 0,
+        },
       },
-    }],
+    ],
   };
 }
 
@@ -1673,17 +1898,21 @@ export function buildCandlestickChartOption(data: any[], config: any): any {
       splitLine: { show: config.showGridLines !== false },
       nice: config.niceScale || false,
     },
-    series: [{
-      type: 'candlestick',
-      data: values,
-      itemStyle: {
-        color: config.candleBullColor || '#ec0000',
-        color0: config.candleBearColor || '#00da3c',
-        borderColor: config.candleBullBorderColor || config.candleBullColor || '#ec0000',
-        borderColor0: config.candleBearBorderColor || config.candleBearColor || '#00da3c',
+    series: [
+      {
+        type: 'candlestick',
+        data: values,
+        itemStyle: {
+          color: config.candleBullColor || '#ec0000',
+          color0: config.candleBearColor || '#00da3c',
+          borderColor:
+            config.candleBullBorderColor || config.candleBullColor || '#ec0000',
+          borderColor0:
+            config.candleBearBorderColor || config.candleBearColor || '#00da3c',
+        },
+        ...(config.candleBarWidth ? { barWidth: config.candleBarWidth } : {}),
       },
-      ...(config.candleBarWidth ? { barWidth: config.candleBarWidth } : {}),
-    }],
+    ],
   };
 
   const zoom = buildDataZoom(config);
@@ -1705,7 +1934,11 @@ export function buildParallelChartOption(data: any[], config: any): any {
   if (data.length > 0 && data[0].dimensions) {
     dimensions = data[0].dimensions;
     seriesData = data[0].data || [];
-  } else if (data.length > 0 && typeof data[0] === 'object' && !Array.isArray(data[0])) {
+  } else if (
+    data.length > 0 &&
+    typeof data[0] === 'object' &&
+    !Array.isArray(data[0])
+  ) {
     dimensions = Object.keys(data[0]);
     seriesData = data.map(d => dimensions.map(dim => d[dim]));
   } else {
@@ -1736,18 +1969,20 @@ export function buildParallelChartOption(data: any[], config: any): any {
         nameTextStyle: { fontSize: 12 },
       },
     },
-    series: [{
-      type: 'parallel',
-      lineStyle: {
-        width: config.parallelLineWidth || 1,
-        opacity: config.parallelLineOpacity ?? 0.5,
+    series: [
+      {
+        type: 'parallel',
+        lineStyle: {
+          width: config.parallelLineWidth || 1,
+          opacity: config.parallelLineOpacity ?? 0.5,
+        },
+        smooth: config.parallelSmooth || false,
+        activeOpacity: config.parallelActiveOpacity ?? 1,
+        inactiveOpacity: config.parallelInactiveOpacity ?? 0.1,
+        realtime: config.parallelRealtime !== false,
+        data: seriesData,
       },
-      smooth: config.parallelSmooth || false,
-      activeOpacity: config.parallelActiveOpacity ?? 1,
-      inactiveOpacity: config.parallelInactiveOpacity ?? 0.1,
-      realtime: config.parallelRealtime !== false,
-      data: seriesData,
-    }],
+    ],
   };
 }
 
@@ -1780,15 +2015,21 @@ export function buildBar3DChartOption(data: any[], config: any): any {
       boxWidth: config.grid3DBoxWidth || 100,
       boxDepth: config.grid3DBoxDepth || 100,
       boxHeight: config.grid3DBoxHeight || 100,
-      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
+      viewControl: {
+        autoRotate: config.autoRotate || false,
+        alpha: config.viewAlpha ?? 20,
+        beta: config.viewBeta ?? 40,
+      },
     },
-    series: [{
-      type: 'bar3D',
-      data: seriesData.map(d => ({ value: d })),
-      shading: config.shading || 'lambert',
-      label: { show: config.showDataLabel || false, fontSize: 10 },
-      itemStyle: { opacity: config.itemOpacity ?? 0.8 },
-    }],
+    series: [
+      {
+        type: 'bar3D',
+        data: seriesData.map(d => ({ value: d })),
+        shading: config.shading || 'lambert',
+        label: { show: config.showDataLabel || false, fontSize: 10 },
+        itemStyle: { opacity: config.itemOpacity ?? 0.8 },
+      },
+    ],
   };
 }
 
@@ -1810,16 +2051,22 @@ export function buildLine3DChartOption(data: any[], config: any): any {
     yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
     zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
     grid3D: {
-      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
-    },
-    series: [{
-      type: 'line3D',
-      data: seriesData,
-      lineStyle: {
-        width: config.lineWidth || 2,
-        opacity: config.lineOpacity ?? 1,
+      viewControl: {
+        autoRotate: config.autoRotate || false,
+        alpha: config.viewAlpha ?? 20,
+        beta: config.viewBeta ?? 40,
       },
-    }],
+    },
+    series: [
+      {
+        type: 'line3D',
+        data: seriesData,
+        lineStyle: {
+          width: config.lineWidth || 2,
+          opacity: config.lineOpacity ?? 1,
+        },
+      },
+    ],
   };
 }
 
@@ -1840,16 +2087,22 @@ export function buildScatter3DChartOption(data: any[], config: any): any {
     yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
     zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
     grid3D: {
-      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
-    },
-    series: [{
-      type: 'scatter3D',
-      data: seriesData,
-      symbolSize: config.scatterSymbolSize || 10,
-      itemStyle: {
-        opacity: config.itemOpacity ?? 0.8,
+      viewControl: {
+        autoRotate: config.autoRotate || false,
+        alpha: config.viewAlpha ?? 20,
+        beta: config.viewBeta ?? 40,
       },
-    }],
+    },
+    series: [
+      {
+        type: 'scatter3D',
+        data: seriesData,
+        symbolSize: config.scatterSymbolSize || 10,
+        itemStyle: {
+          opacity: config.itemOpacity ?? 0.8,
+        },
+      },
+    ],
   };
 }
 
@@ -1875,15 +2128,21 @@ export function buildSurfaceChartOption(data: any[], config: any): any {
     yAxis3D: { type: 'value', name: config.yAxisLabel || '' },
     zAxis3D: { type: 'value', name: config.zAxisLabel || '' },
     grid3D: {
-      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
+      viewControl: {
+        autoRotate: config.autoRotate || false,
+        alpha: config.viewAlpha ?? 20,
+        beta: config.viewBeta ?? 40,
+      },
     },
-    series: [{
-      type: 'surface',
-      data: seriesData,
-      shading: config.shading || 'lambert',
-      wireframe: { show: config.wireframe !== false },
-      itemStyle: { opacity: config.itemOpacity ?? 0.9 },
-    }],
+    series: [
+      {
+        type: 'surface',
+        data: seriesData,
+        shading: config.shading || 'lambert',
+        wireframe: { show: config.wireframe !== false },
+        itemStyle: { opacity: config.itemOpacity ?? 0.9 },
+      },
+    ],
   };
 }
 
@@ -1923,33 +2182,41 @@ export function buildGlobeChartOption(data: any[], config: any): any {
         main: { intensity: 1.2, shadow: false },
         ambient: { intensity: 0.6 },
       },
-      layers: [{
-        type: 'blend',
-        blendTo: 'emission',
-        texture: 'none',
-      }],
+      layers: [
+        {
+          type: 'blend',
+          blendTo: 'emission',
+          texture: 'none',
+        },
+      ],
     },
-    series: [{
-      type: 'scatter3D',
-      coordinateSystem: 'globe',
-      data: seriesData,
-      symbolSize: (val: any) => Math.max(6, (val?.[2] || 10) / 5),
-      label: {
-        show: config.showDataLabel || false,
-        formatter: (params: any) => tooltipNames[params.dataIndex] || '',
-        fontSize: 10,
+    series: [
+      {
+        type: 'scatter3D',
+        coordinateSystem: 'globe',
+        data: seriesData,
+        symbolSize: (val: any) => Math.max(6, (val?.[2] || 10) / 5),
+        label: {
+          show: config.showDataLabel || false,
+          formatter: (params: any) => tooltipNames[params.dataIndex] || '',
+          fontSize: 10,
+        },
+        itemStyle: {
+          opacity: 0.9,
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.4)',
+        },
       },
-      itemStyle: {
-        opacity: 0.9,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.4)',
-      },
-    }],
+    ],
   };
 }
 
 // ========= Graph GL Chart =========
-export function buildGraphGLChartOption(nodes: any[], links: any[], config: any): any {
+export function buildGraphGLChartOption(
+  nodes: any[],
+  links: any[],
+  config: any,
+): any {
   // Handle multiple data formats:
   // 1. Object with nodes/links: { nodes: [...], links: [...] }
   // 2. Array where first element has nodes/links
@@ -1961,7 +2228,12 @@ export function buildGraphGLChartOption(nodes: any[], links: any[], config: any)
     // Data passed as object { nodes, links }
     graphNodes = (nodes as any).nodes;
     graphLinks = (nodes as any).links || [];
-  } else if (Array.isArray(nodes) && nodes.length > 0 && nodes[0]?.nodes && nodes[0]?.links) {
+  } else if (
+    Array.isArray(nodes) &&
+    nodes.length > 0 &&
+    nodes[0]?.nodes &&
+    nodes[0]?.links
+  ) {
     // Array where first element wraps nodes/links
     graphNodes = nodes[0].nodes;
     graphLinks = nodes[0].links;
@@ -1976,25 +2248,27 @@ export function buildGraphGLChartOption(nodes: any[], links: any[], config: any)
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
-    series: [{
-      type: 'graphGL',
-      nodes: graphNodes.map((n: any, i: number) => ({
-        name: String(n.name || n.id || i),
-        value: n.value || 1,
-        symbolSize: n.symbolSize || config.nodeSize || 10,
-        x: Math.random() * 200 - 100,
-        y: Math.random() * 200 - 100,
-      })),
-      edges: graphLinks.map((l: any) => ({
-        source: String(l.source),
-        target: String(l.target),
-      })),
-      forceAtlas2: {
-        steps: 100,
-        gravity: config.graphGravity || 0.1,
-        edgeWeightInfluence: 1,
+    series: [
+      {
+        type: 'graphGL',
+        nodes: graphNodes.map((n: any, i: number) => ({
+          name: String(n.name || n.id || i),
+          value: n.value || 1,
+          symbolSize: n.symbolSize || config.nodeSize || 10,
+          x: Math.random() * 200 - 100,
+          y: Math.random() * 200 - 100,
+        })),
+        edges: graphLinks.map((l: any) => ({
+          source: String(l.source),
+          target: String(l.target),
+        })),
+        forceAtlas2: {
+          steps: 100,
+          gravity: config.graphGravity || 0.1,
+          edgeWeightInfluence: 1,
+        },
       },
-    }],
+    ],
   };
 }
 
@@ -2013,16 +2287,26 @@ export function buildScatterGLChartOption(data: any[], config: any): any {
     color: getColors(config.colorScheme),
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled },
-    xAxis: { type: 'value', show: config.xAxis !== false, splitLine: { show: config.showGridLines !== false } },
-    yAxis: { type: 'value', show: config.yAxis !== false, splitLine: { show: config.showGridLines !== false } },
-    series: [{
-      type: 'scatterGL',
-      data: seriesData,
-      symbolSize: config.scatterSymbolSize || 5,
-      itemStyle: {
-        opacity: config.itemOpacity ?? 0.6,
+    xAxis: {
+      type: 'value',
+      show: config.xAxis !== false,
+      splitLine: { show: config.showGridLines !== false },
+    },
+    yAxis: {
+      type: 'value',
+      show: config.yAxis !== false,
+      splitLine: { show: config.showGridLines !== false },
+    },
+    series: [
+      {
+        type: 'scatterGL',
+        data: seriesData,
+        symbolSize: config.scatterSymbolSize || 5,
+        itemStyle: {
+          opacity: config.itemOpacity ?? 0.6,
+        },
       },
-    }],
+    ],
   };
 }
 
@@ -2055,8 +2339,16 @@ export function buildLinesGLChartOption(data: any[], config: any): any {
     color: colors,
     ...buildAnimation(config),
     tooltip: { show: !config.tooltipDisabled, trigger: 'axis' },
-    xAxis: { type: 'value', show: config.xAxis !== false, splitLine: { show: config.showGridLines !== false } },
-    yAxis: { type: 'value', show: config.yAxis !== false, splitLine: { show: config.showGridLines !== false } },
+    xAxis: {
+      type: 'value',
+      show: config.xAxis !== false,
+      splitLine: { show: config.showGridLines !== false },
+    },
+    yAxis: {
+      type: 'value',
+      show: config.yAxis !== false,
+      splitLine: { show: config.showGridLines !== false },
+    },
     legend: { show: false },
     series,
   };
@@ -2068,7 +2360,12 @@ export function buildMap3DChartOption(data: any[], config: any): any {
   // Data format: [{ name: 'region', value: number }, ...]
   const seriesData = data.map(d => ({
     name: String(d.name),
-    value: typeof d.value === 'number' ? d.value : (Array.isArray(d.value) ? d.value[2] || 0 : 0),
+    value:
+      typeof d.value === 'number'
+        ? d.value
+        : Array.isArray(d.value)
+          ? d.value[2] || 0
+          : 0,
   }));
 
   const categories = seriesData.map(d => d.name);
@@ -2080,7 +2377,8 @@ export function buildMap3DChartOption(data: any[], config: any): any {
     ...buildAnimation(config),
     tooltip: {
       show: !config.tooltipDisabled,
-      formatter: (params: any) => `${params.name || categories[params.value?.[0]] || ''}: ${params.value?.[2] ?? ''}`,
+      formatter: (params: any) =>
+        `${params.name || categories[params.value?.[0]] || ''}: ${params.value?.[2] ?? ''}`,
     },
     visualMap: {
       show: config.showVisualMap !== false,
@@ -2097,19 +2395,25 @@ export function buildMap3DChartOption(data: any[], config: any): any {
     grid3D: {
       boxWidth: 120,
       boxDepth: 40,
-      viewControl: { autoRotate: config.autoRotate || false, alpha: config.viewAlpha ?? 20, beta: config.viewBeta ?? 40 },
+      viewControl: {
+        autoRotate: config.autoRotate || false,
+        alpha: config.viewAlpha ?? 20,
+        beta: config.viewBeta ?? 40,
+      },
       light: {
         main: { intensity: 1.2 },
         ambient: { intensity: 0.3 },
       },
     },
-    series: [{
-      type: 'bar3D',
-      data: values.map((v, i) => ({ value: v, name: categories[i] })),
-      shading: 'lambert',
-      label: { show: config.showDataLabel || false, fontSize: 10 },
-      itemStyle: { opacity: 0.85 },
-    }],
+    series: [
+      {
+        type: 'bar3D',
+        data: values.map((v, i) => ({ value: v, name: categories[i] })),
+        shading: 'lambert',
+        label: { show: config.showDataLabel || false, fontSize: 10 },
+        itemStyle: { opacity: 0.85 },
+      },
+    ],
   };
 }
 
@@ -2138,7 +2442,7 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
     const mag = Math.sqrt(vx * vx + vy * vy);
     if (mag > maxMag) maxMag = mag;
     // angle in degrees: 0° = right, 90° = up; ECharts rotates CW so negate
-    const angle = -Math.atan2(vy, vx) * 180 / Math.PI;
+    const angle = (-Math.atan2(vy, vx) * 180) / Math.PI;
     return { x: v[0], y: v[1], mag, angle };
   });
   if (maxMag === 0) maxMag = 1;
@@ -2163,17 +2467,23 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
     xAxis: {
       type: 'value',
       show: true,
-      splitLine: { show: true, lineStyle: { type: 'dashed', color: '#e8e8e8' } },
+      splitLine: {
+        show: true,
+        lineStyle: { type: 'dashed', color: '#e8e8e8' },
+      },
     },
     yAxis: {
       type: 'value',
       show: true,
-      splitLine: { show: true, lineStyle: { type: 'dashed', color: '#e8e8e8' } },
+      splitLine: {
+        show: true,
+        lineStyle: { type: 'dashed', color: '#e8e8e8' },
+      },
     },
     visualMap: {
       show: true,
       min: 0,
-      max: +(maxMag.toFixed(3)),
+      max: +maxMag.toFixed(3),
       dimension: 2,
       orient: 'vertical',
       right: 0,
@@ -2181,18 +2491,23 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
       text: ['High', 'Low'],
       calculable: true,
       inRange: {
-        color: colors.length >= 2 ? [colors[1], colors[0]] : ['#50a3ba', '#eac736', '#d94e5d'],
+        color:
+          colors.length >= 2
+            ? [colors[1], colors[0]]
+            : ['#50a3ba', '#eac736', '#d94e5d'],
       },
     },
-    series: [{
-      type: 'scatter',
-      data: arrowData,
-      symbol: 'arrow',
-      symbolSize: (val: any) => {
-        const mag = val[2] || 0;
-        return Math.max(6, (mag / maxMag) * 22);
+    series: [
+      {
+        type: 'scatter',
+        data: arrowData,
+        symbol: 'arrow',
+        symbolSize: (val: any) => {
+          const mag = val[2] || 0;
+          return Math.max(6, (mag / maxMag) * 22);
+        },
+        itemStyle: { opacity: 0.85 },
       },
-      itemStyle: { opacity: 0.85 },
-    }],
+    ],
   };
 }

@@ -37,7 +37,8 @@ export function createPromptFormControl(prompt: ExecutePrompt): FormControl {
       break;
   }
 
-  const defaultValue = getDefaultValueFromConfig(prompt) ?? getDefaultValue(prompt.type);
+  const defaultValue =
+    getDefaultValueFromConfig(prompt) ?? getDefaultValue(prompt.type);
   return new FormControl(defaultValue, validators);
 }
 
@@ -89,7 +90,7 @@ export function getDefaultValue(type: PromptType): any {
  * Ensures start value is less than or equal to end value
  */
 export function rangeValidator(
-  control: AbstractControl
+  control: AbstractControl,
 ): ValidationErrors | null {
   const value = control.value;
 
@@ -136,7 +137,7 @@ export function hasError(control: FormControl, errorKey: string): boolean {
  */
 export function getErrorMessage(
   control: FormControl,
-  promptName: string
+  promptName: string,
 ): string {
   if (control.hasError('required')) {
     return `${promptName} is required`;
@@ -155,7 +156,7 @@ export function getErrorMessage(
  */
 export function validateSection(
   prompts: ExecutePrompt[],
-  formControls: { [key: string]: FormControl }
+  formControls: { [key: string]: FormControl },
 ): boolean {
   return prompts
     .filter(p => p.mandatory)

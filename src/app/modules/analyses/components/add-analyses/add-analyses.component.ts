@@ -248,8 +248,8 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Grid layout constants (24-col / 50px-row for fine-grained smooth resizing)
   private readonly GRID_COLUMNS = 24;
-  private readonly ROW_HEIGHT = 50;  // px per grid row unit
-  private readonly GRID_GAP = 12;    // px gap between grid cells
+  private readonly ROW_HEIGHT = 50; // px per grid row unit
+  private readonly GRID_GAP = 12; // px gap between grid cells
   private resizeObserver: ResizeObserver | null = null;
 
   constructor(
@@ -406,16 +406,13 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     // Visual pixel width = colSpan × fr + (colSpan - 1) × gap
     visual.width = Math.max(
       100,
-      Math.round(
-        visual.colSpan * fr + (visual.colSpan - 1) * this.GRID_GAP,
-      ),
+      Math.round(visual.colSpan * fr + (visual.colSpan - 1) * this.GRID_GAP),
     );
     // Visual pixel height = rowSpan × rowHeight + (rowSpan - 1) × gap
     visual.height = Math.max(
       100,
       Math.round(
-        visual.rowSpan * this.ROW_HEIGHT +
-          (visual.rowSpan - 1) * this.GRID_GAP,
+        visual.rowSpan * this.ROW_HEIGHT + (visual.rowSpan - 1) * this.GRID_GAP,
       ),
     );
 
@@ -439,18 +436,10 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
       for (let row = 0; !placed && row < 500; row++) {
         for (let col = 0; col <= this.GRID_COLUMNS - colSpan; col++) {
-          if (
-            this.canPlaceAt(occupied, row, col, colSpan, visual.rowSpan)
-          ) {
+          if (this.canPlaceAt(occupied, row, col, colSpan, visual.rowSpan)) {
             visual.gridRow = row;
             visual.gridCol = col;
-            this.markGridCells(
-              occupied,
-              row,
-              col,
-              colSpan,
-              visual.rowSpan,
-            );
+            this.markGridCells(occupied, row, col, colSpan, visual.rowSpan);
             placed = true;
             break;
           }
@@ -932,7 +921,11 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // 3-axis charts: heat-map, sankey, graph need x + y + z
-    if (this.isHeatMapChartType(visual.chartType) || this.isSankeyChartType(visual.chartType) || this.isGraphChartType(visual.chartType)) {
+    if (
+      this.isHeatMapChartType(visual.chartType) ||
+      this.isSankeyChartType(visual.chartType) ||
+      this.isGraphChartType(visual.chartType)
+    ) {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
     }
 
@@ -1164,7 +1157,10 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       const maxCols = this.GRID_COLUMNS - this.resizingVisual.gridCol;
       newColSpan = Math.max(
         4,
-        Math.min(maxCols, this.resizeStartColSpan + Math.round(deltaX / colUnit)),
+        Math.min(
+          maxCols,
+          this.resizeStartColSpan + Math.round(deltaX / colUnit),
+        ),
       );
     }
     if (this.resizeDirection.includes('bottom')) {
@@ -1245,7 +1241,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       } else if (this.autoScrollClientY < rect.top + EDGE) {
         const ratio = Math.min(
           1,
-          ((rect.top + EDGE) - this.autoScrollClientY) / EDGE,
+          (rect.top + EDGE - this.autoScrollClientY) / EDGE,
         );
         container.scrollTop -= Math.ceil(MAX_SPEED * ratio);
         scrolled = true;
@@ -1276,7 +1272,11 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       const visualBox = (event.target as HTMLElement).closest('.visual-box');
       if (visualBox) {
         const rect = visualBox.getBoundingClientRect();
-        event.dataTransfer.setDragImage(visualBox, event.clientX - rect.left, event.clientY - rect.top);
+        event.dataTransfer.setDragImage(
+          visualBox,
+          event.clientX - rect.left,
+          event.clientY - rect.top,
+        );
       }
     }
   }

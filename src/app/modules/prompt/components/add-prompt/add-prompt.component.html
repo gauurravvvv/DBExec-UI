@@ -1,177 +1,339 @@
 <div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/prompt">
-                    <i class="pi pi-arrow-left text-xl"></i>
-                </button>
-                <h2>Add Prompt</h2>
-            </div>
-            <div class="warning-section" *ngIf="hasDuplicates">
-                <div class="duplicate-warning">
-                    <i class="pi pi-exclamation-triangle"></i>
-                    <span>Duplicate prompt names found. Please remove duplicates to continue.</span>
-                </div>
-            </div>
-            <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-                    [disabled]="!isFormDirty" (click)="onCancel()">
-                </button>
-                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="sectionForm.invalid || hasDuplicates || hasEmptyPrompts">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          routerLink="/app/prompt"
+        >
+          <i class="pi pi-arrow-left text-xl"></i>
+        </button>
+        <h2>Add Prompt</h2>
+      </div>
+      <div class="warning-section" *ngIf="hasDuplicates">
+        <div class="duplicate-warning">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span
+            >Duplicate prompt names found. Please remove duplicates to
+            continue.</span
+          >
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="sectionForm.invalid || hasDuplicates || hasEmptyPrompts"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="sectionForm" class="admin-form">
+      <div class="form-grid">
+        <div class="form-field" *ngIf="showOrganisationDropdown">
+          <app-custom-dropdown
+            formControlName="organisation"
+            label="Organisation"
+            placeholder="Select Organisation"
+            [options]="organisations"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            [required]="true"
+            [showError]="
+              !!(
+                sectionForm.get('organisation')?.invalid &&
+                sectionForm.get('organisation')?.touched
+              )
+            "
+            errorMessage="Organisation is required"
+            (ngModelChange)="
+              onOrganisationChange({
+                value: sectionForm.get('organisation')?.value,
+              })
+            "
+          >
+          </app-custom-dropdown>
         </div>
 
-        <!-- Form Section -->
-        <form [formGroup]="sectionForm" class="admin-form">
-            <div class="form-grid">
-                <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <app-custom-dropdown formControlName="organisation" label="Organisation"
-                        placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
-                        [filter]="true" filterBy="name" [required]="true"
-                        [showError]="!!(sectionForm.get('organisation')?.invalid && sectionForm.get('organisation')?.touched)"
-                        errorMessage="Organisation is required"
-                        (ngModelChange)="onOrganisationChange({value: sectionForm.get('organisation')?.value})">
-                    </app-custom-dropdown>
-                </div>
+        <!-- Database dropdown -->
+        <div class="form-field">
+          <app-custom-dropdown
+            formControlName="database"
+            label="Database"
+            placeholder="Select Database"
+            [options]="databases"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            [required]="true"
+            [showError]="
+              !!(
+                sectionForm.get('database')?.invalid &&
+                sectionForm.get('database')?.touched
+              )
+            "
+            errorMessage="Database is required"
+            (ngModelChange)="
+              onDatabaseChange({ value: sectionForm.get('database')?.value })
+            "
+          >
+          </app-custom-dropdown>
+        </div>
 
-                <!-- Database dropdown -->
-                <div class="form-field">
-                    <app-custom-dropdown formControlName="database" label="Database" placeholder="Select Database"
-                        [options]="databases" optionLabel="name" optionValue="id" [filter]="true" filterBy="name"
-                        [required]="true"
-                        [showError]="!!(sectionForm.get('database')?.invalid && sectionForm.get('database')?.touched)"
-                        errorMessage="Database is required"
-                        (ngModelChange)="onDatabaseChange({value: sectionForm.get('database')?.value})">
-                    </app-custom-dropdown>
-                </div>
+        <!-- Tab dropdown -->
+        <div class="form-field">
+          <app-custom-dropdown
+            formControlName="tab"
+            label="Tab"
+            placeholder="Select Tab"
+            [options]="tabs"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            [required]="true"
+            [showError]="
+              !!(
+                sectionForm.get('tab')?.invalid &&
+                sectionForm.get('tab')?.touched
+              )
+            "
+            errorMessage="Tab is required"
+            (ngModelChange)="
+              onTabChange({ value: sectionForm.get('tab')?.value })
+            "
+          >
+          </app-custom-dropdown>
+        </div>
 
-                <!-- Tab dropdown -->
-                <div class="form-field">
-                    <app-custom-dropdown formControlName="tab" label="Tab" placeholder="Select Tab" [options]="tabs"
-                        optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
-                        [showError]="!!(sectionForm.get('tab')?.invalid && sectionForm.get('tab')?.touched)"
-                        errorMessage="Tab is required"
-                        (ngModelChange)="onTabChange({value: sectionForm.get('tab')?.value})">
-                    </app-custom-dropdown>
-                </div>
-
-                <!-- Section Groups Container - Only show when tab is selected -->
-                <div class="form-field fields-container" *ngIf="selectedTab && sectionForm.get('tab')?.value">
-                    <div class="fields-header">
-                        <label>Section Groups<span class="required">*</span></label>
-                        <div class="button-group">
-                            <button pButton type="button"
-                                [icon]="areAllExpanded ? 'pi pi-angle-double-up' : 'pi pi-angle-double-down'"
-                                class="p-button-rounded p-button-text expand-collapse-btn"
-                                (click)="areAllExpanded ? collapseAll() : expandAll()"
-                                [pTooltip]="areAllExpanded ? 'Collapse All' : 'Expand All'"
-                                tooltipPosition="bottom"
-                                *ngIf="sectionGroups.length > 0">
-                            </button>
-                            <button pButton type="button" icon="pi pi-times"
-                                class="p-button-rounded p-button-text p-button-danger clear-btn mr-1"
-                                (click)="clearAllSectionGroups()">
-                            </button>
-                            <button pButton type="button" icon="pi pi-plus"
-                                class="p-button-rounded p-button-text add-btn" (click)="addSectionGroup()">
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="fields-list">
-                        <div *ngFor="let sectionGroup of sectionGroups.controls; let groupIndex=index"
-                            [formGroup]="$any(sectionGroup)" class="schema-group"
-                            [class.highlight-animation]="groupIndex === lastAddedGroupIndex && isNewlyAdded">
-
-                            <!-- Section Header -->
-                            <div class="schema-header">
-                                <button pButton type="button"
-                                    [icon]="isGroupExpanded(groupIndex) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-                                    class="p-button-rounded p-button-text expand-btn"
-                                    (click)="toggleGroup(groupIndex)">
-                                </button>
-                                <div style="width: 300px;">
-                                    <app-custom-dropdown formControlName="sectionId" label="Section"
-                                        placeholder="Select Section" [options]="getAvailableSections(groupIndex)"
-                                        optionLabel="name" optionValue="id" [filter]="true" filterBy="name"
-                                        [required]="true"
-                                        [showError]="!!(sectionGroup.get('sectionId')?.invalid && sectionGroup.get('sectionId')?.touched)"
-                                        errorMessage="Section is required"
-                                        (ngModelChange)="onSectionChange({value: sectionGroup.get('sectionId')?.value}, groupIndex)">
-                                    </app-custom-dropdown>
-                                </div>
-                                <span class="section-count" *ngIf="!isGroupExpanded(groupIndex)">
-                                    {{ getPrompts(groupIndex).length }} prompt{{ getPrompts(groupIndex).length !== 1 ? 's' : '' }}
-                                </span>
-                                <button pButton type="button" icon="pi pi-plus"
-                                    class="p-button-rounded p-button-text add-btn"
-                                    (click)="addPromptToSection(groupIndex)"
-                                    [disabled]="!sectionGroup.get('sectionId')?.value">
-                                </button>
-                                <button pButton type="button" icon="pi pi-trash"
-                                    class="p-button-rounded p-button-text clear-btn"
-                                    (click)="removeSectionGroup(groupIndex)" [disabled]="sectionGroups.length === 1">
-                                </button>
-                            </div>
-
-                            <!-- Prompts for this section -->
-                            <div class="mappings-list" formArrayName="prompts" *ngIf="isGroupExpanded(groupIndex)">
-                                <div *ngFor="let prompt of getPrompts(groupIndex).controls; let promptIndex=index"
-                                    [formGroupName]="promptIndex" class="mapping-row" [ngClass]="{
-                                        'duplicate': isDuplicateRow(groupIndex, promptIndex),
-                                        'highlight-animation': promptIndex === lastAddedPromptIndex && 
-                                                             groupIndex === lastAddedGroupIndex && 
-                                                             isNewlyAddedSection
-                                    }">
-
-                                    <span class="index-number">{{promptIndex + 1}}</span>
-
-                                    <div class="mapping-inputs">
-                                        <!-- Name field -->
-                                        <div class="form-field">
-                                            <app-custom-input formControlName="name" label="Name"
-                                                placeholder="Enter prompt name" icon="pi-box" [required]="true"
-                                                [showError]="!!(prompt.get('name')?.invalid && prompt.get('name')?.touched)"
-                                                [errorMessage]="prompt.get('name')?.errors?.['required'] ? 'Prompt name is required' : 
-                                                               prompt.get('name')?.errors?.['pattern'] ? 'Prompt name can only contain letters, spaces and hyphens' : ''">
-                                            </app-custom-input>
-                                        </div>
-
-                                        <!-- Description field -->
-                                        <div class="form-field">
-                                            <app-custom-input formControlName="description" label="Description"
-                                                placeholder="Enter description" icon="pi-align-left"
-                                                [showError]="!!prompt.get('description')?.errors?.['pattern']"
-                                                errorMessage="Description can only contain letters, spaces and hyphens">
-                                            </app-custom-input>
-                                        </div>
-
-                                        <!-- Type field -->
-                                        <div class="form-field">
-                                            <app-custom-dropdown formControlName="type" label="Type"
-                                                placeholder="Select Type" [options]="promptTypes" optionLabel="label"
-                                                optionValue="value" [filter]="true" filterBy="label" [required]="true"
-                                                [showError]="!!(prompt.get('type')?.invalid && prompt.get('type')?.touched)"
-                                                errorMessage="Type is required">
-                                            </app-custom-dropdown>
-                                        </div>
-                                    </div>
-
-                                    <button pButton type="button" icon="pi pi-trash"
-                                        class="p-button-rounded p-button-text p-button-danger"
-                                        (click)="removePromptFromSection(groupIndex, promptIndex)"
-                                        [disabled]="getPrompts(groupIndex).length === 1">
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Section Groups Container - Only show when tab is selected -->
+        <div
+          class="form-field fields-container"
+          *ngIf="selectedTab && sectionForm.get('tab')?.value"
+        >
+          <div class="fields-header">
+            <label>Section Groups<span class="required">*</span></label>
+            <div class="button-group">
+              <button
+                pButton
+                type="button"
+                [icon]="
+                  areAllExpanded
+                    ? 'pi pi-angle-double-up'
+                    : 'pi pi-angle-double-down'
+                "
+                class="p-button-rounded p-button-text expand-collapse-btn"
+                (click)="areAllExpanded ? collapseAll() : expandAll()"
+                [pTooltip]="areAllExpanded ? 'Collapse All' : 'Expand All'"
+                tooltipPosition="bottom"
+                *ngIf="sectionGroups.length > 0"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times"
+                class="p-button-rounded p-button-text p-button-danger clear-btn mr-1"
+                (click)="clearAllSectionGroups()"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-plus"
+                class="p-button-rounded p-button-text add-btn"
+                (click)="addSectionGroup()"
+              ></button>
             </div>
-        </form>
-    </div>
+          </div>
+
+          <div class="fields-list">
+            <div
+              *ngFor="
+                let sectionGroup of sectionGroups.controls;
+                let groupIndex = index
+              "
+              [formGroup]="$any(sectionGroup)"
+              class="schema-group"
+              [class.highlight-animation]="
+                groupIndex === lastAddedGroupIndex && isNewlyAdded
+              "
+            >
+              <!-- Section Header -->
+              <div class="schema-header">
+                <button
+                  pButton
+                  type="button"
+                  [icon]="
+                    isGroupExpanded(groupIndex)
+                      ? 'pi pi-chevron-down'
+                      : 'pi pi-chevron-right'
+                  "
+                  class="p-button-rounded p-button-text expand-btn"
+                  (click)="toggleGroup(groupIndex)"
+                ></button>
+                <div style="width: 300px">
+                  <app-custom-dropdown
+                    formControlName="sectionId"
+                    label="Section"
+                    placeholder="Select Section"
+                    [options]="getAvailableSections(groupIndex)"
+                    optionLabel="name"
+                    optionValue="id"
+                    [filter]="true"
+                    filterBy="name"
+                    [required]="true"
+                    [showError]="
+                      !!(
+                        sectionGroup.get('sectionId')?.invalid &&
+                        sectionGroup.get('sectionId')?.touched
+                      )
+                    "
+                    errorMessage="Section is required"
+                    (ngModelChange)="
+                      onSectionChange(
+                        { value: sectionGroup.get('sectionId')?.value },
+                        groupIndex
+                      )
+                    "
+                  >
+                  </app-custom-dropdown>
+                </div>
+                <span
+                  class="section-count"
+                  *ngIf="!isGroupExpanded(groupIndex)"
+                >
+                  {{ getPrompts(groupIndex).length }} prompt{{
+                    getPrompts(groupIndex).length !== 1 ? 's' : ''
+                  }}
+                </span>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-plus"
+                  class="p-button-rounded p-button-text add-btn"
+                  (click)="addPromptToSection(groupIndex)"
+                  [disabled]="!sectionGroup.get('sectionId')?.value"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text clear-btn"
+                  (click)="removeSectionGroup(groupIndex)"
+                  [disabled]="sectionGroups.length === 1"
+                ></button>
+              </div>
+
+              <!-- Prompts for this section -->
+              <div
+                class="mappings-list"
+                formArrayName="prompts"
+                *ngIf="isGroupExpanded(groupIndex)"
+              >
+                <div
+                  *ngFor="
+                    let prompt of getPrompts(groupIndex).controls;
+                    let promptIndex = index
+                  "
+                  [formGroupName]="promptIndex"
+                  class="mapping-row"
+                  [ngClass]="{
+                    duplicate: isDuplicateRow(groupIndex, promptIndex),
+                    'highlight-animation':
+                      promptIndex === lastAddedPromptIndex &&
+                      groupIndex === lastAddedGroupIndex &&
+                      isNewlyAddedSection,
+                  }"
+                >
+                  <span class="index-number">{{ promptIndex + 1 }}</span>
+
+                  <div class="mapping-inputs">
+                    <!-- Name field -->
+                    <div class="form-field">
+                      <app-custom-input
+                        formControlName="name"
+                        label="Name"
+                        placeholder="Enter prompt name"
+                        icon="pi-box"
+                        [required]="true"
+                        [showError]="
+                          !!(
+                            prompt.get('name')?.invalid &&
+                            prompt.get('name')?.touched
+                          )
+                        "
+                        [errorMessage]="getNameError(prompt.get('name'))"
+                      >
+                      </app-custom-input>
+                    </div>
+
+                    <!-- Description field -->
+                    <div class="form-field">
+                      <app-custom-input
+                        formControlName="description"
+                        label="Description"
+                        placeholder="Enter description"
+                        icon="pi-align-left"
+                      >
+                      </app-custom-input>
+                    </div>
+
+                    <!-- Type field -->
+                    <div class="form-field">
+                      <app-custom-dropdown
+                        formControlName="type"
+                        label="Type"
+                        placeholder="Select Type"
+                        [options]="promptTypes"
+                        optionLabel="label"
+                        optionValue="value"
+                        [filter]="true"
+                        filterBy="label"
+                        [required]="true"
+                        [showError]="
+                          !!(
+                            prompt.get('type')?.invalid &&
+                            prompt.get('type')?.touched
+                          )
+                        "
+                        errorMessage="Type is required"
+                      >
+                      </app-custom-dropdown>
+                    </div>
+                  </div>
+
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-text p-button-danger"
+                    (click)="removePromptFromSection(groupIndex, promptIndex)"
+                    [disabled]="getPrompts(groupIndex).length === 1"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

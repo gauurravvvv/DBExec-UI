@@ -50,9 +50,14 @@ export class AddDatabaseComponent implements OnInit {
     this.databaseForm = this.fb.group({
       name: [
         '',
-        [Validators.required, Validators.pattern('^[a-zA-Z0-9\\s-]+$')],
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
       ],
-      description: ['', Validators.required],
+      description: ['', [Validators.maxLength(500)]],
       type: [{ value: 'postgres', disabled: true }],
       host: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
       port: [
@@ -195,10 +200,14 @@ export class AddDatabaseComponent implements OnInit {
     const control = this.databaseForm.get(fieldName);
     if (control?.errors) {
       if (control.errors['required']) return 'This field is required';
+      if (control.errors['minlength'])
+        return `Must be at least ${control.errors['minlength'].requiredLength} characters`;
+      if (control.errors['maxlength'])
+        return `Must not exceed ${control.errors['maxlength'].requiredLength} characters`;
       if (control.errors['pattern']) {
         switch (fieldName) {
           case 'name':
-            return 'Name can only contain letters, numbers, spaces and hyphens';
+            return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
           case 'host':
             return 'Invalid host format';
           case 'port':
@@ -208,10 +217,6 @@ export class AddDatabaseComponent implements OnInit {
           default:
             return 'Invalid format';
         }
-      }
-      if (control.errors['minlength']) return 'Minimum length is 8 characters';
-      if (fieldName === 'password' && control.errors['pattern']) {
-        return 'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character';
       }
       if (control.errors['min'] && fieldName === 'port')
         return 'Port must be at least 1';

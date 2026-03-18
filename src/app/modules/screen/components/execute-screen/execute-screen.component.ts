@@ -407,7 +407,9 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
           return {
             promptId: p.promptId,
             type: p.type,
-            value: prompt ? this.resolveFormValueToString(prompt, p.value) : p.value,
+            value: prompt
+              ? this.resolveFormValueToString(prompt, p.value)
+              : p.value,
             isRange: p.isRange,
             startValue: p.startValue,
             endValue: p.endValue,
@@ -631,7 +633,9 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
       return {
         promptId: p.promptId,
         type: p.type,
-        value: prompt ? this.resolveFormValueToString(prompt, p.value) : p.value,
+        value: prompt
+          ? this.resolveFormValueToString(prompt, p.value)
+          : p.value,
         isRange: p.isRange,
         startValue: p.startValue,
         endValue: p.endValue,
@@ -740,7 +744,8 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
           // Extract prompts array from config (handle both old flat and new rich format)
           if (dataset.promptConfig) {
             const config = dataset.promptConfig;
-            const savedPrompts = config.prompts || (Array.isArray(config) ? config : []);
+            const savedPrompts =
+              config.prompts || (Array.isArray(config) ? config : []);
             this.patchSavedPromptValues(savedPrompts);
           }
         }
@@ -770,9 +775,14 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
           if (!control) return;
 
           // Restore value based on type
-          if (saved.isRange && (saved.startValue != null || saved.endValue != null)) {
+          if (
+            saved.isRange &&
+            (saved.startValue != null || saved.endValue != null)
+          ) {
             if (prompt.type === 'daterange') {
-              const start = saved.startValue ? new Date(saved.startValue) : null;
+              const start = saved.startValue
+                ? new Date(saved.startValue)
+                : null;
               const end = saved.endValue ? new Date(saved.endValue) : null;
               control.setValue([start, end]);
             } else if (prompt.type === 'rangeslider') {
@@ -786,13 +796,20 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
               control.setValue(new Date(saved.value));
             } else if (prompt.type === 'number') {
               control.setValue(Number(saved.value));
-            } else if (prompt.type === 'multiselect' || prompt.type === 'checkbox') {
+            } else if (
+              prompt.type === 'multiselect' ||
+              prompt.type === 'checkbox'
+            ) {
               // Values are [{id, value}] objects — extract IDs for form (form stores IDs)
               // Filter out stale IDs that no longer exist in current prompt options
               const validIds = new Set(prompt.values.map(v => v.id));
-              const arr = Array.isArray(saved.value) ? saved.value : [saved.value];
+              const arr = Array.isArray(saved.value)
+                ? saved.value
+                : [saved.value];
               const ids = arr
-                .map((v: any) => (typeof v === 'object' && v?.id != null) ? v.id : v)
+                .map((v: any) =>
+                  typeof v === 'object' && v?.id != null ? v.id : v,
+                )
                 .filter((id: any) => validIds.has(id));
               if (ids.length > 0) {
                 control.setValue(ids);
@@ -800,7 +817,10 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
             } else if (prompt.type === 'dropdown' || prompt.type === 'radio') {
               // Value is {id, value} object — extract ID for form
               // Only patch if the ID still exists in current prompt options
-              const val = (typeof saved.value === 'object' && saved.value?.id != null) ? saved.value.id : saved.value;
+              const val =
+                typeof saved.value === 'object' && saved.value?.id != null
+                  ? saved.value.id
+                  : saved.value;
               const validIds = new Set(prompt.values.map(v => v.id));
               if (validIds.has(val)) {
                 control.setValue(val);
@@ -837,10 +857,19 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
             const submission = createPromptSubmission(prompt, control.value);
 
             // Enrich selection values with prompt value IDs for storage
-            const enrichedValue = this.enrichValueWithIds(prompt, submission.value);
+            const enrichedValue = this.enrichValueWithIds(
+              prompt,
+              submission.value,
+            );
             // Resolve IDs to string values for display
-            const resolvedValue = this.resolveFormValueToString(prompt, control.value);
-            const displayStr = this.formatDisplayValue(resolvedValue, prompt.type);
+            const resolvedValue = this.resolveFormValueToString(
+              prompt,
+              control.value,
+            );
+            const displayStr = this.formatDisplayValue(
+              resolvedValue,
+              prompt.type,
+            );
 
             prompts.push({
               promptId: prompt.id,
@@ -863,7 +892,11 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
         });
 
         if (prompts.length > 0) {
-          sections.push({ sectionId: section.id, sectionName: section.name, prompts });
+          sections.push({
+            sectionId: section.id,
+            sectionName: section.name,
+            prompts,
+          });
         }
       });
 
@@ -883,7 +916,10 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
   private resolveFormValueToString(prompt: ExecutePrompt, formValue: any): any {
     if (formValue == null) return formValue;
 
-    if ((prompt.type === 'multiselect' || prompt.type === 'checkbox') && Array.isArray(formValue)) {
+    if (
+      (prompt.type === 'multiselect' || prompt.type === 'checkbox') &&
+      Array.isArray(formValue)
+    ) {
       return formValue.map((id: any) => {
         const match = prompt.values.find(v => v.id === id);
         return match ? match.value : id;
@@ -905,10 +941,15 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
   private enrichValueWithIds(prompt: ExecutePrompt, formValue: any): any {
     if (formValue == null) return formValue;
 
-    if ((prompt.type === 'multiselect' || prompt.type === 'checkbox') && Array.isArray(formValue)) {
+    if (
+      (prompt.type === 'multiselect' || prompt.type === 'checkbox') &&
+      Array.isArray(formValue)
+    ) {
       return formValue.map((id: any) => {
         const matched = prompt.values.find(v => v.id === id);
-        return matched ? { id: matched.id, value: matched.value } : { value: id };
+        return matched
+          ? { id: matched.id, value: matched.value }
+          : { value: id };
       });
     }
 

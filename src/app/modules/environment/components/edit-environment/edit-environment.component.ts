@@ -27,7 +27,7 @@ export class EditEnvironmentComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private globalService: GlobalService,
-    private environmentService: EnvironmentService
+    private environmentService: EnvironmentService,
   ) {
     this.initForm();
   }

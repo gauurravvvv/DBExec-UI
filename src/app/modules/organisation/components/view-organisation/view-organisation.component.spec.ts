@@ -8,9 +8,8 @@ describe('ViewOrganisationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ViewOrganisationComponent ]
-    })
-    .compileComponents();
+      declarations: [ViewOrganisationComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ViewOrganisationComponent);
     component = fixture.componentInstance;

@@ -8,9 +8,8 @@ describe('ViewPromptComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ViewPromptComponent ]
-    })
-    .compileComponents();
+      declarations: [ViewPromptComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ViewPromptComponent);
     component = fixture.componentInstance;

@@ -56,7 +56,7 @@
     "restrictionsLabel": "制限事項と特権",
     "addUserToGroup": "グループにユーザーを追加します",
     "userGroup": "ユーザー・グループ",
-    "editButton":"グループを編集する"
+    "editButton": "グループを編集する"
   },
   "privileges": {
     "section": "セクションレベル",

@@ -82,8 +82,13 @@ export class ConfigurableBarChartComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartType'] ||
-        changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartType'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }
@@ -100,7 +105,12 @@ export class ConfigurableBarChartComponent
   }
 
   updateChartOption(): void {
-    this.chartOption = buildBarChartOption(this.data, this.config, this.chartType, this.multiData);
+    this.chartOption = buildBarChartOption(
+      this.data,
+      this.config,
+      this.chartType,
+      this.multiData,
+    );
   }
 
   onChartInit(ec: any): void {

@@ -1,48 +1,85 @@
 <div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text back-button" routerLink="/app/organisation">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-                <h2>Edit Organisation</h2>
-            </div>
-            <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-                    [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
-                </button>
-                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="orgForm.invalid || !isFormDirty">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
-        </div>
-
-
-        <!-- Form Section -->
-        <form [formGroup]="orgForm" class="admin-form mt-4">
-            <!-- Step 1: Basic Information -->
-            <div class="form-grid">
-                <!-- Organisation Name -->
-                <app-custom-input formControlName="name" label="Organisation Name" placeholder="Enter organisation name"
-                    icon="pi-building" [required]="true"
-                    [showError]="!!(orgForm.get('name')?.invalid && orgForm.get('name')?.touched)"
-                    errorMessage="Organisation name is required">
-                </app-custom-input>
-
-                <!-- Organisation Description -->
-                <app-custom-input formControlName="description" label="Organisation Description"
-                    placeholder="Enter organisation description" icon="pi-align-left" [required]="true"
-                    [showError]="!!(orgForm.get('description')?.invalid && orgForm.get('description')?.touched)"
-                    errorMessage="Organisation description is required">
-                </app-custom-input>
-
-                <!-- Status -->
-                <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0"
-                    trueLabel="Active" falseLabel="Inactive">
-                </app-custom-toggle>
-            </div>
-        </form>
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/organisation"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Edit Organisation</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty || isCancelClicked"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="orgForm.invalid || !isFormDirty"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
     </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="orgForm" class="admin-form mt-4">
+      <!-- Step 1: Basic Information -->
+      <div class="form-grid">
+        <!-- Organisation Name -->
+        <app-custom-input
+          formControlName="name"
+          label="Organisation Name"
+          placeholder="Enter organisation name"
+          icon="pi-building"
+          [required]="true"
+          [showError]="
+            !!(orgForm.get('name')?.invalid && orgForm.get('name')?.touched)
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Organisation Description -->
+        <app-custom-input
+          formControlName="description"
+          label="Organisation Description"
+          placeholder="Enter organisation description"
+          icon="pi-align-left"
+          [required]="true"
+          [showError]="
+            !!(
+              orgForm.get('description')?.invalid &&
+              orgForm.get('description')?.touched
+            )
+          "
+          [errorMessage]="getDescriptionError()"
+        >
+        </app-custom-input>
+
+        <!-- Status -->
+        <app-custom-toggle
+          formControlName="status"
+          label="Status"
+          [trueValue]="1"
+          [falseValue]="0"
+          trueLabel="Active"
+          falseLabel="Inactive"
+        >
+        </app-custom-toggle>
+      </div>
+    </form>
+  </div>
 </div>

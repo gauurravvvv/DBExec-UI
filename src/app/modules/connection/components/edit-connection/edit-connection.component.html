@@ -1,88 +1,164 @@
 <div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text back-button" routerLink="/app/connections">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-                <h2>Edit Connection</h2>
-            </div>
-            <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-                    [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()"></button>
-                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="connectionForm.invalid || !isFormDirty">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/connections"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Edit Connection</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty || isCancelClicked"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="connectionForm.invalid || !isFormDirty"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="connectionForm" class="admin-form" #formContainer>
+      <div class="form-grid">
+        <!-- Name Field -->
+        <app-custom-input
+          formControlName="name"
+          label="Name"
+          placeholder="Enter name"
+          icon="pi-box"
+          [required]="true"
+          [showError]="
+            !!(
+              connectionForm.get('name')?.invalid &&
+              connectionForm.get('name')?.touched
+            )
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Description Field -->
+        <app-custom-input
+          formControlName="description"
+          label="Description"
+          placeholder="Enter description"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+
+        <!-- Organisation Field (readonly) -->
+        <div class="form-field" *ngIf="showOrganisationDropdown">
+          <label for="organisation">Organisation</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-building"></i>
+            <input
+              id="organisation"
+              type="text"
+              pInputText
+              [value]="selectedOrgName"
+              disabled
+              class="readonly"
+            />
+          </span>
         </div>
 
-        <!-- Form Section -->
-        <form [formGroup]="connectionForm" class="admin-form" #formContainer>
-            <div class="form-grid">
-                <!-- Name Field -->
-                <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-box"
-                    [required]="true"
-                    [showError]="!!(connectionForm.get('name')?.invalid && connectionForm.get('name')?.touched)"
-                    [errorMessage]="connectionForm.get('name')?.errors?.['required'] ? 'Name is required' : 
-                                   connectionForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
-                </app-custom-input>
+        <!-- Database Field (readonly) -->
+        <div class="form-field">
+          <label for="database">Database</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-database"></i>
+            <input
+              id="database"
+              type="text"
+              pInputText
+              [value]="selectedDatabaseName"
+              disabled
+              class="readonly"
+            />
+          </span>
+        </div>
 
-                <!-- Description Field -->
-                <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
-                    icon="pi-align-left">
-                </app-custom-input>
+        <!-- Status Toggle -->
+        <app-custom-toggle
+          formControlName="status"
+          label="Status"
+          [trueValue]="1"
+          [falseValue]="0"
+          trueLabel="Active"
+          falseLabel="Inactive"
+        >
+        </app-custom-toggle>
 
-                <!-- Organisation Field (readonly) -->
-                <div class="form-field" *ngIf="showOrganisationDropdown">
-                    <label for="organisation">Organisation</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-building"></i>
-                        <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled
-                            class="readonly" />
-                    </span>
-                </div>
+        <!-- DB Username -->
+        <app-custom-input
+          formControlName="dbUsername"
+          label="Database Username"
+          placeholder="Enter Database Username"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              connectionForm.get('dbUsername')?.invalid &&
+              connectionForm.get('dbUsername')?.touched
+            )
+          "
+          errorMessage="Database Username is required"
+        >
+        </app-custom-input>
 
-                <!-- Database Field (readonly) -->
-                <div class="form-field">
-                    <label for="database">Database</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-database"></i>
-                        <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled
-                            class="readonly" />
-                    </span>
-                </div>
-
-                <!-- Status Toggle -->
-                <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0"
-                    trueLabel="Active" falseLabel="Inactive">
-                </app-custom-toggle>
-
-                <!-- DB Username -->
-                <app-custom-input formControlName="dbUsername" label="Database Username"
-                    placeholder="Enter Database Username" icon="pi-user" [required]="true"
-                    [showError]="!!(connectionForm.get('dbUsername')?.invalid && connectionForm.get('dbUsername')?.touched)"
-                    errorMessage="Database Username is required">
-                </app-custom-input>
-
-                <!-- DB Password -->
-                <div class="form-field">
-                    <label for="password">Database Password<span class="required"> *</span></label>
-                    <span class="p-input-icon-left p-input-icon-right">
-                        <i class="pi pi-lock"></i>
-                        <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText
-                            formControlName="dbPassword" placeholder="Enter password"
-                            [ngClass]="{'ng-invalid ng-dirty': connectionForm.get('dbPassword')?.invalid && connectionForm.get('dbPassword')?.touched}">
-                        <i class="pi pi-eye" style="cursor: pointer;" (click)="togglePassword($event)"></i>
-                    </span>
-                    <small class="error-message"
-                        *ngIf="connectionForm.get('dbPassword')?.invalid && connectionForm.get('dbPassword')?.touched">
-                        <span *ngIf="connectionForm.get('dbPassword')?.errors?.['required']">Database Password is
-                            required</span>
-                    </small>
-                </div>
-            </div>
-        </form>
-    </div>
+        <!-- DB Password -->
+        <div class="form-field">
+          <label for="password"
+            >Database Password<span class="required"> *</span></label
+          >
+          <span class="p-input-icon-left p-input-icon-right">
+            <i class="pi pi-lock"></i>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              pInputText
+              formControlName="dbPassword"
+              placeholder="Enter password"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  connectionForm.get('dbPassword')?.invalid &&
+                  connectionForm.get('dbPassword')?.touched,
+              }"
+            />
+            <i
+              class="pi pi-eye"
+              style="cursor: pointer"
+              (click)="togglePassword($event)"
+            ></i>
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              connectionForm.get('dbPassword')?.invalid &&
+              connectionForm.get('dbPassword')?.touched
+            "
+          >
+            Database Password is required
+          </small>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

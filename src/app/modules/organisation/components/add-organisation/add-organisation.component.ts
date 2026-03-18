@@ -35,16 +35,30 @@ export class AddOrganisationComponent implements OnInit {
 
   private initForm() {
     this.orgForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(REGEX.orgName)]],
-      description: ['', [Validators.required]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
+      description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(500),
+        ],
+      ],
       encryptionAlgorithm: ['', [Validators.required]],
       pepperKey: [
         '',
         [
           Validators.required,
-          Validators.pattern(
-            /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{32,}$/,
-          ),
+          Validators.minLength(32),
+          Validators.pattern(REGEX.pepperKey),
         ],
       ],
     });
@@ -70,7 +84,6 @@ export class AddOrganisationComponent implements OnInit {
     const input = event.target;
     input.value = input.value.replace(/[^0-9]/g, '');
 
-    // Update form control value
     const controlName = input.getAttribute('formControlName');
     if (controlName) {
       this.orgForm.get(controlName)?.setValue(input.value);
@@ -92,7 +105,6 @@ export class AddOrganisationComponent implements OnInit {
     this.currentStep = 0;
     this.isFormDirty = false;
     this.orgForm.markAsPristine();
-    // Reset specific form controls to empty strings
     Object.keys(this.orgForm.controls).forEach(key => {
       this.orgForm.get(key)?.setValue('');
     });
@@ -120,5 +132,37 @@ export class AddOrganisationComponent implements OnInit {
 
   isFormValid(): boolean {
     return this.orgForm.valid && this.confirmationChecked;
+  }
+
+  getNameError(): string {
+    const control = this.orgForm.get('name');
+    if (control?.errors?.['required']) return 'Organisation name is required';
+    if (control?.errors?.['minlength'])
+      return `Organisation name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Organisation name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Organisation name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
+  }
+
+  getDescriptionError(): string {
+    const control = this.orgForm.get('description');
+    if (control?.errors?.['required']) return 'Description is required';
+    if (control?.errors?.['minlength'])
+      return `Description must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Description must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    return '';
+  }
+
+  getPepperKeyError(): string {
+    const control = this.orgForm.get('pepperKey');
+    if (control?.errors?.['required']) return 'Pepper key is required';
+    if (control?.errors?.['minlength'])
+      return `Pepper key must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Pepper key can only contain letters, numbers and special characters (no spaces)';
+    return '';
   }
 }

@@ -83,7 +83,7 @@
     "paused": "一時停止中",
     "taskType": "タスクの種類",
     "notScheduled": "スケジュールされていません",
-    "nextRunTime":"次回実行時間",
+    "nextRunTime": "次回実行時間",
     "allTime": "オールタイム",
     "last7Days": "過去 7 日間",
     "last15Days": "過去 15 日間",

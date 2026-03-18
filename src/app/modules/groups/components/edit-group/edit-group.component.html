@@ -1,66 +1,122 @@
 <div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text back-button" routerLink="/app/group">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-                <h2>Edit Group</h2>
-            </div>
-            <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-                    [disabled]="!isFormDirty" (click)="onCancel()">
-                </button>
-                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="groupForm.invalid || !isFormDirty || groupForm.get('users')?.value?.length <= 1">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/group"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Edit Group</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="
+            groupForm.invalid ||
+            !isFormDirty ||
+            groupForm.get('users')?.value?.length <= 1
+          "
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="groupForm" class="admin-form" *ngIf="groupForm">
+      <div class="form-grid">
+        <!-- Hidden ID Field -->
+        <input type="hidden" formControlName="id" />
+
+        <!-- Name Field -->
+        <app-custom-input
+          formControlName="name"
+          label="Name"
+          placeholder="Enter name"
+          icon="pi-key"
+          [required]="true"
+          [showError]="
+            !!(groupForm.get('name')?.invalid && groupForm.get('name')?.touched)
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Description Field -->
+        <app-custom-input
+          formControlName="description"
+          label="Description"
+          placeholder="Enter description"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+
+        <!-- Organisation (readonly) -->
+        <div class="form-field">
+          <label for="organisation">Organisation</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-building"></i>
+            <input
+              id="organisation"
+              type="text"
+              pInputText
+              [value]="selectedOrgName"
+              placeholder="Organisation"
+              readonly
+              class="readonly"
+            />
+          </span>
+          <input type="hidden" formControlName="organisation" />
         </div>
 
-        <!-- Form Section -->
-        <form [formGroup]="groupForm" class="admin-form" *ngIf="groupForm">
-            <div class="form-grid">
-                <!-- Hidden ID Field -->
-                <input type="hidden" formControlName="id">
+        <!-- Users Multiselect -->
+        <app-custom-multiselect
+          formControlName="users"
+          label="Users"
+          placeholder="Select Users"
+          [options]="users"
+          optionLabel="username"
+          optionValue="id"
+          [filter]="true"
+          filterBy="username"
+          display="chip"
+          [required]="true"
+          [showError]="
+            !!(
+              groupForm.get('users')?.invalid && groupForm.get('users')?.touched
+            )
+          "
+          errorMessage="At least two users are required"
+        >
+        </app-custom-multiselect>
 
-                <!-- Name Field -->
-                <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-key"
-                    [required]="true" [showError]="!!(groupForm.get('name')?.invalid && groupForm.get('name')?.touched)"
-                    [errorMessage]="groupForm.get('name')?.errors?.['required'] ? 'Name is required' : 
-                                   groupForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
-                </app-custom-input>
-
-                <!-- Description Field -->
-                <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
-                    icon="pi-align-left">
-                </app-custom-input>
-
-                <!-- Organisation (readonly) -->
-                <div class="form-field">
-                    <label for="organisation">Organisation</label>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-building"></i>
-                        <input id="organisation" type="text" pInputText [value]="selectedOrgName"
-                            placeholder="Organisation" readonly class="readonly">
-                    </span>
-                    <input type="hidden" formControlName="organisation">
-                </div>
-
-                <!-- Users Multiselect -->
-                <app-custom-multiselect formControlName="users" label="Users" placeholder="Select Users"
-                    [options]="users" optionLabel="username" optionValue="id" [filter]="true" filterBy="username"
-                    display="chip" [required]="true"
-                    [showError]="!!(groupForm.get('users')?.invalid && groupForm.get('users')?.touched)"
-                    errorMessage="At least two users are required">
-                </app-custom-multiselect>
-
-                <!-- Status -->
-                <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0"
-                    trueLabel="Active" falseLabel="Inactive">
-                </app-custom-toggle>
-            </div>
-        </form>
-    </div>
+        <!-- Status -->
+        <app-custom-toggle
+          formControlName="status"
+          label="Status"
+          [trueValue]="1"
+          [falseValue]="0"
+          trueLabel="Active"
+          falseLabel="Inactive"
+        >
+        </app-custom-toggle>
+      </div>
+    </form>
+  </div>
 </div>

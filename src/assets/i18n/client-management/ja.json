@@ -66,11 +66,11 @@
         "required": "タイムゾーンを入力してください"
       },
       "state": {
-         "required": "州を入力してください" 
-        },
+        "required": "州を入力してください"
+      },
       "languageId": {
-         "required": "言語を入力してください" 
-        }
+        "required": "言語を入力してください"
+      }
     }
   }
 }

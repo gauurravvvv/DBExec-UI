@@ -1,5 +1,12 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
 } from '@angular/core';
 import { buildLinesGLChartOption } from '../../helpers/echarts-option-builder';
 
@@ -8,7 +15,9 @@ import { buildLinesGLChartOption } from '../../helpers/echarts-option-builder';
   templateUrl: './configurable-linesgl-chart.component.html',
   styleUrls: ['./configurable-linesgl-chart.component.scss'],
 })
-export class ConfigurableLinesGlChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableLinesGlChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
 
   @Input() data: any[] = [];
@@ -39,7 +48,12 @@ export class ConfigurableLinesGlChartComponent implements OnInit, OnChanges, DoC
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }

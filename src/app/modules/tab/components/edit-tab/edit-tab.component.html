@@ -3,16 +3,32 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/tab">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          routerLink="/app/tab"
+        >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
         <h2>Edit Tab</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-          [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()"></button>
-        <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-          [disabled]="tabForm.invalid || !isFormDirty">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty || isCancelClicked"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="tabForm.invalid || !isFormDirty"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -23,17 +39,28 @@
       <div class="form-grid">
         <!-- Name Field -->
         <div class="form-field">
-          <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-box" [required]="true"
-            [showError]="!!(tabForm.get('name')?.invalid && tabForm.get('name')?.touched)"
-            [errorMessage]="tabForm.get('name')?.errors?.['required'] ? 'Name is required' : 
-                           tabForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
+          <app-custom-input
+            formControlName="name"
+            label="Name"
+            placeholder="Enter name"
+            icon="pi-box"
+            [required]="true"
+            [showError]="
+              !!(tabForm.get('name')?.invalid && tabForm.get('name')?.touched)
+            "
+            [errorMessage]="getNameError()"
+          >
           </app-custom-input>
         </div>
 
         <!-- Description Field -->
         <div class="form-field">
-          <app-custom-input formControlName="description" label="Description" placeholder="Enter description"
-            icon="pi-align-left">
+          <app-custom-input
+            formControlName="description"
+            label="Description"
+            placeholder="Enter description"
+            icon="pi-align-left"
+          >
           </app-custom-input>
         </div>
 
@@ -42,7 +69,13 @@
           <label for="organisation">Organisation</label>
           <span class="p-input-icon-left">
             <i class="pi pi-building"></i>
-            <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled />
+            <input
+              id="organisation"
+              type="text"
+              pInputText
+              [value]="selectedOrgName"
+              disabled
+            />
           </span>
         </div>
 
@@ -51,13 +84,25 @@
           <label for="database">Database</label>
           <span class="p-input-icon-left">
             <i class="pi pi-database"></i>
-            <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled />
+            <input
+              id="database"
+              type="text"
+              pInputText
+              [value]="selectedDatabaseName"
+              disabled
+            />
           </span>
         </div>
 
         <!-- Status -->
-        <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0" trueLabel="Active"
-          falseLabel="Inactive">
+        <app-custom-toggle
+          formControlName="status"
+          label="Status"
+          [trueValue]="1"
+          [falseValue]="0"
+          trueLabel="Active"
+          falseLabel="Inactive"
+        >
         </app-custom-toggle>
       </div>
     </form>

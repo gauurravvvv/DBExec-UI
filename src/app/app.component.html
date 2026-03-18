@@ -6,63 +6,62 @@
 <p-toast key="topRight" position="top-right"></p-toast>
 
 <div class="session-expired-popup" *ngIf="showSessionExpiredDialog">
-    <div class="popup-content">
-        <div class="popup-header">
-            <div class="popup-icon">
-                <i class="pi pi-sign-out"></i>
-            </div>
-            <h3>Session Expired</h3>
-        </div>
-        <div class="popup-body">
-            <p class="popup-message">
-                Your session has ended. This may be because you logged in from another location.
-            </p>
-            <ul class="popup-info-list">
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>Only one active session is allowed per user</span>
-                </li>
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>Please log in again to continue</span>
-                </li>
-            </ul>
-        </div>
-        <div class="popup-actions">
-            <button class="btn-confirm" (click)="onSessionExpiredOk()">
-                <i class="pi pi-sign-in"></i>
-                Go to Login
-            </button>
-        </div>
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-sign-out"></i>
+      </div>
+      <h3>Session Expired</h3>
     </div>
+    <div class="popup-body">
+      <p class="popup-message">
+        Your session has ended. This may be because you logged in from another
+        location.
+      </p>
+      <ul class="popup-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>Only one active session is allowed per user</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>Please log in again to continue</span>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-confirm" (click)="onSessionExpiredOk()">
+        <i class="pi pi-sign-in"></i>
+        Go to Login
+      </button>
+    </div>
+  </div>
 </div>
 
 <div class="idle-timeout-popup" *ngIf="showIdleWarningDialog">
-    <div class="popup-content">
-        <div class="popup-header">
-            <div class="popup-icon idle-icon">
-                <i class="pi pi-clock"></i>
-            </div>
-            <h3>Inactivity Warning</h3>
-        </div>
-        <div class="popup-body">
-            <p class="popup-message">
-                You will be logged out due to inactivity.
-            </p>
-            <div class="countdown-display">
-                <span class="countdown-number">{{ idleCountdown }}</span>
-                <span class="countdown-label">seconds remaining</span>
-            </div>
-        </div>
-        <div class="popup-actions">
-            <button class="btn-cancel" (click)="onIdleLogoutNow()">
-                <i class="pi pi-sign-out"></i>
-                Logout Now
-            </button>
-            <button class="btn-confirm" (click)="onIdleStayLoggedIn()">
-                <i class="pi pi-refresh"></i>
-                Stay Logged In
-            </button>
-        </div>
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon idle-icon">
+        <i class="pi pi-clock"></i>
+      </div>
+      <h3>Inactivity Warning</h3>
     </div>
+    <div class="popup-body">
+      <p class="popup-message">You will be logged out due to inactivity.</p>
+      <div class="countdown-display">
+        <span class="countdown-number">{{ idleCountdown }}</span>
+        <span class="countdown-label">seconds remaining</span>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="onIdleLogoutNow()">
+        <i class="pi pi-sign-out"></i>
+        Logout Now
+      </button>
+      <button class="btn-confirm" (click)="onIdleStayLoggedIn()">
+        <i class="pi pi-refresh"></i>
+        Stay Logged In
+      </button>
+    </div>
+  </div>
 </div>

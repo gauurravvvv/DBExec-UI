@@ -372,8 +372,7 @@ export const CHART_TYPES = [
     name: 'Bar 3D',
     icon: 'pi pi-chart-bar',
     category: '3D Charts',
-    description:
-      'Three-dimensional bar chart for spatial data comparison',
+    description: 'Three-dimensional bar chart for spatial data comparison',
   },
   {
     id: 'line3d',
@@ -722,123 +721,123 @@ export const DEFAULT_CHART_CONFIG = {
   xAxis: true,
   yAxis: true,
   showGridLines: true,
-  gridLineStyle: 'dashed',        // splitLine.lineStyle.type
+  gridLineStyle: 'dashed', // splitLine.lineStyle.type
   showXAxisLabel: true,
   showYAxisLabel: true,
   xAxisLabel: 'Category',
   yAxisLabel: 'Value',
-  xAxisLabelRotate: 0,           // axisLabel.rotate (0-90)
-  niceScale: false,              // yAxis.nice (was roundDomains)
-  autoScale: true,               // yAxis.scale
-  boundaryGap: true,             // xAxis.boundaryGap
-  inverseX: false,               // xAxis.inverse
-  inverseY: false,               // yAxis.inverse
-  axisPointerType: 'line',       // tooltip.axisPointer.type
+  xAxisLabelRotate: 0, // axisLabel.rotate (0-90)
+  niceScale: false, // yAxis.nice (was roundDomains)
+  autoScale: true, // yAxis.scale
+  boundaryGap: true, // xAxis.boundaryGap
+  inverseX: false, // xAxis.inverse
+  inverseY: false, // yAxis.inverse
+  axisPointerType: 'line', // tooltip.axisPointer.type
 
   // === Data Labels (ECharts series.label) ===
   showDataLabel: false,
-  labelPosition: 'top',          // series.label.position
-  labelFontSize: 12,             // series.label.fontSize
+  labelPosition: 'top', // series.label.position
+  labelFontSize: 12, // series.label.fontSize
 
   // === Legend (ECharts legend) ===
   legend: false,
-  legendTitle: 'Legend',           // not used by ECharts (kept for backward compat)
-  legendPosition: 'right',       // legend orient + position
-  legendType: 'scroll',          // legend.type: 'plain' | 'scroll'
+  legendTitle: 'Legend', // not used by ECharts (kept for backward compat)
+  legendPosition: 'right', // legend orient + position
+  legendType: 'scroll', // legend.type: 'plain' | 'scroll'
 
   // === Tooltip (ECharts tooltip) ===
   tooltipDisabled: false,
-  tooltipTrigger: 'axis',        // tooltip.trigger: 'item' | 'axis' | 'none'
+  tooltipTrigger: 'axis', // tooltip.trigger: 'item' | 'axis' | 'none'
 
   // === Emphasis (ECharts series.emphasis) ===
-  emphasis: 'series',            // emphasis.focus
+  emphasis: 'series', // emphasis.focus
 
   // === Animation (ECharts animation) ===
   animations: false,
-  animationDuration: 1000,       // animationDuration (ms)
-  animationEasing: 'cubicOut',   // animationEasing
+  animationDuration: 1000, // animationDuration (ms)
+  animationEasing: 'cubicOut', // animationEasing
 
   // === Interactive Features ===
-  dataZoom: false,               // dataZoom component
-  toolbox: false,                // toolbox component
-  gradient: false,               // gradient fill
+  dataZoom: false, // dataZoom component
+  toolbox: false, // toolbox component
+  gradient: false, // gradient fill
 
   // === Bar Chart (ECharts series type: 'bar') ===
-  barWidth: '',                  // series.barWidth (px or %, empty = auto)
-  barMaxWidth: '',               // series.barMaxWidth (px or %, empty = auto)
-  barGap: '30%',                 // series.barGap
-  barCategoryGap: '20%',         // series.barCategoryGap
-  barMinWidth: '',               // series.barMinWidth (auto if empty)
-  barMinHeight: 0,               // series.barMinHeight
-  stackStrategy: 'samesign',    // series.stackStrategy: 'samesign' | 'all' | 'positive' | 'negative'
-  roundEdges: false,             // series.itemStyle.borderRadius
-  showBackground: false,         // series.showBackground
+  barWidth: '', // series.barWidth (px or %, empty = auto)
+  barMaxWidth: '', // series.barMaxWidth (px or %, empty = auto)
+  barGap: '30%', // series.barGap
+  barCategoryGap: '20%', // series.barCategoryGap
+  barMinWidth: '', // series.barMinWidth (auto if empty)
+  barMinHeight: 0, // series.barMinHeight
+  stackStrategy: 'samesign', // series.stackStrategy: 'samesign' | 'all' | 'positive' | 'negative'
+  roundEdges: false, // series.itemStyle.borderRadius
+  showBackground: false, // series.showBackground
 
   // === Line Chart (ECharts series type: 'line') ===
-  lineSmooth: false,             // series.smooth
-  lineSmoothness: 0.5,           // series.smooth (0-1 when number)
-  lineStep: 'none',              // series.step: false | 'start' | 'middle' | 'end'
-  lineStyleType: 'solid',        // series.lineStyle.type
-  showSymbol: true,              // series.showSymbol
-  symbolShape: 'circle',         // series.symbol
-  symbolSize: 4,                 // series.symbolSize
-  lineWidth: 2,                  // series.lineStyle.width
-  connectNulls: false,           // series.connectNulls
-  rangeFillOpacity: 0.15,        // series.areaStyle.opacity (for line with area)
-  endLabel: false,               // series.endLabel.show
-  sampling: 'none',              // series.sampling: 'none' | 'lttb' | 'average' | 'max' | 'min' | 'sum'
-  showAllSymbol: 'auto',         // series.showAllSymbol: 'auto' | true | false
+  lineSmooth: false, // series.smooth
+  lineSmoothness: 0.5, // series.smooth (0-1 when number)
+  lineStep: 'none', // series.step: false | 'start' | 'middle' | 'end'
+  lineStyleType: 'solid', // series.lineStyle.type
+  showSymbol: true, // series.showSymbol
+  symbolShape: 'circle', // series.symbol
+  symbolSize: 4, // series.symbolSize
+  lineWidth: 2, // series.lineStyle.width
+  connectNulls: false, // series.connectNulls
+  rangeFillOpacity: 0.15, // series.areaStyle.opacity (for line with area)
+  endLabel: false, // series.endLabel.show
+  sampling: 'none', // series.sampling: 'none' | 'lttb' | 'average' | 'max' | 'min' | 'sum'
+  showAllSymbol: 'auto', // series.showAllSymbol: 'auto' | true | false
 
   // === Area Chart (extends Line) ===
-  areaOpacity: 0.7,              // series.areaStyle.opacity
+  areaOpacity: 0.7, // series.areaStyle.opacity
 
   // === Pie Chart (ECharts series type: 'pie') ===
-  labels: true,                  // series.label.show
-  pieLabelPosition: 'outside',   // series.label.position
-  pieLabelLine: true,            // series.labelLine.show
-  pieMinAngle: 0,                // series.minAngle (min sector angle in degrees)
-  pieAvoidLabelOverlap: true,    // series.avoidLabelOverlap
-  pieInnerRadius: 0,             // series.radius[0] (%)
-  pieOuterRadius: 70,            // series.radius[1] (%)
-  pieStartAngle: 90,             // series.startAngle
-  piePadAngle: 0,                // series.padAngle (gap between slices)
-  pieSelectedMode: 'none',       // series.selectedMode
-  pieSelectedOffset: 10,         // series.selectedOffset
-  pieBorderRadius: 0,            // series.itemStyle.borderRadius
-  pieClockwise: true,            // series.clockwise
-  pieEndAngle: null,             // series.endAngle (null = full circle)
-  piePercentPrecision: 2,        // series.percentPrecision
-  roseType: 'none',              // series.roseType
+  labels: true, // series.label.show
+  pieLabelPosition: 'outside', // series.label.position
+  pieLabelLine: true, // series.labelLine.show
+  pieMinAngle: 0, // series.minAngle (min sector angle in degrees)
+  pieAvoidLabelOverlap: true, // series.avoidLabelOverlap
+  pieInnerRadius: 0, // series.radius[0] (%)
+  pieOuterRadius: 70, // series.radius[1] (%)
+  pieStartAngle: 90, // series.startAngle
+  piePadAngle: 0, // series.padAngle (gap between slices)
+  pieSelectedMode: 'none', // series.selectedMode
+  pieSelectedOffset: 10, // series.selectedOffset
+  pieBorderRadius: 0, // series.itemStyle.borderRadius
+  pieClockwise: true, // series.clockwise
+  pieEndAngle: null, // series.endAngle (null = full circle)
+  piePercentPrecision: 2, // series.percentPrecision
+  roseType: 'none', // series.roseType
   trimLabels: true,
   maxLabelLength: 10,
 
   // === Polar/Radar Chart (ECharts type: 'radar') ===
-  radarShape: 'polygon',         // radar.shape: 'polygon' | 'circle'
-  radarAreaOpacity: 0.15,        // series.areaStyle.opacity
-  radarSymbol: 'circle',         // series.symbol
-  radarSymbolSize: 4,            // series.symbolSize
-  radarLineWidth: 2,             // series.lineStyle.width
+  radarShape: 'polygon', // radar.shape: 'polygon' | 'circle'
+  radarAreaOpacity: 0.15, // series.areaStyle.opacity
+  radarSymbol: 'circle', // series.symbol
+  radarSymbolSize: 4, // series.symbolSize
+  radarLineWidth: 2, // series.lineStyle.width
   labelTrim: true,
   labelTrimSize: 10,
 
   // === Gauge Chart (ECharts series type: 'gauge') ===
-  min: 0,                        // series.min
-  max: 100,                      // series.max
-  units: '%',                    // series.detail.formatter
-  gaugeStartAngle: 225,          // series.startAngle
-  gaugeEndAngle: -45,            // series.endAngle
-  splitNumber: 10,               // series.splitNumber (was bigSegments)
-  tickSplitNumber: 5,            // series.axisTick.splitNumber (was smallSegments)
-  gaugeShowScale: true,          // axisLabel.show (was showAxis)
-  gaugeShowValue: true,          // detail.show (was showText)
-  gaugeShowPointer: true,        // pointer.show
-  gaugePointerLength: 60,        // pointer.length (%)
-  gaugeShowProgress: false,      // progress.show
-  gaugeAxisLineWidth: 15,        // axisLine.lineStyle.width
-  gaugePointerWidth: 6,          // pointer.width
-  gaugePointerIcon: '',          // pointer.icon (empty = default, or symbol name)
-  gaugeProgressRoundCap: false,  // progress.roundCap
-  gaugeAxisLineRoundCap: false,  // axisLine.roundCap
+  min: 0, // series.min
+  max: 100, // series.max
+  units: '%', // series.detail.formatter
+  gaugeStartAngle: 225, // series.startAngle
+  gaugeEndAngle: -45, // series.endAngle
+  splitNumber: 10, // series.splitNumber (was bigSegments)
+  tickSplitNumber: 5, // series.axisTick.splitNumber (was smallSegments)
+  gaugeShowScale: true, // axisLabel.show (was showAxis)
+  gaugeShowValue: true, // detail.show (was showText)
+  gaugeShowPointer: true, // pointer.show
+  gaugePointerLength: 60, // pointer.length (%)
+  gaugeShowProgress: false, // progress.show
+  gaugeAxisLineWidth: 15, // axisLine.lineStyle.width
+  gaugePointerWidth: 6, // pointer.width
+  gaugePointerIcon: '', // pointer.icon (empty = default, or symbol name)
+  gaugeProgressRoundCap: false, // progress.roundCap
+  gaugeAxisLineRoundCap: false, // axisLine.roundCap
 
   // === Card chart specific ===
   cardColor: '',
@@ -848,7 +847,7 @@ export const DEFAULT_CHART_CONFIG = {
   innerPadding: 15,
 
   // === Heat Map (ECharts series type: 'heatmap') ===
-  heatmapShowLabels: true,       // series.label.show
+  heatmapShowLabels: true, // series.label.show
   trimXAxisTicks: true,
   trimYAxisTicks: true,
   maxXAxisTickLength: 16,
@@ -859,121 +858,121 @@ export const DEFAULT_CHART_CONFIG = {
   maxRadius: 20,
 
   // === Scatter Chart (ECharts series type: 'scatter') ===
-  scatterSymbolSize: 10,         // series.symbolSize
-  scatterSymbolShape: 'circle',  // series.symbol
-  effectRippleScale: 3,          // series.rippleEffect.scale (for effect-scatter)
-  effectShowOn: 'render',        // series.showEffectOn: 'render' | 'emphasis'
+  scatterSymbolSize: 10, // series.symbolSize
+  scatterSymbolShape: 'circle', // series.symbol
+  effectRippleScale: 3, // series.rippleEffect.scale (for effect-scatter)
+  effectShowOn: 'render', // series.showEffectOn: 'render' | 'emphasis'
   effectRippleBrushType: 'stroke', // series.rippleEffect.brushType: 'stroke' | 'fill'
-  effectRippleNumber: 3,         // series.rippleEffect.number
-  effectRipplePeriod: 4,         // series.rippleEffect.period (seconds)
+  effectRippleNumber: 3, // series.rippleEffect.number
+  effectRipplePeriod: 4, // series.rippleEffect.period (seconds)
 
   // === Funnel Chart (ECharts series type: 'funnel') ===
-  funnelSort: 'descending',      // series.sort
-  funnelAlign: 'center',         // series.funnelAlign
-  funnelGap: 2,                  // series.gap
-  funnelMinSize: '0%',           // series.minSize
-  funnelMaxSize: '100%',         // series.maxSize
-  funnelOrient: 'vertical',      // series.orient: 'vertical' | 'horizontal'
+  funnelSort: 'descending', // series.sort
+  funnelAlign: 'center', // series.funnelAlign
+  funnelGap: 2, // series.gap
+  funnelMinSize: '0%', // series.minSize
+  funnelMaxSize: '100%', // series.maxSize
+  funnelOrient: 'vertical', // series.orient: 'vertical' | 'horizontal'
 
   // === Sankey Chart (ECharts series type: 'sankey') ===
-  sankeyNodeWidth: 20,           // series.nodeWidth
-  sankeyNodeGap: 8,              // series.nodeGap
-  sankeyOrient: 'horizontal',    // series.orient
-  sankeyNodeAlign: 'justify',    // series.nodeAlign: 'justify' | 'left' | 'right'
-  sankeyDraggable: true,         // series.draggable
-  sankeyEdgeLabel: false,        // series.edgeLabel.show
-  sankeyCurveness: 0.5,          // series.lineStyle.curveness
+  sankeyNodeWidth: 20, // series.nodeWidth
+  sankeyNodeGap: 8, // series.nodeGap
+  sankeyOrient: 'horizontal', // series.orient
+  sankeyNodeAlign: 'justify', // series.nodeAlign: 'justify' | 'left' | 'right'
+  sankeyDraggable: true, // series.draggable
+  sankeyEdgeLabel: false, // series.edgeLabel.show
+  sankeyCurveness: 0.5, // series.lineStyle.curveness
 
   // === Waterfall Chart (stacked bar) ===
   waterfallShowTotal: true,
 
   // === Treemap Chart (ECharts series type: 'treemap') ===
-  treemapShowLabels: true,       // series.label.show
-  treemapRoam: false,            // series.roam
-  treemapBreadcrumb: false,      // series.breadcrumb.show
-  treemapLeafDepth: 1,           // series.leafDepth (drill-down depth)
+  treemapShowLabels: true, // series.label.show
+  treemapRoam: false, // series.roam
+  treemapBreadcrumb: false, // series.breadcrumb.show
+  treemapLeafDepth: 1, // series.leafDepth (drill-down depth)
   treemapNodeClick: 'zoomToNode', // series.nodeClick: false | 'zoomToNode' | 'link'
-  treemapVisualDimension: 0,     // series.visualDimension
+  treemapVisualDimension: 0, // series.visualDimension
 
   // === Graph Chart (ECharts series type: 'graph') ===
-  graphLayout: 'force',          // series.layout
-  graphRepulsion: 200,           // series.force.repulsion
-  graphEdgeLength: 100,          // series.force.edgeLength
-  graphGravity: 0.1,             // series.force.gravity
-  graphEdgeSymbol: 'none',       // series.edgeSymbol: 'none' | 'circle' | 'arrow'
-  graphEdgeSymbolSize: 10,       // series.edgeSymbolSize
-  graphDraggable: true,          // series.draggable
-  graphForceFriction: 0.6,       // series.force.friction
-  graphEdgeLabel: false,         // series.edgeLabel.show
+  graphLayout: 'force', // series.layout
+  graphRepulsion: 200, // series.force.repulsion
+  graphEdgeLength: 100, // series.force.edgeLength
+  graphGravity: 0.1, // series.force.gravity
+  graphEdgeSymbol: 'none', // series.edgeSymbol: 'none' | 'circle' | 'arrow'
+  graphEdgeSymbolSize: 10, // series.edgeSymbolSize
+  graphDraggable: true, // series.draggable
+  graphForceFriction: 0.6, // series.force.friction
+  graphEdgeLabel: false, // series.edgeLabel.show
 
   // === Tree Chart (ECharts series type: 'tree') ===
-  treeOrient: 'TB',              // series.orient
-  treeLayout: 'orthogonal',      // series.layout
-  treeEdgeShape: 'curve',        // series.edgeShape: 'curve' | 'polyline'
-  treeExpandAndCollapse: true,   // series.expandAndCollapse
-  treeInitialDepth: 3,           // series.initialTreeDepth
-  treeRoam: false,               // series.roam
-  treeEdgeForkPosition: '50%',   // series.edgeForkPosition
+  treeOrient: 'TB', // series.orient
+  treeLayout: 'orthogonal', // series.layout
+  treeEdgeShape: 'curve', // series.edgeShape: 'curve' | 'polyline'
+  treeExpandAndCollapse: true, // series.expandAndCollapse
+  treeInitialDepth: 3, // series.initialTreeDepth
+  treeRoam: false, // series.roam
+  treeEdgeForkPosition: '50%', // series.edgeForkPosition
 
   // === Pictorial Bar (ECharts series type: 'pictorialBar') ===
-  pictorialSymbol: 'roundRect',  // series.symbol
-  pictorialRepeat: false,        // series.symbolRepeat
+  pictorialSymbol: 'roundRect', // series.symbol
+  pictorialRepeat: false, // series.symbolRepeat
   pictorialSymbolPosition: 'start', // series.symbolPosition: 'start' | 'center' | 'end'
-  pictorialSymbolClip: true,     // series.symbolClip
+  pictorialSymbolClip: true, // series.symbolClip
   pictorialSymbolRepeatDirection: 'start', // series.symbolRepeatDirection: 'start' | 'end'
   pictorialSymbolMargin: 'auto', // series.symbolMargin
 
   // === Polar Bar (ECharts bar in polar coordinates) ===
-  polarBarInnerRadius: 15,       // polar.radius[0] (%)
+  polarBarInnerRadius: 15, // polar.radius[0] (%)
 
   // === Parallel Chart (ECharts series type: 'parallel') ===
-  parallelSmooth: false,         // series.smooth
-  parallelLineWidth: 1,          // series.lineStyle.width
-  parallelLineOpacity: 0.5,      // series.lineStyle.opacity
-  parallelActiveOpacity: 1,      // series.activeOpacity
-  parallelInactiveOpacity: 0.1,  // series.inactiveOpacity
-  parallelRealtime: true,        // series.realtime
+  parallelSmooth: false, // series.smooth
+  parallelLineWidth: 1, // series.lineStyle.width
+  parallelLineOpacity: 0.5, // series.lineStyle.opacity
+  parallelActiveOpacity: 1, // series.activeOpacity
+  parallelInactiveOpacity: 0.1, // series.inactiveOpacity
+  parallelRealtime: true, // series.realtime
 
   // === Candlestick Chart (ECharts series type: 'candlestick') ===
-  candleBullColor: '#ec0000',    // series.itemStyle.color (bullish/up candle)
-  candleBearColor: '#00da3c',    // series.itemStyle.color0 (bearish/down candle)
+  candleBullColor: '#ec0000', // series.itemStyle.color (bullish/up candle)
+  candleBearColor: '#00da3c', // series.itemStyle.color0 (bearish/down candle)
   candleBullBorderColor: '#ec0000', // series.itemStyle.borderColor
   candleBearBorderColor: '#00da3c', // series.itemStyle.borderColor0
-  candleBarWidth: '',            // series.barWidth (auto if empty)
+  candleBarWidth: '', // series.barWidth (auto if empty)
 
   // === Sunburst Chart (ECharts series type: 'sunburst') ===
-  sunburstRadius: '90%',         // series.radius[1] (outer radius %)
+  sunburstRadius: '90%', // series.radius[1] (outer radius %)
   sunburstNodeClick: 'rootToNode', // series.nodeClick: false | 'rootToNode' | 'link'
-  sunburstSort: 'desc',          // series.sort: 'desc' | 'asc' | null
-  sunburstStartAngle: 90,        // series.startAngle
+  sunburstSort: 'desc', // series.sort: 'desc' | 'asc' | null
+  sunburstStartAngle: 90, // series.startAngle
 
   // === Box Plot (ECharts series type: 'boxplot') ===
-  boxplotLayout: 'horizontal',   // series.layout: 'horizontal' | 'vertical'
-  boxplotBoxWidth: 7,            // series.boxWidth (min box width px)
-  boxplotBoxMaxWidth: 50,        // series.boxWidth max
+  boxplotLayout: 'horizontal', // series.layout: 'horizontal' | 'vertical'
+  boxplotBoxWidth: 7, // series.boxWidth (min box width px)
+  boxplotBoxMaxWidth: 50, // series.boxWidth max
 
   // === 3D Charts (require echarts-gl) ===
-  autoRotate: false,             // grid3D.viewControl.autoRotate
-  autoRotateSpeed: 10,           // viewControl.autoRotateSpeed (globe)
-  grid3DBoxWidth: 100,           // grid3D.boxWidth
-  grid3DBoxDepth: 100,           // grid3D.boxDepth
-  grid3DBoxHeight: 100,          // grid3D.boxHeight
-  zAxisLabel: '',                // zAxis3D.name
-  shading: 'lambert',            // series.shading
-  itemOpacity: 0.8,              // series.itemStyle.opacity
-  lineOpacity: 1,                // series.lineStyle.opacity (3D lines)
-  viewAlpha: 20,                 // grid3D.viewControl.alpha
-  viewBeta: 40,                  // grid3D.viewControl.beta
+  autoRotate: false, // grid3D.viewControl.autoRotate
+  autoRotateSpeed: 10, // viewControl.autoRotateSpeed (globe)
+  grid3DBoxWidth: 100, // grid3D.boxWidth
+  grid3DBoxDepth: 100, // grid3D.boxDepth
+  grid3DBoxHeight: 100, // grid3D.boxHeight
+  zAxisLabel: '', // zAxis3D.name
+  shading: 'lambert', // series.shading
+  itemOpacity: 0.8, // series.itemStyle.opacity
+  lineOpacity: 1, // series.lineStyle.opacity (3D lines)
+  viewAlpha: 20, // grid3D.viewControl.alpha
+  viewBeta: 40, // grid3D.viewControl.beta
 
   // === Surface Chart ===
-  wireframe: true,               // series.wireframe.show
-  showVisualMap: false,           // visualMap.show
+  wireframe: true, // series.wireframe.show
+  showVisualMap: false, // visualMap.show
 
   // === Globe Chart ===
-  globeBaseColor: '#304156',     // globe.baseColor
+  globeBaseColor: '#304156', // globe.baseColor
 
   // === GL Charts ===
-  nodeSize: 10,                  // graphGL node symbolSize
+  nodeSize: 10, // graphGL node symbolSize
 };
 
 // ============================================================
@@ -1190,9 +1189,7 @@ const FUNNEL_DATA = [
 /**
  * Gauge data: single KPI value
  */
-const GAUGE_DATA = [
-  { name: 'Uptime', value: 99.7 },
-];
+const GAUGE_DATA = [{ name: 'Uptime', value: 99.7 }];
 
 /**
  * Linear gauge data: multiple KPIs
@@ -1477,29 +1474,51 @@ const CANDLESTICK_DATA = [
 /**
  * Parallel coordinates data: multi-dimension comparison
  */
-const PARALLEL_DATA = [{
-  dimensions: ['Price', 'Rating', 'Storage', 'Battery', 'Weight'],
-  data: [
-    [799, 4.5, 128, 4000, 175],
-    [999, 4.7, 256, 4500, 185],
-    [599, 4.2, 64, 3500, 160],
-    [1199, 4.8, 512, 5000, 195],
-    [449, 3.9, 64, 3000, 150],
-    [899, 4.6, 256, 4200, 180],
-    [699, 4.3, 128, 3800, 165],
-    [1099, 4.7, 512, 4800, 190],
-  ],
-}];
+const PARALLEL_DATA = [
+  {
+    dimensions: ['Price', 'Rating', 'Storage', 'Battery', 'Weight'],
+    data: [
+      [799, 4.5, 128, 4000, 175],
+      [999, 4.7, 256, 4500, 185],
+      [599, 4.2, 64, 3500, 160],
+      [1199, 4.8, 512, 5000, 195],
+      [449, 3.9, 64, 3000, 150],
+      [899, 4.6, 256, 4200, 180],
+      [699, 4.3, 128, 3800, 165],
+      [1099, 4.7, 512, 4800, 190],
+    ],
+  },
+];
 
 /**
  * 3D chart data: [x, y, z] coordinates
  */
 const DATA_3D = [
-  [0, 0, 5], [0, 1, 1], [0, 2, 0], [0, 3, 3], [0, 4, 2],
-  [1, 0, 7], [1, 1, 2], [1, 2, 4], [1, 3, 1], [1, 4, 6],
-  [2, 0, 3], [2, 1, 4], [2, 2, 6], [2, 3, 8], [2, 4, 3],
-  [3, 0, 1], [3, 1, 6], [3, 2, 8], [3, 3, 5], [3, 4, 7],
-  [4, 0, 2], [4, 1, 3], [4, 2, 1], [4, 3, 7], [4, 4, 9],
+  [0, 0, 5],
+  [0, 1, 1],
+  [0, 2, 0],
+  [0, 3, 3],
+  [0, 4, 2],
+  [1, 0, 7],
+  [1, 1, 2],
+  [1, 2, 4],
+  [1, 3, 1],
+  [1, 4, 6],
+  [2, 0, 3],
+  [2, 1, 4],
+  [2, 2, 6],
+  [2, 3, 8],
+  [2, 4, 3],
+  [3, 0, 1],
+  [3, 1, 6],
+  [3, 2, 8],
+  [3, 3, 5],
+  [3, 4, 7],
+  [4, 0, 2],
+  [4, 1, 3],
+  [4, 2, 1],
+  [4, 3, 7],
+  [4, 4, 9],
 ];
 
 /**
@@ -1570,13 +1589,15 @@ const MAP_3D_DATA = [
 /**
  * Flow GL data: vector field (simplified)
  */
-const FLOW_GL_DATA = [{
-  data: Array.from({ length: 100 }, (_, i) => {
-    const x = (i % 10) / 10;
-    const y = Math.floor(i / 10) / 10;
-    return [x, y, Math.sin(x * 6) * 0.5, Math.cos(y * 6) * 0.5];
-  }),
-}];
+const FLOW_GL_DATA = [
+  {
+    data: Array.from({ length: 100 }, (_, i) => {
+      const x = (i % 10) / 10;
+      const y = Math.floor(i / 10) / 10;
+      return [x, y, Math.sin(x * 6) * 0.5, Math.cos(y * 6) * 0.5];
+    }),
+  },
+];
 
 /**
  * Master map of dummy chart data keyed by chart type ID.
@@ -1597,29 +1618,29 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
   'bar-horizontal-normalized': MULTI_SERIES_DATA,
 
   // --- Line charts (multi-series) ---
-  'line': MULTI_SERIES_DATA,
+  line: MULTI_SERIES_DATA,
   'line-stacked': MULTI_SERIES_DATA,
   'line-step': MULTI_SERIES_DATA,
 
   // --- Area charts (multi-series) ---
-  'area': MULTI_SERIES_DATA,
+  area: MULTI_SERIES_DATA,
   'area-stacked': MULTI_SERIES_DATA,
   'area-normalized': MULTI_SERIES_DATA,
 
   // --- Polar (multi-series) ---
-  'polar': MULTI_SERIES_DATA,
+  polar: MULTI_SERIES_DATA,
 
   // --- Pie family ---
-  'pie': PIE_DATA,
-  'donut': PIE_DATA,
+  pie: PIE_DATA,
+  donut: PIE_DATA,
   'half-donut': PIE_DATA,
-  'rose': ROSE_DATA,
+  rose: ROSE_DATA,
   'pie-advanced': PIE_DATA,
   'pie-grid': PIE_DATA,
   'nested-pie': PIE_DATA,
 
   // --- Gauges ---
-  'gauge': GAUGE_DATA,
+  gauge: GAUGE_DATA,
   'linear-gauge': LINEAR_GAUGE_DATA,
 
   // --- Cards ---
@@ -1630,26 +1651,26 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
   'tree-map': TREE_MAP_DATA,
 
   // --- Scatter ---
-  'scatter': SCATTER_DATA,
+  scatter: SCATTER_DATA,
   'effect-scatter': SCATTER_DATA,
-  'bubble': BUBBLE_DATA,
+  bubble: BUBBLE_DATA,
 
   // --- Statistical ---
   'box-chart': BOX_CHART_DATA,
 
   // --- Funnel ---
-  'funnel': FUNNEL_DATA,
+  funnel: FUNNEL_DATA,
 
   // --- Hierarchical ---
-  'sunburst': SUNBURST_DATA,
-  'tree': TREE_DATA,
+  sunburst: SUNBURST_DATA,
+  tree: TREE_DATA,
 
   // --- Flow ---
-  'sankey': SANKEY_DATA,
-  'graph': GRAPH_DATA,
+  sankey: SANKEY_DATA,
+  graph: GRAPH_DATA,
 
   // --- Bar variants ---
-  'waterfall': WATERFALL_DATA,
+  waterfall: WATERFALL_DATA,
   'pictorial-bar': PICTORIAL_BAR_DATA,
   'bar-polar': POLAR_BAR_DATA,
 
@@ -1657,25 +1678,25 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
   'theme-river': THEME_RIVER_DATA,
 
   // --- Radar ---
-  'radar': MULTI_SERIES_DATA,
+  radar: MULTI_SERIES_DATA,
 
   // --- Candlestick ---
-  'candlestick': CANDLESTICK_DATA,
+  candlestick: CANDLESTICK_DATA,
 
   // --- Parallel ---
-  'parallel': PARALLEL_DATA,
+  parallel: PARALLEL_DATA,
 
   // --- 3D Charts ---
-  'bar3d': DATA_3D,
-  'line3d': DATA_3D,
-  'scatter3d': DATA_3D,
-  'surface': SURFACE_DATA,
-  'globe': GLOBE_DATA,
-  'graphgl': GRAPH_DATA,
-  'scattergl': SCATTER_GL_DATA,
-  'linesgl': LINES_GL_DATA,
-  'map3d': MAP_3D_DATA,
-  'flowgl': FLOW_GL_DATA,
+  bar3d: DATA_3D,
+  line3d: DATA_3D,
+  scatter3d: DATA_3D,
+  surface: SURFACE_DATA,
+  globe: GLOBE_DATA,
+  graphgl: GRAPH_DATA,
+  scattergl: SCATTER_GL_DATA,
+  linesgl: LINES_GL_DATA,
+  map3d: MAP_3D_DATA,
+  flowgl: FLOW_GL_DATA,
 };
 
 /**
@@ -1702,7 +1723,15 @@ const LINE_CHART_TYPES = ['line', 'line-stacked', 'line-step'];
 
 const AREA_CHART_TYPES = ['area', 'area-stacked', 'area-normalized'];
 
-const PIE_CHART_TYPES = ['pie', 'pie-advanced', 'pie-grid', 'donut', 'half-donut', 'nested-pie', 'rose'];
+const PIE_CHART_TYPES = [
+  'pie',
+  'pie-advanced',
+  'pie-grid',
+  'donut',
+  'half-donut',
+  'nested-pie',
+  'rose',
+];
 
 const GAUGE_CHART_TYPES = ['gauge', 'linear-gauge'];
 
@@ -1983,7 +2012,9 @@ export function hasAxisLabels(chartType: string | null): boolean {
 
 export function is3DCoordinateChartType(chartType: string | null): boolean {
   if (!chartType) return false;
-  return ['bar3d', 'line3d', 'scatter3d', 'surface', 'map3d'].includes(chartType);
+  return ['bar3d', 'line3d', 'scatter3d', 'surface', 'map3d'].includes(
+    chartType,
+  );
 }
 
 export function supportsGradient(chartType: string | null): boolean {
@@ -1994,9 +2025,13 @@ export function supportsGradient(chartType: string | null): boolean {
 export function supportsDataZoom(chartType: string | null): boolean {
   if (!chartType) return false;
   const zoomTypes = [
-    ...BAR_CHART_TYPES, ...LINE_CHART_TYPES, ...AREA_CHART_TYPES,
-    'scatter', 'effect-scatter',
-    'waterfall', 'candlestick',
+    ...BAR_CHART_TYPES,
+    ...LINE_CHART_TYPES,
+    ...AREA_CHART_TYPES,
+    'scatter',
+    'effect-scatter',
+    'waterfall',
+    'candlestick',
   ];
   return zoomTypes.includes(chartType);
 }
@@ -2007,9 +2042,14 @@ export function supportsDataLabel(chartType: string | null): boolean {
   // Charts with their own label config (pie, funnel, sunburst, sankey, graph, treemap)
   // or charts where labels don't apply (gauge, card, 3D, GL) are excluded.
   const supported = [
-    ...BAR_CHART_TYPES, ...LINE_CHART_TYPES, ...AREA_CHART_TYPES,
-    'scatter', 'effect-scatter', 'bubble',
-    'waterfall', 'pictorial-bar',
+    ...BAR_CHART_TYPES,
+    ...LINE_CHART_TYPES,
+    ...AREA_CHART_TYPES,
+    'scatter',
+    'effect-scatter',
+    'bubble',
+    'waterfall',
+    'pictorial-bar',
   ];
   return supported.includes(chartType);
 }
@@ -2017,12 +2057,26 @@ export function supportsDataLabel(chartType: string | null): boolean {
 export function supportsLegend(chartType: string | null): boolean {
   if (!chartType) return false;
   const noLegendTypes = [
-    'number-card', 'tree-map', 'sunburst', 'tree',
-    'gauge', 'linear-gauge', 'sankey', 'waterfall',
-    'theme-river', 'pictorial-bar',
-    'bar3d', 'line3d', 'scatter3d',
-    'graphgl', 'scattergl', 'linesgl', 'flowgl',
-    'globe', 'surface', 'map3d',
+    'number-card',
+    'tree-map',
+    'sunburst',
+    'tree',
+    'gauge',
+    'linear-gauge',
+    'sankey',
+    'waterfall',
+    'theme-river',
+    'pictorial-bar',
+    'bar3d',
+    'line3d',
+    'scatter3d',
+    'graphgl',
+    'scattergl',
+    'linesgl',
+    'flowgl',
+    'globe',
+    'surface',
+    'map3d',
   ];
   return !noLegendTypes.includes(chartType);
 }
@@ -2030,12 +2084,30 @@ export function supportsLegend(chartType: string | null): boolean {
 export function supportsEmphasis(chartType: string | null): boolean {
   if (!chartType) return false;
   const noEmphasisTypes = [
-    'number-card', 'gauge', 'linear-gauge', 'radar', 'parallel',
-    'tree-map', 'sunburst', 'sankey', 'waterfall', 'box-chart',
-    'tree', 'pictorial-bar', 'bar-polar', 'candlestick',
-    'bar3d', 'line3d', 'scatter3d',
-    'graphgl', 'scattergl', 'linesgl', 'flowgl',
-    'globe', 'surface', 'map3d',
+    'number-card',
+    'gauge',
+    'linear-gauge',
+    'radar',
+    'parallel',
+    'tree-map',
+    'sunburst',
+    'sankey',
+    'waterfall',
+    'box-chart',
+    'tree',
+    'pictorial-bar',
+    'bar-polar',
+    'candlestick',
+    'bar3d',
+    'line3d',
+    'scatter3d',
+    'graphgl',
+    'scattergl',
+    'linesgl',
+    'flowgl',
+    'globe',
+    'surface',
+    'map3d',
   ];
   return !noEmphasisTypes.includes(chartType);
 }
@@ -2043,12 +2115,21 @@ export function supportsEmphasis(chartType: string | null): boolean {
 export function supportsToolbox(chartType: string | null): boolean {
   if (!chartType) return false;
   const supported = [
-    ...BAR_CHART_TYPES, ...LINE_CHART_TYPES, ...AREA_CHART_TYPES,
+    ...BAR_CHART_TYPES,
+    ...LINE_CHART_TYPES,
+    ...AREA_CHART_TYPES,
     ...PIE_CHART_TYPES,
-    'scatter', 'effect-scatter',
-    'waterfall', 'pictorial-bar',
-    'funnel', 'bar-polar',
-    'sunburst', 'sankey', 'graph', 'tree', 'theme-river',
+    'scatter',
+    'effect-scatter',
+    'waterfall',
+    'pictorial-bar',
+    'funnel',
+    'bar-polar',
+    'sunburst',
+    'sankey',
+    'graph',
+    'tree',
+    'theme-river',
   ];
   return supported.includes(chartType);
 }

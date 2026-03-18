@@ -53,7 +53,7 @@
             [ngClass]="{
               'ng-invalid ng-dirty':
                 roleForm.get('organisation')?.invalid &&
-                roleForm.get('organisation')?.touched
+                roleForm.get('organisation')?.touched,
             }"
           >
           </p-dropdown>
@@ -107,7 +107,8 @@
               placeholder="Enter name"
               [ngClass]="{
                 'ng-invalid ng-dirty':
-                  roleForm.get('name')?.invalid && roleForm.get('name')?.touched
+                  roleForm.get('name')?.invalid &&
+                  roleForm.get('name')?.touched,
               }"
             />
           </span>

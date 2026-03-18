@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -27,7 +28,7 @@ export class EditTabComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private globalService: GlobalService,
-    private tabService: TabService
+    private tabService: TabService,
   ) {
     this.initForm();
   }
@@ -54,7 +55,15 @@ export class EditTabComponent implements OnInit {
   initForm(): void {
     this.tabForm = this.fb.group({
       id: [''],
-      name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s-]+$')]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: [''],
       organisation: [''],
       database: [''],
@@ -92,6 +101,18 @@ export class EditTabComponent implements OnInit {
         }
       });
     }
+  }
+
+  getNameError(): string {
+    const control = this.tabForm.get('name');
+    if (control?.errors?.['required']) return 'Tab name is required';
+    if (control?.errors?.['minlength'])
+      return `Tab name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Tab name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Tab name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 
   onCancel(): void {

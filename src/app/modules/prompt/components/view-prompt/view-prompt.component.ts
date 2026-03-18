@@ -19,7 +19,7 @@ export class ViewPromptComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private promptService: PromptService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {

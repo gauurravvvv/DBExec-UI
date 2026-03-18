@@ -25,7 +25,7 @@ export class ViewDatasetComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private datasetService: DatasetService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   isArray = Array.isArray;
@@ -41,7 +41,9 @@ export class ViewDatasetComponent implements OnInit {
     if (prompt.value == null) return '-';
     if (Array.isArray(prompt.value)) {
       return prompt.value
-        .map((v: any) => (typeof v === 'object' && v?.value != null) ? v.value : v)
+        .map((v: any) =>
+          typeof v === 'object' && v?.value != null ? v.value : v,
+        )
         .join(', ');
     }
     if (typeof prompt.value === 'object' && prompt.value?.value != null) {
@@ -132,7 +134,7 @@ export class ViewDatasetComponent implements OnInit {
       .deleteDatasetField(
         this.datasetData.organisationId,
         this.datasetData.id,
-        this.fieldToDelete.id
+        this.fieldToDelete.id,
       )
       .then((response: any) => {
         this.showDeleteFieldConfirm = false;
@@ -176,7 +178,7 @@ export class ViewDatasetComponent implements OnInit {
       .viewDatasetField(
         this.datasetData.organisationId,
         this.datasetData.id,
-        field.id
+        field.id,
       )
       .then((response: any) => {
         this.isLoadingField = false;

@@ -39,28 +39,28 @@ const routes: Routes = [
         path: 'dashboard',
         loadChildren: () =>
           import('./modules/dashboard/dashboard.module').then(
-            m => m.DashboardModule
+            m => m.DashboardModule,
           ),
       },
       {
         path: 'super-admin',
         loadChildren: () =>
           import('./modules/superAdmin/super-admin.module').then(
-            m => m.SuperAdminModule
+            m => m.SuperAdminModule,
           ),
       },
       {
         path: 'organisation',
         loadChildren: () =>
           import('./modules/organisation/organisation.module').then(
-            m => m.OrganisationModule
+            m => m.OrganisationModule,
           ),
       },
       {
         path: 'org-admin',
         loadChildren: () =>
           import('./modules/organisation-admin/organisation-admin.module').then(
-            m => m.OrgAdminModule
+            m => m.OrgAdminModule,
           ),
       },
       {
@@ -82,21 +82,21 @@ const routes: Routes = [
         path: 'environment',
         loadChildren: () =>
           import('./modules/environment/environment.module').then(
-            m => m.EnvironmentModule
+            m => m.EnvironmentModule,
           ),
       },
       {
         path: 'category',
         loadChildren: () =>
           import('./modules/categories/category.module').then(
-            m => m.CategoryModule
+            m => m.CategoryModule,
           ),
       },
       {
         path: 'database',
         loadChildren: () =>
           import('./modules/database/database.module').then(
-            m => m.DatabaseModule
+            m => m.DatabaseModule,
           ),
       },
 
@@ -104,7 +104,7 @@ const routes: Routes = [
         path: 'connections',
         loadChildren: () =>
           import('./modules/connection/connection.module').then(
-            m => m.ConnectionsModule
+            m => m.ConnectionsModule,
           ),
       },
 
@@ -117,7 +117,7 @@ const routes: Routes = [
         path: 'secrets',
         loadChildren: () =>
           import('./modules/credentials/credentials.module').then(
-            m => m.CredentialsModule
+            m => m.CredentialsModule,
           ),
       },
       {
@@ -129,7 +129,7 @@ const routes: Routes = [
         path: 'analyses',
         loadChildren: () =>
           import('./modules/analyses/analyses.module').then(
-            m => m.AnalysesModule
+            m => m.AnalysesModule,
           ),
       },
       {

@@ -54,21 +54,29 @@
       cursor: pointer;
       transition: all 0.2s ease;
 
-      i { font-size: 0.9rem; }
+      i {
+        font-size: 0.9rem;
+      }
 
       &.btn-cancel {
         background: var(--card-background);
         border: 1px solid var(--border-color);
         color: var(--text-color);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        &:hover { background: var(--hover-background); transform: translateY(-1px); }
+        &:hover {
+          background: var(--hover-background);
+          transform: translateY(-1px);
+        }
       }
 
       &.btn-primary {
         background: linear-gradient(135deg, #2196f3, #1976d2);
         color: white;
         box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
-        &:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4); }
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
       }
     }
   }
@@ -170,8 +178,13 @@
     color: white;
     box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
 
-    i { font-size: 0.9rem; }
-    &:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4); }
+    i {
+      font-size: 0.9rem;
+    }
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+    }
   }
 }
 

@@ -66,7 +66,7 @@ export class EditorCustomizationHelper {
   static customizeEditorContextMenu(
     editor: any,
     executeCompleteQueryCallback: () => void,
-    executeSelectedQueryCallback: (selectedText: string) => void
+    executeSelectedQueryCallback: (selectedText: string) => void,
   ): void {
     if (!editor) return;
 
@@ -171,7 +171,7 @@ export class EditorCustomizationHelper {
    */
   static setupContentChangeListener(
     editor: any,
-    onChangeCallback: (value: string) => void
+    onChangeCallback: (value: string) => void,
   ): void {
     if (!editor) return;
 

@@ -33,7 +33,7 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
 
   constructor(
     private datasetService: DatasetService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   @HostListener('document:keydown.escape', ['$event'])

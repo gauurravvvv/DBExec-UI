@@ -16,7 +16,7 @@ export class EnvironmentService {
       .get(
         ENVIRONMENT.LIST +
           `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`
+          `/${params.pageNumber}/${params.limit}`,
       )
       .toPromise()
       .then((response: any) => {

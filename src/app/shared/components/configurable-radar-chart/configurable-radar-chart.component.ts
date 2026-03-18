@@ -15,7 +15,9 @@ import { buildRadarChartOption } from '../../helpers/echarts-option-builder';
   templateUrl: './configurable-radar-chart.component.html',
   styleUrls: ['./configurable-radar-chart.component.scss'],
 })
-export class ConfigurableRadarChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableRadarChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
 
   @Input() data: any[] = [];
@@ -51,7 +53,12 @@ export class ConfigurableRadarChartComponent implements OnInit, OnChanges, DoChe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }

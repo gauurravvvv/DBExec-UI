@@ -15,7 +15,9 @@ import { buildParallelChartOption } from '../../helpers/echarts-option-builder';
   templateUrl: './configurable-parallel-chart.component.html',
   styleUrls: ['./configurable-parallel-chart.component.scss'],
 })
-export class ConfigurableParallelChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableParallelChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
 
   @Input() data: any[] = [];
@@ -48,7 +50,12 @@ export class ConfigurableParallelChartComponent implements OnInit, OnChanges, Do
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }

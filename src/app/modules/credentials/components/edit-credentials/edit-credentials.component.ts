@@ -66,7 +66,7 @@ export class EditCredentialsComponent implements OnInit, OnDestroy {
     if (this.credentialSet?.values) {
       // Reset password visibility array
       this.showPassword = new Array(this.credentialSet.values.length).fill(
-        false
+        false,
       );
 
       this.credentialSet.values.forEach((field: any) => {
@@ -87,7 +87,7 @@ export class EditCredentialsComponent implements OnInit, OnDestroy {
   private checkFormDirty() {
     const currentValues = this.editForm.value;
     this.isFormDirty = Object.keys(currentValues).some(
-      key => currentValues[key] !== this.initialValues[key]
+      key => currentValues[key] !== this.initialValues[key],
     );
   }
 
@@ -104,7 +104,7 @@ export class EditCredentialsComponent implements OnInit, OnDestroy {
           fieldName: key,
           value: this.editForm.value[key],
           sequence: this.credentialSet.values.find(
-            (value: any) => value.fieldName === key
+            (value: any) => value.fieldName === key,
           )?.sequence,
         })),
       };

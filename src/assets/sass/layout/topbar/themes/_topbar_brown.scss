@@ -1,13 +1,13 @@
 .layout-topbar-brown {
-    $topbarBgColor: #5D4037;
-    $topbarLeftBgColor: #4E342E;
+  $topbarBgColor: #5d4037;
+  $topbarLeftBgColor: #4e342e;
 
-    $topbarMenuButtonBgColor:#F9A825;
-    $topbarMenuButtonTextColor:#212121;
+  $topbarMenuButtonBgColor: #f9a825;
+  $topbarMenuButtonTextColor: #212121;
 
-    $topbarItemTextColor: #ffffff;
-    $topbarItemTextHoverBgColor: rgba(255,255,255,.12);
+  $topbarItemTextColor: #ffffff;
+  $topbarItemTextHoverBgColor: rgba(255, 255, 255, 0.12);
 
-    @import '../_topbar_exports';
-    @import '../_topbar_theme';
+  @import '../_topbar_exports';
+  @import '../_topbar_theme';
 }

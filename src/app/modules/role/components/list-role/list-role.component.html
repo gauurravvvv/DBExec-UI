@@ -95,11 +95,11 @@
                 <td>
                   {{
                     role.lastLogin
-                      ? (role.lastLogin | date : 'medium')
+                      ? (role.lastLogin | date: 'medium')
                       : 'Never logged in'
                   }}
                 </td>
-                <td>{{ role.createdOn | date : 'mediumDate' }}</td>
+                <td>{{ role.createdOn | date: 'mediumDate' }}</td>
                 <td class="actions">
                   <button
                     class="action-btn edit"

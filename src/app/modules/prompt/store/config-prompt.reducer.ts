@@ -30,7 +30,7 @@ function updateAccessOrder(accessOrder: string[], key: string): string[] {
 function evictOldestIfNeeded(
   schemas: { [key: string]: SchemaEntry },
   accessOrder: string[],
-  currentKey: string
+  currentKey: string,
 ): { schemas: { [key: string]: SchemaEntry }; accessOrder: string[] } {
   let newSchemas = { ...schemas };
   let newAccessOrder = [...accessOrder];
@@ -82,7 +82,7 @@ export const configPromptReducer = createReducer(
           },
         },
       };
-    }
+    },
   ),
 
   // Load schema data success - store data and handle LRU eviction
@@ -116,7 +116,7 @@ export const configPromptReducer = createReducer(
         schemas: finalSchemas,
         accessOrder: finalAccessOrder,
       };
-    }
+    },
   ),
 
   // Load schema data failure
@@ -139,7 +139,7 @@ export const configPromptReducer = createReducer(
           },
         },
       };
-    }
+    },
   ),
 
   // Set active schema - update access order
@@ -164,7 +164,7 @@ export const configPromptReducer = createReducer(
         accessOrder: updateAccessOrder(state.accessOrder, key),
         schemas: updatedSchemas,
       };
-    }
+    },
   ),
 
   // Clear specific schema
@@ -180,7 +180,7 @@ export const configPromptReducer = createReducer(
         activeSchemaKey:
           state.activeSchemaKey === key ? null : state.activeSchemaKey,
       };
-    }
+    },
   ),
 
   // Clear all schemas
@@ -191,7 +191,7 @@ export const configPromptReducer = createReducer(
       schemas: {},
       accessOrder: [],
       activeSchemaKey: null,
-    })
+    }),
   ),
 
   // Refresh schema data - clear existing and reload
@@ -215,6 +215,6 @@ export const configPromptReducer = createReducer(
           },
         },
       };
-    }
-  )
+    },
+  ),
 );

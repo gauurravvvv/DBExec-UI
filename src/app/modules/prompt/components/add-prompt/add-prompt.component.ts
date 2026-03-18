@@ -128,10 +128,29 @@ export class AddPromptComponent implements OnInit, OnDestroy {
 
   createPrompt(): FormGroup {
     return this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: ['', [Validators.pattern(REGEX.lastName)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
+      description: [''],
       type: ['', Validators.required],
     });
+  }
+
+  getNameError(control: any): string {
+    if (control?.errors?.['required']) return 'Prompt name is required';
+    if (control?.errors?.['minlength'])
+      return `Prompt name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Prompt name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Prompt name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 
   addSectionGroup() {
@@ -215,7 +234,10 @@ export class AddPromptComponent implements OnInit, OnDestroy {
   }
 
   get areAllExpanded(): boolean {
-    return this.sectionGroups.length > 0 && this.expandedGroups.size === this.sectionGroups.length;
+    return (
+      this.sectionGroups.length > 0 &&
+      this.expandedGroups.size === this.sectionGroups.length
+    );
   }
 
   get hasEmptyPrompts(): boolean {

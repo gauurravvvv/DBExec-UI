@@ -14,6 +14,7 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { GroupService } from '../../services/group.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-add-group',
@@ -53,7 +54,15 @@ export class AddGroupComponent implements OnInit {
 
   initForm() {
     this.userGroupForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s-]+$')]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: [''],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
@@ -125,26 +134,6 @@ export class AddGroupComponent implements OnInit {
     });
   }
 
-  getFieldErrorMessage(field: any): string {
-    if (field.get('name')?.errors) {
-      const errors = field.get('name')?.errors;
-
-      if (errors?.['required']) {
-        return 'Field name is required';
-      }
-      if (errors?.['minlength']) {
-        return 'Field name must be at least 6 characters';
-      }
-      if (errors?.['maxlength']) {
-        return 'Field name cannot exceed 20 characters';
-      }
-      if (errors?.['pattern']) {
-        return 'Field name can only contain letters, spaces and hyphens';
-      }
-    }
-    return '';
-  }
-
   minUsersValidator(min: number) {
     return (control: AbstractControl): ValidationErrors | null => {
       const users = control.value as any[];
@@ -158,5 +147,17 @@ export class AddGroupComponent implements OnInit {
   canSubmit(): boolean {
     const users = this.userGroupForm.get('users')?.value || [];
     return this.userGroupForm.valid && users.length > 1;
+  }
+
+  getNameError(): string {
+    const control = this.userGroupForm.get('name');
+    if (control?.errors?.['required']) return 'Group name is required';
+    if (control?.errors?.['minlength'])
+      return `Group name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Group name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Group name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 }

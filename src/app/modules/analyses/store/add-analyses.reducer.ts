@@ -30,7 +30,7 @@ function updateAccessOrder(accessOrder: string[], key: string): string[] {
 function evictOldestIfNeeded(
   datasets: { [key: string]: DatasetEntry },
   accessOrder: string[],
-  currentKey: string
+  currentKey: string,
 ): { datasets: { [key: string]: DatasetEntry }; accessOrder: string[] } {
   let newDatasets = { ...datasets };
   let newAccessOrder = [...accessOrder];
@@ -82,7 +82,7 @@ export const addAnalysesReducer = createReducer(
           },
         },
       };
-    }
+    },
   ),
 
   // Load dataset data success - store data and handle LRU eviction
@@ -116,7 +116,7 @@ export const addAnalysesReducer = createReducer(
         datasets: finalDatasets,
         accessOrder: finalAccessOrder,
       };
-    }
+    },
   ),
 
   // Load dataset data failure
@@ -139,7 +139,7 @@ export const addAnalysesReducer = createReducer(
           },
         },
       };
-    }
+    },
   ),
 
   // Set active dataset - update access order
@@ -164,7 +164,7 @@ export const addAnalysesReducer = createReducer(
         accessOrder: updateAccessOrder(state.accessOrder, key),
         datasets: updatedDatasets,
       };
-    }
+    },
   ),
 
   // Clear specific dataset
@@ -180,7 +180,7 @@ export const addAnalysesReducer = createReducer(
         activeDatasetKey:
           state.activeDatasetKey === key ? null : state.activeDatasetKey,
       };
-    }
+    },
   ),
 
   // Clear all datasets
@@ -191,6 +191,6 @@ export const addAnalysesReducer = createReducer(
       datasets: {},
       accessOrder: [],
       activeDatasetKey: null,
-    })
-  )
+    }),
+  ),
 );

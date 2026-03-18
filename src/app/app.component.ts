@@ -51,17 +51,21 @@ export class AppComponent implements OnInit, OnDestroy {
     this.listenToLoading();
 
     // Session expired (refresh token invalidated)
-    this.sessionSub = this.sessionExpiredService.onSessionExpired.subscribe(() => {
-      this.idleTimeoutService.stop();
-      this.showIdleWarningDialog = false;
-      this.showSessionExpiredDialog = true;
-    });
+    this.sessionSub = this.sessionExpiredService.onSessionExpired.subscribe(
+      () => {
+        this.idleTimeoutService.stop();
+        this.showIdleWarningDialog = false;
+        this.showSessionExpiredDialog = true;
+      },
+    );
 
     // Idle timeout warning (countdown tick)
-    this.idleWarningSub = this.idleTimeoutService.onIdleWarning.subscribe((seconds) => {
-      this.idleCountdown = seconds;
-      this.showIdleWarningDialog = true;
-    });
+    this.idleWarningSub = this.idleTimeoutService.onIdleWarning.subscribe(
+      seconds => {
+        this.idleCountdown = seconds;
+        this.showIdleWarningDialog = true;
+      },
+    );
 
     // Idle timeout expired — auto logout
     this.idleLogoutSub = this.idleTimeoutService.onIdleLogout.subscribe(() => {
@@ -71,11 +75,22 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Start/stop idle tracking based on route
     this.routerSub = this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe((event) => {
-        if (event.url === '/login' || event.url === '/' || event.url === '/forgot-password') {
+      .pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd,
+        ),
+      )
+      .subscribe(event => {
+        if (
+          event.url === '/login' ||
+          event.url === '/' ||
+          event.url === '/forgot-password'
+        ) {
           this.idleTimeoutService.stop();
-        } else if (this.loginService.isLoggedIn() && !this.idleTimeoutService.isRunning) {
+        } else if (
+          this.loginService.isLoggedIn() &&
+          !this.idleTimeoutService.isRunning
+        ) {
           this.idleTimeoutService.start();
         }
       });

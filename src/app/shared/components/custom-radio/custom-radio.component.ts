@@ -60,9 +60,12 @@ export class CustomRadioComponent implements ControlValueAccessor {
 
   get gapValue(): string {
     switch (this.gap) {
-      case 'small': return '0.5rem';
-      case 'large': return '1.5rem';
-      default: return '1rem';
+      case 'small':
+        return '0.5rem';
+      case 'large':
+        return '1.5rem';
+      default:
+        return '1rem';
     }
   }
 

@@ -1,54 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>DBExec</title>
+    <base href="/" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 
-<head>
-  <meta charset="utf-8" />
-  <title>DBExec</title>
-  <base href="/" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="icon" type="image/x-icon" href="assets/icons/dbexec_icon.svg" />
+    <link
+      id="theme-css"
+      rel="stylesheet"
+      type="text/css"
+      href="assets/theme/indigo/theme-light.css"
+    />
+    <link
+      id="layout-css"
+      rel="stylesheet"
+      type="text/css"
+      href="assets/layout/css/layout-light.css"
+    />
+    <link rel="stylesheet" href="node_modules/primeicons/primeicons.css" />
+  </head>
 
-  <link rel="icon" type="image/x-icon" href="assets/icons/dbexec_icon.svg" />
-  <link id="theme-css" rel="stylesheet" type="text/css" href="assets/theme/indigo/theme-light.css" />
-  <link id="layout-css" rel="stylesheet" type="text/css" href="assets/layout/css/layout-light.css" />
-  <link rel="stylesheet" href="node_modules/primeicons/primeicons.css" />
-</head>
+  <body>
+    <app-root></app-root>
 
-<body>
-  <app-root></app-root>
-  
-  <!-- Monaco Editor from CDN -->
-  <script>
-    // Set loading flag before script loads
-    window.monacoLoading = true;
-    window.monacoLoaded = false;
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js" 
-          onerror="console.error('Failed to load Monaco loader script'); window.monacoLoading = false;"></script>
-  <script>
-    // Wait for loader to be available
-    (function checkLoader() {
-      if (typeof require !== 'undefined' && typeof require.config === 'function') {
-        require.config({ 
-          paths: { 
-            'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' 
-          }
-        });
-        require(['vs/editor/editor.main'], function() {
-          window.monacoLoaded = true;
-          window.monacoLoading = false;
-        }, function(err) {
-          console.error('Failed to load Monaco editor.main:', err);
-          window.monacoLoading = false;
-        });
-      } else if (window.monacoLoading) {
-        // Retry if still loading
-        setTimeout(checkLoader, 100);
-      }
-    })();
-  </script>
-</body>
-
+    <!-- Monaco Editor from CDN -->
+    <script>
+      // Set loading flag before script loads
+      window.monacoLoading = true;
+      window.monacoLoaded = false;
+    </script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"
+      onerror="
+        console.error('Failed to load Monaco loader script');
+        window.monacoLoading = false;
+      "
+    ></script>
+    <script>
+      // Wait for loader to be available
+      (function checkLoader() {
+        if (
+          typeof require !== 'undefined' &&
+          typeof require.config === 'function'
+        ) {
+          require.config({
+            paths: {
+              vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs',
+            },
+          });
+          require(['vs/editor/editor.main'], function () {
+            window.monacoLoaded = true;
+            window.monacoLoading = false;
+          }, function (err) {
+            console.error('Failed to load Monaco editor.main:', err);
+            window.monacoLoading = false;
+          });
+        } else if (window.monacoLoading) {
+          // Retry if still loading
+          setTimeout(checkLoader, 100);
+        }
+      })();
+    </script>
+  </body>
 </html>

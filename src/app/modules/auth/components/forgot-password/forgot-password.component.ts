@@ -21,16 +21,48 @@ export class ForgotPasswordComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private router: Router,
     private loginService: LoginService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     this.forgotPasswordForm = this.fb.group({
-      organisation: ['', [Validators.required, REGEX.orgName]],
-      username: ['', [Validators.required, REGEX.username]],
+      organisation: [
+        '',
+        [Validators.required, Validators.pattern(REGEX.orgName)],
+      ],
+      username: ['', [Validators.required, Validators.pattern(REGEX.username)]],
       email: ['', [Validators.required, Validators.email]],
     });
   }
 
   ngOnInit(): void {}
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.forgotPasswordForm.get(fieldName);
+    if (!control?.errors) return '';
+    if (control.errors['required']) {
+      switch (fieldName) {
+        case 'organisation':
+          return 'Organisation is required';
+        case 'username':
+          return 'Username is required';
+        case 'email':
+          return 'Email is required';
+        default:
+          return 'This field is required';
+      }
+    }
+    if (control.errors['pattern']) {
+      switch (fieldName) {
+        case 'organisation':
+          return 'Organisation name must start with a letter or number';
+        case 'username':
+          return 'Username must start with a letter and contain only letters, numbers, dots, underscores or hyphens';
+        default:
+          return 'Invalid format';
+      }
+    }
+    if (control.errors['email']) return 'Please enter a valid email address';
+    return '';
+  }
 
   onSubmit(): void {
     if (this.forgotPasswordForm.valid) {

@@ -72,9 +72,9 @@
     },
     "noRecords": "レコードが見つかりません",
     "copyWorkflow": "ワークフローのコピー",
-    "newWorkflowPlaceholder":"新しいワークフロー名",
-    "selectWorkflow":"ワークフローを選択",
-    "save":"保存"
+    "newWorkflowPlaceholder": "新しいワークフロー名",
+    "selectWorkflow": "ワークフローを選択",
+    "save": "保存"
   },
   "createEditWorkflow": {
     "save": "保存",

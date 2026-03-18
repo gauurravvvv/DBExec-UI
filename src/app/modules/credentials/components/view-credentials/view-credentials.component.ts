@@ -65,7 +65,7 @@ export class ViewCredentialsComponent implements OnInit {
     private credentialsService: CredentialService,
     private messageService: MessageService,
     private clipboard: Clipboard,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit(): void {
@@ -110,7 +110,7 @@ export class ViewCredentialsComponent implements OnInit {
       this.credentialDetails.values.length > 0
     ) {
       return this.credentialDetails.values[0].values.map(
-        field => field.fieldName
+        field => field.fieldName,
       );
     }
     return [];
@@ -186,7 +186,7 @@ export class ViewCredentialsComponent implements OnInit {
         this.credentialsService
           .deleteCredential(
             this.credentialDetails.organisationId,
-            this.selectedCredentialId.toString()
+            this.selectedCredentialId.toString(),
           )
           .then(response => {
             if (this.globalService.handleSuccessService(response)) {
@@ -194,7 +194,7 @@ export class ViewCredentialsComponent implements OnInit {
               this.selectedCredentialId = null;
               this.loadCredentialDetails(
                 this.selectedOrgId,
-                this.selectedCategoryId
+                this.selectedCategoryId,
               );
             }
           });
@@ -236,7 +236,7 @@ export class ViewCredentialsComponent implements OnInit {
         if (this.globalService.handleSuccessService(response)) {
           this.loadCredentialDetails(
             this.selectedOrgId,
-            this.selectedCategoryId
+            this.selectedCategoryId,
           );
         }
       });
@@ -261,7 +261,7 @@ export class ViewCredentialsComponent implements OnInit {
         if (this.globalService.handleSuccessService(response)) {
           this.loadCredentialDetails(
             this.selectedOrgId,
-            this.selectedCategoryId
+            this.selectedCategoryId,
           );
         }
       });

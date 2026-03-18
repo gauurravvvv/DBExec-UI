@@ -1,640 +1,1127 @@
 <div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text" (click)="onBack()">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-                <h2>Query Builder</h2>
+  <div class="add-admin-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" (click)="onBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Query Builder</h2>
+      </div>
+      <div class="action-buttons">
+        <div class="structure-nav-wrapper" #treeSearchInput>
+          <button
+            class="btn-icon"
+            type="button"
+            (click)="toggleStructureTree()"
+            title="Navigate to prompt"
+          >
+            <i class="pi pi-sitemap"></i>
+          </button>
+          <div
+            class="structure-tree-dropdown"
+            #treeDropdown
+            *ngIf="showStructureTree"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="tree-scroll-area">
+              <p-tree
+                [value]="structureTreeNodes"
+                [filter]="true"
+                [filterBy]="'label'"
+                [filterPlaceholder]="'Search tab, section or prompt...'"
+                filterMode="lenient"
+                selectionMode="single"
+                (onNodeSelect)="onStructureNodeSelect($event)"
+                (onFilter)="onTreeFilter($event)"
+                [style]="{ border: 'none', width: '100%' }"
+                styleClass="structure-tree"
+              >
+              </p-tree>
             </div>
-            <div class="action-buttons">
-                <div class="structure-nav-wrapper" #treeSearchInput>
-                    <button class="btn-icon" type="button" (click)="toggleStructureTree()" title="Navigate to prompt">
-                        <i class="pi pi-sitemap"></i>
-                    </button>
-                    <div class="structure-tree-dropdown" #treeDropdown *ngIf="showStructureTree"
-                        (click)="$event.stopPropagation()">
-                        <div class="tree-scroll-area">
-                            <p-tree [value]="structureTreeNodes" [filter]="true" [filterBy]="'label'"
-                                [filterPlaceholder]="'Search tab, section or prompt...'" filterMode="lenient"
-                                selectionMode="single" (onNodeSelect)="onStructureNodeSelect($event)"
-                                (onFilter)="onTreeFilter($event)" [style]="{'border':'none','width':'100%'}"
-                                styleClass="structure-tree">
-                            </p-tree>
-                        </div>
-                        <div class="tree-empty" *ngIf="loadingStructure">
-                            <i class="pi pi-spin pi-spinner"></i>
-                            <span>Loading structure...</span>
-                        </div>
-                        <div class="tree-empty" *ngIf="!loadingStructure && structureTreeNodes.length === 0">
-                            <i class="pi pi-info-circle"></i>
-                            <span>No structure available</span>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn-secondary" type="button" (click)="onReset()" [disabled]="isSubmitting || !hasAnyValue">
-                    <i class="pi pi-refresh"></i>
-                    Reset
-                </button>
-                <button class="btn-cancel" type="button" (click)="onExecute()" [disabled]="isSubmitting || !hasAnyValue">
-                    <i class="pi pi-play"></i>
-                    Run
-                </button>
-                <button class="btn-primary" type="button" (click)="onSave()" [disabled]="isSubmitting || !hasAnyValue || !queryRanSuccessfully">
-                    <i class="pi pi-save"></i>
-                    {{ isEditMode ? 'Update' : 'Save' }}
-                </button>
+            <div class="tree-empty" *ngIf="loadingStructure">
+              <i class="pi pi-spin pi-spinner"></i>
+              <span>Loading structure...</span>
             </div>
+            <div
+              class="tree-empty"
+              *ngIf="!loadingStructure && structureTreeNodes.length === 0"
+            >
+              <i class="pi pi-info-circle"></i>
+              <span>No structure available</span>
+            </div>
+          </div>
         </div>
-
-        <!-- Content -->
-        <div class="screen-content">
-            <!-- Tab Loading Skeleton -->
-            <div class="tab-skeleton-container" *ngIf="loadingTabs">
-                <div class="tab-skeleton-header">
-                    <p-skeleton *ngFor="let i of skeletonTabs" width="120px" height="40px"
-                        styleClass="mr-2"></p-skeleton>
-                </div>
-            </div>
-
-            <!-- Tab Error State -->
-            <div class="error-state" *ngIf="!loadingTabs && tabError">
-                <i class="pi pi-exclamation-triangle"></i>
-                <span>{{ tabError }}</span>
-                <button pButton label="Retry" class="p-button-outlined" (click)="loadTabs()"></button>
-            </div>
-
-            <!-- Empty State -->
-            <div class="empty-state" *ngIf="!loadingTabs && !tabError && tabs.length === 0">
-                <i class="pi pi-inbox"></i>
-                <span>No tabs configured for this query builder</span>
-            </div>
-
-            <!-- Tab View -->
-            <p-tabView *ngIf="!loadingTabs && !tabError && tabs.length > 0" [(activeIndex)]="activeTabIndex"
-                (onChange)="onTabChange($event)" [scrollable]="true" styleClass="full-height-tabs">
-
-                <p-tabPanel *ngFor="let tab of tabs; let tabIndex = index" [header]="tab.name">
-                    <div class="tab-content" [attr.id]="'tab-' + tab.id"
-                        [ngClass]="{'tab-content--highlight': highlightedElementId === 'tab-' + tab.id}">
-                        <!-- Section Loading Skeleton -->
-                        <div class="section-skeleton-container" *ngIf="tab.loading">
-                            <p-skeleton *ngFor="let i of skeletonSections" width="100%" height="60px"
-                                styleClass="mb-3"></p-skeleton>
-                        </div>
-
-                        <!-- Section Error State -->
-                        <div class="error-state" *ngIf="!tab.loading && tab.error">
-                            <i class="pi pi-exclamation-triangle"></i>
-                            <span>{{ tab.error }}</span>
-                            <button pButton label="Retry" class="p-button-outlined"
-                                (click)="loadSections(tab)"></button>
-                        </div>
-
-                        <!-- Empty Sections State -->
-                        <div class="empty-state"
-                            *ngIf="!tab.loading && !tab.error && tab.loaded && tab.sections.length === 0">
-                            <i class="pi pi-folder-open"></i>
-                            <span>No sections in this tab</span>
-                        </div>
-
-                        <!-- Accordion Sections -->
-                        <p-accordion *ngIf="!tab.loading && !tab.error && tab.sections.length > 0" [multiple]="true">
-                            <p-accordionTab *ngFor="let section of tab.sections" [header]="section.name"
-                                [selected]="section.expanded" (selectedChange)="onSectionToggle(section, $event)"
-                                [attr.id]="'section-' + section.id">
-
-                                <!-- Prompt Loading Skeleton -->
-                                <div class="prompt-skeleton-container" *ngIf="section.loading">
-                                    <div class="prompt-skeleton-row" *ngFor="let i of skeletonPrompts">
-                                        <p-skeleton width="120px" height="16px" styleClass="mb-1"></p-skeleton>
-                                        <p-skeleton width="100%" height="38px"></p-skeleton>
-                                    </div>
-                                </div>
-
-                                <!-- Prompt Error State -->
-                                <div class="error-state" *ngIf="!section.loading && section.error">
-                                    <i class="pi pi-exclamation-triangle"></i>
-                                    <span>{{ section.error }}</span>
-                                    <button pButton label="Retry" class="p-button-outlined"
-                                        (click)="loadPrompts(section)"></button>
-                                </div>
-
-                                <!-- Empty Prompts State -->
-                                <div class="empty-state"
-                                    *ngIf="!section.loading && !section.error && section.loaded && section.prompts.length === 0">
-                                    <i class="pi pi-info-circle"></i>
-                                    <span>No prompts in this section</span>
-                                </div>
-
-                                <!-- Prompt Form Fields -->
-                                <div class="prompt-form-grid" [formGroup]="promptForm"
-                                    *ngIf="!section.loading && !section.error && section.prompts.length > 0">
-
-                                    <div class="prompt-field" *ngFor="let prompt of section.prompts"
-                                        [ngSwitch]="prompt.type" [attr.id]="'prompt-' + prompt.id"
-                                        [ngClass]="{'prompt-field--half': prompt.config?.appearance?.width === 'half', 'prompt-field--full': prompt.config?.appearance?.width === 'full', 'prompt-field--highlight': highlightedElementId === 'prompt-' + prompt.id}">
-
-                                        <i class="pi pi-check-circle filled-badge" *ngIf="hasValue(prompt)"></i>
-
-                                        <!-- Text -->
-                                        <ng-container *ngSwitchCase="'text'">
-                                            <app-custom-input [label]="prompt.name"
-                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                [required]="prompt.mandatory"
-                                                [type]="prompt.config?.appearance?.inputType || 'text'"
-                                                [inputMode]="prompt.config?.appearance?.inputMode || 'input'"
-                                                [maxLength]="prompt.config?.appearance?.maxLength ?? null"
-                                                [minLength]="prompt.config?.appearance?.minLength ?? null"
-                                                [readonly]="prompt.config?.appearance?.readonly || false"
-                                                [rows]="prompt.config?.appearance?.rows || 3"
-                                                [autoResize]="prompt.config?.appearance?.autoResize || false"
-                                                [formControlName]="prompt.formControlName">
-                                            </app-custom-input>
-                                        </ng-container>
-
-                                        <!-- Number -->
-                                        <ng-container *ngSwitchCase="'number'">
-                                            <app-custom-number [label]="prompt.name"
-                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                [required]="prompt.mandatory"
-                                                [min]="prompt.config?.appearance?.min ?? null"
-                                                [max]="prompt.config?.appearance?.max ?? null"
-                                                [step]="prompt.config?.appearance?.step ?? 1"
-                                                [showButtons]="prompt.config?.appearance?.showButtons || false"
-                                                [prefix]="prompt.config?.appearance?.prefix || ''"
-                                                [suffix]="prompt.config?.appearance?.suffix || ''"
-                                                [readonly]="prompt.config?.appearance?.readonly || false"
-                                                [formControlName]="prompt.formControlName">
-                                            </app-custom-number>
-                                        </ng-container>
-
-                                        <!-- Date -->
-                                        <ng-container *ngSwitchCase="'date'">
-                                            <app-custom-calendar [label]="prompt.name"
-                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                [required]="prompt.mandatory"
-                                                [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
-                                                [showIcon]="prompt.config?.appearance?.showIcon !== false"
-                                                [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
-                                                [showWeek]="prompt.config?.appearance?.showWeek || false"
-                                                [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 1"
-                                                [view]="prompt.config?.appearance?.view || 'date'"
-                                                [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
-                                                [selectOtherMonths]="prompt.config?.appearance?.selectOtherMonths || false"
-                                                [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
-                                                [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
-                                                [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
-                                                [firstDayOfWeek]="prompt.config?.appearance?.firstDayOfWeek || 0"
-                                                [showTime]="false"
-                                                [readonlyInput]="prompt.config?.appearance?.readonlyInput || false"
-                                                [touchUI]="prompt.config?.appearance?.touchUI || false"
-                                                [keepInvalid]="prompt.config?.appearance?.keepInvalid || false"
-                                                [inline]="prompt.config?.appearance?.inline || false"
-                                                [minDate]="prompt.config?.appearance?.minDate || null"
-                                                [maxDate]="prompt.config?.appearance?.maxDate || null"
-                                                [disabledDays]="prompt.config?.appearance?.disabledDays || []"
-                                                [formControlName]="prompt.formControlName">
-                                            </app-custom-calendar>
-                                        </ng-container>
-
-                                        <!-- Calendar (date + time) -->
-                                        <ng-container *ngSwitchCase="'calendar'">
-                                            <app-custom-calendar [label]="prompt.name"
-                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                [required]="prompt.mandatory"
-                                                [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
-                                                [showIcon]="prompt.config?.appearance?.showIcon !== false"
-                                                [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
-                                                [showWeek]="prompt.config?.appearance?.showWeek || false"
-                                                [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 1"
-                                                [view]="prompt.config?.appearance?.view || 'date'"
-                                                [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
-                                                [selectOtherMonths]="prompt.config?.appearance?.selectOtherMonths || false"
-                                                [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
-                                                [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
-                                                [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
-                                                [firstDayOfWeek]="prompt.config?.appearance?.firstDayOfWeek || 0"
-                                                [showTime]="prompt.config?.appearance?.showTime !== false"
-                                                [timeOnly]="prompt.config?.appearance?.timeOnly || false"
-                                                [hourFormat]="prompt.config?.appearance?.hourFormat || '12'"
-                                                [showSeconds]="prompt.config?.appearance?.showSeconds || false"
-                                                [stepHour]="prompt.config?.appearance?.stepHour || 1"
-                                                [stepMinute]="prompt.config?.appearance?.stepMinute || 1"
-                                                [stepSecond]="prompt.config?.appearance?.stepSecond || 1"
-                                                [selectionMode]="prompt.config?.appearance?.selectionMode || 'single'"
-                                                [readonlyInput]="prompt.config?.appearance?.readonlyInput || false"
-                                                [touchUI]="prompt.config?.appearance?.touchUI || false"
-                                                [keepInvalid]="prompt.config?.appearance?.keepInvalid || false"
-                                                [inline]="prompt.config?.appearance?.inline || false"
-                                                [minDate]="prompt.config?.appearance?.minDate || null"
-                                                [maxDate]="prompt.config?.appearance?.maxDate || null"
-                                                [disabledDays]="prompt.config?.appearance?.disabledDays || []"
-                                                [formControlName]="prompt.formControlName">
-                                            </app-custom-calendar>
-                                        </ng-container>
-
-                                        <!-- Date Range -->
-                                        <ng-container *ngSwitchCase="'daterange'">
-                                            <app-custom-daterange [label]="prompt.name"
-                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                [required]="prompt.mandatory"
-                                                [dateFormat]="prompt.config?.appearance?.dateFormat || 'dd/mm/yy'"
-                                                [showIcon]="prompt.config?.appearance?.showIcon !== false"
-                                                [showButtonBar]="prompt.config?.appearance?.showButtonBar || false"
-                                                [showWeek]="prompt.config?.appearance?.showWeek || false"
-                                                [numberOfMonths]="prompt.config?.appearance?.numberOfMonths || 2"
-                                                [showOtherMonths]="prompt.config?.appearance?.showOtherMonths !== false"
-                                                [selectOtherMonths]="prompt.config?.appearance?.selectOtherMonths || false"
-                                                [yearNavigator]="prompt.config?.appearance?.yearNavigator || false"
-                                                [monthNavigator]="prompt.config?.appearance?.monthNavigator || false"
-                                                [yearRange]="prompt.config?.appearance?.yearRange || '2000:2030'"
-                                                [firstDayOfWeek]="prompt.config?.appearance?.firstDayOfWeek || 0"
-                                                [readonlyInput]="prompt.config?.appearance?.readonlyInput !== false"
-                                                [touchUI]="prompt.config?.appearance?.touchUI || false"
-                                                [showTime]="prompt.config?.appearance?.showTime || false"
-                                                [hourFormat]="prompt.config?.appearance?.hourFormat || '12'"
-                                                [showSeconds]="prompt.config?.appearance?.showSeconds || false"
-                                                [inline]="prompt.config?.appearance?.inline || false"
-                                                [minDate]="prompt.config?.appearance?.minDate || null"
-                                                [maxDate]="prompt.config?.appearance?.maxDate || null"
-                                                [disabledDays]="prompt.config?.appearance?.disabledDays || []"
-                                                [formControlName]="prompt.formControlName">
-                                            </app-custom-daterange>
-                                        </ng-container>
-
-                                        <!-- Dropdown -->
-                                        <ng-container *ngSwitchCase="'dropdown'">
-                                            <app-custom-dropdown [label]="prompt.name"
-                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                [options]="prompt.options" optionLabel="label" optionValue="value"
-                                                [required]="prompt.mandatory"
-                                                [filter]="prompt.config?.appearance?.filter !== false"
-                                                [filterPlaceholder]="prompt.config?.appearance?.filterPlaceholder || ''"
-                                                [filterMatchMode]="prompt.config?.appearance?.filterMatchMode || 'contains'"
-                                                [resetFilterOnHide]="prompt.config?.appearance?.resetFilterOnHide || false"
-                                                [showClear]="prompt.config?.appearance?.showClear || false"
-                                                [editable]="prompt.config?.appearance?.editable || false"
-                                                [autoDisplayFirst]="prompt.config?.appearance?.autoDisplayFirst !== false"
-                                                [scrollHeight]="prompt.config?.appearance?.scrollHeight || '200px'"
-                                                [emptyMessage]="prompt.config?.appearance?.emptyMessage || 'No results found'"
-                                                [emptyFilterMessage]="prompt.config?.appearance?.emptyFilterMessage || 'No results found'"
-                                                [virtualScroll]="prompt.config?.appearance?.virtualScroll || false"
-                                                [virtualScrollItemSize]="prompt.config?.appearance?.virtualScrollItemSize || 38"
-                                                [formControlName]="prompt.formControlName" appendTo="body">
-                                            </app-custom-dropdown>
-                                        </ng-container>
-
-                                        <!-- Multi-select -->
-                                        <ng-container *ngSwitchCase="'multiselect'">
-                                            <app-custom-multiselect [label]="prompt.name"
-                                                [placeholder]="prompt.config?.appearance?.placeholder || getPlaceholder(prompt)"
-                                                [options]="prompt.options" optionLabel="label" optionValue="value"
-                                                [required]="prompt.mandatory"
-                                                [filter]="prompt.config?.appearance?.filter !== false"
-                                                [filterMatchMode]="prompt.config?.appearance?.filterMatchMode || 'contains'"
-                                                [resetFilterOnHide]="prompt.config?.appearance?.resetFilterOnHide || false"
-                                                [display]="prompt.config?.appearance?.displayMode || prompt.config?.appearance?.display || 'chip'"
-                                                [showToggleAll]="prompt.config?.appearance?.showToggleAll !== false"
-                                                [showHeader]="prompt.config?.appearance?.showHeader !== false"
-                                                [maxSelectedLabels]="prompt.config?.appearance?.maxSelectedLabels ?? 3"
-                                                [selectedItemsLabel]="prompt.config?.appearance?.selectedItemsLabel || '{0} items selected'"
-                                                [selectionLimit]="prompt.config?.appearance?.selectionLimit ?? null"
-                                                [scrollHeight]="prompt.config?.appearance?.scrollHeight || '200px'"
-                                                [emptyMessage]="prompt.config?.appearance?.emptyMessage || 'No results found'"
-                                                [emptyFilterMessage]="prompt.config?.appearance?.emptyFilterMessage || 'No results found'"
-                                                [virtualScroll]="prompt.config?.appearance?.virtualScroll || false"
-                                                [virtualScrollItemSize]="prompt.config?.appearance?.virtualScrollItemSize || 38"
-                                                [formControlName]="prompt.formControlName" appendTo="body">
-                                            </app-custom-multiselect>
-                                        </ng-container>
-
-                                        <!-- Radio -->
-                                        <ng-container *ngSwitchCase="'radio'">
-                                            <app-custom-radio [label]="prompt.name" [required]="prompt.mandatory"
-                                                [options]="prompt.options"
-                                                [layout]="prompt.config?.appearance?.layout || 'horizontal'"
-                                                [columns]="prompt.config?.appearance?.columns || 0"
-                                                [gap]="prompt.config?.appearance?.gap || 'medium'"
-                                                [labelPosition]="prompt.config?.appearance?.labelPosition || 'right'"
-                                                [formControlName]="prompt.formControlName">
-                                            </app-custom-radio>
-                                        </ng-container>
-
-                                        <!-- Checkbox -->
-                                        <ng-container *ngSwitchCase="'checkbox'">
-                                            <app-custom-checkbox [label]="prompt.name" [required]="prompt.mandatory"
-                                                [options]="prompt.options"
-                                                [layout]="prompt.config?.appearance?.layout || 'horizontal'"
-                                                [columns]="prompt.config?.appearance?.columns || 0"
-                                                [gap]="prompt.config?.appearance?.gap || 'medium'"
-                                                [labelPosition]="prompt.config?.appearance?.labelPosition || 'right'"
-                                                [checkboxDisabled]="prompt.config?.appearance?.disabled || false"
-                                                [formControlName]="prompt.formControlName">
-                                            </app-custom-checkbox>
-                                        </ng-container>
-
-                                        <!-- Range Slider -->
-                                        <ng-container *ngSwitchCase="'rangeslider'">
-                                            <app-custom-rangeslider [label]="prompt.name" [required]="prompt.mandatory"
-                                                [min]="prompt.config?.appearance?.min ?? 0"
-                                                [max]="prompt.config?.appearance?.max ?? 100"
-                                                [step]="prompt.config?.appearance?.step ?? 1"
-                                                [orientation]="prompt.config?.appearance?.orientation || 'horizontal'"
-                                                [animate]="prompt.config?.appearance?.animate || false"
-                                                [showValueLabels]="prompt.config?.appearance?.showValueLabels || false"
-                                                [showBoundLabels]="prompt.config?.appearance?.showBoundLabels || false"
-                                                [formControlName]="prompt.formControlName">
-                                            </app-custom-rangeslider>
-                                        </ng-container>
-
-                                        <!-- Validation Error -->
-                                        <div class="prompt-error"
-                                            *ngIf="getPromptControl(prompt)?.invalid && getPromptControl(prompt)?.touched">
-                                            <small class="p-error"
-                                                *ngIf="getPromptControl(prompt)?.hasError('required')">
-                                                {{ prompt.name }} is required
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </p-accordionTab>
-                        </p-accordion>
-                    </div>
-                </p-tabPanel>
-            </p-tabView>
-        </div>
+        <button
+          class="btn-secondary"
+          type="button"
+          (click)="onReset()"
+          [disabled]="isSubmitting || !hasAnyValue"
+        >
+          <i class="pi pi-refresh"></i>
+          Reset
+        </button>
+        <button
+          class="btn-cancel"
+          type="button"
+          (click)="onExecute()"
+          [disabled]="isSubmitting || !hasAnyValue"
+        >
+          <i class="pi pi-play"></i>
+          Run
+        </button>
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="onSave()"
+          [disabled]="isSubmitting || !hasAnyValue || !queryRanSuccessfully"
+        >
+          <i class="pi pi-save"></i>
+          {{ isEditMode ? 'Update' : 'Save' }}
+        </button>
+      </div>
     </div>
+
+    <!-- Content -->
+    <div class="screen-content">
+      <!-- Tab Loading Skeleton -->
+      <div class="tab-skeleton-container" *ngIf="loadingTabs">
+        <div class="tab-skeleton-header">
+          <p-skeleton
+            *ngFor="let i of skeletonTabs"
+            width="120px"
+            height="40px"
+            styleClass="mr-2"
+          ></p-skeleton>
+        </div>
+      </div>
+
+      <!-- Tab Error State -->
+      <div class="error-state" *ngIf="!loadingTabs && tabError">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ tabError }}</span>
+        <button
+          pButton
+          label="Retry"
+          class="p-button-outlined"
+          (click)="loadTabs()"
+        ></button>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        class="empty-state"
+        *ngIf="!loadingTabs && !tabError && tabs.length === 0"
+      >
+        <i class="pi pi-inbox"></i>
+        <span>No tabs configured for this query builder</span>
+      </div>
+
+      <!-- Tab View -->
+      <p-tabView
+        *ngIf="!loadingTabs && !tabError && tabs.length > 0"
+        [(activeIndex)]="activeTabIndex"
+        (onChange)="onTabChange($event)"
+        [scrollable]="true"
+        styleClass="full-height-tabs"
+      >
+        <p-tabPanel
+          *ngFor="let tab of tabs; let tabIndex = index"
+          [header]="tab.name"
+        >
+          <div
+            class="tab-content"
+            [attr.id]="'tab-' + tab.id"
+            [ngClass]="{
+              'tab-content--highlight':
+                highlightedElementId === 'tab-' + tab.id,
+            }"
+          >
+            <!-- Section Loading Skeleton -->
+            <div class="section-skeleton-container" *ngIf="tab.loading">
+              <p-skeleton
+                *ngFor="let i of skeletonSections"
+                width="100%"
+                height="60px"
+                styleClass="mb-3"
+              ></p-skeleton>
+            </div>
+
+            <!-- Section Error State -->
+            <div class="error-state" *ngIf="!tab.loading && tab.error">
+              <i class="pi pi-exclamation-triangle"></i>
+              <span>{{ tab.error }}</span>
+              <button
+                pButton
+                label="Retry"
+                class="p-button-outlined"
+                (click)="loadSections(tab)"
+              ></button>
+            </div>
+
+            <!-- Empty Sections State -->
+            <div
+              class="empty-state"
+              *ngIf="
+                !tab.loading &&
+                !tab.error &&
+                tab.loaded &&
+                tab.sections.length === 0
+              "
+            >
+              <i class="pi pi-folder-open"></i>
+              <span>No sections in this tab</span>
+            </div>
+
+            <!-- Accordion Sections -->
+            <p-accordion
+              *ngIf="!tab.loading && !tab.error && tab.sections.length > 0"
+              [multiple]="true"
+            >
+              <p-accordionTab
+                *ngFor="let section of tab.sections"
+                [header]="section.name"
+                [selected]="section.expanded"
+                (selectedChange)="onSectionToggle(section, $event)"
+                [attr.id]="'section-' + section.id"
+              >
+                <!-- Prompt Loading Skeleton -->
+                <div class="prompt-skeleton-container" *ngIf="section.loading">
+                  <div
+                    class="prompt-skeleton-row"
+                    *ngFor="let i of skeletonPrompts"
+                  >
+                    <p-skeleton
+                      width="120px"
+                      height="16px"
+                      styleClass="mb-1"
+                    ></p-skeleton>
+                    <p-skeleton width="100%" height="38px"></p-skeleton>
+                  </div>
+                </div>
+
+                <!-- Prompt Error State -->
+                <div
+                  class="error-state"
+                  *ngIf="!section.loading && section.error"
+                >
+                  <i class="pi pi-exclamation-triangle"></i>
+                  <span>{{ section.error }}</span>
+                  <button
+                    pButton
+                    label="Retry"
+                    class="p-button-outlined"
+                    (click)="loadPrompts(section)"
+                  ></button>
+                </div>
+
+                <!-- Empty Prompts State -->
+                <div
+                  class="empty-state"
+                  *ngIf="
+                    !section.loading &&
+                    !section.error &&
+                    section.loaded &&
+                    section.prompts.length === 0
+                  "
+                >
+                  <i class="pi pi-info-circle"></i>
+                  <span>No prompts in this section</span>
+                </div>
+
+                <!-- Prompt Form Fields -->
+                <div
+                  class="prompt-form-grid"
+                  [formGroup]="promptForm"
+                  *ngIf="
+                    !section.loading &&
+                    !section.error &&
+                    section.prompts.length > 0
+                  "
+                >
+                  <div
+                    class="prompt-field"
+                    *ngFor="let prompt of section.prompts"
+                    [ngSwitch]="prompt.type"
+                    [attr.id]="'prompt-' + prompt.id"
+                    [ngClass]="{
+                      'prompt-field--half':
+                        prompt.config?.appearance?.width === 'half',
+                      'prompt-field--full':
+                        prompt.config?.appearance?.width === 'full',
+                      'prompt-field--highlight':
+                        highlightedElementId === 'prompt-' + prompt.id,
+                    }"
+                  >
+                    <i
+                      class="pi pi-check-circle filled-badge"
+                      *ngIf="hasValue(prompt)"
+                    ></i>
+
+                    <!-- Text -->
+                    <ng-container *ngSwitchCase="'text'">
+                      <app-custom-input
+                        [label]="prompt.name"
+                        [placeholder]="
+                          prompt.config?.appearance?.placeholder ||
+                          getPlaceholder(prompt)
+                        "
+                        [required]="prompt.mandatory"
+                        [type]="prompt.config?.appearance?.inputType || 'text'"
+                        [inputMode]="
+                          prompt.config?.appearance?.inputMode || 'input'
+                        "
+                        [maxLength]="
+                          prompt.config?.appearance?.maxLength ?? null
+                        "
+                        [minLength]="
+                          prompt.config?.appearance?.minLength ?? null
+                        "
+                        [readonly]="
+                          prompt.config?.appearance?.readonly || false
+                        "
+                        [rows]="prompt.config?.appearance?.rows || 3"
+                        [autoResize]="
+                          prompt.config?.appearance?.autoResize || false
+                        "
+                        [formControlName]="prompt.formControlName"
+                      >
+                      </app-custom-input>
+                    </ng-container>
+
+                    <!-- Number -->
+                    <ng-container *ngSwitchCase="'number'">
+                      <app-custom-number
+                        [label]="prompt.name"
+                        [placeholder]="
+                          prompt.config?.appearance?.placeholder ||
+                          getPlaceholder(prompt)
+                        "
+                        [required]="prompt.mandatory"
+                        [min]="prompt.config?.appearance?.min ?? null"
+                        [max]="prompt.config?.appearance?.max ?? null"
+                        [step]="prompt.config?.appearance?.step ?? 1"
+                        [showButtons]="
+                          prompt.config?.appearance?.showButtons || false
+                        "
+                        [prefix]="prompt.config?.appearance?.prefix || ''"
+                        [suffix]="prompt.config?.appearance?.suffix || ''"
+                        [readonly]="
+                          prompt.config?.appearance?.readonly || false
+                        "
+                        [formControlName]="prompt.formControlName"
+                      >
+                      </app-custom-number>
+                    </ng-container>
+
+                    <!-- Date -->
+                    <ng-container *ngSwitchCase="'date'">
+                      <app-custom-calendar
+                        [label]="prompt.name"
+                        [placeholder]="
+                          prompt.config?.appearance?.placeholder ||
+                          getPlaceholder(prompt)
+                        "
+                        [required]="prompt.mandatory"
+                        [dateFormat]="
+                          prompt.config?.appearance?.dateFormat || 'dd/mm/yy'
+                        "
+                        [showIcon]="
+                          prompt.config?.appearance?.showIcon !== false
+                        "
+                        [showButtonBar]="
+                          prompt.config?.appearance?.showButtonBar || false
+                        "
+                        [showWeek]="
+                          prompt.config?.appearance?.showWeek || false
+                        "
+                        [numberOfMonths]="
+                          prompt.config?.appearance?.numberOfMonths || 1
+                        "
+                        [view]="prompt.config?.appearance?.view || 'date'"
+                        [showOtherMonths]="
+                          prompt.config?.appearance?.showOtherMonths !== false
+                        "
+                        [selectOtherMonths]="
+                          prompt.config?.appearance?.selectOtherMonths || false
+                        "
+                        [yearNavigator]="
+                          prompt.config?.appearance?.yearNavigator || false
+                        "
+                        [monthNavigator]="
+                          prompt.config?.appearance?.monthNavigator || false
+                        "
+                        [yearRange]="
+                          prompt.config?.appearance?.yearRange || '2000:2030'
+                        "
+                        [firstDayOfWeek]="
+                          prompt.config?.appearance?.firstDayOfWeek || 0
+                        "
+                        [showTime]="false"
+                        [readonlyInput]="
+                          prompt.config?.appearance?.readonlyInput || false
+                        "
+                        [touchUI]="prompt.config?.appearance?.touchUI || false"
+                        [keepInvalid]="
+                          prompt.config?.appearance?.keepInvalid || false
+                        "
+                        [inline]="prompt.config?.appearance?.inline || false"
+                        [minDate]="prompt.config?.appearance?.minDate || null"
+                        [maxDate]="prompt.config?.appearance?.maxDate || null"
+                        [disabledDays]="
+                          prompt.config?.appearance?.disabledDays || []
+                        "
+                        [formControlName]="prompt.formControlName"
+                      >
+                      </app-custom-calendar>
+                    </ng-container>
+
+                    <!-- Calendar (date + time) -->
+                    <ng-container *ngSwitchCase="'calendar'">
+                      <app-custom-calendar
+                        [label]="prompt.name"
+                        [placeholder]="
+                          prompt.config?.appearance?.placeholder ||
+                          getPlaceholder(prompt)
+                        "
+                        [required]="prompt.mandatory"
+                        [dateFormat]="
+                          prompt.config?.appearance?.dateFormat || 'dd/mm/yy'
+                        "
+                        [showIcon]="
+                          prompt.config?.appearance?.showIcon !== false
+                        "
+                        [showButtonBar]="
+                          prompt.config?.appearance?.showButtonBar || false
+                        "
+                        [showWeek]="
+                          prompt.config?.appearance?.showWeek || false
+                        "
+                        [numberOfMonths]="
+                          prompt.config?.appearance?.numberOfMonths || 1
+                        "
+                        [view]="prompt.config?.appearance?.view || 'date'"
+                        [showOtherMonths]="
+                          prompt.config?.appearance?.showOtherMonths !== false
+                        "
+                        [selectOtherMonths]="
+                          prompt.config?.appearance?.selectOtherMonths || false
+                        "
+                        [yearNavigator]="
+                          prompt.config?.appearance?.yearNavigator || false
+                        "
+                        [monthNavigator]="
+                          prompt.config?.appearance?.monthNavigator || false
+                        "
+                        [yearRange]="
+                          prompt.config?.appearance?.yearRange || '2000:2030'
+                        "
+                        [firstDayOfWeek]="
+                          prompt.config?.appearance?.firstDayOfWeek || 0
+                        "
+                        [showTime]="
+                          prompt.config?.appearance?.showTime !== false
+                        "
+                        [timeOnly]="
+                          prompt.config?.appearance?.timeOnly || false
+                        "
+                        [hourFormat]="
+                          prompt.config?.appearance?.hourFormat || '12'
+                        "
+                        [showSeconds]="
+                          prompt.config?.appearance?.showSeconds || false
+                        "
+                        [stepHour]="prompt.config?.appearance?.stepHour || 1"
+                        [stepMinute]="
+                          prompt.config?.appearance?.stepMinute || 1
+                        "
+                        [stepSecond]="
+                          prompt.config?.appearance?.stepSecond || 1
+                        "
+                        [selectionMode]="
+                          prompt.config?.appearance?.selectionMode || 'single'
+                        "
+                        [readonlyInput]="
+                          prompt.config?.appearance?.readonlyInput || false
+                        "
+                        [touchUI]="prompt.config?.appearance?.touchUI || false"
+                        [keepInvalid]="
+                          prompt.config?.appearance?.keepInvalid || false
+                        "
+                        [inline]="prompt.config?.appearance?.inline || false"
+                        [minDate]="prompt.config?.appearance?.minDate || null"
+                        [maxDate]="prompt.config?.appearance?.maxDate || null"
+                        [disabledDays]="
+                          prompt.config?.appearance?.disabledDays || []
+                        "
+                        [formControlName]="prompt.formControlName"
+                      >
+                      </app-custom-calendar>
+                    </ng-container>
+
+                    <!-- Date Range -->
+                    <ng-container *ngSwitchCase="'daterange'">
+                      <app-custom-daterange
+                        [label]="prompt.name"
+                        [placeholder]="
+                          prompt.config?.appearance?.placeholder ||
+                          getPlaceholder(prompt)
+                        "
+                        [required]="prompt.mandatory"
+                        [dateFormat]="
+                          prompt.config?.appearance?.dateFormat || 'dd/mm/yy'
+                        "
+                        [showIcon]="
+                          prompt.config?.appearance?.showIcon !== false
+                        "
+                        [showButtonBar]="
+                          prompt.config?.appearance?.showButtonBar || false
+                        "
+                        [showWeek]="
+                          prompt.config?.appearance?.showWeek || false
+                        "
+                        [numberOfMonths]="
+                          prompt.config?.appearance?.numberOfMonths || 2
+                        "
+                        [showOtherMonths]="
+                          prompt.config?.appearance?.showOtherMonths !== false
+                        "
+                        [selectOtherMonths]="
+                          prompt.config?.appearance?.selectOtherMonths || false
+                        "
+                        [yearNavigator]="
+                          prompt.config?.appearance?.yearNavigator || false
+                        "
+                        [monthNavigator]="
+                          prompt.config?.appearance?.monthNavigator || false
+                        "
+                        [yearRange]="
+                          prompt.config?.appearance?.yearRange || '2000:2030'
+                        "
+                        [firstDayOfWeek]="
+                          prompt.config?.appearance?.firstDayOfWeek || 0
+                        "
+                        [readonlyInput]="
+                          prompt.config?.appearance?.readonlyInput !== false
+                        "
+                        [touchUI]="prompt.config?.appearance?.touchUI || false"
+                        [showTime]="
+                          prompt.config?.appearance?.showTime || false
+                        "
+                        [hourFormat]="
+                          prompt.config?.appearance?.hourFormat || '12'
+                        "
+                        [showSeconds]="
+                          prompt.config?.appearance?.showSeconds || false
+                        "
+                        [inline]="prompt.config?.appearance?.inline || false"
+                        [minDate]="prompt.config?.appearance?.minDate || null"
+                        [maxDate]="prompt.config?.appearance?.maxDate || null"
+                        [disabledDays]="
+                          prompt.config?.appearance?.disabledDays || []
+                        "
+                        [formControlName]="prompt.formControlName"
+                      >
+                      </app-custom-daterange>
+                    </ng-container>
+
+                    <!-- Dropdown -->
+                    <ng-container *ngSwitchCase="'dropdown'">
+                      <app-custom-dropdown
+                        [label]="prompt.name"
+                        [placeholder]="
+                          prompt.config?.appearance?.placeholder ||
+                          getPlaceholder(prompt)
+                        "
+                        [options]="prompt.options"
+                        optionLabel="label"
+                        optionValue="value"
+                        [required]="prompt.mandatory"
+                        [filter]="prompt.config?.appearance?.filter !== false"
+                        [filterPlaceholder]="
+                          prompt.config?.appearance?.filterPlaceholder || ''
+                        "
+                        [filterMatchMode]="
+                          prompt.config?.appearance?.filterMatchMode ||
+                          'contains'
+                        "
+                        [resetFilterOnHide]="
+                          prompt.config?.appearance?.resetFilterOnHide || false
+                        "
+                        [showClear]="
+                          prompt.config?.appearance?.showClear || false
+                        "
+                        [editable]="
+                          prompt.config?.appearance?.editable || false
+                        "
+                        [autoDisplayFirst]="
+                          prompt.config?.appearance?.autoDisplayFirst !== false
+                        "
+                        [scrollHeight]="
+                          prompt.config?.appearance?.scrollHeight || '200px'
+                        "
+                        [emptyMessage]="
+                          prompt.config?.appearance?.emptyMessage ||
+                          'No results found'
+                        "
+                        [emptyFilterMessage]="
+                          prompt.config?.appearance?.emptyFilterMessage ||
+                          'No results found'
+                        "
+                        [virtualScroll]="
+                          prompt.config?.appearance?.virtualScroll || false
+                        "
+                        [virtualScrollItemSize]="
+                          prompt.config?.appearance?.virtualScrollItemSize || 38
+                        "
+                        [formControlName]="prompt.formControlName"
+                        appendTo="body"
+                      >
+                      </app-custom-dropdown>
+                    </ng-container>
+
+                    <!-- Multi-select -->
+                    <ng-container *ngSwitchCase="'multiselect'">
+                      <app-custom-multiselect
+                        [label]="prompt.name"
+                        [placeholder]="
+                          prompt.config?.appearance?.placeholder ||
+                          getPlaceholder(prompt)
+                        "
+                        [options]="prompt.options"
+                        optionLabel="label"
+                        optionValue="value"
+                        [required]="prompt.mandatory"
+                        [filter]="prompt.config?.appearance?.filter !== false"
+                        [filterMatchMode]="
+                          prompt.config?.appearance?.filterMatchMode ||
+                          'contains'
+                        "
+                        [resetFilterOnHide]="
+                          prompt.config?.appearance?.resetFilterOnHide || false
+                        "
+                        [display]="
+                          prompt.config?.appearance?.displayMode ||
+                          prompt.config?.appearance?.display ||
+                          'chip'
+                        "
+                        [showToggleAll]="
+                          prompt.config?.appearance?.showToggleAll !== false
+                        "
+                        [showHeader]="
+                          prompt.config?.appearance?.showHeader !== false
+                        "
+                        [maxSelectedLabels]="
+                          prompt.config?.appearance?.maxSelectedLabels ?? 3
+                        "
+                        [selectedItemsLabel]="
+                          prompt.config?.appearance?.selectedItemsLabel ||
+                          '{0} items selected'
+                        "
+                        [selectionLimit]="
+                          prompt.config?.appearance?.selectionLimit ?? null
+                        "
+                        [scrollHeight]="
+                          prompt.config?.appearance?.scrollHeight || '200px'
+                        "
+                        [emptyMessage]="
+                          prompt.config?.appearance?.emptyMessage ||
+                          'No results found'
+                        "
+                        [emptyFilterMessage]="
+                          prompt.config?.appearance?.emptyFilterMessage ||
+                          'No results found'
+                        "
+                        [virtualScroll]="
+                          prompt.config?.appearance?.virtualScroll || false
+                        "
+                        [virtualScrollItemSize]="
+                          prompt.config?.appearance?.virtualScrollItemSize || 38
+                        "
+                        [formControlName]="prompt.formControlName"
+                        appendTo="body"
+                      >
+                      </app-custom-multiselect>
+                    </ng-container>
+
+                    <!-- Radio -->
+                    <ng-container *ngSwitchCase="'radio'">
+                      <app-custom-radio
+                        [label]="prompt.name"
+                        [required]="prompt.mandatory"
+                        [options]="prompt.options"
+                        [layout]="
+                          prompt.config?.appearance?.layout || 'horizontal'
+                        "
+                        [columns]="prompt.config?.appearance?.columns || 0"
+                        [gap]="prompt.config?.appearance?.gap || 'medium'"
+                        [labelPosition]="
+                          prompt.config?.appearance?.labelPosition || 'right'
+                        "
+                        [formControlName]="prompt.formControlName"
+                      >
+                      </app-custom-radio>
+                    </ng-container>
+
+                    <!-- Checkbox -->
+                    <ng-container *ngSwitchCase="'checkbox'">
+                      <app-custom-checkbox
+                        [label]="prompt.name"
+                        [required]="prompt.mandatory"
+                        [options]="prompt.options"
+                        [layout]="
+                          prompt.config?.appearance?.layout || 'horizontal'
+                        "
+                        [columns]="prompt.config?.appearance?.columns || 0"
+                        [gap]="prompt.config?.appearance?.gap || 'medium'"
+                        [labelPosition]="
+                          prompt.config?.appearance?.labelPosition || 'right'
+                        "
+                        [checkboxDisabled]="
+                          prompt.config?.appearance?.disabled || false
+                        "
+                        [formControlName]="prompt.formControlName"
+                      >
+                      </app-custom-checkbox>
+                    </ng-container>
+
+                    <!-- Range Slider -->
+                    <ng-container *ngSwitchCase="'rangeslider'">
+                      <app-custom-rangeslider
+                        [label]="prompt.name"
+                        [required]="prompt.mandatory"
+                        [min]="prompt.config?.appearance?.min ?? 0"
+                        [max]="prompt.config?.appearance?.max ?? 100"
+                        [step]="prompt.config?.appearance?.step ?? 1"
+                        [orientation]="
+                          prompt.config?.appearance?.orientation || 'horizontal'
+                        "
+                        [animate]="prompt.config?.appearance?.animate || false"
+                        [showValueLabels]="
+                          prompt.config?.appearance?.showValueLabels || false
+                        "
+                        [showBoundLabels]="
+                          prompt.config?.appearance?.showBoundLabels || false
+                        "
+                        [formControlName]="prompt.formControlName"
+                      >
+                      </app-custom-rangeslider>
+                    </ng-container>
+
+                    <!-- Validation Error -->
+                    <div
+                      class="prompt-error"
+                      *ngIf="
+                        getPromptControl(prompt)?.invalid &&
+                        getPromptControl(prompt)?.touched
+                      "
+                    >
+                      <small
+                        class="p-error"
+                        *ngIf="getPromptControl(prompt)?.hasError('required')"
+                      >
+                        {{ prompt.name }} is required
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </p-accordionTab>
+            </p-accordion>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+  </div>
 </div>
 
 <!-- Save Dialog -->
 <div class="save-screen-popup" *ngIf="showSaveDialog">
-    <div class="popup-content">
-        <h3>{{ isEditMode ? 'Update Dataset' : 'Save as Dataset' }}</h3>
-        <form [formGroup]="saveForm" class="save-form">
-            <div class="form-field">
-                <app-custom-input formControlName="name" label="Name" placeholder="Enter dataset name"
-                    icon="pi-bookmark" [required]="true"
-                    [showError]="!!(saveForm.get('name')?.invalid && saveForm.get('name')?.touched)"
-                    errorMessage="Name is required">
-                </app-custom-input>
-            </div>
-            <div class="form-field">
-                <app-custom-input formControlName="description" label="Description"
-                    placeholder="Enter description (optional)" icon="pi-align-left">
-                </app-custom-input>
-                <small class="char-count">
-                    {{ saveForm.get('description')?.value?.length || 0 }}/500 characters
-                </small>
-            </div>
+  <div class="popup-content">
+    <h3>{{ isEditMode ? 'Update Dataset' : 'Save as Dataset' }}</h3>
+    <form [formGroup]="saveForm" class="save-form">
+      <div class="form-field">
+        <app-custom-input
+          formControlName="name"
+          label="Name"
+          placeholder="Enter dataset name"
+          icon="pi-bookmark"
+          [required]="true"
+          [showError]="
+            !!(saveForm.get('name')?.invalid && saveForm.get('name')?.touched)
+          "
+          errorMessage="Name is required"
+        >
+        </app-custom-input>
+      </div>
+      <div class="form-field">
+        <app-custom-input
+          formControlName="description"
+          label="Description"
+          placeholder="Enter description (optional)"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+        <small class="char-count">
+          {{ saveForm.get('description')?.value?.length || 0 }}/500 characters
+        </small>
+      </div>
 
-            <div class="popup-actions">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
-                    (click)="onSaveCancel()">
-                </button>
-                <button pButton type="submit" [label]="isEditMode ? 'Update' : 'Save'" class="p-button-outlined"
-                    [disabled]="saveForm.invalid || isSaving" (click)="onSaveConfirm()">
-                    <i class="pi pi-spin pi-spinner mr-2" *ngIf="isSaving"></i>
-                    <i class="pi pi-save mr-2" *ngIf="!isSaving"></i>
-                </button>
-            </div>
-        </form>
-    </div>
+      <div class="popup-actions">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-danger"
+          (click)="onSaveCancel()"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          [label]="isEditMode ? 'Update' : 'Save'"
+          class="p-button-outlined"
+          [disabled]="saveForm.invalid || isSaving"
+          (click)="onSaveConfirm()"
+        >
+          <i class="pi pi-spin pi-spinner mr-2" *ngIf="isSaving"></i>
+          <i class="pi pi-save mr-2" *ngIf="!isSaving"></i>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Execute Result Dialog -->
 <div class="execute-result-popup" *ngIf="showExecuteResult && executePayload">
-    <div class="popup-content">
-        <div class="popup-header-row">
-            <h3>Execution Config</h3>
-            <button class="popup-close-btn" type="button" (click)="onCloseExecuteResult()">
-                <i class="pi pi-times"></i>
-            </button>
-        </div>
-
-        <div class="execute-result-body" *ngIf="groupedValues.length > 0">
-            <p-tabView [scrollable]="true" styleClass="full-height-tabs">
-                <p-tabPanel *ngFor="let tab of groupedValues" [header]="tab.tabName">
-                    <p-accordion [multiple]="true">
-                        <p-accordionTab *ngFor="let section of tab.sections" [header]="section.sectionName"
-                            [selected]="true">
-                            <div class="result-table">
-                                <div class="result-row" *ngFor="let prompt of section.prompts">
-                                    <span class="result-name">{{ prompt.name }}</span>
-                                    <span class="result-value">{{ prompt.displayValue }}</span>
-                                </div>
-                            </div>
-                        </p-accordionTab>
-                    </p-accordion>
-                </p-tabPanel>
-            </p-tabView>
-        </div>
-
-        <div class="empty-state-inline" *ngIf="groupedValues.length === 0">
-            <i class="pi pi-info-circle"></i>
-            <span>No values selected</span>
-        </div>
-
-        <div class="execute-error" *ngIf="executeError">
-            <i class="pi pi-exclamation-triangle"></i>
-            <span>{{ executeError }}</span>
-        </div>
-
-        <div class="popup-actions">
-            <button class="btn-cancel" type="button" (click)="onCloseExecuteResult()">
-                <i class="pi pi-times"></i>
-                Close
-            </button>
-            <button class="btn-primary" type="button" (click)="onExecuteConfirm()" [disabled]="isSubmitting">
-                <i class="pi pi-spin pi-spinner" *ngIf="isSubmitting"></i>
-                <i class="pi pi-cog" *ngIf="!isSubmitting"></i>
-                {{ isSubmitting ? 'Generating...' : 'Generate' }}
-            </button>
-        </div>
+  <div class="popup-content">
+    <div class="popup-header-row">
+      <h3>Execution Config</h3>
+      <button
+        class="popup-close-btn"
+        type="button"
+        (click)="onCloseExecuteResult()"
+      >
+        <i class="pi pi-times"></i>
+      </button>
     </div>
+
+    <div class="execute-result-body" *ngIf="groupedValues.length > 0">
+      <p-tabView [scrollable]="true" styleClass="full-height-tabs">
+        <p-tabPanel *ngFor="let tab of groupedValues" [header]="tab.tabName">
+          <p-accordion [multiple]="true">
+            <p-accordionTab
+              *ngFor="let section of tab.sections"
+              [header]="section.sectionName"
+              [selected]="true"
+            >
+              <div class="result-table">
+                <div class="result-row" *ngFor="let prompt of section.prompts">
+                  <span class="result-name">{{ prompt.name }}</span>
+                  <span class="result-value">{{ prompt.displayValue }}</span>
+                </div>
+              </div>
+            </p-accordionTab>
+          </p-accordion>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+
+    <div class="empty-state-inline" *ngIf="groupedValues.length === 0">
+      <i class="pi pi-info-circle"></i>
+      <span>No values selected</span>
+    </div>
+
+    <div class="execute-error" *ngIf="executeError">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ executeError }}</span>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" type="button" (click)="onCloseExecuteResult()">
+        <i class="pi pi-times"></i>
+        Close
+      </button>
+      <button
+        class="btn-primary"
+        type="button"
+        (click)="onExecuteConfirm()"
+        [disabled]="isSubmitting"
+      >
+        <i class="pi pi-spin pi-spinner" *ngIf="isSubmitting"></i>
+        <i class="pi pi-cog" *ngIf="!isSubmitting"></i>
+        {{ isSubmitting ? 'Generating...' : 'Generate' }}
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- SQL Result Dialog -->
 <div class="sql-result-popup" *ngIf="showSqlResult">
-    <div class="popup-content">
-        <div class="popup-header-row">
-            <h3>Generated SQL</h3>
-            <button class="popup-close-btn" type="button" (click)="onCloseSqlResult()">
-                <i class="pi pi-times"></i>
-            </button>
-        </div>
-
-        <div class="sql-result-body">
-            <div class="sql-block">
-                <div class="sql-block-header">
-                    <span class="sql-block-label">SQL Query</span>
-                    <button class="btn-copy" type="button" (click)="copySqlToClipboard()" title="Copy to clipboard">
-                        <i class="pi pi-copy"></i>
-                    </button>
-                </div>
-                <pre class="sql-code">{{ generatedSql }}</pre>
-            </div>
-
-            <div class="sql-components" *ngIf="sqlComponents">
-                <div class="sql-component-row" *ngIf="sqlComponents.schema">
-                    <span class="component-label">Schema</span>
-                    <span class="component-value">{{ sqlComponents.schema }}</span>
-                </div>
-                <div class="sql-component-row" *ngIf="sqlComponents.tables?.length > 0">
-                    <span class="component-label">Tables</span>
-                    <span class="component-value">
-                        <span class="component-tag" *ngFor="let t of sqlComponents.tables">
-                            {{ t.name }} ({{ t.alias }})
-                        </span>
-                    </span>
-                </div>
-                <div class="sql-component-row" *ngIf="sqlComponents.columns?.length > 0">
-                    <span class="component-label">Columns</span>
-                    <span class="component-value">{{ sqlComponents.columns.join(', ') }}</span>
-                </div>
-                <div class="sql-component-row" *ngIf="sqlComponents.joins?.length > 0">
-                    <span class="component-label">Joins</span>
-                    <span class="component-value">
-                        <span class="component-tag" *ngFor="let j of sqlComponents.joins">{{ j }}</span>
-                    </span>
-                </div>
-                <div class="sql-component-row" *ngIf="sqlComponents.whereConditions?.length > 0">
-                    <span class="component-label">Filters</span>
-                    <span class="component-value">
-                        <span class="component-tag" *ngFor="let w of sqlComponents.whereConditions">{{ w }}</span>
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <div class="popup-actions">
-            <button class="btn-cancel" type="button" (click)="onCloseSqlResult()">
-                <i class="pi pi-times"></i>
-                Close
-            </button>
-            <button class="btn-primary" type="button" (click)="runGeneratedSql()"
-                [disabled]="isExecutingQuery || !generatedSql.trim()">
-                <i class="pi pi-spin pi-spinner" *ngIf="isExecutingQuery"></i>
-                <i class="pi pi-play" *ngIf="!isExecutingQuery"></i>
-                {{ isExecutingQuery ? 'Running...' : 'Run Query' }}
-            </button>
-        </div>
+  <div class="popup-content">
+    <div class="popup-header-row">
+      <h3>Generated SQL</h3>
+      <button
+        class="popup-close-btn"
+        type="button"
+        (click)="onCloseSqlResult()"
+      >
+        <i class="pi pi-times"></i>
+      </button>
     </div>
+
+    <div class="sql-result-body">
+      <div class="sql-block">
+        <div class="sql-block-header">
+          <span class="sql-block-label">SQL Query</span>
+          <button
+            class="btn-copy"
+            type="button"
+            (click)="copySqlToClipboard()"
+            title="Copy to clipboard"
+          >
+            <i class="pi pi-copy"></i>
+          </button>
+        </div>
+        <pre class="sql-code">{{ generatedSql }}</pre>
+      </div>
+
+      <div class="sql-components" *ngIf="sqlComponents">
+        <div class="sql-component-row" *ngIf="sqlComponents.schema">
+          <span class="component-label">Schema</span>
+          <span class="component-value">{{ sqlComponents.schema }}</span>
+        </div>
+        <div class="sql-component-row" *ngIf="sqlComponents.tables?.length > 0">
+          <span class="component-label">Tables</span>
+          <span class="component-value">
+            <span class="component-tag" *ngFor="let t of sqlComponents.tables">
+              {{ t.name }} ({{ t.alias }})
+            </span>
+          </span>
+        </div>
+        <div
+          class="sql-component-row"
+          *ngIf="sqlComponents.columns?.length > 0"
+        >
+          <span class="component-label">Columns</span>
+          <span class="component-value">{{
+            sqlComponents.columns.join(', ')
+          }}</span>
+        </div>
+        <div class="sql-component-row" *ngIf="sqlComponents.joins?.length > 0">
+          <span class="component-label">Joins</span>
+          <span class="component-value">
+            <span class="component-tag" *ngFor="let j of sqlComponents.joins">{{
+              j
+            }}</span>
+          </span>
+        </div>
+        <div
+          class="sql-component-row"
+          *ngIf="sqlComponents.whereConditions?.length > 0"
+        >
+          <span class="component-label">Filters</span>
+          <span class="component-value">
+            <span
+              class="component-tag"
+              *ngFor="let w of sqlComponents.whereConditions"
+              >{{ w }}</span
+            >
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" type="button" (click)="onCloseSqlResult()">
+        <i class="pi pi-times"></i>
+        Close
+      </button>
+      <button
+        class="btn-primary"
+        type="button"
+        (click)="runGeneratedSql()"
+        [disabled]="isExecutingQuery || !generatedSql.trim()"
+      >
+        <i class="pi pi-spin pi-spinner" *ngIf="isExecutingQuery"></i>
+        <i class="pi pi-play" *ngIf="!isExecutingQuery"></i>
+        {{ isExecutingQuery ? 'Running...' : 'Run Query' }}
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Query Results Popup -->
-<div class="results-popup-overlay" *ngIf="showResultsPopup && queryResult" (click)="closeResultsPopup()">
-    <div class="results-popup-container" (click)="$event.stopPropagation()"
-        [class.compact]="queryResult.error || queryResult.message || (queryResult.rows.length === 0 && queryResult.columns.length === 0)">
-        <!-- Popup Header -->
-        <div class="results-popup-header">
-            <div class="popup-header-left">
-                <i class="pi pi-table"></i>
-                <span class="popup-title">Query Results</span>
-                <span class="popup-meta" *ngIf="!queryResult.error && queryResult.columns.length > 0">
-                    {{ queryResult.rowCount }} row(s) in {{ queryResult.executionTime }}
-                </span>
-            </div>
-            <div class="popup-header-right">
-                <button pButton label="Clear Filters" icon="pi pi-filter-slash"
-                    class="p-button-outlined p-button-danger p-button-sm clear-filters-btn"
-                    (click)="clearResultFilters()" [disabled]="!isResultFilterActive"
-                    *ngIf="!queryResult.error && queryResult.columns.length > 0">
-                </button>
-                <button pButton class="p-button-text p-button-rounded p-button-sm" icon="pi pi-times"
-                    (click)="closeResultsPopup()" pTooltip="Close" tooltipPosition="bottom">
-                </button>
-            </div>
-        </div>
-
-        <!-- Popup Body -->
-        <div class="results-popup-body">
-            <!-- Error Message -->
-            <div class="results-error-card" *ngIf="queryResult.error">
-                <div class="error-icon-wrapper">
-                    <i class="pi pi-times"></i>
-                </div>
-                <h4>Query Execution Failed</h4>
-                <div class="error-message-box">
-                    <code>{{ queryResult.error }}</code>
-                </div>
-                <div class="error-meta" *ngIf="queryResult.executionTime">
-                    <i class="pi pi-clock"></i>
-                    <span>{{ queryResult.executionTime }}</span>
-                </div>
-            </div>
-
-            <!-- Success Message (for non-SELECT queries) -->
-            <div class="results-success-card" *ngIf="queryResult.message && !queryResult.error">
-                <div class="success-icon-wrapper">
-                    <i class="pi pi-check"></i>
-                </div>
-                <h4>Query Executed Successfully</h4>
-                <p class="success-message">{{ queryResult.message }}</p>
-                <div class="success-meta" *ngIf="queryResult.executionTime">
-                    <i class="pi pi-clock"></i>
-                    <span>{{ queryResult.executionTime }}</span>
-                </div>
-            </div>
-
-            <!-- Empty Results (columns exist but 0 rows) -->
-            <div class="results-empty-card"
-                *ngIf="!queryResult.error && !queryResult.message && queryResult.columns.length === 0 && queryResult.rows.length === 0">
-                <div class="empty-icon-wrapper">
-                    <i class="pi pi-inbox"></i>
-                </div>
-                <h4>No Results</h4>
-                <p>The query returned 0 rows.</p>
-            </div>
-
-            <!-- Results Table -->
-            <div class="results-table-container" *ngIf="!queryResult.error && queryResult.columns.length > 0">
-                <p-table [value]="queryResult.rows" [rows]="resultRows" [paginator]="isPaginationEnabled"
-                    [lazy]="isPaginationEnabled" (onLazyLoad)="onResultsLazyLoad($event)"
-                    [totalRecords]="queryResult.rowCount" [rowHover]="true"
-                    currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
-                    [rowsPerPageOptions]="[10, 25, 50, 100]" paginatorDropdownAppendTo="body" styleClass="p-datatable-sm modern-table"
-                    [scrollable]="true" scrollHeight="calc(80vh - 200px)">
-
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th style="width: 60px" pFrozenColumn>#</th>
-                            <th *ngFor="let col of queryResult.columns">
-                                <div class="th-content">{{ col }}</div>
-                            </th>
-                        </tr>
-                        <!-- Filter Row -->
-                        <tr>
-                            <th pFrozenColumn></th>
-                            <th *ngFor="let col of queryResult.columns">
-                                <input pInputText type="text" [(ngModel)]="resultFilterValues[col]"
-                                    (input)="onResultFilterChange()" [placeholder]="'Search ' + col"
-                                    class="w-full p-column-filter">
-                            </th>
-                        </tr>
-                    </ng-template>
-
-                    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
-                        <tr>
-                            <td pFrozenColumn class="row-number-cell">{{ rowIndex + 1 }}</td>
-                            <td *ngFor="let col of queryResult.columns" [title]="row[col]">
-                                <span [ngClass]="{'null-value': row[col] === null || row[col] === undefined}">
-                                    {{ row[col] !== null && row[col] !== undefined ? row[col] : 'NULL' }}
-                                </span>
-                            </td>
-                        </tr>
-                    </ng-template>
-
-                    <ng-template pTemplate="emptymessage">
-                        <tr>
-                            <td [attr.colspan]="queryResult.columns.length + 1" class="empty-message-cell text-center">
-                                No matching records found
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </div>
-        </div>
+<div
+  class="results-popup-overlay"
+  *ngIf="showResultsPopup && queryResult"
+  (click)="closeResultsPopup()"
+>
+  <div
+    class="results-popup-container"
+    (click)="$event.stopPropagation()"
+    [class.compact]="
+      queryResult.error ||
+      queryResult.message ||
+      (queryResult.rows.length === 0 && queryResult.columns.length === 0)
+    "
+  >
+    <!-- Popup Header -->
+    <div class="results-popup-header">
+      <div class="popup-header-left">
+        <i class="pi pi-table"></i>
+        <span class="popup-title">Query Results</span>
+        <span
+          class="popup-meta"
+          *ngIf="!queryResult.error && queryResult.columns.length > 0"
+        >
+          {{ queryResult.rowCount }} row(s) in {{ queryResult.executionTime }}
+        </span>
+      </div>
+      <div class="popup-header-right">
+        <button
+          pButton
+          label="Clear Filters"
+          icon="pi pi-filter-slash"
+          class="p-button-outlined p-button-danger p-button-sm clear-filters-btn"
+          (click)="clearResultFilters()"
+          [disabled]="!isResultFilterActive"
+          *ngIf="!queryResult.error && queryResult.columns.length > 0"
+        ></button>
+        <button
+          pButton
+          class="p-button-text p-button-rounded p-button-sm"
+          icon="pi pi-times"
+          (click)="closeResultsPopup()"
+          pTooltip="Close"
+          tooltipPosition="bottom"
+        ></button>
+      </div>
     </div>
+
+    <!-- Popup Body -->
+    <div class="results-popup-body">
+      <!-- Error Message -->
+      <div class="results-error-card" *ngIf="queryResult.error">
+        <div class="error-icon-wrapper">
+          <i class="pi pi-times"></i>
+        </div>
+        <h4>Query Execution Failed</h4>
+        <div class="error-message-box">
+          <code>{{ queryResult.error }}</code>
+        </div>
+        <div class="error-meta" *ngIf="queryResult.executionTime">
+          <i class="pi pi-clock"></i>
+          <span>{{ queryResult.executionTime }}</span>
+        </div>
+      </div>
+
+      <!-- Success Message (for non-SELECT queries) -->
+      <div
+        class="results-success-card"
+        *ngIf="queryResult.message && !queryResult.error"
+      >
+        <div class="success-icon-wrapper">
+          <i class="pi pi-check"></i>
+        </div>
+        <h4>Query Executed Successfully</h4>
+        <p class="success-message">{{ queryResult.message }}</p>
+        <div class="success-meta" *ngIf="queryResult.executionTime">
+          <i class="pi pi-clock"></i>
+          <span>{{ queryResult.executionTime }}</span>
+        </div>
+      </div>
+
+      <!-- Empty Results (columns exist but 0 rows) -->
+      <div
+        class="results-empty-card"
+        *ngIf="
+          !queryResult.error &&
+          !queryResult.message &&
+          queryResult.columns.length === 0 &&
+          queryResult.rows.length === 0
+        "
+      >
+        <div class="empty-icon-wrapper">
+          <i class="pi pi-inbox"></i>
+        </div>
+        <h4>No Results</h4>
+        <p>The query returned 0 rows.</p>
+      </div>
+
+      <!-- Results Table -->
+      <div
+        class="results-table-container"
+        *ngIf="!queryResult.error && queryResult.columns.length > 0"
+      >
+        <p-table
+          [value]="queryResult.rows"
+          [rows]="resultRows"
+          [paginator]="isPaginationEnabled"
+          [lazy]="isPaginationEnabled"
+          (onLazyLoad)="onResultsLazyLoad($event)"
+          [totalRecords]="queryResult.rowCount"
+          [rowHover]="true"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10, 25, 50, 100]"
+          paginatorDropdownAppendTo="body"
+          styleClass="p-datatable-sm modern-table"
+          [scrollable]="true"
+          scrollHeight="calc(80vh - 200px)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 60px" pFrozenColumn>#</th>
+              <th *ngFor="let col of queryResult.columns">
+                <div class="th-content">{{ col }}</div>
+              </th>
+            </tr>
+            <!-- Filter Row -->
+            <tr>
+              <th pFrozenColumn></th>
+              <th *ngFor="let col of queryResult.columns">
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="resultFilterValues[col]"
+                  (input)="onResultFilterChange()"
+                  [placeholder]="'Search ' + col"
+                  class="w-full p-column-filter"
+                />
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+            <tr>
+              <td pFrozenColumn class="row-number-cell">{{ rowIndex + 1 }}</td>
+              <td *ngFor="let col of queryResult.columns" [title]="row[col]">
+                <span
+                  [ngClass]="{
+                    'null-value': row[col] === null || row[col] === undefined,
+                  }"
+                >
+                  {{
+                    row[col] !== null && row[col] !== undefined
+                      ? row[col]
+                      : 'NULL'
+                  }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td
+                [attr.colspan]="queryResult.columns.length + 1"
+                class="empty-message-cell text-center"
+              >
+                No matching records found
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
 </div>

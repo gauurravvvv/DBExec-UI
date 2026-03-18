@@ -43,13 +43,13 @@ export class ChangePasswordDialogComponent implements OnInit {
           [
             Validators.required,
             Validators.pattern(
-              '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'
+              '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$',
             ),
           ],
         ],
         confirmPassword: ['', Validators.required],
       },
-      { validator: this.passwordMatchValidator }
+      { validator: this.passwordMatchValidator },
     );
   }
 

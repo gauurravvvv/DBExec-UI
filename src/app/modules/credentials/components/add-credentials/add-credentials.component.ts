@@ -35,7 +35,7 @@ export class AddCredentialsComponent implements OnInit {
     private organisationService: OrganisationService,
     private categoryService: CategoryService,
     private globalService: GlobalService,
-    private credentialService: CredentialService
+    private credentialService: CredentialService,
   ) {
     this.initForm();
   }
@@ -199,7 +199,7 @@ export class AddCredentialsComponent implements OnInit {
               value: ['', Validators.required],
               sequence: [config.sequence],
               showPassword: [false],
-            })
+            }),
           );
         });
 
@@ -235,7 +235,7 @@ export class AddCredentialsComponent implements OnInit {
         credentials: formData.credentialSets.map((set: any) => ({
           values: set.credentials.map((cred: any) => ({
             configId: this.categoryData.configurations.find(
-              (config: any) => config.fieldName === cred.fieldName
+              (config: any) => config.fieldName === cred.fieldName,
             )?.id,
             value: cred.value,
           })),
@@ -257,7 +257,7 @@ export class AddCredentialsComponent implements OnInit {
       const credentials = this.getCredentialsFormArray(set);
       return credentials.controls.every(
         control =>
-          control.get('value')?.valid && control.get('value')?.value !== ''
+          control.get('value')?.valid && control.get('value')?.value !== '',
       );
     });
   }

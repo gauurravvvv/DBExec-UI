@@ -8,9 +8,8 @@ describe('EditOrgAdminComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EditOrgAdminComponent ]
-    })
-    .compileComponents();
+      declarations: [EditOrgAdminComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(EditOrgAdminComponent);
     component = fixture.componentInstance;

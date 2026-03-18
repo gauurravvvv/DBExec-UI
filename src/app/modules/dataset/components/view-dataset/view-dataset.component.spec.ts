@@ -8,9 +8,8 @@ describe('ViewDatasetComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ViewDatasetComponent ]
-    })
-    .compileComponents();
+      declarations: [ViewDatasetComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ViewDatasetComponent);
     component = fixture.componentInstance;

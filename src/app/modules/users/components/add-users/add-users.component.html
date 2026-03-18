@@ -3,16 +3,32 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" routerLink="/app/users">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/users"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Add User</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" [disabled]="!isFormDirty"
-          (click)="onCancel()"></button>
-        <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-          [disabled]="userForm.invalid">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="userForm.invalid"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -22,43 +38,97 @@
     <form [formGroup]="userForm" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
-        <app-custom-input formControlName="firstName" label="First Name" placeholder="Enter first name" icon="pi-user"
-          [required]="true" [showError]="!!(userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched)"
-          [errorMessage]="userForm.get('firstName')?.errors?.['required'] ? 'First name is required' : 
-                         userForm.get('firstName')?.errors?.['minlength'] ? 'First name must be at least ' + userForm.get('firstName')?.errors?.['minlength'].requiredLength + ' characters' :
-                         userForm.get('firstName')?.errors?.['pattern'] ? 'First name can only contain letters and hyphens' : ''">
+        <app-custom-input
+          formControlName="firstName"
+          label="First Name"
+          placeholder="Enter first name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('firstName')?.invalid &&
+              userForm.get('firstName')?.touched
+            )
+          "
+          [errorMessage]="getFirstNameError()"
+        >
         </app-custom-input>
 
         <!-- Last Name -->
-        <app-custom-input formControlName="lastName" label="Last Name" placeholder="Enter last name" icon="pi-user"
-          [required]="true" [showError]="!!(userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched)"
-          [errorMessage]="userForm.get('lastName')?.errors?.['required'] ? 'Last name is required' : 
-                         userForm.get('lastName')?.errors?.['minlength'] ? 'Last name must be at least ' + userForm.get('lastName')?.errors?.['minlength'].requiredLength + ' characters' :
-                         userForm.get('lastName')?.errors?.['pattern'] ? 'Last name can only contain letters and hyphens' : ''">
+        <app-custom-input
+          formControlName="lastName"
+          label="Last Name"
+          placeholder="Enter last name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('lastName')?.invalid &&
+              userForm.get('lastName')?.touched
+            )
+          "
+          [errorMessage]="getLastNameError()"
+        >
         </app-custom-input>
 
         <!-- Organisation Dropdown -->
-        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation"
-          placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
-          [filter]="true" filterBy="name" [required]="true"
-          [showError]="!!(userForm.get('organisation')?.invalid && userForm.get('organisation')?.touched)"
-          errorMessage="Organisation is required">
+        <app-custom-dropdown
+          *ngIf="showOrganisationDropdown"
+          formControlName="organisation"
+          label="Organisation"
+          placeholder="Select Organisation"
+          [options]="organisations"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('organisation')?.invalid &&
+              userForm.get('organisation')?.touched
+            )
+          "
+          errorMessage="Organisation is required"
+        >
         </app-custom-dropdown>
 
         <!-- Username -->
-        <app-custom-input formControlName="username" label="Username" placeholder="Enter username" icon="pi-user-edit"
-          [required]="true" [showError]="!!(userForm.get('username')?.invalid && userForm.get('username')?.touched)"
-          [errorMessage]="userForm.get('username')?.errors?.['required'] ? 'Username is required' : 
-                         userForm.get('username')?.errors?.['minlength'] ? 'Username must be at least ' + userForm.get('username')?.errors?.['minlength'].requiredLength + ' characters' :
-                         userForm.get('username')?.errors?.['maxlength'] ? 'Username cannot exceed ' + userForm.get('username')?.errors?.['maxlength'].requiredLength + ' characters' :
-                         userForm.get('username')?.errors?.['pattern'] ? 'Username can only contain letters, numbers, dots, hyphens and underscores' : ''">
+        <app-custom-input
+          formControlName="username"
+          label="Username"
+          placeholder="Enter username"
+          icon="pi-user-edit"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('username')?.invalid &&
+              userForm.get('username')?.touched
+            )
+          "
+          [errorMessage]="getUsernameError()"
+        >
         </app-custom-input>
 
         <!-- Email -->
-        <app-custom-input formControlName="email" label="Email" placeholder="Enter email address" icon="pi-envelope"
-          type="email" [required]="true"
-          [showError]="!!(userForm.get('email')?.invalid && userForm.get('email')?.touched)" [errorMessage]="userForm.get('email')?.errors?.['required'] ? 'Email is required' : 
-                         userForm.get('email')?.errors?.['email'] ? 'Please enter a valid email' : ''">
+        <app-custom-input
+          formControlName="email"
+          label="Email"
+          placeholder="Enter email address"
+          icon="pi-envelope"
+          type="email"
+          [required]="true"
+          [showError]="
+            !!(userForm.get('email')?.invalid && userForm.get('email')?.touched)
+          "
+          [errorMessage]="
+            userForm.get('email')?.errors?.['required']
+              ? 'Email is required'
+              : userForm.get('email')?.errors?.['email']
+                ? 'Please enter a valid email'
+                : ''
+          "
+        >
         </app-custom-input>
 
         <!-- Password -->
@@ -66,24 +136,34 @@
           <label for="password">Password<span class="required"> *</span></label>
           <span class="p-input-icon-left p-input-icon-right">
             <i class="pi pi-lock"></i>
-            <input id="password" [type]="showPassword ? 'text' : 'password'" pInputText formControlName="password"
-              placeholder="Enter password" [ngClass]="{
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              pInputText
+              formControlName="password"
+              placeholder="Enter password"
+              [ngClass]="{
                 'ng-invalid ng-dirty':
                   userForm.get('password')?.invalid &&
-                  userForm.get('password')?.touched
-              }" />
-            <i class="pi pi-eye" style="cursor: pointer" (click)="togglePassword($event)"></i>
+                  userForm.get('password')?.touched,
+              }"
+            />
+            <i
+              class="pi pi-eye"
+              style="cursor: pointer"
+              (click)="togglePassword($event)"
+            ></i>
           </span>
-          <small class="error-message" *ngIf="
+          <small
+            class="error-message"
+            *ngIf="
               userForm.get('password')?.invalid &&
               userForm.get('password')?.touched
-            ">
-            Password must contain at least 8 characters, one uppercase letter,
-            one lowercase letter, one number and one special character
+            "
+          >
+            {{ getPasswordError() }}
           </small>
         </div>
-
-
       </div>
     </form>
   </div>

@@ -1,87 +1,152 @@
 <div class="add-admin-wrapper">
-    <div class="add-admin-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/prompt">
-                    <i class="pi pi-arrow-left text-xl"></i>
-                </button>
-                <h2>Edit Prompt</h2>
-            </div>
-            <div class="action-buttons">
-                <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-                    [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()">
-                </button>
-                <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-                    [disabled]="promptForm.invalid || !isFormDirty">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Form Section -->
-        <form [formGroup]="promptForm" class="admin-form" #formContainer>
-            <div class="form-container">
-                <!-- Left Column -->
-                <div class="form-grid left-column">
-                    <!-- Name Field -->
-                    <div class="form-field">
-                        <app-custom-input formControlName="name" label="Name" placeholder="Enter name" icon="pi-box"
-                            [required]="true"
-                            [showError]="!!(promptForm.get('name')?.invalid && promptForm.get('name')?.touched)"
-                            [errorMessage]="promptForm.get('name')?.errors?.['required'] ? 'Name is required' : 
-                                           promptForm.get('name')?.errors?.['pattern'] ? 'Name can only contain letters, spaces and hyphens' : ''">
-                        </app-custom-input>
-                    </div>
-
-                    <!-- Description Field -->
-                    <div class="form-field">
-                        <app-custom-input formControlName="description" label="Description"
-                            placeholder="Enter description" icon="pi-align-left">
-                        </app-custom-input>
-                    </div>
-
-                    <!-- Organisation and Database fields (disabled) -->
-                    <div class="form-field" *ngIf="showOrganisationDropdown">
-                        <label for="organisation">Organisation</label>
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-building"></i>
-                            <input id="organisation" type="text" pInputText [value]="selectedOrgName" disabled>
-                        </span>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="database">Database</label>
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-database"></i>
-                            <input id="database" type="text" pInputText [value]="selectedDatabaseName" disabled>
-                        </span>
-                    </div>
-
-                    <div class="form-field">
-                        <label for="tab">Tab</label>
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-box"></i>
-                            <input id="tab" type="text" pInputText [value]="selectedTabName" disabled>
-                        </span>
-                    </div>
-
-                    <!-- Section dropdown -->
-                    <div class="form-field">
-                        <app-custom-dropdown formControlName="section" label="Section" placeholder="Select Section"
-                            [options]="sections" optionLabel="name" optionValue="id" [filter]="true" filterBy="name"
-                            [required]="true"
-                            [showError]="!!(promptForm.get('section')?.invalid && promptForm.get('section')?.touched)"
-                            errorMessage="Section is required">
-                        </app-custom-dropdown>
-                    </div>
-
-                    <!-- Status -->
-                    <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0"
-                        trueLabel="Active" falseLabel="Inactive">
-                    </app-custom-toggle>
-                </div>
-            </div>
-        </form>
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          routerLink="/app/prompt"
+        >
+          <i class="pi pi-arrow-left text-xl"></i>
+        </button>
+        <h2>Edit Prompt</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty || isCancelClicked"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="promptForm.invalid || !isFormDirty"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
     </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="promptForm" class="admin-form" #formContainer>
+      <div class="form-container">
+        <!-- Left Column -->
+        <div class="form-grid left-column">
+          <!-- Name Field -->
+          <div class="form-field">
+            <app-custom-input
+              formControlName="name"
+              label="Name"
+              placeholder="Enter name"
+              icon="pi-box"
+              [required]="true"
+              [showError]="
+                !!(
+                  promptForm.get('name')?.invalid &&
+                  promptForm.get('name')?.touched
+                )
+              "
+              [errorMessage]="getNameError()"
+            >
+            </app-custom-input>
+          </div>
+
+          <!-- Description Field -->
+          <div class="form-field">
+            <app-custom-input
+              formControlName="description"
+              label="Description"
+              placeholder="Enter description"
+              icon="pi-align-left"
+            >
+            </app-custom-input>
+          </div>
+
+          <!-- Organisation and Database fields (disabled) -->
+          <div class="form-field" *ngIf="showOrganisationDropdown">
+            <label for="organisation">Organisation</label>
+            <span class="p-input-icon-left">
+              <i class="pi pi-building"></i>
+              <input
+                id="organisation"
+                type="text"
+                pInputText
+                [value]="selectedOrgName"
+                disabled
+              />
+            </span>
+          </div>
+
+          <div class="form-field">
+            <label for="database">Database</label>
+            <span class="p-input-icon-left">
+              <i class="pi pi-database"></i>
+              <input
+                id="database"
+                type="text"
+                pInputText
+                [value]="selectedDatabaseName"
+                disabled
+              />
+            </span>
+          </div>
+
+          <div class="form-field">
+            <label for="tab">Tab</label>
+            <span class="p-input-icon-left">
+              <i class="pi pi-box"></i>
+              <input
+                id="tab"
+                type="text"
+                pInputText
+                [value]="selectedTabName"
+                disabled
+              />
+            </span>
+          </div>
+
+          <!-- Section dropdown -->
+          <div class="form-field">
+            <app-custom-dropdown
+              formControlName="section"
+              label="Section"
+              placeholder="Select Section"
+              [options]="sections"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              filterBy="name"
+              [required]="true"
+              [showError]="
+                !!(
+                  promptForm.get('section')?.invalid &&
+                  promptForm.get('section')?.touched
+                )
+              "
+              errorMessage="Section is required"
+            >
+            </app-custom-dropdown>
+          </div>
+
+          <!-- Status -->
+          <app-custom-toggle
+            formControlName="status"
+            label="Status"
+            [trueValue]="1"
+            [falseValue]="0"
+            trueLabel="Active"
+            falseLabel="Inactive"
+          >
+          </app-custom-toggle>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

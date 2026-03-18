@@ -27,7 +27,7 @@ export class EditSuperAdminComponent implements OnInit {
     private superAdminService: SuperAdminService,
     private router: Router,
     private route: ActivatedRoute,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit(): void {
@@ -48,7 +48,7 @@ export class EditSuperAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.firstName),
         ],
@@ -57,7 +57,7 @@ export class EditSuperAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.lastName),
         ],
@@ -117,8 +117,10 @@ export class EditSuperAdminComponent implements OnInit {
     if (control?.errors?.['required']) return 'First name is required';
     if (control?.errors?.['minlength'])
       return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `First name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
-      return 'First name can only contain letters and hyphens';
+      return 'First name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
     return '';
   }
 
@@ -127,8 +129,10 @@ export class EditSuperAdminComponent implements OnInit {
     if (control?.errors?.['required']) return 'Last name is required';
     if (control?.errors?.['minlength'])
       return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Last name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
-      return 'Last name can only contain letters and hyphens';
+      return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
     return '';
   }
 }

@@ -8,9 +8,8 @@ describe('AddPromptComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AddPromptComponent ]
-    })
-    .compileComponents();
+      declarations: [AddPromptComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AddPromptComponent);
     component = fixture.componentInstance;

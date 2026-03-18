@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private authService: LoginService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   private getDefaultRouteByRole(): string {
@@ -39,7 +39,7 @@ export class AuthGuard implements CanActivate {
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
+    state: RouterStateSnapshot,
   ): boolean {
     if (state.url === '/login') {
       if (this.authService.isLoggedIn()) {

@@ -1,6 +1,5 @@
 <div class="dataset-page-wrapper">
   <div class="dataset-content-container">
-
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
@@ -15,60 +14,84 @@
         <div class="toolbar-left">
           <!-- Organisation Dropdown -->
           <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-            <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name" optionValue="id"
-              [filter]="true" label="Organisation" [floatingLabel]="true" filterBy="name"
-              (onChangeEvent)="onOrgChange($event)">
+            <app-custom-dropdown
+              [(ngModel)]="selectedOrg"
+              [options]="organisations"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              label="Organisation"
+              [floatingLabel]="true"
+              filterBy="name"
+              (onChangeEvent)="onOrgChange($event)"
+            >
             </app-custom-dropdown>
           </div>
         </div>
 
         <div class="toolbar-right">
           <!-- Clear Filters Button -->
-          <button pButton label="Clear Filters" icon="pi pi-filter-slash" (click)="clearFilters()"
-            [disabled]="!isFilterActive" class="p-button-outlined p-button-danger modern-button mr-2">
-          </button>
+          <button
+            pButton
+            label="Clear Filters"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button mr-2"
+          ></button>
 
           <!-- Add Button -->
-          <button pButton label="Add" icon="pi pi-plus" (click)="onAddNewDatabase()"
-            class="p-button-raised p-button-primary modern-button">
-          </button>
+          <button
+            pButton
+            label="Add"
+            icon="pi pi-plus"
+            (click)="onAddNewDatabase()"
+            class="p-button-raised p-button-primary modern-button"
+          ></button>
         </div>
       </div>
 
       <!-- Table -->
       <div class="table-wrapper">
-        <p-table #dt [value]="dbs" [rows]="10" [paginator]="true" [lazy]="true" (onLazyLoad)="loadDatabases($event)"
-          [totalRecords]="totalItems" [globalFilterFields]="['name', 'description', 'config.dbType', 'status']"
-          [rowHover]="true" dataKey="id" currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-sm modern-table"
-          [scrollable]="true" scrollHeight="calc(100vh - 440px)">
-
+        <p-table
+          #dt
+          [value]="dbs"
+          [rows]="10"
+          [paginator]="true"
+          [lazy]="true"
+          (onLazyLoad)="loadDatabases($event)"
+          [totalRecords]="totalItems"
+          [globalFilterFields]="[
+            'name',
+            'description',
+            'config.dbType',
+            'status',
+          ]"
+          [rowHover]="true"
+          dataKey="id"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10, 25, 50, 100]"
+          styleClass="p-datatable-sm modern-table"
+          [scrollable]="true"
+          scrollHeight="calc(100vh - 440px)"
+        >
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 25%" pFrozenColumn>
-                <div class="th-content">
-                  Name
-                </div>
+                <div class="th-content">Name</div>
               </th>
               <th style="width: 25%">
-                <div class="th-content">
-                  Description
-                </div>
+                <div class="th-content">Description</div>
               </th>
               <th style="width: 15%">
-                <div class="th-content">
-                  Type
-                </div>
+                <div class="th-content">Type</div>
               </th>
               <th style="width: 15%">
-                <div class="th-content">
-                  Status
-                </div>
+                <div class="th-content">Status</div>
               </th>
               <th style="width: 15%">
-                <div class="th-content">
-                  Created
-                </div>
+                <div class="th-content">Created</div>
               </th>
               <th style="width: 5%">
                 <!-- Actions -->
@@ -77,12 +100,24 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input pInputText type="text" [(ngModel)]="filterValues.name" (input)="onFilterChange()"
-                  placeholder="Search Name" class="w-full p-column-filter">
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.name"
+                  (input)="onFilterChange()"
+                  placeholder="Search Name"
+                  class="w-full p-column-filter"
+                />
               </th>
               <th>
-                <input pInputText type="text" [(ngModel)]="filterValues.description" (input)="onFilterChange()"
-                  placeholder="Search Description" class="w-full p-column-filter">
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.description"
+                  (input)="onFilterChange()"
+                  placeholder="Search Description"
+                  class="w-full p-column-filter"
+                />
               </th>
               <th>
                 <!-- No filter for Type currently, or add if needed. Keeping it empty for now as requested filter list was Name, Desc, Status -->
@@ -104,8 +139,15 @@
           <ng-template pTemplate="body" let-db>
             <tr class="modern-row">
               <td pFrozenColumn>
-                <a class="dataset-name-link"
-                  [routerLink]="['/app/database/view', db.organisationId, db.id, db.isMasterDB ? 1 : 0]">
+                <a
+                  class="dataset-name-link"
+                  [routerLink]="[
+                    '/app/database/view',
+                    db.organisationId,
+                    db.id,
+                    db.isMasterDB ? 1 : 0,
+                  ]"
+                >
                   {{ db.name }}
                   <span class="master-badge" *ngIf="db.isMasterDB">
                     <i class="pi pi-star-fill"></i>
@@ -114,27 +156,46 @@
                 </a>
               </td>
               <td>
-                <span class="description-text" [title]="db.description">{{ db.description || '-' }}</span>
+                <span class="description-text" [title]="db.description">{{
+                  db.description || '-'
+                }}</span>
               </td>
               <td>
                 <span class="pill">{{ 'PostgreSQL' }}</span>
               </td>
               <td>
-                <span class="status-indicator" [ngClass]="{'active': db.status === 1, 'inactive': db.status !== 1}">
+                <span
+                  class="status-indicator"
+                  [ngClass]="{
+                    active: db.status === 1,
+                    inactive: db.status !== 1,
+                  }"
+                >
                   <span class="dot"></span>
                   {{ db.status === 1 ? 'Active' : 'Inactive' }}
                 </span>
               </td>
               <td>
-                <span class="date-text">{{ db.createdOn | date:'medium' }}</span>
+                <span class="date-text">{{
+                  db.createdOn | date: 'medium'
+                }}</span>
               </td>
               <td>
                 <div class="row-actions">
-                  <button class="icon-btn edit-btn" (click)="onEdit(db.id)" pTooltip="Edit" tooltipPosition="bottom">
+                  <button
+                    class="icon-btn edit-btn"
+                    (click)="onEdit(db.id)"
+                    pTooltip="Edit"
+                    tooltipPosition="bottom"
+                  >
                     <i class="pi pi-pencil"></i>
                   </button>
-                  <button class="icon-btn delete-btn" (click)="confirmDelete(db)" pTooltip="Delete"
-                    tooltipPosition="bottom">
+                  <button
+                    class="icon-btn delete-btn"
+                    (click)="confirmDelete(db)"
+                    pTooltip="Delete"
+                    tooltipPosition="bottom"
+                  >
                     <i class="pi pi-trash"></i>
                   </button>
                 </div>
@@ -155,13 +216,27 @@
 </div>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content" [class.master-warning]="selectedDatabase?.isMasterDB">
+  <div
+    class="popup-content"
+    [class.master-warning]="selectedDatabase?.isMasterDB"
+  >
     <!-- Header -->
     <div class="popup-header">
       <div class="popup-icon" [class.danger]="selectedDatabase?.isMasterDB">
-        <i class="pi" [ngClass]="selectedDatabase?.isMasterDB ? 'pi-exclamation-triangle' : 'pi-trash'"></i>
+        <i
+          class="pi"
+          [ngClass]="
+            selectedDatabase?.isMasterDB
+              ? 'pi-exclamation-triangle'
+              : 'pi-trash'
+          "
+        ></i>
       </div>
-      <h3>{{ selectedDatabase?.isMasterDB ? 'Critical Warning' : 'Confirm Delete' }}</h3>
+      <h3>
+        {{
+          selectedDatabase?.isMasterDB ? 'Critical Warning' : 'Confirm Delete'
+        }}
+      </h3>
     </div>
 
     <!-- Standard Delete Section (Non-Master DB) -->
@@ -171,9 +246,7 @@
         <span>{{ selectedDatabase?.name }}</span>
       </div>
 
-      <p class="delete-intro">
-        Are you sure you want to delete this database?
-      </p>
+      <p class="delete-intro">Are you sure you want to delete this database?</p>
 
       <ul class="delete-info-list">
         <li>
@@ -199,7 +272,8 @@
       </div>
 
       <p class="warning-intro">
-        You are about to delete <strong>{{ selectedDatabase?.name }}</strong>, which is the master database.
+        You are about to delete <strong>{{ selectedDatabase?.name }}</strong
+        >, which is the master database.
       </p>
 
       <ul class="warning-list">
@@ -222,11 +296,13 @@
       </ul>
 
       <div class="checkbox-option">
-        <p-checkbox [(ngModel)]="deleteConfiguration" [binary]="true" inputId="deleteConfig">
+        <p-checkbox
+          [(ngModel)]="deleteConfiguration"
+          [binary]="true"
+          inputId="deleteConfig"
+        >
         </p-checkbox>
-        <label for="deleteConfig">
-          Also delete associated system data
-        </label>
+        <label for="deleteConfig"> Also delete associated system data </label>
       </div>
     </div>
 

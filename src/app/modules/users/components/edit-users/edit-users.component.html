@@ -3,16 +3,32 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" routerLink="/app/users">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/users"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Edit User</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-          [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()"></button>
-        <button pButton class="p-button-primary btn-save" type="submit" label="Save"
-          [disabled]="userForm.invalid || !isFormDirty" (click)="onSubmit()">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty || isCancelClicked"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          [disabled]="userForm.invalid || !isFormDirty"
+          (click)="onSubmit()"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -22,19 +38,37 @@
     <form [formGroup]="userForm" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
-        <app-custom-input formControlName="firstName" label="First Name" placeholder="Enter first name" icon="pi-user"
-          [required]="true" [showError]="!!(userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched)"
-          [errorMessage]="userForm.get('firstName')?.errors?.['required'] ? 'First name is required' : 
-                         userForm.get('firstName')?.errors?.['minlength'] ? 'First name must be at least ' + userForm.get('firstName')?.errors?.['minlength'].requiredLength + ' characters' :
-                         userForm.get('firstName')?.errors?.['pattern'] ? 'First name can only contain letters and hyphens' : ''">
+        <app-custom-input
+          formControlName="firstName"
+          label="First Name"
+          placeholder="Enter first name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('firstName')?.invalid &&
+              userForm.get('firstName')?.touched
+            )
+          "
+          [errorMessage]="getFirstNameError()"
+        >
         </app-custom-input>
 
         <!-- Last Name -->
-        <app-custom-input formControlName="lastName" label="Last Name" placeholder="Enter last name" icon="pi-user"
-          [required]="true" [showError]="!!(userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched)"
-          [errorMessage]="userForm.get('lastName')?.errors?.['required'] ? 'Last name is required' : 
-                         userForm.get('lastName')?.errors?.['minlength'] ? 'Last name must be at least ' + userForm.get('lastName')?.errors?.['minlength'].requiredLength + ' characters' :
-                         userForm.get('lastName')?.errors?.['pattern'] ? 'Last name can only contain letters and hyphens' : ''">
+        <app-custom-input
+          formControlName="lastName"
+          label="Last Name"
+          placeholder="Enter last name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('lastName')?.invalid &&
+              userForm.get('lastName')?.touched
+            )
+          "
+          [errorMessage]="getLastNameError()"
+        >
         </app-custom-input>
 
         <!-- Organisation (readonly) -->
@@ -42,8 +76,15 @@
           <label for="organisation">Organisation</label>
           <span class="p-input-icon-left">
             <i class="pi pi-building"></i>
-            <input id="organisation" type="text" pInputText [value]="selectedOrgName" placeholder="Organisation"
-              readonly class="readonly" />
+            <input
+              id="organisation"
+              type="text"
+              pInputText
+              [value]="selectedOrgName"
+              placeholder="Organisation"
+              readonly
+              class="readonly"
+            />
           </span>
         </div>
 
@@ -52,22 +93,48 @@
           <label for="username">Username <span class="required">*</span></label>
           <span class="p-input-icon-left">
             <i class="pi pi-user-edit"></i>
-            <input id="username" type="text" pInputText formControlName="username" placeholder="Enter username" readonly
-              class="readonly" />
+            <input
+              id="username"
+              type="text"
+              pInputText
+              formControlName="username"
+              placeholder="Enter username"
+              readonly
+              class="readonly"
+            />
           </span>
         </div>
 
         <!-- Email -->
-        <app-custom-input formControlName="email" label="Email" placeholder="Enter email address" icon="pi-envelope"
-          type="email" [required]="true"
-          [showError]="!!(userForm.get('email')?.invalid && userForm.get('email')?.touched)" [errorMessage]="userForm.get('email')?.errors?.['required'] ? 'Email is required' : 
-                         userForm.get('email')?.errors?.['email'] ? 'Please enter a valid email' : ''">
+        <app-custom-input
+          formControlName="email"
+          label="Email"
+          placeholder="Enter email address"
+          icon="pi-envelope"
+          type="email"
+          [required]="true"
+          [showError]="
+            !!(userForm.get('email')?.invalid && userForm.get('email')?.touched)
+          "
+          [errorMessage]="
+            userForm.get('email')?.errors?.['required']
+              ? 'Email is required'
+              : userForm.get('email')?.errors?.['email']
+                ? 'Please enter a valid email'
+                : ''
+          "
+        >
         </app-custom-input>
 
-
         <!-- Status -->
-        <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0" trueLabel="Active"
-          falseLabel="Inactive">
+        <app-custom-toggle
+          formControlName="status"
+          label="Status"
+          [trueValue]="1"
+          [falseValue]="0"
+          trueLabel="Active"
+          falseLabel="Inactive"
+        >
         </app-custom-toggle>
       </div>
     </form>

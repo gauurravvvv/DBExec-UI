@@ -4,7 +4,9 @@
     <div class="page-header-section">
       <div class="header-content">
         <h2>Query Builders</h2>
-        <p class="subtitle">Design query forms using organized tabs, sections, and prompts</p>
+        <p class="subtitle">
+          Design query forms using organized tabs, sections, and prompts
+        </p>
       </div>
     </div>
 
@@ -15,42 +17,80 @@
         <div class="toolbar-left">
           <!-- Organisation Dropdown -->
           <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-            <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name" optionValue="id"
-              [filter]="true" label="Organisation" [floatingLabel]="true" filterBy="name"
-              (onChangeEvent)="onOrgChange($event)">
+            <app-custom-dropdown
+              [(ngModel)]="selectedOrg"
+              [options]="organisations"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              label="Organisation"
+              [floatingLabel]="true"
+              filterBy="name"
+              (onChangeEvent)="onOrgChange($event)"
+            >
             </app-custom-dropdown>
           </div>
 
           <!-- Database Dropdown -->
           <div class="dropdown-field">
-            <app-custom-dropdown [(ngModel)]="selectedDatabase" placeholder="Select Database" [options]="databases"
-              optionLabel="name" optionValue="id" [filter]="true" [floatingLabel]="true" label="Database"
-              filterBy="name" (onChangeEvent)="onDBChange($event)">
+            <app-custom-dropdown
+              [(ngModel)]="selectedDatabase"
+              placeholder="Select Database"
+              [options]="databases"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [floatingLabel]="true"
+              label="Database"
+              filterBy="name"
+              (onChangeEvent)="onDBChange($event)"
+            >
             </app-custom-dropdown>
           </div>
         </div>
 
         <div class="toolbar-right">
           <!-- Clear Filters Button -->
-          <button pButton label="Clear Filters" icon="pi pi-filter-slash" (click)="clearFilters()"
-            [disabled]="!isFilterActive" class="p-button-outlined p-button-danger modern-button mr-2">
-          </button>
+          <button
+            pButton
+            label="Clear Filters"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button mr-2"
+          ></button>
 
           <!-- Add Button -->
-          <button pButton label="Add" icon="pi pi-plus" (click)="onAddNewScreen()"
-            class="p-button-raised p-button-primary modern-button">
-          </button>
+          <button
+            pButton
+            label="Add"
+            icon="pi pi-plus"
+            (click)="onAddNewScreen()"
+            class="p-button-raised p-button-primary modern-button"
+          ></button>
         </div>
       </div>
 
       <!-- Table Wrapper -->
       <div class="table-wrapper">
-        <p-table #dt [value]="screens" [rows]="10" [paginator]="true" [lazy]="true" (onLazyLoad)="loadScreens($event)"
-          [totalRecords]="totalRecords" [globalFilterFields]="['name', 'description', 'status']" [rowHover]="true"
-          dataKey="id" currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
-          scrollHeight="calc(100vh - 440px)">
-
+        <p-table
+          #dt
+          [value]="screens"
+          [rows]="10"
+          [paginator]="true"
+          [lazy]="true"
+          (onLazyLoad)="loadScreens($event)"
+          [totalRecords]="totalRecords"
+          [globalFilterFields]="['name', 'description', 'status']"
+          [rowHover]="true"
+          dataKey="id"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10, 25, 50, 100]"
+          styleClass="p-datatable-sm modern-table"
+          [scrollable]="true"
+          scrollHeight="calc(100vh - 440px)"
+        >
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 25%" pFrozenColumn>
@@ -72,12 +112,24 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input pInputText type="text" [(ngModel)]="filterValues.name" (input)="onFilterChange()"
-                  placeholder="Search Name" class="w-full p-column-filter">
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.name"
+                  (input)="onFilterChange()"
+                  placeholder="Search Name"
+                  class="w-full p-column-filter"
+                />
               </th>
               <th>
-                <input pInputText type="text" [(ngModel)]="filterValues.description" (input)="onFilterChange()"
-                  placeholder="Search Description" class="w-full p-column-filter">
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="filterValues.description"
+                  (input)="onFilterChange()"
+                  placeholder="Search Description"
+                  class="w-full p-column-filter"
+                />
               </th>
               <th></th>
               <th></th>
@@ -88,7 +140,10 @@
           <ng-template pTemplate="body" let-screen>
             <tr class="modern-row">
               <td pFrozenColumn>
-                <a class="dataset-name-link" [routerLink]="['/app/screen/view', selectedOrg, screen.id]">
+                <a
+                  class="dataset-name-link"
+                  [routerLink]="['/app/screen/view', selectedOrg, screen.id]"
+                >
                   {{ screen.name }}
                 </a>
               </td>
@@ -98,31 +153,54 @@
                 </span>
               </td>
               <td>
-                <span class="status-indicator"
-                  [ngClass]="{'active': screen.status === 1, 'inactive': screen.status !== 1}">
+                <span
+                  class="status-indicator"
+                  [ngClass]="{
+                    active: screen.status === 1,
+                    inactive: screen.status !== 1,
+                  }"
+                >
                   <span class="dot"></span>
                   {{ screen.status === 1 ? 'Active' : 'Inactive' }}
                 </span>
               </td>
               <td>
-                <span class="date-text">{{ screen.createdOn | date:'medium' }}</span>
+                <span class="date-text">{{
+                  screen.createdOn | date: 'medium'
+                }}</span>
               </td>
               <td>
                 <div class="row-actions">
-                  <button class="icon-btn edit-btn" (click)="onEditScreen(screen)" pTooltip="Edit"
-                    tooltipPosition="bottom">
+                  <button
+                    class="icon-btn edit-btn"
+                    (click)="onEditScreen(screen)"
+                    pTooltip="Edit"
+                    tooltipPosition="bottom"
+                  >
                     <i class="pi pi-pencil"></i>
                   </button>
-                  <button class="icon-btn config-btn" (click)="onConfig(screen.id)" pTooltip="Config"
-                    tooltipPosition="bottom">
+                  <button
+                    class="icon-btn config-btn"
+                    (click)="onConfig(screen.id)"
+                    pTooltip="Config"
+                    tooltipPosition="bottom"
+                  >
                     <i class="pi pi-cog"></i>
                   </button>
-                  <button class="icon-btn execute-btn" (click)="onExecute(screen.id)" pTooltip="Execute"
-                    tooltipPosition="bottom">
+                  <button
+                    class="icon-btn execute-btn"
+                    (click)="onExecute(screen.id)"
+                    pTooltip="Execute"
+                    tooltipPosition="bottom"
+                  >
                     <i class="pi pi-play"></i>
                   </button>
-                  <button class="icon-btn delete-btn" (click)="confirmDelete(screen.id)" pTooltip="Delete"
-                    tooltipPosition="bottom">
+                  <button
+                    class="icon-btn delete-btn"
+                    (click)="confirmDelete(screen.id)"
+                    pTooltip="Delete"
+                    tooltipPosition="bottom"
+                  >
                     <i class="pi pi-trash"></i>
                   </button>
                 </div>

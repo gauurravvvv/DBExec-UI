@@ -347,7 +347,7 @@ export class SqlQueryDialogComponent
     this.completionProviderDisposable =
       this.monacoIntelliSenseService.registerSQLCompletions(
         databases,
-        this.editor
+        this.editor,
       );
 
     // Register hover provider using the service

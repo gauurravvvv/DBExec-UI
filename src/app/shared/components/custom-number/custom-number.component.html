@@ -1,43 +1,75 @@
 <div class="form-field">
-    <ng-container *ngIf="label">
-        <span class="p-float-label" *ngIf="floatingLabel">
-            <p-inputNumber [(ngModel)]="value" [placeholder]="placeholder"
-                [useGrouping]="useGrouping" [min]="$any(min)" [max]="$any(max)"
-                [step]="step" [showButtons]="showButtons" [prefix]="prefix" [suffix]="suffix"
-                [readonly]="readonly" [disabled]="disabled || numberDisabled"
-                [ngClass]="{'ng-invalid ng-dirty': showError}"
-                (onInput)="onValueChange($event.value)" (onBlur)="onBlur()"
-                [inputId]="inputId" styleClass="w-full">
-            </p-inputNumber>
-            <label [for]="inputId">
-                {{ label }}
-                <span class="required" *ngIf="required">*</span>
-            </label>
-        </span>
-        <ng-container *ngIf="!floatingLabel">
-            <label class="normal-label">
-                {{ label }}
-                <span class="required" *ngIf="required">*</span>
-            </label>
-            <p-inputNumber [(ngModel)]="value" [placeholder]="placeholder"
-                [useGrouping]="useGrouping" [min]="$any(min)" [max]="$any(max)"
-                [step]="step" [showButtons]="showButtons" [prefix]="prefix" [suffix]="suffix"
-                [readonly]="readonly" [disabled]="disabled || numberDisabled"
-                [ngClass]="{'ng-invalid ng-dirty': showError}"
-                (onInput)="onValueChange($event.value)" (onBlur)="onBlur()"
-                styleClass="w-full">
-            </p-inputNumber>
-        </ng-container>
+  <ng-container *ngIf="label">
+    <span class="p-float-label" *ngIf="floatingLabel">
+      <p-inputNumber
+        [(ngModel)]="value"
+        [placeholder]="placeholder"
+        [useGrouping]="useGrouping"
+        [min]="$any(min)"
+        [max]="$any(max)"
+        [step]="step"
+        [showButtons]="showButtons"
+        [prefix]="prefix"
+        [suffix]="suffix"
+        [readonly]="readonly"
+        [disabled]="disabled || numberDisabled"
+        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        (onInput)="onValueChange($event.value)"
+        (onBlur)="onBlur()"
+        [inputId]="inputId"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
+      <label [for]="inputId">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+      </label>
+    </span>
+    <ng-container *ngIf="!floatingLabel">
+      <label class="normal-label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+      </label>
+      <p-inputNumber
+        [(ngModel)]="value"
+        [placeholder]="placeholder"
+        [useGrouping]="useGrouping"
+        [min]="$any(min)"
+        [max]="$any(max)"
+        [step]="step"
+        [showButtons]="showButtons"
+        [prefix]="prefix"
+        [suffix]="suffix"
+        [readonly]="readonly"
+        [disabled]="disabled || numberDisabled"
+        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        (onInput)="onValueChange($event.value)"
+        (onBlur)="onBlur()"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
     </ng-container>
-    <p-inputNumber *ngIf="!label" [(ngModel)]="value" [placeholder]="placeholder"
-        [useGrouping]="useGrouping" [min]="$any(min)" [max]="$any(max)"
-        [step]="step" [showButtons]="showButtons" [prefix]="prefix" [suffix]="suffix"
-        [readonly]="readonly" [disabled]="disabled || numberDisabled"
-        [ngClass]="{'ng-invalid ng-dirty': showError}"
-        (onInput)="onValueChange($event.value)" (onBlur)="onBlur()"
-        styleClass="w-full">
-    </p-inputNumber>
-    <small class="error-message" *ngIf="showError && errorMessage">
-        {{ errorMessage }}
-    </small>
+  </ng-container>
+  <p-inputNumber
+    *ngIf="!label"
+    [(ngModel)]="value"
+    [placeholder]="placeholder"
+    [useGrouping]="useGrouping"
+    [min]="$any(min)"
+    [max]="$any(max)"
+    [step]="step"
+    [showButtons]="showButtons"
+    [prefix]="prefix"
+    [suffix]="suffix"
+    [readonly]="readonly"
+    [disabled]="disabled || numberDisabled"
+    [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+    (onInput)="onValueChange($event.value)"
+    (onBlur)="onBlur()"
+    styleClass="w-full"
+  >
+  </p-inputNumber>
+  <small class="error-message" *ngIf="showError && errorMessage">
+    {{ errorMessage }}
+  </small>
 </div>

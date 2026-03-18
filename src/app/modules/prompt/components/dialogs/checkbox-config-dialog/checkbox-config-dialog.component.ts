@@ -125,11 +125,17 @@ export class CheckboxConfigDialogComponent implements OnChanges {
       this.formattedOptions = [];
       return;
     }
-    if (typeof this.promptValues[0] === 'object' && this.promptValues[0]?.label) {
+    if (
+      typeof this.promptValues[0] === 'object' &&
+      this.promptValues[0]?.label
+    ) {
       this.formattedOptions = this.promptValues;
       return;
     }
-    this.formattedOptions = this.promptValues.map(val => ({ label: String(val), value: val }));
+    this.formattedOptions = this.promptValues.map(val => ({
+      label: String(val),
+      value: val,
+    }));
   }
 
   applyPreview(): void {

@@ -88,7 +88,7 @@ export function registerFormulaLanguage(): void {
   // Set language configuration
   monaco.languages.setLanguageConfiguration(
     'formulaLang',
-    FORMULA_LANGUAGE_CONFIG
+    FORMULA_LANGUAGE_CONFIG,
   );
 
   // Set token provider for syntax highlighting
@@ -107,7 +107,7 @@ export function getCurrentMonacoTheme(): string {
  * Create a theme observer that updates Monaco editor theme when app theme changes
  */
 export function createThemeObserver(
-  onThemeChange: (theme: string) => void
+  onThemeChange: (theme: string) => void,
 ): MutationObserver {
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
@@ -135,7 +135,7 @@ export function createThemeObserver(
 export function createFunctionCompletionItem(
   fn: { name: string; usage: string; description: string },
   range: any,
-  monaco: any
+  monaco: any,
 ): any {
   return {
     label: fn.name,
@@ -159,7 +159,7 @@ export function createFieldCompletionItem(
   field: any,
   range: any,
   monaco: any,
-  isAfterBrace: boolean
+  isAfterBrace: boolean,
 ): any {
   const fieldName = field.columnToUse || field.columnToView;
 

@@ -28,7 +28,7 @@ export class ViewOrgAdminComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private orgAdminService: OrganisationAdminService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {

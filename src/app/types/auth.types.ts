@@ -1,4 +1,4 @@
-import { UserRole } from "../constants/auth.constants";
+import { UserRole } from '../constants/auth.constants';
 
 export interface User {
   id: string;

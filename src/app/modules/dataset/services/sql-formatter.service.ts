@@ -67,7 +67,7 @@ export class SqlFormatterService {
             },
           ];
         },
-      }
+      },
     );
 
     // Also register range formatting provider for selection formatting

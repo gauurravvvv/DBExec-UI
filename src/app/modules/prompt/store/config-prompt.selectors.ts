@@ -14,25 +14,25 @@ import {
 
 // Feature selector
 export const selectConfigPromptState = createFeatureSelector<ConfigPromptState>(
-  CONFIG_PROMPT_FEATURE_KEY
+  CONFIG_PROMPT_FEATURE_KEY,
 );
 
 // Select all schemas
 export const selectAllSchemas = createSelector(
   selectConfigPromptState,
-  (state: ConfigPromptState) => state.schemas
+  (state: ConfigPromptState) => state.schemas,
 );
 
 // Select active schema key
 export const selectActiveSchemaKey = createSelector(
   selectConfigPromptState,
-  (state: ConfigPromptState) => state.activeSchemaKey
+  (state: ConfigPromptState) => state.activeSchemaKey,
 );
 
 // Select access order (for debugging/monitoring)
 export const selectAccessOrder = createSelector(
   selectConfigPromptState,
-  (state: ConfigPromptState) => state.accessOrder
+  (state: ConfigPromptState) => state.accessOrder,
 );
 
 // Select cache stats
@@ -43,7 +43,7 @@ export const selectCacheStats = createSelector(
     cachedCount: Object.keys(schemas).length,
     maxCached: CACHE_CONFIG.MAX_CACHED_SCHEMAS,
     accessOrder,
-  })
+  }),
 );
 
 // Factory selector: Get schema entry by orgId and dbId
@@ -57,28 +57,28 @@ export const selectSchemaByKey = (orgId: string, dbId: string) =>
 export const selectSchemaData = (orgId: string, dbId: string) =>
   createSelector(
     selectSchemaByKey(orgId, dbId),
-    (entry): any | null => entry?.data || null
+    (entry): any | null => entry?.data || null,
   );
 
 // Factory selector: Get schema loading status
 export const selectSchemaStatus = (orgId: string, dbId: string) =>
   createSelector(
     selectSchemaByKey(orgId, dbId),
-    entry => entry?.status || 'idle'
+    entry => entry?.status || 'idle',
   );
 
 // Factory selector: Check if schema is loading
 export const selectIsSchemaLoading = (orgId: string, dbId: string) =>
   createSelector(
     selectSchemaStatus(orgId, dbId),
-    status => status === 'loading'
+    status => status === 'loading',
   );
 
 // Factory selector: Check if schema is loaded
 export const selectIsSchemaLoaded = (orgId: string, dbId: string) =>
   createSelector(
     selectSchemaStatus(orgId, dbId),
-    status => status === 'loaded'
+    status => status === 'loaded',
   );
 
 // Factory selector: Get schema error
@@ -96,7 +96,7 @@ export const selectIsSchemaStale = (orgId: string, dbId: string) =>
 export const selectSchemaLoadedAt = (orgId: string, dbId: string) =>
   createSelector(
     selectSchemaByKey(orgId, dbId),
-    entry => entry?.loadedAt || null
+    entry => entry?.loadedAt || null,
   );
 
 // Select active schema entry
@@ -105,19 +105,19 @@ export const selectActiveSchema = createSelector(
   (state): SchemaEntry | null => {
     if (!state.activeSchemaKey) return null;
     return state.schemas[state.activeSchemaKey] || null;
-  }
+  },
 );
 
 // Select active schema data
 export const selectActiveSchemaData = createSelector(
   selectActiveSchema,
-  (entry): any | null => entry?.data || null
+  (entry): any | null => entry?.data || null,
 );
 
 // Select active schema status
 export const selectActiveSchemaStatus = createSelector(
   selectActiveSchema,
-  entry => entry?.status || 'idle'
+  entry => entry?.status || 'idle',
 );
 
 // Check if active schema is stale
@@ -126,5 +126,5 @@ export const selectIsActiveSchemaStale = createSelector(
   entry => {
     if (!entry || !entry.loadedAt) return true;
     return isSchemaStale(entry.loadedAt);
-  }
+  },
 );

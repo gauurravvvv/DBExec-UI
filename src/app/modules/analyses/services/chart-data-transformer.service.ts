@@ -485,9 +485,7 @@ export class ChartDataTransformerService {
 
       const linkKey = `${source}→${target}`;
       const value =
-        hasValue && isZNumeric
-          ? this.toNumber(row[mapping.zAxisColumn!])
-          : 1;
+        hasValue && isZNumeric ? this.toNumber(row[mapping.zAxisColumn!]) : 1;
 
       const existing = linkMap.get(linkKey) || 0;
       linkMap.set(linkKey, existing + value);
@@ -523,9 +521,7 @@ export class ChartDataTransformerService {
           : 0;
         return [x, y, z];
       })
-      .filter(
-        ([x, y, z]) => isFinite(x) && isFinite(y) && isFinite(z),
-      );
+      .filter(([x, y, z]) => isFinite(x) && isFinite(y) && isFinite(z));
   }
 
   /**

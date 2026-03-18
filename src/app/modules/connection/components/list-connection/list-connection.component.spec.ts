@@ -8,9 +8,8 @@ describe('ListConnectionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ListConnectionComponent ]
-    })
-    .compileComponents();
+      declarations: [ListConnectionComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ListConnectionComponent);
     component = fixture.componentInstance;

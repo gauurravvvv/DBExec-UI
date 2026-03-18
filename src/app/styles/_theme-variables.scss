@@ -77,8 +77,11 @@
 
 // Add transition for all themed elements
 * {
-  transition: background-color 0.3s ease, color 0.3s ease,
-    border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 // Form controls specific transitions
@@ -115,34 +118,34 @@ textarea,
     background: var(--menu-background) !important;
     border: 1px solid var(--menu-border-color) !important;
     box-shadow: var(--menu-shadow) !important;
-    
+
     .p-menu-list {
       background: var(--menu-background) !important;
       border: none !important;
     }
-    
+
     .p-menuitem {
       .p-menuitem-link {
         color: var(--menu-text-color) !important;
         transition: all 0.2s ease !important;
-        
+
         &:hover {
           background: var(--menu-hover-background) !important;
         }
-        
+
         .p-menuitem-icon {
           color: var(--menu-icon-color) !important;
         }
-        
+
         .p-menuitem-text {
           color: var(--menu-text-color) !important;
         }
       }
-      
+
       &.p-disabled {
         .p-menuitem-link {
           opacity: var(--menu-disabled-opacity) !important;
-          
+
           &:hover {
             background: transparent !important;
           }

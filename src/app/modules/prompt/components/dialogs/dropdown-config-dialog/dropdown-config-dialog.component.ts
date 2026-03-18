@@ -81,7 +81,10 @@ export class DropdownConfigDialogComponent implements OnChanges {
 
   get formattedOptions(): any[] {
     if (!this.promptValues || this.promptValues.length === 0) return [];
-    if (typeof this.promptValues[0] === 'object' && this.promptValues[0]?.label) {
+    if (
+      typeof this.promptValues[0] === 'object' &&
+      this.promptValues[0]?.label
+    ) {
       return this.promptValues;
     }
     return this.promptValues.map(val => ({ label: String(val), value: val }));

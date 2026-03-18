@@ -17,7 +17,6 @@
 
   <div class="header-right">
     <div class="header-actions">
-
       <!-- Search Trigger -->
       <div class="search-trigger" (click)="openSearchModal()">
         <i class="pi pi-search"></i>
@@ -26,14 +25,29 @@
       </div>
 
       <!-- Fullscreen -->
-      <button class="icon-btn" (click)="toggleFullscreen()" [pTooltip]="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'" tooltipPosition="bottom">
-        <i class="pi" [ngClass]="isFullscreen ? 'pi-window-minimize' : 'pi-window-maximize'"></i>
+      <button
+        class="icon-btn"
+        (click)="toggleFullscreen()"
+        [pTooltip]="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
+        tooltipPosition="bottom"
+      >
+        <i
+          class="pi"
+          [ngClass]="isFullscreen ? 'pi-window-minimize' : 'pi-window-maximize'"
+        ></i>
       </button>
 
       <!-- Notifications -->
-      <button class="icon-btn notification-btn" (click)="toggleNotificationMenu($event)" pTooltip="Notifications" tooltipPosition="bottom">
+      <button
+        class="icon-btn notification-btn"
+        (click)="toggleNotificationMenu($event)"
+        pTooltip="Notifications"
+        tooltipPosition="bottom"
+      >
         <i class="pi pi-bell"></i>
-        <span class="badge" *ngIf="unreadNotifications > 0">{{ unreadNotifications }}</span>
+        <span class="badge" *ngIf="unreadNotifications > 0">{{
+          unreadNotifications
+        }}</span>
       </button>
 
       <!-- Divider -->
@@ -47,7 +61,10 @@
             <span class="username">{{ userName }}</span>
             <span class="user-role">{{ userRole }}</span>
           </div>
-          <i class="pi pi-chevron-down chevron" [class.open]="showProfileMenu"></i>
+          <i
+            class="pi pi-chevron-down chevron"
+            [class.open]="showProfileMenu"
+          ></i>
         </div>
 
         <div class="profile-menu" *ngIf="showProfileMenu">
@@ -75,7 +92,6 @@
           </ul>
         </div>
       </div>
-
     </div>
   </div>
 </header>
@@ -87,17 +103,24 @@
   <div class="banner-glow-right"></div>
   <div class="banner-content">
     <div class="banner-text-wrapper">
-      <span class="banner-label" (click)="showAnnouncementOverlay = true">ANNOUNCEMENT</span>
+      <span class="banner-label" (click)="showAnnouncementOverlay = true"
+        >ANNOUNCEMENT</span
+      >
       <span class="banner-divider">|</span>
       <span class="banner-message">
-        {{ typedMessage }}<span class="typewriter-cursor" *ngIf="isTyping">|</span>
+        {{ typedMessage
+        }}<span class="typewriter-cursor" *ngIf="isTyping">|</span>
       </span>
     </div>
   </div>
 </div>
 
 <!-- Announcement Popup -->
-<div class="announcement-popup-backdrop" *ngIf="showAnnouncementOverlay" (click)="showAnnouncementOverlay = false">
+<div
+  class="announcement-popup-backdrop"
+  *ngIf="showAnnouncementOverlay"
+  (click)="showAnnouncementOverlay = false"
+>
   <div class="announcement-popup" (click)="$event.stopPropagation()">
     <div class="popup-accent"></div>
     <div class="popup-inner">
@@ -111,27 +134,44 @@
           <p-checkbox [(ngModel)]="doNotShowAgain" [binary]="true"></p-checkbox>
           <span>Do not show again</span>
         </label>
-        <button class="popup-btn" (click)="closeAnnouncementPopup()">Dismiss</button>
+        <button class="popup-btn" (click)="closeAnnouncementPopup()">
+          Dismiss
+        </button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Notification Menu -->
-<div class="notification-menu" [class.show]="showNotificationMenu" #notificationMenu>
+<div
+  class="notification-menu"
+  [class.show]="showNotificationMenu"
+  #notificationMenu
+>
   <div class="notification-header">
     <h3>Notifications</h3>
-    <button pButton class="p-button-text" *ngIf="hasNotifications" (click)="markAllAsRead()">Mark all read</button>
+    <button
+      pButton
+      class="p-button-text"
+      *ngIf="hasNotifications"
+      (click)="markAllAsRead()"
+    >
+      Mark all read
+    </button>
   </div>
   <div class="notification-list" *ngIf="hasNotifications; else noNotifications">
-    <div class="notification-item" *ngFor="let notification of notifications" [class.unread]="!notification.read"
-      (click)="markAsRead(notification, $event)">
+    <div
+      class="notification-item"
+      *ngFor="let notification of notifications"
+      [class.unread]="!notification.read"
+      (click)="markAsRead(notification, $event)"
+    >
       <div class="notification-icon">
         <i class="pi" [ngClass]="notification.icon"></i>
       </div>
       <div class="notification-content">
         <p class="message">{{ notification.message }}</p>
-        <span class="time">{{ notification.time | date : 'shortTime' }}</span>
+        <span class="time">{{ notification.time | date: 'shortTime' }}</span>
       </div>
       <button class="close-btn" (click)="removeNotification(notification.id)">
         <i class="pi pi-times"></i>

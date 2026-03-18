@@ -8,9 +8,8 @@ describe('ListTabComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ListTabComponent ]
-    })
-    .compileComponents();
+      declarations: [ListTabComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ListTabComponent);
     component = fixture.componentInstance;

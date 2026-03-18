@@ -476,7 +476,12 @@ export class ViewScreenComponent implements OnInit, OnDestroy {
   }
 
   onConfigure(): void {
-    this.router.navigate([SCREEN.CONFIG, this.orgId, this.databaseId, this.screenId]);
+    this.router.navigate([
+      SCREEN.CONFIG,
+      this.orgId,
+      this.databaseId,
+      this.screenId,
+    ]);
   }
 
   confirmDelete(): void {

@@ -1,11 +1,11 @@
 .p-togglebutton.p-button {
-    &:focus {
-        background: $toggleButtonActiveBg;
-        border-color: $toggleButtonActiveBorderColor;
+  &:focus {
+    background: $toggleButtonActiveBg;
+    border-color: $toggleButtonActiveBorderColor;
 
-        &.p-highlight {
-            background: $toggleButtonActiveHoverBg;
-            border-color: $toggleButtonActiveHoverBorderColor;
-        }
+    &.p-highlight {
+      background: $toggleButtonActiveHoverBg;
+      border-color: $toggleButtonActiveHoverBorderColor;
     }
+  }
 }

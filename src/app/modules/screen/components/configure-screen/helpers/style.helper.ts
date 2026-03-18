@@ -16,7 +16,7 @@ const MANDATORY_COLOR = '#ff4444';
  * Get style for mandatory prompt border/background
  */
 export function getPromptMandatoryStyle(
-  prompt: Prompt
+  prompt: Prompt,
 ): Record<string, string> {
   if (!prompt.isMandatory) {
     return {};
@@ -38,7 +38,7 @@ export function getGroupBulletStyle(
   groupId: number,
   section: Section | undefined,
   activeGroupId: number | null,
-  activeGroupSectionId: string | number | null
+  activeGroupSectionId: string | number | null,
 ): Record<string, string> {
   if (!section) return {};
 
@@ -74,7 +74,7 @@ export function getPromptGroupStyle(
   prompt: Prompt,
   section: Section,
   activeGroupId: number | null,
-  activeGroupSectionId: string | number | null
+  activeGroupSectionId: string | number | null,
 ): Record<string, string> {
   if (prompt.groupId === undefined || prompt.groupId === null) {
     return {};
@@ -102,7 +102,7 @@ export function getPromptGroupDotStyle(
   prompt: Prompt,
   section: Section,
   activeGroupId: number | null,
-  activeGroupSectionId: string | number | null
+  activeGroupSectionId: string | number | null,
 ): Record<string, string> {
   if (prompt.groupId === undefined || prompt.groupId === null) {
     return { display: 'none' };
@@ -129,10 +129,10 @@ export function getPromptGroupDotStyle(
  */
 export function getSectionGroupColor(
   section: Section,
-  groupId: number
+  groupId: number,
 ): string | null {
   const prompt = section.prompts.find(
-    (p: Prompt) => p.groupId === groupId && p.colorIndex !== undefined
+    (p: Prompt) => p.groupId === groupId && p.colorIndex !== undefined,
   );
 
   if (!prompt || prompt.colorIndex === undefined) return null;
@@ -144,7 +144,7 @@ export function getSectionGroupColor(
  * Get count of grouped prompts by groupId
  */
 export function getGroupedPromptsCount(
-  section: Section
+  section: Section,
 ): Record<number, number> {
   const groups: Record<number, number> = {};
   section.prompts.forEach((prompt: Prompt) => {

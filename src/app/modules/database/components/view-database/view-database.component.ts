@@ -53,7 +53,7 @@ export class ViewDatabaseComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private databaseService: DatabaseService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     // Initialize chart options with default values
     this.initChartOptions();
@@ -92,7 +92,7 @@ export class ViewDatabaseComponent implements OnInit {
       this.filteredSchemas = this.dbData.statistics.schemaStats;
     } else {
       this.filteredSchemas = this.dbData.statistics.schemaStats.filter(
-        (schema: any) => schema.name.toLowerCase().includes(searchTerm)
+        (schema: any) => schema.name.toLowerCase().includes(searchTerm),
       );
     }
   }
@@ -160,17 +160,17 @@ export class ViewDatabaseComponent implements OnInit {
 
   getSchemaColor(schema: any): string {
     const colors = this.generateColors(
-      this.dbData.statistics.schemaStats.length
+      this.dbData.statistics.schemaStats.length,
     );
     const index = this.dbData.statistics.schemaStats.findIndex(
-      (s: any) => s.name === schema.name
+      (s: any) => s.name === schema.name,
     );
     return colors[index % colors.length];
   }
 
   getTablesForSchema(schemaName: string): any[] {
     const schema = this.dbData.statistics.schemas.find(
-      (s: any) => s.name === schemaName
+      (s: any) => s.name === schemaName,
     );
     return schema ? schema.tables : [];
   }
@@ -183,7 +183,7 @@ export class ViewDatabaseComponent implements OnInit {
         name: table.name,
         schema: schema.name,
         size: table.sizeMB.total,
-      }))
+      })),
     );
 
     // Sort by size descending
@@ -209,7 +209,7 @@ export class ViewDatabaseComponent implements OnInit {
       schema.tables.map((table: any) => ({
         name: `${schema.name}.${table.name}`,
         size: table.sizeMB.total,
-      }))
+      })),
     );
 
     this.tableSizeChartData = {
@@ -263,7 +263,7 @@ export class ViewDatabaseComponent implements OnInit {
           align: 'center',
           labels: {
             color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--text-color'
+              '--text-color',
             ),
             font: { size: 12 },
             usePointStyle: true,
@@ -274,23 +274,23 @@ export class ViewDatabaseComponent implements OnInit {
           display: true,
           text: 'Top 10 Schemas by Size',
           color: getComputedStyle(document.documentElement).getPropertyValue(
-            '--text-color'
+            '--text-color',
           ),
           font: { size: 14, weight: 'bold' },
           padding: { bottom: 10 },
         },
         tooltip: {
           backgroundColor: getComputedStyle(
-            document.documentElement
+            document.documentElement,
           ).getPropertyValue('--card-background'),
           titleColor: getComputedStyle(
-            document.documentElement
+            document.documentElement,
           ).getPropertyValue('--text-color'),
           bodyColor: getComputedStyle(
-            document.documentElement
+            document.documentElement,
           ).getPropertyValue('--text-color'),
           borderColor: getComputedStyle(
-            document.documentElement
+            document.documentElement,
           ).getPropertyValue('--border-color'),
           borderWidth: 1,
         },
@@ -303,14 +303,14 @@ export class ViewDatabaseComponent implements OnInit {
           stacked: true,
           ticks: {
             color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--text-color'
+              '--text-color',
             ),
             font: { size: 11 },
             beginAtZero: true,
           },
           grid: {
             color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--border-color'
+              '--border-color',
             ),
             drawBorder: false,
           },
@@ -319,7 +319,7 @@ export class ViewDatabaseComponent implements OnInit {
           stacked: true,
           ticks: {
             color: getComputedStyle(document.documentElement).getPropertyValue(
-              '--text-color'
+              '--text-color',
             ),
             font: { size: 11 },
           },
@@ -338,7 +338,7 @@ export class ViewDatabaseComponent implements OnInit {
     const schemaCount = this.schemaSizeChartData.labels.length;
     document.documentElement.style.setProperty(
       '--schema-count',
-      schemaCount.toString()
+      schemaCount.toString(),
     );
   }
 

@@ -18,7 +18,7 @@ export class ViewConnectionComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private globalService: GlobalService,
-    private connectionService: ConnectionService
+    private connectionService: ConnectionService,
   ) {}
 
   ngOnInit() {

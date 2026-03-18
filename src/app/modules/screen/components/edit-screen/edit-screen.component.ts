@@ -28,7 +28,7 @@ export class EditScreenComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private screenService: ScreenService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     this.initForm();
   }
@@ -58,7 +58,15 @@ export class EditScreenComponent implements OnInit {
       id: [''],
       organisation: [''],
       database: [''],
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: [''],
       status: [false],
     });
@@ -87,6 +95,18 @@ export class EditScreenComponent implements OnInit {
         this.screenForm.markAsPristine();
       }
     });
+  }
+
+  getNameError(): string {
+    const control = this.screenForm.get('name');
+    if (control?.errors?.['required']) return 'Screen name is required';
+    if (control?.errors?.['minlength'])
+      return `Screen name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Screen name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Screen name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 
   onSubmit() {

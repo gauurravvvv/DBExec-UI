@@ -80,9 +80,28 @@ export class AddTabComponent implements OnInit {
 
   createTabGroup(): FormGroup {
     return this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: ['', [Validators.pattern(REGEX.lastName)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
+      description: [''],
     });
+  }
+
+  getNameError(control: any): string {
+    if (control?.errors?.['required']) return 'Tab name is required';
+    if (control?.errors?.['minlength'])
+      return `Tab name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Tab name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Tab name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 
   get tabGroups(): FormArray {

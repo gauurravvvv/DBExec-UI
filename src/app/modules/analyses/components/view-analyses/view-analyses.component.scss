@@ -868,12 +868,16 @@ $radius-sm: 8px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: default;
 
   &:hover {
     border-color: rgba(var(--primary-color-rgb), 0.4);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(var(--primary-color-rgb), 0.08);
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(var(--primary-color-rgb), 0.08);
   }
 }
 

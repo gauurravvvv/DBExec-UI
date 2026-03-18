@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { TableSchema, TableColumn, DatabaseSchema } from '../helpers/dummy-data.helper';
+import {
+  TableSchema,
+  TableColumn,
+  DatabaseSchema,
+} from '../helpers/dummy-data.helper';
 import {
   SQL_KEYWORDS,
   SQL_FUNCTIONS,
@@ -18,15 +22,77 @@ interface TableRef {
 
 // Keywords that should never be treated as a table alias
 const RESERVED_WORDS = new Set([
-  'where', 'on', 'set', 'and', 'or', 'not', 'in', 'between', 'like', 'is',
-  'null', 'order', 'group', 'having', 'limit', 'offset', 'union', 'except',
-  'intersect', 'inner', 'outer', 'left', 'right', 'full', 'cross', 'natural',
-  'join', 'select', 'from', 'insert', 'update', 'delete', 'create', 'alter',
-  'drop', 'into', 'values', 'as', 'case', 'when', 'then', 'else', 'end',
-  'exists', 'all', 'any', 'some', 'distinct', 'top', 'asc', 'desc', 'true',
-  'false', 'fetch', 'for', 'with', 'recursive', 'returning', 'using',
-  'lateral', 'only', 'window', 'over', 'partition', 'rows', 'range',
-  'groups', 'preceding', 'following', 'current', 'unbounded',
+  'where',
+  'on',
+  'set',
+  'and',
+  'or',
+  'not',
+  'in',
+  'between',
+  'like',
+  'is',
+  'null',
+  'order',
+  'group',
+  'having',
+  'limit',
+  'offset',
+  'union',
+  'except',
+  'intersect',
+  'inner',
+  'outer',
+  'left',
+  'right',
+  'full',
+  'cross',
+  'natural',
+  'join',
+  'select',
+  'from',
+  'insert',
+  'update',
+  'delete',
+  'create',
+  'alter',
+  'drop',
+  'into',
+  'values',
+  'as',
+  'case',
+  'when',
+  'then',
+  'else',
+  'end',
+  'exists',
+  'all',
+  'any',
+  'some',
+  'distinct',
+  'top',
+  'asc',
+  'desc',
+  'true',
+  'false',
+  'fetch',
+  'for',
+  'with',
+  'recursive',
+  'returning',
+  'using',
+  'lateral',
+  'only',
+  'window',
+  'over',
+  'partition',
+  'rows',
+  'range',
+  'groups',
+  'preceding',
+  'following',
+  'current',
+  'unbounded',
 ]);
 
 /**
@@ -62,7 +128,10 @@ export class MonacoIntelliSenseService {
             allTables.push(table);
             tableByName.set(table.name.toLowerCase(), table);
             // Also store as schema.table
-            tableByName.set(`${schema.name.toLowerCase()}.${table.name.toLowerCase()}`, table);
+            tableByName.set(
+              `${schema.name.toLowerCase()}.${table.name.toLowerCase()}`,
+              table,
+            );
             schemaMap.get(schema.name.toLowerCase())!.push(table);
             tableToSchema.set(table.name.toLowerCase(), schema.name);
           }
@@ -101,16 +170,25 @@ export class MonacoIntelliSenseService {
 
           // ─── MULTI-STATEMENT ISOLATION ──────────────────────
           const cursorOffset = model.getOffsetAt(position);
-          const { statement: currentStatement, startOffset } = this.getCurrentStatement(fullText, cursorOffset);
+          const { statement: currentStatement, startOffset } =
+            this.getCurrentStatement(fullText, cursorOffset);
           const textInStatement = fullText.substring(startOffset, cursorOffset);
 
           // Strip strings/comments for safe structural parsing
-          const strippedStatement = this.stripStringsAndComments(currentStatement);
-          const strippedTextInStatement = this.stripStringsAndComments(textInStatement);
+          const strippedStatement =
+            this.stripStringsAndComments(currentStatement);
+          const strippedTextInStatement =
+            this.stripStringsAndComments(textInStatement);
 
           // ─── PARSE REFERENCES (scoped to current statement) ─
-          const tableRefs = this.parseTableReferences(strippedStatement, tableByName);
-          const cteRefs = this.parseCTEReferences(strippedStatement, tableByName);
+          const tableRefs = this.parseTableReferences(
+            strippedStatement,
+            tableByName,
+          );
+          const cteRefs = this.parseCTEReferences(
+            strippedStatement,
+            tableByName,
+          );
           const allRefs = [...cteRefs, ...tableRefs];
           const aliasMap = this.buildAliasMap(allRefs);
 
@@ -123,19 +201,44 @@ export class MonacoIntelliSenseService {
               startColumn: position.column,
               endColumn: position.column,
             };
-            return { suggestions: this.getDotCompletions(dotMatch, databases, allTables, aliasMap, schemaMap, afterDotRange) };
+            return {
+              suggestions: this.getDotCompletions(
+                dotMatch,
+                databases,
+                allTables,
+                aliasMap,
+                schemaMap,
+                afterDotRange,
+              ),
+            };
           }
 
           // ─── INSERT INTO table (...) → Column suggestions ───
-          const insertMatch = strippedTextInStatement.match(/\bINSERT\s+INTO\s+(?:(\w+)\.)?(\w+)\s*\(([^)]*?)$/i);
+          const insertMatch = strippedTextInStatement.match(
+            /\bINSERT\s+INTO\s+(?:(\w+)\.)?(\w+)\s*\(([^)]*?)$/i,
+          );
           if (insertMatch) {
-            return { suggestions: this.getInsertColumnSuggestions(insertMatch, tableByName, defaultRange) };
+            return {
+              suggestions: this.getInsertColumnSuggestions(
+                insertMatch,
+                tableByName,
+                defaultRange,
+              ),
+            };
           }
 
           // ─── UPDATE table SET → Column suggestions ──────────
-          const updateSetMatch = strippedTextInStatement.match(/\bUPDATE\s+(?:(\w+)\.)?(\w+)\s+SET\s+(?:.*,\s*)?(\w*)$/i);
+          const updateSetMatch = strippedTextInStatement.match(
+            /\bUPDATE\s+(?:(\w+)\.)?(\w+)\s+SET\s+(?:.*,\s*)?(\w*)$/i,
+          );
           if (updateSetMatch) {
-            return { suggestions: this.getUpdateSetSuggestions(updateSetMatch, tableByName, defaultRange) };
+            return {
+              suggestions: this.getUpdateSetSuggestions(
+                updateSetMatch,
+                tableByName,
+                defaultRange,
+              ),
+            };
           }
 
           // ─── CONTEXT ANALYSIS (uses stripped text) ──────────
@@ -202,7 +305,8 @@ export class MonacoIntelliSenseService {
 
               // 3. Unqualified table names (for quick access / default schema)
               for (const table of allTables) {
-                const schemaName = tableToSchema.get(table.name.toLowerCase()) || '';
+                const schemaName =
+                  tableToSchema.get(table.name.toLowerCase()) || '';
                 addSuggestion({
                   label: table.name,
                   kind: monaco.languages.CompletionItemKind.Class,
@@ -307,9 +411,31 @@ export class MonacoIntelliSenseService {
 
           // ─── WHERE / ON / SET / AND / OR → Columns from ALL referenced tables ─
           if (ctx === 'column') {
-            this.addColumnsFromRefs(allRefs, suggestions, seenLabels, defaultRange, '0_');
+            this.addColumnsFromRefs(
+              allRefs,
+              suggestions,
+              seenLabels,
+              defaultRange,
+              '0_',
+            );
             // WHERE-context keywords
-            const whereKeywords = ['AND', 'OR', 'NOT', 'IN', 'LIKE', 'ILIKE', 'BETWEEN', 'IS NULL', 'IS NOT NULL', 'EXISTS', 'NOT EXISTS', 'TRUE', 'FALSE', 'NULL', 'CASE'];
+            const whereKeywords = [
+              'AND',
+              'OR',
+              'NOT',
+              'IN',
+              'LIKE',
+              'ILIKE',
+              'BETWEEN',
+              'IS NULL',
+              'IS NOT NULL',
+              'EXISTS',
+              'NOT EXISTS',
+              'TRUE',
+              'FALSE',
+              'NULL',
+              'CASE',
+            ];
             for (const kw of whereKeywords) {
               addSuggestion({
                 label: kw,
@@ -328,8 +454,25 @@ export class MonacoIntelliSenseService {
           if (ctx === 'having') {
             // Aggregates are most relevant in HAVING
             this.addFunctions(suggestions, seenLabels, defaultRange, '0_');
-            this.addColumnsFromRefs(allRefs, suggestions, seenLabels, defaultRange, '1_');
-            const havingKeywords = ['AND', 'OR', 'NOT', 'IN', 'BETWEEN', 'IS NULL', 'IS NOT NULL', 'TRUE', 'FALSE', 'NULL'];
+            this.addColumnsFromRefs(
+              allRefs,
+              suggestions,
+              seenLabels,
+              defaultRange,
+              '1_',
+            );
+            const havingKeywords = [
+              'AND',
+              'OR',
+              'NOT',
+              'IN',
+              'BETWEEN',
+              'IS NULL',
+              'IS NOT NULL',
+              'TRUE',
+              'FALSE',
+              'NULL',
+            ];
             for (const kw of havingKeywords) {
               addSuggestion({
                 label: kw,
@@ -350,8 +493,10 @@ export class MonacoIntelliSenseService {
                 if (!ref.tableSchema) continue;
                 const prefix = ref.alias || ref.tableName;
                 for (const col of ref.tableSchema.columns) {
-                  const label = allRefs.length > 1 ? `${prefix}.${col.name}` : col.name;
-                  const insertText = allRefs.length > 1 ? `${prefix}.${col.name}` : col.name;
+                  const label =
+                    allRefs.length > 1 ? `${prefix}.${col.name}` : col.name;
+                  const insertText =
+                    allRefs.length > 1 ? `${prefix}.${col.name}` : col.name;
                   addSuggestion({
                     label: label,
                     kind: monaco.languages.CompletionItemKind.Field,
@@ -392,20 +537,30 @@ export class MonacoIntelliSenseService {
                   detail: `${col.type} (${ref.tableName})${col.isPrimaryKey ? ' PK' : ''}${col.isForeignKey ? ' FK' : ''}`,
                   documentation: this.getColumnDocumentation(col),
                   insertText: label,
-                  sortText: col.isPrimaryKey || col.isForeignKey ? '0_' + label : '1_' + label,
+                  sortText:
+                    col.isPrimaryKey || col.isForeignKey
+                      ? '0_' + label
+                      : '1_' + label,
                   range: defaultRange,
                 });
               }
             }
             // Add smart FK-based ON condition snippets
-            this.addJoinOnSnippets(allRefs, suggestions, seenLabels, defaultRange);
+            this.addJoinOnSnippets(
+              allRefs,
+              suggestions,
+              seenLabels,
+              defaultRange,
+            );
             return { suggestions };
           }
 
           // ─── DEFAULT / GENERIC context → Keywords + Functions + Snippets + Tables ─
 
           // Smart alias suggestion: if text ends with FROM/JOIN table_name, suggest alias
-          const aliasContextMatch = strippedTextInStatement.match(/\b(?:from|join)\s+(?:\w+\.)?(\w+)\s+$/i);
+          const aliasContextMatch = strippedTextInStatement.match(
+            /\b(?:from|join)\s+(?:\w+\.)?(\w+)\s+$/i,
+          );
           if (aliasContextMatch) {
             const tblName = aliasContextMatch[1];
             const suggestedAlias = this.generateAlias(tblName);
@@ -446,7 +601,9 @@ export class MonacoIntelliSenseService {
             addSuggestion({
               label: table.name,
               kind: monaco.languages.CompletionItemKind.Class,
-              detail: tblSchema ? `Table · ${tblSchema}` : `Table (${table.columns.length} columns)`,
+              detail: tblSchema
+                ? `Table · ${tblSchema}`
+                : `Table (${table.columns.length} columns)`,
               documentation: this.getTableDocumentation(table),
               insertText: table.name,
               sortText: '2_' + table.name,
@@ -457,7 +614,12 @@ export class MonacoIntelliSenseService {
           this.addKeywords(suggestions, seenLabels, defaultRange, '1_');
           this.addFunctions(suggestions, seenLabels, defaultRange, '2_');
           this.addSnippets(suggestions, seenLabels, defaultRange);
-          this.addDynamicSnippets(allTables, suggestions, seenLabels, defaultRange);
+          this.addDynamicSnippets(
+            allTables,
+            suggestions,
+            seenLabels,
+            defaultRange,
+          );
 
           return { suggestions };
         } catch (error) {
@@ -493,12 +655,17 @@ export class MonacoIntelliSenseService {
     }
 
     // In SELECT clause (after SELECT or after comma in SELECT, before FROM)
-    if (/\bselect\s+(?:distinct\s+)?(?:[\w\.\*,\s\(\)]*,\s*)?\w*$/i.test(t) && !/\bfrom\b/i.test(t)) {
+    if (
+      /\bselect\s+(?:distinct\s+)?(?:[\w\.\*,\s\(\)]*,\s*)?\w*$/i.test(t) &&
+      !/\bfrom\b/i.test(t)
+    ) {
       return 'select';
     }
 
     // Check the last major keyword before cursor for fine-grained context
-    const lastClause = t.match(/\b(select|from|where|join|on|set|having|order\s+by|group\s+by|and|or)\b\s*(?:[\s\S](?!\b(?:select|from|where|join|on|set|having|order\s+by|group\s+by)\b))*$/i);
+    const lastClause = t.match(
+      /\b(select|from|where|join|on|set|having|order\s+by|group\s+by|and|or)\b\s*(?:[\s\S](?!\b(?:select|from|where|join|on|set|having|order\s+by|group\s+by)\b))*$/i,
+    );
     if (lastClause) {
       const clause = lastClause[1].toLowerCase().replace(/\s+/g, ' ');
       if (clause === 'having') {
@@ -524,13 +691,17 @@ export class MonacoIntelliSenseService {
    * Parse all FROM and JOIN table references in the query.
    * Extracts table name, optional schema, alias, and resolves to TableSchema.
    */
-  private parseTableReferences(sql: string, tableByName: Map<string, TableSchema>): TableRef[] {
+  private parseTableReferences(
+    sql: string,
+    tableByName: Map<string, TableSchema>,
+  ): TableRef[] {
     const refs: TableRef[] = [];
     const seen = new Set<string>();
 
     // Match: FROM/JOIN [schema.]table [AS] [alias]
     // Excludes subqueries (detected by open paren after FROM/JOIN)
-    const regex = /\b(?:from|join)\s+(?![\(\s]*select)(?:(\w+)\.)?(\w+)(?:\s+(?:as\s+)?(\w+))?/gi;
+    const regex =
+      /\b(?:from|join)\s+(?![\(\s]*select)(?:(\w+)\.)?(\w+)(?:\s+(?:as\s+)?(\w+))?/gi;
     let match;
 
     while ((match = regex.exec(sql)) !== null) {
@@ -539,15 +710,22 @@ export class MonacoIntelliSenseService {
       const rawAlias = match[3] || null;
 
       // Skip if the "alias" is actually a SQL keyword
-      const alias = rawAlias && !RESERVED_WORDS.has(rawAlias.toLowerCase()) ? rawAlias : null;
+      const alias =
+        rawAlias && !RESERVED_WORDS.has(rawAlias.toLowerCase())
+          ? rawAlias
+          : null;
 
       // Resolve to a TableSchema
       const lookupKey = schemaName
         ? `${schemaName.toLowerCase()}.${tableName.toLowerCase()}`
         : tableName.toLowerCase();
-      const tableSchema = tableByName.get(lookupKey) || tableByName.get(tableName.toLowerCase()) || null;
+      const tableSchema =
+        tableByName.get(lookupKey) ||
+        tableByName.get(tableName.toLowerCase()) ||
+        null;
 
-      const key = `${schemaName || ''}.${tableName}.${alias || ''}`.toLowerCase();
+      const key =
+        `${schemaName || ''}.${tableName}.${alias || ''}`.toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
         refs.push({ schemaName, tableName, alias, tableSchema });
@@ -591,12 +769,16 @@ export class MonacoIntelliSenseService {
       }
       // Block comment: /* ... */
       else if (sql[i] === '/' && sql[i + 1] === '*') {
-        result.push(' '); i++;
-        result.push(' '); i++;
+        result.push(' ');
+        i++;
+        result.push(' ');
+        i++;
         while (i < sql.length) {
           if (sql[i] === '*' && sql[i + 1] === '/') {
-            result.push(' '); i++;
-            result.push(' '); i++;
+            result.push(' ');
+            i++;
+            result.push(' ');
+            i++;
             break;
           }
           result.push(sql[i] === '\n' ? '\n' : ' ');
@@ -605,13 +787,17 @@ export class MonacoIntelliSenseService {
       }
       // String literal: '...' (with '' escape)
       else if (sql[i] === "'") {
-        result.push(' '); i++;
+        result.push(' ');
+        i++;
         while (i < sql.length) {
           if (sql[i] === "'" && sql[i + 1] === "'") {
-            result.push(' '); i++;
-            result.push(' '); i++;
+            result.push(' ');
+            i++;
+            result.push(' ');
+            i++;
           } else if (sql[i] === "'") {
-            result.push(' '); i++;
+            result.push(' ');
+            i++;
             break;
           } else {
             result.push(sql[i] === '\n' ? '\n' : ' ');
@@ -647,18 +833,38 @@ export class MonacoIntelliSenseService {
         continue;
       }
       if (inBlockComment) {
-        if (ch === '*' && next === '/') { inBlockComment = false; i++; }
+        if (ch === '*' && next === '/') {
+          inBlockComment = false;
+          i++;
+        }
         continue;
       }
       if (inString) {
-        if (ch === "'" && next === "'") { i++; continue; } // escaped quote
-        if (ch === "'") { inString = false; continue; }
+        if (ch === "'" && next === "'") {
+          i++;
+          continue;
+        } // escaped quote
+        if (ch === "'") {
+          inString = false;
+          continue;
+        }
         continue;
       }
 
-      if (ch === '-' && next === '-') { inLineComment = true; i++; continue; }
-      if (ch === '/' && next === '*') { inBlockComment = true; i++; continue; }
-      if (ch === "'") { inString = true; continue; }
+      if (ch === '-' && next === '-') {
+        inLineComment = true;
+        i++;
+        continue;
+      }
+      if (ch === '/' && next === '*') {
+        inBlockComment = true;
+        i++;
+        continue;
+      }
+      if (ch === "'") {
+        inString = true;
+        continue;
+      }
     }
 
     return inString || inLineComment || inBlockComment;
@@ -670,7 +876,10 @@ export class MonacoIntelliSenseService {
    * Extract the current SQL statement around the cursor.
    * Finds statement boundaries by locating semicolons outside strings/comments.
    */
-  private getCurrentStatement(fullText: string, cursorOffset: number): { statement: string; startOffset: number } {
+  private getCurrentStatement(
+    fullText: string,
+    cursorOffset: number,
+  ): { statement: string; startOffset: number } {
     const stripped = this.stripStringsAndComments(fullText);
     let start = 0;
     let end = fullText.length;
@@ -698,7 +907,10 @@ export class MonacoIntelliSenseService {
    * Parse CTE (WITH ... AS) definitions and return them as table references.
    * Recognizes: WITH name AS (...), name2 AS (...)
    */
-  private parseCTEReferences(strippedSql: string, tableByName: Map<string, TableSchema>): TableRef[] {
+  private parseCTEReferences(
+    strippedSql: string,
+    tableByName: Map<string, TableSchema>,
+  ): TableRef[] {
     const refs: TableRef[] = [];
 
     // Check if there's a WITH clause
@@ -772,7 +984,10 @@ export class MonacoIntelliSenseService {
   private generateAlias(tableName: string): string {
     const parts = tableName.split('_');
     if (parts.length > 1) {
-      return parts.map(p => p[0] || '').join('').toLowerCase();
+      return parts
+        .map(p => p[0] || '')
+        .join('')
+        .toLowerCase();
     }
     return tableName[0].toLowerCase();
   }
@@ -786,7 +1001,7 @@ export class MonacoIntelliSenseService {
   private getInsertColumnSuggestions(
     insertMatch: RegExpMatchArray,
     tableByName: Map<string, TableSchema>,
-    range: any
+    range: any,
   ): any[] {
     const schemaName = insertMatch[1];
     const tableName = insertMatch[2];
@@ -795,12 +1010,16 @@ export class MonacoIntelliSenseService {
     const key = schemaName
       ? `${schemaName.toLowerCase()}.${tableName.toLowerCase()}`
       : tableName.toLowerCase();
-    const table = tableByName.get(key) || tableByName.get(tableName.toLowerCase());
+    const table =
+      tableByName.get(key) || tableByName.get(tableName.toLowerCase());
     if (!table) return [];
 
     // Parse already-specified columns
     const existingCols = new Set(
-      existingColsStr.split(',').map(c => c.replace(/\s+/g, '').toLowerCase()).filter(c => c)
+      existingColsStr
+        .split(',')
+        .map(c => c.replace(/\s+/g, '').toLowerCase())
+        .filter(c => c),
     );
 
     return table.columns
@@ -823,7 +1042,7 @@ export class MonacoIntelliSenseService {
   private getUpdateSetSuggestions(
     updateMatch: RegExpMatchArray,
     tableByName: Map<string, TableSchema>,
-    range: any
+    range: any,
   ): any[] {
     const schemaName = updateMatch[1];
     const tableName = updateMatch[2];
@@ -831,7 +1050,8 @@ export class MonacoIntelliSenseService {
     const key = schemaName
       ? `${schemaName.toLowerCase()}.${tableName.toLowerCase()}`
       : tableName.toLowerCase();
-    const table = tableByName.get(key) || tableByName.get(tableName.toLowerCase());
+    const table =
+      tableByName.get(key) || tableByName.get(tableName.toLowerCase());
     if (!table) return [];
 
     return table.columns.map((col, idx) => ({
@@ -840,8 +1060,11 @@ export class MonacoIntelliSenseService {
       detail: `${col.type}${col.nullable ? '' : ' NOT NULL'}`,
       documentation: this.getColumnDocumentation(col),
       insertText: `${col.name} = $0`,
-      insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-      sortText: col.isPrimaryKey ? '1_' + String(idx).padStart(4, '0') : '0_' + String(idx).padStart(4, '0'),
+      insertTextRules:
+        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+      sortText: col.isPrimaryKey
+        ? '1_' + String(idx).padStart(4, '0')
+        : '0_' + String(idx).padStart(4, '0'),
       range: range,
     }));
   }
@@ -873,7 +1096,9 @@ export class MonacoIntelliSenseService {
       // Try schema lookup
       const schemaTables = schemaMap.get(firstPart.toLowerCase());
       if (schemaTables) {
-        const table = schemaTables.find(t => t.name.toLowerCase() === secondPart.toLowerCase());
+        const table = schemaTables.find(
+          t => t.name.toLowerCase() === secondPart.toLowerCase(),
+        );
         if (table) {
           return this.buildColumnSuggestions(table, range);
         }
@@ -887,7 +1112,9 @@ export class MonacoIntelliSenseService {
     }
 
     // Direct table name lookup
-    const directTable = allTables.find(t => t.name.toLowerCase() === secondPart.toLowerCase());
+    const directTable = allTables.find(
+      t => t.name.toLowerCase() === secondPart.toLowerCase(),
+    );
     if (directTable) {
       return this.buildColumnSuggestions(directTable, range);
     }
@@ -932,7 +1159,7 @@ export class MonacoIntelliSenseService {
     suggestions: any[],
     seen: Set<string>,
     range: any,
-    sortPrefix: string
+    sortPrefix: string,
   ): void {
     if (refs.length === 0) return;
     for (const ref of refs) {
@@ -969,7 +1196,12 @@ export class MonacoIntelliSenseService {
     }
   }
 
-  private addKeywords(suggestions: any[], seen: Set<string>, range: any, sortPrefix: string): void {
+  private addKeywords(
+    suggestions: any[],
+    seen: Set<string>,
+    range: any,
+    sortPrefix: string,
+  ): void {
     for (const kw of SQL_KEYWORDS) {
       if (seen.has(kw)) continue;
       seen.add(kw);
@@ -988,7 +1220,12 @@ export class MonacoIntelliSenseService {
     }
   }
 
-  private addFunctions(suggestions: any[], seen: Set<string>, range: any, sortPrefix: string): void {
+  private addFunctions(
+    suggestions: any[],
+    seen: Set<string>,
+    range: any,
+    sortPrefix: string,
+  ): void {
     for (const fn of SQL_FUNCTIONS) {
       if (seen.has(fn.name)) continue;
       seen.add(fn.name);
@@ -1003,7 +1240,8 @@ export class MonacoIntelliSenseService {
           value: `**${fn.name}**(${fn.params})\n\n${fn.description}`,
         },
         insertText: hasParams ? `${fn.name}($0)` : `${fn.name}()`,
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        insertTextRules:
+          monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
         sortText: sortPrefix + fn.name,
         range: range,
       });
@@ -1020,14 +1258,20 @@ export class MonacoIntelliSenseService {
         detail: 'SQL Snippet',
         documentation: snippet.documentation,
         insertText: snippet.insertText,
-        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        insertTextRules:
+          monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
         sortText: '4_' + snippet.label,
         range: range,
       });
     }
   }
 
-  private addDynamicSnippets(tables: TableSchema[], suggestions: any[], seen: Set<string>, range: any): void {
+  private addDynamicSnippets(
+    tables: TableSchema[],
+    suggestions: any[],
+    seen: Set<string>,
+    range: any,
+  ): void {
     for (const table of tables) {
       for (const col of table.columns) {
         if (col.isForeignKey && col.foreignKeyTable && col.foreignKeyColumn) {
@@ -1040,7 +1284,8 @@ export class MonacoIntelliSenseService {
             detail: `JOIN ${table.name} ↔ ${col.foreignKeyTable}`,
             documentation: `Auto-join on FK: ${table.name}.${col.name} → ${col.foreignKeyTable}.${col.foreignKeyColumn}`,
             insertText: `JOIN ${table.name} ON ${col.foreignKeyTable}.${col.foreignKeyColumn} = ${table.name}.${col.name}$0`,
-            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             sortText: '3_' + label,
             range: range,
           });
@@ -1053,7 +1298,12 @@ export class MonacoIntelliSenseService {
    * Add smart ON-condition snippets when cursor is after JOIN ... ON
    * Detects FK relationships between the just-joined table and existing tables.
    */
-  private addJoinOnSnippets(tableRefs: TableRef[], suggestions: any[], seen: Set<string>, range: any): void {
+  private addJoinOnSnippets(
+    tableRefs: TableRef[],
+    suggestions: any[],
+    seen: Set<string>,
+    range: any,
+  ): void {
     if (tableRefs.length < 2) return;
 
     // The last ref is likely the table that was just JOINed
@@ -1063,11 +1313,14 @@ export class MonacoIntelliSenseService {
     const newPrefix = newRef.alias || newRef.tableName;
 
     for (const col of newRef.tableSchema.columns) {
-      if (!col.isForeignKey || !col.foreignKeyTable || !col.foreignKeyColumn) continue;
+      if (!col.isForeignKey || !col.foreignKeyTable || !col.foreignKeyColumn)
+        continue;
 
       // Find the referenced table in existing refs
       const targetRef = tableRefs.find(
-        r => r.tableName.toLowerCase() === col.foreignKeyTable!.toLowerCase() && r !== newRef
+        r =>
+          r.tableName.toLowerCase() === col.foreignKeyTable!.toLowerCase() &&
+          r !== newRef,
       );
       if (targetRef) {
         const targetPrefix = targetRef.alias || targetRef.tableName;
@@ -1080,7 +1333,8 @@ export class MonacoIntelliSenseService {
           detail: 'FK join condition',
           documentation: `Auto-detected foreign key: ${newRef.tableName}.${col.name} → ${col.foreignKeyTable}.${col.foreignKeyColumn}`,
           insertText: label + '$0',
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          insertTextRules:
+            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
           sortText: '0_' + label, // highest priority
           range: range,
         });
@@ -1093,7 +1347,11 @@ export class MonacoIntelliSenseService {
       const existingPrefix = existingRef.alias || existingRef.tableName;
 
       for (const col of existingRef.tableSchema.columns) {
-        if (!col.isForeignKey || col.foreignKeyTable?.toLowerCase() !== newRef.tableName.toLowerCase()) continue;
+        if (
+          !col.isForeignKey ||
+          col.foreignKeyTable?.toLowerCase() !== newRef.tableName.toLowerCase()
+        )
+          continue;
 
         const label = `${existingPrefix}.${col.name} = ${newPrefix}.${col.foreignKeyColumn}`;
         if (seen.has(label)) continue;
@@ -1104,7 +1362,8 @@ export class MonacoIntelliSenseService {
           detail: 'FK join condition',
           documentation: `Auto-detected foreign key: ${existingRef.tableName}.${col.name} → ${newRef.tableName}.${col.foreignKeyColumn}`,
           insertText: label + '$0',
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          insertTextRules:
+            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
           sortText: '0_' + label,
           range: range,
         });
@@ -1154,11 +1413,17 @@ export class MonacoIntelliSenseService {
           if (beforeDot) {
             const qualifier = beforeDot.word.toLowerCase();
             // Try qualifier as table name
-            const qualTable = tables.find(t => t.name.toLowerCase() === qualifier);
+            const qualTable = tables.find(
+              t => t.name.toLowerCase() === qualifier,
+            );
             if (qualTable) {
-              const col = qualTable.columns.find(c => c.name.toLowerCase() === wordLower);
+              const col = qualTable.columns.find(
+                c => c.name.toLowerCase() === wordLower,
+              );
               if (col) {
-                return { contents: this.buildColumnHoverContents(qualTable, col) };
+                return {
+                  contents: this.buildColumnHoverContents(qualTable, col),
+                };
               }
             }
             // Qualifier might be an alias — resolve from current text
@@ -1167,14 +1432,19 @@ export class MonacoIntelliSenseService {
             const tableByName = new Map<string, TableSchema>();
             tables.forEach(t => tableByName.set(t.name.toLowerCase(), t));
             const refs = this.parseTableReferences(strippedText, tableByName);
-            const ref = refs.find(r =>
-              (r.alias && r.alias.toLowerCase() === qualifier) ||
-              r.tableName.toLowerCase() === qualifier
+            const ref = refs.find(
+              r =>
+                (r.alias && r.alias.toLowerCase() === qualifier) ||
+                r.tableName.toLowerCase() === qualifier,
             );
             if (ref?.tableSchema) {
-              const col = ref.tableSchema.columns.find(c => c.name.toLowerCase() === wordLower);
+              const col = ref.tableSchema.columns.find(
+                c => c.name.toLowerCase() === wordLower,
+              );
               if (col) {
-                return { contents: this.buildColumnHoverContents(ref.tableSchema, col) };
+                return {
+                  contents: this.buildColumnHoverContents(ref.tableSchema, col),
+                };
               }
             }
           }
@@ -1186,24 +1456,30 @@ export class MonacoIntelliSenseService {
           const pkCols = table.columns.filter(c => c.isPrimaryKey);
           const fkCols = table.columns.filter(c => c.isForeignKey);
           const contents = [
-            { value: `**Table: ${table.name}** — ${table.columns.length} columns` },
+            {
+              value: `**Table: ${table.name}** — ${table.columns.length} columns`,
+            },
             {
               value:
                 '```\n' +
                 table.columns
                   .map(
                     (c: TableColumn) =>
-                      `${c.name.padEnd(24)} ${c.type}${c.isPrimaryKey ? ' PK' : ''}${c.isForeignKey ? ' FK→' + c.foreignKeyTable : ''}`
+                      `${c.name.padEnd(24)} ${c.type}${c.isPrimaryKey ? ' PK' : ''}${c.isForeignKey ? ' FK→' + c.foreignKeyTable : ''}`,
                   )
                   .join('\n') +
                 '\n```',
             },
           ];
           if (pkCols.length > 0) {
-            contents.push({ value: `🔑 PK: ${pkCols.map(c => c.name).join(', ')}` });
+            contents.push({
+              value: `🔑 PK: ${pkCols.map(c => c.name).join(', ')}`,
+            });
           }
           if (fkCols.length > 0) {
-            contents.push({ value: `🔗 FK: ${fkCols.map(c => `${c.name}→${c.foreignKeyTable}.${c.foreignKeyColumn}`).join(', ')}` });
+            contents.push({
+              value: `🔗 FK: ${fkCols.map(c => `${c.name}→${c.foreignKeyTable}.${c.foreignKeyColumn}`).join(', ')}`,
+            });
           }
           return { contents };
         }
@@ -1215,7 +1491,9 @@ export class MonacoIntelliSenseService {
         }
 
         // Check if it's a SQL function
-        const fnMatch = SQL_FUNCTIONS.find(fn => fn.name.toLowerCase() === wordLower);
+        const fnMatch = SQL_FUNCTIONS.find(
+          fn => fn.name.toLowerCase() === wordLower,
+        );
         if (fnMatch) {
           return {
             contents: [
@@ -1231,17 +1509,21 @@ export class MonacoIntelliSenseService {
         const tableByName = new Map<string, TableSchema>();
         tables.forEach(t => tableByName.set(t.name.toLowerCase(), t));
         const refs = this.parseTableReferences(strippedFull, tableByName);
-        const aliasRef = refs.find(r => r.alias && r.alias.toLowerCase() === wordLower);
+        const aliasRef = refs.find(
+          r => r.alias && r.alias.toLowerCase() === wordLower,
+        );
         if (aliasRef?.tableSchema) {
           const contents = [
-            { value: `**Alias:** \`${aliasRef.alias}\` → **${aliasRef.tableName}** (${aliasRef.tableSchema.columns.length} columns)` },
+            {
+              value: `**Alias:** \`${aliasRef.alias}\` → **${aliasRef.tableName}** (${aliasRef.tableSchema.columns.length} columns)`,
+            },
             {
               value:
                 '```\n' +
                 aliasRef.tableSchema.columns
                   .map(
                     (c: TableColumn) =>
-                      `${c.name.padEnd(24)} ${c.type}${c.isPrimaryKey ? ' PK' : ''}${c.isForeignKey ? ' FK' : ''}`
+                      `${c.name.padEnd(24)} ${c.type}${c.isPrimaryKey ? ' PK' : ''}${c.isForeignKey ? ' FK' : ''}`,
                   )
                   .join('\n') +
                 '\n```',
@@ -1251,7 +1533,8 @@ export class MonacoIntelliSenseService {
         }
 
         // Column name — collect ALL matching tables
-        const matchingColumns: { table: TableSchema; column: TableColumn }[] = [];
+        const matchingColumns: { table: TableSchema; column: TableColumn }[] =
+          [];
         for (const tbl of tables) {
           const col = tbl.columns.find(c => c.name.toLowerCase() === wordLower);
           if (col) {
@@ -1260,19 +1543,29 @@ export class MonacoIntelliSenseService {
         }
 
         if (matchingColumns.length === 1) {
-          return { contents: this.buildColumnHoverContents(matchingColumns[0].table, matchingColumns[0].column) };
+          return {
+            contents: this.buildColumnHoverContents(
+              matchingColumns[0].table,
+              matchingColumns[0].column,
+            ),
+          };
         }
 
         if (matchingColumns.length > 1) {
           const contents = [
-            { value: `**Column: ${word.word}** _(found in ${matchingColumns.length} tables)_` },
             {
-              value: matchingColumns.map(({ table: tbl, column }) => {
-                let info = `• **${tbl.name}**.${column.name} — \`${column.type}\``;
-                if (column.isPrimaryKey) info += ' 🔑';
-                if (column.isForeignKey) info += ` 🔗→${column.foreignKeyTable}`;
-                return info;
-              }).join('\n'),
+              value: `**Column: ${word.word}** _(found in ${matchingColumns.length} tables)_`,
+            },
+            {
+              value: matchingColumns
+                .map(({ table: tbl, column }) => {
+                  let info = `• **${tbl.name}**.${column.name} — \`${column.type}\``;
+                  if (column.isPrimaryKey) info += ' 🔑';
+                  if (column.isForeignKey)
+                    info += ` 🔗→${column.foreignKeyTable}`;
+                  return info;
+                })
+                .join('\n'),
             },
           ];
           return { contents };
@@ -1283,14 +1576,21 @@ export class MonacoIntelliSenseService {
     });
   }
 
-  private buildColumnHoverContents(table: TableSchema, col: TableColumn): any[] {
+  private buildColumnHoverContents(
+    table: TableSchema,
+    col: TableColumn,
+  ): any[] {
     const contents = [
       { value: `**${table.name}.${col.name}**` },
-      { value: `Type: \`${col.type}\` | Nullable: ${col.nullable ? 'Yes' : 'No'}` },
+      {
+        value: `Type: \`${col.type}\` | Nullable: ${col.nullable ? 'Yes' : 'No'}`,
+      },
     ];
     if (col.isPrimaryKey) contents.push({ value: '🔑 **Primary Key**' });
     if (col.isForeignKey) {
-      contents.push({ value: `🔗 **Foreign Key** → ${col.foreignKeyTable}.${col.foreignKeyColumn}` });
+      contents.push({
+        value: `🔗 **Foreign Key** → ${col.foreignKeyTable}.${col.foreignKeyColumn}`,
+      });
     }
     return contents;
   }
@@ -1338,33 +1638,42 @@ export class MonacoIntelliSenseService {
           if (funcParenPos < 0) return null;
 
           // Extract function name (word before the opening paren)
-          const beforeParen = textUntilPosition.substring(0, funcParenPos).replace(/\s+$/, '');
+          const beforeParen = textUntilPosition
+            .substring(0, funcParenPos)
+            .replace(/\s+$/, '');
           const funcNameMatch = beforeParen.match(/(\w+)$/);
           if (!funcNameMatch) return null;
 
           const funcName = funcNameMatch[1].toUpperCase();
 
           // Look up the function definition
-          const funcDef = SQL_FUNCTIONS.find(f => f.name.toUpperCase() === funcName);
+          const funcDef = SQL_FUNCTIONS.find(
+            f => f.name.toUpperCase() === funcName,
+          );
           if (!funcDef) return null;
 
           // Build parameter list
           const params = funcDef.params
-            ? funcDef.params.split(',').map(p => p.replace(/\s+/g, ' ').trim()).filter(p => p)
+            ? funcDef.params
+                .split(',')
+                .map(p => p.replace(/\s+/g, ' ').trim())
+                .filter(p => p)
             : [];
 
           if (params.length === 0) return null;
 
           return {
             value: {
-              signatures: [{
-                label: `${funcDef.name}(${funcDef.params})`,
-                documentation: funcDef.description,
-                parameters: params.map(p => ({
-                  label: p,
-                  documentation: '',
-                })),
-              }],
+              signatures: [
+                {
+                  label: `${funcDef.name}(${funcDef.params})`,
+                  documentation: funcDef.description,
+                  parameters: params.map(p => ({
+                    label: p,
+                    documentation: '',
+                  })),
+                },
+              ],
               activeSignature: 0,
               activeParameter: Math.min(commaCount, params.length - 1),
             },
@@ -1382,7 +1691,10 @@ export class MonacoIntelliSenseService {
   /**
    * Register keyboard shortcuts for the editor
    */
-  registerKeyboardShortcuts(editor: any, executeQueryCallback: () => void): void {
+  registerKeyboardShortcuts(
+    editor: any,
+    executeQueryCallback: () => void,
+  ): void {
     // Execute query with Ctrl+Enter or Cmd+Enter
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
       executeQueryCallback();
@@ -1393,7 +1705,7 @@ export class MonacoIntelliSenseService {
       monaco.KeyMod.Shift | monaco.KeyMod.Alt | monaco.KeyCode.KeyF,
       () => {
         editor.getAction('editor.action.formatDocument').run();
-      }
+      },
     );
   }
 
@@ -1404,10 +1716,16 @@ export class MonacoIntelliSenseService {
     const fkCols = table.columns.filter(c => c.isForeignKey);
     let doc = `**${table.name}** (${table.columns.length} columns)\n\n`;
     if (pkCols.length) doc += `🔑 PK: ${pkCols.join(', ')}\n`;
-    if (fkCols.length) doc += `🔗 FK: ${fkCols.map(c => `${c.name}→${c.foreignKeyTable}`).join(', ')}\n`;
-    doc += '\n' + table.columns
-      .map(c => `• ${c.name}: ${c.type}${c.isPrimaryKey ? ' 🔑' : ''}${c.isForeignKey ? ' 🔗' : ''}`)
-      .join('\n');
+    if (fkCols.length)
+      doc += `🔗 FK: ${fkCols.map(c => `${c.name}→${c.foreignKeyTable}`).join(', ')}\n`;
+    doc +=
+      '\n' +
+      table.columns
+        .map(
+          c =>
+            `• ${c.name}: ${c.type}${c.isPrimaryKey ? ' 🔑' : ''}${c.isForeignKey ? ' 🔗' : ''}`,
+        )
+        .join('\n');
     return doc;
   }
 

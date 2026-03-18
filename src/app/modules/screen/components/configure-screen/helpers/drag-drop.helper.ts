@@ -34,7 +34,7 @@ export function reorderTabs(
   tabs: TabData[],
   originalIndex: number,
   dropIndex: number,
-  activeTabIndex: number
+  activeTabIndex: number,
 ): TabReorderResult {
   const updatedTabs = [...tabs];
   const draggedTab = updatedTabs[originalIndex];
@@ -72,7 +72,7 @@ export function reorderTabs(
 export function reorderSections(
   sections: Section[],
   originalIndex: number,
-  dropIndex: number
+  dropIndex: number,
 ): SectionReorderResult {
   const updatedSections = [...sections];
   const draggedSection = updatedSections[originalIndex];
@@ -99,7 +99,7 @@ export function reorderSections(
 export function reorderPrompts(
   section: Section,
   originalIndex: number,
-  dropIndex: number
+  dropIndex: number,
 ): number {
   const updatedPrompts = [...section.prompts];
   const draggedPrompt = updatedPrompts[originalIndex];
@@ -147,7 +147,7 @@ export function resetDragState(): DragState {
  */
 export function findTabById(
   tabs: TabData[],
-  tabId: string | number
+  tabId: string | number,
 ): TabData | undefined {
   return tabs.find(t => t.id === tabId);
 }
@@ -157,7 +157,7 @@ export function findTabById(
  */
 export function findSectionById(
   tab: TabData,
-  sectionId: string | number
+  sectionId: string | number,
 ): Section | undefined {
   return tab.sections.find((s: Section) => s.id === sectionId);
 }

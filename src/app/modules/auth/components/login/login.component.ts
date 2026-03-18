@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private router: Router,
     private loginService: LoginService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     this.loginForm = this.fb.group({
       organisation: [
@@ -72,5 +72,35 @@ export class LoginComponent implements OnInit {
     this.showPassword = !this.showPassword;
     const input = document.getElementById('password') as HTMLInputElement;
     input.type = this.showPassword ? 'text' : 'password';
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.loginForm.get(fieldName);
+    if (!control?.errors) return '';
+    if (control.errors['required']) {
+      switch (fieldName) {
+        case 'organisation':
+          return 'Organisation is required';
+        case 'username':
+          return 'Username is required';
+        case 'password':
+          return 'Password is required';
+        default:
+          return 'This field is required';
+      }
+    }
+    if (control.errors['pattern']) {
+      switch (fieldName) {
+        case 'organisation':
+          return 'Organisation name must start with a letter or number';
+        case 'username':
+          return 'Username must start with a letter and contain only letters, numbers, dots, underscores or hyphens';
+        case 'password':
+          return 'Invalid password format';
+        default:
+          return 'Invalid format';
+      }
+    }
+    return '';
   }
 }

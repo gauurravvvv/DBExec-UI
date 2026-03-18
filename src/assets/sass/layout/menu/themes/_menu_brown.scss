@@ -1,15 +1,15 @@
 .layout-menu-brown {
-    $menuBgColor:#4E342E;
-    
-    $rootMenuTextColor:#ffffff;
+  $menuBgColor: #4e342e;
 
-    $menuItemTextColor:rgba(255,255,255,.6);
-    $menuItemHoverBgColor:rgba(255,255,255,.12);
-    $activeMenuItemTextColor:#ffffff;
-    $activeMenuItemBgColor: rgba(255,255,255,.24);
+  $rootMenuTextColor: #ffffff;
 
-    $inlineMenuBorderColor: rgba(255,255,255,.24);
+  $menuItemTextColor: rgba(255, 255, 255, 0.6);
+  $menuItemHoverBgColor: rgba(255, 255, 255, 0.12);
+  $activeMenuItemTextColor: #ffffff;
+  $activeMenuItemBgColor: rgba(255, 255, 255, 0.24);
 
-    @import '../_menu_exports';
-    @import '../_menu_theme';
+  $inlineMenuBorderColor: rgba(255, 255, 255, 0.24);
+
+  @import '../_menu_exports';
+  @import '../_menu_theme';
 }

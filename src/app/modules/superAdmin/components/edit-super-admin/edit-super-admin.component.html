@@ -3,16 +3,32 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" routerLink="/app/super-admin">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/super-admin"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Edit Super Admin</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" [disabled]="!isFormDirty"
-          (click)="onCancel()"></button>
-        <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-          [disabled]="adminForm.invalid || !isFormDirty">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="adminForm.invalid || !isFormDirty"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -22,15 +38,37 @@
     <form [formGroup]="adminForm" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
-        <app-custom-input formControlName="firstName" label="First Name" placeholder="Enter first name" icon="pi-user"
-          [required]="true" [showError]="!!(adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched)"
-          [errorMessage]="getFirstNameError()">
+        <app-custom-input
+          formControlName="firstName"
+          label="First Name"
+          placeholder="Enter first name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              adminForm.get('firstName')?.invalid &&
+              adminForm.get('firstName')?.touched
+            )
+          "
+          [errorMessage]="getFirstNameError()"
+        >
         </app-custom-input>
 
         <!-- Last Name -->
-        <app-custom-input formControlName="lastName" label="Last Name" placeholder="Enter last name" icon="pi-user"
-          [required]="true" [showError]="!!(adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched)"
-          [errorMessage]="getLastNameError()">
+        <app-custom-input
+          formControlName="lastName"
+          label="Last Name"
+          placeholder="Enter last name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              adminForm.get('lastName')?.invalid &&
+              adminForm.get('lastName')?.touched
+            )
+          "
+          [errorMessage]="getLastNameError()"
+        >
         </app-custom-input>
 
         <!-- Username (readonly) -->
@@ -38,21 +76,50 @@
           <label for="username">Username<span class="required">*</span></label>
           <span class="p-input-icon-left">
             <i class="pi pi-user-edit"></i>
-            <input id="username" type="text" pInputText formControlName="username" placeholder="Enter username" readonly
-              [ngClass]="{ readonly: true }" />
+            <input
+              id="username"
+              type="text"
+              pInputText
+              formControlName="username"
+              placeholder="Enter username"
+              readonly
+              [ngClass]="{ readonly: true }"
+            />
           </span>
         </div>
 
         <!-- Email -->
-        <app-custom-input formControlName="email" label="Email" placeholder="Enter email address" icon="pi-envelope"
-          type="email" [required]="true"
-          [showError]="!!(adminForm.get('email')?.invalid && adminForm.get('email')?.touched)" [errorMessage]="adminForm.get('email')?.errors?.['required'] ? 'Email is required' : 
-                         adminForm.get('email')?.errors?.['email'] ? 'Please enter a valid email' : ''">
+        <app-custom-input
+          formControlName="email"
+          label="Email"
+          placeholder="Enter email address"
+          icon="pi-envelope"
+          type="email"
+          [required]="true"
+          [showError]="
+            !!(
+              adminForm.get('email')?.invalid && adminForm.get('email')?.touched
+            )
+          "
+          [errorMessage]="
+            adminForm.get('email')?.errors?.['required']
+              ? 'Email is required'
+              : adminForm.get('email')?.errors?.['email']
+                ? 'Please enter a valid email'
+                : ''
+          "
+        >
         </app-custom-input>
 
         <!-- Status -->
-        <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0" trueLabel="Active"
-          falseLabel="Inactive">
+        <app-custom-toggle
+          formControlName="status"
+          label="Status"
+          [trueValue]="1"
+          [falseValue]="0"
+          trueLabel="Active"
+          falseLabel="Inactive"
+        >
         </app-custom-toggle>
       </div>
     </form>

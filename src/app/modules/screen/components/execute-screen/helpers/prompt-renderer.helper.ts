@@ -67,7 +67,7 @@ export function formatForSubmission(type: PromptType, value: any): any {
     case 'daterange':
       if (!Array.isArray(value)) return [null, null];
       return value.map((d: Date | null) =>
-        d instanceof Date ? formatDate(d, 'yyyy-MM-dd', 'en-US') : null
+        d instanceof Date ? formatDate(d, 'yyyy-MM-dd', 'en-US') : null,
       );
 
     case 'checkbox':
@@ -91,7 +91,7 @@ export function formatForSubmission(type: PromptType, value: any): any {
  */
 export function createPromptSubmission(
   prompt: ExecutePrompt,
-  rawValue: any
+  rawValue: any,
 ): PromptSubmission {
   const formattedValue = formatForSubmission(prompt.type, rawValue);
   const isRange = isRangeType(prompt.type);

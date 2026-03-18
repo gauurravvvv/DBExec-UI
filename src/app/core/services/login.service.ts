@@ -35,12 +35,12 @@ export class LoginService {
 
           StorageService.set(
             StorageType.ORGANISATION_ID,
-            result.data.user.organisationId
+            result.data.user.organisationId,
           );
 
           StorageService.set(
             StorageType.ORGANISATION,
-            result.data.user.organisationName
+            result.data.user.organisationName,
           );
         }
         return result;

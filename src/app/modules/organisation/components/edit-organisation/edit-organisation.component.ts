@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from '../../services/organisation.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-edit-organisation',
@@ -35,8 +36,23 @@ export class EditOrganisationComponent implements OnInit {
   private initForm() {
     this.orgForm = this.fb.group({
       id: [''],
-      name: ['', [Validators.required]],
-      description: ['', [Validators.required]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
+      description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(500),
+        ],
+      ],
       status: [],
     });
 
@@ -44,7 +60,6 @@ export class EditOrganisationComponent implements OnInit {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
-      // Compare current form value with original data
       const currentValue = this.orgForm.value;
       const originalValue: any = {
         id: this.orgData?.id,
@@ -53,7 +68,6 @@ export class EditOrganisationComponent implements OnInit {
         status: this.orgData?.status,
       };
 
-      // Check if any value is different from original
       this.isFormDirty = Object.keys(currentValue).some(
         key => currentValue[key] !== originalValue[key],
       );
@@ -90,7 +104,6 @@ export class EditOrganisationComponent implements OnInit {
         }
       });
     } else {
-      // Mark all fields as touched to trigger validation messages
       Object.keys(this.orgForm.controls).forEach(key => {
         const control = this.orgForm.get(key);
         control?.markAsTouched();
@@ -107,5 +120,27 @@ export class EditOrganisationComponent implements OnInit {
     });
     this.orgForm.markAsPristine();
     this.isCancelClicked = true;
+  }
+
+  getNameError(): string {
+    const control = this.orgForm.get('name');
+    if (control?.errors?.['required']) return 'Organisation name is required';
+    if (control?.errors?.['minlength'])
+      return `Organisation name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Organisation name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Organisation name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
+  }
+
+  getDescriptionError(): string {
+    const control = this.orgForm.get('description');
+    if (control?.errors?.['required']) return 'Description is required';
+    if (control?.errors?.['minlength'])
+      return `Description must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Description must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    return '';
   }
 }

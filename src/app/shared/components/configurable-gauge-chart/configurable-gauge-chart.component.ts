@@ -112,8 +112,14 @@ export class ConfigurableGaugeChartComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartType'] ||
-        changes['chartWidth'] || changes['chartHeight'] || changes['value']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartType'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight'] ||
+      changes['value']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }

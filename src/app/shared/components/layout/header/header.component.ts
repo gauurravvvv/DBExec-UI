@@ -32,7 +32,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild('notificationMenu') notificationMenu!: ElementRef;
 
   announcementTitle: string | null = 'System Maintenance Notice';
-  announcementDescription: string | null = 'The system will undergo scheduled maintenance on March 5th, 2026. Some services may be temporarily unavailable during this period. Please save your work beforehand.';
+  announcementDescription: string | null =
+    'The system will undergo scheduled maintenance on March 5th, 2026. Some services may be temporarily unavailable during this period. Please save your work beforehand.';
   typedMessage: string = '';
   isTyping: boolean = false;
   showAnnouncementOverlay: boolean = false;
@@ -157,7 +158,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     ) {
       this.showNotificationMenu = false;
     }
-
   }
 
   toggleProfileMenu(event: Event) {

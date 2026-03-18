@@ -1,35 +1,60 @@
 <div class="save-dataset-popup" *ngIf="visible">
-    <div class="popup-content">
-        <h3>{{ dialogTitle }}</h3>
-        <form [formGroup]="datasetForm" class="dataset-form">
-            <!-- Dataset Name -->
-            <div class="form-field">
-                <app-custom-input formControlName="name" label="Name" placeholder="Enter dataset name"
-                    icon="pi-database" [required]="true"
-                    [showError]="!!(datasetForm.get('name')?.invalid && datasetForm.get('name')?.touched)"
-                    errorMessage="Dataset name is required">
-                </app-custom-input>
-            </div>
+  <div class="popup-content">
+    <h3>{{ dialogTitle }}</h3>
+    <form [formGroup]="datasetForm" class="dataset-form">
+      <!-- Dataset Name -->
+      <div class="form-field">
+        <app-custom-input
+          formControlName="name"
+          label="Name"
+          placeholder="Enter dataset name"
+          icon="pi-database"
+          [required]="true"
+          [showError]="
+            !!(
+              datasetForm.get('name')?.invalid &&
+              datasetForm.get('name')?.touched
+            )
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+      </div>
 
-            <!-- Description -->
-            <div class="form-field">
-                <app-custom-input formControlName="description" label="Description"
-                    placeholder="Enter dataset description (optional)" icon="pi-align-left">
-                </app-custom-input>
-                <small class="char-count">
-                    {{ datasetForm.get('description')?.value?.length || 0 }}/500 characters
-                </small>
-            </div>
+      <!-- Description -->
+      <div class="form-field">
+        <app-custom-input
+          formControlName="description"
+          label="Description"
+          placeholder="Enter dataset description (optional)"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+        <small class="char-count">
+          {{ datasetForm.get('description')?.value?.length || 0 }}/500
+          characters
+        </small>
+      </div>
 
-            <div class="popup-actions">
-                <button pButton type="button" label="Cancel" class="p-button-outlined p-button-danger"
-                    (click)="onCancel()">
-                </button>
-                <button pButton type="submit" label="Save Dataset" class="p-button-outlined"
-                    [disabled]="datasetForm.invalid" (click)="onSubmit()">
-                    <i class="pi pi-save mr-2"></i>
-                </button>
-            </div>
-        </form>
-    </div>
+      <div class="popup-actions">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-danger"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          label="Save Dataset"
+          class="p-button-outlined"
+          [disabled]="datasetForm.invalid"
+          (click)="onSubmit()"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

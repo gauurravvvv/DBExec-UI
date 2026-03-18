@@ -19,7 +19,7 @@ export class ViewSectionComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private sectionService: SectionService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {

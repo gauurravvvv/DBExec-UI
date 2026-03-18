@@ -8,6 +8,7 @@ import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
 
 @Component({
   selector: 'app-add-org-admin',
@@ -48,7 +49,7 @@ export class AddOrgAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.firstName),
         ],
@@ -57,7 +58,7 @@ export class AddOrgAdminComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.lastName),
         ],
@@ -72,7 +73,7 @@ export class AddOrgAdminComponent implements OnInit {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern(REGEX.password)]],
+      password: ['', [Validators.required, passwordStrengthValidator()]],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
           ? ''
@@ -109,6 +110,11 @@ export class AddOrgAdminComponent implements OnInit {
             this.router.navigate([ORGANISATION_ADMIN.LIST]);
           }
         });
+    } else {
+      Object.keys(this.adminFrom.controls).forEach(key => {
+        const control = this.adminFrom.get(key);
+        control?.markAsTouched();
+      });
     }
   }
 
@@ -118,5 +124,61 @@ export class AddOrgAdminComponent implements OnInit {
     Object.keys(this.adminFrom.controls).forEach(key => {
       this.adminFrom.get(key)?.setValue('');
     });
+  }
+
+  getFirstNameError(): string {
+    const control = this.adminFrom.get('firstName');
+    if (control?.errors?.['required']) return 'First name is required';
+    if (control?.errors?.['minlength'])
+      return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `First name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'First name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+    return '';
+  }
+
+  getLastNameError(): string {
+    const control = this.adminFrom.get('lastName');
+    if (control?.errors?.['required']) return 'Last name is required';
+    if (control?.errors?.['minlength'])
+      return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Last name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+    return '';
+  }
+
+  getUsernameError(): string {
+    const control = this.adminFrom.get('username');
+    if (control?.errors?.['required']) return 'Username is required';
+    if (control?.errors?.['minlength'])
+      return `Username must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Username must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Username must start with a letter and can only contain letters, numbers, dots, hyphens and underscores';
+    return '';
+  }
+
+  getPasswordError(): string {
+    const control = this.adminFrom.get('password');
+    if (control?.errors?.['required']) return 'Password is required';
+    if (control?.errors?.['passwordMinLength'])
+      return `Password must be at least ${control.errors['passwordMinLength'].requiredLength} characters`;
+    if (control?.errors?.['passwordMaxLength'])
+      return `Password must not exceed ${control.errors['passwordMaxLength'].requiredLength} characters`;
+    if (control?.errors?.['passwordNoSpaces'])
+      return 'Password must not contain spaces';
+    if (control?.errors?.['passwordLowercase'])
+      return 'Password must contain at least one lowercase letter';
+    if (control?.errors?.['passwordUppercase'])
+      return 'Password must contain at least one uppercase letter';
+    if (control?.errors?.['passwordDigit'])
+      return 'Password must contain at least one number';
+    if (control?.errors?.['passwordSpecial'])
+      return 'Password must contain at least one special character (e.g., @$!%*?&)';
+    return '';
   }
 }

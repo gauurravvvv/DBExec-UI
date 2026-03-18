@@ -157,8 +157,13 @@
     color: white;
     box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
 
-    i { font-size: 0.9rem; }
-    &:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4); }
+    i {
+      font-size: 0.9rem;
+    }
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+    }
   }
 }
 
@@ -481,5 +486,4 @@
       background: var(--success-color, #22c55e) !important;
     }
   }
-
 }

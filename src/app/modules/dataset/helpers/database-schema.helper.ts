@@ -4,7 +4,6 @@
  */
 
 export class DatabaseSchemaHelper {
-  
   /**
    * Filter databases based on search text
    */
@@ -12,27 +11,34 @@ export class DatabaseSchemaHelper {
     databases: any[],
     searchText: string,
     expandedDatabases: { [key: string]: boolean },
-    expandedSchemas: { [key: string]: boolean }
+    expandedSchemas: { [key: string]: boolean },
   ): any[] {
     if (!databases || databases.length === 0) {
       return [];
     }
-    
+
     if (!searchText.trim()) {
       return databases;
     }
-    
+
     const search = searchText.toLowerCase();
-    const filtered = databases.map(db => ({
-      ...db,
-      schemas: db.schemas.map((schema: any) => ({
-        ...schema,
-        tables: schema.tables.filter((table: any) => 
-          table.name.toLowerCase().includes(search) ||
-          table.columns.some((col: any) => col.name.toLowerCase().includes(search))
-        )
-      })).filter((schema: any) => schema.tables.length > 0)
-    })).filter(db => db.schemas.length > 0);
+    const filtered = databases
+      .map(db => ({
+        ...db,
+        schemas: db.schemas
+          .map((schema: any) => ({
+            ...schema,
+            tables: schema.tables.filter(
+              (table: any) =>
+                table.name.toLowerCase().includes(search) ||
+                table.columns.some((col: any) =>
+                  col.name.toLowerCase().includes(search),
+                ),
+            ),
+          }))
+          .filter((schema: any) => schema.tables.length > 0),
+      }))
+      .filter(db => db.schemas.length > 0);
 
     // Auto-expand databases and schemas that have matching results
     filtered.forEach(db => {
@@ -54,14 +60,14 @@ export class DatabaseSchemaHelper {
     expandedSchemas: { [key: string]: boolean },
     expandedTables: { [key: string]: boolean },
     schemaName?: string,
-    tableName?: string
+    tableName?: string,
   ): void {
     expandedDatabases[dbName] = true;
-    
+
     if (schemaName) {
       expandedSchemas[`${dbName}.${schemaName}`] = true;
     }
-    
+
     if (tableName && schemaName) {
       expandedTables[`${dbName}.${schemaName}.${tableName}`] = true;
     }
@@ -74,7 +80,7 @@ export class DatabaseSchemaHelper {
     databaseName: string,
     expandedDatabases: { [key: string]: boolean },
     expandedSchemas: { [key: string]: boolean },
-    expandedTables: { [key: string]: boolean }
+    expandedTables: { [key: string]: boolean },
   ): void {
     expandedDatabases[databaseName] = false;
 
@@ -99,17 +105,21 @@ export class DatabaseSchemaHelper {
   static generateColumnReference(
     schemaName: string,
     tableName: string,
-    columnName: string
+    columnName: string,
   ): string {
-    return schemaName === 'public' 
-      ? `${tableName}.${columnName}` 
+    return schemaName === 'public'
+      ? `${tableName}.${columnName}`
       : `${schemaName}.${tableName}.${columnName}`;
   }
 
   /**
    * Build table key for expanded state tracking
    */
-  static buildTableKey(dbName: string, schemaName: string, tableName: string): string {
+  static buildTableKey(
+    dbName: string,
+    schemaName: string,
+    tableName: string,
+  ): string {
     return `${dbName}.${schemaName}.${tableName}`;
   }
 

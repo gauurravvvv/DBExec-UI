@@ -6,10 +6,22 @@
         <h2>Access Manager</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" [disabled]="!isFormDirty"
-          (click)="onCancel()"></button>
-        <button pButton class="p-button-primary btn-save" type="submit" label="Grant Access" (click)="onSubmit()"
-          [disabled]="accessForm.invalid">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Grant Access"
+          (click)="onSubmit()"
+          [disabled]="accessForm.invalid"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -19,41 +31,112 @@
     <form [formGroup]="accessForm" class="admin-form">
       <div class="form-grid">
         <!-- Organisation Dropdown -->
-        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation"
-          placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
-          [filter]="true" filterBy="name" [required]="true" (onChangeEvent)="loadDatabases()"
-          [showError]="!!(accessForm.get('organisation')?.invalid && accessForm.get('organisation')?.touched)"
-          errorMessage="Organisation is required">
+        <app-custom-dropdown
+          *ngIf="showOrganisationDropdown"
+          formControlName="organisation"
+          label="Organisation"
+          placeholder="Select Organisation"
+          [options]="organisations"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
+          (onChangeEvent)="loadDatabases()"
+          [showError]="
+            !!(
+              accessForm.get('organisation')?.invalid &&
+              accessForm.get('organisation')?.touched
+            )
+          "
+          errorMessage="Organisation is required"
+        >
         </app-custom-dropdown>
 
         <!-- Database Dropdown -->
-        <app-custom-dropdown formControlName="database" label="Database" placeholder="Select Database"
-          [options]="databases" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
+        <app-custom-dropdown
+          formControlName="database"
+          label="Database"
+          placeholder="Select Database"
+          [options]="databases"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
           (onChangeEvent)="loadConnections()"
-          [showError]="!!(accessForm.get('database')?.invalid && accessForm.get('database')?.touched)"
-          errorMessage="Database is required">
+          [showError]="
+            !!(
+              accessForm.get('database')?.invalid &&
+              accessForm.get('database')?.touched
+            )
+          "
+          errorMessage="Database is required"
+        >
         </app-custom-dropdown>
 
         <!-- Connection Dropdown -->
-        <app-custom-dropdown formControlName="connection" label="Connection" placeholder="Select Connection"
-          [options]="connections" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
+        <app-custom-dropdown
+          formControlName="connection"
+          label="Connection"
+          placeholder="Select Connection"
+          [options]="connections"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
           (onChangeEvent)="onConnectionChange()"
-          [showError]="!!(accessForm.get('connection')?.invalid && accessForm.get('connection')?.touched)"
-          errorMessage="Connection is required">
+          [showError]="
+            !!(
+              accessForm.get('connection')?.invalid &&
+              accessForm.get('connection')?.touched
+            )
+          "
+          errorMessage="Connection is required"
+        >
         </app-custom-dropdown>
 
         <!-- Groups Multiselect -->
-        <app-custom-multiselect formControlName="groups" label="Groups" placeholder="Select Groups" [options]="groups"
-          optionLabel="name" optionValue="id" [filter]="true" filterBy="name" display="chip"
-          [showError]="!!(accessForm.get('groups')?.invalid && accessForm.get('groups')?.touched)"
-          errorMessage="Groups are required">
+        <app-custom-multiselect
+          formControlName="groups"
+          label="Groups"
+          placeholder="Select Groups"
+          [options]="groups"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          display="chip"
+          [showError]="
+            !!(
+              accessForm.get('groups')?.invalid &&
+              accessForm.get('groups')?.touched
+            )
+          "
+          errorMessage="Groups are required"
+        >
         </app-custom-multiselect>
 
         <!-- Users Multiselect -->
-        <app-custom-multiselect formControlName="users" label="Users" placeholder="Select Users" [options]="users"
-          optionLabel="username" optionValue="id" [filter]="true" filterBy="name" display="chip"
-          [showError]="!!(accessForm.get('users')?.invalid && accessForm.get('users')?.touched)"
-          errorMessage="Users are required">
+        <app-custom-multiselect
+          formControlName="users"
+          label="Users"
+          placeholder="Select Users"
+          [options]="users"
+          optionLabel="username"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          display="chip"
+          [showError]="
+            !!(
+              accessForm.get('users')?.invalid &&
+              accessForm.get('users')?.touched
+            )
+          "
+          errorMessage="Users are required"
+        >
         </app-custom-multiselect>
       </div>
     </form>

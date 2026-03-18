@@ -68,7 +68,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   availableColumns: any[] = [];
   cachedAvailableTables: any[] = [];
 
-
   // Enhanced autocomplete properties (WHERE)
   maxSuggestions = 50;
   currentAlias = '';
@@ -501,7 +500,10 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
               tables: parsedTables,
               promptJoin: config.prompt_join,
               promptWhere: config.prompt_where,
-              promptValues: values.map((v: any) => ({ id: v.id, value: v.value })),
+              promptValues: values.map((v: any) => ({
+                id: v.id,
+                value: v.value,
+              })),
             },
             { emitEvent: false },
           );
@@ -680,14 +682,18 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     if (idx > -1 && typeof addedValue === 'string') {
       // Check for duplicates by value string
       const isDuplicate = values.some(
-        (v: any, i: number) => i !== idx && (typeof v === 'object' ? v.value : v) === addedValue,
+        (v: any, i: number) =>
+          i !== idx && (typeof v === 'object' ? v.value : v) === addedValue,
       );
       if (isDuplicate) {
         values.splice(idx, 1);
       } else {
         values[idx] = { id: null, value: addedValue };
       }
-      this.promptForm.patchValue({ promptValues: values }, { emitEvent: false });
+      this.promptForm.patchValue(
+        { promptValues: values },
+        { emitEvent: false },
+      );
     }
   }
 
@@ -725,7 +731,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     // Check duplicate by value string
     const isDuplicate = values.some(
       (v: any, i: number) =>
-        i !== this.editingChipIndex && (typeof v === 'object' ? v.value : v) === newValue,
+        i !== this.editingChipIndex &&
+        (typeof v === 'object' ? v.value : v) === newValue,
     );
 
     if (!isDuplicate) {
@@ -1215,7 +1222,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         .map(v => v.trim())
         .filter(v => v.length > 0);
       // Get current values as {id, value} objects
-      let currentValues: any[] = this.promptForm.get('promptValues')?.value || [];
+      let currentValues: any[] =
+        this.promptForm.get('promptValues')?.value || [];
       const existingStrings = new Set(
         currentValues.map((v: any) => (typeof v === 'object' ? v.value : v)),
       );

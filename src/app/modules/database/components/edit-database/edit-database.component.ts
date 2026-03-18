@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { DATABASE } from 'src/app/constants/routes';
 import { DatabaseService } from '../../services/database.service';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -24,13 +25,13 @@ import {
         style({ opacity: 0, transform: 'translateY(-10px)' }),
         animate(
           '300ms ease-out',
-          style({ opacity: 1, transform: 'translateY(0)' })
+          style({ opacity: 1, transform: 'translateY(0)' }),
         ),
       ]),
       transition(':leave', [
         animate(
           '300ms ease-in',
-          style({ opacity: 0, transform: 'translateY(-10px)' })
+          style({ opacity: 0, transform: 'translateY(-10px)' }),
         ),
       ]),
     ]),
@@ -42,7 +43,7 @@ import {
           overflow: 'hidden',
           opacity: '0',
           padding: '0 1rem',
-        })
+        }),
       ),
       state(
         'expanded',
@@ -51,7 +52,7 @@ import {
           overflow: 'hidden',
           opacity: '1',
           padding: '1rem',
-        })
+        }),
       ),
       transition('collapsed <=> expanded', [animate('300ms ease-in-out')]),
     ]),
@@ -75,7 +76,7 @@ export class EditDatabaseComponent implements OnInit {
     private globalService: GlobalService,
     private messageService: MessageService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -96,7 +97,7 @@ export class EditDatabaseComponent implements OnInit {
         // Only mark form as dirty if values are different from initial values
         this.isFormDirty = !this.isEqual(
           this.databaseForm.getRawValue(),
-          this.initialFormValues
+          this.initialFormValues,
         );
       }
     });
@@ -108,9 +109,14 @@ export class EditDatabaseComponent implements OnInit {
     this.databaseForm = this.fb.group({
       name: [
         '',
-        [Validators.required, Validators.pattern('^[a-zA-Z0-9\\s-]+$')],
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
       ],
-      description: ['', Validators.required],
+      description: ['', [Validators.maxLength(500)]],
       type: [{ value: 'postgres', disabled: true }],
       host: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
       port: [
@@ -201,10 +207,14 @@ export class EditDatabaseComponent implements OnInit {
     const control = this.databaseForm.get(fieldName);
     if (control?.errors) {
       if (control.errors['required']) return 'This field is required';
+      if (control.errors['minlength'])
+        return `Must be at least ${control.errors['minlength'].requiredLength} characters`;
+      if (control.errors['maxlength'])
+        return `Must not exceed ${control.errors['maxlength'].requiredLength} characters`;
       if (control.errors['pattern']) {
         switch (fieldName) {
           case 'name':
-            return 'Name can only contain letters, numbers, spaces and hyphens';
+            return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
           case 'host':
             return 'Invalid host format';
           case 'port':
@@ -214,10 +224,6 @@ export class EditDatabaseComponent implements OnInit {
           default:
             return 'Invalid format';
         }
-      }
-      if (control.errors['minlength']) return 'Minimum length is 8 characters';
-      if (fieldName === 'password' && control.errors['pattern']) {
-        return 'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character';
       }
       if (control.errors['min'] && fieldName === 'port')
         return 'Port must be at least 1';

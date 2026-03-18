@@ -123,7 +123,7 @@ export class QueryService {
 
   getTableColumns(databaseId: number, tableName: string): Observable<any> {
     return this.httpClientService.queryGet(
-      `/database/columns/${databaseId}/${tableName}`
+      `/database/columns/${databaseId}/${tableName}`,
     );
   }
 }

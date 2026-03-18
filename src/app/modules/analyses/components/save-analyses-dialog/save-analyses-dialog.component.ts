@@ -8,6 +8,7 @@ import {
   HostListener,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { REGEX } from 'src/app/constants/regex.constant';
 
 export interface AnalysisFormData {
   name: string;
@@ -52,9 +53,29 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
 
   initForm() {
     this.analysisForm = this.fb.group({
-      name: ['', [Validators.required, Validators.maxLength(100)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: ['', [Validators.maxLength(500)]],
     });
+  }
+
+  getNameError(): string {
+    const control = this.analysisForm.get('name');
+    if (control?.errors?.['required']) return 'Analysis name is required';
+    if (control?.errors?.['minlength'])
+      return `Analysis name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Analysis name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Analysis name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 
   onSubmit() {

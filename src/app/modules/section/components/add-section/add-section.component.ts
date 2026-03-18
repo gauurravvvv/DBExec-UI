@@ -95,9 +95,28 @@ export class AddSectionComponent implements OnInit {
 
   createSection(): FormGroup {
     return this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
-      description: ['', [Validators.pattern(REGEX.lastName)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
+      description: [''],
     });
+  }
+
+  getNameError(control: any): string {
+    if (control?.errors?.['required']) return 'Section name is required';
+    if (control?.errors?.['minlength'])
+      return `Section name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Section name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Section name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 
   getTabSections(groupIndex: number): FormArray {
@@ -186,7 +205,10 @@ export class AddSectionComponent implements OnInit {
   }
 
   get areAllExpanded(): boolean {
-    return this.tabGroups.length > 0 && this.expandedGroups.size === this.tabGroups.length;
+    return (
+      this.tabGroups.length > 0 &&
+      this.expandedGroups.size === this.tabGroups.length
+    );
   }
 
   get hasEmptySections(): boolean {

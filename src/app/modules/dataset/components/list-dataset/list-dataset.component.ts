@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -352,11 +358,13 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
     if (event.key === 'ArrowDown') {
       event.preventDefault();
-      this.qbActiveIndex = this.qbActiveIndex < len - 1 ? this.qbActiveIndex + 1 : 0;
+      this.qbActiveIndex =
+        this.qbActiveIndex < len - 1 ? this.qbActiveIndex + 1 : 0;
       this.scrollQbActiveIntoView();
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
-      this.qbActiveIndex = this.qbActiveIndex > 0 ? this.qbActiveIndex - 1 : len - 1;
+      this.qbActiveIndex =
+        this.qbActiveIndex > 0 ? this.qbActiveIndex - 1 : len - 1;
       this.scrollQbActiveIntoView();
     } else if (event.key === 'Enter' && this.qbActiveIndex >= 0) {
       event.preventDefault();
@@ -394,7 +402,8 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.queryBuilders = response.data?.screens || [];
-          this.qbTotalRecords = response.data?.count || this.queryBuilders.length;
+          this.qbTotalRecords =
+            response.data?.count || this.queryBuilders.length;
         } else {
           this.queryBuilders = [];
           this.qbTotalRecords = 0;

@@ -23,7 +23,7 @@
   border: 1px solid var(--border-color);
   border-radius: 16px;
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
     0 24px 48px -12px rgba(0, 0, 0, 0.25),
     0 8px 16px -4px rgba(0, 0, 0, 0.12);
   overflow: hidden;
@@ -96,7 +96,9 @@
       color: var(--secondary-color);
       transition: all 0.15s ease;
 
-      i { font-size: 0.8rem; }
+      i {
+        font-size: 0.8rem;
+      }
 
       &:hover {
         background: var(--hover-background);
@@ -154,7 +156,7 @@
       box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
 
       .pill-count {
-        background: rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.2);
         color: white;
       }
     }
@@ -167,9 +169,16 @@
   flex: 1;
   padding: 8px;
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
+  }
 
   .result-item {
     display: flex;
@@ -184,8 +193,13 @@
     &:hover {
       background: var(--hover-background);
 
-      .result-body .result-title { color: var(--primary-color); }
-      .arrow-icon { opacity: 1; transform: translateX(0); }
+      .result-body .result-title {
+        color: var(--primary-color);
+      }
+      .arrow-icon {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     .result-icon-wrap {
@@ -302,7 +316,9 @@
     color: var(--text-color);
     margin: 0 0 6px;
 
-    strong { color: var(--text-color); }
+    strong {
+      color: var(--text-color);
+    }
   }
 
   .empty-hint {
@@ -366,11 +382,21 @@
 
 // ── Keyframes ─────────────────────────────────────────────────────
 @keyframes overlayIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

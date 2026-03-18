@@ -1,19 +1,20 @@
 <div class="form-field">
-    <label *ngIf="label">
-        {{ label }}
-        <span class="required" *ngIf="required">*</span>
-    </label>
-    <textarea
-        pInputTextarea
-        [placeholder]="placeholder"
-        [value]="value"
-        [disabled]="disabled"
-        [rows]="rows"
-        [ngClass]="{'ng-invalid ng-dirty': showError}"
-        (input)="onInputChange($event)"
-        (blur)="onBlur()">
-    </textarea>
-    <small class="error-message" *ngIf="showError && errorMessage">
-        {{ errorMessage }}
-    </small>
+  <label *ngIf="label">
+    {{ label }}
+    <span class="required" *ngIf="required">*</span>
+  </label>
+  <textarea
+    pInputTextarea
+    [placeholder]="placeholder"
+    [value]="value"
+    [disabled]="disabled"
+    [rows]="rows"
+    [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+    (input)="onInputChange($event)"
+    (blur)="onBlur()"
+  >
+  </textarea>
+  <small class="error-message" *ngIf="showError && errorMessage">
+    {{ errorMessage }}
+  </small>
 </div>

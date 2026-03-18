@@ -1,5 +1,12 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
 } from '@angular/core';
 import { buildSankeyChartOption } from '../../helpers/echarts-option-builder';
 
@@ -8,7 +15,9 @@ import { buildSankeyChartOption } from '../../helpers/echarts-option-builder';
   templateUrl: './configurable-sankey-chart.component.html',
   styleUrls: ['./configurable-sankey-chart.component.scss'],
 })
-export class ConfigurableSankeyChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableSankeyChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
 
   @Input() data: any = { nodes: [], links: [] };
@@ -43,7 +52,12 @@ export class ConfigurableSankeyChartComponent implements OnInit, OnChanges, DoCh
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }

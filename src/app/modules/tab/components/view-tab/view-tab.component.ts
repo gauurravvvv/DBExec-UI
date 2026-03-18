@@ -19,7 +19,7 @@ export class ViewTabComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private tabService: TabService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {

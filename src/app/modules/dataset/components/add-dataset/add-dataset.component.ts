@@ -1369,9 +1369,10 @@ export class AddDatasetComponent
     if (!this.editor) return;
 
     const selection = this.editor.getSelection();
-    const text = schemaName.toLowerCase() === 'public'
-      ? `${tableName}.${columnName}`
-      : `${schemaName}.${tableName}.${columnName}`;
+    const text =
+      schemaName.toLowerCase() === 'public'
+        ? `${tableName}.${columnName}`
+        : `${schemaName}.${tableName}.${columnName}`;
 
     this.editor.executeEdits('insert-column', [
       {

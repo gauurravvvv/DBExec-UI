@@ -31,7 +31,7 @@ export class EditConnectionComponent implements OnInit {
     private route: ActivatedRoute,
     private globalService: GlobalService,
     private tabService: TabService,
-    private connectionService: ConnectionService
+    private connectionService: ConnectionService,
   ) {
     this.initForm();
   }
@@ -58,7 +58,15 @@ export class EditConnectionComponent implements OnInit {
   initForm(): void {
     this.connectionForm = this.fb.group({
       id: [''],
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: [''],
       organisation: [''],
       database: [''],
@@ -107,7 +115,6 @@ export class EditConnectionComponent implements OnInit {
 
   onCancel(): void {
     if (this.isFormDirty) {
-      // Restore basic form values
       this.connectionForm.patchValue({
         id: this.connectionData.id,
         name: this.connectionData.name,
@@ -115,7 +122,7 @@ export class EditConnectionComponent implements OnInit {
         organisation: this.connectionData.organisationId,
         database: this.connectionData.databaseId,
         status: this.connectionData.status,
-        dbUserName: this.connectionData.dbUsername,
+        dbUsername: this.connectionData.dbUsername,
         dbPassword: '',
       });
 
@@ -130,5 +137,17 @@ export class EditConnectionComponent implements OnInit {
   togglePassword(event: Event) {
     event.preventDefault();
     this.showPassword = !this.showPassword;
+  }
+
+  getNameError(): string {
+    const control = this.connectionForm.get('name');
+    if (control?.errors?.['required']) return 'Connection name is required';
+    if (control?.errors?.['minlength'])
+      return `Connection name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Connection name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 }

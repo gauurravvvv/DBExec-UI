@@ -50,7 +50,7 @@ export class ListCategoryComponent implements OnInit {
     private categoryService: CategoryService,
     private organisationService: OrganisationService,
     private router: Router,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {
@@ -134,13 +134,13 @@ export class ListCategoryComponent implements OnInit {
       filtered = filtered.filter(
         category =>
           category.name.toLowerCase().includes(search) ||
-          category.description?.toLowerCase().includes(search)
+          category.description?.toLowerCase().includes(search),
       );
     }
 
     if (this.selectedStatus !== null) {
       filtered = filtered.filter(
-        category => category.status === this.selectedStatus
+        category => category.status === this.selectedStatus,
       );
     }
 

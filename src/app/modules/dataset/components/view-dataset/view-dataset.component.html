@@ -1,328 +1,417 @@
 <div class="view-category-wrapper">
-    <div class="view-category-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text p-button-plain back-button" (click)="goBack()">
-                    <i class="pi pi-arrow-left text-xl"></i>
-                </button>
-                <h2>Dataset Details</h2>
-            </div>
-            <div class="header-actions">
-                <button class="btn-primary" (click)="onEdit()">
-                    <i class="pi pi-pencil"></i>
-                    Edit
-                </button>
-                <button class="btn-danger" type="button" (click)="confirmDelete()">
-                    <i class="pi pi-trash"></i>
-                    Delete
-                </button>
-            </div>
-        </div>
+  <div class="view-category-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          (click)="goBack()"
+        >
+          <i class="pi pi-arrow-left text-xl"></i>
+        </button>
+        <h2>Dataset Details</h2>
+      </div>
+      <div class="header-actions">
+        <button class="btn-primary" (click)="onEdit()">
+          <i class="pi pi-pencil"></i>
+          Edit
+        </button>
+        <button class="btn-danger" type="button" (click)="confirmDelete()">
+          <i class="pi pi-trash"></i>
+          Delete
+        </button>
+      </div>
+    </div>
 
-        <!-- Content Section -->
-        <div class="content-section" *ngIf="datasetData">
-            <div class="details-grid">
-                <!-- Basic Information -->
-                <div class="info-section">
-                    <h3>
-                        <i class="pi pi-info-circle mr-2"></i>
-                        Basic Information
-                    </h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <label>Dataset Name</label>
-                            <p>{{ datasetData.name }}</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Description</label>
-                            <p>{{ datasetData.description || 'No description available' }}</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Type</label>
-                            <p>{{ datasetData.type === 1 ? 'SQL Based' : 'Prompt Based' }}</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Status</label>
-                            <span class="status-badge" [class.active]="datasetData.status === 1">
-                                <i class="pi" [ngClass]="
+    <!-- Content Section -->
+    <div class="content-section" *ngIf="datasetData">
+      <div class="details-grid">
+        <!-- Basic Information -->
+        <div class="info-section">
+          <h3>
+            <i class="pi pi-info-circle mr-2"></i>
+            Basic Information
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Dataset Name</label>
+              <p>{{ datasetData.name }}</p>
+            </div>
+            <div class="info-item">
+              <label>Description</label>
+              <p>{{ datasetData.description || 'No description available' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Type</label>
+              <p>{{ datasetData.type === 1 ? 'SQL Based' : 'Prompt Based' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Status</label>
+              <span
+                class="status-badge"
+                [class.active]="datasetData.status === 1"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
                     datasetData.status === 1
                       ? 'pi-check-circle'
                       : 'pi-times-circle'
-                  "></i>
-                                {{ datasetData.status === 1 ? 'Active' : 'Inactive' }}
-                            </span>
-                        </div>
-                        <div class="info-item">
-                            <label>Organisation</label>
-                            <p class="with-icon">
-                                <i class="pi pi-building mr-2"></i>
-                                {{ datasetData.organisationName }}
-                            </p>
-                        </div>
-                        <div class="info-item">
-                            <label>Database</label>
-                            <p class="with-icon">
-                                <i class="pi pi-database mr-2"></i>
-                                {{ datasetData.databaseName }}
-                            </p>
-                        </div>
-                        <div class="info-item">
-                            <label>Created On</label>
-                            <p class="with-icon">
-                                <i class="pi pi-calendar mr-2"></i>
-                                {{ datasetData.createdOn | date : 'medium' }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Query Builder Configuration (Type 2 only) -->
-                <div class="info-section full-width" *ngIf="datasetData.type === 2 && datasetData.screenId">
-                    <div class="section-header">
-                        <h3>
-                            <i class="pi pi-sliders-h mr-2"></i>
-                            Query Builder Configuration
-                        </h3>
-                    </div>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <label>Query Builder</label>
-                            <p class="with-icon">
-                                <i class="pi pi-sitemap mr-2"></i>
-                                {{ datasetData.screenName || 'Screen #' + datasetData.screenId }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Grouped Display: Tab + Accordion (matches Execution Config popup) -->
-                    <div class="qb-config-display" *ngIf="datasetData.promptConfig?.display?.length > 0">
-                        <p-tabView [scrollable]="true" styleClass="qb-config-tabs">
-                            <p-tabPanel *ngFor="let tab of datasetData.promptConfig.display"
-                                [header]="tab.tabName">
-                                <p-accordion [multiple]="true">
-                                    <p-accordionTab *ngFor="let section of tab.sections"
-                                        [header]="section.sectionName" [selected]="true">
-                                        <div class="result-table">
-                                            <div class="result-row" *ngFor="let prompt of section.prompts">
-                                                <span class="result-name">{{ prompt.name }}</span>
-                                                <span class="result-value">{{ formatPromptValue(prompt) }}</span>
-                                            </div>
-                                        </div>
-                                    </p-accordionTab>
-                                </p-accordion>
-                            </p-tabPanel>
-                        </p-tabView>
-                    </div>
-
-                    <!-- Fallback: flat prompts list (old format without display grouping) -->
-                    <div class="qb-config-display"
-                        *ngIf="!datasetData.promptConfig?.display && datasetData.promptConfig?.prompts?.length > 0">
-                        <div class="result-table">
-                            <div class="result-row" *ngFor="let p of datasetData.promptConfig.prompts">
-                                <span class="result-name">{{ p.name || 'Prompt #' + p.promptId }}</span>
-                                <span class="result-value">{{ formatPromptValue(p) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SQL Query -->
-                <div class="info-section full-width">
-                    <div class="section-header">
-                        <h3>
-                            <i class="pi pi-code mr-2"></i>
-                            {{ datasetData.type === 2 ? 'Generated SQL Query' : 'SQL Query' }}
-                        </h3>
-                        <div class="sql-actions">
-                            <button pButton class="p-button-text btn-export" (click)="copySQLToClipboard()"
-                                pTooltip="Copy SQL" tooltipPosition="top">
-                                <i class="pi pi-copy"></i>
-                            </button>
-                            <button pButton class="p-button-text btn-export" (click)="downloadSQL()"
-                                pTooltip="Download SQL" tooltipPosition="top">
-                                <i class="pi pi-download"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="sql-container">
-                        <pre class="sql-content">{{ datasetData.sql }}</pre>
-                    </div>
-                </div>
-
-                <!-- Fields -->
-                <div class="info-section full-width">
-                    <div class="section-header">
-                        <h3>
-                            <i class="pi pi-list mr-2"></i>
-                            Fields
-                            <span class="count-badge">{{ datasetData.datasetFields?.length || 0 }}</span>
-                        </h3>
-                        <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
-                            <i class="pi pi-plus"></i>
-                            Add Custom Field
-                        </button>
-                    </div>
-                    <div class="column-mapping-container">
-                        <div
-                            *ngIf="datasetData?.datasetFields && datasetData?.datasetFields.length > 0; else noMappings">
-                            <div class="mapping-list">
-                                <div class="mapping-item"
-                                    *ngFor="let entity of datasetData.datasetFields; let i = index"
-                                    [class.custom-field]="entity.type === 2">
-                                    <span class="field-number">{{ i + 1 }}</span>
-                                    <div class="field-content">
-                                        <span class="column-view">{{ entity.columnToView }}</span>
-                                        <span class="column-use">{{ entity.columnToUse }}</span>
-                                    </div>
-                                    <div class="field-actions">
-                                        <button pButton class="p-button-text p-button-sm btn-edit"
-                                            (click)="openEditFieldDialog(entity, i)" pTooltip="Edit field"
-                                            tooltipPosition="top">
-                                            <i class="pi pi-pencil"></i>
-                                        </button>
-                                        <button pButton class="p-button-text p-button-sm p-button-danger btn-delete"
-                                            (click)="confirmDeleteField(entity, i)" pTooltip="Delete field"
-                                            tooltipPosition="top" [disabled]="entity.type !== 2">
-                                            <i class="pi pi-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <ng-template #noMappings>
-                            <div class="no-data">
-                                <i class="pi pi-info-circle"></i>
-                                <span>No fields found</span>
-                            </div>
-                        </ng-template>
-                    </div>
-                </div>
-
-                <!-- Analyses -->
-                <div class="info-section full-width">
-                    <h3>
-                        <i class="pi pi-chart-bar mr-2"></i>
-                        Analyses
-                        <span class="count-badge">{{ datasetData.analyses?.length || 0 }}</span>
-                    </h3>
-                    <div class="fields-list">
-                        <div class="field-item" *ngFor="let analysis of datasetData.analyses">
-                            <i class="pi pi-chart-line"></i>
-                            {{ analysis.name || analysis }}
-                        </div>
-                        <div *ngIf="!datasetData?.analyses || datasetData?.analyses.length === 0" class="no-data">
-                            No analyses found
-                        </div>
-                    </div>
-                </div>
+                  "
+                ></i>
+                {{ datasetData.status === 1 ? 'Active' : 'Inactive' }}
+              </span>
             </div>
+            <div class="info-item">
+              <label>Organisation</label>
+              <p class="with-icon">
+                <i class="pi pi-building mr-2"></i>
+                {{ datasetData.organisationName }}
+              </p>
+            </div>
+            <div class="info-item">
+              <label>Database</label>
+              <p class="with-icon">
+                <i class="pi pi-database mr-2"></i>
+                {{ datasetData.databaseName }}
+              </p>
+            </div>
+            <div class="info-item">
+              <label>Created On</label>
+              <p class="with-icon">
+                <i class="pi pi-calendar mr-2"></i>
+                {{ datasetData.createdOn | date: 'medium' }}
+              </p>
+            </div>
+          </div>
         </div>
+
+        <!-- Query Builder Configuration (Type 2 only) -->
+        <div
+          class="info-section full-width"
+          *ngIf="datasetData.type === 2 && datasetData.screenId"
+        >
+          <div class="section-header">
+            <h3>
+              <i class="pi pi-sliders-h mr-2"></i>
+              Query Builder Configuration
+            </h3>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Query Builder</label>
+              <p class="with-icon">
+                <i class="pi pi-sitemap mr-2"></i>
+                {{
+                  datasetData.screenName || 'Screen #' + datasetData.screenId
+                }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Grouped Display: Tab + Accordion (matches Execution Config popup) -->
+          <div
+            class="qb-config-display"
+            *ngIf="datasetData.promptConfig?.display?.length > 0"
+          >
+            <p-tabView [scrollable]="true" styleClass="qb-config-tabs">
+              <p-tabPanel
+                *ngFor="let tab of datasetData.promptConfig.display"
+                [header]="tab.tabName"
+              >
+                <p-accordion [multiple]="true">
+                  <p-accordionTab
+                    *ngFor="let section of tab.sections"
+                    [header]="section.sectionName"
+                    [selected]="true"
+                  >
+                    <div class="result-table">
+                      <div
+                        class="result-row"
+                        *ngFor="let prompt of section.prompts"
+                      >
+                        <span class="result-name">{{ prompt.name }}</span>
+                        <span class="result-value">{{
+                          formatPromptValue(prompt)
+                        }}</span>
+                      </div>
+                    </div>
+                  </p-accordionTab>
+                </p-accordion>
+              </p-tabPanel>
+            </p-tabView>
+          </div>
+
+          <!-- Fallback: flat prompts list (old format without display grouping) -->
+          <div
+            class="qb-config-display"
+            *ngIf="
+              !datasetData.promptConfig?.display &&
+              datasetData.promptConfig?.prompts?.length > 0
+            "
+          >
+            <div class="result-table">
+              <div
+                class="result-row"
+                *ngFor="let p of datasetData.promptConfig.prompts"
+              >
+                <span class="result-name">{{
+                  p.name || 'Prompt #' + p.promptId
+                }}</span>
+                <span class="result-value">{{ formatPromptValue(p) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SQL Query -->
+        <div class="info-section full-width">
+          <div class="section-header">
+            <h3>
+              <i class="pi pi-code mr-2"></i>
+              {{ datasetData.type === 2 ? 'Generated SQL Query' : 'SQL Query' }}
+            </h3>
+            <div class="sql-actions">
+              <button
+                pButton
+                class="p-button-text btn-export"
+                (click)="copySQLToClipboard()"
+                pTooltip="Copy SQL"
+                tooltipPosition="top"
+              >
+                <i class="pi pi-copy"></i>
+              </button>
+              <button
+                pButton
+                class="p-button-text btn-export"
+                (click)="downloadSQL()"
+                pTooltip="Download SQL"
+                tooltipPosition="top"
+              >
+                <i class="pi pi-download"></i>
+              </button>
+            </div>
+          </div>
+          <div class="sql-container">
+            <pre class="sql-content">{{ datasetData.sql }}</pre>
+          </div>
+        </div>
+
+        <!-- Fields -->
+        <div class="info-section full-width">
+          <div class="section-header">
+            <h3>
+              <i class="pi pi-list mr-2"></i>
+              Fields
+              <span class="count-badge">{{
+                datasetData.datasetFields?.length || 0
+              }}</span>
+            </h3>
+            <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
+              <i class="pi pi-plus"></i>
+              Add Custom Field
+            </button>
+          </div>
+          <div class="column-mapping-container">
+            <div
+              *ngIf="
+                datasetData?.datasetFields &&
+                  datasetData?.datasetFields.length > 0;
+                else noMappings
+              "
+            >
+              <div class="mapping-list">
+                <div
+                  class="mapping-item"
+                  *ngFor="
+                    let entity of datasetData.datasetFields;
+                    let i = index
+                  "
+                  [class.custom-field]="entity.type === 2"
+                >
+                  <span class="field-number">{{ i + 1 }}</span>
+                  <div class="field-content">
+                    <span class="column-view">{{ entity.columnToView }}</span>
+                    <span class="column-use">{{ entity.columnToUse }}</span>
+                  </div>
+                  <div class="field-actions">
+                    <button
+                      pButton
+                      class="p-button-text p-button-sm btn-edit"
+                      (click)="openEditFieldDialog(entity, i)"
+                      pTooltip="Edit field"
+                      tooltipPosition="top"
+                    >
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button
+                      pButton
+                      class="p-button-text p-button-sm p-button-danger btn-delete"
+                      (click)="confirmDeleteField(entity, i)"
+                      pTooltip="Delete field"
+                      tooltipPosition="top"
+                      [disabled]="entity.type !== 2"
+                    >
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noMappings>
+              <div class="no-data">
+                <i class="pi pi-info-circle"></i>
+                <span>No fields found</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Analyses -->
+        <div class="info-section full-width">
+          <h3>
+            <i class="pi pi-chart-bar mr-2"></i>
+            Analyses
+            <span class="count-badge">{{
+              datasetData.analyses?.length || 0
+            }}</span>
+          </h3>
+          <div class="fields-list">
+            <div
+              class="field-item"
+              *ngFor="let analysis of datasetData.analyses"
+            >
+              <i class="pi pi-chart-line"></i>
+              {{ analysis.name || analysis }}
+            </div>
+            <div
+              *ngIf="
+                !datasetData?.analyses || datasetData?.analyses.length === 0
+              "
+              class="no-data"
+            >
+              No analyses found
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Edit Fields Dialog -->
-<app-edit-dataset-fields-dialog [visible]="showEditFieldsDialog" [field]="selectedField"
-    [fieldIndex]="selectedFieldIndex" (close)="onEditFieldDialogClose($event)">
+<app-edit-dataset-fields-dialog
+  [visible]="showEditFieldsDialog"
+  [field]="selectedField"
+  [fieldIndex]="selectedFieldIndex"
+  (close)="onEditFieldDialogClose($event)"
+>
 </app-edit-dataset-fields-dialog>
 
 <!-- Add Custom Field Dialog -->
-<app-add-custom-field-dialog [visible]="showAddCustomFieldDialog" [datasetId]="datasetData?.id"
-    [organisationId]="datasetData?.organisationId" [datasetFields]="datasetData?.datasetFields || []"
-    (close)="onAddCustomFieldDialogClose($event)">
+<app-add-custom-field-dialog
+  [visible]="showAddCustomFieldDialog"
+  [datasetId]="datasetData?.id"
+  [organisationId]="datasetData?.organisationId"
+  [datasetFields]="datasetData?.datasetFields || []"
+  (close)="onAddCustomFieldDialogClose($event)"
+>
 </app-add-custom-field-dialog>
 
 <!-- Edit Custom Field Dialog -->
-<app-add-custom-field-dialog [visible]="showEditCustomFieldDialog" [datasetId]="datasetData?.id"
-    [organisationId]="datasetData?.organisationId" [datasetFields]="datasetData?.datasetFields || []" [editMode]="true"
-    [editFieldData]="selectedField" (close)="onEditCustomFieldDialogClose($event)">
+<app-add-custom-field-dialog
+  [visible]="showEditCustomFieldDialog"
+  [datasetId]="datasetData?.id"
+  [organisationId]="datasetData?.organisationId"
+  [datasetFields]="datasetData?.datasetFields || []"
+  [editMode]="true"
+  [editFieldData]="selectedField"
+  (close)="onEditCustomFieldDialogClose($event)"
+>
 </app-add-custom-field-dialog>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-    <div class="popup-content">
-        <!-- Header -->
-        <div class="popup-header">
-            <div class="popup-icon">
-                <i class="pi pi-trash"></i>
-            </div>
-            <h3>Confirm Delete</h3>
-        </div>
-
-        <!-- Delete Info Section -->
-        <div class="standard-delete-section">
-            <p class="delete-intro">
-                Are you sure you want to delete this dataset?
-            </p>
-
-            <ul class="delete-info-list">
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>All associated analyses will be affected</span>
-                </li>
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>Dataset configurations will be removed</span>
-                </li>
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>This action cannot be undone</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Actions -->
-        <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">
-                <i class="pi pi-times"></i>
-                Cancel
-            </button>
-            <button class="btn-confirm" (click)="proceedDelete()">
-                <i class="pi pi-trash"></i>
-                Delete
-            </button>
-        </div>
+  <div class="popup-content">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3>Confirm Delete</h3>
     </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">Are you sure you want to delete this dataset?</p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>All associated analyses will be affected</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>Dataset configurations will be removed</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()">
+        <i class="pi pi-trash"></i>
+        Delete
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Delete Field Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteFieldConfirm">
-    <div class="popup-content">
-        <!-- Header -->
-        <div class="popup-header">
-            <div class="popup-icon">
-                <i class="pi pi-trash"></i>
-            </div>
-            <h3>Confirm Delete Field</h3>
-        </div>
-
-        <!-- Delete Info Section -->
-        <div class="standard-delete-section">
-            <p class="delete-intro">
-                Are you sure you want to delete this field?
-            </p>
-
-            <ul class="delete-info-list">
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>This field will be removed from the dataset</span>
-                </li>
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>This action cannot be undone</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Actions -->
-        <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDeleteField()">
-                <i class="pi pi-times"></i>
-                Cancel
-            </button>
-            <button class="btn-confirm" (click)="proceedDeleteField()">
-                <i class="pi pi-trash"></i>
-                Delete
-            </button>
-        </div>
+  <div class="popup-content">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3>Confirm Delete Field</h3>
     </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">Are you sure you want to delete this field?</p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This field will be removed from the dataset</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDeleteField()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="proceedDeleteField()">
+        <i class="pi pi-trash"></i>
+        Delete
+      </button>
+    </div>
+  </div>
 </div>

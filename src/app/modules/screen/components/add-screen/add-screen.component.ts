@@ -64,7 +64,15 @@ export class AddScreenComponent implements OnInit {
         Validators.required,
       ],
       database: [{ value: '', disabled: true }, Validators.required],
-      name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(64),
+          Validators.pattern(REGEX.orgName),
+        ],
+      ],
       description: [''],
     });
 
@@ -84,6 +92,18 @@ export class AddScreenComponent implements OnInit {
         this.organisations = [...response.data.orgs];
       }
     });
+  }
+
+  getNameError(): string {
+    const control = this.screenForm.get('name');
+    if (control?.errors?.['required']) return 'Screen name is required';
+    if (control?.errors?.['minlength'])
+      return `Screen name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Screen name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Screen name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
   }
 
   onSubmit() {

@@ -86,7 +86,7 @@ export class AddCustomFieldDialogComponent
 
   constructor(
     private datasetService: DatasetService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -144,7 +144,7 @@ export class AddCustomFieldDialogComponent
         // Filter out the current field being edited to prevent self-reference
         if (this.editMode && this.editFieldData) {
           this.filteredFields = this.datasetFields.filter(
-            (field: any) => field.id !== this.editFieldData.id
+            (field: any) => field.id !== this.editFieldData.id,
           );
         } else {
           this.filteredFields = [...this.datasetFields];
@@ -231,7 +231,7 @@ export class AddCustomFieldDialogComponent
     // Set language configuration from helper
     monaco.languages.setLanguageConfiguration(
       'formulaLang',
-      FORMULA_LANGUAGE_CONFIG
+      FORMULA_LANGUAGE_CONFIG,
     );
 
     // Set token provider for syntax highlighting from helper
@@ -298,7 +298,7 @@ export class AddCustomFieldDialogComponent
     let availableFields = this.datasetFields || [];
     if (this.editMode && this.editFieldData) {
       availableFields = availableFields.filter(
-        (field: any) => field.id !== this.editFieldData.id
+        (field: any) => field.id !== this.editFieldData.id,
       );
     }
 
@@ -329,7 +329,7 @@ export class AddCustomFieldDialogComponent
             // Suggest dataset fields using helper
             availableFields.forEach((field: any) => {
               suggestions.push(
-                createFieldCompletionItem(field, range, monaco, true)
+                createFieldCompletionItem(field, range, monaco, true),
               );
             });
             return { suggestions };
@@ -343,7 +343,7 @@ export class AddCustomFieldDialogComponent
           // Add field suggestions with { wrapper using helper
           availableFields.forEach((field: any) => {
             suggestions.push(
-              createFieldCompletionItem(field, range, monaco, false)
+              createFieldCompletionItem(field, range, monaco, false),
             );
           });
 
@@ -356,7 +356,7 @@ export class AddCustomFieldDialogComponent
     return this.functionCategories.reduce(
       (acc: FunctionDefinition[], cat: FunctionCategory) =>
         acc.concat(cat.functions),
-      []
+      [],
     );
   }
 
@@ -492,7 +492,7 @@ export class AddCustomFieldDialogComponent
       // Find matching field by columnToUse or columnToView (any type)
       const matchedField = this.datasetFields.find(
         (field: any) =>
-          field.columnToUse === fieldName || field.columnToView === fieldName
+          field.columnToUse === fieldName || field.columnToView === fieldName,
       );
 
       if (matchedField && !usedIds.includes(matchedField.id)) {
@@ -562,14 +562,14 @@ export class AddCustomFieldDialogComponent
   getTotalFunctionCount(): number {
     return this.functionCategories.reduce(
       (total: number, cat: FunctionCategory) => total + cat.functions.length,
-      0
+      0,
     );
   }
 
   getFilteredFunctionCount(): number {
     return this.filteredCategories.reduce(
       (total: number, cat: FunctionCategory) => total + cat.functions.length,
-      0
+      0,
     );
   }
 
@@ -638,7 +638,7 @@ export class AddCustomFieldDialogComponent
     let baseFields = this.datasetFields;
     if (this.editMode && this.editFieldData) {
       baseFields = this.datasetFields.filter(
-        (field: any) => field.id !== this.editFieldData.id
+        (field: any) => field.id !== this.editFieldData.id,
       );
     }
 
@@ -650,7 +650,7 @@ export class AddCustomFieldDialogComponent
     this.filteredFields = baseFields.filter(
       (field: any) =>
         field.columnToView?.toLowerCase().includes(query) ||
-        field.columnToUse?.toLowerCase().includes(query)
+        field.columnToUse?.toLowerCase().includes(query),
     );
   }
 

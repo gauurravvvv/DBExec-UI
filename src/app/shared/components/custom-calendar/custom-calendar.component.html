@@ -1,61 +1,141 @@
 <div class="form-field">
-    <ng-container *ngIf="label">
-        <!-- Floating Label -->
-        <span class="p-float-label" *ngIf="floatingLabel">
-            <p-calendar [ngModel]="value" [showTime]="showTime" [showIcon]="showIcon" [dateFormat]="dateFormat"
-                [showButtonBar]="showButtonBar" [showWeek]="showWeek" [numberOfMonths]="numberOfMonths"
-                [view]="view" [showOtherMonths]="showOtherMonths" [selectOtherMonths]="selectOtherMonths"
-                [yearNavigator]="yearNavigator" [monthNavigator]="monthNavigator" [yearRange]="yearRange"
-                [firstDayOfWeek]="firstDayOfWeek" [timeOnly]="timeOnly" [hourFormat]="hourFormat"
-                [showSeconds]="showSeconds" [stepHour]="stepHour" [stepMinute]="stepMinute"
-                [stepSecond]="stepSecond" [selectionMode]="selectionMode" [readonlyInput]="readonlyInput"
-                [touchUI]="touchUI" [keepInvalid]="keepInvalid" [inline]="inline"
-                [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)" [maxDate]="$any(maxDate)" [disabledDays]="disabledDays"
-                [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
-                (ngModelChange)="onValueChange($event)" (onBlur)="onBlur()" [inputId]="inputId"
-                [appendTo]="appendTo" panelStyleClass="custom-calendar-panel">
-            </p-calendar>
-            <label [for]="inputId">
-                {{ label }}
-                <span class="required" *ngIf="required">*</span>
-            </label>
-        </span>
-        <!-- Normal Label -->
-        <ng-container *ngIf="!floatingLabel">
-            <label class="normal-label">
-                {{ label }}
-                <span class="required" *ngIf="required">*</span>
-            </label>
-            <p-calendar [ngModel]="value" [showTime]="showTime" [showIcon]="showIcon" [dateFormat]="dateFormat"
-                [showButtonBar]="showButtonBar" [showWeek]="showWeek" [numberOfMonths]="numberOfMonths"
-                [view]="view" [showOtherMonths]="showOtherMonths" [selectOtherMonths]="selectOtherMonths"
-                [yearNavigator]="yearNavigator" [monthNavigator]="monthNavigator" [yearRange]="yearRange"
-                [firstDayOfWeek]="firstDayOfWeek" [timeOnly]="timeOnly" [hourFormat]="hourFormat"
-                [showSeconds]="showSeconds" [stepHour]="stepHour" [stepMinute]="stepMinute"
-                [stepSecond]="stepSecond" [selectionMode]="selectionMode" [readonlyInput]="readonlyInput"
-                [touchUI]="touchUI" [keepInvalid]="keepInvalid" [inline]="inline"
-                [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)" [maxDate]="$any(maxDate)" [disabledDays]="disabledDays"
-                [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
-                (ngModelChange)="onValueChange($event)" (onBlur)="onBlur()" [appendTo]="appendTo"
-                panelStyleClass="custom-calendar-panel">
-            </p-calendar>
-        </ng-container>
+  <ng-container *ngIf="label">
+    <!-- Floating Label -->
+    <span class="p-float-label" *ngIf="floatingLabel">
+      <p-calendar
+        [ngModel]="value"
+        [showTime]="showTime"
+        [showIcon]="showIcon"
+        [dateFormat]="dateFormat"
+        [showButtonBar]="showButtonBar"
+        [showWeek]="showWeek"
+        [numberOfMonths]="numberOfMonths"
+        [view]="view"
+        [showOtherMonths]="showOtherMonths"
+        [selectOtherMonths]="selectOtherMonths"
+        [yearNavigator]="yearNavigator"
+        [monthNavigator]="monthNavigator"
+        [yearRange]="yearRange"
+        [firstDayOfWeek]="firstDayOfWeek"
+        [timeOnly]="timeOnly"
+        [hourFormat]="hourFormat"
+        [showSeconds]="showSeconds"
+        [stepHour]="stepHour"
+        [stepMinute]="stepMinute"
+        [stepSecond]="stepSecond"
+        [selectionMode]="selectionMode"
+        [readonlyInput]="readonlyInput"
+        [touchUI]="touchUI"
+        [keepInvalid]="keepInvalid"
+        [inline]="inline"
+        [placeholder]="placeholder"
+        [disabled]="disabled"
+        [minDate]="$any(minDate)"
+        [maxDate]="$any(maxDate)"
+        [disabledDays]="disabledDays"
+        [style]="{ width: '100%' }"
+        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        (ngModelChange)="onValueChange($event)"
+        (onBlur)="onBlur()"
+        [inputId]="inputId"
+        [appendTo]="appendTo"
+        panelStyleClass="custom-calendar-panel"
+      >
+      </p-calendar>
+      <label [for]="inputId">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+      </label>
+    </span>
+    <!-- Normal Label -->
+    <ng-container *ngIf="!floatingLabel">
+      <label class="normal-label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+      </label>
+      <p-calendar
+        [ngModel]="value"
+        [showTime]="showTime"
+        [showIcon]="showIcon"
+        [dateFormat]="dateFormat"
+        [showButtonBar]="showButtonBar"
+        [showWeek]="showWeek"
+        [numberOfMonths]="numberOfMonths"
+        [view]="view"
+        [showOtherMonths]="showOtherMonths"
+        [selectOtherMonths]="selectOtherMonths"
+        [yearNavigator]="yearNavigator"
+        [monthNavigator]="monthNavigator"
+        [yearRange]="yearRange"
+        [firstDayOfWeek]="firstDayOfWeek"
+        [timeOnly]="timeOnly"
+        [hourFormat]="hourFormat"
+        [showSeconds]="showSeconds"
+        [stepHour]="stepHour"
+        [stepMinute]="stepMinute"
+        [stepSecond]="stepSecond"
+        [selectionMode]="selectionMode"
+        [readonlyInput]="readonlyInput"
+        [touchUI]="touchUI"
+        [keepInvalid]="keepInvalid"
+        [inline]="inline"
+        [placeholder]="placeholder"
+        [disabled]="disabled"
+        [minDate]="$any(minDate)"
+        [maxDate]="$any(maxDate)"
+        [disabledDays]="disabledDays"
+        [style]="{ width: '100%' }"
+        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+        (ngModelChange)="onValueChange($event)"
+        (onBlur)="onBlur()"
+        [appendTo]="appendTo"
+        panelStyleClass="custom-calendar-panel"
+      >
+      </p-calendar>
     </ng-container>
-    <!-- No Label -->
-    <p-calendar *ngIf="!label" [ngModel]="value" [showTime]="showTime" [showIcon]="showIcon"
-        [dateFormat]="dateFormat" [showButtonBar]="showButtonBar" [showWeek]="showWeek"
-        [numberOfMonths]="numberOfMonths" [view]="view" [showOtherMonths]="showOtherMonths"
-        [selectOtherMonths]="selectOtherMonths" [yearNavigator]="yearNavigator" [monthNavigator]="monthNavigator"
-        [yearRange]="yearRange" [firstDayOfWeek]="firstDayOfWeek" [timeOnly]="timeOnly" [hourFormat]="hourFormat"
-        [showSeconds]="showSeconds" [stepHour]="stepHour" [stepMinute]="stepMinute" [stepSecond]="stepSecond"
-        [selectionMode]="selectionMode" [readonlyInput]="readonlyInput" [touchUI]="touchUI"
-        [keepInvalid]="keepInvalid" [inline]="inline"
-        [placeholder]="placeholder" [disabled]="disabled" [minDate]="$any(minDate)" [maxDate]="$any(maxDate)" [disabledDays]="disabledDays"
-        [style]="{'width':'100%'}" [ngClass]="{'ng-invalid ng-dirty': showError}"
-        (ngModelChange)="onValueChange($event)" (onBlur)="onBlur()" [appendTo]="appendTo"
-        panelStyleClass="custom-calendar-panel">
-    </p-calendar>
-    <small class="error-message" *ngIf="showError && errorMessage">
-        {{ errorMessage }}
-    </small>
+  </ng-container>
+  <!-- No Label -->
+  <p-calendar
+    *ngIf="!label"
+    [ngModel]="value"
+    [showTime]="showTime"
+    [showIcon]="showIcon"
+    [dateFormat]="dateFormat"
+    [showButtonBar]="showButtonBar"
+    [showWeek]="showWeek"
+    [numberOfMonths]="numberOfMonths"
+    [view]="view"
+    [showOtherMonths]="showOtherMonths"
+    [selectOtherMonths]="selectOtherMonths"
+    [yearNavigator]="yearNavigator"
+    [monthNavigator]="monthNavigator"
+    [yearRange]="yearRange"
+    [firstDayOfWeek]="firstDayOfWeek"
+    [timeOnly]="timeOnly"
+    [hourFormat]="hourFormat"
+    [showSeconds]="showSeconds"
+    [stepHour]="stepHour"
+    [stepMinute]="stepMinute"
+    [stepSecond]="stepSecond"
+    [selectionMode]="selectionMode"
+    [readonlyInput]="readonlyInput"
+    [touchUI]="touchUI"
+    [keepInvalid]="keepInvalid"
+    [inline]="inline"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [minDate]="$any(minDate)"
+    [maxDate]="$any(maxDate)"
+    [disabledDays]="disabledDays"
+    [style]="{ width: '100%' }"
+    [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+    (ngModelChange)="onValueChange($event)"
+    (onBlur)="onBlur()"
+    [appendTo]="appendTo"
+    panelStyleClass="custom-calendar-panel"
+  >
+  </p-calendar>
+  <small class="error-message" *ngIf="showError && errorMessage">
+    {{ errorMessage }}
+  </small>
 </div>

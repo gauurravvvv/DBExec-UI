@@ -8,9 +8,8 @@ describe('ViewGroupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ViewGroupComponent ]
-    })
-    .compileComponents();
+      declarations: [ViewGroupComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ViewGroupComponent);
     component = fixture.componentInstance;

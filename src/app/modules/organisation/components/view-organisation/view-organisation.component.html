@@ -1,215 +1,247 @@
 <div class="view-organisation-wrapper" *ngIf="organisationData">
-    <div class="view-organisation-container">
-        <!-- Header Section -->
-        <div class="page-header">
-            <div class="left-section">
-                <button pButton class="p-button-text p-button-plain back-button" routerLink="/app/organisation">
-                    <i class="pi pi-arrow-left text-xl"></i>
-                </button>
-                <h2>Organisation Details</h2>
-            </div>
-            <div class="header-actions flex gap-2">
-                <button class="btn-primary" (click)="showAnnouncementDialog = true">
-                    <i class="pi pi-volume-up"></i>
-                    Announcement
-                </button>
-                <button class="btn-primary" [routerLink]="['/app/organisation/edit', organisationId]">
-                    <i class="pi pi-pencil"></i>
-                    Edit
-                </button>
-                <button class="btn-danger" (click)="confirmDelete(organisationId)">
-                    <i class="pi pi-trash"></i>
-                    Delete
-                </button>
-            </div>
-        </div>
-
-        <!-- Profile Section -->
-        <div class="profile-container">
-            <div class="details-grid">
-                <!-- First Row -->
-                <div class="first-row">
-                    <!-- Organisation Identity -->
-                    <div class="identity-section">
-                        <div class="avatar-section">
-                            <div class="avatar-circle" [style.background-color]="avatarBackground">
-                                {{ organisationInitials }}
-                            </div>
-                            <h3 class="organisation-name">{{ organisationData.name }}</h3>
-                            <div class="status-indicator">
-                                <span class="status-badge" [class.active]="organisationData.status === 1">
-                                    {{ organisationData.status === 1 ? 'Active' : 'Inactive' }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Basic Information -->
-                    <div class="detail-group">
-                        <h4>Basic Information</h4>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-building"></i>
-                                Organisation Name
-                            </span>
-                            <span class="value">{{ organisationData.name }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-id-card"></i>
-                                Organisation ID
-                            </span>
-                            <span class="value">#{{ organisationData.id }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-calendar"></i>
-                                Created On
-                            </span>
-                            <span class="value">{{ organisationData.createdOn | date:'medium' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Overview -->
-                <div class="stats-row">
-                    <div class="stats-bar">
-                        <div class="stat-item">
-                            <i class="pi pi-user"></i>
-                            <span class="stat-value">{{ organisationData.usersCount || 0 }}</span>
-                            <span class="stat-label">Users</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <i class="pi pi-shield"></i>
-                            <span class="stat-value">{{ organisationData.adminsCount || 0 }}</span>
-                            <span class="stat-label">Admins</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <i class="pi pi-users"></i>
-                            <span class="stat-value">{{ organisationData.groupsCount || 0 }}</span>
-                            <span class="stat-label">Groups</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <i class="pi pi-database"></i>
-                            <span class="stat-value">{{ organisationData.databasesCount || 0 }}</span>
-                            <span class="stat-label">Databases</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <i class="pi pi-link"></i>
-                            <span class="stat-value">{{ organisationData.connectionsCount || 0 }}</span>
-                            <span class="stat-label">Connections</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Second Row -->
-                <div class="second-row">
-                    <!-- Configuration Limits -->
-                    <div class="detail-group">
-                        <h4>Configuration Limits</h4>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-database"></i>
-                                Max Databases
-                            </span>
-                            <span class="value">{{ organisationData.config.maxDatabases }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-user"></i>
-                                Max Users
-                            </span>
-                            <span class="value">{{ organisationData.config.maxUsers }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-shield"></i>
-                                Max Admins
-                            </span>
-                            <span class="value">{{ organisationData.config.maxAdmins }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Additional Limits -->
-                    <div class="detail-group">
-                        <h4>Additional Limits</h4>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-users"></i>
-                                Max Groups
-                            </span>
-                            <span class="value">{{ organisationData.config.maxGroups }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-globe"></i>
-                                Max Environments
-                            </span>
-                            <span class="value">{{ organisationData.config.maxEnvironment }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">
-                                <i class="pi pi-list"></i>
-                                Max Categories
-                            </span>
-                            <span class="value">{{ organisationData.config.maxCategories }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="view-organisation-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          routerLink="/app/organisation"
+        >
+          <i class="pi pi-arrow-left text-xl"></i>
+        </button>
+        <h2>Organisation Details</h2>
+      </div>
+      <div class="header-actions flex gap-2">
+        <button class="btn-primary" (click)="showAnnouncementDialog = true">
+          <i class="pi pi-volume-up"></i>
+          Announcement
+        </button>
+        <button
+          class="btn-primary"
+          [routerLink]="['/app/organisation/edit', organisationId]"
+        >
+          <i class="pi pi-pencil"></i>
+          Edit
+        </button>
+        <button class="btn-danger" (click)="confirmDelete(organisationId)">
+          <i class="pi pi-trash"></i>
+          Delete
+        </button>
+      </div>
     </div>
+
+    <!-- Profile Section -->
+    <div class="profile-container">
+      <div class="details-grid">
+        <!-- First Row -->
+        <div class="first-row">
+          <!-- Organisation Identity -->
+          <div class="identity-section">
+            <div class="avatar-section">
+              <div
+                class="avatar-circle"
+                [style.background-color]="avatarBackground"
+              >
+                {{ organisationInitials }}
+              </div>
+              <h3 class="organisation-name">{{ organisationData.name }}</h3>
+              <div class="status-indicator">
+                <span
+                  class="status-badge"
+                  [class.active]="organisationData.status === 1"
+                >
+                  {{ organisationData.status === 1 ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Basic Information -->
+          <div class="detail-group">
+            <h4>Basic Information</h4>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-building"></i>
+                Organisation Name
+              </span>
+              <span class="value">{{ organisationData.name }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-id-card"></i>
+                Organisation ID
+              </span>
+              <span class="value">#{{ organisationData.id }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-calendar"></i>
+                Created On
+              </span>
+              <span class="value">{{
+                organisationData.createdOn | date: 'medium'
+              }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-row">
+          <div class="stats-bar">
+            <div class="stat-item">
+              <i class="pi pi-user"></i>
+              <span class="stat-value">{{
+                organisationData.usersCount || 0
+              }}</span>
+              <span class="stat-label">Users</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <i class="pi pi-shield"></i>
+              <span class="stat-value">{{
+                organisationData.adminsCount || 0
+              }}</span>
+              <span class="stat-label">Admins</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <i class="pi pi-users"></i>
+              <span class="stat-value">{{
+                organisationData.groupsCount || 0
+              }}</span>
+              <span class="stat-label">Groups</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <i class="pi pi-database"></i>
+              <span class="stat-value">{{
+                organisationData.databasesCount || 0
+              }}</span>
+              <span class="stat-label">Databases</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <i class="pi pi-link"></i>
+              <span class="stat-value">{{
+                organisationData.connectionsCount || 0
+              }}</span>
+              <span class="stat-label">Connections</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Second Row -->
+        <div class="second-row">
+          <!-- Configuration Limits -->
+          <div class="detail-group">
+            <h4>Configuration Limits</h4>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-database"></i>
+                Max Databases
+              </span>
+              <span class="value">{{
+                organisationData.config.maxDatabases
+              }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-user"></i>
+                Max Users
+              </span>
+              <span class="value">{{ organisationData.config.maxUsers }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-shield"></i>
+                Max Admins
+              </span>
+              <span class="value">{{ organisationData.config.maxAdmins }}</span>
+            </div>
+          </div>
+
+          <!-- Additional Limits -->
+          <div class="detail-group">
+            <h4>Additional Limits</h4>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-users"></i>
+                Max Groups
+              </span>
+              <span class="value">{{ organisationData.config.maxGroups }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-globe"></i>
+                Max Environments
+              </span>
+              <span class="value">{{
+                organisationData.config.maxEnvironment
+              }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-list"></i>
+                Max Categories
+              </span>
+              <span class="value">{{
+                organisationData.config.maxCategories
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-    <div class="popup-content">
-        <!-- Header -->
-        <div class="popup-header">
-            <div class="popup-icon">
-                <i class="pi pi-trash"></i>
-            </div>
-            <h3>Confirm Delete</h3>
-        </div>
-
-        <!-- Delete Info Section -->
-        <div class="standard-delete-section">
-
-            <p class="delete-intro">
-                Are you sure you want to delete this organisation?
-            </p>
-
-            <ul class="delete-info-list">
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>All associated users will lose access</span>
-                </li>
-                <li>
-                    <i class="pi pi-info-circle"></i>
-                    <span>This action cannot be undone</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Actions -->
-        <div class="popup-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">
-                <i class="pi pi-times"></i>
-                Cancel
-            </button>
-            <button class="btn-confirm" (click)="proceedDelete()">
-                <i class="pi pi-trash"></i>
-                Delete
-            </button>
-        </div>
+  <div class="popup-content">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3>Confirm Delete</h3>
     </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        Are you sure you want to delete this organisation?
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>All associated users will lose access</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="proceedDelete()">
+        <i class="pi pi-trash"></i>
+        Delete
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Announcement Dialog -->
-<app-announcement-dialog [(visible)]="showAnnouncementDialog"
-    [organisationId]="organisationId"
-    (save)="onAnnouncementSave($event)">
+<app-announcement-dialog
+  [(visible)]="showAnnouncementDialog"
+  [organisationId]="organisationId"
+  (save)="onAnnouncementSave($event)"
+>
 </app-announcement-dialog>

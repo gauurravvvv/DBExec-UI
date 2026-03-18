@@ -1,235 +1,349 @@
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '900px'}" [draggable]="false" [resizable]="false"
-    header="Customise Date Range Picker" styleClass="daterange-config-dialog" (onHide)="onClose()">
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '900px' }"
+  [draggable]="false"
+  [resizable]="false"
+  header="Customise Date Range Picker"
+  styleClass="daterange-config-dialog"
+  (onHide)="onClose()"
+>
+  <div class="dialog-content">
+    <!-- ===== Configuration Panel ===== -->
+    <div class="config-panel">
+      <div class="panel-header">
+        <i class="pi pi-cog"></i>
+        <span>Configuration Options</span>
+      </div>
 
-    <div class="dialog-content">
-        <!-- ===== Configuration Panel ===== -->
-        <div class="config-panel">
-            <div class="panel-header">
-                <i class="pi pi-cog"></i>
-                <span>Configuration Options</span>
-            </div>
+      <div class="config-form">
+        <!-- ── BASIC ── -->
+        <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
 
-            <div class="config-form">
-
-                <!-- ── BASIC ── -->
-                <div class="section-label">
-                    <i class="pi pi-sliders-h"></i> Basic
-                </div>
-
-                <div class="config-group">
-                    <label>Placeholder Text</label>
-                    <input type="text" pInputText [(ngModel)]="config.placeholder"
-                        placeholder="e.g., Select date range" />
-                </div>
-
-                <div class="config-group">
-                    <label>Date Format</label>
-                    <p-dropdown [options]="dateFormatOptions" [(ngModel)]="config.dateFormat" optionLabel="label"
-                        optionValue="value" [style]="{width: '100%'}" appendTo="body">
-                    </p-dropdown>
-                </div>
-
-                <div class="config-group">
-                    <label>Number of Months Visible</label>
-                    <p-dropdown [options]="numberOfMonthsOptions" [(ngModel)]="config.numberOfMonths"
-                        optionLabel="label" optionValue="value" [style]="{width: '100%'}" appendTo="body">
-                    </p-dropdown>
-                </div>
-
-                <!-- ── DISPLAY ── -->
-                <div class="section-label">
-                    <i class="pi pi-eye"></i> Display
-                </div>
-
-                <div class="config-row">
-                    <label>Show Calendar Icon Button</label>
-                    <p-inputSwitch [(ngModel)]="config.showIcon"></p-inputSwitch>
-                </div>
-
-                <div class="config-row">
-                    <label>Show Today / Clear Buttons</label>
-                    <p-inputSwitch [(ngModel)]="config.showButtonBar"></p-inputSwitch>
-                </div>
-
-                <div class="config-row">
-                    <label>Show Week Numbers</label>
-                    <p-inputSwitch [(ngModel)]="config.showWeek"></p-inputSwitch>
-                </div>
-
-                <div class="config-row">
-                    <label>Show Inline (no popup)</label>
-                    <p-inputSwitch [(ngModel)]="config.inline"></p-inputSwitch>
-                </div>
-
-                <div class="config-row">
-                    <label>Read-Only Input</label>
-                    <p-inputSwitch [(ngModel)]="config.readonlyInput"></p-inputSwitch>
-                </div>
-
-                <!-- ── NAVIGATION ── -->
-                <div class="section-label">
-                    <i class="pi pi-compass"></i> Navigation
-                </div>
-
-                <div class="config-row">
-                    <label>Show Other Month Days</label>
-                    <p-inputSwitch [(ngModel)]="config.showOtherMonths"></p-inputSwitch>
-                </div>
-
-                <div class="config-row">
-                    <label>Allow Selecting Other Month Days</label>
-                    <p-inputSwitch [(ngModel)]="config.selectOtherMonths" [disabled]="!config.showOtherMonths">
-                    </p-inputSwitch>
-                </div>
-
-                <div class="config-group">
-                    <label>First Day of Week</label>
-                    <p-dropdown [options]="firstDayOptions" [(ngModel)]="config.firstDayOfWeek" optionLabel="label"
-                        optionValue="value" [style]="{width: '100%'}" appendTo="body">
-                    </p-dropdown>
-                </div>
-
-                <!-- ── TIME ── -->
-                <div class="section-label">
-                    <i class="pi pi-clock"></i> Time
-                </div>
-
-                <div class="config-row">
-                    <label>Include Time Picker</label>
-                    <p-inputSwitch [(ngModel)]="config.showTime" (onChange)="onShowTimeChange($event.checked)">
-                    </p-inputSwitch>
-                </div>
-
-                <ng-container *ngIf="config.showTime">
-                    <div class="config-group">
-                        <label>Hour Format</label>
-                        <p-dropdown [options]="hourFormatOptions" [(ngModel)]="config.hourFormat" optionLabel="label"
-                            optionValue="value" [style]="{width: '100%'}" appendTo="body">
-                        </p-dropdown>
-                    </div>
-
-                    <div class="config-row">
-                        <label>Show Seconds</label>
-                        <p-inputSwitch [(ngModel)]="config.showSeconds"></p-inputSwitch>
-                    </div>
-                </ng-container>
-
-                <!-- ── CONSTRAINTS ── -->
-                <div class="section-label">
-                    <i class="pi pi-lock"></i> Constraints
-                </div>
-
-                <div class="config-group">
-                    <label>Minimum Date</label>
-                    <p-calendar [(ngModel)]="config.minDate" [dateFormat]="config.dateFormat" [showButtonBar]="true"
-                        [showIcon]="true" [style]="{width: '100%'}" appendTo="body" placeholder="No minimum">
-                    </p-calendar>
-                </div>
-
-                <div class="config-group">
-                    <label>Maximum Date</label>
-                    <p-calendar [(ngModel)]="config.maxDate" [dateFormat]="config.dateFormat" [showButtonBar]="true"
-                        [showIcon]="true" [style]="{width: '100%'}" appendTo="body" placeholder="No maximum">
-                    </p-calendar>
-                </div>
-
-                <div class="config-group">
-                    <label>Disabled Days of Week</label>
-                    <div class="day-toggle-group">
-                        <span *ngFor="let day of weekDays" class="day-chip" [class.active]="isDisabledDay(day.value)"
-                            (click)="toggleDisabledDay(day.value)">
-                            {{ day.label }}
-                        </span>
-                    </div>
-                    <small class="hint">Selected days will be disabled in the picker</small>
-                </div>
-
-
-            </div>
-            <div class="apply-preview-action">
-                <button class="btn-primary" type="button" (click)="applyPreview()">
-                    <i class="pi pi-refresh"></i>
-                    Apply Preview
-                </button>
-            </div>
+        <div class="config-group">
+          <label>Placeholder Text</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="config.placeholder"
+            placeholder="e.g., Select date range"
+          />
         </div>
 
-        <!-- ===== Live Preview Panel ===== -->
-        <div class="preview-panel">
-            <div class="panel-header">
-                <i class="pi pi-eye"></i>
-                <span>Preview</span>
-            </div>
-
-            <div class="preview-content">
-                <div class="preview-label">Try it out:</div>
-
-                <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <app-custom-daterange [(ngModel)]="previewRange" [placeholder]="previewConfig.placeholder"
-                        [dateFormat]="previewConfig.dateFormat" [numberOfMonths]="previewConfig.numberOfMonths"
-                        [showIcon]="previewConfig.showIcon && !previewConfig.inline" [showButtonBar]="previewConfig.showButtonBar"
-                        [showWeek]="previewConfig.showWeek" [inline]="previewConfig.inline" [readonlyInput]="previewConfig.readonlyInput"
-                        [showOtherMonths]="previewConfig.showOtherMonths" [selectOtherMonths]="previewConfig.selectOtherMonths"
-                        [firstDayOfWeek]="previewConfig.firstDayOfWeek" [showTime]="previewConfig.showTime"
-                        [hourFormat]="previewConfig.hourFormat" [showSeconds]="previewConfig.showSeconds"
-                        [minDate]="$any(previewConfig.minDate)" [maxDate]="$any(previewConfig.maxDate)"
-                        [disabledDays]="previewConfig.disabledDays">
-                    </app-custom-daterange>
-                </ng-container>
-
-                <div class="preview-actions"
-                    *ngIf="previewRange && previewRange.length === 2 && previewRange[1] && !previewConfig.inline">
-                    <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
-                        icon="pi pi-check" (click)="setAsDefault()">
-                    </button>
-                </div>
-
-                <div class="default-indicator" *ngIf="config.defaultStartDate && config.defaultEndDate">
-                    <i class="pi pi-bookmark"></i>
-                    <span>Default: <strong>{{ config.defaultStartDate | date: 'shortDate' }}
-                            – {{ config.defaultEndDate | date: 'shortDate' }}</strong></span>
-                    <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded p-button-sm"
-                        (click)="clearDefault()" pTooltip="Clear default">
-                    </button>
-                </div>
-
-                <!-- Config Summary -->
-                <div class="config-summary">
-                    <div class="summary-title">
-                        <i class="pi pi-info-circle"></i> Active Settings
-                    </div>
-                    <div class="summary-chips">
-                        <span class="summary-chip" *ngIf="previewConfig.numberOfMonths > 1">{{ previewConfig.numberOfMonths }}
-                            months</span>
-                        <span class="summary-chip" *ngIf="previewConfig.showTime">Time Picker{{ previewConfig.showSeconds ? ' + Sec' :
-                            '' }}</span>
-                        <span class="summary-chip" *ngIf="previewConfig.inline">Inline</span>
-                        <span class="summary-chip" *ngIf="previewConfig.showButtonBar">Button Bar</span>
-                        <span class="summary-chip" *ngIf="previewConfig.showWeek">Week Nos.</span>
-                        <span class="summary-chip" *ngIf="previewConfig.readonlyInput">Read-only</span>
-                        <span class="summary-chip" *ngIf="previewConfig.disabledDays.length > 0">{{ previewConfig.disabledDays.length
-                            }} day(s) off</span>
-                        <span class="summary-chip" *ngIf="previewConfig.minDate">Min date</span>
-                        <span class="summary-chip" *ngIf="previewConfig.maxDate">Max date</span>
-                        <span class="summary-empty"
-                            *ngIf="!previewConfig.showTime && !previewConfig.inline && !previewConfig.showButtonBar && !previewConfig.showWeek && !previewConfig.readonlyInput && previewConfig.disabledDays.length === 0 && !previewConfig.minDate && !previewConfig.maxDate && previewConfig.numberOfMonths <= 1">
-                            Default configuration
-                        </span>
-                    </div>
-                </div>
-
-            </div>
+        <div class="config-group">
+          <label>Date Format</label>
+          <p-dropdown
+            [options]="dateFormatOptions"
+            [(ngModel)]="config.dateFormat"
+            optionLabel="label"
+            optionValue="value"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+          >
+          </p-dropdown>
         </div>
+
+        <div class="config-group">
+          <label>Number of Months Visible</label>
+          <p-dropdown
+            [options]="numberOfMonthsOptions"
+            [(ngModel)]="config.numberOfMonths"
+            optionLabel="label"
+            optionValue="value"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+          >
+          </p-dropdown>
+        </div>
+
+        <!-- ── DISPLAY ── -->
+        <div class="section-label"><i class="pi pi-eye"></i> Display</div>
+
+        <div class="config-row">
+          <label>Show Calendar Icon Button</label>
+          <p-inputSwitch [(ngModel)]="config.showIcon"></p-inputSwitch>
+        </div>
+
+        <div class="config-row">
+          <label>Show Today / Clear Buttons</label>
+          <p-inputSwitch [(ngModel)]="config.showButtonBar"></p-inputSwitch>
+        </div>
+
+        <div class="config-row">
+          <label>Show Week Numbers</label>
+          <p-inputSwitch [(ngModel)]="config.showWeek"></p-inputSwitch>
+        </div>
+
+        <div class="config-row">
+          <label>Show Inline (no popup)</label>
+          <p-inputSwitch [(ngModel)]="config.inline"></p-inputSwitch>
+        </div>
+
+        <div class="config-row">
+          <label>Read-Only Input</label>
+          <p-inputSwitch [(ngModel)]="config.readonlyInput"></p-inputSwitch>
+        </div>
+
+        <!-- ── NAVIGATION ── -->
+        <div class="section-label">
+          <i class="pi pi-compass"></i> Navigation
+        </div>
+
+        <div class="config-row">
+          <label>Show Other Month Days</label>
+          <p-inputSwitch [(ngModel)]="config.showOtherMonths"></p-inputSwitch>
+        </div>
+
+        <div class="config-row">
+          <label>Allow Selecting Other Month Days</label>
+          <p-inputSwitch
+            [(ngModel)]="config.selectOtherMonths"
+            [disabled]="!config.showOtherMonths"
+          >
+          </p-inputSwitch>
+        </div>
+
+        <div class="config-group">
+          <label>First Day of Week</label>
+          <p-dropdown
+            [options]="firstDayOptions"
+            [(ngModel)]="config.firstDayOfWeek"
+            optionLabel="label"
+            optionValue="value"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+          >
+          </p-dropdown>
+        </div>
+
+        <!-- ── TIME ── -->
+        <div class="section-label"><i class="pi pi-clock"></i> Time</div>
+
+        <div class="config-row">
+          <label>Include Time Picker</label>
+          <p-inputSwitch
+            [(ngModel)]="config.showTime"
+            (onChange)="onShowTimeChange($event.checked)"
+          >
+          </p-inputSwitch>
+        </div>
+
+        <ng-container *ngIf="config.showTime">
+          <div class="config-group">
+            <label>Hour Format</label>
+            <p-dropdown
+              [options]="hourFormatOptions"
+              [(ngModel)]="config.hourFormat"
+              optionLabel="label"
+              optionValue="value"
+              [style]="{ width: '100%' }"
+              appendTo="body"
+            >
+            </p-dropdown>
+          </div>
+
+          <div class="config-row">
+            <label>Show Seconds</label>
+            <p-inputSwitch [(ngModel)]="config.showSeconds"></p-inputSwitch>
+          </div>
+        </ng-container>
+
+        <!-- ── CONSTRAINTS ── -->
+        <div class="section-label"><i class="pi pi-lock"></i> Constraints</div>
+
+        <div class="config-group">
+          <label>Minimum Date</label>
+          <p-calendar
+            [(ngModel)]="config.minDate"
+            [dateFormat]="config.dateFormat"
+            [showButtonBar]="true"
+            [showIcon]="true"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+            placeholder="No minimum"
+          >
+          </p-calendar>
+        </div>
+
+        <div class="config-group">
+          <label>Maximum Date</label>
+          <p-calendar
+            [(ngModel)]="config.maxDate"
+            [dateFormat]="config.dateFormat"
+            [showButtonBar]="true"
+            [showIcon]="true"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+            placeholder="No maximum"
+          >
+          </p-calendar>
+        </div>
+
+        <div class="config-group">
+          <label>Disabled Days of Week</label>
+          <div class="day-toggle-group">
+            <span
+              *ngFor="let day of weekDays"
+              class="day-chip"
+              [class.active]="isDisabledDay(day.value)"
+              (click)="toggleDisabledDay(day.value)"
+            >
+              {{ day.label }}
+            </span>
+          </div>
+          <small class="hint"
+            >Selected days will be disabled in the picker</small
+          >
+        </div>
+      </div>
+      <div class="apply-preview-action">
+        <button class="btn-primary" type="button" (click)="applyPreview()">
+          <i class="pi pi-refresh"></i>
+          Apply Preview
+        </button>
+      </div>
     </div>
 
-    <ng-template pTemplate="footer">
-        <button class="btn-cancel" type="button" (click)="onClose()">
-            <i class="pi pi-times"></i>
-            Cancel
-        </button>
-        <button class="btn-primary" type="button" (click)="onSave()">
-            <i class="pi pi-check"></i>
-            Apply
-        </button>
-    </ng-template>
+    <!-- ===== Live Preview Panel ===== -->
+    <div class="preview-panel">
+      <div class="panel-header">
+        <i class="pi pi-eye"></i>
+        <span>Preview</span>
+      </div>
+
+      <div class="preview-content">
+        <div class="preview-label">Try it out:</div>
+
+        <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
+          <app-custom-daterange
+            [(ngModel)]="previewRange"
+            [placeholder]="previewConfig.placeholder"
+            [dateFormat]="previewConfig.dateFormat"
+            [numberOfMonths]="previewConfig.numberOfMonths"
+            [showIcon]="previewConfig.showIcon && !previewConfig.inline"
+            [showButtonBar]="previewConfig.showButtonBar"
+            [showWeek]="previewConfig.showWeek"
+            [inline]="previewConfig.inline"
+            [readonlyInput]="previewConfig.readonlyInput"
+            [showOtherMonths]="previewConfig.showOtherMonths"
+            [selectOtherMonths]="previewConfig.selectOtherMonths"
+            [firstDayOfWeek]="previewConfig.firstDayOfWeek"
+            [showTime]="previewConfig.showTime"
+            [hourFormat]="previewConfig.hourFormat"
+            [showSeconds]="previewConfig.showSeconds"
+            [minDate]="$any(previewConfig.minDate)"
+            [maxDate]="$any(previewConfig.maxDate)"
+            [disabledDays]="previewConfig.disabledDays"
+          >
+          </app-custom-daterange>
+        </ng-container>
+
+        <div
+          class="preview-actions"
+          *ngIf="
+            previewRange &&
+            previewRange.length === 2 &&
+            previewRange[1] &&
+            !previewConfig.inline
+          "
+        >
+          <button
+            pButton
+            type="button"
+            label="Set as Default"
+            class="p-button-text p-button-sm"
+            icon="pi pi-check"
+            (click)="setAsDefault()"
+          ></button>
+        </div>
+
+        <div
+          class="default-indicator"
+          *ngIf="config.defaultStartDate && config.defaultEndDate"
+        >
+          <i class="pi pi-bookmark"></i>
+          <span
+            >Default:
+            <strong
+              >{{ config.defaultStartDate | date: 'shortDate' }} –
+              {{ config.defaultEndDate | date: 'shortDate' }}</strong
+            ></span
+          >
+          <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="p-button-text p-button-rounded p-button-sm"
+            (click)="clearDefault()"
+            pTooltip="Clear default"
+          ></button>
+        </div>
+
+        <!-- Config Summary -->
+        <div class="config-summary">
+          <div class="summary-title">
+            <i class="pi pi-info-circle"></i> Active Settings
+          </div>
+          <div class="summary-chips">
+            <span class="summary-chip" *ngIf="previewConfig.numberOfMonths > 1"
+              >{{ previewConfig.numberOfMonths }} months</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.showTime"
+              >Time Picker{{ previewConfig.showSeconds ? ' + Sec' : '' }}</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.inline"
+              >Inline</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.showButtonBar"
+              >Button Bar</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.showWeek"
+              >Week Nos.</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.readonlyInput"
+              >Read-only</span
+            >
+            <span
+              class="summary-chip"
+              *ngIf="previewConfig.disabledDays.length > 0"
+              >{{ previewConfig.disabledDays.length }} day(s) off</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.minDate"
+              >Min date</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.maxDate"
+              >Max date</span
+            >
+            <span
+              class="summary-empty"
+              *ngIf="
+                !previewConfig.showTime &&
+                !previewConfig.inline &&
+                !previewConfig.showButtonBar &&
+                !previewConfig.showWeek &&
+                !previewConfig.readonlyInput &&
+                previewConfig.disabledDays.length === 0 &&
+                !previewConfig.minDate &&
+                !previewConfig.maxDate &&
+                previewConfig.numberOfMonths <= 1
+              "
+            >
+              Default configuration
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button class="btn-cancel" type="button" (click)="onClose()">
+      <i class="pi pi-times"></i>
+      Cancel
+    </button>
+    <button class="btn-primary" type="button" (click)="onSave()">
+      <i class="pi pi-check"></i>
+      Apply
+    </button>
+  </ng-template>
 </p-dialog>

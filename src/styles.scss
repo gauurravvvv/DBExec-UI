@@ -774,11 +774,13 @@
   }
 }
 
-
 .ABCD_Chips {
   .p-chips .p-chips-multiple-container {
-    box-shadow: inset 0 0 0 1px $grey-color-1, inset 0 0 0 1px $grey-color-1,
-      inset 0 0 0 1px $grey-color-1, inset 0 0 0 1px $grey-color-1;
+    box-shadow:
+      inset 0 0 0 1px $grey-color-1,
+      inset 0 0 0 1px $grey-color-1,
+      inset 0 0 0 1px $grey-color-1,
+      inset 0 0 0 1px $grey-color-1;
   }
 }
 
@@ -1815,7 +1817,10 @@ aw-wizard-navigation-bar.horizontal ul.steps-indicator li {
   color: #005792;
   width: 0.5rem;
   height: 0.5rem;
-  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
   border-radius: 50%;
 }
 
@@ -1873,8 +1878,10 @@ aw-wizard-navigation-bar.horizontal ul.steps-indicator li {
 }
 
 .global-search-footer-btn {
-  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, -1.8),
-    0 2px 2px 0 rgba(0, 0, 0, -0.8), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 3px 1px -2px rgba(0, 0, 0, -1.8),
+    0 2px 2px 0 rgba(0, 0, 0, -0.8),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
 .qbe-tab-view {
@@ -1959,7 +1966,9 @@ aw-wizard-navigation-bar.horizontal ul.steps-indicator li {
 
 // Add theme transition
 body {
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
   background-color: var(--background-color);
   color: var(--text-color);
 }

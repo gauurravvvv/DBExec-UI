@@ -55,7 +55,7 @@ export class ListCredentialsComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private organisationService: OrganisationService,
-    private credentialService: CredentialService
+    private credentialService: CredentialService,
   ) {}
 
   ngOnInit() {
@@ -131,7 +131,7 @@ export class ListCredentialsComponent implements OnInit {
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
       filtered = filtered.filter(credential =>
-        credential.categoryName.toLowerCase().includes(search)
+        credential.categoryName.toLowerCase().includes(search),
       );
     }
 

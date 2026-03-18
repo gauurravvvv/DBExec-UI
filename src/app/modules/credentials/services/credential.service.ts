@@ -15,7 +15,7 @@ export class CredentialService {
       .get(
         SECRET.LIST +
           `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`
+          `/${params.pageNumber}/${params.limit}`,
       )
       .toPromise()
       .then((response: any) => {

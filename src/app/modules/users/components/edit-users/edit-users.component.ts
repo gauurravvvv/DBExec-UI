@@ -22,12 +22,13 @@ export class EditUsersComponent implements OnInit {
   selectedOrgName: string = '';
   userData: any;
   orgId: string = '';
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private userService: UserService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {
     this.initForm();
   }
@@ -49,7 +50,7 @@ export class EditUsersComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.firstName),
         ],
@@ -58,7 +59,7 @@ export class EditUsersComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.minLength(4),
+          Validators.minLength(2),
           Validators.maxLength(30),
           Validators.pattern(REGEX.lastName),
         ],
@@ -73,12 +74,6 @@ export class EditUsersComponent implements OnInit {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      password: [
-        '',
-        Validators.pattern(
-          '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$'
-        ),
-      ],
       organisation: ['', Validators.required],
       status: [],
     });
@@ -125,6 +120,29 @@ export class EditUsersComponent implements OnInit {
     this.selectedOrgName = this.userData.organisationName;
     this.isCancelClicked = true;
     this.userForm.markAsPristine();
-    this.isCancelClicked = true;
+  }
+
+  getFirstNameError(): string {
+    const control = this.userForm.get('firstName');
+    if (control?.errors?.['required']) return 'First name is required';
+    if (control?.errors?.['minlength'])
+      return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `First name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'First name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+    return '';
+  }
+
+  getLastNameError(): string {
+    const control = this.userForm.get('lastName');
+    if (control?.errors?.['required']) return 'Last name is required';
+    if (control?.errors?.['minlength'])
+      return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Last name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+    return '';
   }
 }

@@ -1,139 +1,229 @@
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '900px'}" [draggable]="false" [resizable]="false"
-    header="Customise Range Slider" styleClass="rangeslider-config-dialog" (onHide)="onClose()">
-
-    <div class="dialog-content">
-        <div class="config-panel">
-            <div class="panel-header"><i class="pi pi-cog"></i><span>Configuration Options</span></div>
-            <div class="config-form">
-
-                <div class="section-label"><i class="pi pi-arrows-h"></i> Range Bounds</div>
-
-                <div class="config-group">
-                    <label>Minimum Bound</label>
-                    <p-inputNumber [(ngModel)]="config.min" [showButtons]="true" buttonLayout="horizontal"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" [style]="{width:'100%'}"
-                        (onInput)="onBoundsChange()">
-                    </p-inputNumber>
-                </div>
-                <div class="config-group">
-                    <label>Maximum Bound</label>
-                    <p-inputNumber [(ngModel)]="config.max" [showButtons]="true" buttonLayout="horizontal"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" [style]="{width:'100%'}"
-                        (onInput)="onBoundsChange()">
-                    </p-inputNumber>
-                </div>
-                <div class="config-group">
-                    <label>Step Increment</label>
-                    <p-dropdown [options]="stepOptions" [(ngModel)]="config.step" optionLabel="label"
-                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
-                    </p-dropdown>
-                    <small class="hint">Snap interval when dragging</small>
-                </div>
-
-                <div class="section-label"><i class="pi pi-bookmark"></i> Default Selection</div>
-
-                <div class="config-group">
-                    <label>Default Min Value</label>
-                    <p-inputNumber [(ngModel)]="config.defaultMin" [showButtons]="true" buttonLayout="horizontal"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" [min]="config.min"
-                        [max]="config.defaultMax" [style]="{width:'100%'}">
-                    </p-inputNumber>
-                </div>
-                <div class="config-group">
-                    <label>Default Max Value</label>
-                    <p-inputNumber [(ngModel)]="config.defaultMax" [showButtons]="true" buttonLayout="horizontal"
-                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" [min]="config.defaultMin"
-                        [max]="config.max" [style]="{width:'100%'}">
-                    </p-inputNumber>
-                </div>
-
-                <div class="section-label"><i class="pi pi-eye"></i> Display</div>
-
-                <div class="config-group">
-                    <label>Orientation</label>
-                    <p-dropdown [options]="orientationOptions" [(ngModel)]="config.orientation" optionLabel="label"
-                        optionValue="value" [style]="{width:'100%'}" appendTo="body">
-                    </p-dropdown>
-                </div>
-                <div class="config-row"><label>Show Value Labels</label>
-                    <p-inputSwitch [(ngModel)]="config.showValueLabels"></p-inputSwitch>
-                </div>
-                <div class="config-row"><label>Show Bound Labels</label>
-                    <p-inputSwitch [(ngModel)]="config.showBoundLabels"></p-inputSwitch>
-                </div>
-
-                <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
-
-                <div class="config-row"><label>Animate on Click</label>
-                    <p-inputSwitch [(ngModel)]="config.animate"></p-inputSwitch>
-                </div>
-                <div class="config-row"><label>Disabled</label>
-                    <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
-                </div>
-
-
-            </div>
-            <div class="apply-preview-action">
-                <button class="btn-primary" type="button" (click)="applyPreview()">
-                    <i class="pi pi-refresh"></i>
-                    Apply Preview
-                </button>
-            </div>
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '900px' }"
+  [draggable]="false"
+  [resizable]="false"
+  header="Customise Range Slider"
+  styleClass="rangeslider-config-dialog"
+  (onHide)="onClose()"
+>
+  <div class="dialog-content">
+    <div class="config-panel">
+      <div class="panel-header">
+        <i class="pi pi-cog"></i><span>Configuration Options</span>
+      </div>
+      <div class="config-form">
+        <div class="section-label">
+          <i class="pi pi-arrows-h"></i> Range Bounds
         </div>
 
-        <div class="preview-panel">
-            <div class="panel-header"><i class="pi pi-eye"></i><span>Preview</span></div>
-            <div class="preview-content">
-                <div class="preview-label">Try it out:</div>
-
-                <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
-                    <app-custom-rangeslider [(ngModel)]="previewRange"
-                        [min]="previewConfig.min" [max]="previewConfig.max"
-                        [step]="previewConfig.step" [orientation]="previewConfig.orientation"
-                        [animate]="previewConfig.animate" [sliderDisabled]="previewConfig.disabled"
-                        [showValueLabels]="previewConfig.showValueLabels"
-                        [showBoundLabels]="previewConfig.showBoundLabels">
-                    </app-custom-rangeslider>
-                </ng-container>
-
-                <div class="preview-actions">
-                    <button pButton type="button" label="Set as Default" class="p-button-text p-button-sm"
-                        icon="pi pi-bookmark" (click)="setAsDefault()"></button>
-                    <button pButton type="button" label="Reset to Bounds"
-                        class="p-button-text p-button-sm p-button-secondary" icon="pi pi-refresh"
-                        (click)="resetToDefaults()"></button>
-                </div>
-
-                <div class="default-indicator">
-                    <i class="pi pi-bookmark"></i>
-                    <span>Default Range: <strong>{{ config.defaultMin }}</strong> — <strong>{{ config.defaultMax
-                            }}</strong></span>
-                </div>
-
-                <div class="config-summary">
-                    <div class="summary-title"><i class="pi pi-info-circle"></i> Active Settings</div>
-                    <div class="summary-chips">
-                        <span class="summary-chip">{{ previewConfig.min }} – {{ previewConfig.max }}</span>
-                        <span class="summary-chip" *ngIf="previewConfig.step !== 1">Step: {{ previewConfig.step }}</span>
-                        <span class="summary-chip" *ngIf="previewConfig.orientation === 'vertical'">Vertical</span>
-                        <span class="summary-chip" *ngIf="previewConfig.animate">Animated</span>
-                        <span class="summary-chip" *ngIf="previewConfig.disabled">Disabled</span>
-                        <span class="summary-chip" *ngIf="previewConfig.showBoundLabels">Bound Labels</span>
-                        <span class="summary-chip" *ngIf="!previewConfig.showValueLabels">No Value Labels</span>
-                    </div>
-                </div>
-            </div>
+        <div class="config-group">
+          <label>Minimum Bound</label>
+          <p-inputNumber
+            [(ngModel)]="config.min"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus"
+            [style]="{ width: '100%' }"
+            (onInput)="onBoundsChange()"
+          >
+          </p-inputNumber>
         </div>
+        <div class="config-group">
+          <label>Maximum Bound</label>
+          <p-inputNumber
+            [(ngModel)]="config.max"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus"
+            [style]="{ width: '100%' }"
+            (onInput)="onBoundsChange()"
+          >
+          </p-inputNumber>
+        </div>
+        <div class="config-group">
+          <label>Step Increment</label>
+          <p-dropdown
+            [options]="stepOptions"
+            [(ngModel)]="config.step"
+            optionLabel="label"
+            optionValue="value"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+          >
+          </p-dropdown>
+          <small class="hint">Snap interval when dragging</small>
+        </div>
+
+        <div class="section-label">
+          <i class="pi pi-bookmark"></i> Default Selection
+        </div>
+
+        <div class="config-group">
+          <label>Default Min Value</label>
+          <p-inputNumber
+            [(ngModel)]="config.defaultMin"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus"
+            [min]="config.min"
+            [max]="config.defaultMax"
+            [style]="{ width: '100%' }"
+          >
+          </p-inputNumber>
+        </div>
+        <div class="config-group">
+          <label>Default Max Value</label>
+          <p-inputNumber
+            [(ngModel)]="config.defaultMax"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus"
+            [min]="config.defaultMin"
+            [max]="config.max"
+            [style]="{ width: '100%' }"
+          >
+          </p-inputNumber>
+        </div>
+
+        <div class="section-label"><i class="pi pi-eye"></i> Display</div>
+
+        <div class="config-group">
+          <label>Orientation</label>
+          <p-dropdown
+            [options]="orientationOptions"
+            [(ngModel)]="config.orientation"
+            optionLabel="label"
+            optionValue="value"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+          >
+          </p-dropdown>
+        </div>
+        <div class="config-row">
+          <label>Show Value Labels</label>
+          <p-inputSwitch [(ngModel)]="config.showValueLabels"></p-inputSwitch>
+        </div>
+        <div class="config-row">
+          <label>Show Bound Labels</label>
+          <p-inputSwitch [(ngModel)]="config.showBoundLabels"></p-inputSwitch>
+        </div>
+
+        <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
+
+        <div class="config-row">
+          <label>Animate on Click</label>
+          <p-inputSwitch [(ngModel)]="config.animate"></p-inputSwitch>
+        </div>
+        <div class="config-row">
+          <label>Disabled</label>
+          <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
+        </div>
+      </div>
+      <div class="apply-preview-action">
+        <button class="btn-primary" type="button" (click)="applyPreview()">
+          <i class="pi pi-refresh"></i>
+          Apply Preview
+        </button>
+      </div>
     </div>
 
-    <ng-template pTemplate="footer">
-        <button class="btn-cancel" type="button" (click)="onClose()">
-            <i class="pi pi-times"></i>
-            Cancel
-        </button>
-        <button class="btn-primary" type="button" (click)="onSave()">
-            <i class="pi pi-check"></i>
-            Apply
-        </button>
-    </ng-template>
+    <div class="preview-panel">
+      <div class="panel-header">
+        <i class="pi pi-eye"></i><span>Preview</span>
+      </div>
+      <div class="preview-content">
+        <div class="preview-label">Try it out:</div>
+
+        <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
+          <app-custom-rangeslider
+            [(ngModel)]="previewRange"
+            [min]="previewConfig.min"
+            [max]="previewConfig.max"
+            [step]="previewConfig.step"
+            [orientation]="previewConfig.orientation"
+            [animate]="previewConfig.animate"
+            [sliderDisabled]="previewConfig.disabled"
+            [showValueLabels]="previewConfig.showValueLabels"
+            [showBoundLabels]="previewConfig.showBoundLabels"
+          >
+          </app-custom-rangeslider>
+        </ng-container>
+
+        <div class="preview-actions">
+          <button
+            pButton
+            type="button"
+            label="Set as Default"
+            class="p-button-text p-button-sm"
+            icon="pi pi-bookmark"
+            (click)="setAsDefault()"
+          ></button>
+          <button
+            pButton
+            type="button"
+            label="Reset to Bounds"
+            class="p-button-text p-button-sm p-button-secondary"
+            icon="pi pi-refresh"
+            (click)="resetToDefaults()"
+          ></button>
+        </div>
+
+        <div class="default-indicator">
+          <i class="pi pi-bookmark"></i>
+          <span
+            >Default Range: <strong>{{ config.defaultMin }}</strong> —
+            <strong>{{ config.defaultMax }}</strong></span
+          >
+        </div>
+
+        <div class="config-summary">
+          <div class="summary-title">
+            <i class="pi pi-info-circle"></i> Active Settings
+          </div>
+          <div class="summary-chips">
+            <span class="summary-chip"
+              >{{ previewConfig.min }} – {{ previewConfig.max }}</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.step !== 1"
+              >Step: {{ previewConfig.step }}</span
+            >
+            <span
+              class="summary-chip"
+              *ngIf="previewConfig.orientation === 'vertical'"
+              >Vertical</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.animate"
+              >Animated</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.disabled"
+              >Disabled</span
+            >
+            <span class="summary-chip" *ngIf="previewConfig.showBoundLabels"
+              >Bound Labels</span
+            >
+            <span class="summary-chip" *ngIf="!previewConfig.showValueLabels"
+              >No Value Labels</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button class="btn-cancel" type="button" (click)="onClose()">
+      <i class="pi pi-times"></i>
+      Cancel
+    </button>
+    <button class="btn-primary" type="button" (click)="onSave()">
+      <i class="pi pi-check"></i>
+      Apply
+    </button>
+  </ng-template>
 </p-dialog>

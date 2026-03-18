@@ -1,4 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
+} from '@angular/core';
 import { buildTreeChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
@@ -6,7 +15,9 @@ import { buildTreeChartOption } from '../../helpers/echarts-option-builder';
   templateUrl: './configurable-tree-chart.component.html',
   styleUrls: ['./configurable-tree-chart.component.scss'],
 })
-export class ConfigurableTreeChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableTreeChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
   @Input() data: any[] = [];
   @Input() showConfigPanel: boolean = true;
@@ -16,12 +27,31 @@ export class ConfigurableTreeChartComponent implements OnInit, OnChanges, DoChec
   @Output() onSelect = new EventEmitter<any>();
   chartOption: any = {};
   echartsInstance: any = null;
-  private defaultConfig: any = { animations: true, tooltipDisabled: false, colorScheme: 'default', labels: true, treeOrient: 'TB', treeLayout: 'orthogonal', toolbox: false };
-  get config(): any { return this.chartConfig || this.defaultConfig; }
-  ngOnInit(): void { this.updateChartOption(); this.previousConfigSnapshot = JSON.stringify(this.config); }
+  private defaultConfig: any = {
+    animations: true,
+    tooltipDisabled: false,
+    colorScheme: 'default',
+    labels: true,
+    treeOrient: 'TB',
+    treeLayout: 'orthogonal',
+    toolbox: false,
+  };
+  get config(): any {
+    return this.chartConfig || this.defaultConfig;
+  }
+  ngOnInit(): void {
+    this.updateChartOption();
+    this.previousConfigSnapshot = JSON.stringify(this.config);
+  }
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
-      this.updateChartOption(); this.previousConfigSnapshot = JSON.stringify(this.config);
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
+      this.updateChartOption();
+      this.previousConfigSnapshot = JSON.stringify(this.config);
     }
   }
   ngDoCheck(): void {
@@ -33,7 +63,13 @@ export class ConfigurableTreeChartComponent implements OnInit, OnChanges, DoChec
       }
     }
   }
-  updateChartOption(): void { this.chartOption = buildTreeChartOption(this.data, this.config); }
-  onChartInit(ec: any): void { this.echartsInstance = ec; }
-  onChartSelect(event: any): void { this.onSelect.emit(event); }
+  updateChartOption(): void {
+    this.chartOption = buildTreeChartOption(this.data, this.config);
+  }
+  onChartInit(ec: any): void {
+    this.echartsInstance = ec;
+  }
+  onChartSelect(event: any): void {
+    this.onSelect.emit(event);
+  }
 }

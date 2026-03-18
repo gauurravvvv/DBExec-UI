@@ -19,7 +19,7 @@ export class ViewGroupComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private groupService: GroupService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
   ) {}
 
   ngOnInit() {

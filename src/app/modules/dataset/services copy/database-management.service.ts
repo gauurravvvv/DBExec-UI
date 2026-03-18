@@ -19,7 +19,7 @@ export interface Database {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DatabaseManagementService {
   // Organisations
@@ -46,7 +46,7 @@ export class DatabaseManagementService {
 
   constructor(
     private organisationService: OrganisationService,
-    private queryService: QueryService
+    private queryService: QueryService,
   ) {}
 
   // Organisation management
@@ -103,9 +103,19 @@ export class DatabaseManagementService {
     // For now, return mock databases based on organisation
     // In a real implementation, this would call an API
     const mockDatabases: Database[] = [
-      { id: 1, name: 'PostgreSQL Database', type: 'postgresql', orgId: organisationId },
+      {
+        id: 1,
+        name: 'PostgreSQL Database',
+        type: 'postgresql',
+        orgId: organisationId,
+      },
       { id: 2, name: 'MySQL Database', type: 'mysql', orgId: organisationId },
-      { id: 3, name: 'MongoDB Database', type: 'mongodb', orgId: organisationId },
+      {
+        id: 3,
+        name: 'MongoDB Database',
+        type: 'mongodb',
+        orgId: organisationId,
+      },
     ];
 
     this.databasesSubject.next(mockDatabases);

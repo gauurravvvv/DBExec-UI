@@ -9,7 +9,10 @@ import { GlobalService } from 'src/app/core/services/global.service';
   styleUrls: ['./empty-root.component.scss'],
 })
 export class EmptyRootComponent implements OnInit {
-  constructor(private router: Router, private globalService: GlobalService) {}
+  constructor(
+    private router: Router,
+    private globalService: GlobalService,
+  ) {}
 
   ngOnInit(): void {
     const role = this.globalService.getTokenDetails('role');

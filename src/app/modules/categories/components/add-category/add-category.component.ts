@@ -29,7 +29,7 @@ export class AddCategoryComponent implements OnInit {
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private environmentService: EnvironmentService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
   ) {
     this.initForm();
   }
@@ -75,7 +75,7 @@ export class AddCategoryComponent implements OnInit {
         this.loadEnvironments();
         this.categoryForm.patchValue(
           { environments: [] },
-          { emitEvent: false }
+          { emitEvent: false },
         );
       } else {
         this.environments = [];
@@ -237,7 +237,7 @@ export class AddCategoryComponent implements OnInit {
     setTimeout(() => {
       const formElement = document.querySelector('.admin-form');
       const newField = document.getElementById(
-        `field-${this.config.length - 1}`
+        `field-${this.config.length - 1}`,
       );
 
       if (formElement && newField) {

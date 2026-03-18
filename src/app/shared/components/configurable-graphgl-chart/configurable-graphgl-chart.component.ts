@@ -1,5 +1,12 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, OnChanges, DoCheck, SimpleChanges,
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  DoCheck,
+  SimpleChanges,
 } from '@angular/core';
 import { buildGraphGLChartOption } from '../../helpers/echarts-option-builder';
 
@@ -8,7 +15,9 @@ import { buildGraphGLChartOption } from '../../helpers/echarts-option-builder';
   templateUrl: './configurable-graphgl-chart.component.html',
   styleUrls: ['./configurable-graphgl-chart.component.scss'],
 })
-export class ConfigurableGraphGlChartComponent implements OnInit, OnChanges, DoCheck {
+export class ConfigurableGraphGlChartComponent
+  implements OnInit, OnChanges, DoCheck
+{
   private previousConfigSnapshot: string = '';
 
   @Input() data: any[] = [];
@@ -41,7 +50,12 @@ export class ConfigurableGraphGlChartComponent implements OnInit, OnChanges, DoC
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['chartConfig'] || changes['chartWidth'] || changes['chartHeight']) {
+    if (
+      changes['data'] ||
+      changes['chartConfig'] ||
+      changes['chartWidth'] ||
+      changes['chartHeight']
+    ) {
       this.updateChartOption();
       this.previousConfigSnapshot = JSON.stringify(this.config);
     }
