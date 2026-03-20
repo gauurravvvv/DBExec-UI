@@ -8,7 +8,7 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, throwError, BehaviorSubject, of, from } from 'rxjs';
 import {
   catchError,
   filter,
@@ -87,7 +87,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     req = req.clone({ url: URL, headers });
 
     return next.handle(req).pipe(
-      map(evt => this.handleSuccess(req, evt, next)),
+      switchMap(evt => this.handleSuccessAsync(req, evt, next)),
       catchError(error => this.handleError(req, error, next)),
       finalize(() => {
         if (!skipLoader) {
@@ -95,6 +95,37 @@ export class HttpRequestInterceptor implements HttpInterceptor {
         }
       }),
     );
+  }
+
+  /**
+   * Async wrapper that unwraps Blob responses containing JSON errors
+   * (e.g., when a blob request gets a 440 auth error from the server).
+   */
+  private handleSuccessAsync(
+    req: HttpRequest<any>,
+    evt: HttpEvent<any>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
+    if (
+      evt instanceof HttpResponse &&
+      evt.body instanceof Blob &&
+      (evt.headers.get('content-type') || '').includes('application/json')
+    ) {
+      // Server returned JSON for a blob request — parse it so error codes are detected
+      return from(evt.body.text()).pipe(
+        switchMap(text => {
+          let json: any;
+          try {
+            json = JSON.parse(text);
+          } catch {
+            return of(evt as HttpEvent<any>);
+          }
+          // handleSuccess may throw (e.g., HttpErrorResponse for 440) — let it propagate
+          return of(this.handleSuccess(req, evt.clone({ body: json }), next));
+        }),
+      );
+    }
+    return of(this.handleSuccess(req, evt, next));
   }
 
   private handleSuccess(
@@ -105,6 +136,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     if (evt instanceof HttpResponse) {
       // Session expired returned as 200 with code 440 in body
       if (evt.body?.code === 440) {
+        // Already logged out — ignore stale 440 responses
+        if (!StorageService.get(StorageType.ACCESS_TOKEN)) {
+          return evt;
+        }
         // Don't attempt refresh for the refresh endpoint itself
         if (req.url.includes(AUTH.REFRESH_TOKEN)) {
           this.handleSessionExpired();
@@ -128,6 +163,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
     if (error instanceof HttpErrorResponse && error.status === 440) {
+      // Already logged out — ignore stale 440 responses
+      if (!StorageService.get(StorageType.ACCESS_TOKEN)) {
+        return throwError(error);
+      }
       // Don't attempt refresh for the refresh endpoint itself
       if (req.url.includes(AUTH.REFRESH_TOKEN)) {
         this.handleSessionExpired();

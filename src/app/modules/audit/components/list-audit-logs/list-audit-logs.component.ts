@@ -177,20 +177,131 @@ export class ListAuditLogsComponent implements OnInit {
     const m = this.selectedLog?.metadata;
     if (!m) return [];
 
-    const detailObj = m.createdUser || m.deletedUser;
-    if (!detailObj || typeof detailObj !== 'object') return [];
+    const items: { key: string; value: any }[] = [];
 
-    return Object.keys(detailObj).map(k => ({
-      key: this.formatKey(k),
-      value: detailObj[k] ?? '-',
-    }));
+    // Entity snapshot (CREATE / DELETE / RESET_PASSWORD)
+    const detailObj = m.entity;
+    if (detailObj && typeof detailObj === 'object') {
+      for (const k of Object.keys(detailObj)) {
+        items.push({ key: this.formatKey(k), value: detailObj[k] ?? '-' });
+      }
+    }
+
+    // Extra context fields (visualCount, userCount, columnCount, etc.)
+    for (const [k, v] of Object.entries(m)) {
+      if (k === 'entity' || k === 'oldValues' || k === 'newValues') continue;
+      if (v !== null && typeof v === 'object' && !Array.isArray(v)) continue;
+      items.push({ key: this.formatKey(k), value: Array.isArray(v) ? v.join(', ') : (v ?? '-') });
+    }
+
+    return items;
   }
 
+  // Field label map matching backend FIELD_LABELS
+  private readonly fieldLabels: Record<string, string> = {
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    email: 'Email',
+    role: 'Role',
+    status: 'Status',
+    isDefault: 'Default User',
+    name: 'Name',
+    description: 'Description',
+    databaseName: 'Database',
+    dbUsername: 'DB Username',
+    dbType: 'DB Type',
+    hostname: 'Hostname',
+    port: 'Port',
+    isMasterDB: 'Master Database',
+    sql: 'SQL Query',
+    type: 'Type',
+    datasetName: 'Dataset',
+    columnCount: 'Column Count',
+    columns: 'Columns',
+    screenName: 'Screen',
+    relatedAnalysesCount: 'Related Analyses',
+    columnToUse: 'Column (Use)',
+    columnToView: 'Column (View)',
+    customLogic: 'Custom Logic',
+    isCfUsed: 'Custom Field Used',
+    sequence: 'Sequence',
+    analysisName: 'Analysis',
+    visualCount: 'Visual Count',
+    promptCount: 'Prompt Count',
+    tabCount: 'Tab Count',
+    tabName: 'Tab',
+    sectionName: 'Section',
+    mandatory: 'Mandatory',
+    prompt_schema: 'Schema',
+    prompt_table: 'Table',
+    prompt_column: 'Column',
+    prompt_join: 'Join',
+    prompt_where: 'Where',
+    prompt_sql: 'SQL',
+    prompt_values_sql: 'Values SQL',
+    schema: 'Schema',
+    tables: 'Tables',
+    hasJoin: 'Has Join',
+    hasWhere: 'Has Where',
+    valueCount: 'Value Count',
+    valuesAdded: 'Values Added',
+    valuesDeleted: 'Values Deleted',
+    appearance: 'Appearance',
+    config: 'Configuration',
+    usersAdded: 'Users Added',
+    usersRemoved: 'Users Removed',
+    groupsAdded: 'Groups Added',
+    groupsRemoved: 'Groups Removed',
+    userCount: 'User Count',
+    userIds: 'User IDs',
+    visibility: 'Visibility',
+  };
+
   formatKey(key: string): string {
+    if (this.fieldLabels[key]) return this.fieldLabels[key];
     return key
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, s => s.toUpperCase())
       .trim();
+  }
+
+  private getFilterParams(): any {
+    const filter: any = {};
+    if (this.filterValues.username) filter.username = this.filterValues.username;
+    if (this.filterValues.module) filter.module = this.filterValues.module;
+    if (this.filterValues.action) filter.action = this.filterValues.action;
+    if (this.filterValues.entityName) filter.entityName = this.filterValues.entityName;
+    if (this.filterValues.organisationId) filter.organisationId = this.filterValues.organisationId;
+    return filter;
+  }
+
+  exportLogs(format: 'excel' | 'pdf') {
+    const filter = this.getFilterParams();
+    const params: any = { format };
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
+
+    this.auditService.exportAuditLogs(params).subscribe({
+      next: (blob: Blob) => {
+        const ext = format === 'excel' ? 'xlsx' : 'pdf';
+        const orgLabel = this.organisationOptions.find(
+          (o: any) => o.value === this.filterValues.organisationId
+        )?.label || 'Organisation';
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const fileName = `Audit_Logs_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.${ext}`;
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.globalService.handleSuccessService({ status: false, code: 500, message: 'Failed to export audit logs' });
+      },
+    });
   }
 
   loadLogs(event: any) {
@@ -200,23 +311,7 @@ export class ListAuditLogsComponent implements OnInit {
     const limit = event.rows;
 
     const params: any = { page, limit };
-    const filter: any = {};
-
-    if (this.filterValues.username) {
-      filter.username = this.filterValues.username;
-    }
-    if (this.filterValues.module) {
-      filter.module = this.filterValues.module;
-    }
-    if (this.filterValues.action) {
-      filter.action = this.filterValues.action;
-    }
-    if (this.filterValues.entityName) {
-      filter.entityName = this.filterValues.entityName;
-    }
-    if (this.filterValues.organisationId) {
-      filter.organisationId = this.filterValues.organisationId;
-    }
+    const filter = this.getFilterParams();
 
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);

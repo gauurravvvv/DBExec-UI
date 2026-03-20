@@ -136,6 +136,44 @@ export class ListLoginActivityComponent implements OnInit {
     return eventType?.replace(/_/g, ' ') || '-';
   }
 
+  private getFilterParams(): any {
+    const filter: any = {};
+    if (this.filterValues.username) filter.username = this.filterValues.username;
+    if (this.filterValues.eventType) filter.eventType = this.filterValues.eventType;
+    if (this.filterValues.organisationName) filter.organisationName = this.filterValues.organisationName;
+    if (this.filterValues.organisationId) filter.organisationId = this.filterValues.organisationId;
+    return filter;
+  }
+
+  exportActivity(format: 'excel' | 'pdf') {
+    const filter = this.getFilterParams();
+    const params: any = { format };
+    if (Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter);
+    }
+
+    this.auditService.exportLoginActivity(params).subscribe({
+      next: (blob: Blob) => {
+        const ext = format === 'excel' ? 'xlsx' : 'pdf';
+        const orgLabel = this.organisationOptions.find(
+          (o: any) => o.value === this.filterValues.organisationId
+        )?.label || 'Organisation';
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const fileName = `Login_Activity_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.${ext}`;
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.globalService.handleSuccessService({ status: false, code: 500, message: 'Failed to export login activity' });
+      },
+    });
+  }
+
   loadActivities(event: any) {
     this.lastTableLazyLoadEvent = event;
 
@@ -143,20 +181,7 @@ export class ListLoginActivityComponent implements OnInit {
     const limit = event.rows;
 
     const params: any = { page, limit };
-    const filter: any = {};
-
-    if (this.filterValues.username) {
-      filter.username = this.filterValues.username;
-    }
-    if (this.filterValues.eventType) {
-      filter.eventType = this.filterValues.eventType;
-    }
-    if (this.filterValues.organisationName) {
-      filter.organisationName = this.filterValues.organisationName;
-    }
-    if (this.filterValues.organisationId) {
-      filter.organisationId = this.filterValues.organisationId;
-    }
+    const filter = this.getFilterParams();
 
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);

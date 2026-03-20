@@ -87,6 +87,9 @@ export class AppComponent implements OnInit, OnDestroy {
           event.url === '/forgot-password'
         ) {
           this.idleTimeoutService.stop();
+          this.showSessionExpiredDialog = false;
+          this.showIdleWarningDialog = false;
+          this.sessionExpiredService.reset();
         } else if (
           this.loginService.isLoggedIn() &&
           !this.idleTimeoutService.isRunning

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { AUDIT } from 'src/app/constants/api';
 
 @Injectable({
@@ -26,5 +27,13 @@ export class AuditService {
         const result = JSON.parse(JSON.stringify(response));
         return result;
       });
+  }
+
+  exportAuditLogs(params: any): Observable<Blob> {
+    return this.http.get(AUDIT.EXPORT_LOGS, { params, responseType: 'blob' });
+  }
+
+  exportLoginActivity(params: any): Observable<Blob> {
+    return this.http.get(AUDIT.EXPORT_LOGIN_ACTIVITY, { params, responseType: 'blob' });
   }
 }

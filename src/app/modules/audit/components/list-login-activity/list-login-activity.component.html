@@ -51,6 +51,24 @@
         <div class="toolbar-right">
           <button
             pButton
+            icon="pi pi-file-excel"
+            pTooltip="Export Excel"
+            tooltipPosition="top"
+            (click)="exportActivity('excel')"
+            [disabled]="totalItems === 0"
+            class="p-button-outlined p-button-success modern-button"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-file-pdf"
+            pTooltip="Export PDF"
+            tooltipPosition="top"
+            (click)="exportActivity('pdf')"
+            [disabled]="totalItems === 0"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+          <button
+            pButton
             icon="pi pi-refresh"
             pTooltip="Refresh"
             tooltipPosition="top"

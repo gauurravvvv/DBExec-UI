@@ -215,4 +215,6 @@ export const ANNOUNCEMENT = {
 export const AUDIT = {
   LIST: '/audit/list',
   LOGIN_ACTIVITY: '/audit/login-activity',
+  EXPORT_LOGS: '/audit/export/logs',
+  EXPORT_LOGIN_ACTIVITY: '/audit/export/login-activity',
 };
