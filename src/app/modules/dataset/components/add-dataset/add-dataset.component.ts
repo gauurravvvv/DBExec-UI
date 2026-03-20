@@ -59,8 +59,8 @@ export class AddDatasetComponent
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   // Removed ViewChild as we now use dynamic containers per tab
-  @Input() databaseId?: number;
-  @Input() orgId?: number;
+  @Input() databaseId?: string;
+  @Input() orgId?: string;
   @Input() initialQuery?: string;
 
   editor: any;
@@ -348,7 +348,7 @@ export class AddDatasetComponent
     this.loadDatabases();
   }
 
-  refreshSingleDatabase(dbId: number): void {
+  refreshSingleDatabase(dbId: string): void {
     if (!dbId || !this.selectedOrg?.id) return;
 
     const orgId = this.selectedOrg.id.toString();
@@ -707,7 +707,7 @@ export class AddDatasetComponent
     }
   }
 
-  private async loadDatabaseSchema(dbId: number): Promise<void> {
+  private async loadDatabaseSchema(dbId: string): Promise<void> {
     if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
 
     const orgId = this.selectedOrg.id.toString();
@@ -747,7 +747,7 @@ export class AddDatasetComponent
   /**
    * Apply cached schema data from store to component state
    */
-  private applyCachedSchemaData(dbId: number, schemaData: any): void {
+  private applyCachedSchemaData(dbId: string, schemaData: any): void {
     // Store schema data by database ID
     this.databaseSchemas[dbId] = schemaData;
 
@@ -763,7 +763,7 @@ export class AddDatasetComponent
   /**
    * Load database schema from API and update store
    */
-  private async loadDatabaseSchemaFromAPI(dbId: number): Promise<void> {
+  private async loadDatabaseSchemaFromAPI(dbId: string): Promise<void> {
     if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
 
     const orgId = this.selectedOrg.id.toString();

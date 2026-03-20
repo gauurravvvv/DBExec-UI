@@ -7,7 +7,7 @@ export interface ExecuteScreenRequest {
   screenId: string;
   organisation: string;
   prompts: {
-    promptId: number;
+    promptId: string;
     type: string;
     value: any;
     isRange: boolean;

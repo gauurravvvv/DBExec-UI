@@ -17,6 +17,8 @@ export interface AnnouncementData {
   endTime: Date;
   bgColor: string;
   textColor: string;
+  type: number;
+  status: number;
 }
 
 @Component({
@@ -26,13 +28,15 @@ export interface AnnouncementData {
 })
 export class AnnouncementDialogComponent implements OnChanges {
   @Input() visible = false;
-  @Input() organisationId!: number;
+  @Input() organisationId!: string;
+  @Input() type: number = 2; // 1 = for admins, 2 = for users
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<AnnouncementData>();
 
   announcementForm: FormGroup;
   minDate = new Date();
   maxDescriptionLength = 1000;
+  isStatusActive = true;
 
   constructor(
     private fb: FormBuilder,
@@ -57,9 +61,9 @@ export class AnnouncementDialogComponent implements OnChanges {
 
   private loadAnnouncement(): void {
     this.announcementService
-      .getAnnouncement(this.organisationId.toString())
+      .getAnnouncementDetails(this.organisationId.toString(), this.type)
       .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
+        if (this.globalService.handleSuccessService(response, false, false)) {
           const data = response.data;
           if (data) {
             this.announcementForm.patchValue({
@@ -70,6 +74,13 @@ export class AnnouncementDialogComponent implements OnChanges {
               bgColor: data.bgColor || '#0d47a1',
               textColor: data.textColor || '#ffffff',
             });
+            this.isStatusActive = data.status === 1;
+          } else {
+            this.announcementForm.reset({
+              bgColor: '#0d47a1',
+              textColor: '#ffffff',
+            });
+            this.isStatusActive = true;
           }
         }
       });
@@ -93,7 +104,11 @@ export class AnnouncementDialogComponent implements OnChanges {
 
   onSave(): void {
     if (this.isFormValid) {
-      this.save.emit(this.announcementForm.value);
+      this.save.emit({
+        ...this.announcementForm.value,
+        type: this.type,
+        status: this.isStatusActive ? 1 : 0,
+      });
       this.announcementForm.reset();
       this.closeDialog();
     }

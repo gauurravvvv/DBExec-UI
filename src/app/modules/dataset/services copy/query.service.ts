@@ -11,8 +11,8 @@ export class QueryService {
 
   // Query execution - use Query Server
   executeQuery(queryData: {
-    orgId: number;
-    databaseId: number;
+    orgId: string;
+    databaseId: string;
     query: string;
     page?: number;
     limit?: number;
@@ -20,7 +20,7 @@ export class QueryService {
   }): Observable<any> {
     return this.httpClientService.queryPost('/query/execute', queryData);
   }
-  getDatabaseStructure(databaseId: number, orgId: number): Observable<any> {
+  getDatabaseStructure(databaseId: string, orgId: string): Observable<any> {
     return this.httpClientService.queryPostNoLoader(`/query/getStructure`, {
       databaseId,
       orgId,
@@ -29,8 +29,8 @@ export class QueryService {
 
   // Save query metadata - use API Server
   saveQuery(queryData: {
-    orgId: number;
-    databaseId: number;
+    orgId: string;
+    databaseId: string;
     name: string;
     query: string;
     description?: string;
@@ -40,7 +40,7 @@ export class QueryService {
 
   // Get saved queries - use API Server
   getSavedQueries(params: {
-    orgId?: number;
+    orgId?: string;
     pageNumber?: number;
     limit?: number;
   }): Observable<any> {
@@ -58,14 +58,14 @@ export class QueryService {
   }
 
   // Delete query - use API Server
-  deleteQuery(queryId: number): Observable<any> {
+  deleteQuery(queryId: string): Observable<any> {
     return this.httpClientService.apiDelete(`/query/${queryId}`);
   }
 
   // Get query history - use Query Server
   getQueryHistory(params: {
-    orgId?: number;
-    databaseId?: number;
+    orgId?: string;
+    databaseId?: string;
     pageNumber?: number;
     limit?: number;
   }): Observable<any> {
@@ -86,7 +86,7 @@ export class QueryService {
 
   // Validate query - use Query Server
   validateQuery(queryData: {
-    databaseId: number;
+    databaseId: string;
     query: string;
   }): Observable<any> {
     return this.httpClientService.queryPost('/query/validate', queryData);
@@ -94,7 +94,7 @@ export class QueryService {
 
   // Get query explain - use Query Server
   getQueryExplain(queryData: {
-    databaseId: number;
+    databaseId: string;
     query: string;
   }): Observable<any> {
     return this.httpClientService.queryPost('/query/explain', queryData);
@@ -102,8 +102,8 @@ export class QueryService {
 
   // Export query results as CSV - use Query Server
   exportQueryResults(queryData: {
-    orgId: number;
-    databaseId: number;
+    orgId: string;
+    databaseId: string;
     query: string;
     filter?: string;
   }): Observable<Blob> {
@@ -113,15 +113,15 @@ export class QueryService {
   }
 
   // New methods demonstrating database schema operations on Query Server
-  getDatabaseSchema(databaseId: number): Observable<any> {
+  getDatabaseSchema(databaseId: string): Observable<any> {
     return this.httpClientService.queryGet(`/database/schema/${databaseId}`);
   }
 
-  getDatabaseTables(databaseId: number): Observable<any> {
+  getDatabaseTables(databaseId: string): Observable<any> {
     return this.httpClientService.queryGet(`/database/tables/${databaseId}`);
   }
 
-  getTableColumns(databaseId: number, tableName: string): Observable<any> {
+  getTableColumns(databaseId: string, tableName: string): Observable<any> {
     return this.httpClientService.queryGet(
       `/database/columns/${databaseId}/${tableName}`,
     );

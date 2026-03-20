@@ -589,14 +589,6 @@
   align-items: center;
   justify-content: center;
   padding: 10px 48px;
-  background: linear-gradient(
-    135deg,
-    #0d47a1 0%,
-    #1565c0 40%,
-    #1976d2 70%,
-    #1e88e5 100%
-  );
-  color: white;
   font-size: 13px;
   position: relative;
   z-index: 999;
@@ -712,7 +704,6 @@
   .popup-accent {
     width: 4px;
     flex-shrink: 0;
-    background: linear-gradient(180deg, #1976d2, #42a5f5);
   }
 
   .popup-inner {

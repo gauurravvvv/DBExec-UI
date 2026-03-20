@@ -76,8 +76,6 @@ export class DatabaseService {
     if (adminCredentials) {
       requestBody.adminCredentials = {
         email: adminCredentials.email,
-        phone: adminCredentials.phone,
-        password: adminCredentials.password,
       };
     }
 

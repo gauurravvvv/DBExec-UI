@@ -83,6 +83,12 @@
                 <span>My Profile</span>
               </a>
             </li>
+            <li class="menu-item" *ngIf="isOrgAdmin">
+              <a (click)="showAnnouncementDialog = true; showProfileMenu = false">
+                <i class="pi pi-volume-up"></i>
+                <span>Announce</span>
+              </a>
+            </li>
             <li class="menu-item logout">
               <a (click)="logout()">
                 <i class="pi pi-sign-out"></i>
@@ -97,7 +103,11 @@
 </header>
 
 <!-- Announcement Banner -->
-<div class="announcement-banner" *ngIf="announcementTitle">
+<div
+  class="announcement-banner"
+  *ngIf="announcementTitle"
+  [ngStyle]="{ 'background': announcementBgColor, 'color': announcementTextColor }"
+>
   <div class="banner-shimmer"></div>
   <div class="banner-glow-left"></div>
   <div class="banner-glow-right"></div>
@@ -122,10 +132,10 @@
   (click)="showAnnouncementOverlay = false"
 >
   <div class="announcement-popup" (click)="$event.stopPropagation()">
-    <div class="popup-accent"></div>
+    <div class="popup-accent" [ngStyle]="{ 'background': announcementBgColor }"></div>
     <div class="popup-inner">
       <div class="popup-header-row">
-        <span class="popup-tag">Announcement</span>
+        <span class="popup-tag" [ngStyle]="{ 'color': announcementBgColor }">Announcement</span>
       </div>
       <h3 class="popup-title">{{ announcementTitle }}</h3>
       <p class="popup-description">{{ announcementDescription }}</p>
@@ -186,6 +196,16 @@
   </ng-template>
   <div class="notification-footer">Showing last 30 days</div>
 </div>
+
+<!-- Announcement Dialog (ORG_ADMIN creates type=2 announcements for users) -->
+<app-announcement-dialog
+  *ngIf="isOrgAdmin"
+  [(visible)]="showAnnouncementDialog"
+  [organisationId]="globalService.getTokenDetails('organisationId')"
+  [type]="2"
+  (save)="onAnnouncementSave($event)"
+>
+</app-announcement-dialog>
 
 <!-- Global Search -->
 <app-global-search></app-global-search>

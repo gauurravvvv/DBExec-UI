@@ -51,8 +51,8 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   // Dataset ID from route
-  datasetId?: number;
-  orgId?: number;
+  datasetId?: string;
+  orgId?: string;
   isLoadingDataset = false;
   datasetName: string = '';
   datasetDescription: string = '';
@@ -203,9 +203,9 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Fetch orgId and datasetId from route params
     this.route.params.subscribe(params => {
-      this.datasetId = params['id'] ? +params['id'] : undefined;
+      this.datasetId = params['id'] ? params['id'] : undefined;
       this.orgId = params['orgId']
-        ? +params['orgId']
+        ? params['orgId']
         : this.globalService.getTokenDetails('organisationId');
 
       // If datasetId is present, fetch dataset data first
@@ -223,7 +223,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     document.addEventListener('click', this.closeContextMenu.bind(this));
   }
 
-  refreshSingleDatabase(dbId: number): void {
+  refreshSingleDatabase(dbId: string): void {
     if (!dbId || !this.orgId) return;
 
     const orgId = this.orgId.toString();
@@ -525,7 +525,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  private async loadDatabaseSchema(dbId: number): Promise<void> {
+  private async loadDatabaseSchema(dbId: string): Promise<void> {
     if (!dbId || !this.orgId) return Promise.resolve();
 
     const orgId = this.orgId.toString();
@@ -565,7 +565,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * Apply cached schema data from store to component state
    */
-  private applyCachedSchemaData(dbId: number, schemaData: any): void {
+  private applyCachedSchemaData(dbId: string, schemaData: any): void {
     // Store schema data by database ID
     this.databaseSchemas[dbId] = schemaData;
 
@@ -581,7 +581,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * Load database schema from API and update store
    */
-  private async loadDatabaseSchemaFromAPI(dbId: number): Promise<void> {
+  private async loadDatabaseSchemaFromAPI(dbId: string): Promise<void> {
     if (!dbId || !this.orgId) return Promise.resolve();
 
     const orgId = this.orgId.toString();
@@ -1211,7 +1211,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isLoadingDataset = true;
 
     this.datasetService
-      .getDataset(this.orgId.toString(), this.datasetId.toString())
+      .getDataset(this.orgId, this.datasetId)
       .then(response => {
         this.isLoadingDataset = false;
 

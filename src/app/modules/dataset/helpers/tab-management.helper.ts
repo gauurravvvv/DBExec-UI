@@ -79,7 +79,7 @@ export class TabManagementHelper {
   static createQueryTab(
     tabCounter: number,
     title: string,
-    databaseId?: number,
+    databaseId?: string,
     databaseName: string = 'database',
   ): QueryTab {
     const tabId = `tab_${tabCounter}`;

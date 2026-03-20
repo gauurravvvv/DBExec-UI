@@ -163,7 +163,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
   visualCounter: number = 0;
-  focusedVisualId: number | null = null;
+  focusedVisualId: string | null = null;
   resizingVisual: any = null;
   resizeStartX: number = 0;
   resizeStartY: number = 0;
@@ -234,7 +234,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   draggingVisual: any = null;
 
   // Title editing
-  editingTitleId: number | null = null;
+  editingTitleId: string | null = null;
 
   // Axis selection mode
   activeAxisSelection: 'x' | 'y' | 'z' | null = null;
@@ -695,7 +695,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
           // Set visual counter
           if (this.visuals.length > 0) {
-            this.visualCounter = Math.max(...this.visuals.map(v => v.id), 0);
+            this.visualCounter = Math.max(...this.visuals.map(v => Number(v.id) || 0), 0);
           }
 
           this.cdr.detectChanges();
@@ -882,7 +882,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     const { xRatio, yRatio } = this.getNextVisualPosition();
 
     const visual: any = {
-      id: this.visualCounter,
+      id: String(this.visualCounter),
       title: 'Untitled Visual',
       x: 0,
       y: 0,
@@ -908,7 +908,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.visuals.push(visual);
     this.placeVisualsOnGrid();
     this.recalculateAllVisualDimensions();
-    this.focusedVisualId = this.visualCounter;
+    this.focusedVisualId = String(this.visualCounter);
 
     // Scroll to the new visual (scoped to canvas container only)
     setTimeout(() => {
@@ -1232,7 +1232,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  removeVisual(id: number): void {
+  removeVisual(id: string): void {
     this.visuals = this.visuals.filter(v => v.id !== id);
     if (this.focusedVisualId === id) {
       this.focusedVisualId = null;
@@ -1255,7 +1255,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isConfigSidebarOpen = false;
   }
 
-  startEditTitle(id: number, event: Event): void {
+  startEditTitle(id: string, event: Event): void {
     event.stopPropagation();
     this.editingTitleId = id;
   }
@@ -1270,13 +1270,13 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onVisualClick(event: MouseEvent, id: number): void {
+  onVisualClick(event: MouseEvent, id: string): void {
     if (this.isResizing) return;
     event.stopPropagation();
     this.focusedVisualId = this.focusedVisualId === id ? null : id;
   }
 
-  onVisualRightClick(event: MouseEvent, id: number): void {
+  onVisualRightClick(event: MouseEvent, id: string): void {
     event.preventDefault();
     event.stopPropagation();
     this.focusedVisualId = id;

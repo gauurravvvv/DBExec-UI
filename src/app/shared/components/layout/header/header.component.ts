@@ -14,6 +14,8 @@ import { Renderer2 } from '@angular/core';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { GlobalSearchService } from '../../../services/global-search.service';
 import { LoginService } from 'src/app/core/services/login.service';
+import { AnnouncementService } from 'src/app/modules/organisation/services/announcement.service';
+import { ROLES } from 'src/app/constants/user.constant';
 
 @Component({
   selector: 'app-header',
@@ -31,34 +33,39 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isFullscreen = false;
   @ViewChild('notificationMenu') notificationMenu!: ElementRef;
 
-  announcementTitle: string | null = 'System Maintenance Notice';
-  announcementDescription: string | null =
-    'The system will undergo scheduled maintenance on March 5th, 2026. Some services may be temporarily unavailable during this period. Please save your work beforehand.';
+  announcementTitle: string | null = null;
+  announcementDescription: string | null = null;
+  announcementBgColor: string = '#0d47a1';
+  announcementTextColor: string = '#ffffff';
   typedMessage: string = '';
   isTyping: boolean = false;
   showAnnouncementOverlay: boolean = false;
   doNotShowAgain: boolean = false;
   private typewriterTimer: any;
 
+  // Announcement dialog for ORG_ADMIN
+  showAnnouncementDialog = false;
+  isOrgAdmin = false;
+
   showNotificationMenu = false;
   unreadNotifications = 2; // Example count
   notifications = [
     {
-      id: 1,
+      id: '1',
       message: 'New environment "Production" has been created',
       time: new Date(),
       read: false,
       icon: 'pi-globe',
     },
     {
-      id: 2,
+      id: '2',
       message: 'Database "Main DB" is now connected',
       time: new Date(Date.now() - 3600000), // 1 hour ago
       read: true,
       icon: 'pi-database',
     },
     {
-      id: 3,
+      id: '3',
       message:
         'User "John Doe" has been added to the Development team with admin privileges',
       time: new Date(Date.now() - 7200000), // 2 hours ago
@@ -66,21 +73,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
       icon: 'pi-user-plus',
     },
     {
-      id: 4,
+      id: '4',
       message: 'Backup completed successfully for "Analytics DB"',
       time: new Date(Date.now() - 86400000), // 1 day ago
       read: true,
       icon: 'pi-check-circle',
     },
     {
-      id: 5,
+      id: '5',
       message: 'Security update: 2 new access policies have been implemented',
       time: new Date(Date.now() - 172800000), // 2 days ago
       read: true,
       icon: 'pi-shield',
     },
     {
-      id: 6,
+      id: '6',
       message:
         'System maintenance scheduled for tomorrow at 02:00 AM UTCSystem maintenance scheduled for tomorrow at 02:00 AM UTCSystem maintenance scheduled for tomorrow at 02:00 AM UTC',
       time: new Date(Date.now() - 259200000), // 3 days ago
@@ -91,11 +98,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private globalService: GlobalService,
+    public globalService: GlobalService,
     private renderer: Renderer2,
     private store: Store,
     private globalSearchService: GlobalSearchService,
     private loginService: LoginService,
+    private announcementService: AnnouncementService,
   ) {
     // Always use light mode (theming disabled)
     this.isDarkMode = false;
@@ -113,12 +121,41 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.userInitials = this.globalService.chipNameProvider(userFullName);
     this.userRole = this.globalService.getTokenDetails('role');
 
+    this.isOrgAdmin = this.userRole === ROLES.ORG_ADMIN;
+
     this.updateUnreadCount();
 
-    // Start typewriter effect for announcement
-    if (this.announcementTitle) {
-      this.startTypewriter();
+    // Fetch announcement only for custom org users (not super admin / default org)
+    // ORG_ADMIN sees type=1 (announcements from super admin)
+    // ORG_USER sees type=2 (announcements from org admin)
+    if (this.userRole !== ROLES.SUPER_ADMIN) {
+      const announcementType = this.isOrgAdmin ? 1 : 2;
+      this.fetchAnnouncement(announcementType);
     }
+  }
+
+  private fetchAnnouncement(type: number) {
+    const orgId = this.globalService.getTokenDetails('organisationId');
+    if (!orgId) return;
+
+    this.announcementService.getAnnouncement(orgId, type).then(res => {
+      if (res?.status && res?.data) {
+        this.announcementTitle = res.data.name;
+        this.announcementDescription = res.data.description;
+        this.announcementBgColor = res.data.bgColor || '#0d47a1';
+        this.announcementTextColor = res.data.textColor || '#ffffff';
+        this.startTypewriter();
+      }
+    });
+  }
+
+  onAnnouncementSave(data: any) {
+    const orgId = this.globalService.getTokenDetails('organisationId');
+    this.announcementService
+      .addAnnouncement({ organisation: orgId, ...data })
+      .then(res => {
+        this.globalService.handleSuccessService(res);
+      });
   }
 
   ngOnDestroy() {
@@ -210,7 +247,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.unreadNotifications = 0;
   }
 
-  removeNotification(id: number) {
+  removeNotification(id: string) {
     //call delete notification API
     // this.notifications = this.notifications.filter(n => n.id !== id);
   }
@@ -288,6 +325,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   dismissAnnouncement() {
+    const orgId = this.globalService.getTokenDetails('organisationId');
+    this.announcementService.dismissAnnouncement(orgId);
     this.announcementTitle = null;
     this.announcementDescription = null;
     this.typedMessage = '';

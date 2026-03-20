@@ -35,6 +35,7 @@ import { SidebarComponent } from './shared/components/layout/sidebar/sidebar.com
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
 import { SharedModule } from './shared/shared.module';
+import { AnnouncementDialogModule } from './modules/organisation/components/announcement-dialog/announcement-dialog.module';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { SharedModule } from './shared/shared.module';
     InputTextareaModule,
     AppPrimeNGModule,
     SharedModule,
+    AnnouncementDialogModule,
     // NgRx Store
     StoreModule.forRoot({}),
     EffectsModule.forRoot([]),

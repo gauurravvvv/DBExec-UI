@@ -19,7 +19,7 @@ export class SuperAdminService {
       });
   }
 
-  deleteSuperAdmin(id: number) {
+  deleteSuperAdmin(id: string) {
     return this.http
       .delete(SUPER_ADMIN.DELETE + `${id}`)
       .toPromise()

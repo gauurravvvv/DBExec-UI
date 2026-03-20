@@ -20,10 +20,37 @@
     }
   }
 
-  .color-pickers-row {
+  .color-status-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 1rem;
+    align-items: start;
+  }
+
+  .status-toggle-field {
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 8px;
+    }
+
+    .status-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .status-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+
+        &.active {
+          color: var(--success-color, #4caf50);
+        }
+      }
+    }
   }
 
   .color-picker-field {

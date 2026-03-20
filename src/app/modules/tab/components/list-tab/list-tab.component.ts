@@ -116,9 +116,9 @@ export class ListTabComponent implements OnInit, OnDestroy {
   }
 
   handleDeepLinking(params: any) {
-    const orgId = params['orgId'] ? Number(params['orgId']) : null;
+    const orgId = params['orgId'] ? params['orgId'] : null;
     const databaseId = params['databaseId']
-      ? Number(params['databaseId'])
+      ? params['databaseId']
       : null;
     const name = params['name'];
 
@@ -157,7 +157,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadOrganisations(preSelectedOrgId?: number): Promise<void> {
+  loadOrganisations(preSelectedOrgId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
         page: DEFAULT_PAGE,
@@ -193,7 +193,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadDatabases(preSelectedDbId?: number): Promise<void> {
+  loadDatabases(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
       if (!this.selectedOrg) {
         resolve();

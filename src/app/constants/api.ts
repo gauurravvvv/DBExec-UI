@@ -213,6 +213,8 @@ export const GLOBAL_SEARCH = {
 export const ANNOUNCEMENT = {
   CONFIGURE: '/announcement/configure',
   GET: '/announcement/get/',
+  DETAILS: '/announcement/details/',
+  DISMISS: '/announcement/dismiss/',
 };
 
 export const AUDIT = {

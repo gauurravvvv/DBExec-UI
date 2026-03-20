@@ -5,16 +5,16 @@ import { OrganisationService } from '../../organisation/services/organisation.se
 import { QueryService } from './query.service';
 
 export interface Organisation {
-  id: number;
+  id: string;
   name: string;
   [key: string]: any;
 }
 
 export interface Database {
-  id: number;
+  id: string;
   name: string;
   type: string;
-  orgId: number;
+  orgId: string;
   [key: string]: any;
 }
 
@@ -91,7 +91,7 @@ export class DatabaseManagementService {
   }
 
   // Database management
-  loadDatabases(orgId?: number): Observable<Database[]> {
+  loadDatabases(orgId?: string): Observable<Database[]> {
     const organisationId = orgId || this.getSelectedOrganisation()?.id;
 
     if (!organisationId) {
@@ -104,14 +104,14 @@ export class DatabaseManagementService {
     // In a real implementation, this would call an API
     const mockDatabases: Database[] = [
       {
-        id: 1,
+        id: '1',
         name: 'PostgreSQL Database',
         type: 'postgresql',
         orgId: organisationId,
       },
-      { id: 2, name: 'MySQL Database', type: 'mysql', orgId: organisationId },
+      { id: '2', name: 'MySQL Database', type: 'mysql', orgId: organisationId },
       {
-        id: 3,
+        id: '3',
         name: 'MongoDB Database',
         type: 'mongodb',
         orgId: organisationId,
@@ -157,12 +157,12 @@ export class DatabaseManagementService {
   }
 
   // Get database by ID
-  getDatabaseById(id: number): Database | null {
+  getDatabaseById(id: string): Database | null {
     return this.getDatabases().find(db => db.id === id) || null;
   }
 
   // Get organisation by ID
-  getOrganisationById(id: number): Organisation | null {
+  getOrganisationById(id: string): Organisation | null {
     return this.getOrganisations().find(org => org.id === id) || null;
   }
 

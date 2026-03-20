@@ -24,7 +24,7 @@ export class ListSuperAdminComponent implements OnInit {
   totalItems = 0;
 
   showDeleteConfirm = false;
-  adminIdToDelete: number | null = null;
+  adminIdToDelete: string | null = null;
 
   // Component-managed filter values
   filterValues: any = {
@@ -83,7 +83,7 @@ export class ListSuperAdminComponent implements OnInit {
     this.router.navigate([SUPER_ADMIN.EDIT + '/' + adminId]);
   }
 
-  confirmDelete(adminId: number) {
+  confirmDelete(adminId: string) {
     this.adminIdToDelete = adminId;
     this.showDeleteConfirm = true;
   }
@@ -101,7 +101,7 @@ export class ListSuperAdminComponent implements OnInit {
     }
   }
 
-  onDelete(adminId: number) {
+  onDelete(adminId: string) {
     this.superAdminService.deleteSuperAdmin(adminId).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         // Refresh current view

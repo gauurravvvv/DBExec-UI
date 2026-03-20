@@ -37,7 +37,7 @@ import {
 } from './helpers/prompt-renderer.helper';
 
 interface GroupedPrompt {
-  promptId: number;
+  promptId: string;
   name: string;
   value: any;
   displayValue: string;
@@ -47,12 +47,12 @@ interface GroupedPrompt {
   endValue?: any;
 }
 interface GroupedSection {
-  sectionId: number;
+  sectionId: string;
   sectionName: string;
   prompts: GroupedPrompt[];
 }
 interface GroupedTab {
-  tabId: number;
+  tabId: string;
   tabName: string;
   sections: GroupedSection[];
 }
@@ -391,7 +391,7 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     this.executeError = null;
 
     // Build prompt lookup for ID → string value resolution
-    const promptMap = new Map<number, ExecutePrompt>();
+    const promptMap = new Map<string, ExecutePrompt>();
     this.tabs.forEach(tab => {
       tab.sections.forEach(section => {
         section.prompts.forEach(p => promptMap.set(p.id, p));
@@ -466,8 +466,8 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     const startTime = Date.now();
 
     const payload: any = {
-      orgId: Number(this.orgId),
-      databaseId: Number(this.databaseId),
+      orgId: this.orgId,
+      databaseId: this.databaseId,
       query,
       page,
       limit,
@@ -618,7 +618,7 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     const description = (this.saveForm.get('description')?.value || '').trim();
 
     // Build promptId → prompt lookup from loaded prompts
-    const promptMap = new Map<number, ExecutePrompt>();
+    const promptMap = new Map<string, ExecutePrompt>();
     this.tabs.forEach(tab => {
       tab.sections.forEach(section => {
         section.prompts.forEach(p => {
@@ -659,9 +659,9 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
     const payload: any = {
       name,
       description,
-      organisation: Number(this.orgId),
-      database: Number(this.databaseId),
-      screenId: Number(this.screenId),
+      organisation: this.orgId,
+      database: this.databaseId,
+      screenId: this.screenId,
       prompts,
       promptConfig: {
         prompts: enrichedPrompts,
@@ -759,9 +759,9 @@ export class ExecuteScreenComponent implements OnInit, OnDestroy {
    */
   private patchSavedPromptValues(savedPrompts: any[]): void {
     // Build a map of promptId → saved prompt data
-    const savedMap = new Map<number, any>();
+    const savedMap = new Map<string, any>();
     savedPrompts.forEach((p: any) => {
-      savedMap.set(Number(p.promptId), p);
+      savedMap.set(p.promptId, p);
     });
 
     // Patch each prompt's form control using promptId to match

@@ -32,9 +32,9 @@
         {{ descriptionLength }}/{{ maxDescriptionLength }}
       </span>
     </div>
-    <div class="color-pickers-row">
+    <div class="color-status-row">
       <div class="color-picker-field">
-        <label>Background Color</label>
+        <label>Background</label>
         <div class="color-picker-inline">
           <p-colorPicker
             formControlName="bgColor"
@@ -46,7 +46,7 @@
         </div>
       </div>
       <div class="color-picker-field">
-        <label>Text Color</label>
+        <label>Text</label>
         <div class="color-picker-inline">
           <p-colorPicker
             formControlName="textColor"
@@ -55,6 +55,18 @@
           <span class="color-value">{{
             announcementForm.get('textColor')?.value
           }}</span>
+        </div>
+      </div>
+      <div class="status-toggle-field">
+        <label>Status</label>
+        <div class="status-toggle">
+          <p-inputSwitch
+            [(ngModel)]="isStatusActive"
+            [ngModelOptions]="{ standalone: true }"
+          ></p-inputSwitch>
+          <span class="status-text" [class.active]="isStatusActive">
+            {{ isStatusActive ? 'Active' : 'Inactive' }}
+          </span>
         </div>
       </div>
     </div>

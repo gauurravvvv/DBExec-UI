@@ -227,7 +227,7 @@
               <i
                 class="pi pi-eye"
                 style="cursor: pointer"
-                (click)="togglePassword($event, 'password')"
+                (click)="togglePassword($event)"
               ></i>
             </span>
             <small
@@ -339,42 +339,9 @@
         >
         </app-custom-input>
 
-        <!-- Admin Password Field -->
-        <div class="form-field">
-          <label for="adminPassword"
-            >Admin Password<span class="required"> *</span></label
-          >
-          <span class="p-input-icon-left p-input-icon-right">
-            <i class="pi pi-lock"></i>
-            <input
-              id="adminPassword"
-              [type]="showAdminPassword ? 'text' : 'password'"
-              pInputText
-              formControlName="adminPassword"
-              placeholder="Enter password"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  databaseForm.get('adminPassword')?.invalid &&
-                  databaseForm.get('adminPassword')?.touched,
-              }"
-            />
-            <i
-              class="pi pi-eye"
-              style="cursor: pointer"
-              (click)="togglePassword($event, 'adminPassword')"
-            ></i>
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              databaseForm.get('adminPassword')?.invalid &&
-              databaseForm.get('adminPassword')?.touched
-            "
-          >
-            Password must contain at least 8 characters, one uppercase letter,
-            one lowercase letter, one number and one special character
-          </small>
-        </div>
+        <p class="admin-setup-note">
+          A setup email will be sent to this address. The admin will set their own password.
+        </p>
       </div>
     </form>
   </div>

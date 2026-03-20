@@ -30,7 +30,7 @@ export class ListOrganisationComponent implements OnInit {
   totalItems = 0;
 
   showDeleteConfirm = false;
-  orgIdToDelete: number | null = null;
+  orgIdToDelete: string | null = null;
 
   constructor(
     private organisationService: OrganisationService,
@@ -107,7 +107,7 @@ export class ListOrganisationComponent implements OnInit {
     this.router.navigate([ORGANISATION.EDIT + '/' + org.id]);
   }
 
-  confirmDelete(orgId: number) {
+  confirmDelete(orgId: string) {
     this.orgIdToDelete = orgId;
     this.showDeleteConfirm = true;
   }
@@ -125,9 +125,9 @@ export class ListOrganisationComponent implements OnInit {
     }
   }
 
-  onDelete(orgId: number) {
+  onDelete(orgId: string) {
     this.organisationService
-      .deleteOrganisation(orgId.toString())
+      .deleteOrganisation(orgId)
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
           if (this.lastTableLazyLoadEvent) {

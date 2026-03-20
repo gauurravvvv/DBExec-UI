@@ -34,7 +34,7 @@ interface OrganisationData {
   styleUrls: ['./view-organisation.component.scss'],
 })
 export class ViewOrganisationComponent implements OnInit {
-  organisationId!: number;
+  organisationId!: string;
   organisationData!: OrganisationData;
   avatarBackground: string = '#2196F3';
   organisationInitials: string = '';
@@ -58,7 +58,7 @@ export class ViewOrganisationComponent implements OnInit {
 
   loadOrganisationData() {
     this.organisationService
-      .viewOrganisation(this.organisationId.toString())
+      .viewOrganisation(this.organisationId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.organisationData = response.data;
@@ -78,7 +78,7 @@ export class ViewOrganisationComponent implements OnInit {
     }
   }
 
-  confirmDelete(id: number) {
+  confirmDelete(id: string) {
     this.showDeleteConfirm = true;
   }
 
@@ -88,7 +88,7 @@ export class ViewOrganisationComponent implements OnInit {
 
   proceedDelete() {
     this.organisationService
-      .deleteOrganisation(this.organisationId.toString())
+      .deleteOrganisation(this.organisationId)
       .then(response => {
         if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ORGANISATION.LIST]);

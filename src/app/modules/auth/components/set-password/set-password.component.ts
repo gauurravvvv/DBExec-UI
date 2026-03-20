@@ -17,7 +17,7 @@ export class SetPasswordComponent implements OnInit {
   setPasswordForm: FormGroup;
   showPassword = false;
   features = SET_PASSWORD_PAGE_OPTIONS;
-  userId!: number;
+  userId!: string;
   orgId!: string;
   token!: string;
 
@@ -50,7 +50,7 @@ export class SetPasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      this.userId = +params['id'];
+      this.userId = params['id'];
       this.orgId = params['orgId'];
       this.token = params['token'];
       if (!this.userId || !this.orgId || !this.token) {

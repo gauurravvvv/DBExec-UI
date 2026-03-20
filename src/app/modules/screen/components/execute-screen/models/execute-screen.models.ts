@@ -18,8 +18,8 @@ export type PromptType =
 
 // Prompt config from API
 export interface PromptConfig {
-  id: number;
-  promptId: number;
+  id: string;
+  promptId: string;
   prompt_schema: string;
   prompt_table: string;
   prompt_column: string;
@@ -32,21 +32,21 @@ export interface PromptConfig {
 
 // API response for prompt values
 export interface PromptValue {
-  id: number;
-  promptId: number;
+  id: string;
+  promptId: string;
   value: string;
 }
 
 // Prompt model for execute screen
 export interface ExecutePrompt {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  sectionId: number;
+  sectionId: string;
   type: PromptType;
   mandatory: boolean;
   isGroup: boolean;
-  groupId: number | null;
+  groupId: string | null;
   promptControlName: string;
   sequence: number;
   values: PromptValue[];
@@ -54,15 +54,15 @@ export interface ExecutePrompt {
   // Internal tracking
   formControlName: string;
   // Cached options for dropdown/multiselect/radio/checkbox
-  options: { label: string; value: number }[];
+  options: { label: string; value: string }[];
 }
 
 // Section model for execute screen
 export interface ExecuteSection {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  tabId: number;
+  tabId: string;
   sectionControlName: string;
   sequence: number;
   prompts: ExecutePrompt[];
@@ -75,7 +75,7 @@ export interface ExecuteSection {
 
 // Tab model for execute screen
 export interface ExecuteTab {
-  id: number;
+  id: string;
   name: string;
   description: string;
   tabControlName: string;
@@ -89,16 +89,16 @@ export interface ExecuteTab {
 
 // Screen model
 export interface ExecuteScreen {
-  id: number;
+  id: string;
   name: string;
-  organisationId: number;
-  databaseId: number;
+  organisationId: string;
+  databaseId: string;
   tabs: ExecuteTab[];
 }
 
 // Form submission payload
 export interface PromptSubmission {
-  promptId: number;
+  promptId: string;
   controlName: string;
   type: PromptType;
   value: any;
@@ -121,12 +121,12 @@ export interface ApiResponse<T> {
 }
 
 export interface TabApiResponse {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  organisationId: number;
+  organisationId: string;
   organisationName: string;
-  databaseId: number;
+  databaseId: string;
   databaseName: string;
   tabControlName: string;
   sequence: number;
@@ -136,13 +136,13 @@ export interface TabApiResponse {
 }
 
 export interface SectionApiResponse {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  tabId: number;
-  organisationId: number;
+  tabId: string;
+  organisationId: string;
   organisationName: string;
-  databaseId: number;
+  databaseId: string;
   databaseName: string;
   status: number;
   sequence: number;
@@ -152,20 +152,20 @@ export interface SectionApiResponse {
 }
 
 export interface PromptApiResponse {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  sectionId: number;
-  organisationId: number;
+  sectionId: string;
+  organisationId: string;
   organisationName: string;
-  databaseId: number;
+  databaseId: string;
   databaseName: string;
   status: number;
   type: string;
   validation: string | null;
   mandatory: number;
   isGroup: boolean;
-  groupId: number | null;
+  groupId: string | null;
   promptControlName: string;
   sequence: number;
   createdOn: string;

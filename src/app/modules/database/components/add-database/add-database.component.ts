@@ -19,7 +19,6 @@ export class AddDatabaseComponent implements OnInit {
   organisations: any[] = [];
   private _showOrganisationDropdown = false;
   showPassword: boolean = false;
-  showAdminPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -84,7 +83,6 @@ export class AddDatabaseComponent implements OnInit {
       acknowledgment: [false],
       schemaAcknowledgment: [false],
       isMasterDB: [false],
-      adminPassword: [''],
       adminEmail: [''],
     });
 
@@ -98,16 +96,11 @@ export class AddDatabaseComponent implements OnInit {
       const schemaAcknowledgmentControl = this.databaseForm.get(
         'schemaAcknowledgment',
       );
-      const adminPasswordControl = this.databaseForm.get('adminPassword');
       const adminEmailControl = this.databaseForm.get('adminEmail');
 
       if (isMaster) {
         acknowledgmentControl?.setValidators(Validators.requiredTrue);
         schemaAcknowledgmentControl?.setValidators(Validators.requiredTrue);
-        adminPasswordControl?.setValidators([
-          Validators.required,
-          Validators.pattern(REGEX.password),
-        ]);
         adminEmailControl?.setValidators([
           Validators.required,
           Validators.email,
@@ -115,16 +108,13 @@ export class AddDatabaseComponent implements OnInit {
       } else {
         acknowledgmentControl?.clearValidators();
         schemaAcknowledgmentControl?.clearValidators();
-        adminPasswordControl?.clearValidators();
         adminEmailControl?.clearValidators();
 
-        adminPasswordControl?.setValue('');
         adminEmailControl?.setValue('');
       }
 
       acknowledgmentControl?.updateValueAndValidity();
       schemaAcknowledgmentControl?.updateValueAndValidity();
-      adminPasswordControl?.updateValueAndValidity();
       adminEmailControl?.updateValueAndValidity();
     });
   }
@@ -166,7 +156,6 @@ export class AddDatabaseComponent implements OnInit {
       if (formValue.isMasterDB) {
         payload.adminCredentials = {
           email: formValue.adminEmail,
-          password: formValue.adminPassword,
         };
       }
 
@@ -184,11 +173,8 @@ export class AddDatabaseComponent implements OnInit {
       this.databaseForm.get('isMasterDB')?.setValue(false);
       this.databaseForm.get('acknowledgment')?.setValue(false);
       this.databaseForm.get('schemaAcknowledgment')?.setValue(false);
-      this.databaseForm.get('adminPassword')?.setValue('');
       this.databaseForm.get('adminEmail')?.setValue('');
-      this.databaseForm.get('adminPassword')?.clearValidators();
       this.databaseForm.get('adminEmail')?.clearValidators();
-      this.databaseForm.get('adminPassword')?.updateValueAndValidity();
       this.databaseForm.get('adminEmail')?.updateValueAndValidity();
       this.databaseForm.get('type')?.setValue('postgres');
       this.databaseForm.get('type')?.disable();
@@ -244,13 +230,9 @@ export class AddDatabaseComponent implements OnInit {
     return true;
   }
 
-  togglePassword(event: Event, field: 'password' | 'adminPassword'): void {
+  togglePassword(event: Event): void {
     event.preventDefault();
-    if (field === 'password') {
-      this.showPassword = !this.showPassword;
-    } else {
-      this.showAdminPassword = !this.showAdminPassword;
-    }
+    this.showPassword = !this.showPassword;
   }
 
   set showOrganisationDropdown(value: boolean) {

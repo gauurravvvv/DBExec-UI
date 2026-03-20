@@ -16,7 +16,7 @@ export class ResetPasswordComponent implements OnInit {
   resetPasswordForm: FormGroup;
   showPassword = false;
   features = RESET_PASSWORD_PAGE_OPTIONS;
-  userId!: number;
+  userId!: string;
   orgId!: string;
 
   otpControls: UntypedFormControl[] = [];
@@ -55,7 +55,7 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      this.userId = +params['id'];
+      this.userId = params['id'];
       this.orgId = params['orgId'];
       if (!this.userId || !this.orgId) {
         this.router.navigate([AUTH.LOGIN]);

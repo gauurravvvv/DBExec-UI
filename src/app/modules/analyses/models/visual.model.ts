@@ -43,7 +43,7 @@ export interface ChartDataMapping {
  */
 export interface Visual {
   /** Unique identifier for the visual */
-  id: number;
+  id: string;
 
   /** Display title of the visual */
   title: string;
@@ -107,7 +107,7 @@ export interface Visual {
  * Dataset field definition from the API
  */
 export interface DatasetField {
-  id: number;
+  id: string;
   columnToUse: string;
   columnToView: string;
   customLogic: string | null;
@@ -118,7 +118,7 @@ export interface DatasetField {
  * Dataset details containing metadata and fields
  */
 export interface DatasetDetails {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   datasetFields: DatasetField[];
@@ -142,7 +142,7 @@ export interface FieldLabels {
  * Factory function to create a new Visual with default values
  * Default ratios: 0.5 width (50% of canvas), 0.45 height (45% of canvas)
  */
-export function createVisual(id: number, config: any): Visual {
+export function createVisual(id: string, config: any): Visual {
   return {
     id,
     title: 'Untitled Visual',

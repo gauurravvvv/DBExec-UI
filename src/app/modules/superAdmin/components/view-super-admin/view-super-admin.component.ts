@@ -6,7 +6,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 
 interface AdminData {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   username: string;
@@ -16,7 +16,7 @@ interface AdminData {
   status: number;
   lastLogin: string | null;
   organisationName: string;
-  organisationId: number;
+  organisationId: string;
   role: string;
   isFirstLogin: boolean;
   isDefault: number;
@@ -121,7 +121,7 @@ export class ViewSuperAdminComponent implements OnInit {
 
   onDelete(adminId: string) {
     this.superAdminService
-      .deleteSuperAdmin(Number(adminId))
+      .deleteSuperAdmin(adminId)
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
           this.router.navigate([SUPER_ADMIN.LIST]);

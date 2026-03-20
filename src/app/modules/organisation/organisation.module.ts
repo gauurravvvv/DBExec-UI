@@ -9,16 +9,15 @@ import { RippleModule } from 'primeng/ripple';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AddOrganisationComponent } from './components/add-organisation/add-organisation.component';
-import { AnnouncementDialogComponent } from './components/announcement-dialog/announcement-dialog.component';
 import { EditOrganisationComponent } from './components/edit-organisation/edit-organisation.component';
 import { ListOrganisationComponent } from './components/list-organisation/list-organisation.component';
 import { ViewOrganisationComponent } from './components/view-organisation/view-organisation.component';
 import { OrganisationRoutingModule } from './organisation-routing.module';
+import { AnnouncementDialogModule } from './components/announcement-dialog/announcement-dialog.module';
 
 @NgModule({
   declarations: [
     AddOrganisationComponent,
-    AnnouncementDialogComponent,
     EditOrganisationComponent,
     ListOrganisationComponent,
     ViewOrganisationComponent,
@@ -35,6 +34,7 @@ import { OrganisationRoutingModule } from './organisation-routing.module';
     OrganisationRoutingModule,
     AppPrimeNGModule,
     SharedModule,
+    AnnouncementDialogModule,
   ],
 })
 export class OrganisationModule {}

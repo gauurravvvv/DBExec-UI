@@ -173,7 +173,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
   visualCounter: number = 0;
-  focusedVisualId: number | null = null;
+  focusedVisualId: string | null = null;
   resizingVisual: Visual | null = null;
   resizeStartX: number = 0;
   resizeStartY: number = 0;
@@ -641,7 +641,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addVisual(): void {
     this.visualCounter++;
-    const visual = createVisual(this.visualCounter, getDefaultChartConfig());
+    const visual = createVisual(String(this.visualCounter), getDefaultChartConfig());
 
     // Default grid size: 6 columns (half width), 2 rows
     this.visuals.push(visual);
@@ -651,7 +651,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.recalculateAllVisualDimensions();
 
     // Auto-focus the newly added visual
-    this.focusedVisualId = this.visualCounter;
+    this.focusedVisualId = String(this.visualCounter);
 
     // Scroll to the new visual (scoped to canvas container only)
     setTimeout(() => {
@@ -704,7 +704,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     const visual = this.getFocusedVisual();
     if (visual) return visual;
     // Return an empty visual to avoid null errors in template bindings
-    return createVisual(0, getDefaultChartConfig());
+    return createVisual('0', getDefaultChartConfig());
   }
 
   // Check if there's at least one visual with a chart type selected
@@ -971,7 +971,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  removeVisual(id: number): void {
+  removeVisual(id: string): void {
     this.visuals = this.visuals.filter(v => v.id !== id);
     if (this.focusedVisualId === id) {
       this.focusedVisualId = null;
@@ -1077,7 +1077,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Left-click: Focus visual for chart type selection
-  onVisualClick(event: MouseEvent, id: number): void {
+  onVisualClick(event: MouseEvent, id: string): void {
     // Prevent click from firing during/after resize
     if (this.isResizing) {
       return;
@@ -1091,7 +1091,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Right-click: Open configuration sidebar
-  onVisualRightClick(event: MouseEvent, id: number): void {
+  onVisualRightClick(event: MouseEvent, id: string): void {
     event.preventDefault(); // Prevent default context menu
     event.stopPropagation();
     // Focus the visual and open config sidebar
@@ -1099,7 +1099,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isConfigSidebarOpen = true;
   }
 
-  toggleFocusVisual(id: number): void {
+  toggleFocusVisual(id: string): void {
     if (this.focusedVisualId === id) {
       this.focusedVisualId = null;
       this.isConfigSidebarOpen = false;
