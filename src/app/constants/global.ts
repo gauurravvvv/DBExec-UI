@@ -70,5 +70,28 @@ export const RESET_PASSWORD_PAGE_OPTIONS = [
   },
 ];
 
+export const SET_PASSWORD_PAGE_OPTIONS = [
+  {
+    icon: 'shield',
+    title: 'Secure Setup',
+    description: 'Industry-standard security protocols to protect your account',
+  },
+  {
+    icon: 'key',
+    title: 'Strong Password',
+    description: 'Create a strong password for better protection',
+  },
+  {
+    icon: 'clock',
+    title: 'Quick Activation',
+    description: 'Set your password and start using your account right away',
+  },
+  {
+    icon: 'lock',
+    title: 'Token Verified',
+    description: 'Secure one-time link verification for account activation',
+  },
+];
+
 export const MAX_LIMIT = 10000000;
 export const DEFAULT_PAGE = 1;

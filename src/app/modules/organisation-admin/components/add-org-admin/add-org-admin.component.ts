@@ -8,7 +8,6 @@ import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
-import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
 
 @Component({
   selector: 'app-add-org-admin',
@@ -17,7 +16,6 @@ import { passwordStrengthValidator } from 'src/app/shared/validators/password-st
 })
 export class AddOrgAdminComponent implements OnInit {
   adminFrom!: FormGroup;
-  showPassword = false;
   organisations: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
@@ -73,7 +71,6 @@ export class AddOrgAdminComponent implements OnInit {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, passwordStrengthValidator()]],
       organisation: [
         this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
           ? ''
@@ -94,11 +91,6 @@ export class AddOrgAdminComponent implements OnInit {
         this.organisations = [...response.data.orgs];
       }
     });
-  }
-
-  togglePassword(event: Event) {
-    event.preventDefault();
-    this.showPassword = !this.showPassword;
   }
 
   onSubmit() {
@@ -159,26 +151,6 @@ export class AddOrgAdminComponent implements OnInit {
       return `Username must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
       return 'Username must start with a letter and can only contain letters, numbers, dots, hyphens and underscores';
-    return '';
-  }
-
-  getPasswordError(): string {
-    const control = this.adminFrom.get('password');
-    if (control?.errors?.['required']) return 'Password is required';
-    if (control?.errors?.['passwordMinLength'])
-      return `Password must be at least ${control.errors['passwordMinLength'].requiredLength} characters`;
-    if (control?.errors?.['passwordMaxLength'])
-      return `Password must not exceed ${control.errors['passwordMaxLength'].requiredLength} characters`;
-    if (control?.errors?.['passwordNoSpaces'])
-      return 'Password must not contain spaces';
-    if (control?.errors?.['passwordLowercase'])
-      return 'Password must contain at least one lowercase letter';
-    if (control?.errors?.['passwordUppercase'])
-      return 'Password must contain at least one uppercase letter';
-    if (control?.errors?.['passwordDigit'])
-      return 'Password must contain at least one number';
-    if (control?.errors?.['passwordSpecial'])
-      return 'Password must contain at least one special character (e.g., @$!%*?&)';
     return '';
   }
 }

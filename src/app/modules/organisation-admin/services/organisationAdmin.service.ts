@@ -21,14 +21,13 @@ export class OrganisationAdminService {
   }
 
   addOrganisationAdmin(orgAdminForm: FormGroup) {
-    const { firstName, lastName, email, password, organisation, username } =
+    const { firstName, lastName, email, organisation, username } =
       orgAdminForm.value;
     return this.http
       .post(ORG_ADMIN.ADD, {
         firstName,
         lastName,
         email,
-        password,
         organisation,
         username,
       })

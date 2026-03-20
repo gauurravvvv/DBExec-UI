@@ -31,14 +31,13 @@ export class UserService {
   }
 
   addUser(userForm: FormGroup) {
-    const { firstName, lastName, username, password, email, organisation } =
+    const { firstName, lastName, username, email, organisation } =
       userForm.value;
     return this.http
       .post(USER.ADD, {
         firstName,
         lastName,
         username,
-        password,
         email,
         organisation,
       })

@@ -4,6 +4,9 @@ export const AUTH = {
   REFRESH_TOKEN: '/auth/refresh',
   GENERATE_OTP: '/auth/generateOTP',
   RESET_PASSWORD: '/auth/reset',
+  SET_PASSWORD: '/auth/set-password',
+  VERIFY_SETUP_TOKEN: '/auth/verify-setup-token',
+  RESEND_SETUP_LINK: '/auth/resend-setup-link',
 };
 
 export const DASHBOARD = {

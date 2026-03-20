@@ -33,6 +33,7 @@ import { HeaderComponent } from './shared/components/layout/header/header.compon
 import { HomeComponent } from './shared/components/layout/home/home.component';
 import { SidebarComponent } from './shared/components/layout/sidebar/sidebar.component';
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
+import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
 import { SharedModule } from './shared/shared.module';
 
 @NgModule({
@@ -41,6 +42,7 @@ import { SharedModule } from './shared/shared.module';
     LoginComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
+    SetPasswordComponent,
     HomeComponent,
     HeaderComponent,
     SidebarComponent,

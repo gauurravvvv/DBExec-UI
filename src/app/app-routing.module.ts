@@ -5,6 +5,7 @@ import { ForgotPasswordComponent } from './modules/auth/components/forgot-passwo
 import { AuthGuard } from './core/guards/auth.guard';
 import { HomeComponent } from './shared/components/layout/home/home.component';
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
+import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
 
 const routes: Routes = [
   {
@@ -24,6 +25,10 @@ const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
+  },
+  {
+    path: 'set-password',
+    component: SetPasswordComponent,
   },
   {
     path: 'app',

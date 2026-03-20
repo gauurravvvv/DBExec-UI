@@ -62,15 +62,45 @@ export class LoginService {
       });
   }
 
-  resetPassword(loginForm: UntypedFormGroup, id: number, orgId: string) {
-    const { otp, newPassword } = loginForm.value;
+  resetPassword(loginForm: UntypedFormGroup, id: number, orgId: string, otp?: string) {
+    const { otp: formOtp, newPassword } = loginForm.value;
     return this.http
       .post(AUTH.RESET_PASSWORD, {
         id: id,
         orgId: orgId,
-        otp: +otp,
+        otp: otp || formOtp,
         password: newPassword,
       })
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  setPassword(password: string, id: number, orgId: string, token: string) {
+    return this.http
+      .post(AUTH.SET_PASSWORD, { id, orgId, token, password })
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  verifySetupToken(id: number, orgId: string, token: string) {
+    return this.http
+      .post(AUTH.VERIFY_SETUP_TOKEN, { id, orgId, token })
+      .toPromise()
+      .then(response => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  resendSetupLink(id: number, orgId: string) {
+    return this.http
+      .post(AUTH.RESEND_SETUP_LINK, { id, orgId })
       .toPromise()
       .then(response => {
         const result = JSON.parse(JSON.stringify(response));
