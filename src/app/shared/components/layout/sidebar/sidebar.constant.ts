@@ -92,29 +92,9 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/home/system/qExecutor',
   },
   {
-    value: 'secretsEnvironment',
-    route: '/app/environment',
-  },
-  {
-    value: 'secretsCredentials',
-    route: '/app/secrets',
-  },
-  {
-    value: 'secretsCategory',
-    route: '/app/category',
-  },
-  {
     value: 'myProfile',
     route: '/home/system/myProfile',
   },
-  { value: 'dbColumn', route: '/home/system/dbColumn' },
-  { value: 'dbView', route: '/home/system/dbView' },
-  { value: 'dbMaterializedView', route: '/home/system/dbMaterializedView' },
-  { value: 'dbIndex', route: '/home/system/dbIndex' },
-  { value: 'dbSequence', route: '/home/system/dbSequence' },
-  { value: 'dbFunction', route: '/home/system/dbFunction' },
-  { value: 'dbStoredProcedure', route: '/home/system/dbStoredProcedure' },
-  { value: 'dbTrigger', route: '/home/system/dbTrigger' },
   { value: 'auditLogs', route: '/app/audit-logs' },
   { value: 'loginActivity', route: '/app/login-activity' },
 ];

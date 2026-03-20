@@ -79,20 +79,6 @@ const routes: Routes = [
           import('./modules/access/access.module').then(m => m.AccessModule),
       },
       {
-        path: 'environment',
-        loadChildren: () =>
-          import('./modules/environment/environment.module').then(
-            m => m.EnvironmentModule,
-          ),
-      },
-      {
-        path: 'category',
-        loadChildren: () =>
-          import('./modules/categories/category.module').then(
-            m => m.CategoryModule,
-          ),
-      },
-      {
         path: 'database',
         loadChildren: () =>
           import('./modules/database/database.module').then(
@@ -112,13 +98,6 @@ const routes: Routes = [
         path: 'role',
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),
-      },
-      {
-        path: 'secrets',
-        loadChildren: () =>
-          import('./modules/credentials/credentials.module').then(
-            m => m.CredentialsModule,
-          ),
       },
       {
         path: 'dataset',
