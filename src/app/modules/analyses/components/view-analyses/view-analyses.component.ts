@@ -79,6 +79,7 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   analysisDetails: any = null;
   datasetDetails: any = null;
   showDeleteConfirm = false;
+  activeFilters: any[] = [];
 
   // Sidebar toggle states
   isFieldsPanelOpen: boolean = true;
@@ -643,6 +644,55 @@ export class ViewAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
         },
       );
     }
+  }
+
+  onFiltersApplied(filters: any[]): void {
+    this.activeFilters = filters;
+    this.reloadDataWithFilters();
+  }
+
+  onFiltersCleared(): void {
+    this.activeFilters = [];
+    this.reloadDataWithFilters();
+  }
+
+  private reloadDataWithFilters(): void {
+    // Dispatch loading action
+    this.store.dispatch(
+      AddAnalysesActions.loadDatasetData({
+        orgId: this.orgId,
+        datasetId: this.datasetId,
+      }),
+    );
+
+    // Re-run query with filters
+    this.datasetService
+      .runDatasetQuery({
+        datasetId: this.datasetId,
+        organisation: this.orgId,
+        filters: this.activeFilters,
+      })
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.store.dispatch(
+            AddAnalysesActions.loadDatasetDataSuccess({
+              orgId: this.orgId,
+              datasetId: this.datasetId,
+              data: response.data,
+            }),
+          );
+        }
+      })
+      .catch((err: any) => {
+        console.error('Error running filtered query', err);
+        this.store.dispatch(
+          AddAnalysesActions.loadDatasetDataFailure({
+            orgId: this.orgId,
+            datasetId: this.datasetId,
+            error: err?.message || 'Filter query failed',
+          }),
+        );
+      });
   }
 
   goBack(): void {

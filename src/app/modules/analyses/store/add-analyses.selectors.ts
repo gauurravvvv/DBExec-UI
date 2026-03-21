@@ -131,3 +131,9 @@ export const selectIsActiveDatasetStale = createSelector(
     return isDatasetStale(entry.loadedAt);
   },
 );
+
+// Select applied runtime filters
+export const selectAppliedFilters = createSelector(
+  selectAddAnalysesState,
+  (state) => state.appliedFilters,
+);

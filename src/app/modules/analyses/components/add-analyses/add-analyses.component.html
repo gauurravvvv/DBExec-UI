@@ -223,6 +223,16 @@
               "
               tooltipPosition="bottom"
             ></button>
+            <button
+              pButton
+              label="Test All Charts"
+              icon="pi pi-bolt"
+              class="p-button-outlined add-visual-button p-button-warning"
+              (click)="populateTestData()"
+              pTooltip="Populate all chart types with dummy data"
+              tooltipPosition="bottom"
+              style="margin-top: 6px;"
+            ></button>
           </div>
 
           <!-- Chart Type Grid (when visual is focused but no chart type selected) -->
@@ -676,6 +686,9 @@
       <div class="sidebar-content">
         <div class="sidebar-header-info">
           <div class="dataset-label">Filters</div>
+          <span class="visual-count-badge" *ngIf="configuredFilters.length > 0">
+            {{ configuredFilters.length }}
+          </span>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-content-inner">
@@ -695,14 +708,141 @@
             ></button>
           </div>
 
-          <!-- Filter List (placeholder for future implementation) -->
-          <div class="filter-list-empty">
+          <!-- Filter Cards -->
+          <div class="filter-cards" *ngIf="configuredFilters.length > 0">
+            <div
+              class="filter-card"
+              *ngFor="let filter of configuredFilters; let i = index"
+              [class.disabled]="!filter.isEnabled"
+            >
+              <div class="filter-card-header">
+                <span class="filter-card-name" [pTooltip]="filter.name" tooltipPosition="top">
+                  {{ filter.name }}
+                </span>
+                <div class="filter-card-actions">
+                  <i class="pi pi-pencil" (click)="editFilter(filter)" pTooltip="Edit" tooltipPosition="top"></i>
+                  <i class="pi pi-trash" (click)="removeFilter(filter)" pTooltip="Remove" tooltipPosition="top"></i>
+                </div>
+              </div>
+              <div class="filter-card-meta">
+                <span class="filter-card-column">{{ filter.columnName }}</span>
+                <span class="filter-card-type">{{ getFilterTypeLabel(filter.filterType) }}</span>
+              </div>
+              <div class="filter-card-badges">
+                <span class="badge badge-mandatory" *ngIf="filter.isMandatory">Required</span>
+                <span class="badge badge-disabled" *ngIf="!filter.isEnabled">Disabled</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div class="filter-list-empty" *ngIf="configuredFilters.length === 0">
             <i class="pi pi-filter-slash"></i>
             <p>No filters yet</p>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Filter Configuration Dialog -->
+    <p-dialog
+      header="{{ editingFilter ? 'Edit Filter' : 'Add Filter' }}"
+      [(visible)]="showFilterDialog"
+      [modal]="true"
+      [draggable]="false"
+      [resizable]="false"
+      [style]="{ width: '460px' }"
+      styleClass="filter-config-dialog"
+      [closable]="true"
+      (onHide)="cancelFilterDialog()"
+    >
+      <div class="filter-dialog-form">
+        <!-- Column Selection -->
+        <div class="filter-dialog-field">
+          <label><i class="pi pi-table"></i> Column <span class="required">*</span></label>
+          <p-dropdown
+            [options]="datasetDetails?.datasetFields || []"
+            [(ngModel)]="filterDialogColumn"
+            optionLabel="columnToView"
+            placeholder="Select a dataset column"
+            [filter]="true"
+            filterBy="columnToView"
+            [style]="{ width: '100%' }"
+            (onChange)="onFilterColumnChange()"
+          ></p-dropdown>
+        </div>
+
+        <!-- Filter Name -->
+        <div class="filter-dialog-field">
+          <label><i class="pi pi-tag"></i> Display Name</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="filterDialogName"
+            placeholder="Filter label (defaults to column name)"
+            [style]="{ width: '100%' }"
+          />
+        </div>
+
+        <!-- Type Selection Row -->
+        <div class="filter-dialog-row">
+          <div class="filter-dialog-field">
+            <label><i class="pi pi-filter"></i> Filter Type <span class="required">*</span></label>
+            <p-dropdown
+              [options]="filterTypeOptions"
+              [(ngModel)]="filterDialogType"
+              placeholder="Select type"
+              [style]="{ width: '100%' }"
+              (onChange)="onFilterTypeChange()"
+            ></p-dropdown>
+          </div>
+          <div class="filter-dialog-field">
+            <label><i class="pi pi-sliders-h"></i> Control Type <span class="required">*</span></label>
+            <p-dropdown
+              [options]="controlTypeOptions"
+              [(ngModel)]="filterDialogControl"
+              placeholder="Select control"
+              [style]="{ width: '100%' }"
+              [disabled]="controlTypeOptions.length === 0"
+            ></p-dropdown>
+          </div>
+        </div>
+
+        <!-- Options Row -->
+        <div class="filter-dialog-options">
+          <app-custom-toggle
+            [(ngModel)]="filterDialogEnabled"
+            label="Status"
+            trueLabel="Enabled"
+            falseLabel="Disabled"
+          ></app-custom-toggle>
+          <app-custom-toggle
+            [(ngModel)]="filterDialogMandatory"
+            label="Required"
+            trueLabel="Required"
+            falseLabel="Optional"
+          ></app-custom-toggle>
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+          <button class="btn-cancel" type="button" (click)="cancelFilterDialog()">
+            <i class="pi pi-times"></i>
+            Cancel
+          </button>
+          <button
+            class="btn-primary"
+            type="button"
+            (click)="saveFilterDialog()"
+            [disabled]="!filterDialogColumn || !filterDialogType || !filterDialogControl"
+          >
+            <i class="pi pi-check"></i>
+            {{ editingFilter ? 'Update Filter' : 'Add Filter' }}
+          </button>
+        </div>
+      </ng-template>
+    </p-dialog>
 
     <!-- Center Container -->
     <div class="editor-container" #canvasContainer>
@@ -804,7 +944,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [chartType]="visual.chartType || ''"
               [data]="visual.chartData"
@@ -819,7 +959,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [chartType]="visual.chartType || 'line'"
               [data]="visual.chartData"
@@ -834,7 +974,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [chartType]="visual.chartType || ''"
               [data]="visual.chartData"
@@ -849,7 +989,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -863,7 +1003,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [chartType]="visual.chartType || ''"
               [data]="visual.chartData"
@@ -878,7 +1018,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [chartType]="visual.chartType || ''"
               [data]="visual.chartData"
@@ -893,7 +1033,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -907,7 +1047,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -921,7 +1061,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -935,7 +1075,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -949,7 +1089,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -963,7 +1103,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [chartType]="visual.chartType || 'scatter'"
               [data]="visual.chartData"
@@ -978,7 +1118,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -992,7 +1132,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1006,7 +1146,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1020,7 +1160,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1034,7 +1174,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1048,7 +1188,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1062,7 +1202,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1076,7 +1216,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1090,7 +1230,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1104,7 +1244,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1118,7 +1258,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1132,7 +1272,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1146,7 +1286,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1160,7 +1300,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1174,7 +1314,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1188,7 +1328,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1202,7 +1342,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1216,7 +1356,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1230,7 +1370,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1244,7 +1384,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1258,7 +1398,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1272,7 +1412,7 @@
               "
               [showConfigPanel]="false"
               [chartWidth]="visual.width"
-              [chartHeight]="visual.height - 10"
+              [chartHeight]="visual.height - 35"
               [chartConfig]="visual.config"
               [data]="visual.chartData"
             >
@@ -1442,12 +1582,6 @@
               </p-inputNumber>
             </div>
             <div class="config-row">
-              <label>Nice Scale</label>
-              <p-inputSwitch
-                [(ngModel)]="focusedVisual.config.niceScale"
-              ></p-inputSwitch>
-            </div>
-            <div class="config-row">
               <label>Auto Scale</label>
               <p-inputSwitch
                 [(ngModel)]="focusedVisual.config.autoScale"
@@ -1599,27 +1733,12 @@
             </ng-container>
           </div>
 
-          <!-- ===== emphasis ===== -->
+          <!-- ===== gradient ===== -->
           <div
             class="config-section"
-            *ngIf="supportsEmphasis(focusedVisual.chartType)"
+            *ngIf="supportsGradient(focusedVisual.chartType)"
           >
-            <div class="section-title">Emphasis</div>
-            <div class="config-group">
-              <label>Focus</label>
-              <p-dropdown
-                [options]="emphasisModes"
-                [(ngModel)]="focusedVisual.config.emphasis"
-                optionLabel="label"
-                optionValue="value"
-                [style]="{ width: '100%' }"
-              >
-              </p-dropdown>
-            </div>
-            <div
-              class="config-row"
-              *ngIf="supportsGradient(focusedVisual.chartType)"
-            >
+            <div class="config-row">
               <label>Gradient Fill</label>
               <p-inputSwitch
                 [(ngModel)]="focusedVisual.config.gradient"
@@ -1709,7 +1828,7 @@
                 />
               </div>
               <div class="config-group">
-                <label>Bar Gap</label>
+                <label>Bar Gap <small class="config-hint">(multi-series only)</small></label>
                 <input
                   type="text"
                   pInputText
@@ -1737,36 +1856,6 @@
                 <p-inputSwitch
                   [(ngModel)]="focusedVisual.config.showBackground"
                 ></p-inputSwitch>
-              </div>
-              <div class="config-group">
-                <label>Max Bar Width</label>
-                <input
-                  type="text"
-                  pInputText
-                  [(ngModel)]="focusedVisual.config.barMaxWidth"
-                  placeholder="auto"
-                />
-              </div>
-              <div class="config-group">
-                <label>Min Bar Width</label>
-                <input
-                  type="text"
-                  pInputText
-                  [(ngModel)]="focusedVisual.config.barMinWidth"
-                  placeholder="auto"
-                />
-              </div>
-              <div class="config-group">
-                <label>Min Bar Height</label>
-                <p-inputNumber
-                  [(ngModel)]="focusedVisual.config.barMinHeight"
-                  [min]="0"
-                  [max]="20"
-                  [showButtons]="true"
-                  [style]="{ width: '100%' }"
-                  suffix="px"
-                >
-                </p-inputNumber>
               </div>
               <div class="config-group">
                 <label>Stack Strategy</label>

@@ -206,6 +206,14 @@ export const ANALYSES_VISUAL = {
   VIEW: '/visual/get/',
 };
 
+export const ANALYSIS_FILTER = {
+  ADD: '/analysis-filter/add',
+  UPDATE: '/analysis-filter/update',
+  DELETE: '/analysis-filter/delete/',
+  LIST: '/analysis-filter/list/',
+  VALUES: '/analysis-filter/values/',
+};
+
 export const GLOBAL_SEARCH = {
   SEARCH: '/search/global',
 };

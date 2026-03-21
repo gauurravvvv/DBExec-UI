@@ -54,6 +54,15 @@
     </div>
   </div>
 
+  <!-- Filter Bar -->
+  <app-analysis-filter-bar
+    *ngIf="analysisDetails"
+    [orgId]="orgId"
+    [analysisId]="analysisId"
+    (filtersApplied)="onFiltersApplied($event)"
+    (filtersCleared)="onFiltersCleared()"
+  ></app-analysis-filter-bar>
+
   <!-- Main Content Area with Sidebar and Center -->
   <div class="main-content">
     <!-- Left Sidebar - Fields Panel (Read-only) -->

@@ -1,0 +1,104 @@
+<div class="filter-bar" *ngIf="filters.length > 0">
+  <div class="filter-controls">
+    <ng-container *ngFor="let filter of filters">
+      <!-- Category: Dropdown -->
+      <div class="filter-control" *ngIf="filter.controlType === 'dropdown'">
+        <label>{{ filter.name }}</label>
+        <p-dropdown
+          [options]="filterValues[filter.id] || []"
+          [placeholder]="filter.config?.placeholder || 'Select ' + filter.name"
+          [showClear]="true"
+          [filter]="(filterValues[filter.id]?.length || 0) > 10"
+          (onChange)="onFilterChange(filter, $event.value)"
+          [(ngModel)]="appliedValues[filter.id]"
+          appendTo="body"
+        ></p-dropdown>
+      </div>
+
+      <!-- Category: Multi-Select List -->
+      <div class="filter-control" *ngIf="filter.controlType === 'list'">
+        <label>{{ filter.name }}</label>
+        <p-multiSelect
+          [options]="filterValues[filter.id] || []"
+          [placeholder]="filter.config?.placeholder || 'Select ' + filter.name"
+          [showClear]="true"
+          [filter]="(filterValues[filter.id]?.length || 0) > 10"
+          (onChange)="onFilterChange(filter, $event.value)"
+          [(ngModel)]="appliedValues[filter.id]"
+          appendTo="body"
+          [maxSelectedLabels]="2"
+          selectedItemsLabel="{0} selected"
+        ></p-multiSelect>
+      </div>
+
+      <!-- Numeric: Input -->
+      <div class="filter-control" *ngIf="filter.controlType === 'text' && (filter.filterType === 'numeric_equality' || filter.filterType === 'numeric_range')">
+        <label>{{ filter.name }}</label>
+        <p-inputNumber
+          [placeholder]="filter.config?.placeholder || filter.name"
+          (onInput)="onFilterChange(filter, $event.value)"
+          [(ngModel)]="appliedValues[filter.id]"
+          mode="decimal"
+          [useGrouping]="false"
+        ></p-inputNumber>
+      </div>
+
+      <!-- Numeric: Slider -->
+      <div class="filter-control slider-control" *ngIf="filter.controlType === 'slider'">
+        <label>{{ filter.name }}</label>
+        <p-slider
+          [(ngModel)]="appliedValues[filter.id]"
+          [range]="true"
+          [min]="filter.config?.rangeMin || 0"
+          [max]="filter.config?.rangeMax || 100"
+          (onSlideEnd)="onFilterChange(filter, {min: $event.values[0], max: $event.values[1]})"
+        ></p-slider>
+      </div>
+
+      <!-- Date: Calendar -->
+      <div class="filter-control" *ngIf="filter.controlType === 'datepicker'">
+        <label>{{ filter.name }}</label>
+        <p-calendar
+          [(ngModel)]="appliedValues[filter.id]"
+          [selectionMode]="filter.filterType === 'time_range' ? 'range' : 'single'"
+          [showClear]="true"
+          [placeholder]="filter.config?.placeholder || 'Select date'"
+          (onSelect)="onFilterChange(filter, appliedValues[filter.id])"
+          appendTo="body"
+          dateFormat="yy-mm-dd"
+        ></p-calendar>
+      </div>
+
+      <!-- Text: Input -->
+      <div class="filter-control" *ngIf="filter.controlType === 'text' && filter.filterType === 'category'">
+        <label>{{ filter.name }}</label>
+        <input
+          pInputText
+          type="text"
+          [placeholder]="filter.config?.placeholder || 'Search ' + filter.name"
+          [(ngModel)]="appliedValues[filter.id]"
+          (input)="onFilterChange(filter, appliedValues[filter.id])"
+        />
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="filter-actions">
+    <button
+      pButton
+      class="p-button-sm p-button-primary"
+      label="Apply"
+      icon="pi pi-check"
+      (click)="applyFilters()"
+      [disabled]="!hasActiveFilters"
+    ></button>
+    <button
+      pButton
+      class="p-button-sm p-button-secondary p-button-text"
+      label="Clear"
+      icon="pi pi-times"
+      (click)="clearFilters()"
+      *ngIf="hasActiveFilters"
+    ></button>
+  </div>
+</div>

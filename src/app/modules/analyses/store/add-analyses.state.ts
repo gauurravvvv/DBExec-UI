@@ -27,6 +27,20 @@ export interface DatasetEntry {
   lastAccessedAt: Date | null; // For LRU tracking
 }
 
+// Applied filter value for runtime filtering
+export interface AppliedFilterValue {
+  filterId: string;
+  columnName: string;
+  filterType: string;
+  operator?: string;
+  values?: any[];
+  rangeMin?: number;
+  rangeMax?: number;
+  dateRangeStart?: string;
+  dateRangeEnd?: string;
+  nullOption?: string;
+}
+
 // Main state interface with dynamic keys
 export interface AddAnalysesState {
   // Dynamic dataset storage: key format is "dataset_{orgId}_{datasetId}"
@@ -35,6 +49,8 @@ export interface AddAnalysesState {
   activeDatasetKey: string | null;
   // Order of dataset keys for LRU tracking (most recent at end)
   accessOrder: string[];
+  // Currently applied runtime filters
+  appliedFilters: AppliedFilterValue[];
 }
 
 // Initial state
@@ -42,6 +58,7 @@ export const initialAddAnalysesState: AddAnalysesState = {
   datasets: {},
   activeDatasetKey: null,
   accessOrder: [],
+  appliedFilters: [],
 };
 
 // Helper to generate dataset key

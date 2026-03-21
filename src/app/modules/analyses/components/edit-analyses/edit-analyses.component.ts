@@ -110,6 +110,18 @@ import {
   selectIsDatasetLoaded,
 } from '../../store';
 
+interface ConfiguredFilter {
+  tempId: string;
+  name: string;
+  columnName: string;
+  filterType: string;
+  controlType: string;
+  config: any;
+  isEnabled: boolean;
+  isMandatory: boolean;
+  sequence: number;
+}
+
 @Component({
   selector: 'app-edit-analyses',
   templateUrl: './edit-analyses.component.html',
@@ -128,6 +140,30 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   isVisualsPanelOpen: boolean = true;
   isVisualListPanelOpen: boolean = false;
   isFilterPanelOpen: boolean = false;
+
+  // Filter configuration
+  configuredFilters: ConfiguredFilter[] = [];
+  showFilterDialog: boolean = false;
+  editingFilter: ConfiguredFilter | null = null;
+
+  // Filter dialog form fields
+  filterDialogColumn: any = null;
+  filterDialogType: string = '';
+  filterDialogControl: string = '';
+  filterDialogName: string = '';
+  filterDialogEnabled: boolean = true;
+  filterDialogMandatory: boolean = false;
+
+  // Filter dropdown options
+  filterTypeOptions = [
+    { label: 'Category', value: 'category' },
+    { label: 'Numeric (Exact)', value: 'numeric_equality' },
+    { label: 'Numeric (Range)', value: 'numeric_range' },
+    { label: 'Date/Time (Exact)', value: 'time_equality' },
+    { label: 'Date/Time (Range)', value: 'time_range' },
+  ];
+
+  controlTypeOptions: { label: string; value: string }[] = [];
 
   // Search queries
   visualListSearchQuery: string = '';
@@ -484,6 +520,9 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
             'Dataset info loaded. Fields:',
             this.datasetDetails?.datasetFields?.length,
           );
+
+          // Load existing filters for this analysis
+          this.loadExistingFilters();
 
           // Step 3: Initialize store and run query
           this.initializeStoreSelectors();
@@ -867,12 +906,152 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addFilter(): void {
-    // Placeholder for future filter implementation
-    // this.globalService.showToast(
-    //   'info',
-    //   'Coming Soon',
-    //   'Filter functionality will be available soon',
-    // );
+    this.editingFilter = null;
+    this.resetFilterDialog();
+    this.showFilterDialog = true;
+  }
+
+  editFilter(filter: ConfiguredFilter): void {
+    this.editingFilter = filter;
+    this.filterDialogColumn = this.datasetDetails?.datasetFields?.find(
+      (f: any) => (f.columnName || f.columnToView) === filter.columnName,
+    ) || null;
+    this.filterDialogType = filter.filterType;
+    this.filterDialogControl = filter.controlType;
+    this.filterDialogName = filter.name;
+    this.filterDialogEnabled = filter.isEnabled;
+    this.filterDialogMandatory = filter.isMandatory;
+    this.updateControlTypeOptions();
+    this.showFilterDialog = true;
+  }
+
+  removeFilter(filter: ConfiguredFilter): void {
+    this.configuredFilters = this.configuredFilters.filter(
+      f => f.tempId !== filter.tempId,
+    );
+    this.resequenceFilters();
+  }
+
+  saveFilterDialog(): void {
+    if (!this.filterDialogColumn || !this.filterDialogType || !this.filterDialogControl) return;
+
+    const columnName = this.filterDialogColumn.columnName || this.filterDialogColumn.columnToView;
+    const name = this.filterDialogName || this.filterDialogColumn.columnToView;
+
+    if (this.editingFilter) {
+      const idx = this.configuredFilters.findIndex(f => f.tempId === this.editingFilter!.tempId);
+      if (idx !== -1) {
+        this.configuredFilters[idx] = {
+          ...this.configuredFilters[idx],
+          name,
+          columnName,
+          filterType: this.filterDialogType,
+          controlType: this.filterDialogControl,
+          isEnabled: this.filterDialogEnabled,
+          isMandatory: this.filterDialogMandatory,
+        };
+      }
+    } else {
+      this.configuredFilters.push({
+        tempId: crypto.randomUUID(),
+        name,
+        columnName,
+        filterType: this.filterDialogType,
+        controlType: this.filterDialogControl,
+        config: {},
+        isEnabled: this.filterDialogEnabled,
+        isMandatory: this.filterDialogMandatory,
+        sequence: this.configuredFilters.length,
+      });
+    }
+    this.showFilterDialog = false;
+  }
+
+  cancelFilterDialog(): void {
+    this.showFilterDialog = false;
+  }
+
+  resetFilterDialog(): void {
+    this.filterDialogColumn = null;
+    this.filterDialogType = '';
+    this.filterDialogControl = '';
+    this.filterDialogName = '';
+    this.filterDialogEnabled = true;
+    this.filterDialogMandatory = false;
+    this.controlTypeOptions = [];
+  }
+
+  onFilterTypeChange(): void {
+    this.updateControlTypeOptions();
+    if (this.controlTypeOptions.length > 0) {
+      this.filterDialogControl = this.controlTypeOptions[0].value;
+    }
+  }
+
+  onFilterColumnChange(): void {
+    if (this.filterDialogColumn && !this.filterDialogName) {
+      this.filterDialogName = this.filterDialogColumn.columnToView;
+    }
+  }
+
+  updateControlTypeOptions(): void {
+    switch (this.filterDialogType) {
+      case 'category':
+        this.controlTypeOptions = [
+          { label: 'Dropdown', value: 'dropdown' },
+          { label: 'Multi-Select List', value: 'list' },
+        ];
+        break;
+      case 'numeric_equality':
+        this.controlTypeOptions = [
+          { label: 'Text Input', value: 'text' },
+          { label: 'Dropdown', value: 'dropdown' },
+        ];
+        break;
+      case 'numeric_range':
+        this.controlTypeOptions = [
+          { label: 'Slider', value: 'slider' },
+          { label: 'Text Input', value: 'text' },
+        ];
+        break;
+      case 'time_equality':
+      case 'time_range':
+        this.controlTypeOptions = [
+          { label: 'Date Picker', value: 'datepicker' },
+        ];
+        break;
+      default:
+        this.controlTypeOptions = [];
+    }
+  }
+
+  resequenceFilters(): void {
+    this.configuredFilters.forEach((f, i) => f.sequence = i);
+  }
+
+  getFilterTypeLabel(type: string): string {
+    return this.filterTypeOptions.find(o => o.value === type)?.label || type;
+  }
+
+  async loadExistingFilters(): Promise<void> {
+    try {
+      const res: any = await this.analysesService.listFilters(this.orgId, this.analysisId);
+      if (res?.success && res.data) {
+        this.configuredFilters = (res.data || []).map((f: any) => ({
+          tempId: f.id || crypto.randomUUID(),
+          name: f.name,
+          columnName: f.columnName,
+          filterType: f.filterType,
+          controlType: f.controlType,
+          config: f.config || {},
+          isEnabled: f.isEnabled,
+          isMandatory: f.isMandatory,
+          sequence: f.sequence,
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to load existing filters', err);
+    }
   }
 
   addVisual(): void {
@@ -1639,6 +1818,16 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
         organisation: this.orgId,
         database: this.databaseId,
         visuals: visualConfigurations,
+        filters: this.configuredFilters.map((f, i) => ({
+          name: f.name,
+          columnName: f.columnName,
+          filterType: f.filterType,
+          controlType: f.controlType,
+          config: f.config || {},
+          isEnabled: f.isEnabled,
+          isMandatory: f.isMandatory,
+          sequence: i,
+        })),
       };
 
       this.analysesService.updateAnalyses(updatePayload).then(response => {

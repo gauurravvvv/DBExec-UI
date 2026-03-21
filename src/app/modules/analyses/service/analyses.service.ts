@@ -7,6 +7,7 @@ import {
   SUPER_ADMIN,
   ANALYSES,
   ANALYSES_VISUAL,
+  ANALYSIS_FILTER,
 } from 'src/app/constants/api';
 
 @Injectable({
@@ -313,6 +314,56 @@ export class AnalysesService {
         database,
         sql,
       })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  addFilters(payload: any) {
+    return this.http
+      .post(ANALYSIS_FILTER.ADD, payload)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  updateFilter(payload: any) {
+    return this.http
+      .put(ANALYSIS_FILTER.UPDATE, payload)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  deleteFilter(orgId: string, filterId: string) {
+    return this.http
+      .delete(ANALYSIS_FILTER.DELETE + `${orgId}/${filterId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  listFilters(orgId: string, analysisId: string) {
+    return this.http
+      .get(ANALYSIS_FILTER.LIST + `${orgId}/${analysisId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  getFilterValues(orgId: string, filterId: string) {
+    return this.http
+      .get(ANALYSIS_FILTER.VALUES + `${orgId}/${filterId}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

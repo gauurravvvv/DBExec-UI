@@ -153,26 +153,16 @@ function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
 }
 
 function buildGrid(config: any): any {
-  // Compute bottom margin: account for axis name + rotated labels
-  let bottom = config.showXAxisLabel ? 50 : 30;
-  const rotation = config.xAxisLabelRotate || 0;
-  if (rotation > 0) {
-    const extraBottom =
-      Math.sin((rotation * Math.PI) / 180) *
-      Math.min((config.maxXAxisTickLength || 16) * 7, 80);
-    bottom += Math.ceil(extraBottom);
-  }
+  // containLabel: true handles rotated label space automatically,
+  // so we only need base margins for axis names + legend
+  const baseBottom = config.showXAxisLabel ? 40 : 15;
+  const pos = config.legend ? (config.legendPosition || 'right') : '';
 
   return {
-    left: 50,
-    right:
-      config.legend &&
-      config.legendPosition !== 'below' &&
-      config.legendPosition !== 'top'
-        ? 140
-        : 20,
-    bottom,
-    top: config.legend && config.legendPosition === 'top' ? 50 : 20,
+    left: pos === 'left' ? 140 : 50,
+    right: pos === 'right' ? 140 : 20,
+    bottom: pos === 'below' ? baseBottom + 35 : baseBottom,
+    top: pos === 'top' ? 50 : 20,
     containLabel: true,
   };
 }
@@ -206,16 +196,15 @@ function buildCategoryAxis(
   const showLabel = isX ? config.showXAxisLabel : config.showYAxisLabel;
   const label = isX ? config.xAxisLabel : config.yAxisLabel;
 
-  // Dynamically compute nameGap for X-axis based on label rotation
+  // nameGap positions the axis name relative to the axis line.
+  // containLabel ensures rotated labels don't overflow the grid,
+  // so nameGap only needs a modest bump for rotated labels.
   let nameGap = isX ? 35 : 55;
   if (isX && showLabel) {
     const rotation = config.xAxisLabelRotate || 0;
     if (rotation > 0) {
-      // Estimate extra space needed: at 90° a ~8-char label needs ~60px more gap
-      const maxLabelLen = (config.maxXAxisTickLength || 16) * 7;
-      const extraGap =
-        Math.sin((rotation * Math.PI) / 180) * Math.min(maxLabelLen, 80);
-      nameGap = 35 + Math.ceil(extraGap);
+      // Small bump: rotated labels extend below, axis name goes after them
+      nameGap = 35 + Math.min(Math.ceil(rotation * 0.3), 20);
     }
   }
 
@@ -246,6 +235,10 @@ function buildCategoryAxis(
       lineStyle: { type: config.gridLineStyle || 'dashed', color: '#f0f0f0' },
     },
   };
+  // Bar gap properties — set on category axis for reliable effect
+  if (config.barCategoryGap != null && config.barCategoryGap !== '') {
+    result.barCategoryGap = config.barCategoryGap;
+  }
   if (isX && config.inverseX) result.inverse = true;
   if (!isX && config.inverseY) result.inverse = true;
   return result;
@@ -273,7 +266,7 @@ function buildValueAxis(config: any, axis: 'x' | 'y'): any {
     scale: config.autoScale || false,
     min: config.yScaleMin,
     max: config.yScaleMax,
-    nice: config.niceScale || false,
+    nice: true,
   };
   if (isX && config.inverseX) result.inverse = true;
   if (!isX && config.inverseY) result.inverse = true;
@@ -361,7 +354,7 @@ function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
   const index = axis === 'x' ? { xAxisIndex: 0 } : { yAxisIndex: 0 };
   // Position the slider outside the grid with enough room
   const positionProp =
-    axis === 'y' ? { right: 5, width: 20 } : { bottom: 8, height: 22 };
+    axis === 'y' ? { right: 5, width: 20 } : { bottom: 2, height: 20 };
   return [
     {
       type: 'slider',
@@ -410,9 +403,6 @@ export function buildBarChartOption(
 
   const barSeriesBase: any = {};
   if (config.barWidth) barSeriesBase.barWidth = config.barWidth;
-  if (config.barMaxWidth) barSeriesBase.barMaxWidth = config.barMaxWidth;
-  if (config.barMinWidth) barSeriesBase.barMinWidth = config.barMinWidth;
-  if (config.barMinHeight) barSeriesBase.barMinHeight = config.barMinHeight;
   if (config.showBackground) barSeriesBase.showBackground = true;
 
   if (isMulti) {
@@ -501,31 +491,58 @@ export function buildBarChartOption(
         : { color: colors[i % colors.length] },
     }));
 
-    option.series = [
-      {
-        ...barSeriesBase,
-        name: 'Value',
-        type: 'bar',
-        data: coloredValues,
-        label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
-        barGap: config.barGap || '30%',
-        barCategoryGap: config.barCategoryGap || '20%',
-        itemStyle: borderRadius ? { borderRadius } : undefined,
-      },
-    ];
-
-    // Provide legend data from categories so legend shows entries for each bar
     if (config.legend) {
+      // For legend to work on single-series bar charts, each category
+      // needs its own series so ECharts can toggle them individually.
       option.legend = {
         ...option.legend,
         data: categories,
       };
-      // Override series data to include name for legend matching
-      option.series[0].data = values.map((v, i) => ({
-        value: v,
-        name: categories[i],
-        itemStyle: coloredValues[i].itemStyle,
+      option.series = categories.map((cat, i) => ({
+        ...barSeriesBase,
+        name: cat,
+        type: 'bar',
+        stack: 'single', // stack on same position so bars don't spread out
+        data: values.map((v, j) => j === i ? {
+          value: v,
+          itemStyle: coloredValues[j].itemStyle,
+        } : null), // null = invisible + excluded from tooltip
+        label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
+        barGap: config.barGap || '30%',
+        barCategoryGap: config.barCategoryGap || '20%',
+        itemStyle: borderRadius ? { borderRadius, ...coloredValues[i].itemStyle } : coloredValues[i].itemStyle,
       }));
+      // Custom tooltip formatter to filter out null entries from stacked series
+      option.tooltip = {
+        ...option.tooltip,
+        formatter: function (params: any) {
+          if (!Array.isArray(params)) {
+            // Item trigger — single item
+            return params.seriesName + ': ' + params.value;
+          }
+          // Axis trigger — filter out null/undefined entries
+          const valid = params.filter((p: any) => p.value != null);
+          if (valid.length === 0) return '';
+          let result = valid[0].axisValueLabel || '';
+          valid.forEach((p: any) => {
+            result += '<br/>' + p.marker + ' ' + p.seriesName + ': ' + p.value;
+          });
+          return result;
+        },
+      };
+    } else {
+      option.series = [
+        {
+          ...barSeriesBase,
+          name: 'Value',
+          type: 'bar',
+          data: coloredValues,
+          label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
+          barGap: config.barGap || '30%',
+          barCategoryGap: config.barCategoryGap || '20%',
+          itemStyle: borderRadius ? { borderRadius } : undefined,
+        },
+      ];
     }
 
     if (isHorizontal) {
@@ -549,9 +566,11 @@ export function buildBarChartOption(
   const barZoom = buildDataZoom(config, isHorizontal ? 'y' : 'x');
   if (barZoom.length) {
     option.dataZoom = barZoom;
-    // Add space for the dataZoom slider below the grid
+    // Add space for the dataZoom slider below/beside the grid
     if (!isHorizontal) {
-      option.grid.bottom = (option.grid.bottom || 30) + 40;
+      option.grid.bottom = (option.grid.bottom || 15) + 35;
+    } else {
+      option.grid.right = (option.grid.right || 20) + 30;
     }
   }
 
@@ -1797,14 +1816,12 @@ export function buildPictorialBarChartOption(data: any[], config: any): any {
         type: 'pictorialBar',
         data: values,
         symbol: symbol,
-        symbolRepeat: config.pictorialRepeat || false,
-        symbolSize: config.pictorialRepeat ? [20, 6] : ['100%', '100%'],
+        symbolRepeat: config.pictorialRepeat ? 'fixed' : false,
+        symbolSize: config.pictorialRepeat ? ['50%', 14] : ['100%', '100%'],
         symbolPosition: config.pictorialSymbolPosition || 'start',
-        symbolClip: config.pictorialRepeat
-          ? false
-          : config.pictorialSymbolClip !== false,
+        symbolClip: config.pictorialSymbolClip !== false,
         symbolRepeatDirection: config.pictorialSymbolRepeatDirection || 'start',
-        symbolMargin: config.pictorialSymbolMargin || 'auto',
+        symbolMargin: config.pictorialRepeat ? 2 : 'auto',
         barCategoryGap: '40%',
         label: buildDataLabel(config, 'top'),
       },
@@ -1881,7 +1898,6 @@ export function buildCandlestickChartOption(data: any[], config: any): any {
         return `${d.name}<br/>Open: ${d.data[0]}<br/>Close: ${d.data[1]}<br/>Low: ${d.data[2]}<br/>High: ${d.data[3]}`;
       },
     },
-    ...buildLegendWithTitle(config),
     grid: buildGrid(config),
     xAxis: {
       type: 'category',

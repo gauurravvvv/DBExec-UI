@@ -290,12 +290,13 @@ export class DatasetService {
   }
 
   runDatasetQuery(payload: any) {
-    const { datasetId, organisation } = payload;
+    const { datasetId, organisation, filters } = payload;
+    const body: any = { organisation, datasetId };
+    if (filters && filters.length > 0) {
+      body.filters = filters;
+    }
     return this.http
-      .post(DATASET.RUN_QUERY, {
-        organisation,
-        datasetId,
-      })
+      .post(DATASET.RUN_QUERY, body)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

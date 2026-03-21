@@ -114,6 +114,18 @@ import {
   selectIsDatasetStale,
 } from '../../store';
 
+interface ConfiguredFilter {
+  tempId: string;
+  name: string;
+  columnName: string;
+  filterType: string;
+  controlType: string;
+  config: any;
+  isEnabled: boolean;
+  isMandatory: boolean;
+  sequence: number;
+}
+
 @Component({
   selector: 'app-add-analyses',
   templateUrl: './add-analyses.component.html',
@@ -138,6 +150,30 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   isVisualsPanelOpen: boolean = true;
   isVisualListPanelOpen: boolean = false;
   isFilterPanelOpen: boolean = false;
+
+  // Filter configuration
+  configuredFilters: ConfiguredFilter[] = [];
+  showFilterDialog: boolean = false;
+  editingFilter: ConfiguredFilter | null = null;
+
+  // Filter dialog form fields
+  filterDialogColumn: any = null;
+  filterDialogType: string = '';
+  filterDialogControl: string = '';
+  filterDialogName: string = '';
+  filterDialogEnabled: boolean = true;
+  filterDialogMandatory: boolean = false;
+
+  // Filter dropdown options
+  filterTypeOptions = [
+    { label: 'Category', value: 'category' },
+    { label: 'Numeric (Exact)', value: 'numeric_equality' },
+    { label: 'Numeric (Range)', value: 'numeric_range' },
+    { label: 'Date/Time (Exact)', value: 'time_equality' },
+    { label: 'Date/Time (Range)', value: 'time_range' },
+  ];
+
+  controlTypeOptions: { label: string; value: string }[] = [];
 
   // Search queries
   visualListSearchQuery: string = '';
@@ -631,12 +667,131 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addFilter(): void {
-    // Placeholder for future filter implementation
-    // this.globalService.showToast(
-    //   'info',
-    //   'Coming Soon',
-    //   'Filter functionality will be available soon',
-    // );
+    this.editingFilter = null;
+    this.resetFilterDialog();
+    this.showFilterDialog = true;
+  }
+
+  editFilter(filter: ConfiguredFilter): void {
+    this.editingFilter = filter;
+    this.filterDialogColumn = this.datasetDetails?.datasetFields?.find(
+      (f: any) => (f.columnName || f.columnToView) === filter.columnName,
+    ) || null;
+    this.filterDialogType = filter.filterType;
+    this.filterDialogControl = filter.controlType;
+    this.filterDialogName = filter.name;
+    this.filterDialogEnabled = filter.isEnabled;
+    this.filterDialogMandatory = filter.isMandatory;
+    this.updateControlTypeOptions();
+    this.showFilterDialog = true;
+  }
+
+  removeFilter(filter: ConfiguredFilter): void {
+    this.configuredFilters = this.configuredFilters.filter(
+      f => f.tempId !== filter.tempId,
+    );
+    this.resequenceFilters();
+  }
+
+  saveFilterDialog(): void {
+    if (!this.filterDialogColumn || !this.filterDialogType || !this.filterDialogControl) return;
+
+    const columnName = this.filterDialogColumn.columnName || this.filterDialogColumn.columnToView;
+    const name = this.filterDialogName || this.filterDialogColumn.columnToView;
+
+    if (this.editingFilter) {
+      const idx = this.configuredFilters.findIndex(f => f.tempId === this.editingFilter!.tempId);
+      if (idx !== -1) {
+        this.configuredFilters[idx] = {
+          ...this.configuredFilters[idx],
+          name,
+          columnName,
+          filterType: this.filterDialogType,
+          controlType: this.filterDialogControl,
+          isEnabled: this.filterDialogEnabled,
+          isMandatory: this.filterDialogMandatory,
+        };
+      }
+    } else {
+      this.configuredFilters.push({
+        tempId: crypto.randomUUID(),
+        name,
+        columnName,
+        filterType: this.filterDialogType,
+        controlType: this.filterDialogControl,
+        config: {},
+        isEnabled: this.filterDialogEnabled,
+        isMandatory: this.filterDialogMandatory,
+        sequence: this.configuredFilters.length,
+      });
+    }
+    this.showFilterDialog = false;
+  }
+
+  cancelFilterDialog(): void {
+    this.showFilterDialog = false;
+  }
+
+  resetFilterDialog(): void {
+    this.filterDialogColumn = null;
+    this.filterDialogType = '';
+    this.filterDialogControl = '';
+    this.filterDialogName = '';
+    this.filterDialogEnabled = true;
+    this.filterDialogMandatory = false;
+    this.controlTypeOptions = [];
+  }
+
+  onFilterTypeChange(): void {
+    this.updateControlTypeOptions();
+    if (this.controlTypeOptions.length > 0) {
+      this.filterDialogControl = this.controlTypeOptions[0].value;
+    }
+  }
+
+  onFilterColumnChange(): void {
+    if (this.filterDialogColumn && !this.filterDialogName) {
+      this.filterDialogName = this.filterDialogColumn.columnToView;
+    }
+  }
+
+  updateControlTypeOptions(): void {
+    switch (this.filterDialogType) {
+      case 'category':
+        this.controlTypeOptions = [
+          { label: 'Dropdown', value: 'dropdown' },
+          { label: 'Multi-Select List', value: 'list' },
+        ];
+        break;
+      case 'numeric_equality':
+        this.controlTypeOptions = [
+          { label: 'Text Input', value: 'text' },
+          { label: 'Dropdown', value: 'dropdown' },
+        ];
+        break;
+      case 'numeric_range':
+        this.controlTypeOptions = [
+          { label: 'Slider', value: 'slider' },
+          { label: 'Text Input', value: 'text' },
+        ];
+        break;
+      case 'time_equality':
+      case 'time_range':
+        this.controlTypeOptions = [
+          { label: 'Date Picker', value: 'datepicker' },
+        ];
+        break;
+      default:
+        this.controlTypeOptions = [];
+    }
+  }
+
+  resequenceFilters(): void {
+    this.configuredFilters.forEach((f, i) => f.sequence = i);
+  }
+
+  getFilterTypeLabel(type: string): string {
+    return this.filterTypeOptions.find(o => o.value === type)?.label || type;
   }
 
   addVisual(): void {
@@ -690,6 +845,179 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
         }, 500);
       }
     }, 100);
+  }
+
+  /**
+   * Populate all chart types with dummy data for testing configurations.
+   * Creates one visual per chart type with pre-filled data.
+   */
+  populateTestData(): void {
+    // --- Dummy data for different chart shapes ---
+    const single = [
+      { name: 'Electronics', value: 4800 },
+      { name: 'Clothing', value: 3200 },
+      { name: 'Groceries', value: 5600 },
+      { name: 'Furniture', value: 2100 },
+      { name: 'Sports', value: 1700 },
+      { name: 'Books', value: 900 },
+      { name: 'Toys', value: 1400 },
+      { name: 'Healthcare', value: 2800 },
+    ];
+
+    const multi = [
+      { name: 'Q1', series: [{ name: 'Electronics', value: 4200 }, { name: 'Clothing', value: 2800 }, { name: 'Groceries', value: 5100 }, { name: 'Furniture', value: 1800 }] },
+      { name: 'Q2', series: [{ name: 'Electronics', value: 4900 }, { name: 'Clothing', value: 3100 }, { name: 'Groceries', value: 4800 }, { name: 'Furniture', value: 2200 }] },
+      { name: 'Q3', series: [{ name: 'Electronics', value: 5300 }, { name: 'Clothing', value: 3600 }, { name: 'Groceries', value: 5400 }, { name: 'Furniture', value: 2500 }] },
+      { name: 'Q4', series: [{ name: 'Electronics', value: 6100 }, { name: 'Clothing', value: 4200 }, { name: 'Groceries', value: 6200 }, { name: 'Furniture', value: 2900 }] },
+    ];
+
+    const sankeyGraph = {
+      nodes: [
+        { name: 'Budget' }, { name: 'Marketing' }, { name: 'Engineering' }, { name: 'Sales' },
+        { name: 'Digital Ads' }, { name: 'Frontend' }, { name: 'Backend' }, { name: 'Direct' }, { name: 'Channel' },
+      ],
+      links: [
+        { source: 'Budget', target: 'Marketing', value: 40 },
+        { source: 'Budget', target: 'Engineering', value: 35 },
+        { source: 'Budget', target: 'Sales', value: 25 },
+        { source: 'Marketing', target: 'Digital Ads', value: 30 },
+        { source: 'Engineering', target: 'Frontend', value: 15 },
+        { source: 'Engineering', target: 'Backend', value: 20 },
+        { source: 'Sales', target: 'Direct', value: 15 },
+        { source: 'Sales', target: 'Channel', value: 10 },
+      ],
+    };
+
+    const waterfall = [
+      { name: 'Revenue', value: 10000 },
+      { name: 'Cost of Goods', value: -4200 },
+      { name: 'Gross Profit', value: 5800 },
+      { name: 'Marketing', value: -1500 },
+      { name: 'Operations', value: -1200 },
+      { name: 'Tax', value: -800 },
+      { name: 'Net Income', value: 2300 },
+    ];
+
+    const candlestick = [
+      { name: 'Mon', value: [20, 34, 10, 38] },
+      { name: 'Tue', value: [40, 35, 30, 50] },
+      { name: 'Wed', value: [31, 38, 25, 44] },
+      { name: 'Thu', value: [38, 15, 5, 42] },
+      { name: 'Fri', value: [25, 36, 20, 48] },
+    ];
+
+    const boxData = [
+      { name: 'Electronics', data: [850, 920, 1100, 1250, 1400, 1500, 1650, 1800, 2100] },
+      { name: 'Clothing', data: [300, 420, 500, 580, 650, 720, 800, 950, 1100] },
+      { name: 'Groceries', data: [200, 350, 400, 480, 520, 600, 680, 750, 900] },
+      { name: 'Furniture', data: [500, 620, 700, 850, 950, 1050, 1200, 1350, 1500] },
+    ];
+
+    const parallel = [
+      { name: 'Product A', Price: 40, Quality: 85, Delivery: 70, Support: 60 },
+      { name: 'Product B', Price: 60, Quality: 90, Delivery: 55, Support: 80 },
+      { name: 'Product C', Price: 30, Quality: 70, Delivery: 90, Support: 75 },
+    ];
+
+    const heatmap = [
+      { name: 'Mon', series: [{ name: '9am', value: 5 }, { name: '12pm', value: 12 }, { name: '3pm', value: 8 }, { name: '6pm', value: 3 }] },
+      { name: 'Tue', series: [{ name: '9am', value: 7 }, { name: '12pm', value: 15 }, { name: '3pm', value: 10 }, { name: '6pm', value: 6 }] },
+      { name: 'Wed', series: [{ name: '9am', value: 4 }, { name: '12pm', value: 11 }, { name: '3pm', value: 14 }, { name: '6pm', value: 5 }] },
+      { name: 'Thu', series: [{ name: '9am', value: 9 }, { name: '12pm', value: 8 }, { name: '3pm', value: 13 }, { name: '6pm', value: 7 }] },
+      { name: 'Fri', series: [{ name: '9am', value: 6 }, { name: '12pm', value: 16 }, { name: '3pm', value: 9 }, { name: '6pm', value: 4 }] },
+    ];
+
+    const bubble = [
+      { name: 'Electronics', series: [{ x: 20, y: 4800, r: 15 }, { x: 35, y: 5200, r: 20 }, { x: 50, y: 6100, r: 25 }] },
+      { name: 'Clothing', series: [{ x: 15, y: 3200, r: 10 }, { x: 30, y: 3600, r: 14 }, { x: 45, y: 4200, r: 18 }] },
+      { name: 'Groceries', series: [{ x: 25, y: 5600, r: 22 }, { x: 40, y: 5100, r: 16 }, { x: 55, y: 6200, r: 28 }] },
+    ];
+
+    const bar3d = [
+      [0, 0, 5], [0, 1, 7], [0, 2, 3], [0, 3, 8],
+      [1, 0, 4], [1, 1, 9], [1, 2, 6], [1, 3, 2],
+      [2, 0, 8], [2, 1, 3], [2, 2, 7], [2, 3, 5],
+      [3, 0, 6], [3, 1, 5], [3, 2, 9], [3, 3, 4],
+    ];
+
+    // --- Chart type to data mapping ---
+    const chartDefs: { type: string; title: string; data: any; axes: [string | null, string | null, string | null]; colSpan?: number }[] = [
+      // Bar variants
+      { type: 'bar-vertical', title: 'Bar Vertical', data: single, axes: ['category', 'value', null] },
+      { type: 'bar-horizontal', title: 'Bar Horizontal', data: single, axes: ['category', 'value', null] },
+      { type: 'bar-vertical-2d', title: 'Grouped Bar', data: single, axes: ['category', 'value', null] },
+      { type: 'bar-vertical-stacked', title: 'Stacked Bar', data: single, axes: ['category', 'value', null] },
+      { type: 'bar-vertical-normalized', title: 'Normalized Bar', data: single, axes: ['category', 'value', null] },
+
+      // Line / Area
+      { type: 'line', title: 'Line Chart', data: multi, axes: ['category', 'value', null] },
+      { type: 'line-stacked', title: 'Stacked Line', data: multi, axes: ['category', 'value', null] },
+      { type: 'area', title: 'Area Chart', data: multi, axes: ['category', 'value', null] },
+      { type: 'area-stacked', title: 'Stacked Area', data: multi, axes: ['category', 'value', null] },
+
+      // Pie variants
+      { type: 'pie', title: 'Pie Chart', data: single, axes: ['category', null, null] },
+      { type: 'donut', title: 'Donut Chart', data: single, axes: ['category', null, null] },
+      { type: 'rose', title: 'Rose Chart', data: single, axes: ['category', null, null] },
+
+      // Gauge & Card
+      { type: 'gauge', title: 'Gauge', data: [{ name: 'Score', value: 72 }], axes: ['score', null, null] },
+      { type: 'number-card', title: 'Number Card', data: single, axes: ['category', null, null] },
+
+      // Maps
+      { type: 'heat-map', title: 'Heat Map', data: heatmap, axes: ['day', 'time', 'value'] },
+      { type: 'tree-map', title: 'Tree Map', data: single, axes: ['category', null, null] },
+
+      // Scatter / Bubble
+      { type: 'scatter', title: 'Scatter', data: single, axes: ['category', 'value', null] },
+      { type: 'bubble', title: 'Bubble', data: bubble, axes: ['x', 'y', 'size'] },
+      { type: 'box-chart', title: 'Box Plot', data: boxData, axes: ['category', 'value', null] },
+
+      // Funnel / Sunburst / Tree
+      { type: 'funnel', title: 'Funnel', data: single, axes: ['category', null, null] },
+      { type: 'sunburst', title: 'Sunburst', data: single, axes: ['category', null, null] },
+      { type: 'tree', title: 'Tree', data: single, axes: ['category', null, null] },
+
+      // Flow charts
+      { type: 'sankey', title: 'Sankey', data: sankeyGraph, axes: ['source', 'target', 'value'] },
+      { type: 'graph', title: 'Graph', data: sankeyGraph, axes: ['node', 'link', 'value'] },
+      { type: 'waterfall', title: 'Waterfall', data: waterfall, axes: ['category', 'value', null] },
+
+      // Special
+      { type: 'theme-river', title: 'Theme River', data: single, axes: ['category', 'value', null] },
+      { type: 'pictorial-bar', title: 'Pictorial Bar', data: single, axes: ['category', 'value', null] },
+      { type: 'bar-polar', title: 'Polar Bar', data: single, axes: ['category', 'value', null] },
+      { type: 'radar', title: 'Radar', data: multi, axes: ['category', 'value', null] },
+      { type: 'candlestick', title: 'Candlestick', data: candlestick, axes: ['date', 'ohlc', null] },
+      { type: 'parallel', title: 'Parallel', data: parallel, axes: ['dimension', 'value', null] },
+
+      // 3D
+      { type: 'bar3d', title: '3D Bar', data: bar3d, axes: ['x', 'y', 'z'] },
+      { type: 'scatter3d', title: '3D Scatter', data: bar3d, axes: ['x', 'y', 'z'] },
+    ];
+
+    // Clear existing visuals
+    this.visuals = [];
+    this.visualCounter = 0;
+
+    // Create one visual per chart type
+    chartDefs.forEach(def => {
+      this.visualCounter++;
+      const visual = createVisual(String(this.visualCounter), getDefaultChartConfig());
+      visual.title = def.title;
+      visual.chartType = def.type;
+      visual.chartData = def.data;
+      visual.xAxisColumn = def.axes[0];
+      visual.yAxisColumn = def.axes[1];
+      visual.zAxisColumn = def.axes[2];
+      visual.colSpan = def.colSpan || 12;
+      visual.rowSpan = 6;
+      this.visuals.push(visual);
+    });
+
+    this.placeVisualsOnGrid();
+    this.recalculateAllVisualDimensions();
+    this.focusedVisualId = '1';
   }
 
   getFocusedVisual(): Visual | null {
@@ -1461,6 +1789,16 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
         organisation: this.orgId,
         database: this.databaseId,
         visuals: visualConfigurations,
+        filters: this.configuredFilters.map((f, i) => ({
+          name: f.name,
+          columnName: f.columnName,
+          filterType: f.filterType,
+          controlType: f.controlType,
+          config: f.config || {},
+          isEnabled: f.isEnabled,
+          isMandatory: f.isMandatory,
+          sequence: i,
+        })),
       };
 
       this.analysesService.addAnalyses(analysisPayload).then(response => {

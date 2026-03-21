@@ -2066,6 +2066,7 @@ export function supportsLegend(chartType: string | null): boolean {
     'sankey',
     'waterfall',
     'theme-river',
+    'candlestick',
     'pictorial-bar',
     'bar3d',
     'line3d',

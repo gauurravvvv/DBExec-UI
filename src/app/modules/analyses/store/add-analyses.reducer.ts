@@ -193,4 +193,22 @@ export const addAnalysesReducer = createReducer(
       activeDatasetKey: null,
     }),
   ),
+
+  // Apply runtime filters
+  on(
+    AddAnalysesActions.applyFilters,
+    (state, { filters }): AddAnalysesState => ({
+      ...state,
+      appliedFilters: filters,
+    }),
+  ),
+
+  // Clear all applied filters
+  on(
+    AddAnalysesActions.clearAllFilters,
+    (state): AddAnalysesState => ({
+      ...state,
+      appliedFilters: [],
+    }),
+  ),
 );

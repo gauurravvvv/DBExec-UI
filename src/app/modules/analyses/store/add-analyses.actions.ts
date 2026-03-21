@@ -36,3 +36,14 @@ export const clearDatasetData = createAction(
 export const clearAllDatasets = createAction(
   '[Add Analyses] Clear All Datasets',
 );
+
+// Apply runtime filters
+export const applyFilters = createAction(
+  '[Analyses] Apply Filters',
+  props<{ filters: any[] }>(),
+);
+
+// Clear all applied filters
+export const clearAllFilters = createAction(
+  '[Analyses] Clear All Filters',
+);
