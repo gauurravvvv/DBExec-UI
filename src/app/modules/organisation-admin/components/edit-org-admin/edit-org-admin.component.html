@@ -129,15 +129,21 @@
         </app-custom-input>
 
         <!-- Status -->
-        <app-custom-toggle
-          formControlName="status"
-          label="Status"
-          [trueValue]="1"
-          [falseValue]="0"
-          trueLabel="Active"
-          falseLabel="Inactive"
-        >
-        </app-custom-toggle>
+        <div>
+          <app-custom-toggle
+            formControlName="status"
+            label="Status"
+            [trueValue]="1"
+            [falseValue]="0"
+            trueLabel="Active"
+            falseLabel="Inactive"
+          >
+          </app-custom-toggle>
+          <small *ngIf="isLocked" class="locked-note">
+            <i class="pi pi-lock"></i>
+            Account is locked. Unlock from the list page to change status.
+          </small>
+        </div>
       </div>
     </form>
   </div>

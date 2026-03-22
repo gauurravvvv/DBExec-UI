@@ -181,12 +181,13 @@
                 <span
                   class="status-indicator"
                   [ngClass]="{
-                    active: admin.status === 1,
-                    inactive: admin.status !== 1,
+                    locked: admin.isLocked,
+                    active: !admin.isLocked && admin.status === 1,
+                    inactive: !admin.isLocked && admin.status !== 1,
                   }"
                 >
                   <span class="dot"></span>
-                  {{ admin.status === 1 ? 'Active' : 'Inactive' }}
+                  {{ admin.isLocked ? 'Locked' : (admin.status === 1 ? 'Active' : 'Inactive') }}
                 </span>
               </td>
               <td>
@@ -206,6 +207,15 @@
               <td>
                 <div class="row-actions">
                   <button
+                    *ngIf="admin.isLocked"
+                    class="icon-btn unlock-btn"
+                    (click)="onUnlock(admin.id)"
+                    pTooltip="Unlock account"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-lock-open"></i>
+                  </button>
+                  <button
                     class="icon-btn edit-btn"
                     (click)="onEdit(admin.id)"
                     pTooltip="Edit"
@@ -219,11 +229,9 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(admin.id)"
-                    pTooltip="Delete"
+                    [pTooltip]="!admin.canDelete ? (admin.isDefault === 1 ? 'Default admin cannot be deleted' : 'Cannot delete yourself') : 'Delete'"
                     tooltipPosition="bottom"
-                    [disabled]="
-                      !showOrganisationDropdown && admin.id == loggedInUserId
-                    "
+                    [disabled]="!admin.canDelete"
                   >
                     <i class="pi pi-trash"></i>
                   </button>

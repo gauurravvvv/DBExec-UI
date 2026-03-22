@@ -147,6 +147,20 @@
         @media (max-width: 768px) {
           width: 100%;
         }
+
+        .locked-note {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 6px;
+          color: #f59e0b;
+          font-size: 0.8rem;
+          font-weight: 500;
+
+          i {
+            font-size: 0.75rem;
+          }
+        }
       }
 
       // Username field specific styles (readonly)

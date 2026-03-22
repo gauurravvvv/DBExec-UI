@@ -612,6 +612,21 @@
   }
 }
 
+.login-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: #dc2626;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  i {
+    font-size: 0.95rem;
+  }
+}
+
 .p-fluid {
   display: flex;
   flex-direction: column;

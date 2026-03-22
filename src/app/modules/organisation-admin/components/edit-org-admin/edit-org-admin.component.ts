@@ -22,6 +22,7 @@ export class EditOrgAdminComponent implements OnInit {
   selectedOrgName: string = '';
   selectedOrgId: string = '';
   adminData: any;
+  isLocked: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -85,6 +86,10 @@ export class EditOrgAdminComponent implements OnInit {
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.adminData = response.data;
+          this.isLocked = !!this.adminData.isLocked;
+          if (this.isLocked) {
+            this.adminForm.get('status')?.disable();
+          }
           this.adminForm.patchValue({
             id: this.adminData.id,
             firstName: this.adminData.firstName,

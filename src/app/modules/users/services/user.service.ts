@@ -86,6 +86,16 @@ export class UserService {
       });
   }
 
+  unlockUser(orgId: string, id: string) {
+    return this.http
+      .put(USER.UNLOCK + `${orgId}/${id}`, {})
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   updateUserPassword(id: string, password: string) {
     return this.http
       .put(USER.UPDATE_PASSWORD, { id, newPassword: password })

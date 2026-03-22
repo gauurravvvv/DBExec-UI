@@ -31,7 +31,9 @@
         <button
           class="btn-danger"
           type="button"
-          [disabled]="userId == loggedInUserId"
+          [disabled]="!userData?.canDelete"
+          [pTooltip]="!userData?.canDelete ? 'You do not have permission to delete' : 'Delete'"
+          tooltipPosition="bottom"
           (click)="confirmDelete(userId)"
         >
           <i class="pi pi-trash"></i> Delete
@@ -121,10 +123,21 @@
               <span class="value">
                 <span
                   class="status-badge"
-                  [class.active]="userData?.status === 1"
+                  [class.active]="!userData?.isLocked && userData?.status === 1"
+                  [class.locked]="userData?.isLocked"
                 >
-                  {{ userData?.status === 1 ? 'Active' : 'Inactive' }}
+                  {{ userData?.isLocked ? 'Locked' : (userData?.status === 1 ? 'Active' : 'Inactive') }}
                 </span>
+                <button
+                  *ngIf="userData?.isLocked"
+                  class="btn-unlock-inline"
+                  (click)="onUnlock()"
+                  pTooltip="Unlock account"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-lock-open"></i>
+                  Unlock
+                </button>
               </span>
             </div>
             <div class="detail-item">

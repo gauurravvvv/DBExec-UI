@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -12,10 +12,15 @@ import { AUTH } from 'src/app/constants/routes';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })
-export class ForgotPasswordComponent implements OnInit {
+export class ForgotPasswordComponent implements OnInit, OnDestroy {
   forgotPasswordForm: FormGroup;
   showPassword = false;
   features = FORGOT_PASSWORD_PAGE_OPTIONS;
+
+  otpSent = false;
+  countdownDisplay = '';
+  canResend = false;
+  private countdownInterval: any;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -34,6 +39,10 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  ngOnDestroy(): void {
+    this.clearCountdown();
+  }
 
   getErrorMessage(fieldName: string): string {
     const control = this.forgotPasswordForm.get(fieldName);
@@ -69,12 +78,41 @@ export class ForgotPasswordComponent implements OnInit {
       this.loginService
         .generateOTP(this.forgotPasswordForm)
         .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.router.navigate([AUTH.LOGIN], {
-              replaceUrl: true,
-            });
+          this.globalService.handleSuccessService(res);
+          if (res.data?.otpExpiresAt) {
+            this.startCountdown(new Date(res.data.otpExpiresAt));
           }
         });
+    }
+  }
+
+  private startCountdown(expiresAt: Date): void {
+    this.clearCountdown();
+    this.otpSent = true;
+    this.canResend = false;
+    this.updateCountdown(expiresAt);
+    this.countdownInterval = setInterval(() => {
+      this.updateCountdown(expiresAt);
+    }, 1000);
+  }
+
+  private updateCountdown(expiresAt: Date): void {
+    const remainingMs = expiresAt.getTime() - Date.now();
+    if (remainingMs <= 0) {
+      this.countdownDisplay = '';
+      this.canResend = true;
+      this.clearCountdown();
+      return;
+    }
+    const minutes = Math.floor(remainingMs / 60000);
+    const seconds = Math.floor((remainingMs % 60000) / 1000);
+    this.countdownDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  private clearCountdown(): void {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
     }
   }
 }

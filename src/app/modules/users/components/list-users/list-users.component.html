@@ -179,12 +179,13 @@
                 <span
                   class="status-indicator"
                   [ngClass]="{
-                    active: user.status === 1,
-                    inactive: user.status !== 1,
+                    locked: user.isLocked,
+                    active: !user.isLocked && user.status === 1,
+                    inactive: !user.isLocked && user.status !== 1,
                   }"
                 >
                   <span class="dot"></span>
-                  {{ user.status === 1 ? 'Active' : 'Inactive' }}
+                  {{ user.isLocked ? 'Locked' : (user.status === 1 ? 'Active' : 'Inactive') }}
                 </span>
               </td>
               <td>
@@ -204,6 +205,15 @@
               <td>
                 <div class="row-actions">
                   <button
+                    *ngIf="user.isLocked"
+                    class="icon-btn unlock-btn"
+                    (click)="onUnlock(user.id)"
+                    pTooltip="Unlock account"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-lock-open"></i>
+                  </button>
+                  <button
                     class="icon-btn edit-btn"
                     (click)="onEdit(user.id)"
                     pTooltip="Edit"
@@ -214,8 +224,9 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(user.id)"
-                    pTooltip="Delete"
+                    [pTooltip]="!user.canDelete ? 'You do not have permission to delete' : 'Delete'"
                     tooltipPosition="bottom"
+                    [disabled]="!user.canDelete"
                   >
                     <i class="pi pi-trash"></i>
                   </button>

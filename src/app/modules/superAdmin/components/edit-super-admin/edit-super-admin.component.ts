@@ -16,6 +16,7 @@ export class EditSuperAdminComponent implements OnInit {
   adminId: string = '';
   adminData: any;
   isCancelClicked: boolean = false;
+  isLocked: boolean = false;
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
@@ -89,7 +90,11 @@ export class EditSuperAdminComponent implements OnInit {
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.adminData = response.data;
+          this.isLocked = !!this.adminData.isLocked;
           this.adminForm.patchValue(this.adminData);
+          if (this.isLocked) {
+            this.adminForm.get('status')?.disable();
+          }
         }
       });
   }

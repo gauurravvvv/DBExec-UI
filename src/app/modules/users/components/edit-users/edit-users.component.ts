@@ -22,6 +22,7 @@ export class EditUsersComponent implements OnInit {
   selectedOrgName: string = '';
   userData: any;
   orgId: string = '';
+  isLocked: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -83,6 +84,10 @@ export class EditUsersComponent implements OnInit {
     this.userService.viewOrgUser(this.orgId, this.userId).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.userData = response.data;
+        this.isLocked = !!this.userData.isLocked;
+        if (this.isLocked) {
+          this.userForm.get('status')?.disable();
+        }
         this.userForm.patchValue({
           id: this.userData.id,
           firstName: this.userData.firstName,

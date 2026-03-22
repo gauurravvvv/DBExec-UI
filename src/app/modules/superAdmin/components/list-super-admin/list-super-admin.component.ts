@@ -112,6 +112,16 @@ export class ListSuperAdminComponent implements OnInit {
     });
   }
 
+  onUnlock(adminId: string) {
+    this.superAdminService.unlockSuperAdmin(adminId).then((res: any) => {
+      if (this.globalService.handleSuccessService(res)) {
+        if (this.lastTableLazyLoadEvent) {
+          this.loadSuperAdmins(this.lastTableLazyLoadEvent);
+        }
+      }
+    });
+  }
+
   onAddNewAdmin(): void {
     this.router.navigate([SUPER_ADMIN.ADD]);
   }

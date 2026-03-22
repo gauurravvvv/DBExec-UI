@@ -188,6 +188,16 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     this.router.navigate([USER.ADD]);
   }
 
+  onUnlock(id: string) {
+    this.userService.unlockUser(this.selectedOrg, id).then((res: any) => {
+      if (this.globalService.handleSuccessService(res)) {
+        if (this.lastTableLazyLoadEvent) {
+          this.loadUsers(this.lastTableLazyLoadEvent);
+        }
+      }
+    });
+  }
+
   onEdit(id: string) {
     this.router.navigate([USER.EDIT, this.selectedOrg, id]);
   }

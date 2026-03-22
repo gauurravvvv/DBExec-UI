@@ -78,6 +78,16 @@ export class OrganisationAdminService {
       });
   }
 
+  unlockOrgAdmin(orgId: string, id: string) {
+    return this.http
+      .put(ORG_ADMIN.UNLOCK + `${orgId}/${id}`, {})
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   updateOrgAdminPassword(id: string, password: string) {
     return this.http
       .put(ORG_ADMIN.UPDATE_PASSWORD, { id, newPassword: password })

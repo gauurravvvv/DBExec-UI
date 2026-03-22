@@ -189,6 +189,16 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
     this.router.navigate([ORGANISATION_ADMIN.ADD]);
   }
 
+  onUnlock(id: string) {
+    this.orgAdminService.unlockOrgAdmin(this.selectedOrg, id).then((res: any) => {
+      if (this.globalService.handleSuccessService(res)) {
+        if (this.lastTableLazyLoadEvent) {
+          this.loadAdmins(this.lastTableLazyLoadEvent);
+        }
+      }
+    });
+  }
+
   onEdit(id: string) {
     this.router.navigate([ORGANISATION_ADMIN.EDIT, this.selectedOrg, id]);
   }

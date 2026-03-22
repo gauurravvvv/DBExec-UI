@@ -20,6 +20,7 @@ export const SUPER_ADMIN = {
   VIEW: '/super-admin/get/',
   UPDATE: '/super-admin/update',
   UPDATE_PASSWORD: '/super-admin/update/password',
+  UNLOCK: '/super-admin/unlock/',
 };
 
 export const ORG_ADMIN = {
@@ -29,6 +30,7 @@ export const ORG_ADMIN = {
   VIEW: '/org-admin/get/',
   UPDATE: '/org-admin/update',
   UPDATE_PASSWORD: '/org-admin/update/password',
+  UNLOCK: '/org-admin/unlock/',
 };
 
 export const ORGANISATION = {
@@ -46,6 +48,7 @@ export const USER = {
   VIEW: '/user/get/',
   UPDATE: '/user/update',
   UPDATE_PASSWORD: '/user/update/password',
+  UNLOCK: '/user/unlock/',
 };
 
 export const DATABASE = {

@@ -90,6 +90,16 @@ export class ViewOrgAdminComponent implements OnInit {
       });
   }
 
+  onUnlock() {
+    this.orgAdminService
+      .unlockOrgAdmin(this.selectedOrgId, this.adminId)
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
+          this.loadAdminData();
+        }
+      });
+  }
+
   openChangePasswordDialog() {
     this.showChangePasswordDialog = true;
   }

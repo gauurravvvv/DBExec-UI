@@ -30,7 +30,9 @@
         </button>
         <button
           class="btn-danger"
-          [disabled]="adminId == loggedInUserId"
+          [disabled]="!adminData?.canDelete"
+          [pTooltip]="!adminData?.canDelete ? (adminData?.isDefault === 1 ? 'Default admin cannot be deleted' : 'Cannot delete yourself') : 'Delete'"
+          tooltipPosition="bottom"
           (click)="confirmDelete(adminId)"
         >
           <i class="pi pi-trash"></i>
@@ -56,9 +58,21 @@
           </h3>
           <p class="admin-username">@{{ adminData?.username }}</p>
           <div class="status-wrapper">
-            <span class="status-badge" [class.active]="adminData?.status === 1">
-              {{ adminData?.status === 1 ? 'Active' : 'Inactive' }}
+            <span class="status-badge"
+              [class.active]="!adminData?.isLocked && adminData?.status === 1"
+              [class.locked]="adminData?.isLocked">
+              {{ adminData?.isLocked ? 'Locked' : (adminData?.status === 1 ? 'Active' : 'Inactive') }}
             </span>
+            <button
+              *ngIf="adminData?.isLocked"
+              class="btn-unlock"
+              (click)="onUnlock()"
+              pTooltip="Unlock account"
+              tooltipPosition="bottom"
+            >
+              <i class="pi pi-lock-open"></i>
+              Unlock
+            </button>
           </div>
         </div>
 

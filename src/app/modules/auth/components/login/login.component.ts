@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   showPassword = false;
   features = LOGIN_PAGE_OPTIONS;
+  loginError = '';
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -44,8 +45,9 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
+      this.loginError = '';
       this.loginService.login(this.loginForm).then((res: any) => {
-        if (this.globalService.handleSuccessService(res)) {
+        if (this.globalService.handleSuccessService(res, true, false)) {
           const role = this.globalService.getTokenDetails('role');
           let dashboardRoute = '/app/dashboard';
           switch (role) {
@@ -62,6 +64,8 @@ export class LoginComponent implements OnInit {
           this.router.navigateByUrl(dashboardRoute, {
             replaceUrl: true,
           });
+        } else {
+          this.loginError = res.message;
         }
       });
     }

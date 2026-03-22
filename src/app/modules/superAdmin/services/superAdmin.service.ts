@@ -76,6 +76,16 @@ export class SuperAdminService {
       });
   }
 
+  unlockSuperAdmin(id: string) {
+    return this.http
+      .put(SUPER_ADMIN.UNLOCK + `${id}`, {})
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   updateSuperAdminPassword(id: string, password: string) {
     return this.http
       .put(SUPER_ADMIN.UPDATE_PASSWORD, { id, newPassword: password })

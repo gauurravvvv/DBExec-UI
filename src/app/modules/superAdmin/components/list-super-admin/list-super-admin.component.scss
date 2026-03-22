@@ -319,6 +319,12 @@ $radius-sm: 8px;
           color: var(--secondary-color);
           border: 1px solid var(--border-color);
         }
+
+        &.locked {
+          background: rgba(245, 158, 11, 0.1);
+          color: #f59e0b;
+          border: 1px solid rgba(245, 158, 11, 0.2);
+        }
       }
 
       // Mappings Info
@@ -368,6 +374,15 @@ $radius-sm: 8px;
           &.delete-btn:hover {
             background: rgba(244, 67, 54, 0.1);
             color: var(--error-color);
+          }
+
+          &.unlock-btn {
+            color: #f59e0b;
+
+            &:hover {
+              background: rgba(245, 158, 11, 0.1);
+              color: #d97706;
+            }
           }
         }
       }

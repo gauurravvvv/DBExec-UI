@@ -20,6 +20,8 @@ interface AdminData {
   role: string;
   isFirstLogin: boolean;
   isDefault: number;
+  canDelete: boolean;
+  isLocked: boolean;
 }
 
 @Component({
@@ -127,6 +129,14 @@ export class ViewSuperAdminComponent implements OnInit {
           this.router.navigate([SUPER_ADMIN.LIST]);
         }
       });
+  }
+
+  onUnlock() {
+    this.superAdminService.unlockSuperAdmin(this.adminId).then((res: any) => {
+      if (this.globalService.handleSuccessService(res)) {
+        this.loadAdminDetails();
+      }
+    });
   }
 
   openChangePasswordDialog() {
