@@ -160,6 +160,17 @@
         }
       }
 
+      // Hide number input spinners
+      input[type='number'] {
+        -moz-appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
+
       .form-field {
         display: flex;
         flex-direction: column;
@@ -497,6 +508,7 @@
     align-items: center;
     position: relative;
     flex: 0 0 auto;
+    cursor: pointer;
 
     &.active {
       .step-dot {
@@ -506,6 +518,21 @@
       .step-label {
         color: var(--primary-color);
         font-weight: 600;
+      }
+    }
+
+    &.completed {
+      .step-dot {
+        background: var(--success-color);
+        color: white;
+
+        i {
+          font-size: 0.8rem;
+        }
+      }
+      .step-label {
+        color: var(--success-color);
+        font-weight: 500;
       }
     }
 
@@ -521,6 +548,7 @@
       font-weight: 600;
       margin-bottom: 8px;
       transition: all 0.3s ease;
+      font-size: 14px;
     }
 
     .step-label {
@@ -546,11 +574,11 @@
       height: 100%;
       background: var(--primary-color);
       transition: width 0.3s ease;
-      width: 0; // Default width
+      width: 0;
     }
   }
 
-  // Add these new styles for step progression
+  // Step progression styles
   &.step-1 .step-line::before {
     width: 0;
   }
@@ -563,7 +591,7 @@
 .form-grid {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1.5rem;
 
   .form-field {
     width: 50%;
@@ -579,9 +607,9 @@
   }
 }
 
-// Replace the confirmation-field styles with these
+// Acknowledgment cards
 .acknowledgments-container {
-  margin: 2rem 0;
+  margin-top: 0.5rem;
   width: 50%;
 
   .acknowledgments-title {
@@ -638,5 +666,199 @@
       margin-left: 2.25rem;
       display: block;
     }
+  }
+}
+
+// Two-column layout for steps
+.step-1-layout,
+.step-2-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  padding-bottom: 24px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.step-1-left,
+.step-2-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.step-1-right,
+.step-2-right {
+  padding-top: 0;
+
+  .acknowledgments-container {
+    width: 100%;
+    margin-top: 0;
+    position: sticky;
+    top: 0;
+  }
+}
+
+// Group styling for form sections
+.form-group-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  .group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
+
+    i {
+      color: var(--primary-color);
+      font-size: 1rem;
+    }
+  }
+
+  app-custom-input,
+  app-custom-dropdown {
+    width: 100%;
+  }
+
+  .form-field {
+    width: 100% !important;
+  }
+}
+
+.db-connection-group,
+.admin-setup-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  .group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
+
+    i {
+      color: var(--primary-color);
+      font-size: 1rem;
+    }
+  }
+
+  // Two-column row for host+port, username+password
+  .db-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    app-custom-input {
+      width: 100% !important;
+    }
+
+    .form-field {
+      width: 100% !important;
+    }
+  }
+
+  app-custom-input {
+    width: 100%;
+  }
+}
+
+.admin-setup-group {
+  margin-top: 0.5rem;
+}
+
+// Connection test section
+.connection-test-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.25rem;
+
+  .test-connection-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover:not(.disabled) {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    &.disabled {
+      color: var(--secondary-color);
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    i {
+      font-size: 0.85rem;
+    }
+  }
+
+  .connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    &.success {
+      color: var(--success-color);
+    }
+
+    &.failed {
+      color: var(--error-color);
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Admin setup note
+.admin-setup-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: var(--text-color);
+  opacity: 0.6;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--hover-background);
+  border-radius: 6px;
+  border-left: 3px solid var(--primary-color);
+
+  i {
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    margin-top: 2px;
   }
 }

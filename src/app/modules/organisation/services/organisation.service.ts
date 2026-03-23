@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ANNOUNCEMENT, ORGANISATION } from 'src/app/constants/api';
+import { ANNOUNCEMENT, DATABASE, ORGANISATION } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -20,13 +20,30 @@ export class OrganisationService {
   }
 
   addOrganisation(orgForm: FormGroup) {
-    const { name, description, encryptionAlgorithm, pepperKey } = orgForm.value;
+    const {
+      name,
+      description,
+      encryptionAlgorithm,
+      pepperKey,
+      dbHost,
+      dbPort,
+      dbName,
+      dbUsername,
+      dbPassword,
+      adminEmail,
+    } = orgForm.value;
     return this.http
       .post(ORGANISATION.ADD, {
         name,
         description,
         encryptionAlgorithm,
         pepperKey,
+        dbHost,
+        dbPort,
+        dbName,
+        dbUsername,
+        dbPassword,
+        adminEmail,
       })
       .toPromise()
       .then((response: any) => {
@@ -36,14 +53,25 @@ export class OrganisationService {
   }
 
   editOrganisation(orgForm: FormGroup) {
-    const { id, name, status, description } = orgForm.getRawValue();
+    const { id, name, status, description, dbHost, dbPort, dbName, dbUsername, dbPassword } =
+      orgForm.getRawValue();
+
+    const payload: any = {
+      id,
+      name,
+      status: status ? 1 : 0,
+      description,
+    };
+
+    // Only include DB fields if they have values
+    if (dbHost) payload.dbHost = dbHost;
+    if (dbPort) payload.dbPort = dbPort;
+    if (dbName) payload.dbName = dbName;
+    if (dbUsername) payload.dbUsername = dbUsername;
+    if (dbPassword) payload.dbPassword = dbPassword;
+
     return this.http
-      .put(ORGANISATION.EDIT, {
-        id,
-        name,
-        status: status ? 1 : 0,
-        description,
-      })
+      .put(ORGANISATION.EDIT, payload)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -92,6 +120,23 @@ export class OrganisationService {
         endTime,
         organisation,
       })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  validateDatabase(payload: {
+    type: string;
+    host: string;
+    port: number;
+    database: string;
+    username: string;
+    password: string;
+  }) {
+    return this.http
+      .post(DATABASE.VALIDATE, payload)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

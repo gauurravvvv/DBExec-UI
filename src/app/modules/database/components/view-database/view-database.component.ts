@@ -20,7 +20,6 @@ interface StorageTable {
 export class ViewDatabaseComponent implements OnInit {
   dbId!: string;
   orgId!: string;
-  isMasterDb!: string;
   dbData: any;
   showDeleteConfirm = false;
   showTableDetails = false;
@@ -38,7 +37,6 @@ export class ViewDatabaseComponent implements OnInit {
   }; // Initialize with empty data
   schemaChartOptions: any;
   chartOptions: any;
-  deleteConfiguration: boolean = false;
   topStorageTables: StorageTable[] = [];
 
   statsChartOptions: any;
@@ -62,11 +60,7 @@ export class ViewDatabaseComponent implements OnInit {
   ngOnInit(): void {
     this.dbId = this.route.snapshot.params['id'];
     this.orgId = this.route.snapshot.params['orgId'];
-    this.isMasterDb = this.route.snapshot.params['isMasterDb'];
-    if (!this.dbId || !this.orgId || !this.isMasterDb) {
-      return;
-    }
-    if (this.dbId && this.orgId && this.isMasterDb) {
+    if (this.dbId && this.orgId) {
       this.loadDatabaseData();
     }
   }
@@ -74,7 +68,7 @@ export class ViewDatabaseComponent implements OnInit {
   // Changed from private to public
   loadDatabaseData(): void {
     this.databaseService
-      .viewDatabase(this.orgId, this.dbId, this.isMasterDb)
+      .viewDatabase(this.orgId, this.dbId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.dbData = response.data;
@@ -365,7 +359,7 @@ export class ViewDatabaseComponent implements OnInit {
   }
 
   onEdit(): void {
-    this.router.navigate([DATABASE.EDIT, this.dbData.id]);
+    this.router.navigate([DATABASE.EDIT, this.orgId, this.dbData.id]);
   }
 
   confirmDelete(): void {
@@ -378,13 +372,13 @@ export class ViewDatabaseComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.dbData) {
-      // this.databaseService
-      //   .deleteDatabase(this.dbData.id, this.deleteConfiguration)
-      //   .then(response => {
-      //     if (this.globalService.handleSuccessService(response)) {
-      //       this.router.navigate([DATABASE.LIST]);
-      //     }
-      //   });
+      this.databaseService
+        .deleteDatabase(this.orgId, this.dbId)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate([DATABASE.LIST]);
+          }
+        });
     }
   }
 }

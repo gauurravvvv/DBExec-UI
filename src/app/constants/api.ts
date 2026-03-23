@@ -53,7 +53,6 @@ export const USER = {
 
 export const DATABASE = {
   LIST: '/database/list',
-  LIST_ALL: '/database/listAll',
   DELETE: '/database/delete/',
   ADD: '/database/add',
   VIEW: '/database/get/',
@@ -62,6 +61,7 @@ export const DATABASE = {
   LIST_SCHEMA_TABLES: '/database/table/list/',
   LIST_TABLE_COLUMNS: '/database/table/columns/list/',
   RUN_QUERY: '/database/runQuery',
+  VALIDATE: '/database/validate',
 };
 
 export const ENVIRONMENT = {

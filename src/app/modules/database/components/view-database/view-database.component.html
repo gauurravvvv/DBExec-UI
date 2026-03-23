@@ -290,24 +290,18 @@
 </div>
 
 <!-- Delete Confirmation Dialog -->
-<!-- Delete Confirmation Dialog -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
-  <div class="popup-content" [class.master-warning]="dbData?.isMasterDB">
+  <div class="popup-content">
     <!-- Header -->
     <div class="popup-header">
-      <div class="popup-icon" [class.danger]="dbData?.isMasterDB">
-        <i
-          class="pi"
-          [ngClass]="
-            dbData?.isMasterDB ? 'pi-exclamation-triangle' : 'pi-trash'
-          "
-        ></i>
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
       </div>
-      <h3>{{ dbData?.isMasterDB ? 'Critical Warning' : 'Confirm Delete' }}</h3>
+      <h3>Confirm Delete</h3>
     </div>
 
-    <!-- Standard Delete Section (Non-Master DB) -->
-    <div class="standard-delete-section" *ngIf="!dbData?.isMasterDB">
+    <!-- Delete Section -->
+    <div class="standard-delete-section">
       <div class="db-info-badge">
         <i class="pi pi-database"></i>
         <span>{{ dbData?.config?.dbName }}</span>
@@ -331,48 +325,6 @@
       </ul>
     </div>
 
-    <!-- Master DB Warning Section -->
-    <div class="master-warning-section" *ngIf="dbData?.isMasterDB">
-      <div class="warning-badge">
-        <i class="pi pi-database"></i>
-        <span>Master Database</span>
-      </div>
-
-      <p class="warning-intro">
-        You are about to delete <strong>{{ dbData?.config?.dbName }}</strong
-        >, which is the master database.
-      </p>
-
-      <ul class="warning-list">
-        <li>
-          <i class="pi pi-exclamation-circle"></i>
-          <span>Controls core system operations</span>
-        </li>
-        <li>
-          <i class="pi pi-exclamation-circle"></i>
-          <span>Permanently removes all configurations</span>
-        </li>
-        <li>
-          <i class="pi pi-exclamation-circle"></i>
-          <span>Requires system reconfiguration</span>
-        </li>
-        <li>
-          <i class="pi pi-exclamation-circle"></i>
-          <span>Cannot be undone</span>
-        </li>
-      </ul>
-
-      <div class="checkbox-option">
-        <p-checkbox
-          [(ngModel)]="deleteConfiguration"
-          [binary]="true"
-          inputId="deleteConfig"
-        >
-        </p-checkbox>
-        <label for="deleteConfig"> Also delete associated system data </label>
-      </div>
-    </div>
-
     <!-- Actions -->
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
@@ -381,7 +333,7 @@
       </button>
       <button class="btn-confirm" (click)="proceedDelete()">
         <i class="pi pi-trash"></i>
-        {{ dbData?.isMasterDB ? 'Delete Master DB' : 'Delete' }}
+        Delete
       </button>
     </div>
   </div>

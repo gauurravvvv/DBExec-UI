@@ -18,26 +18,9 @@ export class DatabaseService {
       });
   }
 
-  listAllDatabase(params: any) {
+  deleteDatabase(orgId: string, id: string) {
     return this.http
-      .get(DATABASE.LIST_ALL, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
-  }
-
-  deleteDatabase(
-    orgId: string,
-    id: string,
-    isMasterDb: string,
-    deleteConfiguration: boolean,
-  ) {
-    return this.http
-      .post(DATABASE.DELETE + `${orgId}/${id}/${isMasterDb}`, {
-        deleteConfiguration,
-      })
+      .post(DATABASE.DELETE + `${orgId}/${id}`, {})
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -56,31 +39,20 @@ export class DatabaseService {
       username,
       password,
       organisation,
-      isMasterDB,
-      adminCredentials,
     } = payload;
 
-    const requestBody: any = {
-      name,
-      description,
-      type,
-      host,
-      port,
-      database,
-      username,
-      password,
-      organisation,
-      isMasterDB,
-    };
-
-    if (adminCredentials) {
-      requestBody.adminCredentials = {
-        email: adminCredentials.email,
-      };
-    }
-
     return this.http
-      .post(DATABASE.ADD, requestBody)
+      .post(DATABASE.ADD, {
+        name,
+        description,
+        type,
+        host,
+        port,
+        database,
+        username,
+        password,
+        organisation,
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -88,9 +60,9 @@ export class DatabaseService {
       });
   }
 
-  viewDatabase(orgId: string, id: string, isMasterDb: string) {
+  viewDatabase(orgId: string, id: string) {
     return this.http
-      .get(DATABASE.VIEW + `${orgId}/${id}/${isMasterDb}`)
+      .get(DATABASE.VIEW + `${orgId}/${id}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -110,7 +82,6 @@ export class DatabaseService {
       username,
       password,
       organisation,
-      isMasterDB,
       status,
     } = payload;
     return this.http
@@ -125,7 +96,6 @@ export class DatabaseService {
         username,
         password,
         organisation,
-        isMasterDB,
         status,
       })
       .toPromise()

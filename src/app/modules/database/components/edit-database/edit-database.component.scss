@@ -161,6 +161,51 @@
   }
 }
 
+.connection-test-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  .test-connection-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+
+    &:hover:not(.disabled) {
+      opacity: 0.8;
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    i {
+      font-size: 0.875rem;
+
+      &.pi-check-circle {
+        color: var(--success-color);
+      }
+
+      &.pi-times-circle {
+        color: var(--error-color);
+      }
+    }
+  }
+
+  .connection-hint {
+    color: var(--text-color);
+    opacity: 0.6;
+    font-size: 0.75rem;
+  }
+}
+
 .acknowledgments-container {
   margin: 2rem 0;
   width: 50%;
@@ -403,18 +448,6 @@
     font-size: 0.9rem;
   }
 
-  .master-db-note {
-    color: #666;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-
-    i {
-      color: #856404;
-      font-size: 0.9rem;
-    }
-  }
 }
 
 :host ::ng-deep {

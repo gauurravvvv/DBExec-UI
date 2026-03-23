@@ -20,6 +20,11 @@ export class AddDatabaseComponent implements OnInit {
   private _showOrganisationDropdown = false;
   showPassword: boolean = false;
 
+  // Connection test
+  connectionTested = false;
+  connectionTestLoading = false;
+  connectionTestResult: 'success' | 'failed' | null = null;
+
   constructor(
     private fb: FormBuilder,
     private databaseService: DatabaseService,
@@ -28,7 +33,6 @@ export class AddDatabaseComponent implements OnInit {
     private router: Router,
   ) {}
 
-  // Add getter for form dirty state
   get isFormDirty(): boolean {
     return this.databaseForm.dirty;
   }
@@ -41,11 +45,17 @@ export class AddDatabaseComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     }
+
+    // Reset connection test when connection fields change
+    ['host', 'port', 'database', 'username', 'password'].forEach(field => {
+      this.databaseForm.get(field)?.valueChanges.subscribe(() => {
+        this.connectionTested = false;
+        this.connectionTestResult = null;
+      });
+    });
   }
 
   initForm(): void {
-    const orgId = this.globalService.getTokenDetails('organisationId');
-
     this.databaseForm = this.fb.group({
       name: [
         '',
@@ -80,43 +90,12 @@ export class AddDatabaseComponent implements OnInit {
           : this.globalService.getTokenDetails('organisationId'),
         Validators.required,
       ],
-      acknowledgment: [false],
-      schemaAcknowledgment: [false],
-      isMasterDB: [false],
-      adminEmail: [''],
     });
 
     const orgControl = this.databaseForm.get('organisation');
     if (this.showOrganisationDropdown) {
       orgControl?.setValidators([Validators.required]);
     }
-
-    this.databaseForm.get('isMasterDB')?.valueChanges.subscribe(isMaster => {
-      const acknowledgmentControl = this.databaseForm.get('acknowledgment');
-      const schemaAcknowledgmentControl = this.databaseForm.get(
-        'schemaAcknowledgment',
-      );
-      const adminEmailControl = this.databaseForm.get('adminEmail');
-
-      if (isMaster) {
-        acknowledgmentControl?.setValidators(Validators.requiredTrue);
-        schemaAcknowledgmentControl?.setValidators(Validators.requiredTrue);
-        adminEmailControl?.setValidators([
-          Validators.required,
-          Validators.email,
-        ]);
-      } else {
-        acknowledgmentControl?.clearValidators();
-        schemaAcknowledgmentControl?.clearValidators();
-        adminEmailControl?.clearValidators();
-
-        adminEmailControl?.setValue('');
-      }
-
-      acknowledgmentControl?.updateValueAndValidity();
-      schemaAcknowledgmentControl?.updateValueAndValidity();
-      adminEmailControl?.updateValueAndValidity();
-    });
   }
 
   loadOrganisations(): void {
@@ -134,7 +113,7 @@ export class AddDatabaseComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.databaseForm.valid) {
+    if (this.databaseForm.valid && this.connectionTested) {
       const formValue = this.databaseForm.getRawValue();
 
       const payload: any = {
@@ -146,18 +125,8 @@ export class AddDatabaseComponent implements OnInit {
         database: formValue.database,
         username: formValue.username,
         password: formValue.password,
-        organisation: this.showOrganisationDropdown
-          ? formValue.organisation
-          : formValue.organisation,
-        isMasterDB: formValue.isMasterDB,
+        organisation: formValue.organisation,
       };
-
-      // Add admin credentials only if masterDB is true
-      if (formValue.isMasterDB) {
-        payload.adminCredentials = {
-          email: formValue.adminEmail,
-        };
-      }
 
       this.databaseService.addDatabase(payload).then(response => {
         if (this.globalService.handleSuccessService(response)) {
@@ -170,15 +139,12 @@ export class AddDatabaseComponent implements OnInit {
   onCancel(): void {
     if (this.isFormDirty) {
       this.databaseForm.reset();
-      this.databaseForm.get('isMasterDB')?.setValue(false);
-      this.databaseForm.get('acknowledgment')?.setValue(false);
-      this.databaseForm.get('schemaAcknowledgment')?.setValue(false);
-      this.databaseForm.get('adminEmail')?.setValue('');
-      this.databaseForm.get('adminEmail')?.clearValidators();
-      this.databaseForm.get('adminEmail')?.updateValueAndValidity();
       this.databaseForm.get('type')?.setValue('postgres');
       this.databaseForm.get('type')?.disable();
       this.databaseForm.markAsPristine();
+      this.connectionTested = false;
+      this.connectionTestLoading = false;
+      this.connectionTestResult = null;
     }
   }
 
@@ -212,13 +178,6 @@ export class AddDatabaseComponent implements OnInit {
     return '';
   }
 
-  canSubmit(): boolean {
-    return (
-      this.databaseForm.valid &&
-      this.databaseForm.get('acknowledgment')?.value === true
-    );
-  }
-
   onPortKeyPress(event: KeyboardEvent): boolean {
     const pattern = /[0-9]/;
     const inputChar = String.fromCharCode(event.charCode);
@@ -228,6 +187,50 @@ export class AddDatabaseComponent implements OnInit {
       return false;
     }
     return true;
+  }
+
+  testConnection(): void {
+    if (!this.isConnectionFieldsValid()) return;
+
+    this.connectionTestLoading = true;
+    this.connectionTestResult = null;
+
+    const formValue = this.databaseForm.getRawValue();
+    this.organisationService
+      .validateDatabase({
+        type: 'postgres',
+        host: formValue.host,
+        port: formValue.port,
+        database: formValue.database,
+        username: formValue.username,
+        password: formValue.password,
+      })
+      .then((response: any) => {
+        this.connectionTestLoading = false;
+        if (response?.isConnected) {
+          this.connectionTested = true;
+          this.connectionTestResult = 'success';
+        } else {
+          this.connectionTested = false;
+          this.connectionTestResult = 'failed';
+        }
+      })
+      .catch(() => {
+        this.connectionTestLoading = false;
+        this.connectionTested = false;
+        this.connectionTestResult = 'failed';
+      });
+  }
+
+  isConnectionFieldsValid(): boolean {
+    const fields = ['host', 'port', 'database', 'username', 'password'];
+    return fields.every(
+      f => this.databaseForm.get(f)?.valid && this.databaseForm.get(f)?.value,
+    );
+  }
+
+  isFormValid(): boolean {
+    return this.databaseForm.valid && this.connectionTested;
   }
 
   togglePassword(event: Event): void {

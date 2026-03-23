@@ -26,176 +26,445 @@
             pButton
             type="button"
             label="Next"
+            icon="pi pi-arrow-right"
+            iconPos="right"
             (click)="nextStep()"
             class="p-button-primary btn-save"
-            [disabled]="!isBasicInfoValid()"
-          >
-            <i class="pi pi-arrow-right ml-2"></i>
-          </button>
+            [disabled]="!isStep1Valid()"
+          ></button>
         </ng-container>
         <ng-container *ngIf="currentStep === 1">
           <button
             pButton
             type="button"
             label="Previous"
+            icon="pi pi-arrow-left"
+            iconPos="left"
             class="p-button-outlined btn-cancel"
             (click)="previousStep()"
-          >
-            <i class="pi pi-arrow-left mr-2"></i>
-          </button>
+          ></button>
           <button
             pButton
             class="p-button-primary btn-save"
             type="submit"
             label="Save"
+            icon="pi pi-save"
+            iconPos="left"
             (click)="onSubmit()"
             [disabled]="!isFormValid()"
-          >
-            <i class="pi pi-save mr-2"></i>
-          </button>
+          ></button>
         </ng-container>
       </div>
     </div>
 
     <!-- Steps -->
     <div class="steps-container" [ngClass]="'step-' + (currentStep + 1)">
-      <div class="step" [class.active]="currentStep === 0">
-        <div class="step-dot">1</div>
-        <span class="step-label">Basic Information</span>
+      <div
+        class="step"
+        [class.active]="currentStep === 0"
+        [class.completed]="currentStep > 0"
+        (click)="onStepClick(0)"
+      >
+        <div class="step-dot">
+          <i class="pi pi-check" *ngIf="currentStep > 0"></i>
+          <span *ngIf="currentStep <= 0">1</span>
+        </div>
+        <span class="step-label">Organisation Config</span>
       </div>
       <div class="step-line"></div>
-      <div class="step" [class.active]="currentStep === 1">
+      <div
+        class="step"
+        [class.active]="currentStep === 1"
+        (click)="onStepClick(1)"
+      >
         <div class="step-dot">2</div>
-        <span class="step-label">Organisation Configuration</span>
+        <span class="step-label">Master Database</span>
       </div>
     </div>
 
     <form [formGroup]="orgForm" class="admin-form mt-4">
-      <!-- Step 1: Basic Information -->
-      <div *ngIf="currentStep === 0" class="form-grid">
-        <!-- Organisation Name -->
-        <app-custom-input
-          formControlName="name"
-          label="Organisation Name"
-          placeholder="Enter organisation name"
-          icon="pi-building"
-          [required]="true"
-          [showError]="
-            !!(orgForm.get('name')?.invalid && orgForm.get('name')?.touched)
-          "
-          [errorMessage]="getNameError()"
-        >
-        </app-custom-input>
+      <!-- Step 1: Organisation Config (Basic Info + Encryption) -->
+      <div *ngIf="currentStep === 0" class="step-1-layout">
+        <!-- Left Column: Form Fields -->
+        <div class="step-1-left">
+          <!-- Basic Information Group -->
+          <div class="form-group-section">
+            <div class="group-header">
+              <i class="pi pi-building"></i>
+              <span>Basic Information</span>
+            </div>
 
-        <!-- Organisation Description -->
-        <app-custom-input
-          formControlName="description"
-          label="Organisation Description"
-          placeholder="Enter organisation description"
-          icon="pi-align-left"
-          [required]="true"
-          [showError]="
-            !!(
-              orgForm.get('description')?.invalid &&
-              orgForm.get('description')?.touched
-            )
-          "
-          [errorMessage]="getDescriptionError()"
-        >
-        </app-custom-input>
-      </div>
+            <app-custom-input
+              formControlName="name"
+              label="Organisation Name"
+              placeholder="e.g. Acme Corp"
+              icon="pi-building"
+              [required]="true"
+              [showError]="
+                !!(orgForm.get('name')?.invalid && orgForm.get('name')?.touched)
+              "
+              [errorMessage]="getNameError()"
+            >
+            </app-custom-input>
 
-      <!-- Step 2: Organisation Configuration -->
-      <div *ngIf="currentStep === 1" class="form-grid">
-        <!-- Encryption Method -->
-        <app-custom-dropdown
-          formControlName="encryptionAlgorithm"
-          label="Encryption Method"
-          placeholder="Select Encryption Method"
-          [options]="encryptionAlgorithms"
-          optionLabel="label"
-          optionValue="value"
-          [filter]="true"
-          filterBy="label"
-          [required]="true"
-          [showError]="
-            !!(
-              orgForm.get('encryptionAlgorithm')?.invalid &&
-              orgForm.get('encryptionAlgorithm')?.touched
-            )
-          "
-          errorMessage="Encryption method is required"
-        >
-        </app-custom-dropdown>
+            <app-custom-input
+              formControlName="description"
+              label="Description"
+              placeholder="Brief description of this organisation"
+              icon="pi-align-left"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('description')?.invalid &&
+                  orgForm.get('description')?.touched
+                )
+              "
+              [errorMessage]="getDescriptionError()"
+            >
+            </app-custom-input>
+          </div>
 
-        <!-- Pepper Key -->
-        <div class="form-field">
-          <label for="pepperKey"
-            >Pepper Key<span class="required"> *</span></label
-          >
-          <span class="p-input-icon-left p-input-icon-right">
-            <i class="pi pi-lock"></i>
-            <input
-              id="pepperKey"
-              type="password"
-              pInputText
-              formControlName="pepperKey"
-              placeholder="Enter pepper key (minimum 32 characters)"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
+          <!-- Encryption Config Group -->
+          <div class="form-group-section">
+            <div class="group-header">
+              <i class="pi pi-shield"></i>
+              <span>Encryption Config</span>
+            </div>
+
+            <app-custom-dropdown
+              formControlName="encryptionAlgorithm"
+              label="Encryption Method"
+              placeholder="Select Encryption Method"
+              [options]="encryptionAlgorithms"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterBy="label"
+              appendTo="body"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('encryptionAlgorithm')?.invalid &&
+                  orgForm.get('encryptionAlgorithm')?.touched
+                )
+              "
+              errorMessage="Encryption method is required"
+            >
+            </app-custom-dropdown>
+
+            <div class="form-field">
+              <label for="pepperKey"
+                >Pepper Key<span class="required"> *</span></label
+              >
+              <span class="p-input-icon-left p-input-icon-right">
+                <i class="pi pi-lock"></i>
+                <input
+                  id="pepperKey"
+                  type="password"
+                  pInputText
+                  formControlName="pepperKey"
+                  placeholder="Min 32 characters"
+                  [ngClass]="{
+                    'ng-invalid ng-dirty':
+                      orgForm.get('pepperKey')?.invalid &&
+                      orgForm.get('pepperKey')?.touched,
+                  }"
+                />
+                <i
+                  class="pi pi-eye"
+                  style="cursor: pointer"
+                  (click)="togglePepperKeyVisibility($event)"
+                ></i>
+              </span>
+              <small
+                class="error-message"
+                *ngIf="
                   orgForm.get('pepperKey')?.invalid &&
-                  orgForm.get('pepperKey')?.touched,
-              }"
-            />
-            <i
-              class="pi pi-eye"
-              style="cursor: pointer"
-              (click)="togglePepperKeyVisibility($event)"
-            ></i>
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              orgForm.get('pepperKey')?.invalid &&
-              orgForm.get('pepperKey')?.touched
-            "
-          >
-            {{ getPepperKeyError() }}
-          </small>
+                  orgForm.get('pepperKey')?.touched
+                "
+              >
+                {{ getPepperKeyError() }}
+              </small>
+            </div>
+          </div>
         </div>
 
-        <!-- Add this after the Pepper Key field but before closing the form-grid div -->
-        <div class="acknowledgments-container">
-          <div class="acknowledgments-title">
-            Security Configuration Acknowledgment
-          </div>
-          <div class="acknowledgment-card">
-            <div class="p-field-checkbox">
-              <p-checkbox
-                [binary]="true"
-                [(ngModel)]="confirmationChecked"
-                [ngModelOptions]="{ standalone: true }"
-                inputId="confirmation"
+        <!-- Right Column: Encryption Acknowledgment -->
+        <div class="step-1-right">
+          <div class="acknowledgments-container">
+            <div class="acknowledgments-title">
+              Security Configuration Acknowledgment
+            </div>
+            <div class="acknowledgment-card">
+              <div class="p-field-checkbox">
+                <p-checkbox
+                  [binary]="true"
+                  [(ngModel)]="confirmationChecked"
+                  [ngModelOptions]="{ standalone: true }"
+                  inputId="confirmation"
+                >
+                </p-checkbox>
+                <div class="acknowledgment-content">
+                  <label for="confirmation" class="acknowledgment-label">
+                    Encryption Configuration
+                  </label>
+                  <p class="acknowledgment-text">
+                    I understand that the encryption method and pepper key are
+                    critical security settings that cannot be modified after
+                    organisation creation. These settings will be used for all
+                    sensitive data encryption within the organisation.
+                  </p>
+                </div>
+              </div>
+              <small
+                class="error-message"
+                *ngIf="!confirmationChecked && orgForm.get('encryptionAlgorithm')?.valid && orgForm.get('pepperKey')?.valid"
               >
-              </p-checkbox>
-              <div class="acknowledgment-content">
-                <label for="confirmation" class="acknowledgment-label">
-                  Encryption Configuration
-                </label>
-                <p class="acknowledgment-text">
-                  I understand that the encryption method and pepper key are
-                  critical security settings that cannot be modified after
-                  organisation creation. These settings will be used for all
-                  sensitive data encryption within the organisation.
-                </p>
+                Please acknowledge the encryption configuration settings
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Master Database -->
+      <div *ngIf="currentStep === 1" class="step-2-layout">
+        <!-- Left Column: Form Fields -->
+        <div class="step-2-left">
+          <!-- Connection Details Group -->
+          <div class="db-connection-group">
+            <div class="group-header">
+              <i class="pi pi-server"></i>
+              <span>Connection Details</span>
+            </div>
+
+            <div class="db-fields-row">
+              <app-custom-input
+                formControlName="dbHost"
+                label="Host"
+                placeholder="e.g. localhost"
+                icon="pi-desktop"
+                [required]="true"
+                [showError]="
+                  !!(
+                    orgForm.get('dbHost')?.invalid &&
+                    orgForm.get('dbHost')?.touched
+                  )
+                "
+                [errorMessage]="getDbFieldError('dbHost')"
+              >
+              </app-custom-input>
+
+              <div class="form-field">
+                <label for="dbPort">Port<span class="required"> *</span></label>
+                <span class="p-input-icon-left">
+                  <i class="pi pi-hashtag"></i>
+                  <input
+                    id="dbPort"
+                    type="number"
+                    pInputText
+                    formControlName="dbPort"
+                    placeholder="e.g. 5432"
+                    min="1"
+                    max="65535"
+                    (keypress)="onPortKeyPress($event)"
+                    [ngClass]="{
+                      'ng-invalid ng-dirty':
+                        orgForm.get('dbPort')?.invalid &&
+                        orgForm.get('dbPort')?.touched,
+                    }"
+                    class="p-inputtext"
+                  />
+                </span>
+                <small
+                  class="error-message"
+                  *ngIf="
+                    orgForm.get('dbPort')?.invalid &&
+                    orgForm.get('dbPort')?.touched
+                  "
+                >
+                  {{ getDbFieldError('dbPort') }}
+                </small>
               </div>
             </div>
-            <small
-              class="error-message"
-              *ngIf="!confirmationChecked && orgForm.valid"
+
+            <app-custom-input
+              formControlName="dbName"
+              label="Database"
+              placeholder="e.g. mydb"
+              icon="pi-database"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('dbName')?.invalid &&
+                  orgForm.get('dbName')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbName')"
             >
-              Please acknowledge the encryption configuration settings
-            </small>
+            </app-custom-input>
+
+            <div class="db-fields-row">
+              <app-custom-input
+                formControlName="dbUsername"
+                label="Username"
+                placeholder="e.g. postgres"
+                icon="pi-user"
+                [required]="true"
+                [showError]="
+                  !!(
+                    orgForm.get('dbUsername')?.invalid &&
+                    orgForm.get('dbUsername')?.touched
+                  )
+                "
+                [errorMessage]="getDbFieldError('dbUsername')"
+              >
+              </app-custom-input>
+
+              <div class="form-field">
+                <label for="dbPassword"
+                  >Password<span class="required"> *</span></label
+                >
+                <span class="p-input-icon-left p-input-icon-right">
+                  <i class="pi pi-lock"></i>
+                  <input
+                    id="dbPassword"
+                    [type]="showDbPassword ? 'text' : 'password'"
+                    pInputText
+                    formControlName="dbPassword"
+                    placeholder="Enter password"
+                    [ngClass]="{
+                      'ng-invalid ng-dirty':
+                        orgForm.get('dbPassword')?.invalid &&
+                        orgForm.get('dbPassword')?.touched,
+                    }"
+                    class="p-inputtext"
+                  />
+                  <i
+                    class="pi pi-eye"
+                    style="cursor: pointer"
+                    (click)="toggleDbPasswordVisibility($event)"
+                  ></i>
+                </span>
+                <small
+                  class="error-message"
+                  *ngIf="
+                    orgForm.get('dbPassword')?.invalid &&
+                    orgForm.get('dbPassword')?.touched
+                  "
+                >
+                  {{ getDbFieldError('dbPassword') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Test Connection (text link) -->
+            <div class="connection-test-section">
+              <span
+                class="test-connection-link"
+                [class.disabled]="!isDbConnectionFieldsValid() || connectionTestLoading"
+                (click)="testConnection()"
+              >
+                <i
+                  [class]="connectionTestLoading ? 'pi pi-spin pi-spinner' : 'pi pi-bolt'"
+                ></i>
+                {{ connectionTestLoading ? 'Testing connection...' : 'Test Connection' }}
+              </span>
+              <span
+                class="connection-status success"
+                *ngIf="connectionTestResult === 'success'"
+              >
+                <i class="pi pi-check-circle"></i> Connected
+              </span>
+              <span
+                class="connection-status failed"
+                *ngIf="connectionTestResult === 'failed'"
+              >
+                <i class="pi pi-times-circle"></i> Connection failed
+              </span>
+            </div>
+          </div>
+
+          <!-- Admin Setup Group -->
+          <div class="admin-setup-group">
+            <div class="group-header">
+              <i class="pi pi-user-plus"></i>
+              <span>Organisation Admin</span>
+            </div>
+
+            <app-custom-input
+              formControlName="adminEmail"
+              label="Admin Email"
+              placeholder="admin@example.com"
+              icon="pi-envelope"
+              type="email"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('adminEmail')?.invalid &&
+                  orgForm.get('adminEmail')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('adminEmail')"
+            >
+            </app-custom-input>
+
+            <p class="admin-setup-note">
+              <i class="pi pi-info-circle"></i>
+              A setup email will be sent to this address. The admin will set their
+              own password.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Column: Acknowledgments -->
+        <div class="step-2-right">
+          <div class="acknowledgments-container">
+            <div class="acknowledgments-title">
+              Database Configuration Acknowledgments
+            </div>
+            <div class="acknowledgment-card">
+              <div class="p-field-checkbox">
+                <p-checkbox
+                  [binary]="true"
+                  [(ngModel)]="dbAcknowledgment"
+                  [ngModelOptions]="{ standalone: true }"
+                  inputId="dbAcknowledgment"
+                >
+                </p-checkbox>
+                <div class="acknowledgment-content">
+                  <label for="dbAcknowledgment" class="acknowledgment-label">
+                    Database Administrator Privileges
+                  </label>
+                  <p class="acknowledgment-text">
+                    I acknowledge that the username provided has admin privileges
+                    for this database.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="acknowledgment-card">
+              <div class="p-field-checkbox">
+                <p-checkbox
+                  [binary]="true"
+                  [(ngModel)]="schemaAcknowledgment"
+                  [ngModelOptions]="{ standalone: true }"
+                  inputId="schemaAcknowledgment"
+                >
+                </p-checkbox>
+                <div class="acknowledgment-content">
+                  <label for="schemaAcknowledgment" class="acknowledgment-label">
+                    Schema Creation Authorization
+                  </label>
+                  <p class="acknowledgment-text">
+                    I hereby authorize DBExec to create and maintain a
+                    'dbexec_master' schema with all necessary database objects
+                    required for system operations.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

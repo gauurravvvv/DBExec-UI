@@ -260,41 +260,6 @@ $radius-sm: 8px;
           color: var(--primary-color);
         }
 
-        // Master Badge - Premium Golden Style
-        .master-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          background: linear-gradient(
-            135deg,
-            rgba(255, 193, 7, 0.15),
-            rgba(255, 152, 0, 0.15)
-          );
-          color: #ffc107;
-          border: 1px solid rgba(255, 193, 7, 0.3);
-          font-size: 0.65rem;
-          padding: 3px 8px;
-          border-radius: 12px;
-          text-transform: uppercase;
-          font-weight: 700;
-          letter-spacing: 0.5px;
-          flex-shrink: 0;
-          animation: masterPulse 2s ease-in-out infinite;
-
-          i {
-            font-size: 0.55rem;
-          }
-
-          @keyframes masterPulse {
-            0%,
-            100% {
-              box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.3);
-            }
-            50% {
-              box-shadow: 0 0 0 4px rgba(255, 193, 7, 0);
-            }
-          }
-        }
       }
 
       // Description
@@ -504,11 +469,6 @@ td.empty-message-cell {
       }
     }
 
-    // Master Warning Variant - Wider
-    &.master-warning {
-      max-width: 480px;
-    }
-
     // Header
     .popup-header {
       margin-bottom: 1.5rem;
@@ -560,7 +520,6 @@ td.empty-message-cell {
       }
     }
 
-    // Standard Delete Section (Non-Master DB)
     .standard-delete-section {
       text-align: left;
       margin-bottom: 1.5rem;
@@ -616,104 +575,6 @@ td.empty-message-cell {
             color: var(--primary-color);
             font-size: 0.75rem;
             flex-shrink: 0;
-          }
-        }
-      }
-    }
-
-    // Master Warning Section
-    .master-warning-section {
-      text-align: left;
-      margin-bottom: 1.5rem;
-
-      .warning-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: linear-gradient(
-          135deg,
-          rgba(255, 193, 7, 0.15),
-          rgba(255, 152, 0, 0.15)
-        );
-        color: #ffc107;
-        border: 1px solid rgba(255, 193, 7, 0.3);
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 1rem;
-
-        i {
-          font-size: 0.7rem;
-        }
-      }
-
-      .warning-intro {
-        color: var(--secondary-color);
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin-bottom: 1rem;
-
-        strong {
-          color: var(--text-color);
-        }
-      }
-
-      .warning-list {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 1.25rem 0;
-        background: var(--hover-background);
-        border-radius: $radius-sm;
-        padding: 0.75rem 1rem;
-
-        li {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 0.5rem 0;
-          color: var(--secondary-color);
-          font-size: 0.85rem;
-          border-bottom: 1px dashed var(--border-color);
-
-          &:last-child {
-            border-bottom: none;
-          }
-
-          i {
-            color: #ff9800;
-            font-size: 0.7rem;
-            flex-shrink: 0;
-          }
-        }
-      }
-
-      .checkbox-option {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 0.75rem 1rem;
-        background: rgba(244, 67, 54, 0.08);
-        border: 1px solid rgba(244, 67, 54, 0.2);
-        border-radius: $radius-sm;
-
-        label {
-          color: var(--text-color);
-          font-size: 0.85rem;
-          cursor: pointer;
-          user-select: none;
-        }
-
-        ::ng-deep .p-checkbox {
-          .p-checkbox-box {
-            border-color: var(--error-color);
-
-            &.p-highlight {
-              background: var(--error-color);
-              border-color: var(--error-color);
-            }
           }
         }
       }

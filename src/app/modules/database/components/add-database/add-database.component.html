@@ -27,7 +27,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="databaseForm.invalid"
+          [disabled]="!isFormValid()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -93,17 +93,6 @@
             errorMessage="Organisation is required"
           >
           </app-custom-dropdown>
-
-          <!-- Master DB Toggle -->
-          <app-custom-toggle
-            formControlName="isMasterDB"
-            label="Master Database"
-            [trueValue]="true"
-            [falseValue]="false"
-            trueLabel="Yes"
-            falseLabel="No"
-          >
-          </app-custom-toggle>
 
           <!-- Type Field (readonly) -->
           <div class="form-field">
@@ -225,7 +214,8 @@
                 class="p-inputtext"
               />
               <i
-                class="pi pi-eye"
+                class="pi"
+                [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'"
                 style="cursor: pointer"
                 (click)="togglePassword($event)"
               ></i>
@@ -240,108 +230,43 @@
               {{ getErrorMessage('password') }}
             </small>
           </div>
-        </div>
 
-        <!-- Acknowledgments Section at bottom of left side -->
-        <div
-          class="acknowledgments-container"
-          *ngIf="databaseForm.get('isMasterDB')?.value"
-        >
-          <h3 class="acknowledgments-title">Required Acknowledgments</h3>
-
-          <div class="acknowledgment-card">
-            <div class="p-field-checkbox">
-              <p-checkbox
-                formControlName="acknowledgment"
-                [binary]="true"
-                inputId="acknowledgment"
+          <!-- Connection Test -->
+          <div class="form-field">
+            <div class="connection-test-section">
+              <a
+                class="test-connection-link"
+                (click)="testConnection()"
+                [class.disabled]="!isConnectionFieldsValid() || connectionTestLoading"
               >
-              </p-checkbox>
-              <div class="acknowledgment-content">
-                <label for="acknowledgment" class="acknowledgment-label">
-                  Database Administrator Privileges
-                </label>
-                <p class="acknowledgment-text">
-                  I acknowledge that the username provided has admin privileges
-                  for this database.
-                </p>
-              </div>
-            </div>
-            <small
-              class="error-message"
-              *ngIf="
-                databaseForm.get('acknowledgment')?.invalid &&
-                databaseForm.get('acknowledgment')?.touched
-              "
-            >
-              Please acknowledge this requirement
-            </small>
-          </div>
-
-          <div class="acknowledgment-card">
-            <div class="p-field-checkbox">
-              <p-checkbox
-                formControlName="schemaAcknowledgment"
-                [binary]="true"
-                inputId="schemaAcknowledgment"
+                <i
+                  class="pi"
+                  [ngClass]="{
+                    'pi-spin pi-spinner': connectionTestLoading,
+                    'pi-check-circle': connectionTestResult === 'success',
+                    'pi-times-circle': connectionTestResult === 'failed',
+                    'pi-bolt': !connectionTestLoading && !connectionTestResult,
+                  }"
+                ></i>
+                {{
+                  connectionTestLoading
+                    ? 'Testing...'
+                    : connectionTestResult === 'success'
+                      ? 'Connection Successful'
+                      : connectionTestResult === 'failed'
+                        ? 'Connection Failed - Retry'
+                        : 'Test Connection'
+                }}
+              </a>
+              <small
+                class="connection-hint"
+                *ngIf="!connectionTested && !connectionTestLoading"
               >
-              </p-checkbox>
-              <div class="acknowledgment-content">
-                <label for="schemaAcknowledgment" class="acknowledgment-label">
-                  Schema Creation Authorization
-                </label>
-                <p class="acknowledgment-text">
-                  I hereby authorize DBExec to create and maintain a
-                  'dbexec_master' schema with all necessary database objects
-                  required for system operations.
-                </p>
-              </div>
+                Connection test required before saving
+              </small>
             </div>
-            <small
-              class="error-message"
-              *ngIf="
-                databaseForm.get('schemaAcknowledgment')?.invalid &&
-                databaseForm.get('schemaAcknowledgment')?.touched
-              "
-            >
-              Please acknowledge this requirement
-            </small>
           </div>
         </div>
-      </div>
-
-      <!-- Admin credentials on right -->
-      <div
-        class="admin-credentials"
-        *ngIf="databaseForm.get('isMasterDB')?.value"
-      >
-        <!-- System Admin Email Field -->
-        <app-custom-input
-          formControlName="adminEmail"
-          label="Admin Email"
-          placeholder="Enter email address"
-          icon="pi-envelope"
-          type="email"
-          [required]="true"
-          [showError]="
-            !!(
-              databaseForm.get('adminEmail')?.invalid &&
-              databaseForm.get('adminEmail')?.touched
-            )
-          "
-          [errorMessage]="
-            databaseForm.get('adminEmail')?.errors?.['required']
-              ? 'Email is required'
-              : databaseForm.get('adminEmail')?.errors?.['email']
-                ? 'Please enter a valid email'
-                : ''
-          "
-        >
-        </app-custom-input>
-
-        <p class="admin-setup-note">
-          A setup email will be sent to this address. The admin will set their own password.
-        </p>
       </div>
     </form>
   </div>

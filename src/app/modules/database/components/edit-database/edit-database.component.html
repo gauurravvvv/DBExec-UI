@@ -22,20 +22,22 @@
           class="p-button-outlined"
           type="submit"
           label="Save"
+          icon="pi pi-save"
+          iconPos="left"
           (click)="onSubmit()"
-          [disabled]="databaseForm.invalid"
-        >
-          <i class="pi pi-save mr-2"></i>
-        </button>
+          [disabled]="!isFormValid()"
+        ></button>
       </div>
     </div>
 
-    <!-- Form Section -->
-    <div class="warning-container" *ngIf="isMasterDatabase" @slideDown>
-      <div class="warning-message" (click)="toggleWarning()">
-        <div class="warning-header">
+    <!-- Warning Banner -->
+    <div class="warning-container" @slideDown>
+      <div class="warning-message">
+        <div class="warning-header" (click)="toggleWarning()">
           <i class="pi pi-exclamation-triangle"></i>
-          <span class="warning-title">Master Database Configuration</span>
+          <span class="warning-title"
+            >You are editing a database connection</span
+          >
           <i
             class="pi"
             [ngClass]="{
@@ -50,21 +52,23 @@
         >
           <div class="warning-text">
             <p>
-              <i class="pi pi-circle-fill"></i>This is a master database that
-              manages core system operations.
+              <i class="pi pi-circle-fill"></i> Changes to connection details
+              will affect all datasets and queries using this database
             </p>
             <p>
-              <i class="pi pi-circle-fill"></i>Any modifications may affect
-              system functionality and could potentially result in data loss.
+              <i class="pi pi-circle-fill"></i> A successful connection test is
+              required before saving
             </p>
             <p>
-              <i class="pi pi-circle-fill"></i>Please ensure all changes are
-              carefully reviewed and backed up before saving.
+              <i class="pi pi-circle-fill"></i> Existing connections will be
+              updated with the new credentials
             </p>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Form Section -->
     <form [formGroup]="databaseForm" class="admin-form">
       <div class="form-grid">
         <!-- Name Field -->
@@ -162,6 +166,7 @@
               min="1"
               max="65535"
               (keypress)="onPortKeyPress($event)"
+              (input)="onNumberInput($event)"
               [ngClass]="{
                 'ng-invalid ng-dirty':
                   databaseForm.get('port')?.invalid &&
@@ -216,7 +221,7 @@
 
         <!-- Password Field -->
         <div class="form-field">
-          <label for="password">Password<span class="required">*</span></label>
+          <label for="password">Password</label>
           <span class="p-input-icon-left p-input-icon-right">
             <i class="pi pi-lock"></i>
             <input
@@ -224,7 +229,7 @@
               [type]="showPassword ? 'text' : 'password'"
               pInputText
               formControlName="password"
-              placeholder="Enter database password"
+              placeholder="Leave blank to keep current password"
               [ngClass]="{
                 'ng-invalid ng-dirty':
                   databaseForm.get('password')?.invalid &&
@@ -232,39 +237,62 @@
               }"
             />
             <i
-              class="pi pi-eye"
+              class="pi"
+              [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'"
               style="cursor: pointer"
               (click)="togglePassword($event)"
             ></i>
           </span>
-          <small
-            class="error-message"
-            *ngIf="
-              databaseForm.get('password')?.invalid &&
-              databaseForm.get('password')?.touched
-            "
-          >
-            {{ getErrorMessage('password') }}
-          </small>
         </div>
 
-        <!-- Status Field (special handling for master database) -->
+        <!-- Connection Test -->
+        <div class="form-field" *ngIf="isConnectionFieldsDirty()">
+          <div class="connection-test-section">
+            <a
+              class="test-connection-link"
+              (click)="testConnection()"
+              [class.disabled]="!isConnectionFieldsValid() || connectionTestLoading"
+            >
+              <i
+                class="pi"
+                [ngClass]="{
+                  'pi-spin pi-spinner': connectionTestLoading,
+                  'pi-check-circle': connectionTestResult === 'success',
+                  'pi-times-circle': connectionTestResult === 'failed',
+                  'pi-bolt': !connectionTestLoading && !connectionTestResult,
+                }"
+              ></i>
+              {{
+                connectionTestLoading
+                  ? 'Testing...'
+                  : connectionTestResult === 'success'
+                    ? 'Connection Successful'
+                    : connectionTestResult === 'failed'
+                      ? 'Connection Failed - Retry'
+                      : 'Test Connection'
+              }}
+            </a>
+            <small
+              class="connection-hint"
+              *ngIf="!connectionTested && !connectionTestLoading"
+            >
+              Connection test required before saving
+            </small>
+          </div>
+        </div>
+
+        <!-- Status Field -->
         <div class="form-field">
           <label for="status">Status</label>
           <div class="status-toggle ml-3">
             <p-inputSwitch
               [formControlName]="'status'"
-              [disabled]="isMasterDatabase"
               (onChange)="onStatusChange($event)"
             >
             </p-inputSwitch>
             <span class="status-label">{{
               databaseForm.get('status')?.value ? 'Active' : 'Inactive'
             }}</span>
-            <span class="master-db-note" *ngIf="isMasterDatabase">
-              <i class="pi pi-info-circle"></i>
-              Master database must remain active for system operations
-            </span>
           </div>
         </div>
       </div>

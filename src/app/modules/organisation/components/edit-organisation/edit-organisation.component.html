@@ -21,65 +21,371 @@
           [disabled]="!isFormDirty || isCancelClicked"
           (click)="onCancel()"
         ></button>
-        <button
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          label="Save"
-          (click)="onSubmit()"
-          [disabled]="orgForm.invalid || !isFormDirty"
-        >
-          <i class="pi pi-save mr-2"></i>
-        </button>
+        <ng-container *ngIf="hasMasterDb && currentStep === 0">
+          <button
+            pButton
+            type="button"
+            label="Next"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            (click)="nextStep()"
+            class="p-button-primary btn-save"
+            [disabled]="!isStep1Valid()"
+          ></button>
+        </ng-container>
+        <ng-container *ngIf="!hasMasterDb || currentStep === 1">
+          <button
+            *ngIf="hasMasterDb"
+            pButton
+            type="button"
+            label="Previous"
+            icon="pi pi-arrow-left"
+            iconPos="left"
+            class="p-button-outlined btn-cancel"
+            (click)="previousStep()"
+          ></button>
+          <button
+            pButton
+            class="p-button-primary btn-save"
+            type="submit"
+            label="Save"
+            icon="pi pi-save"
+            iconPos="left"
+            (click)="onSubmit()"
+            [disabled]="!isFormValid()"
+          ></button>
+        </ng-container>
       </div>
     </div>
 
-    <!-- Form Section -->
-    <form [formGroup]="orgForm" class="admin-form mt-4">
-      <!-- Step 1: Basic Information -->
-      <div class="form-grid">
-        <!-- Organisation Name -->
-        <app-custom-input
-          formControlName="name"
-          label="Organisation Name"
-          placeholder="Enter organisation name"
-          icon="pi-building"
-          [required]="true"
-          [showError]="
-            !!(orgForm.get('name')?.invalid && orgForm.get('name')?.touched)
-          "
-          [errorMessage]="getNameError()"
-        >
-        </app-custom-input>
-
-        <!-- Organisation Description -->
-        <app-custom-input
-          formControlName="description"
-          label="Organisation Description"
-          placeholder="Enter organisation description"
-          icon="pi-align-left"
-          [required]="true"
-          [showError]="
-            !!(
-              orgForm.get('description')?.invalid &&
-              orgForm.get('description')?.touched
-            )
-          "
-          [errorMessage]="getDescriptionError()"
-        >
-        </app-custom-input>
-
-        <!-- Status -->
-        <app-custom-toggle
-          formControlName="status"
-          label="Status"
-          [trueValue]="1"
-          [falseValue]="0"
-          trueLabel="Active"
-          falseLabel="Inactive"
-        >
-        </app-custom-toggle>
+    <!-- Steps (only when master DB exists) -->
+    <div
+      *ngIf="hasMasterDb"
+      class="steps-container"
+      [ngClass]="'step-' + (currentStep + 1)"
+    >
+      <div
+        class="step"
+        [class.active]="currentStep === 0"
+        [class.completed]="currentStep > 0"
+        (click)="onStepClick(0)"
+      >
+        <div class="step-dot">
+          <i class="pi pi-check" *ngIf="currentStep > 0"></i>
+          <span *ngIf="currentStep <= 0">1</span>
+        </div>
+        <span class="step-label">Organisation Details</span>
       </div>
+      <div class="step-line"></div>
+      <div
+        class="step"
+        [class.active]="currentStep === 1"
+        (click)="onStepClick(1)"
+      >
+        <div class="step-dot">2</div>
+        <span class="step-label">Master Database</span>
+      </div>
+    </div>
+
+    <form [formGroup]="orgForm" class="admin-form mt-4">
+      <!-- Step 1: Organisation Details -->
+      <div *ngIf="currentStep === 0" class="step-1-layout">
+        <div class="step-1-left">
+          <!-- Basic Information -->
+          <div class="form-group-section">
+            <div class="group-header">
+              <i class="pi pi-building"></i>
+              <span>Basic Information</span>
+            </div>
+
+            <app-custom-input
+              formControlName="name"
+              label="Organisation Name"
+              placeholder="e.g. Acme Corp"
+              icon="pi-building"
+              [required]="true"
+              [showError]="
+                !!(orgForm.get('name')?.invalid && orgForm.get('name')?.touched)
+              "
+              [errorMessage]="getNameError()"
+            >
+            </app-custom-input>
+
+            <app-custom-input
+              formControlName="description"
+              label="Description"
+              placeholder="Brief description of this organisation"
+              icon="pi-align-left"
+              [required]="true"
+              [showError]="
+                !!(
+                  orgForm.get('description')?.invalid &&
+                  orgForm.get('description')?.touched
+                )
+              "
+              [errorMessage]="getDescriptionError()"
+            >
+            </app-custom-input>
+
+            <app-custom-toggle
+              formControlName="status"
+              label="Status"
+              [trueValue]="1"
+              [falseValue]="0"
+              trueLabel="Active"
+              falseLabel="Inactive"
+            >
+            </app-custom-toggle>
+          </div>
+        </div>
+
+        <!-- Right Column: Read-only Encryption Info -->
+        <div class="step-1-right" *ngIf="orgData">
+          <div class="readonly-info-container">
+            <div class="readonly-info-title">
+              <i class="pi pi-shield"></i>
+              Encryption Configuration
+            </div>
+            <div class="readonly-info-card">
+              <div class="info-row">
+                <span class="info-label">Encryption Method</span>
+                <span class="info-value">{{
+                  orgData.encryptionAlgorithm || 'Not configured'
+                }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Pepper Key</span>
+                <span class="info-value masked">********</span>
+              </div>
+              <p class="readonly-note">
+                <i class="pi pi-lock"></i>
+                Encryption settings cannot be modified after creation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 / No-step DB section: Master Database -->
+      <div *ngIf="hasMasterDb && currentStep === 1" class="step-2-layout">
+        <div class="step-2-left">
+          <!-- Warning Banner -->
+          <div class="warning-container" @slideDown>
+            <div class="warning-message" (click)="toggleWarning()">
+              <div class="warning-header">
+                <i class="pi pi-exclamation-triangle"></i>
+                <span class="warning-title"
+                  >Master Database Configuration</span
+                >
+                <i
+                  class="pi"
+                  [ngClass]="{
+                    'pi-chevron-down': !isWarningExpanded,
+                    'pi-chevron-up': isWarningExpanded,
+                  }"
+                ></i>
+              </div>
+              <div
+                class="warning-content"
+                [@expandCollapse]="
+                  isWarningExpanded ? 'expanded' : 'collapsed'
+                "
+              >
+                <div class="warning-text">
+                  <p>
+                    <i class="pi pi-circle-fill"></i>This is the master database
+                    that manages core system operations for this organisation.
+                  </p>
+                  <p>
+                    <i class="pi pi-circle-fill"></i>Any modifications may affect
+                    all users and services connected to this organisation.
+                  </p>
+                  <p>
+                    <i class="pi pi-circle-fill"></i>Please ensure all changes
+                    are carefully reviewed and backed up before saving.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connection Details -->
+          <div class="db-connection-group">
+            <div class="group-header">
+              <i class="pi pi-server"></i>
+              <span>Connection Details</span>
+            </div>
+
+            <div class="db-fields-row">
+              <app-custom-input
+                formControlName="dbHost"
+                label="Host"
+                placeholder="e.g. localhost"
+                icon="pi-desktop"
+                [showError]="
+                  !!(
+                    orgForm.get('dbHost')?.invalid &&
+                    orgForm.get('dbHost')?.touched
+                  )
+                "
+                [errorMessage]="getDbFieldError('dbHost')"
+              >
+              </app-custom-input>
+
+              <div class="form-field">
+                <label for="dbPort">Port</label>
+                <span class="p-input-icon-left">
+                  <i class="pi pi-hashtag"></i>
+                  <input
+                    id="dbPort"
+                    type="number"
+                    pInputText
+                    formControlName="dbPort"
+                    placeholder="e.g. 5432"
+                    min="1"
+                    max="65535"
+                    (keypress)="onPortKeyPress($event)"
+                    [ngClass]="{
+                      'ng-invalid ng-dirty':
+                        orgForm.get('dbPort')?.invalid &&
+                        orgForm.get('dbPort')?.touched,
+                    }"
+                    class="p-inputtext"
+                  />
+                </span>
+                <small
+                  class="error-message"
+                  *ngIf="
+                    orgForm.get('dbPort')?.invalid &&
+                    orgForm.get('dbPort')?.touched
+                  "
+                >
+                  {{ getDbFieldError('dbPort') }}
+                </small>
+              </div>
+            </div>
+
+            <app-custom-input
+              formControlName="dbName"
+              label="Database"
+              placeholder="e.g. mydb"
+              icon="pi-database"
+              [showError]="
+                !!(
+                  orgForm.get('dbName')?.invalid &&
+                  orgForm.get('dbName')?.touched
+                )
+              "
+              [errorMessage]="getDbFieldError('dbName')"
+            >
+            </app-custom-input>
+
+            <div class="db-fields-row">
+              <app-custom-input
+                formControlName="dbUsername"
+                label="Username"
+                placeholder="e.g. postgres"
+                icon="pi-user"
+                [showError]="
+                  !!(
+                    orgForm.get('dbUsername')?.invalid &&
+                    orgForm.get('dbUsername')?.touched
+                  )
+                "
+                [errorMessage]="getDbFieldError('dbUsername')"
+              >
+              </app-custom-input>
+
+              <div class="form-field">
+                <label for="dbPassword">Password</label>
+                <span class="p-input-icon-left p-input-icon-right">
+                  <i class="pi pi-lock"></i>
+                  <input
+                    id="dbPassword"
+                    [type]="showDbPassword ? 'text' : 'password'"
+                    pInputText
+                    formControlName="dbPassword"
+                    placeholder="Leave blank to keep current"
+                    class="p-inputtext"
+                  />
+                  <i
+                    class="pi pi-eye"
+                    style="cursor: pointer"
+                    (click)="toggleDbPasswordVisibility($event)"
+                  ></i>
+                </span>
+                <small class="field-hint">
+                  Leave blank to keep the current password unchanged.
+                </small>
+              </div>
+            </div>
+
+            <!-- Test Connection -->
+            <div class="connection-test-section">
+              <span
+                class="test-connection-link"
+                [class.disabled]="
+                  !isDbConnectionFieldsValid() || connectionTestLoading
+                "
+                (click)="testConnection()"
+              >
+                <i
+                  [class]="
+                    connectionTestLoading
+                      ? 'pi pi-spin pi-spinner'
+                      : 'pi pi-bolt'
+                  "
+                ></i>
+                {{
+                  connectionTestLoading
+                    ? 'Testing connection...'
+                    : 'Test Connection'
+                }}
+              </span>
+              <span
+                class="connection-status success"
+                *ngIf="connectionTestResult === 'success'"
+              >
+                <i class="pi pi-check-circle"></i> Connected
+              </span>
+              <span
+                class="connection-status failed"
+                *ngIf="connectionTestResult === 'failed'"
+              >
+                <i class="pi pi-times-circle"></i> Connection failed
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: DB Change Info -->
+        <div class="step-2-right">
+          <div class="readonly-info-container">
+            <div class="readonly-info-title">
+              <i class="pi pi-info-circle"></i>
+              Update Information
+            </div>
+            <div class="readonly-info-card">
+              <p class="update-info-text">
+                <i class="pi pi-circle-fill"></i>
+                Only modified fields will be updated. Unchanged fields retain
+                their current values.
+              </p>
+              <p class="update-info-text">
+                <i class="pi pi-circle-fill"></i>
+                If password is left blank, the existing password will be
+                preserved.
+              </p>
+              <p class="update-info-text">
+                <i class="pi pi-circle-fill"></i>
+                It is recommended to test the connection before saving changes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fallback: No master DB — show save directly on step 1 -->
     </form>
   </div>
 </div>

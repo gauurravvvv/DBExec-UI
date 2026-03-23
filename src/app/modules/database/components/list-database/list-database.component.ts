@@ -35,7 +35,6 @@ export class ListDatabaseComponent implements OnInit {
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatabase: any = null;
   showDeleteConfirm = false;
-  deleteConfiguration: boolean = false;
 
   constructor(
     private databaseService: DatabaseService,
@@ -154,7 +153,7 @@ export class ListDatabaseComponent implements OnInit {
     }
 
     this.databaseService
-      .listAllDatabase(params)
+      .listDatabase(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.dbs = response.data.databases || [];
@@ -176,8 +175,8 @@ export class ListDatabaseComponent implements OnInit {
     this.router.navigate([DATABASE.ADD]);
   }
 
-  onEdit(id: string) {
-    this.router.navigate([DATABASE.EDIT + '/' + id]);
+  onEdit(db: any) {
+    this.router.navigate([DATABASE.EDIT, db.organisationId, db.id]);
   }
 
   confirmDelete(database: any): void {
@@ -188,7 +187,6 @@ export class ListDatabaseComponent implements OnInit {
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.selectedDatabase = null;
-    this.deleteConfiguration = false;
   }
 
   proceedDelete() {
@@ -197,8 +195,6 @@ export class ListDatabaseComponent implements OnInit {
         .deleteDatabase(
           this.selectedDatabase.organisationId,
           this.selectedDatabase.id,
-          this.selectedDatabase.isMasterDB ? '1' : '0',
-          this.deleteConfiguration,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {

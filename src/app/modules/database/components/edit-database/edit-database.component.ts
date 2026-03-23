@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { DATABASE } from 'src/app/constants/routes';
 import { DatabaseService } from '../../services/database.service';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import {
   trigger,
   transition,
@@ -64,17 +64,21 @@ export class EditDatabaseComponent implements OnInit {
   showOrganisationDropdown = false;
   showPassword: boolean = false;
   databaseId: string = '';
+  orgId: string = '';
   initialFormValues: any = null;
   organisationName: string = '';
-  isMasterDatabase: boolean = false;
   isWarningExpanded: boolean = false;
-  private organisationId: string = '';
+
+  // Connection test
+  connectionTested = false;
+  connectionTestLoading = false;
+  connectionTestResult: 'success' | 'failed' | null = null;
 
   constructor(
     private fb: FormBuilder,
     private databaseService: DatabaseService,
+    private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private messageService: MessageService,
     private router: Router,
     private route: ActivatedRoute,
   ) {}
@@ -85,27 +89,30 @@ export class EditDatabaseComponent implements OnInit {
 
     this.initForm();
 
-    // Get database ID from route params and load database data
-    this.route.params.subscribe(params => {
-      this.databaseId = params['id'];
-      this.loadDatabaseData();
-    });
+    this.databaseId = this.route.snapshot.params['id'];
+    this.orgId = this.route.snapshot.params['orgId'];
+    this.loadDatabaseData();
 
     // Monitor form changes
     this.databaseForm.valueChanges.subscribe(() => {
       if (this.initialFormValues) {
-        // Only mark form as dirty if values are different from initial values
         this.isFormDirty = !this.isEqual(
           this.databaseForm.getRawValue(),
           this.initialFormValues,
         );
       }
     });
+
+    // Reset connection test when connection fields change
+    ['host', 'port', 'database', 'username', 'password'].forEach(field => {
+      this.databaseForm.get(field)?.valueChanges.subscribe(() => {
+        this.connectionTested = false;
+        this.connectionTestResult = null;
+      });
+    });
   }
 
   initForm(): void {
-    const orgId = this.globalService.getTokenDetails('organisationId');
-
     this.databaseForm = this.fb.group({
       name: [
         '',
@@ -133,42 +140,90 @@ export class EditDatabaseComponent implements OnInit {
         [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')],
       ],
       username: ['', Validators.required],
-      password: ['', [Validators.required]],
-      organisation: [{ value: orgId, disabled: true }],
+      password: [''],
+      organisation: [{ value: '', disabled: true }],
       status: [true],
     });
   }
 
   loadDatabaseData(): void {
-    // this.databaseService.viewDatabase(this.databaseId).then(response => {
-    //   if (this.globalService.handleSuccessService(response, false)) {
-    //     this.isMasterDatabase = response.data.isMasterDB;
-    //     this.organisationId = response.data.organisationId;
-    //     const formData = {
-    //       name: response.data.name,
-    //       description: response.data.description,
-    //       type: response.data.config.dbType,
-    //       host: response.data.config.hostname,
-    //       port: response.data.config.port,
-    //       database: response.data.config.dbName,
-    //       username: response.data.config.username,
-    //       password: '',
-    //       status: this.isMasterDatabase ? true : response.data.status === 1,
-    //     };
-    //     // Set organisation name directly from response
-    //     this.organisationName = response.data.organisationName;
-    //     if (this.isMasterDatabase) {
-    //       this.databaseForm.get('status')?.disable();
-    //     }
-    //     this.initialFormValues = { ...formData };
-    //     this.databaseForm.patchValue(formData);
-    //     this.isFormDirty = false;
-    //   }
-    // });
+    this.databaseService.viewDatabase(this.orgId, this.databaseId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        const data = response.data;
+        this.organisationName = data.organisationId;
+
+        const formData = {
+          name: data.name,
+          description: data.description || '',
+          type: data.config?.dbType || 'postgres',
+          host: data.config?.hostname || '',
+          port: data.config?.port || '',
+          database: data.config?.dbName || '',
+          username: data.config?.username || '',
+          password: '',
+          organisation: data.organisationId,
+          status: data.status === 1,
+        };
+
+        this.initialFormValues = { ...formData };
+        this.databaseForm.patchValue(formData);
+        this.isFormDirty = false;
+
+        // Connection is already valid since the DB was fetched successfully
+        this.connectionTested = true;
+        this.connectionTestResult = 'success';
+      }
+    });
+  }
+
+  isConnectionFieldsValid(): boolean {
+    const fields = ['host', 'port', 'database', 'username'];
+    return fields.every(f => this.databaseForm.get(f)?.valid && this.databaseForm.get(f)?.value);
+  }
+
+  isConnectionFieldsDirty(): boolean {
+    if (!this.initialFormValues) return false;
+    const current = this.databaseForm.getRawValue();
+    return ['host', 'port', 'database', 'username', 'password'].some(
+      key => current[key] !== this.initialFormValues[key],
+    );
+  }
+
+  testConnection(): void {
+    if (!this.isConnectionFieldsValid()) return;
+
+    this.connectionTestLoading = true;
+    this.connectionTestResult = null;
+
+    const formValue = this.databaseForm.getRawValue();
+    this.organisationService
+      .validateDatabase({
+        type: 'postgres',
+        host: formValue.host,
+        port: formValue.port,
+        database: formValue.database,
+        username: formValue.username,
+        password: formValue.password,
+      })
+      .then((response: any) => {
+        this.connectionTestLoading = false;
+        if (response?.isConnected) {
+          this.connectionTested = true;
+          this.connectionTestResult = 'success';
+        } else {
+          this.connectionTested = false;
+          this.connectionTestResult = 'failed';
+        }
+      })
+      .catch(() => {
+        this.connectionTestLoading = false;
+        this.connectionTested = false;
+        this.connectionTestResult = 'failed';
+      });
   }
 
   onSubmit(): void {
-    if (this.databaseForm.valid) {
+    if (this.databaseForm.valid && this.connectionTested) {
       const formValue = this.databaseForm.getRawValue();
 
       const payload = {
@@ -181,8 +236,8 @@ export class EditDatabaseComponent implements OnInit {
         database: formValue.database,
         username: formValue.username,
         password: formValue.password,
-        organisation: this.organisationId,
-        status: this.isMasterDatabase ? 1 : formValue.status ? 1 : 0,
+        organisation: this.orgId,
+        status: formValue.status ? 1 : 0,
       };
 
       this.databaseService.updateDatabase(payload).then(response => {
@@ -195,12 +250,18 @@ export class EditDatabaseComponent implements OnInit {
 
   onCancel(): void {
     if (this.isFormDirty) {
-      // Reset form to initial values
       this.databaseForm.patchValue(this.initialFormValues);
       this.isFormDirty = false;
+      // Restore connection test state since we reset to original values
+      this.connectionTested = true;
+      this.connectionTestResult = 'success';
     } else {
       this.router.navigate([DATABASE.LIST]);
     }
+  }
+
+  isFormValid(): boolean {
+    return this.databaseForm.valid && this.isFormDirty && this.connectionTested;
   }
 
   getErrorMessage(fieldName: string): string {
@@ -254,19 +315,21 @@ export class EditDatabaseComponent implements OnInit {
   }
 
   onStatusChange(event: any): void {
-    if (!this.isMasterDatabase) {
-      this.databaseForm.patchValue({
-        status: event.checked,
-      });
-    }
+    this.databaseForm.patchValue({
+      status: event.checked,
+    });
   }
 
-  // Helper method to compare objects
+  onNumberInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+  }
+
   private isEqual(obj1: any, obj2: any): boolean {
-    // Exclude password from comparison if it's empty in the form
     const form = { ...obj1 };
     const initial = { ...obj2 };
 
+    // Exclude password from comparison if it's empty in the form
     if (!form.password) {
       delete form.password;
       delete initial.password;

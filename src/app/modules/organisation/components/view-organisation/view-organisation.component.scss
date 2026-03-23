@@ -240,6 +240,59 @@ $radius-sm: 8px;
       }
     }
   }
+  // Master Database Section
+  .master-db-section {
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        font-size: 1rem;
+        color: var(--primary-color);
+      }
+    }
+
+    .master-db-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  // Database Status Banner
+  .db-status-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: $radius-sm;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.5;
+
+    i {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    &.not-configured {
+      background: rgba(255, 152, 0, 0.08);
+      border: 1px solid rgba(255, 152, 0, 0.3);
+      color: #e68a00;
+    }
+
+    &.connection-failed {
+      background: rgba(244, 67, 54, 0.08);
+      border: 1px solid rgba(244, 67, 54, 0.3);
+      color: #d32f2f;
+    }
+  }
+
   // Clean Stats Bar
   .stats-row {
     .stats-bar {

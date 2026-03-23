@@ -15,6 +15,14 @@ interface OrganisationConfig {
   maxGroups: number;
 }
 
+interface MasterDbConfig {
+  hostname: string;
+  port: number;
+  dbName: string;
+  username: string;
+  dbType: string;
+}
+
 interface OrganisationData {
   id: string;
   name: string;
@@ -26,6 +34,8 @@ interface OrganisationData {
   groupsCount: number;
   databasesCount: number;
   connectionsCount: number;
+  dbStatus: 'connected' | 'not_configured' | 'connection_failed';
+  masterDbConfig: MasterDbConfig;
 }
 
 @Component({
