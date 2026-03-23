@@ -242,6 +242,13 @@ $radius-sm: 8px;
   }
   // Master Database Section
   .master-db-section {
+    .section-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
     h4 {
       display: flex;
       align-items: center;
@@ -250,6 +257,35 @@ $radius-sm: 8px;
       i {
         font-size: 1rem;
         color: var(--primary-color);
+      }
+    }
+
+    .btn-refresh-db {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.45rem 1rem;
+      border-radius: $radius-sm;
+      font-weight: 600;
+      font-size: 0.8rem;
+      border: 1px solid var(--primary-color);
+      background: transparent;
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      i {
+        font-size: 0.85rem;
+      }
+
+      &:hover:not(:disabled) {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
     }
 

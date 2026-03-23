@@ -13,6 +13,7 @@ import {
   FUNCTION_CATEGORIES,
   FunctionCategory,
   FunctionDefinition,
+  getAllFunctions,
 } from '../../constants/functions-reference';
 import {
   FORMULA_EDITOR_OPTIONS,
@@ -62,6 +63,10 @@ export class AddCustomFieldDialogComponent
   isValidating = false;
   isValidated = false;
   validationResult: { valid: boolean; message: string } | null = null;
+  fieldNameError: string | null = null;
+
+  // Reserved function names — field names cannot collide with these
+  private reservedNames = new Set(getAllFunctions().map(fn => fn.name));
 
   // Functions Reference
   functionCategories: FunctionCategory[] = FUNCTION_CATEGORIES;
@@ -397,9 +402,19 @@ export class AddCustomFieldDialogComponent
   }
 
   onFieldNameChange() {
+    const name = this.customField.columnToView?.trim() || '';
+
+    // Check if field name conflicts with a formula function name
+    if (name && this.reservedNames.has(name)) {
+      this.fieldNameError = `"${name}" is a reserved function name and cannot be used as a field name`;
+      this.isSaveEnabled = false;
+      return;
+    }
+
+    this.fieldNameError = null;
     // Field name changed - update save button but DON'T reset validation
     this.isSaveEnabled =
-      this.customField.columnToView?.trim() !== '' &&
+      name !== '' &&
       this.customField.columnToUse?.trim() !== '' &&
       this.isValidated;
   }

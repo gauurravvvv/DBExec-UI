@@ -182,7 +182,10 @@
               (click)="onFieldClick(field)"
             >
               <div class="field-icon">
-                <i class="pi pi-bars"></i>
+                <i
+                  class="pi"
+                  [ngClass]="getDataTypeIcon(field.dataType)"
+                ></i>
               </div>
               <div class="field-info">
                 <div class="field-name">{{ field.columnToView }}</div>

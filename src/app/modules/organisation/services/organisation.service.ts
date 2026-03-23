@@ -127,6 +127,16 @@ export class OrganisationService {
       });
   }
 
+  refreshMasterDb(orgId: string) {
+    return this.http
+      .post(ORGANISATION.REFRESH_MASTER_DB + `${orgId}`, {})
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   validateDatabase(payload: {
     type: string;
     host: string;

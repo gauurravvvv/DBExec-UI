@@ -235,6 +235,17 @@
                     <span class="column-view">{{ entity.columnToView }}</span>
                     <span class="column-use">{{ entity.columnToUse }}</span>
                   </div>
+                  <span
+                    class="field-datatype"
+                    *ngIf="entity.dataType"
+                    [pTooltip]="entity.dataType"
+                    tooltipPosition="top"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="getDataTypeIcon(entity.dataType)"
+                    ></i>
+                  </span>
                   <div class="field-actions">
                     <button
                       pButton

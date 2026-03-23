@@ -177,14 +177,6 @@
                 <div class="row-actions">
                   <button
                     class="icon-btn edit-btn"
-                    (click)="useAsAnalysis(dataset.id)"
-                    pTooltip="Create Analysis"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-chart-bar"></i>
-                  </button>
-                  <button
-                    class="icon-btn edit-btn"
                     (click)="onEdit(dataset.id)"
                     pTooltip="Edit"
                     tooltipPosition="bottom"
@@ -198,6 +190,14 @@
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-trash"></i>
+                  </button>
+                  <button
+                    class="icon-btn more-btn"
+                    (click)="op.toggle($event); activeDataset = dataset"
+                    pTooltip="More"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-ellipsis-v"></i>
                   </button>
                 </div>
               </td>
@@ -259,6 +259,35 @@
     </div>
   </div>
 </div>
+
+<!-- Row Actions Overlay Panel -->
+<p-overlayPanel #op appendTo="body" styleClass="action-menu-panel">
+  <div class="action-menu">
+    <button
+      class="action-menu-item"
+      (click)="confirmDuplicate(activeDataset); op.hide()"
+    >
+      <i class="pi pi-copy action-icon duplicate"></i>
+      <span class="action-label">Duplicate</span>
+    </button>
+    <button
+      class="action-menu-item"
+      (click)="useAsAnalysis(activeDataset?.id); op.hide()"
+    >
+      <i class="pi pi-chart-bar action-icon analysis"></i>
+      <span class="action-label">Use in Analysis</span>
+    </button>
+  </div>
+</p-overlayPanel>
+
+<!-- Duplicate Dataset Dialog -->
+<app-save-dataset-dialog
+  [visible]="showDuplicateDialog"
+  [dialogTitle]="'Duplicate Dataset'"
+  [initialName]="datasetToDuplicate?.name ? datasetToDuplicate.name + ' (Copy)' : ''"
+  [initialDescription]="datasetToDuplicate?.description || ''"
+  (close)="onDuplicateDialogClose($event)"
+></app-save-dataset-dialog>
 
 <!-- Command Palette: Query Builder Selection -->
 <div

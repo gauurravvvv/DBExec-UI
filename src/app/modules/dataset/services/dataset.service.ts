@@ -289,6 +289,16 @@ export class DatasetService {
       });
   }
 
+  duplicateDataset(orgId: string, datasetId: string, name: string, description: string) {
+    return this.http
+      .post(DATASET.DUPLICATE + `${orgId}/${datasetId}`, { name, description })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   runDatasetQuery(payload: any) {
     const { datasetId, organisation, filters } = payload;
     const body: any = { organisation, datasetId };

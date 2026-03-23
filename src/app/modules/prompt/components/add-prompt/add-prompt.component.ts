@@ -406,7 +406,7 @@ export class AddPromptComponent implements OnInit, OnDestroy {
 
     this.databaseService.listDatabase(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = response.data;
+        this.databases = response.data.databases || [];
       }
     });
   }

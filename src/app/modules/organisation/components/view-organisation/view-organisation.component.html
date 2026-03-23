@@ -145,10 +145,29 @@
 
         <!-- Master Database Details -->
         <div class="detail-group master-db-section">
-          <h4>
-            <i class="pi pi-database"></i>
-            Master Database
-          </h4>
+          <div class="section-header-row">
+            <h4>
+              <i class="pi pi-database"></i>
+              Master Database
+            </h4>
+            <button
+              class="btn-refresh-db"
+              (click)="refreshMasterDb()"
+              [disabled]="
+                isRefreshingMasterDb ||
+                organisationData.dbStatus !== 'connected'
+              "
+              title="Refresh master database schema to sync new entities and columns"
+            >
+              <i
+                class="pi"
+                [ngClass]="
+                  isRefreshingMasterDb ? 'pi-spin pi-spinner' : 'pi-refresh'
+                "
+              ></i>
+              {{ isRefreshingMasterDb ? 'Refreshing...' : 'Refresh Schema' }}
+            </button>
+          </div>
           <div class="master-db-grid">
             <div class="detail-item">
               <span class="label">

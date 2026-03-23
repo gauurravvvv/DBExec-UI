@@ -317,7 +317,7 @@ export class AddDatasetComponent
       .then(response => {
         this.isLoadingDatabases = false;
         if (this.globalService.handleSuccessService(response, false)) {
-          this.availableDatabases = response.data || [];
+          this.availableDatabases = response.data.databases || [];
 
           // Auto-select the first database and load its schema
           if (this.availableDatabases.length > 0) {
@@ -1209,8 +1209,12 @@ export class AddDatasetComponent
               ? data.length
               : 0;
 
+        // Extract column types
+        const columnTypes = dataObj.columnTypes || response.columnTypes || {};
+
         this.queryResult = {
           columns: columns,
+          columnTypes: columnTypes,
           rows: Array.isArray(data) ? data : [],
           rowCount: rowCount,
           executionTime: executionTime,

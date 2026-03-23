@@ -148,7 +148,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
     this.databaseService.listDatabase(params).then(
       response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = [...response.data];
+          this.databases = [...(response.data.databases || [])];
           if (this.databases.length > 0) {
             this.selectedDatabase = this.databases[0].id;
             this.loadConnections();

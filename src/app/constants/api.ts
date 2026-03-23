@@ -39,6 +39,7 @@ export const ORGANISATION = {
   DELETE: '/org/delete/',
   VIEW: '/org/get/',
   EDIT: '/org/update',
+  REFRESH_MASTER_DB: '/org/refresh-master-db/',
 };
 
 export const USER = {
@@ -113,6 +114,7 @@ export const DATASET = {
   VALIDATE_FIELD: '/dataset/validate/field',
   ADD_FIELD: '/dataset/add/field',
   RUN_QUERY: '/dataset/run',
+  DUPLICATE: '/dataset/duplicate/',
 };
 
 export const TAB = {

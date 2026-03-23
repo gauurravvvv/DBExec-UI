@@ -391,6 +391,11 @@ $radius-sm: 8px;
             background: rgba(244, 67, 54, 0.1);
             color: var(--error-color);
           }
+
+          &.more-btn:hover {
+            background: var(--hover-background);
+            color: var(--text-color);
+          }
         }
       }
 
@@ -857,5 +862,69 @@ td.empty-message-cell {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+// 7. Action Menu Overlay Panel
+::ng-deep .action-menu-panel {
+  &.p-overlaypanel {
+    border: 1px solid var(--border-color);
+    border-radius: $radius-sm;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.12),
+      0 1px 3px rgba(0, 0, 0, 0.08);
+    background: var(--card-background);
+    padding: 0;
+
+    .p-overlaypanel-content {
+      padding: 0;
+    }
+
+    &::before,
+    &::after {
+      display: none !important;
+    }
+  }
+}
+
+.action-menu {
+  padding: 0.3rem;
+
+  .action-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+    text-align: left;
+    white-space: nowrap;
+
+    &:hover {
+      background: var(--hover-background);
+    }
+
+    .action-icon {
+      font-size: 0.85rem;
+      flex-shrink: 0;
+
+      &.duplicate {
+        color: var(--primary-color);
+      }
+
+      &.analysis {
+        color: var(--success-color);
+      }
+    }
+
+    .action-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-color);
+    }
   }
 }

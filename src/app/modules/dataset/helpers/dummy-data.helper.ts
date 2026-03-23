@@ -30,6 +30,7 @@ export interface DatabaseSchema {
 
 export interface QueryResult {
   columns: string[];
+  columnTypes?: Record<string, string>;
   rows: any[];
   rowCount: number;
   executionTime?: string | number;

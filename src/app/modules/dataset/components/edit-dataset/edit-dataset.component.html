@@ -582,6 +582,12 @@
               <th *ngFor="let col of queryResult.columns">
                 <div class="th-content">
                   {{ col }}
+                  <span
+                    class="column-datatype"
+                    *ngIf="queryResult.columnTypes?.[col]"
+                  >
+                    {{ queryResult.columnTypes![col] }}
+                  </span>
                 </div>
               </th>
             </tr>

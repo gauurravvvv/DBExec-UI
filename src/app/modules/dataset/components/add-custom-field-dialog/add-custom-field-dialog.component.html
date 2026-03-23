@@ -1,5 +1,5 @@
-<div class="add-custom-field-popup" *ngIf="visible">
-  <div class="popup-content">
+<div class="add-custom-field-popup" *ngIf="visible" (click)="onCancel()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
     <!-- Header -->
     <div class="dialog-header">
       <div class="header-left">
@@ -91,6 +91,10 @@
             (ngModelChange)="onFieldNameChange()"
           >
           </app-custom-input>
+          <small class="field-name-error" *ngIf="fieldNameError">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ fieldNameError }}
+          </small>
         </div>
 
         <div class="form-field custom-logic-field">
@@ -148,30 +152,31 @@
         <!-- Footer Actions -->
         <div class="popup-actions">
           <button
-            pButton
             type="button"
-            label="Cancel"
-            class="p-button-outlined btn-cancel"
+            class="btn-cancel"
             (click)="onCancel()"
             [disabled]="isSubmitting"
-          ></button>
+          >
+            <i class="pi pi-times"></i>
+            Cancel
+          </button>
           <button
-            pButton
             type="button"
-            label="Validate"
-            class="p-button-outlined btn-secondary"
+            class="btn-secondary"
             (click)="onValidate()"
             [disabled]="!customField.columnToUse || isValidating"
-          ></button>
+          >
+            <i class="pi pi-check-circle"></i>
+            Validate
+          </button>
           <button
-            pButton
             type="button"
-            [label]="editMode ? 'Save Changes' : 'Add Field'"
-            class="p-button-primary btn-save"
+            class="btn-save"
             (click)="onSubmit()"
             [disabled]="!isSaveEnabled || isSubmitting"
           >
-            <i class="pi mr-2" [ngClass]="editMode ? 'pi-save' : 'pi-plus'"></i>
+            <i class="pi" [ngClass]="editMode ? 'pi-save' : 'pi-plus'"></i>
+            {{ editMode ? 'Save Changes' : 'Add Field' }}
           </button>
         </div>
       </div>

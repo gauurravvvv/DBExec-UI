@@ -18,6 +18,7 @@ import { DatasetService } from '../../services/dataset.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { ScreenService } from 'src/app/modules/screen/services/screen.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
 @Component({
   selector: 'app-list-dataset',
@@ -37,6 +38,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   showDeleteConfirm = false;
   datasetToDelete: string | null = null;
+  showDuplicateDialog = false;
+  datasetToDuplicate: any = null;
+  activeDataset: any = null;
   showQueryBuilderPopup = false;
   queryBuilders: any[] = [];
   loadingQueryBuilders = false;
@@ -238,7 +242,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         .listDatabase(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.databases = response.data || [];
+            this.databases = response.data.databases || [];
             if (this.databases.length > 0) {
               if (
                 preSelectedDbId &&
@@ -433,6 +437,30 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   useAsAnalysis(id: string) {
     this.router.navigate([ANALYSES.ADD, this.selectedOrg, id]);
+  }
+
+  confirmDuplicate(dataset: any) {
+    this.datasetToDuplicate = dataset;
+    this.showDuplicateDialog = true;
+  }
+
+  onDuplicateDialogClose(result: DatasetFormData | null) {
+    if (result && this.datasetToDuplicate) {
+      this.datasetService
+        .duplicateDataset(
+          this.selectedOrg,
+          this.datasetToDuplicate.id,
+          result.name,
+          result.description,
+        )
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.loadDatasets();
+          }
+        });
+    }
+    this.showDuplicateDialog = false;
+    this.datasetToDuplicate = null;
   }
 
   confirmDelete(id: string) {

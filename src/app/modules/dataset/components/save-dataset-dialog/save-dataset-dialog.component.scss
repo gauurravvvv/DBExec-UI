@@ -1,85 +1,73 @@
-.save-dataset-popup {
+$radius-lg: 16px;
+$radius-md: 12px;
+$radius-sm: 8px;
+
+.confirmation-popup {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
 
   .popup-content {
     background: var(--card-background);
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px var(--shadow-color);
-    width: 500px;
-    max-width: 90%;
+    width: 90%;
+    max-width: 480px;
+    border-radius: $radius-lg;
+    box-shadow:
+      0 20px 25px -5px var(--shadow-color),
+      0 8px 10px -6px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
 
-    h3 {
-      color: var(--text-color);
-      margin: 0 0 24px 0;
-      font-size: 1.25rem;
-      font-weight: 600;
+    // Header
+    .popup-header {
+      padding: 1.5rem 1.5rem 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      .popup-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-color);
+      }
     }
 
-    .dataset-form {
+    // Form Body
+    .popup-body {
+      padding: 0 1.5rem 1.5rem;
+
       .form-field {
-        margin-bottom: 20px;
+        margin-bottom: 16px;
 
-        label {
-          display: block;
-          margin-bottom: 8px;
-          color: var(--text-color);
-          font-weight: 500;
-          font-size: 14px;
-
-          .required {
-            color: var(--error-color);
-            margin-left: 2px;
-          }
-        }
-
-        .p-input-icon-left {
-          width: 100%;
-
-          input {
-            width: 100%;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            font-size: 14px;
-            padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-
-            &::placeholder {
-              color: var(--text-color);
-              opacity: 0.5;
-            }
-
-            &:focus {
-              border-color: var(--primary-color);
-              box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
-            }
-
-            &.ng-invalid.ng-dirty {
-              border-color: var(--error-color);
-            }
-          }
-
-          i {
-            color: var(--text-color);
-            opacity: 0.7;
-            left: 0.75rem;
-          }
-        }
-
-        .error-message {
-          color: var(--error-color);
-          font-size: 0.875rem;
-          margin-top: 4px;
-          display: block;
+        &:last-child {
+          margin-bottom: 0;
         }
 
         .char-count {
@@ -91,46 +79,78 @@
           text-align: right;
         }
       }
+    }
 
-      .popup-actions {
+    // Actions
+    .popup-actions {
+      padding: 1rem 1.5rem 1.5rem;
+      background: var(--hover-background);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+
+      button {
         display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 24px;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 1.25rem;
+        border-radius: $radius-sm;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
 
-        .p-button {
-          min-width: 6rem;
-          font-weight: 500;
+        &.btn-cancel {
+          background: var(--card-background);
+          border-color: var(--border-color);
+          color: var(--text-color);
 
-          &.p-button-outlined {
-            background: transparent !important;
-            border: 1px solid var(--primary-color) !important;
-            color: var(--primary-color) !important;
+          &:hover {
+            background: var(--hover-background);
+            border-color: var(--secondary-color);
+          }
+        }
 
-            &:hover:not(:disabled) {
-              background: rgba(var(--primary-rgb), 0.04) !important;
-            }
+        &.btn-confirm {
+          background: var(--primary-color);
+          color: white;
+          box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb), 0.2);
 
-            &:disabled {
-              opacity: 0.6;
-              cursor: not-allowed;
-            }
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(var(--primary-rgb), 0.3);
+          }
 
-            &.p-button-danger {
-              border-color: var(--error-color) !important;
-              color: var(--error-color) !important;
-
-              &:hover:not(:disabled) {
-                background: rgba(var(--error-rgb), 0.04) !important;
-              }
-            }
-
-            i {
-              font-size: 1rem;
-            }
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
           }
         }
       }
     }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

@@ -1007,8 +1007,12 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
               ? data.length
               : 0;
 
+        // Extract column types
+        const columnTypes = dataObj.columnTypes || response.columnTypes || {};
+
         this.queryResult = {
           columns: columns,
+          columnTypes: columnTypes,
           rows: Array.isArray(data) ? data : [],
           rowCount: rowCount,
           executionTime: executionTime,

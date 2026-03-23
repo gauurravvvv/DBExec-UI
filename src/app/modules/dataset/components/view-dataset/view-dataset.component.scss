@@ -583,6 +583,24 @@ $radius-sm: 8px;
                 }
               }
 
+              .field-datatype {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 26px;
+                height: 26px;
+                color: var(--primary-color);
+                opacity: 0.8;
+                background: rgba(var(--primary-rgb), 0.08);
+                border-radius: 50%;
+                cursor: default;
+                flex-shrink: 0;
+
+                i {
+                  font-size: 12px;
+                }
+              }
+
               &.custom-field {
                 border-left: 3px solid var(--primary-color);
               }

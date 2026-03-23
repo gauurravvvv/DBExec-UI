@@ -50,6 +50,7 @@ export class ViewOrganisationComponent implements OnInit {
   organisationInitials: string = '';
   showDeleteConfirm: boolean = false;
   showAnnouncementDialog: boolean = false;
+  isRefreshingMasterDb: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -103,6 +104,19 @@ export class ViewOrganisationComponent implements OnInit {
         if (this.globalService.handleSuccessService(response)) {
           this.router.navigate([ORGANISATION.LIST]);
         }
+      });
+  }
+
+  refreshMasterDb() {
+    this.isRefreshingMasterDb = true;
+    this.organisationService
+      .refreshMasterDb(this.organisationId)
+      .then(response => {
+        this.globalService.handleSuccessService(response);
+        this.isRefreshingMasterDb = false;
+      })
+      .catch(() => {
+        this.isRefreshingMasterDb = false;
       });
   }
 

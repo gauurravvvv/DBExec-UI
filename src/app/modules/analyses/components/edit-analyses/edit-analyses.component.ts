@@ -184,6 +184,22 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  getDataTypeIcon(dataType: string): string {
+    if (!dataType) return 'pi-bars';
+    const type = dataType.toLowerCase();
+    if (type.includes('int') || type.includes('numeric') || type.includes('decimal') || type.includes('float') || type.includes('double') || type.includes('real') || type.includes('serial') || type.includes('money')) return 'pi-hashtag';
+    if (type.includes('char') || type.includes('text') || type.includes('string') || type.includes('citext') || type.includes('name')) return 'pi-align-left';
+    if (type.includes('bool')) return 'pi-check-square';
+    if (type.includes('timestamp') || type.includes('date') || type.includes('time') || type.includes('interval')) return 'pi-calendar';
+    if (type.includes('uuid')) return 'pi-key';
+    if (type.includes('json')) return 'pi-code';
+    if (type.includes('array') || type.includes('[]')) return 'pi-list';
+    if (type.includes('bytea') || type.includes('blob')) return 'pi-file';
+    if (type.includes('inet') || type.includes('cidr') || type.includes('macaddr')) return 'pi-globe';
+    if (type.includes('enum') || type.includes('user-defined')) return 'pi-sliders-h';
+    return 'pi-bars';
+  }
+
   // Filtered dataset fields based on search query
   get filteredDatasetFields(): any[] {
     if (!this.datasetDetails?.datasetFields) {

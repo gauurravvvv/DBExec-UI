@@ -73,9 +73,9 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'locate',
-        usage: "locate({email}, '@')",
+        usage: "locate('@', {email})",
         description:
-          'Searches for a substring within text and returns its position (1-indexed). Returns 0 if not found. Combine with substring() to extract parts of text based on delimiter positions.',
+          'Searches for a substring within text and returns its position (1-indexed). First parameter is the substring to find, second is the text to search in. Returns 0 if not found. Optional third parameter specifies start position.',
       },
       {
         name: 'lower',
@@ -392,6 +392,18 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
         description:
           'Population variance assumes data is the complete population. Uses n denominator instead of n-1. Appropriate when you have all possible data points, not just a sample.',
       },
+      {
+        name: 'var',
+        usage: 'var({values})',
+        description:
+          'Alias for variance(). Calculates sample variance — the average squared deviation from the mean using n-1 denominator. Shorthand for convenience.',
+      },
+      {
+        name: 'distinct_count',
+        usage: 'distinct_count({category})',
+        description:
+          'Alias for countDistinct(). Counts only unique values, ignoring duplicates. Provided for QuickSight compatibility.',
+      },
     ],
   },
   {
@@ -533,6 +545,12 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
         description:
           'Returns TRUE if a value does NOT match any item in the list. Opposite of in(). notIn({status}, "Deleted", "Archived") filters out deleted and archived records. Cleaner exclusion logic.',
       },
+      {
+        name: 'inList',
+        usage: "inList({status}, 'Active', 'Pending')",
+        description:
+          'Alias for in(). Returns TRUE if a value matches any item in the provided list. Provided for QuickSight compatibility.',
+      },
     ],
   },
   {
@@ -564,6 +582,18 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
         description:
           'Converts a text string to a date value. The string must be in a recognizable date format. Required before using date functions on text-based date fields from external systems.',
       },
+      {
+        name: 'decimalToInt',
+        usage: 'decimalToInt({price})',
+        description:
+          'Converts a decimal number to an integer by truncating the decimal portion. decimalToInt(42.9) returns 42. Equivalent to Math.trunc(). Use when you need whole numbers from decimal fields.',
+      },
+      {
+        name: 'intToDecimal',
+        usage: 'intToDecimal({quantity})',
+        description:
+          'Converts an integer to a decimal number. intToDecimal(42) returns 42.0. Ensures the value is treated as a decimal for subsequent calculations that require decimal precision.',
+      },
     ],
   },
   {
@@ -573,25 +603,25 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
     functions: [
       {
         name: 'lag',
-        usage: "lag(data, 'sales', 1)",
+        usage: 'lag({sales}, 1)',
         description:
-          'Retrieves a value from a previous row in sorted order. lag(data, "sales", 1) gets the sales value from 1 row back. Essential for comparing current values to previous periods.',
+          'Retrieves a value from a previous row. lag({sales}, 1) gets the sales value from 1 row back. The second parameter is the offset (default 1). Essential for comparing current values to previous periods.',
       },
       {
         name: 'lead',
-        usage: "lead(data, 'sales', 1)",
+        usage: 'lead({sales}, 1)',
         description:
-          'Retrieves a value from a following row in sorted order. lead(data, "sales", 1) gets sales from the next row. Useful for forecasting comparisons or calculating changes to upcoming periods.',
+          'Retrieves a value from a following row. lead({sales}, 1) gets sales from the next row. The second parameter is the offset (default 1). Useful for forecasting comparisons.',
       },
       {
         name: 'difference',
-        usage: "difference(data, 'sales')",
+        usage: 'difference({sales})',
         description:
           'Calculates the absolute change from the previous row. Equivalent to current - lag(current, 1). Positive values indicate increase, negative indicate decrease. Simplifies period-over-period change.',
       },
       {
         name: 'percentDifference',
-        usage: "percentDifference(data, 'sales')",
+        usage: 'percentDifference({sales})',
         description:
           'Calculates percentage change from the previous row. Returns (current - previous) / previous * 100. A result of 25 means 25% increase. Crucial for growth metrics and trend analysis.',
       },
@@ -604,49 +634,49 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
     functions: [
       {
         name: 'firstValue',
-        usage: "firstValue(data, 'sales')",
+        usage: 'firstValue({sales})',
         description:
-          'Returns the first value in the current partition or dataset based on sort order. Useful for getting opening values, baseline comparisons, or earliest records in grouped data.',
+          'Returns the first value in the dataset for the given field. Useful for getting opening values, baseline comparisons, or earliest records.',
       },
       {
         name: 'lastValue',
-        usage: "lastValue(data, 'sales')",
+        usage: 'lastValue({sales})',
         description:
-          'Returns the last value in the current partition or dataset based on sort order. Get the most recent value, closing price, or final status in time-ordered data.',
+          'Returns the last value in the dataset for the given field. Useful for getting the most recent value, closing price, or final status.',
       },
       {
         name: 'windowSum',
-        usage: "windowSum(data, 'sales', -1, 1)",
+        usage: 'windowSum({sales}, -1, 1)',
         description:
-          'Sums values within a sliding window around each row. Parameters define rows before (-1) and after (+1) current row. windowSum with -2, 0 gives a 3-period trailing sum including current.',
+          'Sums values within a sliding window around each row. Parameters define rows before (-1) and after (+1) current row. windowSum({sales}, -2, 0) gives a 3-period trailing sum including current.',
       },
       {
         name: 'windowAvg',
-        usage: "windowAvg(data, 'sales', -1, 1)",
+        usage: 'windowAvg({sales}, -1, 1)',
         description:
-          'Calculates average within a sliding window. windowAvg(data, "sales", -2, 0) computes 3-period moving average. Excellent for smoothing volatile data and identifying trends.',
+          'Calculates average within a sliding window. windowAvg({sales}, -2, 0) computes 3-period moving average. Excellent for smoothing volatile data and identifying trends.',
       },
       {
         name: 'windowCount',
-        usage: "windowCount(data, 'sales', -1, 1)",
+        usage: 'windowCount({sales}, -1, 1)',
         description:
           'Counts non-null values within a sliding window. Useful for calculating how many data points contributed to window calculations or tracking data density over time.',
       },
       {
         name: 'windowMax',
-        usage: "windowMax(data, 'sales', -1, 1)",
+        usage: 'windowMax({sales}, -1, 1)',
         description:
-          'Finds maximum value within a sliding window. windowMax with -6, 0 returns the highest value in the last 7 periods. Great for rolling peak analysis or local maxima detection.',
+          'Finds maximum value within a sliding window. windowMax({sales}, -6, 0) returns the highest value in the last 7 periods. Great for rolling peak analysis or local maxima detection.',
       },
       {
         name: 'windowMin',
-        usage: "windowMin(data, 'sales', -1, 1)",
+        usage: 'windowMin({sales}, -1, 1)',
         description:
           'Finds minimum value within a sliding window. Identify rolling troughs, support levels, or minimum thresholds over a specified range of rows around each data point.',
       },
       {
         name: 'percentOfTotal',
-        usage: "percentOfTotal(data, 'sales')",
+        usage: 'percentOfTotal({sales})',
         description:
           "Calculates each row's value as a percentage of the total. If total sales is 1000 and a row is 250, returns 25. Essential for composition analysis and relative contribution metrics.",
       },
@@ -659,31 +689,31 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
     functions: [
       {
         name: 'runningSum',
-        usage: "runningSum(data, 'sales')",
+        usage: 'runningSum({sales})',
         description:
           'Calculates cumulative total up to and including current row. First row shows first value, second row shows sum of first two, etc. Creates year-to-date, quarter-to-date, or any cumulative totals.',
       },
       {
         name: 'runningAvg',
-        usage: "runningAvg(data, 'sales')",
+        usage: 'runningAvg({sales})',
         description:
           'Calculates cumulative average from the first row to current row. As more data accumulates, the average stabilizes. Useful for tracking overall average as new data arrives.',
       },
       {
         name: 'runningCount',
-        usage: 'runningCount(data)',
+        usage: 'runningCount()',
         description:
           'Returns a cumulative count of rows from start to current position. Row 1 returns 1, row 5 returns 5. Use for numbering rows or tracking progress through a dataset.',
       },
       {
         name: 'runningMax',
-        usage: "runningMax(data, 'sales')",
+        usage: 'runningMax({sales})',
         description:
           'Tracks the highest value seen so far, from first row to current. Only increases when a new maximum is encountered. Perfect for all-time high tracking or watermark calculations.',
       },
       {
         name: 'runningMin',
-        usage: "runningMin(data, 'sales')",
+        usage: 'runningMin({sales})',
         description:
           'Tracks the lowest value seen so far, from first row to current. Only decreases when a new minimum is encountered. Use for all-time low tracking or floor calculations.',
       },
@@ -696,27 +726,216 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
     functions: [
       {
         name: 'rank',
-        usage: "rank(data, 'score')",
+        usage: 'rank({score})',
         description:
           'Assigns ranks with gaps for ties. If two items tie for rank 1, both get rank 1, and the next item gets rank 3 (skipping 2). Standard competition ranking used in sports and academics.',
       },
       {
         name: 'denseRank',
-        usage: "denseRank(data, 'score')",
+        usage: 'denseRank({score})',
         description:
           'Assigns ranks without gaps for ties. If two items tie for rank 1, both get rank 1, and the next item gets rank 2. Consecutive ranking useful when you need compact rank ranges.',
       },
       {
         name: 'rowNumber',
-        usage: 'rowNumber(data)',
+        usage: 'rowNumber()',
         description:
           'Assigns unique sequential numbers to each row (1, 2, 3, ...) within the partition. No ties possible - each row gets a distinct number. Use for unique row identification or pagination.',
       },
       {
         name: 'percentileRank',
-        usage: "percentileRank(data, 'score', value)",
+        usage: 'percentileRank({score}, 50)',
         description:
           'Returns what percentile a specific value falls at within the distribution. If percentileRank returns 90, the value is higher than 90% of all values. Essential for relative performance analysis.',
+      },
+    ],
+  },
+  {
+    id: 'over',
+    name: 'Over (Partition) Functions',
+    icon: 'pi pi-table',
+    functions: [
+      {
+        name: 'avgOver',
+        usage: "avgOver({sales}, {region})",
+        description:
+          'Calculates average of a measure partitioned by a dimension. avgOver({sales}, {region}) returns the average sales for each region, repeated on every row of that region.',
+      },
+      {
+        name: 'sumOver',
+        usage: "sumOver({sales}, {region})",
+        description:
+          'Calculates sum of a measure partitioned by a dimension. Each row shows the total for its partition group. Useful for calculating group totals alongside detail rows.',
+      },
+      {
+        name: 'countOver',
+        usage: "countOver({id}, {category})",
+        description:
+          'Counts values partitioned by a dimension. countOver({id}, {category}) gives the count of items in each category, shown on every row of that category.',
+      },
+      {
+        name: 'distinctCountOver',
+        usage: "distinctCountOver({customerId}, {region})",
+        description:
+          'Counts distinct values partitioned by a dimension. distinctCountOver({customerId}, {region}) counts unique customers per region. Useful for unique entity counts per group.',
+      },
+      {
+        name: 'maxOver',
+        usage: "maxOver({price}, {category})",
+        description:
+          'Finds the maximum value within each partition. maxOver({price}, {category}) returns the highest price in each category, shown on every row of that category.',
+      },
+      {
+        name: 'minOver',
+        usage: "minOver({price}, {category})",
+        description:
+          'Finds the minimum value within each partition. minOver({price}, {category}) returns the lowest price in each category, shown on every row of that category.',
+      },
+      {
+        name: 'stdevOver',
+        usage: "stdevOver({sales}, {region})",
+        description:
+          'Calculates sample standard deviation within each partition. Measures spread of values from the mean using n-1 denominator, grouped by the specified dimension.',
+      },
+      {
+        name: 'stdevpOver',
+        usage: "stdevpOver({sales}, {region})",
+        description:
+          'Calculates population standard deviation within each partition. Uses n denominator. Use when partition data represents the complete population.',
+      },
+      {
+        name: 'varOver',
+        usage: "varOver({sales}, {region})",
+        description:
+          'Calculates sample variance within each partition. Measures data dispersion as squared deviation from mean, using n-1 denominator, grouped by dimension.',
+      },
+      {
+        name: 'varpOver',
+        usage: "varpOver({sales}, {region})",
+        description:
+          'Calculates population variance within each partition. Uses n denominator. Appropriate when partitioned data is the complete population for that group.',
+      },
+      {
+        name: 'percentileOver',
+        usage: "percentileOver({responseTime}, 95, {service})",
+        description:
+          'Returns the value at a given percentile within each partition. percentileOver({responseTime}, 95, {service}) gives the 95th percentile response time per service.',
+      },
+      {
+        name: 'percentileDiscOver',
+        usage: "percentileDiscOver({score}, 50, {department})",
+        description:
+          'Discrete percentile within each partition. Returns an actual value from the dataset closest to the percentile. Never interpolates between values.',
+      },
+      {
+        name: 'percentileContOver',
+        usage: "percentileContOver({score}, 50, {department})",
+        description:
+          'Continuous percentile within each partition. May interpolate between values for mathematical precision. Can return values not in the original dataset.',
+      },
+    ],
+  },
+  {
+    id: 'period-to-date',
+    name: 'Period-to-Date Functions',
+    icon: 'pi pi-calendar-plus',
+    functions: [
+      {
+        name: 'periodToDateSum',
+        usage: "periodToDateSum({revenue}, {orderDate}, 'YYYY')",
+        description:
+          'Calculates year-to-date (or period-to-date) sum. Sums the measure from the start of the specified period (YYYY, MM, etc.) to the current row date. Essential for YTD/MTD reporting.',
+      },
+      {
+        name: 'periodToDateAvg',
+        usage: "periodToDateAvg({sales}, {orderDate}, 'MM')",
+        description:
+          'Calculates period-to-date average. Averages values from the start of the period to the current date. periodToDateAvg with MM gives month-to-date average.',
+      },
+      {
+        name: 'periodToDateCount',
+        usage: "periodToDateCount({orderId}, {orderDate}, 'YYYY')",
+        description:
+          'Counts records from the start of the period to current date. periodToDateCount with YYYY gives year-to-date order count. Useful for tracking cumulative activity within periods.',
+      },
+      {
+        name: 'periodToDateMax',
+        usage: "periodToDateMax({price}, {orderDate}, 'MM')",
+        description:
+          'Finds the maximum value within the period-to-date window. Returns the highest value seen from the start of the current period to the row date.',
+      },
+      {
+        name: 'periodToDateMin',
+        usage: "periodToDateMin({price}, {orderDate}, 'MM')",
+        description:
+          'Finds the minimum value within the period-to-date window. Returns the lowest value from the start of the current period to the row date.',
+      },
+      {
+        name: 'periodToDateMedian',
+        usage: "periodToDateMedian({score}, {testDate}, 'YYYY')",
+        description:
+          'Calculates median within the period-to-date window. Returns the middle value from the start of the period to current date. Less affected by outliers than periodToDateAvg.',
+      },
+      {
+        name: 'periodToDateStDev',
+        usage: "periodToDateStDev({sales}, {orderDate}, 'MM')",
+        description:
+          'Calculates sample standard deviation within the period-to-date window. Measures variability of values from period start to current date using n-1 denominator.',
+      },
+      {
+        name: 'periodToDateStDevP',
+        usage: "periodToDateStDevP({sales}, {orderDate}, 'MM')",
+        description:
+          'Calculates population standard deviation within the period-to-date window. Uses n denominator. Use when period data represents the complete population.',
+      },
+      {
+        name: 'periodToDateVar',
+        usage: "periodToDateVar({sales}, {orderDate}, 'YYYY')",
+        description:
+          'Calculates sample variance within the period-to-date window. Variance is stdev squared, measuring dispersion from period start to current date.',
+      },
+      {
+        name: 'periodToDateVarP',
+        usage: "periodToDateVarP({sales}, {orderDate}, 'YYYY')",
+        description:
+          'Calculates population variance within the period-to-date window. Uses n denominator. Appropriate when period data is the complete population.',
+      },
+      {
+        name: 'periodToDatePercentile',
+        usage: "periodToDatePercentile({responseTime}, {timestamp}, 'MM', 95)",
+        description:
+          'Returns the value at a given percentile within the period-to-date window. Useful for SLA monitoring — e.g., month-to-date 95th percentile response time.',
+      },
+      {
+        name: 'periodToDatePercentileCont',
+        usage: "periodToDatePercentileCont({score}, {testDate}, 'YYYY', 50)",
+        description:
+          'Continuous percentile within the period-to-date window. May interpolate between values for mathematical precision within the current period window.',
+      },
+    ],
+  },
+  {
+    id: 'period-over-period',
+    name: 'Period-over-Period Functions',
+    icon: 'pi pi-replay',
+    functions: [
+      {
+        name: 'periodOverPeriodDifference',
+        usage: "periodOverPeriodDifference({revenue}, {orderDate}, 'MM', 1)",
+        description:
+          'Calculates the absolute difference between the current period value and the value N periods ago. The last parameter is the offset (1 = previous period). Positive means growth.',
+      },
+      {
+        name: 'periodOverPeriodLastValue',
+        usage: "periodOverPeriodLastValue({revenue}, {orderDate}, 'MM', 1)",
+        description:
+          'Returns the value from N periods ago. The last parameter is the offset (1 = previous period). Useful as a baseline for comparison or for showing prior period context.',
+      },
+      {
+        name: 'periodOverPeriodPercentDifference',
+        usage: "periodOverPeriodPercentDifference({revenue}, {orderDate}, 'MM', 1)",
+        description:
+          'Calculates percentage change between current and N periods ago. Returns (current - previous) / previous * 100. A result of 15 means 15% growth.',
       },
     ],
   },
