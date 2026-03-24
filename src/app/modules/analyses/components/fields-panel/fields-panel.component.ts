@@ -31,6 +31,10 @@ export class FieldsPanelComponent {
   editFieldMode: boolean = false;
   editFieldData: any = null;
 
+  // Delete confirmation
+  showDeleteFieldConfirm: boolean = false;
+  fieldToDelete: any = null;
+
   constructor(
     private datasetService: DatasetService,
     private globalService: GlobalService,
@@ -85,6 +89,29 @@ export class FieldsPanelComponent {
     this.fieldClick.emit(field);
   }
 
+  confirmDeleteField(event: Event, field: any): void {
+    event.stopPropagation();
+    this.fieldToDelete = field;
+    this.showDeleteFieldConfirm = true;
+  }
+
+  cancelDeleteField(): void {
+    this.fieldToDelete = null;
+    this.showDeleteFieldConfirm = false;
+  }
+
+  proceedDeleteField(): void {
+    if (!this.fieldToDelete) return;
+    this.deleteAnalysisField(this.fieldToDelete);
+    this.fieldToDelete = null;
+    this.showDeleteFieldConfirm = false;
+  }
+
+  onEditFieldClick(event: Event, field: any): void {
+    event.stopPropagation();
+    this.openEditCustomField(field);
+  }
+
   openAddCustomField(): void {
     this.editFieldMode = false;
     this.editFieldData = null;
@@ -117,4 +144,5 @@ export class FieldsPanelComponent {
         }
       });
   }
+
 }

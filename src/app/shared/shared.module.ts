@@ -50,6 +50,7 @@ import { CustomTextareaComponent } from './components/custom-textarea/custom-tex
 import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.component';
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
 import { AddCustomFieldDialogComponent } from '../modules/dataset/components/add-custom-field-dialog/add-custom-field-dialog.component';
+import { SaveAnalysesDialogComponent } from '../modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 
 @NgModule({
@@ -102,6 +103,7 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     CustomToggleComponent,
     GlobalSearchComponent,
     AddCustomFieldDialogComponent,
+    SaveAnalysesDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -165,6 +167,7 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     CustomToggleComponent,
     GlobalSearchComponent,
     AddCustomFieldDialogComponent,
+    SaveAnalysesDialogComponent,
   ],
 })
 export class SharedModule {}

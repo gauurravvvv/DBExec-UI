@@ -17,8 +17,10 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 import { DatasetService } from '../../services/dataset.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { ScreenService } from 'src/app/modules/screen/services/screen.service';
+import { AnalysesService } from 'src/app/modules/analyses/service/analyses.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
+import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
 
 @Component({
   selector: 'app-list-dataset',
@@ -80,6 +82,10 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     },
   ];
 
+  // Create Analysis dialog
+  showCreateAnalysisDialog = false;
+  analysisDatasetId: string = '';
+
   constructor(
     private organisationService: OrganisationService,
     private router: Router,
@@ -87,6 +93,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     private datasetService: DatasetService,
     private databaseService: DatabaseService,
     private screenService: ScreenService,
+    private analysesService: AnalysesService,
     private route: ActivatedRoute,
   ) {}
 
@@ -436,7 +443,29 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   }
 
   useAsAnalysis(id: string) {
-    this.router.navigate([ANALYSES.ADD, this.selectedOrg, id]);
+    this.analysisDatasetId = id;
+    this.showCreateAnalysisDialog = true;
+  }
+
+  onCreateAnalysisDialogClose(result: AnalysisFormData | null) {
+    if (result && this.analysisDatasetId) {
+      this.analysesService
+        .addAnalyses({
+          name: result.name,
+          description: result.description,
+          datasetId: this.analysisDatasetId,
+          organisation: this.selectedOrg,
+          database: this.selectedDatabase,
+          visuals: [],
+        })
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response, true)) {
+            this.router.navigate([ANALYSES.LIST]);
+          }
+        });
+    }
+    this.showCreateAnalysisDialog = false;
+    this.analysisDatasetId = '';
   }
 
   confirmDuplicate(dataset: any) {

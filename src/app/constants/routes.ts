@@ -76,7 +76,6 @@ export const DATASET = {
 };
 
 export const ANALYSES = {
-  ADD: '/app/analyses/add',
   LIST: '/app/analyses',
   EDIT: '/app/analyses/edit',
   VIEW: '/app/analyses/view',

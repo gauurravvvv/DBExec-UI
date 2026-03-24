@@ -289,6 +289,13 @@
   (close)="onDuplicateDialogClose($event)"
 ></app-save-dataset-dialog>
 
+<!-- Create Analysis Dialog -->
+<app-save-analyses-dialog
+  [visible]="showCreateAnalysisDialog"
+  [dialogTitle]="'Create Analysis'"
+  (close)="onCreateAnalysisDialogClose($event)"
+></app-save-analyses-dialog>
+
 <!-- Command Palette: Query Builder Selection -->
 <div
   class="cmd-overlay"
