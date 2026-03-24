@@ -1,0 +1,562 @@
+<div class="config-sidebar" *ngIf="isOpen && visual?.chartType">
+  <div class="sidebar-content">
+    <div class="sidebar-header-info">
+      <div class="dataset-label">Chart Configuration</div>
+      <button
+        pButton
+        icon="pi pi-times"
+        class="p-button-text p-button-sm close-btn"
+        (click)="closeConfigSidebar()"
+        title="Close"
+      ></button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-content-inner config-form">
+      <!-- Visual Title -->
+      <app-custom-input [(ngModel)]="visual.title" label="Visual Title" [maxLength]="100" placeholder="Enter visual title"></app-custom-input>
+
+      <!-- Color Scheme -->
+      <app-custom-dropdown [(ngModel)]="visual.config.colorScheme" label="Color Scheme" [options]="colorSchemes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+
+      <!-- ===== xAxis / yAxis (ECharts axis config) ===== -->
+      <div
+        class="config-section"
+        *ngIf="hasAxisLabels(visual?.chartType)"
+      >
+        <div class="section-title">Axis</div>
+        <app-custom-toggle [(ngModel)]="visual.config.xAxis" label="Show X Axis" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-toggle [(ngModel)]="visual.config.yAxis" label="Show Y Axis" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-toggle [(ngModel)]="visual.config.showGridLines" label="Grid Lines" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-dropdown *ngIf="visual.config.showGridLines" [(ngModel)]="visual.config.gridLineStyle" label="Grid Line Style" [options]="gridLineStyles" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        <app-custom-toggle [(ngModel)]="visual.config.showXAxisLabel" label="X Axis Name" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-input *ngIf="visual.config.showXAxisLabel" [(ngModel)]="visual.config.xAxisLabel"></app-custom-input>
+        <app-custom-toggle [(ngModel)]="visual.config.showYAxisLabel" label="Y Axis Name" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-input *ngIf="visual.config.showYAxisLabel" [(ngModel)]="visual.config.yAxisLabel"></app-custom-input>
+        <app-custom-number [(ngModel)]="visual.config.xAxisLabelRotate" label="X Label Rotation" [min]="0" [max]="90" [showButtons]="true" suffix="deg"></app-custom-number>
+        <app-custom-toggle [(ngModel)]="visual.config.autoScale" label="Auto Scale" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-toggle [(ngModel)]="visual.config.boundaryGap" label="Boundary Gap" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-toggle [(ngModel)]="visual.config.inverseX" label="Inverse X Axis" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-toggle [(ngModel)]="visual.config.inverseY" label="Inverse Y Axis" [showStatusLabel]="false"></app-custom-toggle>
+      </div>
+
+      <!-- ===== series.label (Data Labels) ===== -->
+      <div
+        class="config-section"
+        *ngIf="supportsDataLabel(visual?.chartType)"
+      >
+        <div class="section-title">Data Labels</div>
+        <app-custom-toggle [(ngModel)]="visual.config.showDataLabel" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+        <ng-container *ngIf="visual.config.showDataLabel">
+          <app-custom-dropdown *ngIf="hasAxisLabels(visual?.chartType)" [(ngModel)]="visual.config.labelPosition" label="Position" [options]="labelPositions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number [(ngModel)]="visual.config.labelFontSize" label="Font Size" [min]="8" [max]="24" [showButtons]="true" suffix="px"></app-custom-number>
+        </ng-container>
+      </div>
+
+      <!-- ===== legend ===== -->
+      <div
+        class="config-section"
+        *ngIf="supportsLegend(visual?.chartType)"
+      >
+        <div class="section-title">Legend</div>
+        <app-custom-toggle [(ngModel)]="visual.config.legend" label="Show Legend" [showStatusLabel]="false"></app-custom-toggle>
+        <ng-container *ngIf="visual.config.legend">
+          <app-custom-dropdown [(ngModel)]="visual.config.legendPosition" label="Position" [options]="legendPositions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.legendType" label="Type" [options]="legendTypes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        </ng-container>
+      </div>
+
+      <!-- ===== tooltip ===== -->
+      <div
+        class="config-section"
+        *ngIf="supportsTooltip(visual?.chartType)"
+      >
+        <div class="section-title">Tooltip</div>
+        <app-custom-toggle [ngModel]="!visual.config.tooltipDisabled" (ngModelChange)="visual.config.tooltipDisabled = !$event" label="Enable Tooltip" [showStatusLabel]="false"></app-custom-toggle>
+        <ng-container *ngIf="!visual.config.tooltipDisabled">
+          <app-custom-dropdown *ngIf="hasAxisLabels(visual?.chartType)" [(ngModel)]="visual.config.tooltipTrigger" label="Trigger" [options]="tooltipTriggers" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown *ngIf="hasAxisLabels(visual?.chartType)" [(ngModel)]="visual.config.axisPointerType" label="Axis Pointer" [options]="axisPointerTypes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        </ng-container>
+      </div>
+
+      <!-- ===== gradient ===== -->
+      <div
+        class="config-section"
+        *ngIf="supportsGradient(visual?.chartType)"
+      >
+        <app-custom-toggle [(ngModel)]="visual.config.gradient" label="Gradient Fill" [showStatusLabel]="false"></app-custom-toggle>
+      </div>
+
+      <!-- ===== animation ===== -->
+      <div
+        class="config-section"
+        *ngIf="supportsAnimation(visual?.chartType)"
+      >
+        <div class="section-title">Animation</div>
+        <app-custom-toggle [(ngModel)]="visual.config.animations" label="Enable Animation" [showStatusLabel]="false"></app-custom-toggle>
+        <ng-container *ngIf="visual.config.animations">
+          <app-custom-number [(ngModel)]="visual.config.animationDuration" label="Duration (ms)" [min]="100" [max]="5000" [step]="100" [showButtons]="true"></app-custom-number>
+          <app-custom-dropdown [(ngModel)]="visual.config.animationEasing" label="Easing" [options]="animationEasings" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        </ng-container>
+      </div>
+
+      <!-- ===== dataZoom / toolbox ===== -->
+      <div
+        class="config-section"
+        *ngIf="
+          supportsDataZoom(visual?.chartType) ||
+          supportsToolbox(visual?.chartType)
+        "
+      >
+        <div class="section-title">Interactive</div>
+        <app-custom-toggle *ngIf="supportsDataZoom(visual?.chartType)" [(ngModel)]="visual.config.dataZoom" label="Data Zoom" [showStatusLabel]="false"></app-custom-toggle>
+        <app-custom-toggle *ngIf="supportsToolbox(visual?.chartType)" [(ngModel)]="visual.config.toolbox" label="Toolbox" [showStatusLabel]="false"></app-custom-toggle>
+      </div>
+
+      <!-- ===== Bar Series Options ===== -->
+      <ng-container *ngIf="isBarChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Bar Options</div>
+          <app-custom-input [(ngModel)]="visual.config.barWidth" label="Bar Width" placeholder="auto"></app-custom-input>
+          <app-custom-input [(ngModel)]="visual.config.barGap" label="Bar Gap" placeholder="30%"></app-custom-input>
+          <app-custom-input [(ngModel)]="visual.config.barCategoryGap" label="Category Gap" placeholder="20%"></app-custom-input>
+          <app-custom-toggle [(ngModel)]="visual.config.roundEdges" label="Round Edges" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.showBackground" label="Show Background" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.stackStrategy" label="Stack Strategy" [options]="stackStrategyOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        </div>
+      </ng-container>
+
+      <!-- ===== Line Series Options ===== -->
+      <ng-container *ngIf="isLineChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Line Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.lineSmooth" label="Smooth Curve" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number *ngIf="visual.config.lineSmooth" [(ngModel)]="visual.config.lineSmoothness" label="Smoothness (0-1)" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+          <app-custom-dropdown [(ngModel)]="visual.config.lineStep" label="Step Style" [options]="lineStepOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.lineStyleType" label="Line Style" [options]="lineStyleTypes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-toggle [(ngModel)]="visual.config.showSymbol" label="Show Symbol" [showStatusLabel]="false"></app-custom-toggle>
+          <ng-container *ngIf="visual.config.showSymbol">
+            <app-custom-dropdown [(ngModel)]="visual.config.symbolShape" label="Symbol Shape" [options]="symbolShapes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+            <app-custom-number [(ngModel)]="visual.config.symbolSize" label="Symbol Size" [min]="1" [max]="20" [showButtons]="true"></app-custom-number>
+          </ng-container>
+          <app-custom-number [(ngModel)]="visual.config.lineWidth" label="Line Width" [min]="1" [max]="10" [showButtons]="true"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.connectNulls" label="Connect Null Points" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.endLabel" label="End Label" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.sampling" label="Sampling" [options]="samplingOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.showAllSymbol" label="Show All Symbols" [options]="showAllSymbolOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        </div>
+      </ng-container>
+
+      <!-- ===== Area Series Options ===== -->
+      <ng-container *ngIf="isAreaChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Area Options</div>
+          <app-custom-number [(ngModel)]="visual.config.areaOpacity" label="Area Opacity" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.lineSmooth" label="Smooth Curve" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number *ngIf="visual.config.lineSmooth" [(ngModel)]="visual.config.lineSmoothness" label="Smoothness (0-1)" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+          <app-custom-dropdown [(ngModel)]="visual.config.lineStep" label="Step Style" [options]="lineStepOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.lineStyleType" label="Line Style" [options]="lineStyleTypes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-toggle [(ngModel)]="visual.config.showSymbol" label="Show Symbol" [showStatusLabel]="false"></app-custom-toggle>
+          <ng-container *ngIf="visual.config.showSymbol">
+            <app-custom-dropdown [(ngModel)]="visual.config.symbolShape" label="Symbol Shape" [options]="symbolShapes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+            <app-custom-number [(ngModel)]="visual.config.symbolSize" label="Symbol Size" [min]="1" [max]="20" [showButtons]="true"></app-custom-number>
+          </ng-container>
+          <app-custom-number [(ngModel)]="visual.config.lineWidth" label="Line Width" [min]="1" [max]="10" [showButtons]="true"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.connectNulls" label="Connect Null Points" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.endLabel" label="End Label" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.sampling" label="Sampling" [options]="samplingOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.showAllSymbol" label="Show All Symbols" [options]="showAllSymbolOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        </div>
+      </ng-container>
+
+      <!-- ===== Pie Series Options ===== -->
+      <ng-container *ngIf="isPieChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Pie Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.labels" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <ng-container *ngIf="visual.config.labels">
+            <app-custom-dropdown [(ngModel)]="visual.config.pieLabelPosition" label="Label Position" [options]="pieLabelPositions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+            <app-custom-toggle [(ngModel)]="visual.config.pieLabelLine" label="Show Label Lines" [showStatusLabel]="false"></app-custom-toggle>
+          </ng-container>
+          <app-custom-number [(ngModel)]="visual.config.pieInnerRadius" label="Inner Radius" [min]="0" [max]="90" [showButtons]="true" suffix="%"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.pieOuterRadius" label="Outer Radius" [min]="20" [max]="95" [showButtons]="true" suffix="%"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.pieStartAngle" label="Start Angle" [min]="0" [max]="360" [showButtons]="true" suffix="deg"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.piePadAngle" label="Pad Angle" [min]="0" [max]="10" [step]="0.5" [showButtons]="true" suffix="deg"></app-custom-number>
+          <app-custom-dropdown [(ngModel)]="visual.config.roseType" label="Rose Type" [options]="pieRoseTypes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.pieSelectedMode" label="Selection Mode" [options]="pieSelectedModes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number *ngIf="visual.config.pieSelectedMode && visual.config.pieSelectedMode !== 'none'" [(ngModel)]="visual.config.pieSelectedOffset" label="Selection Offset" [min]="0" [max]="30" [showButtons]="true" suffix="px"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.pieBorderRadius" label="Border Radius" [min]="0" [max]="20" [showButtons]="true" suffix="px"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.pieMinAngle" label="Min Sector Angle" [min]="0" [max]="30" [showButtons]="true" suffix="deg"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.pieAvoidLabelOverlap" label="Avoid Label Overlap" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.pieClockwise" label="Clockwise" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number [(ngModel)]="visual.config.pieEndAngle" label="End Angle" [min]="0" [max]="360" [showButtons]="true" suffix="deg"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.piePercentPrecision" label="Percent Precision" [min]="0" [max]="6" [showButtons]="true"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Radar / Polar Series Options ===== -->
+      <ng-container
+        *ngIf="
+          isPolarChartType(visual?.chartType) ||
+          isRadarChartType(visual?.chartType)
+        "
+      >
+        <div class="config-section">
+          <div class="section-title">Radar Options</div>
+          <app-custom-dropdown [(ngModel)]="visual.config.radarShape" label="Shape" [options]="radarShapes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number [(ngModel)]="visual.config.radarAreaOpacity" label="Area Opacity" [min]="0" [max]="1" [step]="0.05" [showButtons]="true"></app-custom-number>
+          <app-custom-dropdown [(ngModel)]="visual.config.radarSymbol" label="Symbol" [options]="symbolShapes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number [(ngModel)]="visual.config.radarSymbolSize" label="Symbol Size" [min]="0" [max]="20" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.radarLineWidth" label="Line Width" [min]="0.5" [max]="5" [step]="0.5" [showButtons]="true"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.labelTrim" label="Trim Indicator Names" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number *ngIf="visual.config.labelTrim" [(ngModel)]="visual.config.labelTrimSize" label="Max Label Length" [min]="5" [max]="50" [showButtons]="true"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Gauge Series Options ===== -->
+      <ng-container *ngIf="isGaugeChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Gauge Options</div>
+          <app-custom-number [(ngModel)]="visual.config.min" label="Min Value" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.max" label="Max Value" [showButtons]="true"></app-custom-number>
+          <app-custom-input [(ngModel)]="visual.config.units" label="Units"></app-custom-input>
+          <ng-container *ngIf="visual?.chartType === 'gauge'">
+            <app-custom-number [(ngModel)]="visual.config.gaugeStartAngle" label="Start Angle" [min]="0" [max]="360" [showButtons]="true" suffix="deg"></app-custom-number>
+            <app-custom-number [(ngModel)]="visual.config.gaugeEndAngle" label="End Angle" [min]="-360" [max]="360" [showButtons]="true" suffix="deg"></app-custom-number>
+            <app-custom-number [(ngModel)]="visual.config.splitNumber" label="Major Segments" [min]="1" [max]="20" [showButtons]="true"></app-custom-number>
+            <app-custom-number [(ngModel)]="visual.config.tickSplitNumber" label="Minor Tick Segments" [min]="0" [max]="10" [showButtons]="true"></app-custom-number>
+            <app-custom-toggle [(ngModel)]="visual.config.gaugeShowScale" label="Show Scale Labels" [showStatusLabel]="false"></app-custom-toggle>
+            <app-custom-toggle [(ngModel)]="visual.config.gaugeShowValue" label="Show Value" [showStatusLabel]="false"></app-custom-toggle>
+            <app-custom-toggle [(ngModel)]="visual.config.gaugeShowPointer" label="Show Pointer" [showStatusLabel]="false"></app-custom-toggle>
+            <app-custom-number *ngIf="visual.config.gaugeShowPointer" [(ngModel)]="visual.config.gaugePointerLength" label="Pointer Length" [min]="20" [max]="100" [showButtons]="true" suffix="%"></app-custom-number>
+            <app-custom-toggle [(ngModel)]="visual.config.gaugeShowProgress" label="Show Progress" [showStatusLabel]="false"></app-custom-toggle>
+            <app-custom-number [(ngModel)]="visual.config.gaugeAxisLineWidth" label="Axis Line Width" [min]="5" [max]="40" [showButtons]="true" suffix="px"></app-custom-number>
+            <app-custom-number *ngIf="visual.config.gaugeShowPointer" [(ngModel)]="visual.config.gaugePointerWidth" label="Pointer Width" [min]="1" [max]="20" [showButtons]="true" suffix="px"></app-custom-number>
+            <app-custom-dropdown *ngIf="visual.config.gaugeShowPointer" [(ngModel)]="visual.config.gaugePointerIcon" label="Pointer Icon" [options]="symbolShapes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+            <app-custom-toggle *ngIf="visual.config.gaugeShowProgress" [(ngModel)]="visual.config.gaugeProgressRoundCap" label="Progress Round Cap" [showStatusLabel]="false"></app-custom-toggle>
+            <app-custom-toggle [(ngModel)]="visual.config.gaugeAxisLineRoundCap" label="Axis Line Round Cap" [showStatusLabel]="false"></app-custom-toggle>
+          </ng-container>
+        </div>
+      </ng-container>
+
+      <!-- ===== Card Options ===== -->
+      <ng-container *ngIf="isCardChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Card Display</div>
+          <app-custom-number [(ngModel)]="visual.config.innerPadding" label="Inner Padding" [min]="0" [max]="50" [showButtons]="true" suffix="px"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Scatter Series Options ===== -->
+      <ng-container *ngIf="isScatterChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Scatter Options</div>
+          <app-custom-number [(ngModel)]="visual.config.scatterSymbolSize" label="Symbol Size" [min]="2" [max]="30" [showButtons]="true"></app-custom-number>
+          <app-custom-dropdown [(ngModel)]="visual.config.scatterSymbolShape" label="Symbol Shape" [options]="symbolShapes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number *ngIf="visual?.chartType === 'effect-scatter'" [(ngModel)]="visual.config.effectRippleScale" label="Ripple Scale" [min]="1" [max]="10" [step]="0.5" [showButtons]="true"></app-custom-number>
+          <app-custom-dropdown *ngIf="visual?.chartType === 'effect-scatter'" [(ngModel)]="visual.config.effectShowOn" label="Show Effect On" [options]="effectShowOnOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown *ngIf="visual?.chartType === 'effect-scatter'" [(ngModel)]="visual.config.effectRippleBrushType" label="Ripple Brush Type" [options]="rippleBrushTypeOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number *ngIf="visual?.chartType === 'effect-scatter'" [(ngModel)]="visual.config.effectRippleNumber" label="Ripple Number" [min]="1" [max]="10" [showButtons]="true"></app-custom-number>
+          <app-custom-number *ngIf="visual?.chartType === 'effect-scatter'" [(ngModel)]="visual.config.effectRipplePeriod" label="Ripple Period" [min]="1" [max]="10" [step]="0.5" [showButtons]="true" suffix="s"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Bubble Series Options ===== -->
+      <ng-container *ngIf="isBubbleChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Bubble Options</div>
+          <app-custom-number [(ngModel)]="visual.config.minRadius" label="Min Bubble Size" [min]="1" [max]="20" [showButtons]="true" suffix="px"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.maxRadius" label="Max Bubble Size" [min]="10" [max]="100" [showButtons]="true" suffix="px"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Box Chart Options ===== -->
+      <ng-container *ngIf="isBoxChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Box Plot Options</div>
+          <app-custom-dropdown [(ngModel)]="visual.config.boxplotLayout" label="Layout" [options]="boxplotLayouts" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number [(ngModel)]="visual.config.boxplotBoxWidth" label="Min Box Width" [min]="1" [max]="50" [showButtons]="true" suffix="px"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.boxplotBoxMaxWidth" label="Max Box Width" [min]="10" [max]="200" [showButtons]="true" suffix="px"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.xAxis" label="Show X Axis" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.yAxis" label="Show Y Axis" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.showGridLines" label="Show Grid Lines" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== Heatmap Series Options ===== -->
+      <ng-container *ngIf="isHeatMapChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Heatmap Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.heatmapShowLabels" label="Show Cell Values" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== Treemap Series Options ===== -->
+      <ng-container *ngIf="isTreeMapChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Treemap Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.treemapShowLabels" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.treemapRoam" label="Enable Zoom/Pan" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.treemapBreadcrumb" label="Show Breadcrumb" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number [(ngModel)]="visual.config.treemapLeafDepth" label="Leaf Depth" [min]="1" [max]="10" [showButtons]="true"></app-custom-number>
+          <app-custom-dropdown [(ngModel)]="visual.config.treemapNodeClick" label="Node Click" [options]="treemapNodeClickOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        </div>
+      </ng-container>
+
+      <!-- ===== Funnel Series Options ===== -->
+      <ng-container *ngIf="isFunnelChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Funnel Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.labels" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.funnelSort" label="Sort Order" [options]="funnelSortOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.funnelAlign" label="Alignment" [options]="funnelAlignOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number [(ngModel)]="visual.config.funnelGap" label="Gap" [min]="0" [max]="20" [showButtons]="true" suffix="px"></app-custom-number>
+          <app-custom-input [(ngModel)]="visual.config.funnelMinSize" label="Min Size" placeholder="0%"></app-custom-input>
+          <app-custom-input [(ngModel)]="visual.config.funnelMaxSize" label="Max Size" placeholder="100%"></app-custom-input>
+          <app-custom-dropdown [(ngModel)]="visual.config.funnelOrient" label="Orientation" [options]="funnelOrientOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+        </div>
+      </ng-container>
+
+      <!-- ===== Sunburst Series Options ===== -->
+      <ng-container *ngIf="isSunburstChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Sunburst Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.labels" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-input [(ngModel)]="visual.config.sunburstRadius" label="Outer Radius" placeholder="90%"></app-custom-input>
+          <app-custom-dropdown [(ngModel)]="visual.config.sunburstNodeClick" label="Node Click" [options]="sunburstNodeClickOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.sunburstSort" label="Sort" [options]="sunburstSortOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number [(ngModel)]="visual.config.sunburstStartAngle" label="Start Angle" [min]="0" [max]="360" [showButtons]="true" suffix="deg"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Sankey Series Options ===== -->
+      <ng-container *ngIf="isSankeyChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Sankey Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.labels" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.sankeyOrient" label="Orientation" [options]="sankeyOrientations" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number [(ngModel)]="visual.config.sankeyNodeWidth" label="Node Width" [min]="5" [max]="50" [showButtons]="true" suffix="px"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.sankeyNodeGap" label="Node Gap" [min]="2" [max]="30" [showButtons]="true" suffix="px"></app-custom-number>
+          <app-custom-dropdown [(ngModel)]="visual.config.sankeyNodeAlign" label="Node Align" [options]="sankeyNodeAligns" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-toggle [(ngModel)]="visual.config.sankeyDraggable" label="Draggable Nodes" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.sankeyEdgeLabel" label="Show Edge Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number [(ngModel)]="visual.config.sankeyCurveness" label="Edge Curveness" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Waterfall Options ===== -->
+      <ng-container *ngIf="isWaterfallChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Waterfall Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.waterfallShowTotal" label="Show Total Bar" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.roundEdges" label="Round Edges" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== Graph Series Options ===== -->
+      <ng-container *ngIf="isGraphChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Graph Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.labels" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.graphLayout" label="Layout" [options]="graphLayouts" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <ng-container
+            *ngIf="visual.config.graphLayout === 'force'"
+          >
+            <app-custom-number [(ngModel)]="visual.config.graphRepulsion" label="Repulsion" [min]="50" [max]="1000" [step]="50" [showButtons]="true"></app-custom-number>
+            <app-custom-number [(ngModel)]="visual.config.graphEdgeLength" label="Edge Length" [min]="30" [max]="500" [step]="10" [showButtons]="true"></app-custom-number>
+            <app-custom-number [(ngModel)]="visual.config.graphGravity" label="Gravity" [min]="0" [max]="1" [step]="0.05" [showButtons]="true"></app-custom-number>
+          </ng-container>
+          <app-custom-dropdown [(ngModel)]="visual.config.graphEdgeSymbol" label="Edge Symbol" [options]="graphEdgeSymbols" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-number *ngIf="visual.config.graphEdgeSymbol && visual.config.graphEdgeSymbol !== 'none'" [(ngModel)]="visual.config.graphEdgeSymbolSize" label="Edge Symbol Size" [min]="4" [max]="30" [showButtons]="true"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.graphDraggable" label="Draggable Nodes" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number *ngIf="visual.config.graphLayout === 'force'" [(ngModel)]="visual.config.graphForceFriction" label="Force Friction" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.graphEdgeLabel" label="Show Edge Labels" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== Tree Series Options ===== -->
+      <ng-container *ngIf="isTreeChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Tree Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.labels" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.treeOrient" label="Orientation" [options]="treeOrientations" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.treeLayout" label="Layout" [options]="treeLayouts" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-dropdown [(ngModel)]="visual.config.treeEdgeShape" label="Edge Shape" [options]="treeEdgeShapes" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-toggle [(ngModel)]="visual.config.treeExpandAndCollapse" label="Expand & Collapse" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number [(ngModel)]="visual.config.treeInitialDepth" label="Initial Depth" [min]="1" [max]="10" [showButtons]="true"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.treeRoam" label="Enable Zoom/Pan" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-input [(ngModel)]="visual.config.treeEdgeForkPosition" label="Edge Fork Position" placeholder="e.g. 50%"></app-custom-input>
+        </div>
+      </ng-container>
+
+      <!-- ===== Theme River Series Options ===== -->
+      <ng-container *ngIf="isThemeRiverChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Theme River Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.labels" label="Show Labels" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== Pictorial Bar Series Options ===== -->
+      <ng-container
+        *ngIf="isPictorialBarChartType(visual?.chartType)"
+      >
+        <div class="config-section">
+          <div class="section-title">Pictorial Bar Options</div>
+          <app-custom-dropdown [(ngModel)]="visual.config.pictorialSymbol" label="Symbol Shape" [options]="pictorialSymbols" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-toggle [(ngModel)]="visual.config.pictorialRepeat" label="Repeat Symbol" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.pictorialSymbolPosition" label="Symbol Position" [options]="pictorialSymbolPositions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-toggle [(ngModel)]="visual.config.pictorialSymbolClip" label="Symbol Clip" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-dropdown [(ngModel)]="visual.config.pictorialSymbolRepeatDirection" label="Repeat Direction" [options]="pictorialRepeatDirectionOptions" optionLabel="label" optionValue="value"></app-custom-dropdown>
+          <app-custom-input [(ngModel)]="visual.config.pictorialSymbolMargin" label="Symbol Margin" placeholder="auto or number"></app-custom-input>
+        </div>
+      </ng-container>
+
+      <!-- ===== Polar Bar Series Options ===== -->
+      <ng-container *ngIf="isPolarBarChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Polar Bar Options</div>
+          <app-custom-number [(ngModel)]="visual.config.polarBarInnerRadius" label="Inner Radius" [min]="0" [max]="70" [showButtons]="true" suffix="%"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.roundEdges" label="Round Edges" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.yAxis" label="Show Radius Axis" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== Candlestick Options ===== -->
+      <ng-container *ngIf="isCandlestickChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Candlestick Options</div>
+          <div class="config-group">
+            <label>Bull (Up) Color</label>
+            <input
+              type="color"
+              [(ngModel)]="visual.config.candleBullColor"
+            />
+          </div>
+          <div class="config-group">
+            <label>Bear (Down) Color</label>
+            <input
+              type="color"
+              [(ngModel)]="visual.config.candleBearColor"
+            />
+          </div>
+          <app-custom-toggle [(ngModel)]="visual.config.showGridLines" label="Show Grid Lines" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.xAxis" label="Show X Axis" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.yAxis" label="Show Y Axis" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.dataZoom" label="Data Zoom" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number [(ngModel)]="visual.config.xAxisLabelRotate" label="X Axis Label Rotate" [min]="0" [max]="90" [showButtons]="true" suffix="deg"></app-custom-number>
+          <div class="config-group">
+            <label>Bull Border Color</label>
+            <input
+              type="color"
+              [(ngModel)]="visual.config.candleBullBorderColor"
+            />
+          </div>
+          <div class="config-group">
+            <label>Bear Border Color</label>
+            <input
+              type="color"
+              [(ngModel)]="visual.config.candleBearBorderColor"
+            />
+          </div>
+          <app-custom-input [(ngModel)]="visual.config.candleBarWidth" label="Bar Width" placeholder="auto or number"></app-custom-input>
+        </div>
+      </ng-container>
+
+      <!-- ===== Parallel Options ===== -->
+      <ng-container *ngIf="isParallelChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Parallel Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.parallelSmooth" label="Smooth Lines" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number [(ngModel)]="visual.config.parallelLineWidth" label="Line Width" [min]="0.5" [max]="5" [step]="0.5" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.parallelLineOpacity" label="Line Opacity" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.parallelActiveOpacity" label="Active Opacity" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.parallelInactiveOpacity" label="Inactive Opacity" [min]="0" [max]="1" [step]="0.05" [showButtons]="true"></app-custom-number>
+          <app-custom-toggle [(ngModel)]="visual.config.parallelRealtime" label="Realtime Filter" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== 3D Chart Options ===== -->
+      <ng-container
+        *ngIf="
+          isBar3dChartType(visual?.chartType) ||
+          isLine3dChartType(visual?.chartType) ||
+          isScatter3dChartType(visual?.chartType) ||
+          isSurfaceChartType(visual?.chartType)
+        "
+      >
+        <div class="config-section">
+          <div class="section-title">3D Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.autoRotate" label="Auto Rotate" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.showDataLabel" label="Show Data Labels" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number [(ngModel)]="visual.config.itemOpacity" label="Opacity" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.viewAlpha" label="View Alpha (Pitch)" [min]="0" [max]="90" [showButtons]="true" suffix="deg"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.viewBeta" label="View Beta (Yaw)" [min]="0" [max]="360" [showButtons]="true" suffix="deg"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Surface-Specific Options ===== -->
+      <ng-container *ngIf="isSurfaceChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Surface Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.wireframe" label="Show Wireframe" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.showVisualMap" label="Show Visual Map" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== Globe Options ===== -->
+      <ng-container *ngIf="isGlobeChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Globe Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.autoRotate" label="Auto Rotate" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-number [(ngModel)]="visual.config.autoRotateSpeed" label="Rotation Speed" [min]="1" [max]="50" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.scatterSymbolSize" label="Point Size" [min]="1" [max]="30" [showButtons]="true"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Graph GL Options ===== -->
+      <ng-container *ngIf="isGraphGlChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Graph GL Options</div>
+          <app-custom-number [(ngModel)]="visual.config.graphGravity" label="Gravity" [min]="0" [max]="1" [step]="0.05" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.nodeSize" label="Node Size" [min]="3" [max]="30" [showButtons]="true"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Scatter GL Options ===== -->
+      <ng-container *ngIf="isScatterGlChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Scatter GL Options</div>
+          <app-custom-number [(ngModel)]="visual.config.scatterSymbolSize" label="Point Size" [min]="1" [max]="20" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.itemOpacity" label="Opacity" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Lines GL Options ===== -->
+      <ng-container *ngIf="isLinesGlChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Lines GL Options</div>
+          <app-custom-number [(ngModel)]="visual.config.lineWidth" label="Line Width" [min]="0.5" [max]="5" [step]="0.5" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.lineOpacity" label="Line Opacity" [min]="0" [max]="1" [step]="0.1" [showButtons]="true"></app-custom-number>
+        </div>
+      </ng-container>
+
+      <!-- ===== Map 3D Options ===== -->
+      <ng-container *ngIf="isMap3dChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Map 3D Options</div>
+          <app-custom-toggle [(ngModel)]="visual.config.autoRotate" label="Auto Rotate" [showStatusLabel]="false"></app-custom-toggle>
+          <app-custom-toggle [(ngModel)]="visual.config.showVisualMap" label="Show Visual Map" [showStatusLabel]="false"></app-custom-toggle>
+        </div>
+      </ng-container>
+
+      <!-- ===== Flow GL Options ===== -->
+      <ng-container *ngIf="isFlowGlChartType(visual?.chartType)">
+        <div class="config-section">
+          <div class="section-title">Flow GL Options</div>
+          <app-custom-number [(ngModel)]="visual.config.particleDensity" label="Particle Density" [min]="32" [max]="512" [step]="32" [showButtons]="true"></app-custom-number>
+          <app-custom-number [(ngModel)]="visual.config.particleSpeed" label="Particle Speed" [min]="0.1" [max]="5" [step]="0.1" [showButtons]="true"></app-custom-number>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

@@ -17,44 +17,6 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import {
   CHART_TYPES,
-  COLOR_SCHEMES,
-  LEGEND_POSITIONS,
-  LEGEND_TYPES,
-  LABEL_POSITIONS,
-  TOOLTIP_TRIGGERS,
-  AXIS_POINTER_TYPES,
-  GRID_LINE_STYLES,
-  EMPHASIS_MODES,
-  ANIMATION_EASINGS,
-  LINE_STEP_OPTIONS,
-  LINE_STYLE_TYPES,
-  SYMBOL_SHAPES,
-  PIE_LABEL_POSITIONS,
-  PIE_SELECTED_MODES,
-  PIE_ROSE_TYPES,
-  FUNNEL_SORT_OPTIONS,
-  FUNNEL_ALIGN_OPTIONS,
-  RADAR_SHAPES,
-  GRAPH_LAYOUTS,
-  TREE_ORIENTATIONS,
-  TREE_LAYOUTS,
-  SANKEY_ORIENTATIONS,
-  PICTORIAL_SYMBOLS,
-  TREE_EDGE_SHAPES,
-  GRAPH_EDGE_SYMBOLS,
-  TREEMAP_NODE_CLICK_OPTIONS,
-  SUNBURST_NODE_CLICK_OPTIONS,
-  BOXPLOT_LAYOUTS,
-  PICTORIAL_SYMBOL_POSITIONS,
-  EFFECT_SHOW_ON_OPTIONS,
-  SANKEY_NODE_ALIGNS,
-  SAMPLING_OPTIONS,
-  SHOW_ALL_SYMBOL_OPTIONS,
-  STACK_STRATEGY_OPTIONS,
-  RIPPLE_BRUSH_TYPE_OPTIONS,
-  FUNNEL_ORIENT_OPTIONS,
-  SUNBURST_SORT_OPTIONS,
-  PICTORIAL_REPEAT_DIRECTION_OPTIONS,
   getDefaultChartConfig,
   hasAxisLabels,
   is3DCoordinateChartType,
@@ -92,14 +54,6 @@ import {
   isLinesGlChartType,
   isMap3dChartType,
   isFlowGlChartType,
-  supportsGradient,
-  supportsDataZoom,
-  supportsDataLabel,
-  supportsLegend,
-  supportsEmphasis,
-  supportsToolbox,
-  supportsTooltip,
-  supportsAnimation,
 } from '../../constants/charts.constants';
 import { Visual, createVisual } from '../../models';
 import { AnalysesService } from '../../service/analyses.service';
@@ -113,18 +67,10 @@ import {
   selectIsDatasetLoaded,
   selectIsDatasetStale,
 } from '../../store';
-
-interface ConfiguredFilter {
-  tempId: string;
-  name: string;
-  columnName: string;
-  filterType: string;
-  controlType: string;
-  config: any;
-  isEnabled: boolean;
-  isMandatory: boolean;
-  sequence: number;
-}
+import {
+  ConfiguredFilter,
+  FilterDialogSaveEvent,
+} from '../filter-config-dialog/filter-config-dialog.component';
 
 @Component({
   selector: 'app-add-analyses',
@@ -156,15 +102,7 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   showFilterDialog: boolean = false;
   editingFilter: ConfiguredFilter | null = null;
 
-  // Filter dialog form fields
-  filterDialogColumn: any = null;
-  filterDialogType: string = '';
-  filterDialogControl: string = '';
-  filterDialogName: string = '';
-  filterDialogEnabled: boolean = true;
-  filterDialogMandatory: boolean = false;
-
-  // Filter dropdown options
+  // Filter type options (used by getFilterTypeLabel)
   filterTypeOptions = [
     { label: 'Category', value: 'category' },
     { label: 'Numeric (Exact)', value: 'numeric_equality' },
@@ -173,11 +111,8 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     { label: 'Date/Time (Range)', value: 'time_range' },
   ];
 
-  controlTypeOptions: { label: string; value: string }[] = [];
-
   // Search queries
   visualListSearchQuery: string = '';
-  datasetFieldsSearchQuery: string = '';
 
   // Visuals
   visuals: Visual[] = [];
@@ -194,36 +129,6 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  getDataTypeIcon(dataType: string): string {
-    if (!dataType) return 'pi-bars';
-    const type = dataType.toLowerCase();
-    if (type.includes('int') || type.includes('numeric') || type.includes('decimal') || type.includes('float') || type.includes('double') || type.includes('real') || type.includes('serial') || type.includes('money')) return 'pi-hashtag';
-    if (type.includes('char') || type.includes('text') || type.includes('string') || type.includes('citext') || type.includes('name')) return 'pi-align-left';
-    if (type.includes('bool')) return 'pi-check-square';
-    if (type.includes('timestamp') || type.includes('date') || type.includes('time') || type.includes('interval')) return 'pi-calendar';
-    if (type.includes('uuid')) return 'pi-key';
-    if (type.includes('json')) return 'pi-code';
-    if (type.includes('array') || type.includes('[]')) return 'pi-list';
-    if (type.includes('bytea') || type.includes('blob')) return 'pi-file';
-    if (type.includes('inet') || type.includes('cidr') || type.includes('macaddr')) return 'pi-globe';
-    if (type.includes('enum') || type.includes('user-defined')) return 'pi-sliders-h';
-    return 'pi-bars';
-  }
-
-  // Filtered dataset fields based on search query
-  get filteredDatasetFields(): any[] {
-    if (!this.datasetDetails?.datasetFields) {
-      return [];
-    }
-    if (!this.datasetFieldsSearchQuery) {
-      return this.datasetDetails.datasetFields;
-    }
-    return this.datasetDetails.datasetFields.filter((field: any) =>
-      field.columnToView
-        .toLowerCase()
-        .includes(this.datasetFieldsSearchQuery.toLowerCase()),
-    );
-  }
   visualCounter: number = 0;
   focusedVisualId: string | null = null;
   resizingVisual: Visual | null = null;
@@ -240,46 +145,6 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Available chart types
   chartTypes = CHART_TYPES;
-
-  // ECharts dropdown options
-  colorSchemes = COLOR_SCHEMES;
-  legendPositions = LEGEND_POSITIONS;
-  legendTypes = LEGEND_TYPES;
-  labelPositions = LABEL_POSITIONS;
-  tooltipTriggers = TOOLTIP_TRIGGERS;
-  axisPointerTypes = AXIS_POINTER_TYPES;
-  gridLineStyles = GRID_LINE_STYLES;
-  emphasisModes = EMPHASIS_MODES;
-  animationEasings = ANIMATION_EASINGS;
-  lineStepOptions = LINE_STEP_OPTIONS;
-  lineStyleTypes = LINE_STYLE_TYPES;
-  symbolShapes = SYMBOL_SHAPES;
-  pieLabelPositions = PIE_LABEL_POSITIONS;
-  pieSelectedModes = PIE_SELECTED_MODES;
-  pieRoseTypes = PIE_ROSE_TYPES;
-  funnelSortOptions = FUNNEL_SORT_OPTIONS;
-  funnelAlignOptions = FUNNEL_ALIGN_OPTIONS;
-  radarShapes = RADAR_SHAPES;
-  graphLayouts = GRAPH_LAYOUTS;
-  treeOrientations = TREE_ORIENTATIONS;
-  treeLayouts = TREE_LAYOUTS;
-  sankeyOrientations = SANKEY_ORIENTATIONS;
-  pictorialSymbols = PICTORIAL_SYMBOLS;
-  treeEdgeShapes = TREE_EDGE_SHAPES;
-  graphEdgeSymbols = GRAPH_EDGE_SYMBOLS;
-  treemapNodeClickOptions = TREEMAP_NODE_CLICK_OPTIONS;
-  sunburstNodeClickOptions = SUNBURST_NODE_CLICK_OPTIONS;
-  boxplotLayouts = BOXPLOT_LAYOUTS;
-  pictorialSymbolPositions = PICTORIAL_SYMBOL_POSITIONS;
-  effectShowOnOptions = EFFECT_SHOW_ON_OPTIONS;
-  sankeyNodeAligns = SANKEY_NODE_ALIGNS;
-  samplingOptions = SAMPLING_OPTIONS;
-  showAllSymbolOptions = SHOW_ALL_SYMBOL_OPTIONS;
-  stackStrategyOptions = STACK_STRATEGY_OPTIONS;
-  rippleBrushTypeOptions = RIPPLE_BRUSH_TYPE_OPTIONS;
-  funnelOrientOptions = FUNNEL_ORIENT_OPTIONS;
-  sunburstSortOptions = SUNBURST_SORT_OPTIONS;
-  pictorialRepeatDirectionOptions = PICTORIAL_REPEAT_DIRECTION_OPTIONS;
 
   // Dragging
   draggingVisual: any = null;
@@ -684,21 +549,11 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addFilter(): void {
     this.editingFilter = null;
-    this.resetFilterDialog();
     this.showFilterDialog = true;
   }
 
   editFilter(filter: ConfiguredFilter): void {
     this.editingFilter = filter;
-    this.filterDialogColumn = this.datasetDetails?.datasetFields?.find(
-      (f: any) => (f.columnName || f.columnToView) === filter.columnName,
-    ) || null;
-    this.filterDialogType = filter.filterType;
-    this.filterDialogControl = filter.controlType;
-    this.filterDialogName = filter.name;
-    this.filterDialogEnabled = filter.isEnabled;
-    this.filterDialogMandatory = filter.isMandatory;
-    this.updateControlTypeOptions();
     this.showFilterDialog = true;
   }
 
@@ -709,97 +564,34 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resequenceFilters();
   }
 
-  saveFilterDialog(): void {
-    if (!this.filterDialogColumn || !this.filterDialogType || !this.filterDialogControl) return;
-
-    const columnName = this.filterDialogColumn.columnName || this.filterDialogColumn.columnToView;
-    const name = this.filterDialogName || this.filterDialogColumn.columnToView;
-
+  onFilterDialogSave(event: FilterDialogSaveEvent): void {
     if (this.editingFilter) {
       const idx = this.configuredFilters.findIndex(f => f.tempId === this.editingFilter!.tempId);
       if (idx !== -1) {
         this.configuredFilters[idx] = {
           ...this.configuredFilters[idx],
-          name,
-          columnName,
-          filterType: this.filterDialogType,
-          controlType: this.filterDialogControl,
-          isEnabled: this.filterDialogEnabled,
-          isMandatory: this.filterDialogMandatory,
+          name: event.name,
+          columnName: event.columnName,
+          filterType: event.filterType,
+          controlType: event.controlType,
+          isEnabled: event.isEnabled,
+          isMandatory: event.isMandatory,
         };
       }
     } else {
       this.configuredFilters.push({
         tempId: crypto.randomUUID(),
-        name,
-        columnName,
-        filterType: this.filterDialogType,
-        controlType: this.filterDialogControl,
+        name: event.name,
+        columnName: event.columnName,
+        filterType: event.filterType,
+        controlType: event.controlType,
         config: {},
-        isEnabled: this.filterDialogEnabled,
-        isMandatory: this.filterDialogMandatory,
+        isEnabled: event.isEnabled,
+        isMandatory: event.isMandatory,
         sequence: this.configuredFilters.length,
       });
     }
     this.showFilterDialog = false;
-  }
-
-  cancelFilterDialog(): void {
-    this.showFilterDialog = false;
-  }
-
-  resetFilterDialog(): void {
-    this.filterDialogColumn = null;
-    this.filterDialogType = '';
-    this.filterDialogControl = '';
-    this.filterDialogName = '';
-    this.filterDialogEnabled = true;
-    this.filterDialogMandatory = false;
-    this.controlTypeOptions = [];
-  }
-
-  onFilterTypeChange(): void {
-    this.updateControlTypeOptions();
-    if (this.controlTypeOptions.length > 0) {
-      this.filterDialogControl = this.controlTypeOptions[0].value;
-    }
-  }
-
-  onFilterColumnChange(): void {
-    if (this.filterDialogColumn && !this.filterDialogName) {
-      this.filterDialogName = this.filterDialogColumn.columnToView;
-    }
-  }
-
-  updateControlTypeOptions(): void {
-    switch (this.filterDialogType) {
-      case 'category':
-        this.controlTypeOptions = [
-          { label: 'Dropdown', value: 'dropdown' },
-          { label: 'Multi-Select List', value: 'list' },
-        ];
-        break;
-      case 'numeric_equality':
-        this.controlTypeOptions = [
-          { label: 'Text Input', value: 'text' },
-          { label: 'Dropdown', value: 'dropdown' },
-        ];
-        break;
-      case 'numeric_range':
-        this.controlTypeOptions = [
-          { label: 'Slider', value: 'slider' },
-          { label: 'Text Input', value: 'text' },
-        ];
-        break;
-      case 'time_equality':
-      case 'time_range':
-        this.controlTypeOptions = [
-          { label: 'Date Picker', value: 'datepicker' },
-        ];
-        break;
-      default:
-        this.controlTypeOptions = [];
-    }
   }
 
   resequenceFilters(): void {
@@ -1109,26 +901,6 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     return isTreeMapChartType(chartType);
   }
 
-  supportsLegend(chartType: string | null): boolean {
-    return supportsLegend(chartType);
-  }
-
-  supportsEmphasis(chartType: string | null): boolean {
-    return supportsEmphasis(chartType);
-  }
-
-  supportsToolbox(chartType: string | null): boolean {
-    return supportsToolbox(chartType);
-  }
-
-  supportsTooltip(chartType: string | null): boolean {
-    return supportsTooltip(chartType);
-  }
-
-  supportsAnimation(chartType: string | null): boolean {
-    return supportsAnimation(chartType);
-  }
-
   isBubbleChartType(chartType: string | null): boolean {
     return isBubbleChartType(chartType);
   }
@@ -1237,14 +1009,6 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     return isFlowGlChartType(chartType);
   }
 
-  supportsDataZoom(chartType: string | null): boolean {
-    return supportsDataZoom(chartType);
-  }
-
-  supportsDataLabel(chartType: string | null): boolean {
-    return supportsDataLabel(chartType);
-  }
-
   /**
    * Check if a visual has all required fields mapped for its chart type.
    * No-axis charts (pie, gauge, card, funnel, sunburst, tree, etc.) only need dummy data or single column.
@@ -1285,9 +1049,6 @@ export class AddAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     return is3DCoordinateChartType(chartType);
   }
 
-  supportsGradient(chartType: string | null): boolean {
-    return supportsGradient(chartType);
-  }
   /**
    * Compute and store chart data on the visual object based on axis selections
    * Uses ChartDataTransformerService for modular data transformation
