@@ -50,6 +50,7 @@ export class AddCustomFieldDialogComponent
   @Input() datasetFields: any[] = [];
   @Input() editMode: boolean = false;
   @Input() editFieldData: any = null;
+  @Input() analysisId: string = '';
   @Output() close = new EventEmitter<any>();
 
   customField: CustomFieldData = {
@@ -462,13 +463,18 @@ export class AddCustomFieldDialogComponent
         });
     } else {
       // Add mode - call add API
-      const payload = {
+      const payload: any = {
         organisation: this.organisationId,
         datasetId: this.datasetId,
         name: this.customField.columnToView,
         customLogic: this.customField.columnToUse,
         used_field_ids: usedCustomFieldIds,
       };
+
+      // Include analysisId for analysis-level custom fields
+      if (this.analysisId) {
+        payload.analysisId = this.analysisId;
+      }
 
       this.datasetService
         .addCustomField(payload)

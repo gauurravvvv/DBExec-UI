@@ -522,6 +522,14 @@
     border-left: 3px solid var(--primary-color);
   }
 
+  .field-card.analysis-field {
+    border-left: 3px solid var(--orange-500, #f59e0b);
+  }
+
+  .field-card.analysis-field.custom-field {
+    border-left: 3px solid var(--orange-500, #f59e0b);
+  }
+
   .field-action {
     display: flex;
     align-items: center;

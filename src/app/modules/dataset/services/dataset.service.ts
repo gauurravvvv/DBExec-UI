@@ -272,16 +272,23 @@ export class DatasetService {
   }
 
   addCustomField(payload: any) {
-    const { organisation, datasetId, name, customLogic, used_field_ids } =
+    const { organisation, datasetId, name, customLogic, used_field_ids, analysisId } =
       payload;
+    const requestBody: any = {
+      organisation,
+      datasetId,
+      name,
+      customLogic,
+      used_field_ids,
+    };
+
+    // Include analysisId for analysis-level custom fields
+    if (analysisId) {
+      requestBody.analysisId = analysisId;
+    }
+
     return this.http
-      .post(DATASET.ADD_FIELD, {
-        organisation,
-        datasetId,
-        name,
-        customLogic,
-        used_field_ids,
-      })
+      .post(DATASET.ADD_FIELD, requestBody)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

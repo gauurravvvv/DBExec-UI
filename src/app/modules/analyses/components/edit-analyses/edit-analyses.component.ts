@@ -135,6 +135,14 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   analysisDetails: any = null;
   datasetDetails: any = null;
 
+  // Analysis-level fields
+  analysisFields: any[] = [];
+
+  // Custom field dialog state
+  showCustomFieldDialog: boolean = false;
+  editFieldMode: boolean = false;
+  editFieldData: any = null;
+
   // Sidebar toggle states
   isFieldsPanelOpen: boolean = true;
   isVisualsPanelOpen: boolean = true;
@@ -200,15 +208,29 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     return 'pi-bars';
   }
 
-  // Filtered dataset fields based on search query
+  // Combined fields: dataset-level + analysis-level
+  get allFields(): any[] {
+    const datasetFields = (this.datasetDetails?.datasetFields || []).map((f: any) => ({
+      ...f,
+      _scope: 'dataset',
+    }));
+    const analysisFields = (this.analysisFields || []).map((f: any) => ({
+      ...f,
+      _scope: 'analysis',
+    }));
+    return [...datasetFields, ...analysisFields];
+  }
+
+  // Filtered fields based on search query
   get filteredDatasetFields(): any[] {
-    if (!this.datasetDetails?.datasetFields) {
+    const fields = this.allFields;
+    if (!fields.length) {
       return [];
     }
     if (!this.datasetFieldsSearchQuery) {
-      return this.datasetDetails.datasetFields;
+      return fields;
     }
-    return this.datasetDetails.datasetFields.filter((field: any) =>
+    return fields.filter((field: any) =>
       field.columnToView
         .toLowerCase()
         .includes(this.datasetFieldsSearchQuery.toLowerCase()),
@@ -523,7 +545,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Step 2: Load dataset info (fields)
+   * Step 2: Load dataset info (fields) + analysis-level fields
    */
   loadDatasetInfo(): void {
     console.log('=== 2. LOADING DATASET INFO ===');
@@ -537,11 +559,28 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
             this.datasetDetails?.datasetFields?.length,
           );
 
+          // Also fetch analysis-level fields
+          this.loadAnalysisFields();
+
           // Load existing filters for this analysis
           this.loadExistingFilters();
 
           // Step 3: Initialize store and run query
           this.initializeStoreSelectors();
+        }
+      });
+  }
+
+  /**
+   * Load analysis-level custom fields
+   */
+  loadAnalysisFields(): void {
+    this.analysesService
+      .getAnalysisFields(this.orgId, this.analysisId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.analysisFields = response.data?.analysisFields || [];
+          console.log('Analysis fields loaded:', this.analysisFields.length);
         }
       });
   }
@@ -867,6 +906,50 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   goBack(): void {
     this.router.navigate([ANALYSES.LIST]);
+  }
+
+  // --- Custom Field Dialog ---
+
+  openAddCustomField(): void {
+    this.editFieldMode = false;
+    this.editFieldData = null;
+    this.showCustomFieldDialog = true;
+  }
+
+  openEditCustomField(field: any): void {
+    this.editFieldMode = true;
+    this.editFieldData = {
+      ...field,
+      datasetId: this.datasetId,
+      organisationId: this.orgId,
+    };
+    this.showCustomFieldDialog = true;
+  }
+
+  onCustomFieldDialogClose(event: any): void {
+    this.showCustomFieldDialog = false;
+    if (event?.field) {
+      // Refresh both dataset and analysis fields
+      this.loadAnalysisFields();
+      // Also refresh dataset details in case a dataset-level field was edited
+      this.datasetService
+        .getDataset(this.orgId, this.datasetId)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.datasetDetails = response.data;
+          }
+        });
+    }
+  }
+
+  deleteAnalysisField(field: any): void {
+    this.datasetService
+      .deleteDatasetField(this.orgId, this.datasetId, field.id)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.loadAnalysisFields();
+        }
+      });
   }
 
   toggleFieldsPanel(): void {
@@ -1540,8 +1623,9 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getFieldDisplayName(columnName: string | null): string {
-    if (!columnName || !this.datasetDetails?.datasetFields) return '';
-    const field = this.datasetDetails.datasetFields.find(
+    if (!columnName) return '';
+    // Search in combined fields (dataset + analysis)
+    const field = this.allFields.find(
       (f: any) => f.columnName === columnName || f.columnToView === columnName,
     );
     return field?.columnToView || columnName;

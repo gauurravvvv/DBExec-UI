@@ -126,7 +126,7 @@
     <div class="database-sidebar" [class.collapsed]="!isFieldsPanelOpen">
       <div class="sidebar-content">
         <div class="sidebar-header-info">
-          <div class="dataset-label">Dataset</div>
+          <div class="dataset-label">Fields</div>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-content-inner">
@@ -139,7 +139,7 @@
           <!-- Search Input -->
           <div
             class="search-wrapper"
-            *ngIf="datasetDetails?.datasetFields?.length"
+            *ngIf="allFields.length"
           >
             <span class="p-input-icon-left" style="width: 100%">
               <i class="pi pi-search"></i>
@@ -153,29 +153,101 @@
             </span>
           </div>
 
-          <!-- Fields List -->
+          <!-- Dataset Fields Section -->
+          <div *ngIf="datasetDetails?.datasetFields?.length" style="padding: 4px 12px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-color-secondary); letter-spacing: 0.05em;">
+            Dataset Fields
+          </div>
           <div class="fields-list" [class.selection-mode]="activeAxisSelection">
-            <div
-              class="field-card"
-              *ngFor="let field of filteredDatasetFields"
-              [class.custom-field]="field.type === 2"
-              [class.selectable]="activeAxisSelection !== null"
-              (click)="onFieldClick(field)"
+            <ng-container *ngFor="let field of filteredDatasetFields">
+              <div
+                *ngIf="field._scope === 'dataset'"
+                class="field-card"
+                [class.custom-field]="field.type === 2"
+                [class.selectable]="activeAxisSelection !== null"
+                (click)="onFieldClick(field)"
+              >
+                <div class="field-icon">
+                  <i class="pi" [ngClass]="getDataTypeIcon(field.dataType)"></i>
+                </div>
+                <div class="field-info">
+                  <div class="field-name">{{ field.columnToView }}</div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- Analysis Fields Section -->
+          <div style="padding: 6px 12px 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--primary-color); letter-spacing: 0.05em; border-top: 1px solid var(--surface-border); margin-top: 4px; display: flex; align-items: center; justify-content: space-between;">
+            <span>Analysis Fields</span>
+            <button
+              pButton
+              class="p-button-text p-button-sm p-button-plain"
+              style="padding: 0; height: 18px; width: 18px;"
+              (click)="openAddCustomField()"
+              pTooltip="Add analysis custom field"
+              tooltipPosition="right"
             >
-              <div class="field-icon">
-                <i
-                  class="pi"
-                  [ngClass]="getDataTypeIcon(field.dataType)"
-                ></i>
+              <i class="pi pi-plus" style="font-size: 0.7rem;"></i>
+            </button>
+          </div>
+          <div class="fields-list" [class.selection-mode]="activeAxisSelection">
+            <ng-container *ngFor="let field of filteredDatasetFields">
+              <div
+                *ngIf="field._scope === 'analysis'"
+                class="field-card analysis-field"
+                [class.custom-field]="field.type === 2"
+                [class.selectable]="activeAxisSelection !== null"
+                (click)="onFieldClick(field)"
+              >
+                <div class="field-icon">
+                  <i class="pi" [ngClass]="getDataTypeIcon(field.dataType)"></i>
+                </div>
+                <div class="field-info">
+                  <div class="field-name">{{ field.columnToView }}</div>
+                </div>
+                <div *ngIf="field.type === 2" style="margin-left: auto; display: flex; gap: 2px;">
+                  <button
+                    pButton
+                    class="p-button-text p-button-sm p-button-plain"
+                    style="padding: 0; height: 20px; width: 20px;"
+                    (click)="openEditCustomField(field); $event.stopPropagation()"
+                    pTooltip="Edit"
+                    tooltipPosition="top"
+                  >
+                    <i class="pi pi-pencil" style="font-size: 0.65rem;"></i>
+                  </button>
+                  <button
+                    pButton
+                    class="p-button-text p-button-sm p-button-danger p-button-plain"
+                    style="padding: 0; height: 20px; width: 20px;"
+                    (click)="deleteAnalysisField(field); $event.stopPropagation()"
+                    pTooltip="Delete"
+                    tooltipPosition="top"
+                  >
+                    <i class="pi pi-trash" style="font-size: 0.65rem;"></i>
+                  </button>
+                </div>
               </div>
-              <div class="field-info">
-                <div class="field-name">{{ field.columnToView }}</div>
-              </div>
+            </ng-container>
+            <div *ngIf="analysisFields.length === 0" style="padding: 8px 12px; font-size: 0.75rem; color: var(--text-color-secondary); text-align: center;">
+              No analysis-level fields yet
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Custom Field Dialog -->
+    <app-add-custom-field-dialog
+      [visible]="showCustomFieldDialog"
+      [datasetId]="datasetId"
+      [organisationId]="orgId"
+      [analysisId]="analysisId"
+      [datasetFields]="allFields"
+      [editMode]="editFieldMode"
+      [editFieldData]="editFieldData"
+      (close)="onCustomFieldDialogClose($event)"
+    ></app-add-custom-field-dialog>
 
     <!-- Left Sidebar 2 - Visuals Panel -->
     <div class="visuals-sidebar" [class.collapsed]="!isVisualsPanelOpen">

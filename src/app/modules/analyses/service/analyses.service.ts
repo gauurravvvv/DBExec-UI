@@ -302,6 +302,20 @@ export class AnalysesService {
       });
   }
 
+  /**
+   * Get combined fields for an analysis (dataset-level + analysis-level)
+   * GET /analyses/get/fields/:orgId/:analysisId
+   */
+  getAnalysisFields(orgId: string, analysisId: string) {
+    return this.http
+      .get(ANALYSES.GET_FIELDS + `${orgId}/${analysisId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   updateDataset(payload: any) {
     const { id, name, description, organisation, database, sql } = payload;
 
