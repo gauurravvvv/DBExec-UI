@@ -72,9 +72,10 @@ export class FilterConfigDialogComponent implements OnChanges {
   }
 
   private populateFromFilter(filter: ConfiguredFilter): void {
-    this.filterDialogColumn = this.datasetFields?.find(
-      (f: any) => (f.columnName || f.columnToView) === filter.columnName,
-    ) || null;
+    this.filterDialogColumn =
+      this.datasetFields?.find(
+        (f: any) => (f.columnName || f.columnToView) === filter.columnName,
+      ) || null;
     this.filterDialogType = filter.filterType;
     this.filterDialogControl = filter.controlType;
     this.filterDialogName = filter.name;
@@ -138,9 +139,16 @@ export class FilterConfigDialogComponent implements OnChanges {
   }
 
   saveFilterDialog(): void {
-    if (!this.filterDialogColumn || !this.filterDialogType || !this.filterDialogControl) return;
+    if (
+      !this.filterDialogColumn ||
+      !this.filterDialogType ||
+      !this.filterDialogControl
+    )
+      return;
 
-    const columnName = this.filterDialogColumn.columnName || this.filterDialogColumn.columnToView;
+    const columnName =
+      this.filterDialogColumn.columnName ||
+      this.filterDialogColumn.columnToView;
     const name = this.filterDialogName || this.filterDialogColumn.columnToView;
 
     this.save.emit({

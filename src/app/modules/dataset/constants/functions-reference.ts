@@ -757,79 +757,79 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
     functions: [
       {
         name: 'avgOver',
-        usage: "avgOver({sales}, {region})",
+        usage: 'avgOver({sales}, {region})',
         description:
           'Calculates average of a measure partitioned by a dimension. avgOver({sales}, {region}) returns the average sales for each region, repeated on every row of that region.',
       },
       {
         name: 'sumOver',
-        usage: "sumOver({sales}, {region})",
+        usage: 'sumOver({sales}, {region})',
         description:
           'Calculates sum of a measure partitioned by a dimension. Each row shows the total for its partition group. Useful for calculating group totals alongside detail rows.',
       },
       {
         name: 'countOver',
-        usage: "countOver({id}, {category})",
+        usage: 'countOver({id}, {category})',
         description:
           'Counts values partitioned by a dimension. countOver({id}, {category}) gives the count of items in each category, shown on every row of that category.',
       },
       {
         name: 'distinctCountOver',
-        usage: "distinctCountOver({customerId}, {region})",
+        usage: 'distinctCountOver({customerId}, {region})',
         description:
           'Counts distinct values partitioned by a dimension. distinctCountOver({customerId}, {region}) counts unique customers per region. Useful for unique entity counts per group.',
       },
       {
         name: 'maxOver',
-        usage: "maxOver({price}, {category})",
+        usage: 'maxOver({price}, {category})',
         description:
           'Finds the maximum value within each partition. maxOver({price}, {category}) returns the highest price in each category, shown on every row of that category.',
       },
       {
         name: 'minOver',
-        usage: "minOver({price}, {category})",
+        usage: 'minOver({price}, {category})',
         description:
           'Finds the minimum value within each partition. minOver({price}, {category}) returns the lowest price in each category, shown on every row of that category.',
       },
       {
         name: 'stdevOver',
-        usage: "stdevOver({sales}, {region})",
+        usage: 'stdevOver({sales}, {region})',
         description:
           'Calculates sample standard deviation within each partition. Measures spread of values from the mean using n-1 denominator, grouped by the specified dimension.',
       },
       {
         name: 'stdevpOver',
-        usage: "stdevpOver({sales}, {region})",
+        usage: 'stdevpOver({sales}, {region})',
         description:
           'Calculates population standard deviation within each partition. Uses n denominator. Use when partition data represents the complete population.',
       },
       {
         name: 'varOver',
-        usage: "varOver({sales}, {region})",
+        usage: 'varOver({sales}, {region})',
         description:
           'Calculates sample variance within each partition. Measures data dispersion as squared deviation from mean, using n-1 denominator, grouped by dimension.',
       },
       {
         name: 'varpOver',
-        usage: "varpOver({sales}, {region})",
+        usage: 'varpOver({sales}, {region})',
         description:
           'Calculates population variance within each partition. Uses n denominator. Appropriate when partitioned data is the complete population for that group.',
       },
       {
         name: 'percentileOver',
-        usage: "percentileOver({responseTime}, 95, {service})",
+        usage: 'percentileOver({responseTime}, 95, {service})',
         description:
           'Returns the value at a given percentile within each partition. percentileOver({responseTime}, 95, {service}) gives the 95th percentile response time per service.',
       },
       {
         name: 'percentileDiscOver',
-        usage: "percentileDiscOver({score}, 50, {department})",
+        usage: 'percentileDiscOver({score}, 50, {department})',
         description:
           'Discrete percentile within each partition. Returns an actual value from the dataset closest to the percentile. Never interpolates between values.',
       },
       {
         name: 'percentileContOver',
-        usage: "percentileContOver({score}, 50, {department})",
+        usage: 'percentileContOver({score}, 50, {department})',
         description:
           'Continuous percentile within each partition. May interpolate between values for mathematical precision. Can return values not in the original dataset.',
       },
@@ -933,7 +933,8 @@ export const FUNCTION_CATEGORIES: FunctionCategory[] = [
       },
       {
         name: 'periodOverPeriodPercentDifference',
-        usage: "periodOverPeriodPercentDifference({revenue}, {orderDate}, 'MM', 1)",
+        usage:
+          "periodOverPeriodPercentDifference({revenue}, {orderDate}, 'MM', 1)",
         description:
           'Calculates percentage change between current and N periods ago. Returns (current - previous) / previous * 100. A result of 15 means 15% growth.',
       },

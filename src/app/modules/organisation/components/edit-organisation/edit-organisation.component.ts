@@ -34,7 +34,12 @@ import {
       ),
       state(
         'expanded',
-        style({ height: '*', opacity: '1', overflow: 'hidden', padding: '1rem' }),
+        style({
+          height: '*',
+          opacity: '1',
+          overflow: 'hidden',
+          padding: '1rem',
+        }),
       ),
       transition('collapsed <=> expanded', [animate('200ms ease-in-out')]),
     ]),
@@ -97,7 +102,10 @@ export class EditOrganisationComponent implements OnInit {
       ],
       status: [],
       // Master DB fields
-      dbHost: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
+      dbHost: [
+        '',
+        [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')],
+      ],
       dbPort: [
         '',
         [
@@ -107,7 +115,10 @@ export class EditOrganisationComponent implements OnInit {
           Validators.max(65535),
         ],
       ],
-      dbName: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')]],
+      dbName: [
+        '',
+        [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')],
+      ],
       dbUsername: ['', [Validators.required]],
       dbPassword: [''],
     });
@@ -135,12 +146,14 @@ export class EditOrganisationComponent implements OnInit {
     });
 
     // Reset connection test when DB fields change
-    ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(field => {
-      this.orgForm.get(field)?.valueChanges.subscribe(() => {
-        this.connectionTested = false;
-        this.connectionTestResult = null;
-      });
-    });
+    ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
+      field => {
+        this.orgForm.get(field)?.valueChanges.subscribe(() => {
+          this.connectionTested = false;
+          this.connectionTestResult = null;
+        });
+      },
+    );
   }
 
   private loadOrganisationData() {
@@ -176,7 +189,11 @@ export class EditOrganisationComponent implements OnInit {
 
   isDbConnectionFieldsValid(): boolean {
     const fields = ['dbHost', 'dbPort', 'dbName', 'dbUsername'];
-    return fields.every(f => this.orgForm.get(f)?.valid && this.orgForm.get(f)?.value) || false;
+    return (
+      fields.every(
+        f => this.orgForm.get(f)?.valid && this.orgForm.get(f)?.value,
+      ) || false
+    );
   }
 
   isDbFieldsDirty(): boolean {

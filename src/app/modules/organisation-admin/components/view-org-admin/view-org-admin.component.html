@@ -32,7 +32,13 @@
         <button
           class="btn-danger"
           [disabled]="!adminData?.canDelete"
-          [pTooltip]="!adminData?.canDelete ? (adminData?.isDefault === 1 ? 'Default admin cannot be deleted' : 'Cannot delete yourself') : 'Delete'"
+          [pTooltip]="
+            !adminData?.canDelete
+              ? adminData?.isDefault === 1
+                ? 'Default admin cannot be deleted'
+                : 'Cannot delete yourself'
+              : 'Delete'
+          "
           tooltipPosition="bottom"
           (click)="confirmDelete(adminId)"
         >
@@ -125,10 +131,18 @@
               <span class="value">
                 <span
                   class="status-badge"
-                  [class.active]="!adminData?.isLocked && adminData?.status === 1"
+                  [class.active]="
+                    !adminData?.isLocked && adminData?.status === 1
+                  "
                   [class.locked]="adminData?.isLocked"
                 >
-                  {{ adminData?.isLocked ? 'Locked' : (adminData?.status === 1 ? 'Active' : 'Inactive') }}
+                  {{
+                    adminData?.isLocked
+                      ? 'Locked'
+                      : adminData?.status === 1
+                        ? 'Active'
+                        : 'Inactive'
+                  }}
                 </span>
                 <button
                   *ngIf="adminData?.isLocked"

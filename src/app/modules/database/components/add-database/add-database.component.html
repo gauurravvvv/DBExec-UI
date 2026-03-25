@@ -237,7 +237,9 @@
               <a
                 class="test-connection-link"
                 (click)="testConnection()"
-                [class.disabled]="!isConnectionFieldsValid() || connectionTestLoading"
+                [class.disabled]="
+                  !isConnectionFieldsValid() || connectionTestLoading
+                "
               >
                 <i
                   class="pi"

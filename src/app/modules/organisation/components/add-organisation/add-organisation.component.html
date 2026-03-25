@@ -218,7 +218,11 @@
               </div>
               <small
                 class="error-message"
-                *ngIf="!confirmationChecked && orgForm.get('encryptionAlgorithm')?.valid && orgForm.get('pepperKey')?.valid"
+                *ngIf="
+                  !confirmationChecked &&
+                  orgForm.get('encryptionAlgorithm')?.valid &&
+                  orgForm.get('pepperKey')?.valid
+                "
               >
                 Please acknowledge the encryption configuration settings
               </small>
@@ -362,13 +366,23 @@
             <div class="connection-test-section">
               <span
                 class="test-connection-link"
-                [class.disabled]="!isDbConnectionFieldsValid() || connectionTestLoading"
+                [class.disabled]="
+                  !isDbConnectionFieldsValid() || connectionTestLoading
+                "
                 (click)="testConnection()"
               >
                 <i
-                  [class]="connectionTestLoading ? 'pi pi-spin pi-spinner' : 'pi pi-bolt'"
+                  [class]="
+                    connectionTestLoading
+                      ? 'pi pi-spin pi-spinner'
+                      : 'pi pi-bolt'
+                  "
                 ></i>
-                {{ connectionTestLoading ? 'Testing connection...' : 'Test Connection' }}
+                {{
+                  connectionTestLoading
+                    ? 'Testing connection...'
+                    : 'Test Connection'
+                }}
               </span>
               <span
                 class="connection-status success"
@@ -411,8 +425,8 @@
 
             <p class="admin-setup-note">
               <i class="pi pi-info-circle"></i>
-              A setup email will be sent to this address. The admin will set their
-              own password.
+              A setup email will be sent to this address. The admin will set
+              their own password.
             </p>
           </div>
         </div>
@@ -437,8 +451,8 @@
                     Database Administrator Privileges
                   </label>
                   <p class="acknowledgment-text">
-                    I acknowledge that the username provided has admin privileges
-                    for this database.
+                    I acknowledge that the username provided has admin
+                    privileges for this database.
                   </p>
                 </div>
               </div>
@@ -454,7 +468,10 @@
                 >
                 </p-checkbox>
                 <div class="acknowledgment-content">
-                  <label for="schemaAcknowledgment" class="acknowledgment-label">
+                  <label
+                    for="schemaAcknowledgment"
+                    class="acknowledgment-label"
+                  >
                     Schema Creation Authorization
                   </label>
                   <p class="acknowledgment-text">

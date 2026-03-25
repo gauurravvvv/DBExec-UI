@@ -109,10 +109,12 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Combined fields: dataset-level + analysis-level
   get allFields(): any[] {
-    const datasetFields = (this.datasetDetails?.datasetFields || []).map((f: any) => ({
-      ...f,
-      _scope: 'dataset',
-    }));
+    const datasetFields = (this.datasetDetails?.datasetFields || []).map(
+      (f: any) => ({
+        ...f,
+        _scope: 'dataset',
+      }),
+    );
     const analysisFields = (this.analysisFields || []).map((f: any) => ({
       ...f,
       _scope: 'analysis',
@@ -646,7 +648,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
           // Set visual counter
           if (this.visuals.length > 0) {
-            this.visualCounter = Math.max(...this.visuals.map(v => Number(v.id) || 0), 0);
+            this.visualCounter = Math.max(
+              ...this.visuals.map(v => Number(v.id) || 0),
+              0,
+            );
           }
 
           this.cdr.detectChanges();
@@ -848,7 +853,9 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onFilterDialogSave(event: FilterDialogSaveEvent): void {
     if (this.editingFilter) {
-      const idx = this.configuredFilters.findIndex(f => f.tempId === this.editingFilter!.tempId);
+      const idx = this.configuredFilters.findIndex(
+        f => f.tempId === this.editingFilter!.tempId,
+      );
       if (idx !== -1) {
         this.configuredFilters[idx] = {
           ...this.configuredFilters[idx],
@@ -877,7 +884,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resequenceFilters(): void {
-    this.configuredFilters.forEach((f, i) => f.sequence = i);
+    this.configuredFilters.forEach((f, i) => (f.sequence = i));
   }
 
   getFilterTypeLabel(type: string): string {
@@ -886,7 +893,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async loadExistingFilters(): Promise<void> {
     try {
-      const res: any = await this.analysesService.listFilters(this.orgId, this.analysisId);
+      const res: any = await this.analysesService.listFilters(
+        this.orgId,
+        this.analysisId,
+      );
       if (res?.success && res.data) {
         this.configuredFilters = (res.data || []).map((f: any) => ({
           tempId: f.id || crypto.randomUUID(),

@@ -185,7 +185,13 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{ user.isLocked ? 'Locked' : (user.status === 1 ? 'Active' : 'Inactive') }}
+                  {{
+                    user.isLocked
+                      ? 'Locked'
+                      : user.status === 1
+                        ? 'Active'
+                        : 'Inactive'
+                  }}
                 </span>
               </td>
               <td>
@@ -224,7 +230,11 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(user.id)"
-                    [pTooltip]="!user.canDelete ? 'You do not have permission to delete' : 'Delete'"
+                    [pTooltip]="
+                      !user.canDelete
+                        ? 'You do not have permission to delete'
+                        : 'Delete'
+                    "
                     tooltipPosition="bottom"
                     [disabled]="!user.canDelete"
                   >

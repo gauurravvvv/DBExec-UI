@@ -284,7 +284,9 @@
 <app-save-dataset-dialog
   [visible]="showDuplicateDialog"
   [dialogTitle]="'Duplicate Dataset'"
-  [initialName]="datasetToDuplicate?.name ? datasetToDuplicate.name + ' (Copy)' : ''"
+  [initialName]="
+    datasetToDuplicate?.name ? datasetToDuplicate.name + ' (Copy)' : ''
+  "
   [initialDescription]="datasetToDuplicate?.description || ''"
   (close)="onDuplicateDialogClose($event)"
 ></app-save-dataset-dialog>

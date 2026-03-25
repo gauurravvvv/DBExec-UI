@@ -68,7 +68,10 @@ export class AddOrganisationComponent implements OnInit {
         ],
       ],
       // Master database fields
-      dbHost: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')]],
+      dbHost: [
+        '',
+        [Validators.required, Validators.pattern('^[a-zA-Z0-9.-]+$')],
+      ],
       dbPort: [
         '',
         [
@@ -78,19 +81,24 @@ export class AddOrganisationComponent implements OnInit {
           Validators.max(65535),
         ],
       ],
-      dbName: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')]],
+      dbName: [
+        '',
+        [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$')],
+      ],
       dbUsername: ['', [Validators.required]],
       dbPassword: ['', [Validators.required]],
       adminEmail: ['', [Validators.required, Validators.email]],
     });
 
     // Reset connection test when DB fields change
-    ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(field => {
-      this.orgForm.get(field)?.valueChanges.subscribe(() => {
-        this.connectionTested = false;
-        this.connectionTestResult = null;
-      });
-    });
+    ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
+      field => {
+        this.orgForm.get(field)?.valueChanges.subscribe(() => {
+          this.connectionTested = false;
+          this.connectionTestResult = null;
+        });
+      },
+    );
   }
 
   isStep1Valid(): boolean {
@@ -98,7 +106,13 @@ export class AddOrganisationComponent implements OnInit {
     const descValid = this.orgForm.get('description')?.valid || false;
     const encValid = this.orgForm.get('encryptionAlgorithm')?.valid || false;
     const pepperValid = this.orgForm.get('pepperKey')?.valid || false;
-    return nameValid && descValid && encValid && pepperValid && this.confirmationChecked;
+    return (
+      nameValid &&
+      descValid &&
+      encValid &&
+      pepperValid &&
+      this.confirmationChecked
+    );
   }
 
   isDbConnectionFieldsValid(): boolean {

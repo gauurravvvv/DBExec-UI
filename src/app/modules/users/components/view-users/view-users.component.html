@@ -32,7 +32,11 @@
           class="btn-danger"
           type="button"
           [disabled]="!userData?.canDelete"
-          [pTooltip]="!userData?.canDelete ? 'You do not have permission to delete' : 'Delete'"
+          [pTooltip]="
+            !userData?.canDelete
+              ? 'You do not have permission to delete'
+              : 'Delete'
+          "
           tooltipPosition="bottom"
           (click)="confirmDelete(userId)"
         >
@@ -126,7 +130,13 @@
                   [class.active]="!userData?.isLocked && userData?.status === 1"
                   [class.locked]="userData?.isLocked"
                 >
-                  {{ userData?.isLocked ? 'Locked' : (userData?.status === 1 ? 'Active' : 'Inactive') }}
+                  {{
+                    userData?.isLocked
+                      ? 'Locked'
+                      : userData?.status === 1
+                        ? 'Active'
+                        : 'Inactive'
+                  }}
                 </span>
                 <button
                   *ngIf="userData?.isLocked"

@@ -17,7 +17,9 @@ $radius-sm: 8px;
   border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease, min-width 0.3s ease;
+  transition:
+    width 0.3s ease,
+    min-width 0.3s ease;
   overflow: hidden;
 
   &.collapsed {

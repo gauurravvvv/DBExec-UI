@@ -53,8 +53,17 @@ export class OrganisationService {
   }
 
   editOrganisation(orgForm: FormGroup) {
-    const { id, name, status, description, dbHost, dbPort, dbName, dbUsername, dbPassword } =
-      orgForm.getRawValue();
+    const {
+      id,
+      name,
+      status,
+      description,
+      dbHost,
+      dbPort,
+      dbName,
+      dbUsername,
+      dbPassword,
+    } = orgForm.getRawValue();
 
     const payload: any = {
       id,

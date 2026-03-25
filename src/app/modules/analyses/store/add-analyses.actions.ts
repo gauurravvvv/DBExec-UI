@@ -44,6 +44,4 @@ export const applyFilters = createAction(
 );
 
 // Clear all applied filters
-export const clearAllFilters = createAction(
-  '[Analyses] Clear All Filters',
-);
+export const clearAllFilters = createAction('[Analyses] Clear All Filters');

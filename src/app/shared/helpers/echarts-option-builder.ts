@@ -156,7 +156,7 @@ function buildGrid(config: any): any {
   // containLabel: true handles rotated label space automatically,
   // so we only need base margins for axis names + legend
   const baseBottom = config.showXAxisLabel ? 40 : 15;
-  const pos = config.legend ? (config.legendPosition || 'right') : '';
+  const pos = config.legend ? config.legendPosition || 'right' : '';
 
   return {
     left: pos === 'left' ? 140 : 50,
@@ -503,14 +503,20 @@ export function buildBarChartOption(
         name: cat,
         type: 'bar',
         stack: 'single', // stack on same position so bars don't spread out
-        data: values.map((v, j) => j === i ? {
-          value: v,
-          itemStyle: coloredValues[j].itemStyle,
-        } : null), // null = invisible + excluded from tooltip
+        data: values.map((v, j) =>
+          j === i
+            ? {
+                value: v,
+                itemStyle: coloredValues[j].itemStyle,
+              }
+            : null,
+        ), // null = invisible + excluded from tooltip
         label: buildDataLabel(config, isHorizontal ? 'right' : 'top'),
         barGap: config.barGap || '30%',
         barCategoryGap: config.barCategoryGap || '20%',
-        itemStyle: borderRadius ? { borderRadius, ...coloredValues[i].itemStyle } : coloredValues[i].itemStyle,
+        itemStyle: borderRadius
+          ? { borderRadius, ...coloredValues[i].itemStyle }
+          : coloredValues[i].itemStyle,
       }));
       // Custom tooltip formatter to filter out null entries from stacked series
       option.tooltip = {

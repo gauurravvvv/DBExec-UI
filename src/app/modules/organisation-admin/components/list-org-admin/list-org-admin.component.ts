@@ -190,13 +190,15 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
   }
 
   onUnlock(id: string) {
-    this.orgAdminService.unlockOrgAdmin(this.selectedOrg, id).then((res: any) => {
-      if (this.globalService.handleSuccessService(res)) {
-        if (this.lastTableLazyLoadEvent) {
-          this.loadAdmins(this.lastTableLazyLoadEvent);
+    this.orgAdminService
+      .unlockOrgAdmin(this.selectedOrg, id)
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
+          if (this.lastTableLazyLoadEvent) {
+            this.loadAdmins(this.lastTableLazyLoadEvent);
+          }
         }
-      }
-    });
+      });
   }
 
   onEdit(id: string) {

@@ -82,13 +82,11 @@ export class ViewUsersComponent implements OnInit {
   }
 
   onUnlock() {
-    this.userService
-      .unlockUser(this.orgId, this.userId)
-      .then((res: any) => {
-        if (this.globalService.handleSuccessService(res)) {
-          this.loadAdminData();
-        }
-      });
+    this.userService.unlockUser(this.orgId, this.userId).then((res: any) => {
+      if (this.globalService.handleSuccessService(res)) {
+        this.loadAdminData();
+      }
+    });
   }
 
   openChangePasswordDialog() {

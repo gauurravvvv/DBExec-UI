@@ -272,8 +272,14 @@ export class DatasetService {
   }
 
   addCustomField(payload: any) {
-    const { organisation, datasetId, name, customLogic, used_field_ids, analysisId } =
-      payload;
+    const {
+      organisation,
+      datasetId,
+      name,
+      customLogic,
+      used_field_ids,
+      analysisId,
+    } = payload;
     const requestBody: any = {
       organisation,
       datasetId,
@@ -296,7 +302,12 @@ export class DatasetService {
       });
   }
 
-  duplicateDataset(orgId: string, datasetId: string, name: string, description: string) {
+  duplicateDataset(
+    orgId: string,
+    datasetId: string,
+    name: string,
+    description: string,
+  ) {
     return this.http
       .post(DATASET.DUPLICATE + `${orgId}/${datasetId}`, { name, description })
       .toPromise()

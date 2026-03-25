@@ -34,6 +34,9 @@ export class AuditService {
   }
 
   exportLoginActivity(params: any): Observable<Blob> {
-    return this.http.get(AUDIT.EXPORT_LOGIN_ACTIVITY, { params, responseType: 'blob' });
+    return this.http.get(AUDIT.EXPORT_LOGIN_ACTIVITY, {
+      params,
+      responseType: 'blob',
+    });
   }
 }

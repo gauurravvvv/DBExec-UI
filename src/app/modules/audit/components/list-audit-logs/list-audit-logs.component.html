@@ -190,7 +190,10 @@
                 }}</span>
               </td>
               <td>
-                <span class="action-badge" [ngClass]="getActionClass(log.action)">
+                <span
+                  class="action-badge"
+                  [ngClass]="getActionClass(log.action)"
+                >
                   {{ log.action }}
                 </span>
               </td>
@@ -215,9 +218,7 @@
                 }}</span>
               </td>
               <td>
-                <span class="description-text">{{
-                  log.ipAddress || '-'
-                }}</span>
+                <span class="description-text">{{ log.ipAddress || '-' }}</span>
               </td>
             </tr>
           </ng-template>
@@ -241,7 +242,11 @@
     <div class="popup-header">
       <div class="popup-title-row">
         <span class="popup-entity">{{ selectedLog.entityName || '-' }}</span>
-        <span class="action-badge" [ngClass]="getActionClass(selectedLog.action)">{{ selectedLog.action }}</span>
+        <span
+          class="action-badge"
+          [ngClass]="getActionClass(selectedLog.action)"
+          >{{ selectedLog.action }}</span
+        >
         <span class="version-badge">v{{ selectedLog.version || 1 }}</span>
       </div>
       <button class="popup-close" (click)="showDetailDialog = false">
@@ -261,11 +266,17 @@
       </div>
       <div class="info-item">
         <span class="info-label">Timestamp</span>
-        <span class="info-value">{{ selectedLog.createdOn | date: 'medium' }}</span>
+        <span class="info-value">{{
+          selectedLog.createdOn | date: 'medium'
+        }}</span>
       </div>
       <div class="info-item">
         <span class="info-label">Status</span>
-        <span class="info-value" [class.val-success]="selectedLog.responseSuccess" [class.val-error]="!selectedLog.responseSuccess">
+        <span
+          class="info-value"
+          [class.val-success]="selectedLog.responseSuccess"
+          [class.val-error]="!selectedLog.responseSuccess"
+        >
           {{ selectedLog.responseSuccess ? 'Success' : 'Failed' }}
         </span>
       </div>
@@ -275,7 +286,9 @@
       </div>
       <div class="info-item">
         <span class="info-label">Role</span>
-        <span class="info-value capitalize">{{ selectedLog.userRole || '-' }}</span>
+        <span class="info-value capitalize">{{
+          selectedLog.userRole || '-'
+        }}</span>
       </div>
     </div>
 
@@ -301,7 +314,10 @@
     </div>
 
     <!-- Entity details (CREATE / DELETE — flat kv list) -->
-    <div class="popup-section" *ngIf="!hasChangeComparison() && getEntityDetails().length">
+    <div
+      class="popup-section"
+      *ngIf="!hasChangeComparison() && getEntityDetails().length"
+    >
       <div class="section-title">Entity Details</div>
       <table class="details-table">
         <tbody>

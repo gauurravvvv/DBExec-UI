@@ -21,7 +21,13 @@ export class SetPasswordComponent implements OnInit {
   orgId!: string;
   token!: string;
 
-  pageState: 'loading' | 'valid' | 'expired' | 'already_set' | 'invalid' | 'resent' = 'loading';
+  pageState:
+    | 'loading'
+    | 'valid'
+    | 'expired'
+    | 'already_set'
+    | 'invalid'
+    | 'resent' = 'loading';
   resending = false;
 
   constructor(
@@ -33,14 +39,8 @@ export class SetPasswordComponent implements OnInit {
   ) {
     this.setPasswordForm = this.fb.group(
       {
-        newPassword: [
-          '',
-          [Validators.required, passwordStrengthValidator()],
-        ],
-        confirmPassword: [
-          '',
-          [Validators.required],
-        ],
+        newPassword: ['', [Validators.required, passwordStrengthValidator()]],
+        confirmPassword: ['', [Validators.required]],
       },
       {
         validator: this.passwordMatchValidator,
@@ -79,14 +79,12 @@ export class SetPasswordComponent implements OnInit {
 
   resendLink() {
     this.resending = true;
-    this.loginService
-      .resendSetupLink(this.userId, this.orgId)
-      .then(res => {
-        this.resending = false;
-        if (this.globalService.handleSuccessService(res)) {
-          this.pageState = 'resent';
-        }
-      });
+    this.loginService.resendSetupLink(this.userId, this.orgId).then(res => {
+      this.resending = false;
+      if (this.globalService.handleSuccessService(res)) {
+        this.pageState = 'resent';
+      }
+    });
   }
 
   passwordMatchValidator(g: FormGroup) {

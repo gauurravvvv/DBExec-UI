@@ -129,9 +129,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   handleDeepLinking(params: any) {
     const orgId = params['orgId'] ? params['orgId'] : null;
-    const databaseId = params['databaseId']
-      ? params['databaseId']
-      : null;
+    const databaseId = params['databaseId'] ? params['databaseId'] : null;
     const name = params['name'];
 
     if (name) {

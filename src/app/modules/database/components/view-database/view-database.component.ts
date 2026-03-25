@@ -67,17 +67,15 @@ export class ViewDatabaseComponent implements OnInit {
 
   // Changed from private to public
   loadDatabaseData(): void {
-    this.databaseService
-      .viewDatabase(this.orgId, this.dbId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.dbData = response.data;
-          this.prepareChartData();
-          this.updateChartOptions(); // Update options after data is loaded
-          this.filteredSchemas = this.dbData.statistics.schemaStats;
-          this.prepareTopStorageTables();
-        }
-      });
+    this.databaseService.viewDatabase(this.orgId, this.dbId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.dbData = response.data;
+        this.prepareChartData();
+        this.updateChartOptions(); // Update options after data is loaded
+        this.filteredSchemas = this.dbData.statistics.schemaStats;
+        this.prepareTopStorageTables();
+      }
+    });
   }
 
   onSchemaSearch(event: any): void {

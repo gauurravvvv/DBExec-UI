@@ -32,7 +32,14 @@
       </div>
 
       <!-- Numeric: Input -->
-      <div class="filter-control" *ngIf="filter.controlType === 'text' && (filter.filterType === 'numeric_equality' || filter.filterType === 'numeric_range')">
+      <div
+        class="filter-control"
+        *ngIf="
+          filter.controlType === 'text' &&
+          (filter.filterType === 'numeric_equality' ||
+            filter.filterType === 'numeric_range')
+        "
+      >
         <label>{{ filter.name }}</label>
         <p-inputNumber
           [placeholder]="filter.config?.placeholder || filter.name"
@@ -44,14 +51,22 @@
       </div>
 
       <!-- Numeric: Slider -->
-      <div class="filter-control slider-control" *ngIf="filter.controlType === 'slider'">
+      <div
+        class="filter-control slider-control"
+        *ngIf="filter.controlType === 'slider'"
+      >
         <label>{{ filter.name }}</label>
         <p-slider
           [(ngModel)]="appliedValues[filter.id]"
           [range]="true"
           [min]="filter.config?.rangeMin || 0"
           [max]="filter.config?.rangeMax || 100"
-          (onSlideEnd)="onFilterChange(filter, {min: $event.values[0], max: $event.values[1]})"
+          (onSlideEnd)="
+            onFilterChange(filter, {
+              min: $event.values[0],
+              max: $event.values[1],
+            })
+          "
         ></p-slider>
       </div>
 
@@ -60,7 +75,9 @@
         <label>{{ filter.name }}</label>
         <p-calendar
           [(ngModel)]="appliedValues[filter.id]"
-          [selectionMode]="filter.filterType === 'time_range' ? 'range' : 'single'"
+          [selectionMode]="
+            filter.filterType === 'time_range' ? 'range' : 'single'
+          "
           [showClear]="true"
           [placeholder]="filter.config?.placeholder || 'Select date'"
           (onSelect)="onFilterChange(filter, appliedValues[filter.id])"
@@ -70,7 +87,12 @@
       </div>
 
       <!-- Text: Input -->
-      <div class="filter-control" *ngIf="filter.controlType === 'text' && filter.filterType === 'category'">
+      <div
+        class="filter-control"
+        *ngIf="
+          filter.controlType === 'text' && filter.filterType === 'category'
+        "
+      >
         <label>{{ filter.name }}</label>
         <input
           pInputText

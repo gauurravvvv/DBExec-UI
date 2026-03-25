@@ -174,9 +174,7 @@
             <div class="warning-message" (click)="toggleWarning()">
               <div class="warning-header">
                 <i class="pi pi-exclamation-triangle"></i>
-                <span class="warning-title"
-                  >Master Database Configuration</span
-                >
+                <span class="warning-title">Master Database Configuration</span>
                 <i
                   class="pi"
                   [ngClass]="{
@@ -187,9 +185,7 @@
               </div>
               <div
                 class="warning-content"
-                [@expandCollapse]="
-                  isWarningExpanded ? 'expanded' : 'collapsed'
-                "
+                [@expandCollapse]="isWarningExpanded ? 'expanded' : 'collapsed'"
               >
                 <div class="warning-text">
                   <p>
@@ -197,8 +193,9 @@
                     that manages core system operations for this organisation.
                   </p>
                   <p>
-                    <i class="pi pi-circle-fill"></i>Any modifications may affect
-                    all users and services connected to this organisation.
+                    <i class="pi pi-circle-fill"></i>Any modifications may
+                    affect all users and services connected to this
+                    organisation.
                   </p>
                   <p>
                     <i class="pi pi-circle-fill"></i>Please ensure all changes

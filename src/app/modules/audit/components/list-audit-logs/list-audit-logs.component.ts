@@ -160,7 +160,12 @@ export class ListAuditLogsComponent implements OnInit {
     return m && m.oldValues && m.newValues;
   }
 
-  getChangeRows(): { field: string; oldVal: any; newVal: any; changed: boolean }[] {
+  getChangeRows(): {
+    field: string;
+    oldVal: any;
+    newVal: any;
+    changed: boolean;
+  }[] {
     const m = this.selectedLog?.metadata;
     if (!m?.oldValues || !m?.newValues) return [];
 
@@ -191,7 +196,10 @@ export class ListAuditLogsComponent implements OnInit {
     for (const [k, v] of Object.entries(m)) {
       if (k === 'entity' || k === 'oldValues' || k === 'newValues') continue;
       if (v !== null && typeof v === 'object' && !Array.isArray(v)) continue;
-      items.push({ key: this.formatKey(k), value: Array.isArray(v) ? v.join(', ') : (v ?? '-') });
+      items.push({
+        key: this.formatKey(k),
+        value: Array.isArray(v) ? v.join(', ') : (v ?? '-'),
+      });
     }
 
     return items;
@@ -267,11 +275,14 @@ export class ListAuditLogsComponent implements OnInit {
 
   private getFilterParams(): any {
     const filter: any = {};
-    if (this.filterValues.username) filter.username = this.filterValues.username;
+    if (this.filterValues.username)
+      filter.username = this.filterValues.username;
     if (this.filterValues.module) filter.module = this.filterValues.module;
     if (this.filterValues.action) filter.action = this.filterValues.action;
-    if (this.filterValues.entityName) filter.entityName = this.filterValues.entityName;
-    if (this.filterValues.organisationId) filter.organisationId = this.filterValues.organisationId;
+    if (this.filterValues.entityName)
+      filter.entityName = this.filterValues.entityName;
+    if (this.filterValues.organisationId)
+      filter.organisationId = this.filterValues.organisationId;
     return filter;
   }
 
@@ -285,9 +296,10 @@ export class ListAuditLogsComponent implements OnInit {
     this.auditService.exportAuditLogs(params).subscribe({
       next: (blob: Blob) => {
         const ext = format === 'excel' ? 'xlsx' : 'pdf';
-        const orgLabel = this.organisationOptions.find(
-          (o: any) => o.value === this.filterValues.organisationId
-        )?.label || 'Organisation';
+        const orgLabel =
+          this.organisationOptions.find(
+            (o: any) => o.value === this.filterValues.organisationId,
+          )?.label || 'Organisation';
         const dateStr = new Date().toISOString().slice(0, 10);
         const fileName = `Audit_Logs_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.${ext}`;
 
@@ -299,7 +311,11 @@ export class ListAuditLogsComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: () => {
-        this.globalService.handleSuccessService({ status: false, code: 500, message: 'Failed to export audit logs' });
+        this.globalService.handleSuccessService({
+          status: false,
+          code: 500,
+          message: 'Failed to export audit logs',
+        });
       },
     });
   }

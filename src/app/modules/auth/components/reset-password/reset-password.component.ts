@@ -1,5 +1,16 @@
-import { Component, OnInit, QueryList, ViewChildren, ElementRef } from '@angular/core';
-import { FormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
+import {
+  Component,
+  OnInit,
+  QueryList,
+  ViewChildren,
+  ElementRef,
+} from '@angular/core';
+import {
+  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RESET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -33,19 +44,18 @@ export class ResetPasswordComponent implements OnInit {
     private route: ActivatedRoute,
   ) {
     for (let i = 0; i < this.otpLength; i++) {
-      this.otpControls.push(new UntypedFormControl('', [Validators.required, Validators.pattern(/^[A-Za-z0-9]$/)]));
+      this.otpControls.push(
+        new UntypedFormControl('', [
+          Validators.required,
+          Validators.pattern(/^[A-Za-z0-9]$/),
+        ]),
+      );
     }
 
     this.resetPasswordForm = this.fb.group(
       {
-        newPassword: [
-          '',
-          [Validators.required, passwordStrengthValidator()],
-        ],
-        confirmPassword: [
-          '',
-          [Validators.required],
-        ],
+        newPassword: ['', [Validators.required, passwordStrengthValidator()]],
+        confirmPassword: ['', [Validators.required]],
       },
       {
         validator: this.passwordMatchValidator,
@@ -64,7 +74,10 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   get otpValue(): string {
-    return this.otpControls.map(c => c.value).join('').toUpperCase();
+    return this.otpControls
+      .map(c => c.value)
+      .join('')
+      .toUpperCase();
   }
 
   get isOtpComplete(): boolean {
@@ -117,7 +130,9 @@ export class ResetPasswordComponent implements OnInit {
 
   onOtpPaste(event: ClipboardEvent) {
     event.preventDefault();
-    const pasted = (event.clipboardData?.getData('text') || '').replace(/[^A-Za-z0-9]/g, '').slice(0, this.otpLength);
+    const pasted = (event.clipboardData?.getData('text') || '')
+      .replace(/[^A-Za-z0-9]/g, '')
+      .slice(0, this.otpLength);
     const inputs = this.otpInputs.toArray();
 
     for (let i = 0; i < this.otpLength; i++) {

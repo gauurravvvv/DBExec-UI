@@ -135,5 +135,5 @@ export const selectIsActiveDatasetStale = createSelector(
 // Select applied runtime filters
 export const selectAppliedFilters = createSelector(
   selectAddAnalysesState,
-  (state) => state.appliedFilters,
+  state => state.appliedFilters,
 );

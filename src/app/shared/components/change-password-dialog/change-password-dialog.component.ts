@@ -68,8 +68,7 @@ export class ChangePasswordDialogComponent implements OnInit {
 
   canSubmit(): boolean {
     return (
-      !this.passwordForm.invalid &&
-      !this.passwordForm.hasError('mismatch')
+      !this.passwordForm.invalid && !this.passwordForm.hasError('mismatch')
     );
   }
 

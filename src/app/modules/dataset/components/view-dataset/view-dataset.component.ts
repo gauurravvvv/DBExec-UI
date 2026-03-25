@@ -58,9 +58,7 @@ export class ViewDatasetComponent implements OnInit {
     ) {
       return 'pi-align-left';
     }
-    if (
-      type.includes('bool')
-    ) {
+    if (type.includes('bool')) {
       return 'pi-check-square';
     }
     if (
@@ -83,7 +81,11 @@ export class ViewDatasetComponent implements OnInit {
     if (type.includes('bytea') || type.includes('blob')) {
       return 'pi-file';
     }
-    if (type.includes('inet') || type.includes('cidr') || type.includes('macaddr')) {
+    if (
+      type.includes('inet') ||
+      type.includes('cidr') ||
+      type.includes('macaddr')
+    ) {
       return 'pi-globe';
     }
     if (type.includes('enum') || type.includes('user-defined')) {

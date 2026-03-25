@@ -147,38 +147,42 @@ export class EditDatabaseComponent implements OnInit {
   }
 
   loadDatabaseData(): void {
-    this.databaseService.viewDatabase(this.orgId, this.databaseId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        const data = response.data;
-        this.organisationName = data.organisationId;
+    this.databaseService
+      .viewDatabase(this.orgId, this.databaseId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const data = response.data;
+          this.organisationName = data.organisationId;
 
-        const formData = {
-          name: data.name,
-          description: data.description || '',
-          type: data.config?.dbType || 'postgres',
-          host: data.config?.hostname || '',
-          port: data.config?.port || '',
-          database: data.config?.dbName || '',
-          username: data.config?.username || '',
-          password: '',
-          organisation: data.organisationId,
-          status: data.status === 1,
-        };
+          const formData = {
+            name: data.name,
+            description: data.description || '',
+            type: data.config?.dbType || 'postgres',
+            host: data.config?.hostname || '',
+            port: data.config?.port || '',
+            database: data.config?.dbName || '',
+            username: data.config?.username || '',
+            password: '',
+            organisation: data.organisationId,
+            status: data.status === 1,
+          };
 
-        this.initialFormValues = { ...formData };
-        this.databaseForm.patchValue(formData);
-        this.isFormDirty = false;
+          this.initialFormValues = { ...formData };
+          this.databaseForm.patchValue(formData);
+          this.isFormDirty = false;
 
-        // Connection is already valid since the DB was fetched successfully
-        this.connectionTested = true;
-        this.connectionTestResult = 'success';
-      }
-    });
+          // Connection is already valid since the DB was fetched successfully
+          this.connectionTested = true;
+          this.connectionTestResult = 'success';
+        }
+      });
   }
 
   isConnectionFieldsValid(): boolean {
     const fields = ['host', 'port', 'database', 'username'];
-    return fields.every(f => this.databaseForm.get(f)?.valid && this.databaseForm.get(f)?.value);
+    return fields.every(
+      f => this.databaseForm.get(f)?.valid && this.databaseForm.get(f)?.value,
+    );
   }
 
   isConnectionFieldsDirty(): boolean {

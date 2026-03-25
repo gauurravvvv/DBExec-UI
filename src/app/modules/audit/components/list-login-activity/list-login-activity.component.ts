@@ -138,10 +138,14 @@ export class ListLoginActivityComponent implements OnInit {
 
   private getFilterParams(): any {
     const filter: any = {};
-    if (this.filterValues.username) filter.username = this.filterValues.username;
-    if (this.filterValues.eventType) filter.eventType = this.filterValues.eventType;
-    if (this.filterValues.organisationName) filter.organisationName = this.filterValues.organisationName;
-    if (this.filterValues.organisationId) filter.organisationId = this.filterValues.organisationId;
+    if (this.filterValues.username)
+      filter.username = this.filterValues.username;
+    if (this.filterValues.eventType)
+      filter.eventType = this.filterValues.eventType;
+    if (this.filterValues.organisationName)
+      filter.organisationName = this.filterValues.organisationName;
+    if (this.filterValues.organisationId)
+      filter.organisationId = this.filterValues.organisationId;
     return filter;
   }
 
@@ -155,9 +159,10 @@ export class ListLoginActivityComponent implements OnInit {
     this.auditService.exportLoginActivity(params).subscribe({
       next: (blob: Blob) => {
         const ext = format === 'excel' ? 'xlsx' : 'pdf';
-        const orgLabel = this.organisationOptions.find(
-          (o: any) => o.value === this.filterValues.organisationId
-        )?.label || 'Organisation';
+        const orgLabel =
+          this.organisationOptions.find(
+            (o: any) => o.value === this.filterValues.organisationId,
+          )?.label || 'Organisation';
         const dateStr = new Date().toISOString().slice(0, 10);
         const fileName = `Login_Activity_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.${ext}`;
 
@@ -169,7 +174,11 @@ export class ListLoginActivityComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: () => {
-        this.globalService.handleSuccessService({ status: false, code: 500, message: 'Failed to export login activity' });
+        this.globalService.handleSuccessService({
+          status: false,
+          code: 500,
+          message: 'Failed to export login activity',
+        });
       },
     });
   }

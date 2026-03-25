@@ -187,7 +187,13 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{ admin.isLocked ? 'Locked' : (admin.status === 1 ? 'Active' : 'Inactive') }}
+                  {{
+                    admin.isLocked
+                      ? 'Locked'
+                      : admin.status === 1
+                        ? 'Active'
+                        : 'Inactive'
+                  }}
                 </span>
               </td>
               <td>
@@ -229,7 +235,13 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(admin.id)"
-                    [pTooltip]="!admin.canDelete ? (admin.isDefault === 1 ? 'Default admin cannot be deleted' : 'Cannot delete yourself') : 'Delete'"
+                    [pTooltip]="
+                      !admin.canDelete
+                        ? admin.isDefault === 1
+                          ? 'Default admin cannot be deleted'
+                          : 'Cannot delete yourself'
+                        : 'Delete'
+                    "
                     tooltipPosition="bottom"
                     [disabled]="!admin.canDelete"
                   >

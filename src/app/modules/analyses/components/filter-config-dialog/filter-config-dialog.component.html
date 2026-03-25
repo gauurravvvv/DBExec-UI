@@ -85,7 +85,9 @@
         class="btn-primary"
         type="button"
         (click)="saveFilterDialog()"
-        [disabled]="!filterDialogColumn || !filterDialogType || !filterDialogControl"
+        [disabled]="
+          !filterDialogColumn || !filterDialogType || !filterDialogControl
+        "
       >
         <i class="pi pi-check"></i>
         {{ editingFilter ? 'Update Filter' : 'Add Filter' }}

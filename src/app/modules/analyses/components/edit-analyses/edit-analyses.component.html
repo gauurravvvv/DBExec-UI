@@ -630,7 +630,11 @@
               class="p-button-outlined add-filter-button"
               (click)="addFilter()"
               [disabled]="!datasetDetails?.datasetFields?.length"
-              [pTooltip]="datasetDetails?.datasetFields?.length ? '' : 'Load data first to add filters'"
+              [pTooltip]="
+                datasetDetails?.datasetFields?.length
+                  ? ''
+                  : 'Load data first to add filters'
+              "
               tooltipPosition="bottom"
             ></button>
           </div>
@@ -643,21 +647,41 @@
               [class.disabled]="!filter.isEnabled"
             >
               <div class="filter-card-header">
-                <span class="filter-card-name" [pTooltip]="filter.name" tooltipPosition="top">
+                <span
+                  class="filter-card-name"
+                  [pTooltip]="filter.name"
+                  tooltipPosition="top"
+                >
                   {{ filter.name }}
                 </span>
                 <div class="filter-card-actions">
-                  <i class="pi pi-pencil" (click)="editFilter(filter)" pTooltip="Edit" tooltipPosition="top"></i>
-                  <i class="pi pi-trash" (click)="removeFilter(filter)" pTooltip="Remove" tooltipPosition="top"></i>
+                  <i
+                    class="pi pi-pencil"
+                    (click)="editFilter(filter)"
+                    pTooltip="Edit"
+                    tooltipPosition="top"
+                  ></i>
+                  <i
+                    class="pi pi-trash"
+                    (click)="removeFilter(filter)"
+                    pTooltip="Remove"
+                    tooltipPosition="top"
+                  ></i>
                 </div>
               </div>
               <div class="filter-card-meta">
                 <span class="filter-card-column">{{ filter.columnName }}</span>
-                <span class="filter-card-type">{{ getFilterTypeLabel(filter.filterType) }}</span>
+                <span class="filter-card-type">{{
+                  getFilterTypeLabel(filter.filterType)
+                }}</span>
               </div>
               <div class="filter-card-badges">
-                <span class="badge badge-mandatory" *ngIf="filter.isMandatory">Required</span>
-                <span class="badge badge-disabled" *ngIf="!filter.isEnabled">Disabled</span>
+                <span class="badge badge-mandatory" *ngIf="filter.isMandatory"
+                  >Required</span
+                >
+                <span class="badge badge-disabled" *ngIf="!filter.isEnabled"
+                  >Disabled</span
+                >
               </div>
             </div>
           </div>

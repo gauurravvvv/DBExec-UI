@@ -84,7 +84,9 @@
               </a>
             </li>
             <li class="menu-item" *ngIf="isOrgAdmin">
-              <a (click)="showAnnouncementDialog = true; showProfileMenu = false">
+              <a
+                (click)="showAnnouncementDialog = true; showProfileMenu = false"
+              >
                 <i class="pi pi-volume-up"></i>
                 <span>Announce</span>
               </a>
@@ -106,7 +108,7 @@
 <div
   class="announcement-banner"
   *ngIf="announcementTitle"
-  [ngStyle]="{ 'background': announcementBgColor, 'color': announcementTextColor }"
+  [ngStyle]="{ background: announcementBgColor, color: announcementTextColor }"
 >
   <div class="banner-shimmer"></div>
   <div class="banner-glow-left"></div>
@@ -132,10 +134,15 @@
   (click)="showAnnouncementOverlay = false"
 >
   <div class="announcement-popup" (click)="$event.stopPropagation()">
-    <div class="popup-accent" [ngStyle]="{ 'background': announcementBgColor }"></div>
+    <div
+      class="popup-accent"
+      [ngStyle]="{ background: announcementBgColor }"
+    ></div>
     <div class="popup-inner">
       <div class="popup-header-row">
-        <span class="popup-tag" [ngStyle]="{ 'color': announcementBgColor }">Announcement</span>
+        <span class="popup-tag" [ngStyle]="{ color: announcementBgColor }"
+          >Announcement</span
+        >
       </div>
       <h3 class="popup-title">{{ announcementTitle }}</h3>
       <p class="popup-description">{{ announcementDescription }}</p>
