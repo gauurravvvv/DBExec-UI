@@ -42,7 +42,7 @@ export class AnalysesService {
   }
 
   addAnalyses(payload: any) {
-    const { name, description, datasetId, organisation, database, visuals } =
+    const { name, description, datasetId, organisation, database } =
       payload;
 
     return this.http
@@ -52,7 +52,6 @@ export class AnalysesService {
         datasetId,
         organisation,
         database,
-        visuals,
       })
       .toPromise()
       .then((response: any) => {
@@ -378,6 +377,35 @@ export class AnalysesService {
   getFilterValues(orgId: string, filterId: string) {
     return this.http
       .get(ANALYSIS_FILTER.VALUES + `${orgId}/${filterId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  /**
+   * Run a dataset query in the context of an analysis.
+   * Returns data enriched with both dataset-level and analysis-level custom fields.
+   * POST /analyses/run
+   */
+  runAnalysisQuery(payload: {
+    datasetId: string;
+    analysisId: string;
+    organisation: string;
+    filters?: any[];
+    limit?: number;
+  }) {
+    const { datasetId, analysisId, organisation, filters, limit } = payload;
+    const body: any = { organisation, datasetId, analysisId };
+    if (filters && filters.length > 0) {
+      body.filters = filters;
+    }
+    if (limit !== undefined) {
+      body.limit = limit;
+    }
+    return this.http
+      .post(ANALYSES.RUN_QUERY, body)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

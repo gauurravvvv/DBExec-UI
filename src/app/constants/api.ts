@@ -205,6 +205,7 @@ export const ANALYSES = {
   UPDATE: '/analyses/update',
   VIEW_VISUAL: '/analyses/visual/',
   GET_FIELDS: '/analyses/get/fields/',
+  RUN_QUERY: '/analyses/run',
 };
 
 export const ANALYSES_VISUAL = {

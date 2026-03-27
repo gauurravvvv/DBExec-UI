@@ -10,12 +10,51 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { ANALYSES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import {
   CHART_TYPES,
+  COLOR_SCHEMES,
+  LEGEND_POSITIONS,
+  LEGEND_TYPES,
+  LABEL_POSITIONS,
+  TOOLTIP_TRIGGERS,
+  AXIS_POINTER_TYPES,
+  GRID_LINE_STYLES,
+  EMPHASIS_MODES,
+  ANIMATION_EASINGS,
+  LINE_STEP_OPTIONS,
+  LINE_STYLE_TYPES,
+  SYMBOL_SHAPES,
+  PIE_LABEL_POSITIONS,
+  PIE_SELECTED_MODES,
+  PIE_ROSE_TYPES,
+  FUNNEL_SORT_OPTIONS,
+  FUNNEL_ALIGN_OPTIONS,
+  RADAR_SHAPES,
+  GRAPH_LAYOUTS,
+  TREE_ORIENTATIONS,
+  TREE_LAYOUTS,
+  SANKEY_ORIENTATIONS,
+  PICTORIAL_SYMBOLS,
+  TREE_EDGE_SHAPES,
+  GRAPH_EDGE_SYMBOLS,
+  TREEMAP_NODE_CLICK_OPTIONS,
+  SUNBURST_NODE_CLICK_OPTIONS,
+  BOXPLOT_LAYOUTS,
+  PICTORIAL_SYMBOL_POSITIONS,
+  EFFECT_SHOW_ON_OPTIONS,
+  SANKEY_NODE_ALIGNS,
+  SAMPLING_OPTIONS,
+  SHOW_ALL_SYMBOL_OPTIONS,
+  STACK_STRATEGY_OPTIONS,
+  RIPPLE_BRUSH_TYPE_OPTIONS,
+  FUNNEL_ORIENT_OPTIONS,
+  SUNBURST_SORT_OPTIONS,
+  PICTORIAL_REPEAT_DIRECTION_OPTIONS,
   getDefaultChartConfig,
   hasAxisLabels,
   is3DCoordinateChartType,
@@ -53,20 +92,39 @@ import {
   isLinesGlChartType,
   isMap3dChartType,
   isFlowGlChartType,
+  supportsGradient,
+  supportsDataLabel,
+  supportsLegend,
+  supportsEmphasis,
+  supportsToolbox,
+  supportsTooltip,
+  supportsAnimation,
+  supportsDataZoom,
 } from '../../constants/charts.constants';
-import { Visual } from '../../models';
+import { Visual, createVisual } from '../../models';
 import { AnalysesService } from '../../service/analyses.service';
 import { ChartDataTransformerService } from '../../services';
 import {
   AddAnalysesActions,
+  DatasetLoadingStatus,
+  selectDatasetByKey,
   selectDatasetData,
   selectDatasetStatus,
   selectIsDatasetLoaded,
+  selectIsDatasetStale,
 } from '../../store';
-import {
-  ConfiguredFilter,
-  FilterDialogSaveEvent,
-} from '../filter-config-dialog/filter-config-dialog.component';
+
+interface ConfiguredFilter {
+  tempId: string;
+  name: string;
+  columnName: string;
+  filterType: string;
+  controlType: string;
+  config: any;
+  isEnabled: boolean;
+  isMandatory: boolean;
+  sequence: number;
+}
 
 @Component({
   selector: 'app-edit-analyses',
@@ -84,6 +142,18 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Analysis-level fields
   analysisFields: any[] = [];
 
+  // Cached combined fields (dataset + analysis) to avoid creating new objects on every getter call
+  private _cachedAllFields: any[] = [];
+
+  // Custom field dialog state
+  showCustomFieldDialog: boolean = false;
+  editFieldMode: boolean = false;
+  editFieldData: any = null;
+
+  // Delete field confirmation
+  showDeleteFieldConfirm: boolean = false;
+  fieldToDelete: any = null;
+
   // Sidebar toggle states
   isFieldsPanelOpen: boolean = true;
   isVisualsPanelOpen: boolean = true;
@@ -95,7 +165,15 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   showFilterDialog: boolean = false;
   editingFilter: ConfiguredFilter | null = null;
 
-  // Filter type options (used by getFilterTypeLabel)
+  // Filter dialog form fields
+  filterDialogColumn: any = null;
+  filterDialogType: string = '';
+  filterDialogControl: string = '';
+  filterDialogName: string = '';
+  filterDialogEnabled: boolean = true;
+  filterDialogMandatory: boolean = false;
+
+  // Filter dropdown options
   filterTypeOptions = [
     { label: 'Category', value: 'category' },
     { label: 'Numeric (Exact)', value: 'numeric_equality' },
@@ -104,29 +182,20 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     { label: 'Date/Time (Range)', value: 'time_range' },
   ];
 
+  controlTypeOptions: { label: string; value: string }[] = [];
+
   // Search queries
   visualListSearchQuery: string = '';
+  datasetFieldsSearchQuery: string = '';
 
-  // Combined fields: dataset-level + analysis-level
-  get allFields(): any[] {
-    const datasetFields = (this.datasetDetails?.datasetFields || []).map(
-      (f: any) => ({
-        ...f,
-        _scope: 'dataset',
-      }),
-    );
-    const analysisFields = (this.analysisFields || []).map((f: any) => ({
-      ...f,
-      _scope: 'analysis',
-    }));
-    return [...datasetFields, ...analysisFields];
-  }
+  // Max rows fetched for analysis data
+  readonly DATA_ROW_LIMIT = 1000;
 
   // Visuals
-  visuals: any[] = [];
+  visuals: Visual[] = [];
 
   // Filtered visuals based on search query
-  get filteredVisuals(): any[] {
+  get filteredVisuals(): Visual[] {
     if (!this.visualListSearchQuery) {
       return this.visuals;
     }
@@ -137,6 +206,55 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  getDataTypeIcon(dataType: string): string {
+    if (!dataType) return 'pi-bars';
+    const type = dataType.toLowerCase();
+    if (type.includes('int') || type.includes('numeric') || type.includes('decimal') || type.includes('float') || type.includes('double') || type.includes('real') || type.includes('serial') || type.includes('money')) return 'pi-hashtag';
+    if (type.includes('char') || type.includes('text') || type.includes('string') || type.includes('citext') || type.includes('name')) return 'pi-align-left';
+    if (type.includes('bool')) return 'pi-check-square';
+    if (type.includes('timestamp') || type.includes('date') || type.includes('time') || type.includes('interval')) return 'pi-calendar';
+    if (type.includes('uuid')) return 'pi-key';
+    if (type.includes('json')) return 'pi-code';
+    if (type.includes('array') || type.includes('[]')) return 'pi-list';
+    if (type.includes('bytea') || type.includes('blob')) return 'pi-file';
+    if (type.includes('inet') || type.includes('cidr') || type.includes('macaddr')) return 'pi-globe';
+    if (type.includes('enum') || type.includes('user-defined')) return 'pi-sliders-h';
+    return 'pi-bars';
+  }
+
+  // Combined fields: dataset-level + analysis-level (cached)
+  get allFields(): any[] {
+    return this._cachedAllFields;
+  }
+
+  // Rebuild the cached fields list — call when datasetDetails or analysisFields change
+  private rebuildAllFields(): void {
+    const datasetFields = (this.datasetDetails?.datasetFields || []).map((f: any) => ({
+      ...f,
+      _scope: 'dataset',
+    }));
+    const analysisFields = (this.analysisFields || []).map((f: any) => ({
+      ...f,
+      _scope: 'analysis',
+    }));
+    this._cachedAllFields = [...datasetFields, ...analysisFields];
+  }
+
+  // Filtered fields based on search query
+  get filteredDatasetFields(): any[] {
+    const fields = this._cachedAllFields;
+    if (!fields.length) {
+      return [];
+    }
+    if (!this.datasetFieldsSearchQuery) {
+      return fields;
+    }
+    return fields.filter((field: any) =>
+      field.columnToView
+        .toLowerCase()
+        .includes(this.datasetFieldsSearchQuery.toLowerCase()),
+    );
+  }
   visualCounter: number = 0;
   focusedVisualId: string | null = null;
   resizingVisual: any = null;
@@ -151,7 +269,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // NgRx Store Observables
   graphData$!: Observable<any[] | null>;
-  datasetStatus$!: Observable<string>;
+  datasetStatus$!: Observable<DatasetLoadingStatus>;
   isDataLoaded$!: Observable<boolean>;
 
   // Raw data from dataset query
@@ -162,6 +280,48 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Available chart types
   chartTypes = CHART_TYPES;
+
+  // Color schemes
+  colorSchemes = COLOR_SCHEMES;
+
+  // Dropdown options
+  legendPositions = LEGEND_POSITIONS;
+  legendTypes = LEGEND_TYPES;
+  labelPositions = LABEL_POSITIONS;
+  tooltipTriggers = TOOLTIP_TRIGGERS;
+  axisPointerTypes = AXIS_POINTER_TYPES;
+  gridLineStyles = GRID_LINE_STYLES;
+  emphasisModes = EMPHASIS_MODES;
+  animationEasings = ANIMATION_EASINGS;
+  lineStepOptions = LINE_STEP_OPTIONS;
+  lineStyleTypes = LINE_STYLE_TYPES;
+  symbolShapes = SYMBOL_SHAPES;
+  pieLabelPositions = PIE_LABEL_POSITIONS;
+  pieSelectedModes = PIE_SELECTED_MODES;
+  pieRoseTypes = PIE_ROSE_TYPES;
+  funnelSortOptions = FUNNEL_SORT_OPTIONS;
+  funnelAlignOptions = FUNNEL_ALIGN_OPTIONS;
+  radarShapes = RADAR_SHAPES;
+  graphLayouts = GRAPH_LAYOUTS;
+  treeOrientations = TREE_ORIENTATIONS;
+  treeLayouts = TREE_LAYOUTS;
+  sankeyOrientations = SANKEY_ORIENTATIONS;
+  pictorialSymbols = PICTORIAL_SYMBOLS;
+  treeEdgeShapes = TREE_EDGE_SHAPES;
+  graphEdgeSymbols = GRAPH_EDGE_SYMBOLS;
+  treemapNodeClickOptions = TREEMAP_NODE_CLICK_OPTIONS;
+  sunburstNodeClickOptions = SUNBURST_NODE_CLICK_OPTIONS;
+  boxplotLayouts = BOXPLOT_LAYOUTS;
+  pictorialSymbolPositions = PICTORIAL_SYMBOL_POSITIONS;
+  effectShowOnOptions = EFFECT_SHOW_ON_OPTIONS;
+  sankeyNodeAligns = SANKEY_NODE_ALIGNS;
+  samplingOptions = SAMPLING_OPTIONS;
+  showAllSymbolOptions = SHOW_ALL_SYMBOL_OPTIONS;
+  stackStrategyOptions = STACK_STRATEGY_OPTIONS;
+  rippleBrushTypeOptions = RIPPLE_BRUSH_TYPE_OPTIONS;
+  funnelOrientOptions = FUNNEL_ORIENT_OPTIONS;
+  sunburstSortOptions = SUNBURST_SORT_OPTIONS;
+  pictorialRepeatDirectionOptions = PICTORIAL_REPEAT_DIRECTION_OPTIONS;
 
   // Dragging
   draggingVisual: any = null;
@@ -175,6 +335,11 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Search for chart types
   chartSearchQuery: string = '';
 
+  // Cached chart category/type results to avoid recalculation per CD cycle
+  private _cachedChartCategories: string[] = [];
+  private _cachedChartsByCategory: Map<string, any[]> = new Map();
+  private _lastChartSearchQuery: string | null = null;
+
   // Canvas container reference and dimensions for responsive sizing
   @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
   canvasWidth: number = 1000; // Default fallback
@@ -186,13 +351,18 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Grid constants
   private readonly GRID_COLUMNS = 24;
-  private readonly ROW_HEIGHT = 50;
+  private readonly GRID_ROWS = 12;
   private readonly GRID_GAP = 12;
+  private dynamicRowHeight = 50; // Computed from canvas height
 
   // Reference canvas size for legacy visuals (pixels to ratio conversion)
   private readonly REFERENCE_CANVAS_WIDTH = 1200;
   private readonly REFERENCE_CANVAS_HEIGHT = 600;
   private resizeObserver: ResizeObserver | null = null;
+  private resizeDebounceTimer: any = null;
+  private lastStableWidth: number = 0;
+  private lastStableHeight: number = 0;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -206,26 +376,36 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.orgId = params['orgId'];
-      this.analysisId = params['id'];
-      if (this.analysisId) {
-        this.loadAnalysis();
-      }
-    });
+    this.subscriptions.push(
+      this.route.params.subscribe(params => {
+        this.orgId = params['orgId'];
+        this.analysisId = params['id'];
+        if (this.analysisId) {
+          this.loadAnalysis();
+        }
+      })
+    );
   }
 
   ngAfterViewInit(): void {
     // Get initial canvas dimensions after view is initialized
-    setTimeout(() => this.updateCanvasDimensions(), 0);
+    setTimeout(() => {
+      this.updateCanvasDimensions();
+      this.lastStableWidth = this.canvasWidth;
+      this.lastStableHeight = this.canvasHeight;
+    }, 0);
     // Set up ResizeObserver to detect canvas size changes from any source
     this.setupResizeObserver();
   }
 
   ngOnDestroy(): void {
-    // Clean up ResizeObserver
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions = [];
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
+    }
+    if (this.resizeDebounceTimer) {
+      clearTimeout(this.resizeDebounceTimer);
     }
     this.stopAutoScroll();
   }
@@ -240,10 +420,38 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.canvasContainer?.nativeElement
     ) {
       this.resizeObserver = new ResizeObserver(() => {
-        this.updateCanvasDimensions();
-        this.recalculateAllVisualDimensions();
+        // Debounce resize events to prevent oscillation
+        if (this.resizeDebounceTimer) {
+          clearTimeout(this.resizeDebounceTimer);
+        }
+        this.resizeDebounceTimer = setTimeout(() => {
+          this.handleResize();
+        }, 100);
       });
       this.resizeObserver.observe(this.canvasContainer.nativeElement);
+    }
+  }
+
+  /**
+   * Handle resize with threshold to prevent oscillation
+   * Only recalculate if width changes by more than 10px
+   */
+  private handleResize(): void {
+    if (!this.canvasContainer?.nativeElement) return;
+
+    const rect = this.canvasContainer.nativeElement.getBoundingClientRect();
+    const newWidth = rect.width || 1000;
+    const newHeight = rect.height || 600;
+
+    const THRESHOLD = 10;
+    const widthChanged = Math.abs(newWidth - this.lastStableWidth) > THRESHOLD;
+    const heightChanged = Math.abs(newHeight - this.lastStableHeight) > THRESHOLD;
+
+    if (widthChanged || heightChanged) {
+      this.lastStableWidth = newWidth;
+      this.lastStableHeight = newHeight;
+      this.updateCanvasDimensions();
+      this.recalculateAllVisualDimensions();
     }
   }
 
@@ -258,12 +466,25 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateCanvasDimensions(): void {
     if (this.canvasContainer?.nativeElement) {
       const rect = this.canvasContainer.nativeElement.getBoundingClientRect();
-      const oldWidth = this.canvasWidth;
-      const oldHeight = this.canvasHeight;
       this.canvasWidth = rect.width || 1000;
       this.canvasHeight = rect.height || 600;
-      console.log(
-        `[CANVAS] Dimensions updated: ${oldWidth}x${oldHeight} → ${this.canvasWidth}x${this.canvasHeight}`,
+
+      // Compute dynamic row height so GRID_ROWS rows fill the visible canvas
+      // Formula: canvasHeight = GRID_ROWS * rowHeight + (GRID_ROWS - 1) * gap + padding
+      const CANVAS_PADDING = 40;
+      const availableHeight = this.canvasHeight - CANVAS_PADDING;
+      this.dynamicRowHeight = Math.max(
+        30,
+        Math.floor(
+          (availableHeight - (this.GRID_ROWS - 1) * this.GRID_GAP) /
+            this.GRID_ROWS,
+        ),
+      );
+
+      // Apply as CSS variable so grid-auto-rows stays in sync
+      this.canvasContainer.nativeElement.style.setProperty(
+        '--dynamic-row-height',
+        `${this.dynamicRowHeight}px`,
       );
     }
   }
@@ -273,9 +494,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   private recalculateAllVisualDimensions(): void {
     this.visuals.forEach(visual => {
-      if (visual.colSpan && visual.rowSpan) {
-        this.computeVisualDimensions(visual);
-      }
+      this.computeVisualDimensions(visual);
     });
     this.cdr.detectChanges();
   }
@@ -301,12 +520,11 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     visual.height = Math.max(
       100,
       Math.round(
-        visual.rowSpan * this.ROW_HEIGHT + (visual.rowSpan - 1) * this.GRID_GAP,
+        visual.rowSpan * this.dynamicRowHeight + (visual.rowSpan - 1) * this.GRID_GAP,
       ),
     );
     visual.widthRatio = visual.colSpan / this.GRID_COLUMNS;
-    visual.heightRatio =
-      (visual.rowSpan * this.ROW_HEIGHT) / Math.max(1, this.canvasHeight);
+    visual.heightRatio = visual.rowSpan / this.GRID_ROWS;
   }
 
   private placeVisualsOnGrid(): void {
@@ -385,7 +603,6 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Step 1: Load analysis data
    */
   loadAnalysis(): void {
-    console.log('=== 1. LOADING ANALYSIS DATA ===');
     this.analysesService
       .viewAnalyses(this.orgId, this.analysisId)
       .then(response => {
@@ -393,40 +610,40 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
           this.analysisDetails = response.data;
           this.databaseId = response.data.databaseId;
           this.datasetId = response.data.datasetId;
-          console.log('Analysis loaded. DatasetId:', this.datasetId);
 
-          // Step 2: Load dataset info
           if (this.datasetId) {
+            // Immediately initialize store selectors so cached data is available
+            this.initializeStoreSelectors();
+
+            // Load dataset info, analysis fields, filters in parallel
             this.loadDatasetInfo();
+            this.loadAnalysisFields();
+            this.loadExistingFilters();
+
+            // Check cache and load data + visuals
+            this.checkCachedDataAndLoad();
           }
         }
+      })
+      .catch(error => {
+        console.error('Error loading analysis:', error);
       });
   }
 
   /**
-   * Step 2: Load dataset info (fields) + analysis-level fields
+   * Step 2: Load dataset info (fields)
    */
   loadDatasetInfo(): void {
-    console.log('=== 2. LOADING DATASET INFO ===');
     this.datasetService
       .getDataset(this.orgId, this.datasetId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.datasetDetails = response.data;
-          console.log(
-            'Dataset info loaded. Fields:',
-            this.datasetDetails?.datasetFields?.length,
-          );
-
-          // Also fetch analysis-level fields
-          this.loadAnalysisFields();
-
-          // Load existing filters for this analysis
-          this.loadExistingFilters();
-
-          // Step 3: Initialize store and run query
-          this.initializeStoreSelectors();
+          this.rebuildAllFields();
         }
+      })
+      .catch(error => {
+        console.error('Error loading dataset info:', error);
       });
   }
 
@@ -439,17 +656,52 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.analysisFields = response.data?.analysisFields || [];
-          console.log('Analysis fields loaded:', this.analysisFields.length);
+          this.rebuildAllFields();
         }
+      })
+      .catch(error => {
+        console.error('Error loading analysis fields:', error);
       });
   }
 
   /**
-   * Step 3: Initialize NgRx store selectors and run data query
+   * Check for cached data in the store before running a fresh query.
+   * - No cache: load fresh data
+   * - Cached but stale (>10 min): use cached immediately, refresh in background
+   * - Cached and fresh: use cached data, skip query
+   */
+  private checkCachedDataAndLoad(): void {
+    this.store
+      .select(selectDatasetByKey(this.orgId, this.datasetId))
+      .pipe(first())
+      .subscribe(cachedEntry => {
+        if (!cachedEntry || !cachedEntry.data) {
+          // No cached data, load fresh
+          this.loadDatasetData();
+        } else {
+          // Check if data is stale
+          this.store
+            .select(selectIsDatasetStale(this.orgId, this.datasetId))
+            .pipe(first())
+            .subscribe(isStale => {
+              if (isStale) {
+                // Stale data is already in store (subscription picks it up),
+                // but refresh in background
+                this.loadDatasetData();
+              }
+              // If fresh, do nothing — store subscription already has the data
+            });
+        }
+
+        // Load saved visuals regardless of cache state
+        this.loadAllVisuals();
+      });
+  }
+
+  /**
+   * Initialize NgRx store selectors and subscribe to data changes
    */
   initializeStoreSelectors(): void {
-    console.log('=== 3. INITIALIZING STORE AND RUNNING QUERY ===');
-
     this.graphData$ = this.store.select(
       selectDatasetData(this.orgId, this.datasetId),
     );
@@ -460,29 +712,22 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       selectIsDatasetLoaded(this.orgId, this.datasetId),
     );
 
-    // Subscribe to graphData$ to transform chart data when data arrives
-    this.graphData$.subscribe(data => {
-      if (data && data.length > 0) {
-        this.rawGraphData = data;
-        console.log(
-          'Data received from store. Rows:',
-          this.rawGraphData.length,
-        );
-        // Transform chart data for all visuals
-        this.transformAllVisualsChartData();
-        this.cdr.detectChanges();
-      }
-    });
-
-    // Step 3a: Run the data query
-    this.loadDatasetData();
-
-    // Step 4: Load saved visuals
-    this.loadAllVisuals();
+    // Subscribe to graphData$ to populate rawGraphData and transform charts
+    this.subscriptions.push(
+      this.graphData$.subscribe(data => {
+        if (data && data.length > 0) {
+          this.rawGraphData = data;
+          // Transform chart data for all loaded visuals
+          this.transformAllVisualsChartData();
+          this.cdr.detectChanges();
+        }
+      })
+    );
   }
 
   /**
-   * Run the dataset query API
+   * Run the analysis query API — fetches dataset data enriched with
+   * both dataset-level and analysis-level custom fields.
    */
   loadDatasetData(): void {
     this.store.dispatch(
@@ -492,17 +737,15 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
     );
 
-    this.datasetService
-      .runDatasetQuery({
+    this.analysesService
+      .runAnalysisQuery({
         datasetId: this.datasetId,
+        analysisId: this.analysisId,
         organisation: this.orgId,
+        limit: this.DATA_ROW_LIMIT,
       })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          console.log(
-            'Query executed successfully. Data rows:',
-            response.data?.length,
-          );
           this.store.dispatch(
             AddAnalysesActions.loadDatasetDataSuccess({
               orgId: this.orgId,
@@ -521,7 +764,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       })
       .catch(error => {
-        console.error('Error running dataset query:', error);
+        console.error('Error running analysis query:', error);
         this.store.dispatch(
           AddAnalysesActions.loadDatasetDataFailure({
             orgId: this.orgId,
@@ -537,43 +780,32 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   transformAllVisualsChartData(): void {
     if (!this.rawGraphData || this.rawGraphData.length === 0) {
-      console.log('No raw data available for transformation');
       return;
     }
 
-    console.log('=== TRANSFORMING CHART DATA FOR LOADED VISUALS ===');
-    this.visuals.forEach((visual, index) => {
+    this.visuals.forEach((visual) => {
       // Only transform visuals that are loaded (not in skeleton state)
       if (visual.loaded && !visual.chartData?.length) {
-        console.log(`Transforming Visual ${index + 1}: ${visual.title}`);
         this.transformSingleVisualChartData(visual);
       }
     });
-    console.log('=== END TRANSFORMATION ===');
   }
 
   /**
    * Step 4: Load visual list as skeletons, then fetch each visual independently
    */
   loadAllVisuals(): void {
-    console.log('=== 4. LOADING VISUAL LIST (SKELETON) ===');
-
     // First, get the list of visuals (for skeleton)
     this.analysesService
       .listVisuals(this.orgId, this.analysisId)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           const visualsData = response.data.visuals || [];
-          console.log('Visual skeletons loaded:', visualsData.length);
 
           // Create skeleton visuals with loading state
           this.visuals = visualsData.map((visualData: any) => {
             // Extract chart configuration from nested visualConfig object
             const visualConfig = visualData.visualConfig || {};
-
-            console.log(
-              `[LOAD] Visual ${visualData.id}: API widthRatio=${visualData.widthRatio}, width=${visualData.width}`,
-            );
 
             const visual: any = {
               id: visualData.id,
@@ -612,13 +844,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
               visual.xRatio === null ||
               visual.yRatio === null
             ) {
-              console.log(
-                `[LOAD] Visual ${visual.id}: No ratios saved, calculating from legacy pixels. width=${visual.width}, height=${visual.height}`,
-              );
               this.calculateRatiosFromLegacy(visual);
-              console.log(
-                `[LOAD] Visual ${visual.id}: Calculated widthRatio=${visual.widthRatio}`,
-              );
             }
 
             // Ensure grid properties exist
@@ -631,7 +857,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
             if (!visual.rowSpan) {
               visual.rowSpan = Math.max(
                 3,
-                Math.round(((visual.heightRatio || 0.45) * 600) / 50),
+                Math.round((visual.heightRatio || 0.5) * this.GRID_ROWS),
               );
             }
             visual.gridCol = 0;
@@ -648,10 +874,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
           // Set visual counter
           if (this.visuals.length > 0) {
-            this.visualCounter = Math.max(
-              ...this.visuals.map(v => Number(v.id) || 0),
-              0,
-            );
+            this.visualCounter = Math.max(...this.visuals.map(v => Number(v.id) || 0), 0);
           }
 
           this.cdr.detectChanges();
@@ -659,6 +882,9 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
           // Step 5: Fetch each visual independently and plot in real-time
           this.fetchVisualsIndependently();
         }
+      })
+      .catch(error => {
+        console.error('Error loading visuals:', error);
       });
   }
 
@@ -667,18 +893,14 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Plot each visual as soon as its data arrives
    */
   fetchVisualsIndependently(): void {
-    console.log('=== 5. FETCHING VISUALS INDEPENDENTLY ===');
-
     // Create promises for all visuals
     this.visuals.forEach(visual => {
-      console.log(`Fetching visual ${visual.id}: ${visual.title}`);
 
       this.analysesService
         .getVisual(this.orgId, this.analysisId, visual.id)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
             const visualData = response.data;
-            console.log(`Visual ${visual.id} data received`);
 
             // Find and update the visual in our array
             const visualIndex = this.visuals.findIndex(v => v.id === visual.id);
@@ -712,7 +934,6 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.transformSingleVisualChartData(this.visuals[visualIndex]);
               }
 
-              console.log(`Visual ${visual.id} plotted successfully`);
               this.cdr.detectChanges();
             }
           }
@@ -755,6 +976,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
    * Update chart data for a specific visual
    */
   updateVisualChartData(visual: any): void {
+    if (!this.rawGraphData || this.rawGraphData.length === 0) {
+      visual.chartData = [];
+      return;
+    }
     visual.chartData = this.chartDataTransformer.transformData(
       visual.chartType,
       this.rawGraphData,
@@ -766,19 +991,79 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  refreshData(): void {
+    // Simply call loadDatasetData again to refresh the data
+    this.loadDatasetData();
+  }
+
   goBack(): void {
     this.router.navigate([ANALYSES.LIST]);
   }
 
-  // Called when fields panel emits fieldsChanged (after custom field create/edit/delete)
-  onFieldsChanged(): void {
-    this.loadAnalysisFields();
+  // --- Custom Field Dialog ---
+
+  openAddCustomField(): void {
+    this.editFieldMode = false;
+    this.editFieldData = null;
+    this.showCustomFieldDialog = true;
+  }
+
+  openEditCustomField(field: any): void {
+    this.editFieldMode = true;
+    this.editFieldData = {
+      ...field,
+      datasetId: this.datasetId,
+      organisationId: this.orgId,
+    };
+    this.showCustomFieldDialog = true;
+  }
+
+  onCustomFieldDialogClose(event: any): void {
+    this.showCustomFieldDialog = false;
+    if (event?.field) {
+      // Refresh both dataset and analysis fields
+      this.loadAnalysisFields();
+      // Also refresh dataset details in case a dataset-level field was edited
+      this.datasetService
+        .getDataset(this.orgId, this.datasetId)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.datasetDetails = response.data;
+            this.rebuildAllFields();
+          }
+        });
+      // Re-run dataset query so the new field's computed values are available
+      this.loadDatasetData();
+    }
+  }
+
+  confirmDeleteField(field: any): void {
+    this.fieldToDelete = field;
+    this.showDeleteFieldConfirm = true;
+  }
+
+  cancelDeleteField(): void {
+    this.fieldToDelete = null;
+    this.showDeleteFieldConfirm = false;
+  }
+
+  proceedDeleteField(): void {
+    if (!this.fieldToDelete) return;
     this.datasetService
-      .getDataset(this.orgId, this.datasetId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.datasetDetails = response.data;
+      .deleteDatasetField(this.orgId, this.datasetId, this.fieldToDelete.id)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.fieldToDelete = null;
+          this.showDeleteFieldConfirm = false;
+          this.loadAnalysisFields();
+        } else {
+          // Keep dialog open so user sees context; toast shows the API error
+          this.showDeleteFieldConfirm = false;
         }
+      })
+      .catch(error => {
+        console.error('Error deleting field:', error);
+        this.showDeleteFieldConfirm = false;
       });
   }
 
@@ -836,11 +1121,21 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addFilter(): void {
     this.editingFilter = null;
+    this.resetFilterDialog();
     this.showFilterDialog = true;
   }
 
   editFilter(filter: ConfiguredFilter): void {
     this.editingFilter = filter;
+    this.filterDialogColumn = this.datasetDetails?.datasetFields?.find(
+      (f: any) => (f.columnName || f.columnToView) === filter.columnName,
+    ) || null;
+    this.filterDialogType = filter.filterType;
+    this.filterDialogControl = filter.controlType;
+    this.filterDialogName = filter.name;
+    this.filterDialogEnabled = filter.isEnabled;
+    this.filterDialogMandatory = filter.isMandatory;
+    this.updateControlTypeOptions();
     this.showFilterDialog = true;
   }
 
@@ -851,40 +1146,101 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resequenceFilters();
   }
 
-  onFilterDialogSave(event: FilterDialogSaveEvent): void {
+  saveFilterDialog(): void {
+    if (!this.filterDialogColumn || !this.filterDialogType || !this.filterDialogControl) return;
+
+    const columnName = this.filterDialogColumn.columnName || this.filterDialogColumn.columnToView;
+    const name = this.filterDialogName || this.filterDialogColumn.columnToView;
+
     if (this.editingFilter) {
-      const idx = this.configuredFilters.findIndex(
-        f => f.tempId === this.editingFilter!.tempId,
-      );
+      const idx = this.configuredFilters.findIndex(f => f.tempId === this.editingFilter!.tempId);
       if (idx !== -1) {
         this.configuredFilters[idx] = {
           ...this.configuredFilters[idx],
-          name: event.name,
-          columnName: event.columnName,
-          filterType: event.filterType,
-          controlType: event.controlType,
-          isEnabled: event.isEnabled,
-          isMandatory: event.isMandatory,
+          name,
+          columnName,
+          filterType: this.filterDialogType,
+          controlType: this.filterDialogControl,
+          isEnabled: this.filterDialogEnabled,
+          isMandatory: this.filterDialogMandatory,
         };
       }
     } else {
       this.configuredFilters.push({
         tempId: crypto.randomUUID(),
-        name: event.name,
-        columnName: event.columnName,
-        filterType: event.filterType,
-        controlType: event.controlType,
+        name,
+        columnName,
+        filterType: this.filterDialogType,
+        controlType: this.filterDialogControl,
         config: {},
-        isEnabled: event.isEnabled,
-        isMandatory: event.isMandatory,
+        isEnabled: this.filterDialogEnabled,
+        isMandatory: this.filterDialogMandatory,
         sequence: this.configuredFilters.length,
       });
     }
     this.showFilterDialog = false;
   }
 
+  cancelFilterDialog(): void {
+    this.showFilterDialog = false;
+  }
+
+  resetFilterDialog(): void {
+    this.filterDialogColumn = null;
+    this.filterDialogType = '';
+    this.filterDialogControl = '';
+    this.filterDialogName = '';
+    this.filterDialogEnabled = true;
+    this.filterDialogMandatory = false;
+    this.controlTypeOptions = [];
+  }
+
+  onFilterTypeChange(): void {
+    this.updateControlTypeOptions();
+    if (this.controlTypeOptions.length > 0) {
+      this.filterDialogControl = this.controlTypeOptions[0].value;
+    }
+  }
+
+  onFilterColumnChange(): void {
+    if (this.filterDialogColumn && !this.filterDialogName) {
+      this.filterDialogName = this.filterDialogColumn.columnToView;
+    }
+  }
+
+  updateControlTypeOptions(): void {
+    switch (this.filterDialogType) {
+      case 'category':
+        this.controlTypeOptions = [
+          { label: 'Dropdown', value: 'dropdown' },
+          { label: 'Multi-Select List', value: 'list' },
+        ];
+        break;
+      case 'numeric_equality':
+        this.controlTypeOptions = [
+          { label: 'Text Input', value: 'text' },
+          { label: 'Dropdown', value: 'dropdown' },
+        ];
+        break;
+      case 'numeric_range':
+        this.controlTypeOptions = [
+          { label: 'Slider', value: 'slider' },
+          { label: 'Text Input', value: 'text' },
+        ];
+        break;
+      case 'time_equality':
+      case 'time_range':
+        this.controlTypeOptions = [
+          { label: 'Date Picker', value: 'datepicker' },
+        ];
+        break;
+      default:
+        this.controlTypeOptions = [];
+    }
+  }
+
   resequenceFilters(): void {
-    this.configuredFilters.forEach((f, i) => (f.sequence = i));
+    this.configuredFilters.forEach((f, i) => f.sequence = i);
   }
 
   getFilterTypeLabel(type: string): string {
@@ -893,10 +1249,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async loadExistingFilters(): Promise<void> {
     try {
-      const res: any = await this.analysesService.listFilters(
-        this.orgId,
-        this.analysisId,
-      );
+      const res: any = await this.analysesService.listFilters(this.orgId, this.analysisId);
       if (res?.success && res.data) {
         this.configuredFilters = (res.data || []).map((f: any) => ({
           tempId: f.id || crypto.randomUUID(),
@@ -917,37 +1270,16 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   addVisual(): void {
     this.visualCounter++;
+    const visual = createVisual(String(this.visualCounter), getDefaultChartConfig());
 
-    // Smart grid placement: 2 visuals per row (each 50% width)
-    const { xRatio, yRatio } = this.getNextVisualPosition();
-
-    const visual: any = {
-      id: String(this.visualCounter),
-      title: 'Untitled Visual',
-      x: 0,
-      y: 0,
-      xRatio: xRatio,
-      yRatio: yRatio,
-      width: 400, // Will be computed from ratios
-      height: 350, // Will be computed from ratios
-      widthRatio: 0.5, // 50% of available space (2 visuals per row)
-      heightRatio: 0.45, // 45% of canvas height
-      colSpan: 12,
-      rowSpan: 6,
-      gridCol: 0,
-      gridRow: 0,
-      chartType: null,
-      xAxisColumn: null,
-      yAxisColumn: null,
-      zAxisColumn: null,
-      config: getDefaultChartConfig(),
-      chartData: [],
-    };
-    // Compute pixel dimensions from ratios
-    this.computeVisualDimensions(visual);
+    // Default grid size: 12 columns (half width), 6 rows
     this.visuals.push(visual);
+
+    // Place all visuals on grid (new visual gets first available slot)
     this.placeVisualsOnGrid();
     this.recalculateAllVisualDimensions();
+
+    // Auto-focus the newly added visual
     this.focusedVisualId = String(this.visualCounter);
 
     // Scroll to the new visual (scoped to canvas container only)
@@ -989,225 +1321,244 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
-  /**
-   * Calculate next available position for a new visual in grid layout
-   * Grid: 2 columns (50% width each), rows stack vertically
-   */
-  private getNextVisualPosition(): { xRatio: number; yRatio: number } {
-    if (this.visuals.length === 0) {
-      return { xRatio: 0, yRatio: 0 };
-    }
-
-    // Group visuals by their row (based on yRatio, with tolerance for float comparison)
-    const rows: Map<number, any[]> = new Map();
-    this.visuals.forEach(v => {
-      // Round yRatio to 2 decimal places for grouping
-      const rowKey = Math.round((v.yRatio || 0) * 100);
-      if (!rows.has(rowKey)) {
-        rows.set(rowKey, []);
-      }
-      rows.get(rowKey)!.push(v);
-    });
-
-    // Find the last row and check if it has space
-    const sortedRowKeys = Array.from(rows.keys()).sort((a, b) => a - b);
-    const lastRowKey = sortedRowKeys[sortedRowKeys.length - 1];
-    const lastRowVisuals = rows.get(lastRowKey) || [];
-
-    // If last row has only 1 visual with xRatio = 0 (left side), place on right
-    if (lastRowVisuals.length === 1 && (lastRowVisuals[0].xRatio || 0) < 0.25) {
-      return { xRatio: 0.5, yRatio: lastRowVisuals[0].yRatio };
-    }
-
-    // Otherwise, start a new row below the highest bottom edge
-    let maxBottom = 0;
-    this.visuals.forEach(v => {
-      const bottom = (v.yRatio || 0) + (v.heightRatio || 0.45);
-      if (bottom > maxBottom) {
-        maxBottom = bottom;
-      }
-    });
-
-    // Add small gap (roughly 10px as ratio)
-    const gap = this.canvasHeight > 0 ? 10 / this.canvasHeight : 0.02;
-    return { xRatio: 0, yRatio: maxBottom + gap };
+  trackByVisualId(index: number, visual: Visual): string {
+    return visual.id;
   }
 
-  get focusedVisual(): any {
+  getFocusedVisual(): Visual | null {
     return this.visuals.find(v => v.id === this.focusedVisualId) || null;
   }
 
-  getFocusedVisual(): any {
-    return this.focusedVisual;
+  // Stable placeholder for when no visual is focused — prevents creating throwaway objects per CD cycle
+  private readonly _placeholderVisual: Visual = createVisual('0', getDefaultChartConfig());
+
+  /**
+   * Safe getter for focused visual - use this in templates with ngModel
+   * Returns a stable placeholder visual to avoid null errors when no visual is focused
+   */
+  get focusedVisual(): Visual {
+    return this.getFocusedVisual() || this._placeholderVisual;
   }
 
   get canSave(): boolean {
     return this.visuals.some(v => v.chartType !== null);
   }
 
+  /** Rebuild cached chart categories when search query changes */
+  private rebuildChartCategoryCache(): void {
+    const filtered = this.getFilteredChartTypes();
+    this._cachedChartCategories = [...new Set(filtered.map(c => c.category))];
+    this._cachedChartsByCategory = new Map();
+    for (const category of this._cachedChartCategories) {
+      this._cachedChartsByCategory.set(category, filtered.filter(c => c.category === category));
+    }
+    this._lastChartSearchQuery = this.chartSearchQuery;
+  }
+
+  private ensureChartCacheValid(): void {
+    if (this._lastChartSearchQuery !== this.chartSearchQuery) {
+      this.rebuildChartCategoryCache();
+    }
+  }
+
   getChartCategories(): string[] {
-    return [...new Set(this.chartTypes.map(c => c.category))];
+    this.ensureChartCacheValid();
+    return this._cachedChartCategories;
   }
 
   getChartsByCategory(category: string): any[] {
-    return this.chartTypes.filter(c => c.category === category);
+    this.ensureChartCacheValid();
+    return this._cachedChartsByCategory.get(category) || [];
   }
 
-  get filteredChartTypes(): any[] {
-    if (!this.chartSearchQuery) {
+  getFilteredChartTypes(): any[] {
+    if (!this.chartSearchQuery || this.chartSearchQuery.trim() === '') {
       return this.chartTypes;
     }
-    const query = this.chartSearchQuery.toLowerCase();
+    const query = this.chartSearchQuery.toLowerCase().trim();
     return this.chartTypes.filter(
-      c =>
-        c.name.toLowerCase().includes(query) ||
-        c.category.toLowerCase().includes(query),
+      chart =>
+        chart.name.toLowerCase().includes(query) ||
+        chart.description.toLowerCase().includes(query) ||
+        chart.category.toLowerCase().includes(query),
     );
   }
 
   // Wrapper methods for chart type checking
-  isBarChartType(chartType: string | null): boolean {
-    return isBarChartType(chartType);
+  isBarChartType(chartType: string | null | undefined): boolean {
+    return isBarChartType(chartType ?? null);
   }
 
-  isAreaChartType(chartType: string | null): boolean {
-    return isAreaChartType(chartType);
+  isAreaChartType(chartType: string | null | undefined): boolean {
+    return isAreaChartType(chartType ?? null);
   }
 
-  isPieChartType(chartType: string | null): boolean {
-    return isPieChartType(chartType);
+  isPieChartType(chartType: string | null | undefined): boolean {
+    return isPieChartType(chartType ?? null);
   }
 
-  isGaugeChartType(chartType: string | null): boolean {
-    return isGaugeChartType(chartType);
+  isGaugeChartType(chartType: string | null | undefined): boolean {
+    return isGaugeChartType(chartType ?? null);
   }
 
-  isCardChartType(chartType: string | null): boolean {
-    return isCardChartType(chartType);
+  isCardChartType(chartType: string | null | undefined): boolean {
+    return isCardChartType(chartType ?? null);
   }
 
-  isHeatMapChartType(chartType: string | null): boolean {
-    return isHeatMapChartType(chartType);
+  isHeatMapChartType(chartType: string | null | undefined): boolean {
+    return isHeatMapChartType(chartType ?? null);
   }
 
-  isTreeMapChartType(chartType: string | null): boolean {
-    return isTreeMapChartType(chartType);
+  isTreeMapChartType(chartType: string | null | undefined): boolean {
+    return isTreeMapChartType(chartType ?? null);
   }
 
-  isBubbleChartType(chartType: string | null): boolean {
-    return isBubbleChartType(chartType);
+  isBubbleChartType(chartType: string | null | undefined): boolean {
+    return isBubbleChartType(chartType ?? null);
   }
 
-  isBoxChartType(chartType: string | null): boolean {
-    return isBoxChartType(chartType);
+  isBoxChartType(chartType: string | null | undefined): boolean {
+    return isBoxChartType(chartType ?? null);
   }
 
-  isPolarChartType(chartType: string | null): boolean {
-    return isPolarChartType(chartType);
+  isPolarChartType(chartType: string | null | undefined): boolean {
+    return isPolarChartType(chartType ?? null);
   }
 
-  isLineChartType(chartType: string | null): boolean {
-    return isLineChartType(chartType);
+  isLineChartType(chartType: string | null | undefined): boolean {
+    return isLineChartType(chartType ?? null);
   }
 
-  isScatterChartType(chartType: string | null): boolean {
-    return isScatterChartType(chartType);
+  isScatterChartType(chartType: string | null | undefined): boolean {
+    return isScatterChartType(chartType ?? null);
   }
 
-  isFunnelChartType(chartType: string | null): boolean {
-    return isFunnelChartType(chartType);
+  isFunnelChartType(chartType: string | null | undefined): boolean {
+    return isFunnelChartType(chartType ?? null);
   }
 
-  isSankeyChartType(chartType: string | null): boolean {
-    return isSankeyChartType(chartType);
+  isSankeyChartType(chartType: string | null | undefined): boolean {
+    return isSankeyChartType(chartType ?? null);
   }
 
-  isSunburstChartType(chartType: string | null): boolean {
-    return isSunburstChartType(chartType);
+  isSunburstChartType(chartType: string | null | undefined): boolean {
+    return isSunburstChartType(chartType ?? null);
   }
 
-  isWaterfallChartType(chartType: string | null): boolean {
-    return isWaterfallChartType(chartType);
+  isWaterfallChartType(chartType: string | null | undefined): boolean {
+    return isWaterfallChartType(chartType ?? null);
   }
 
-  isGraphChartType(chartType: string | null): boolean {
-    return isGraphChartType(chartType);
+  isGraphChartType(chartType: string | null | undefined): boolean {
+    return isGraphChartType(chartType ?? null);
   }
 
-  isTreeChartType(chartType: string | null): boolean {
-    return isTreeChartType(chartType);
+  isTreeChartType(chartType: string | null | undefined): boolean {
+    return isTreeChartType(chartType ?? null);
   }
 
-  isThemeRiverChartType(chartType: string | null): boolean {
-    return isThemeRiverChartType(chartType);
+  isThemeRiverChartType(chartType: string | null | undefined): boolean {
+    return isThemeRiverChartType(chartType ?? null);
   }
 
-  isPictorialBarChartType(chartType: string | null): boolean {
-    return isPictorialBarChartType(chartType);
+  isPictorialBarChartType(chartType: string | null | undefined): boolean {
+    return isPictorialBarChartType(chartType ?? null);
   }
 
-  isPolarBarChartType(chartType: string | null): boolean {
-    return isPolarBarChartType(chartType);
+  isPolarBarChartType(chartType: string | null | undefined): boolean {
+    return isPolarBarChartType(chartType ?? null);
   }
 
-  isRadarChartType(chartType: string | null): boolean {
-    return isRadarChartType(chartType);
+  isRadarChartType(chartType: string | null | undefined): boolean {
+    return isRadarChartType(chartType ?? null);
   }
 
-  isCandlestickChartType(chartType: string | null): boolean {
-    return isCandlestickChartType(chartType);
+  isCandlestickChartType(chartType: string | null | undefined): boolean {
+    return isCandlestickChartType(chartType ?? null);
   }
 
-  isParallelChartType(chartType: string | null): boolean {
-    return isParallelChartType(chartType);
+  isParallelChartType(chartType: string | null | undefined): boolean {
+    return isParallelChartType(chartType ?? null);
   }
 
-  isBar3dChartType(chartType: string | null): boolean {
-    return isBar3dChartType(chartType);
+  isBar3dChartType(chartType: string | null | undefined): boolean {
+    return isBar3dChartType(chartType ?? null);
   }
 
-  isLine3dChartType(chartType: string | null): boolean {
-    return isLine3dChartType(chartType);
+  isLine3dChartType(chartType: string | null | undefined): boolean {
+    return isLine3dChartType(chartType ?? null);
   }
 
-  isScatter3dChartType(chartType: string | null): boolean {
-    return isScatter3dChartType(chartType);
+  isScatter3dChartType(chartType: string | null | undefined): boolean {
+    return isScatter3dChartType(chartType ?? null);
   }
 
-  isSurfaceChartType(chartType: string | null): boolean {
-    return isSurfaceChartType(chartType);
+  isSurfaceChartType(chartType: string | null | undefined): boolean {
+    return isSurfaceChartType(chartType ?? null);
   }
 
-  isGlobeChartType(chartType: string | null): boolean {
-    return isGlobeChartType(chartType);
+  isGlobeChartType(chartType: string | null | undefined): boolean {
+    return isGlobeChartType(chartType ?? null);
   }
 
-  isGraphGlChartType(chartType: string | null): boolean {
-    return isGraphGlChartType(chartType);
+  isGraphGlChartType(chartType: string | null | undefined): boolean {
+    return isGraphGlChartType(chartType ?? null);
   }
 
-  isScatterGlChartType(chartType: string | null): boolean {
-    return isScatterGlChartType(chartType);
+  isScatterGlChartType(chartType: string | null | undefined): boolean {
+    return isScatterGlChartType(chartType ?? null);
   }
 
-  isLinesGlChartType(chartType: string | null): boolean {
-    return isLinesGlChartType(chartType);
+  isLinesGlChartType(chartType: string | null | undefined): boolean {
+    return isLinesGlChartType(chartType ?? null);
   }
 
-  isMap3dChartType(chartType: string | null): boolean {
-    return isMap3dChartType(chartType);
+  isMap3dChartType(chartType: string | null | undefined): boolean {
+    return isMap3dChartType(chartType ?? null);
   }
 
-  isFlowGlChartType(chartType: string | null): boolean {
-    return isFlowGlChartType(chartType);
+  isFlowGlChartType(chartType: string | null | undefined): boolean {
+    return isFlowGlChartType(chartType ?? null);
   }
 
-  hasAxisLabels(chartType: string | null): boolean {
-    return hasAxisLabels(chartType);
+  hasAxisLabels(chartType: string | null | undefined): boolean {
+    return hasAxisLabels(chartType ?? null);
   }
 
-  is3DCoordinateChartType(chartType: string | null): boolean {
-    return is3DCoordinateChartType(chartType);
+  is3DCoordinateChartType(chartType: string | null | undefined): boolean {
+    return is3DCoordinateChartType(chartType ?? null);
+  }
+
+  supportsGradient(chartType: string | null | undefined): boolean {
+    return supportsGradient(chartType ?? null);
+  }
+
+  supportsLegend(chartType: string | null | undefined): boolean {
+    return supportsLegend(chartType ?? null);
+  }
+
+  supportsEmphasis(chartType: string | null | undefined): boolean {
+    return supportsEmphasis(chartType ?? null);
+  }
+
+  supportsToolbox(chartType: string | null | undefined): boolean {
+    return supportsToolbox(chartType ?? null);
+  }
+
+  supportsTooltip(chartType: string | null | undefined): boolean {
+    return supportsTooltip(chartType ?? null);
+  }
+
+  supportsAnimation(chartType: string | null | undefined): boolean {
+    return supportsAnimation(chartType ?? null);
+  }
+
+  supportsDataLabel(chartType: string | null | undefined): boolean {
+    return supportsDataLabel(chartType ?? null);
+  }
+
+  supportsDataZoom(chartType: string | null | undefined): boolean {
+    return supportsDataZoom(chartType ?? null);
   }
 
   hasRequiredChartFields(visual: any): boolean {
@@ -1249,12 +1600,16 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.recalculateAllVisualDimensions();
   }
 
-  clearChartType(): void {
-    const visual = this.getFocusedVisual();
-    if (visual) {
-      visual.chartType = null;
-      visual.title = 'Untitled Visual';
-      visual.chartData = [];
+  clearChartType(visual?: Visual): void {
+    const target = visual || this.getFocusedVisual();
+    if (target) {
+      target.chartType = null;
+      target.title = 'Untitled Visual';
+      target.xAxisColumn = null;
+      target.yAxisColumn = null;
+      target.zAxisColumn = null;
+      target.config = getDefaultChartConfig();
+      target.chartData = [];
     }
   }
 
@@ -1314,25 +1669,30 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onFieldClick(field: any): void {
-    if (!this.activeAxisSelection || !this.focusedVisualId) return;
+    if (this.activeAxisSelection && this.focusedVisualId) {
+      const visual = this.getFocusedVisual();
+      if (visual) {
+        // Use columnToUse — this is the actual key in the raw data rows
+        const fieldName = field.columnToUse || field.columnToView;
 
-    const visual = this.getFocusedVisual();
-    if (!visual) return;
+        if (this.activeAxisSelection === 'x') {
+          visual.xAxisColumn = fieldName;
+        } else if (this.activeAxisSelection === 'y') {
+          visual.yAxisColumn = fieldName;
+        } else if (this.activeAxisSelection === 'z') {
+          visual.zAxisColumn = fieldName;
+        }
 
-    // Use columnName (the actual column name to use for data)
-    const fieldName = field.columnName || field.columnToView;
+        // Update chart data if required axes are set
+        this.updateVisualChartData(visual);
 
-    if (this.activeAxisSelection === 'x') {
-      visual.xAxisColumn = fieldName;
-    } else if (this.activeAxisSelection === 'y') {
-      visual.yAxisColumn = fieldName;
-    } else if (this.activeAxisSelection === 'z') {
-      visual.zAxisColumn = fieldName;
+        // Clear selection mode after assignment
+        this.activeAxisSelection = null;
+        // Trigger change detection to update the UI
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      }
     }
-
-    this.activeAxisSelection = null;
-    this.updateVisualChartData(visual);
-    this.cdr.detectChanges();
   }
 
   clearAxisField(axis: 'x' | 'y' | 'z', event: Event): void {
@@ -1352,13 +1712,17 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  getFieldDisplayName(columnName: string | null): string {
-    if (!columnName) return '';
-    // Search in combined fields (dataset + analysis)
-    const field = this.allFields.find(
-      (f: any) => f.columnName === columnName || f.columnToView === columnName,
+  getFieldDisplayName(columnToUse: string | null): string {
+    if (!columnToUse) return '';
+    // Search both dataset-level and analysis-level fields
+    const allFields = this._cachedAllFields?.length
+      ? this._cachedAllFields
+      : this.datasetDetails?.datasetFields || [];
+    const field = allFields.find(
+      (f: any) =>
+        f.columnToUse === columnToUse || f.columnToView === columnToUse,
     );
-    return field?.columnToView || columnName;
+    return field?.columnToView || columnToUse;
   }
 
   // Maximize visual
@@ -1455,7 +1819,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       (contentWidth - (this.GRID_COLUMNS - 1) * this.GRID_GAP) /
       this.GRID_COLUMNS;
     const colUnit = fr + this.GRID_GAP;
-    const rowUnit = this.ROW_HEIGHT + this.GRID_GAP;
+    const rowUnit = this.dynamicRowHeight + this.GRID_GAP;
 
     let newColSpan = this.resizeStartColSpan;
     let newRowSpan = this.resizeStartRowSpan;
@@ -1530,6 +1894,17 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = 'move';
     }
+    // Auto-scroll when dragging near canvas edge
+    this.autoScrollNearEdge(event.clientY);
+  }
+
+  /** Canvas-level dragover for auto-scroll in empty areas */
+  onCanvasDragOver(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    this.autoScrollNearEdge(event.clientY);
   }
 
   onDrop(event: DragEvent, targetVisual: any): void {
@@ -1538,8 +1913,13 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
       const draggedIndex = this.visuals.indexOf(this.draggingVisual);
       const targetIndex = this.visuals.indexOf(targetVisual);
 
+      // Reorder array
       this.visuals.splice(draggedIndex, 1);
       this.visuals.splice(targetIndex, 0, this.draggingVisual);
+
+      // Reflow grid after reorder
+      this.placeVisualsOnGrid();
+      this.recalculateAllVisualDimensions();
     }
     this.draggingVisual = null;
     this.stopAutoScroll();
@@ -1601,6 +1981,44 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * Get visual configuration status for display
+   */
+  getVisualStatus(visual: Visual): {
+    label: string;
+    class: string;
+    icon: string;
+  } {
+    if (!visual.chartType) {
+      return {
+        label: 'No chart type',
+        class: 'status-incomplete',
+        icon: 'pi-circle',
+      };
+    }
+    if (!this.hasRequiredChartFields(visual)) {
+      return {
+        label: 'Fields needed',
+        class: 'status-incomplete',
+        icon: 'pi-exclamation-circle',
+      };
+    }
+    return {
+      label: 'Ready',
+      class: 'status-complete',
+      icon: 'pi-check-circle',
+    };
+  }
+
+  /**
+   * Get chart type display name
+   */
+  getChartTypeName(chartTypeId: string | null): string {
+    if (!chartTypeId) return 'Not selected';
+    const chartType = this.chartTypes.find(c => c.id === chartTypeId);
+    return chartType?.name || chartTypeId;
+  }
+
   saveAnalysis(): void {
     this.showSaveDialog = true;
   }
@@ -1630,15 +2048,6 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
         zAxisColumn: visual.zAxisColumn || null,
         config: visual.config ? { ...visual.config } : null,
       }));
-
-      console.log(
-        '[SAVE] Saving visuals with ratios:',
-        visualConfigurations.map(v => ({
-          id: v.id,
-          widthRatio: v.widthRatio,
-          heightRatio: v.heightRatio,
-        })),
-      );
 
       const updatePayload = {
         id: this.analysisId,

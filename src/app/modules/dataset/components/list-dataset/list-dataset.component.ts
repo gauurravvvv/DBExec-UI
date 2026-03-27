@@ -454,7 +454,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           datasetId: this.analysisDatasetId,
           organisation: this.selectedOrg,
           database: this.selectedDatabase,
-          visuals: [],
         })
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response, true)) {

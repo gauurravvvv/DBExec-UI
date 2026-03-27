@@ -101,6 +101,15 @@ export interface Visual {
 
   /** Chart configuration options */
   config: any;
+
+  /** Whether this visual is currently loading data */
+  loading?: boolean;
+
+  /** Whether this visual has finished loading data */
+  loaded?: boolean;
+
+  /** Whether this visual encountered an error during data loading */
+  error?: boolean;
 }
 
 /**

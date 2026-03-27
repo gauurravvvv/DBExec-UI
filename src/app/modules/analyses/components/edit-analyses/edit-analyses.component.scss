@@ -19,6 +19,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
   padding: 12px 16px;
   background-color: var(--card-background);
   border-bottom: 1px solid var(--border-color);
@@ -68,26 +69,36 @@
           transform: translateX(-2px);
         }
       }
+
+      .toolbar-label {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--text-color-secondary);
+      }
     }
+  }
+
+  .toolbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 
     .toolbar-title {
       margin: 0;
-      margin-left: 0;
       font-size: 20px;
       font-weight: 600;
       color: var(--text-color);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      i {
-        color: var(--primary-color);
-      }
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 500px;
     }
   }
 
   .toolbar-right {
     display: flex;
+    align-items: center;
     gap: 8px !important;
 
     .p-button,
@@ -150,7 +161,7 @@
 
   // Dataset Loading Status Indicator
   .dataset-status-indicator {
-    margin-left: auto;
+    margin-left: 8px;
     padding: 6px 12px;
     border-radius: 4px;
     font-size: 12px;
@@ -216,6 +227,13 @@
         font-size: 14px;
       }
     }
+  }
+
+  .row-limit-hint {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text-color-secondary);
+    cursor: pointer;
   }
 }
 
@@ -417,6 +435,68 @@
 
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) transparent;
+
+    // Fields panel: sticky header + scrollable fields
+    &.fields-panel-content {
+      overflow: hidden;
+    }
+  }
+
+  .fields-sticky-header {
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-background);
+
+    .add-field-action {
+      padding: 8px 12px;
+
+      .add-field-btn {
+        width: 100%;
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+    }
+  }
+
+  .fields-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--secondary-color);
+      }
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+  }
+
+  .fields-section-label {
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    letter-spacing: 0.05em;
+
+    &.analysis-label {
+      border-top: 1px solid var(--surface-border);
+      margin-top: 4px;
+      padding-top: 6px;
+    }
   }
 
   // Dataset Name Section with Dividers
@@ -472,6 +552,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    padding: 0 8px;
     background-color: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -528,6 +609,29 @@
 
   .field-card.analysis-field.custom-field {
     border-left: 3px solid var(--orange-500, #f59e0b);
+  }
+
+  .field-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+
+    .field-action-icon {
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text-color-secondary);
+      transition: color 0.15s ease;
+    }
+
+    .edit-icon:hover { color: var(--primary-color); }
+    .delete-icon:hover { color: #ef4444; }
+  }
+
+  .field-card:hover .field-actions {
+    opacity: 1;
   }
 
   .field-action {
@@ -1400,7 +1504,7 @@
   overflow-x: hidden;
   display: grid;
   grid-template-columns: repeat(24, 1fr);
-  grid-auto-rows: 50px;
+  grid-auto-rows: var(--dynamic-row-height, 50px);
   gap: 12px;
   align-content: start;
 }
@@ -1651,31 +1755,25 @@
 
   .visual-action-buttons {
     position: absolute;
-    right: 6px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
-    gap: 0;
+    align-items: center;
+    gap: 6px;
     opacity: 0;
     transition: opacity 0.15s ease;
 
-    .action-btn {
-      color: var(--secondary-color);
-      padding: 3px;
+    .action-icon {
       font-size: 12px;
-      border-radius: 4px;
-      transition: all 0.15s ease;
-
-      &:hover {
-        color: var(--primary-color);
-        background-color: rgba(var(--primary-color-rgb), 0.08);
-      }
+      cursor: pointer;
+      color: var(--text-color-secondary);
+      transition: color 0.15s ease;
     }
 
-    .close-btn:hover {
-      color: var(--danger-color, #ef4444) !important;
-      background-color: rgba(239, 68, 68, 0.08) !important;
-    }
+    .maximize-icon:hover { color: var(--primary-color); }
+    .change-chart-icon:hover { color: #f59e0b; }
+    .remove-icon:hover { color: #ef4444; }
   }
 }
 
@@ -1798,6 +1896,11 @@
       overflow: visible !important;
     }
   }
+}
+
+.chart-click-guard {
+  width: 100%;
+  height: 100%;
 }
 
 .visual-content-placeholder {
@@ -1947,10 +2050,10 @@
   background: var(--surface-card, #ffffff);
   border-radius: 12px;
   box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
-  max-width: 85vw;
-  max-height: 80vh;
-  width: 750px;
-  height: 520px;
+  max-width: 92vw;
+  max-height: 88vh;
+  width: 1000px;
+  height: 680px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2000,4 +2103,309 @@
   justify-content: center;
   overflow: hidden;
   background: var(--surface-card, #ffffff);
+}
+
+// Filter Configuration Dialog — deep overrides for PrimeNG
+:host ::ng-deep {
+  .filter-config-dialog {
+    .p-dialog {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .p-dialog-header {
+      background: var(--card-background);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 1.5rem;
+
+      .p-dialog-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-color);
+      }
+
+      .p-dialog-header-icon {
+        color: var(--secondary-color);
+
+        &:hover {
+          color: var(--text-color);
+          background: var(--hover-background);
+        }
+      }
+    }
+
+    .p-dialog-content {
+      padding: 1.5rem;
+      background: var(--card-background);
+      overflow: visible;
+    }
+
+    .p-dialog-footer {
+      padding: 1rem 1.5rem;
+      background: var(--hover-background);
+      border-top: 1px solid var(--border-color);
+    }
+  }
+}
+
+// Filter dialog form (inside the dialog content)
+.filter-dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.filter-dialog-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    i {
+      font-size: 0.85rem;
+      color: var(--primary-color);
+    }
+
+    .required {
+      color: var(--danger-color, #e74c3c);
+      margin-left: -2px;
+    }
+  }
+}
+
+.filter-dialog-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.filter-dialog-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 14px 16px;
+  background: var(--hover-background);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 0.9rem;
+    }
+
+    &.btn-cancel {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+      &:hover {
+        background: var(--hover-background);
+        transform: translateY(-1px);
+      }
+    }
+
+    &.btn-primary {
+      background: linear-gradient(135deg, #2196f3, #1976d2);
+      color: white;
+      box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+::ng-deep .row-limit-tooltip .p-tooltip-text {
+  white-space: nowrap;
+}
+
+// ===================================================================
+// Delete Field Confirmation Popup
+// ===================================================================
+.confirmation-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+
+  .popup-content {
+    background: var(--card-background);
+    width: 90%;
+    max-width: 420px;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px var(--shadow-color),
+      0 8px 10px -6px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+
+    .popup-header {
+      padding: 1.5rem 1.5rem 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      .popup-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--error-color, #ef4444);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-color);
+      }
+    }
+
+    .standard-delete-section {
+      padding: 0 2rem 1.5rem;
+
+      .delete-intro {
+        color: var(--secondary-color);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      .delete-info-list {
+        background: var(--hover-background);
+        border-radius: 8px;
+        padding: 1rem;
+        list-style: none;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          color: var(--text-color);
+          font-size: 0.9rem;
+          font-weight: 500;
+
+          i {
+            color: var(--secondary-color);
+            font-size: 1rem;
+          }
+
+          span {
+            flex: 1;
+          }
+        }
+      }
+    }
+
+    .popup-actions {
+      padding: 1rem 1.5rem 1.5rem;
+      background: var(--hover-background);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 1.25rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+
+        &.btn-cancel {
+          background: var(--card-background);
+          border-color: var(--border-color);
+          color: var(--text-color);
+
+          &:hover {
+            background: var(--hover-background);
+            border-color: var(--secondary-color);
+          }
+        }
+
+        &.btn-confirm {
+          background: var(--error-color, #ef4444);
+          color: white;
+          box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+
+          &:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(239, 68, 68, 0.3);
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
