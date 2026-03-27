@@ -30,14 +30,13 @@ export class SuperAdminService {
   }
 
   addSuperAdmin(superAdminForm: FormGroup) {
-    const { firstName, lastName, username, password, email } =
+    const { firstName, lastName, username, email } =
       superAdminForm.value;
     return this.http
       .post(SUPER_ADMIN.ADD, {
         firstName,
         lastName,
         username,
-        password,
         email,
       })
       .toPromise()

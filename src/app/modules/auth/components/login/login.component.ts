@@ -30,11 +30,11 @@ export class LoginComponent implements OnInit {
         [Validators.required, Validators.pattern(REGEX.orgName)],
       ],
       username: [
-        'admin_gaurav',
+        'dbexec_vanshika',
         [Validators.required, Validators.pattern(REGEX.username)],
       ],
       password: [
-        'Pass@1234',
+        'Gaurav@1234',
         [Validators.required, Validators.pattern(REGEX.password)],
       ],
       rememberMe: [false],

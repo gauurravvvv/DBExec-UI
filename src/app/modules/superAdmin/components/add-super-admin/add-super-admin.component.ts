@@ -5,7 +5,6 @@ import { REGEX } from 'src/app/constants/regex.constant';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SuperAdminService } from '../../services/superAdmin.service';
-import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
 
 @Component({
   selector: 'app-add-super-admin',
@@ -14,7 +13,6 @@ import { passwordStrengthValidator } from 'src/app/shared/validators/password-st
 })
 export class AddSuperAdminComponent implements OnInit {
   adminForm!: FormGroup;
-  showPassword = false;
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
@@ -61,14 +59,8 @@ export class AddSuperAdminComponent implements OnInit {
           Validators.pattern(REGEX.username),
         ],
       ],
-      password: ['', [Validators.required, passwordStrengthValidator()]],
       email: ['', [Validators.required, Validators.email]],
     });
-  }
-
-  togglePassword(event: Event): void {
-    event.preventDefault();
-    this.showPassword = !this.showPassword;
   }
 
   onSubmit(): void {
@@ -130,26 +122,6 @@ export class AddSuperAdminComponent implements OnInit {
       return `Username must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
       return 'Username must start with a letter and can only contain letters, numbers, dots, hyphens and underscores';
-    return '';
-  }
-
-  getPasswordError(): string {
-    const control = this.adminForm.get('password');
-    if (control?.errors?.['required']) return 'Password is required';
-    if (control?.errors?.['passwordMinLength'])
-      return `Password must be at least ${control.errors['passwordMinLength'].requiredLength} characters`;
-    if (control?.errors?.['passwordMaxLength'])
-      return `Password must not exceed ${control.errors['passwordMaxLength'].requiredLength} characters`;
-    if (control?.errors?.['passwordNoSpaces'])
-      return 'Password must not contain spaces';
-    if (control?.errors?.['passwordLowercase'])
-      return 'Password must contain at least one lowercase letter';
-    if (control?.errors?.['passwordUppercase'])
-      return 'Password must contain at least one uppercase letter';
-    if (control?.errors?.['passwordDigit'])
-      return 'Password must contain at least one number';
-    if (control?.errors?.['passwordSpecial'])
-      return 'Password must contain at least one special character (e.g., @$!%*?&)';
     return '';
   }
 }

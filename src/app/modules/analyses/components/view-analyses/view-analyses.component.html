@@ -1,7 +1,7 @@
-<div class="query-editor-wrapper">
-  <!-- Header Toolbar -->
-  <div class="query-toolbar">
-    <div class="toolbar-left">
+<div class="view-category-wrapper">
+  <div class="view-category-container">
+    <!-- Header Section -->
+    <div class="page-header">
       <div class="left-section">
         <button
           pButton
@@ -10,22 +10,12 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h3 class="toolbar-title">View Analysis</h3>
+        <h2>Analysis Details</h2>
       </div>
-    </div>
-    <div class="toolbar-right">
       <div class="header-actions">
-        <button
-          class="btn-primary"
-          type="button"
-          [routerLink]="['/app/analyses/edit', orgId, analysisId]"
-        >
+        <button class="btn-primary" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
           Edit
-        </button>
-        <button class="btn-success" type="button" (click)="onPublish()">
-          <i class="pi pi-send"></i>
-          Publish
         </button>
         <button class="btn-danger" type="button" (click)="onDelete()">
           <i class="pi pi-trash"></i>
@@ -33,985 +23,215 @@
         </button>
       </div>
     </div>
-  </div>
 
-  <!-- Sub Header with Toggle Buttons -->
-  <div class="sub-header">
-    <button
-      pButton
-      class="p-button-text btn-primary field-btn"
-      [class.active]="isFieldsPanelOpen"
-      (click)="toggleFieldsPanel()"
-      title="Toggle Fields Pane"
-    >
-      <i class="pi pi-database"></i>
-    </button>
-    <div
-      class="analysis-name"
-      style="margin-left: 16px; display: flex; align-items: center; gap: 8px"
-    >
-      <span style="font-weight: 500">{{ analysisDetails?.name }}</span>
-    </div>
-  </div>
-
-  <!-- Filter Bar -->
-  <app-analysis-filter-bar
-    *ngIf="analysisDetails"
-    [orgId]="orgId"
-    [analysisId]="analysisId"
-    (filtersApplied)="onFiltersApplied($event)"
-    (filtersCleared)="onFiltersCleared()"
-  ></app-analysis-filter-bar>
-
-  <!-- Main Content Area with Sidebar and Center -->
-  <div class="main-content">
-    <!-- Left Sidebar - Fields Panel (Read-only) -->
-    <div class="database-sidebar" [class.collapsed]="!isFieldsPanelOpen">
-      <div class="sidebar-content">
-        <div class="sidebar-header-info">
-          <div class="dataset-label">Dataset</div>
-        </div>
-        <div class="sidebar-divider"></div>
-        <div class="sidebar-content-inner">
-          <!-- Dataset Name Section -->
-          <div class="dataset-name-section">
-            <div class="dataset-name-divider">
-              <span class="dataset-name-text">{{ datasetDetails?.name }}</span>
+    <!-- Content Section -->
+    <div class="content-section" *ngIf="analysisDetails">
+      <div class="details-grid">
+        <!-- Basic Information -->
+        <div class="info-section">
+          <h3>
+            <i class="pi pi-info-circle mr-2"></i>
+            Basic Information
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Analysis Name</label>
+              <p>{{ analysisDetails.name }}</p>
+            </div>
+            <div class="info-item">
+              <label>Description</label>
+              <p>{{ analysisDetails.description || 'No description available' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Dataset</label>
+              <p class="with-icon">
+                <i class="pi pi-table mr-2"></i>
+                {{ datasetDetails?.name || 'N/A' }}
+              </p>
+            </div>
+            <div class="info-item">
+              <label>Database</label>
+              <p class="with-icon">
+                <i class="pi pi-database mr-2"></i>
+                {{ datasetDetails?.databaseName || 'N/A' }}
+              </p>
+            </div>
+            <div class="info-item">
+              <label>Status</label>
+              <span
+                class="status-badge"
+                [class.active]="analysisDetails.status === 1"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    analysisDetails.status === 1
+                      ? 'pi-check-circle'
+                      : 'pi-times-circle'
+                  "
+                ></i>
+                {{ analysisDetails.status === 1 ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Created On</label>
+              <p class="with-icon">
+                <i class="pi pi-calendar mr-2"></i>
+                {{ analysisDetails.createdOn | date: 'medium' }}
+              </p>
             </div>
           </div>
+        </div>
 
-          <!-- Fields List -->
+        <!-- Dataset Fields -->
+        <div class="info-section full-width">
+          <h3>
+            <i class="pi pi-list mr-2"></i>
+            Dataset Fields
+            <span class="count-badge">{{
+              datasetDetails?.datasetFields?.length || 0
+            }}</span>
+          </h3>
+          <div class="column-mapping-container">
+            <div
+              *ngIf="
+                datasetDetails?.datasetFields &&
+                  datasetDetails?.datasetFields.length > 0;
+                else noDatasetFields
+              "
+            >
+              <div class="mapping-list">
+                <div
+                  class="mapping-item"
+                  *ngFor="
+                    let field of datasetDetails.datasetFields;
+                    let i = index
+                  "
+                >
+                  <span class="field-number">{{ i + 1 }}</span>
+                  <div class="field-content">
+                    <span class="column-view">{{ field.columnToView }}</span>
+                    <span class="column-use">{{ field.columnToUse }}</span>
+                  </div>
+                  <span
+                    class="field-datatype"
+                    *ngIf="field.dataType"
+                    [pTooltip]="field.dataType"
+                    tooltipPosition="top"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="getDataTypeIcon(field.dataType)"
+                    ></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <ng-template #noDatasetFields>
+              <div class="no-data">
+                <i class="pi pi-info-circle"></i>
+                <span>No dataset fields found</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Analysis Fields -->
+        <div class="info-section full-width">
+          <div class="section-header">
+            <h3>
+              <i class="pi pi-sliders-h mr-2"></i>
+              Analysis Fields
+              <span class="count-badge">{{
+                analysisFields?.length || 0
+              }}</span>
+            </h3>
+            <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
+              <i class="pi pi-plus"></i>
+              Add Custom Field
+            </button>
+          </div>
+          <div class="column-mapping-container">
+            <div
+              *ngIf="
+                analysisFields && analysisFields.length > 0;
+                else noAnalysisFields
+              "
+            >
+              <div class="mapping-list">
+                <div
+                  class="mapping-item"
+                  *ngFor="let field of analysisFields; let i = index"
+                  [class.custom-field]="field.type === 2"
+                >
+                  <span class="field-number">{{ i + 1 }}</span>
+                  <div class="field-content">
+                    <span class="column-view">{{ field.columnToView }}</span>
+                    <span class="column-use">{{ field.columnToUse }}</span>
+                  </div>
+                  <span
+                    class="field-datatype"
+                    *ngIf="field.dataType"
+                    [pTooltip]="field.dataType"
+                    tooltipPosition="top"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="getDataTypeIcon(field.dataType)"
+                    ></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <ng-template #noAnalysisFields>
+              <div class="no-data">
+                <i class="pi pi-info-circle"></i>
+                <span>No analysis fields found</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Visuals -->
+        <div class="info-section full-width">
+          <h3>
+            <i class="pi pi-chart-bar mr-2"></i>
+            Visuals
+            <span class="count-badge">{{ visuals?.length || 0 }}</span>
+          </h3>
           <div class="fields-list">
             <div
-              class="field-card"
-              *ngFor="let field of datasetDetails?.datasetFields"
+              class="field-item"
+              *ngFor="let visual of visuals"
             >
-              <div class="field-icon">
-                <i class="pi pi-bars"></i>
-              </div>
-              <div class="field-info">
-                <div class="field-name">{{ field.columnToView }}</div>
-              </div>
+              <i class="pi pi-chart-line"></i>
+              {{ visual.title || visual.name || 'Untitled Visual' }}
+            </div>
+            <div
+              *ngIf="!visuals || visuals.length === 0"
+              class="no-data"
+            >
+              No visuals found
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Center Container - Canvas (Read-only)-->
-    <div class="editor-container" #canvasContainer>
-      <div class="canvas-area read-only" *ngIf="visuals.length > 0">
-        <div
-          class="visual-box"
-          *ngFor="let visual of visuals"
-          [style.grid-column]="visual.gridCol + 1 + ' / span ' + visual.colSpan"
-          [style.grid-row]="visual.gridRow + 1 + ' / span ' + visual.rowSpan"
-        >
-          <!-- Visual Title (Read-only) with action buttons -->
-          <div class="visual-inline-title">
-            <span class="inline-title-text">{{ visual.title }}</span>
-            <!-- Action buttons -->
-            <div class="visual-action-buttons">
-              <button
-                *ngIf="visual.chartType && hasRequiredChartFields(visual)"
-                pButton
-                icon="pi pi-window-maximize"
-                class="p-button-text p-button-sm action-btn"
-                (click)="maximizeVisual(visual, $event)"
-                pTooltip="Maximize"
-                tooltipPosition="top"
-              ></button>
-            </div>
-          </div>
-
-          <div class="visual-body">
-            <!-- Loading Placeholder -->
-            <div class="visual-loading-placeholder" *ngIf="visual.loading">
-              <div class="loading-content">
-                <i class="pi pi-spin pi-spinner loading-spinner"></i>
-                <span class="loading-text">Loading visualization...</span>
-              </div>
-            </div>
-
-            <!-- Error State -->
-            <div class="visual-error-placeholder" *ngIf="visual.error">
-              <div class="error-content">
-                <i class="pi pi-exclamation-triangle error-icon"></i>
-                <span class="error-text">Failed to load visualization</span>
-              </div>
-            </div>
-
-            <!-- Chart Components (only show when loaded) -->
-            <ng-container *ngIf="!visual.loading && !visual.error">
-              <!-- Bar Chart Types -->
-              <app-configurable-bar-chart
-                *ngIf="isBarChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType"
-                [data]="visual.chartData"
-              >
-              </app-configurable-bar-chart>
-
-              <!-- Line Chart -->
-              <app-configurable-line-chart
-                *ngIf="isLineChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-line-chart>
-
-              <!-- Area Chart Types -->
-              <app-configurable-area-chart
-                *ngIf="isAreaChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType"
-                [data]="visual.chartData"
-              >
-              </app-configurable-area-chart>
-
-              <!-- Polar Chart -->
-              <app-configurable-polar-chart
-                *ngIf="isPolarChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-polar-chart>
-
-              <!-- Pie Chart Types -->
-              <app-configurable-pie-chart
-                *ngIf="isPieChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType"
-                [data]="visual.chartData"
-              >
-              </app-configurable-pie-chart>
-
-              <!-- Gauge Chart Types -->
-              <app-configurable-gauge-chart
-                *ngIf="isGaugeChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType"
-                [data]="visual.chartData"
-              >
-              </app-configurable-gauge-chart>
-
-              <!-- Number Card Chart -->
-              <app-configurable-card-chart
-                *ngIf="isCardChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-card-chart>
-
-              <!-- Heat Map Chart -->
-              <app-configurable-heatmap-chart
-                *ngIf="isHeatMapChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-heatmap-chart>
-
-              <!-- Tree Map Chart -->
-              <app-configurable-treemap-chart
-                *ngIf="isTreeMapChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-treemap-chart>
-
-              <!-- Bubble Chart -->
-              <app-configurable-bubble-chart
-                *ngIf="
-                  isBubbleChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-bubble-chart>
-
-              <!-- Box Chart -->
-              <app-configurable-box-chart
-                *ngIf="
-                  isBoxChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-box-chart>
-
-              <!-- Scatter Chart Types -->
-              <app-configurable-scatter-chart
-                *ngIf="
-                  isScatterChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType || 'scatter'"
-                [data]="visual.chartData"
-              >
-              </app-configurable-scatter-chart>
-
-              <!-- Funnel Chart -->
-              <app-configurable-funnel-chart
-                *ngIf="
-                  isFunnelChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-funnel-chart>
-
-              <!-- Sunburst Chart -->
-              <app-configurable-sunburst-chart
-                *ngIf="
-                  isSunburstChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-sunburst-chart>
-
-              <!-- Sankey Chart -->
-              <app-configurable-sankey-chart
-                *ngIf="
-                  isSankeyChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-sankey-chart>
-
-              <!-- Waterfall Chart -->
-              <app-configurable-waterfall-chart
-                *ngIf="
-                  isWaterfallChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-waterfall-chart>
-
-              <!-- Graph Chart -->
-              <app-configurable-graph-chart
-                *ngIf="
-                  isGraphChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-graph-chart>
-
-              <!-- Tree Chart -->
-              <app-configurable-tree-chart
-                *ngIf="
-                  isTreeChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-tree-chart>
-
-              <!-- Theme River Chart -->
-              <app-configurable-theme-river-chart
-                *ngIf="
-                  isThemeRiverChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-theme-river-chart>
-
-              <!-- Pictorial Bar Chart -->
-              <app-configurable-pictorial-bar-chart
-                *ngIf="
-                  isPictorialBarChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-pictorial-bar-chart>
-
-              <!-- Polar Bar Chart -->
-              <app-configurable-polar-bar-chart
-                *ngIf="
-                  isPolarBarChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-polar-bar-chart>
-
-              <!-- Radar Chart -->
-              <app-configurable-radar-chart
-                *ngIf="
-                  isRadarChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-radar-chart>
-
-              <!-- Candlestick Chart -->
-              <app-configurable-candlestick-chart
-                *ngIf="
-                  isCandlestickChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-candlestick-chart>
-
-              <!-- Parallel Chart -->
-              <app-configurable-parallel-chart
-                *ngIf="
-                  isParallelChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-parallel-chart>
-
-              <!-- Bar 3D Chart -->
-              <app-configurable-bar3d-chart
-                *ngIf="
-                  isBar3dChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-bar3d-chart>
-
-              <!-- Line 3D Chart -->
-              <app-configurable-line3d-chart
-                *ngIf="
-                  isLine3dChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-line3d-chart>
-
-              <!-- Scatter 3D Chart -->
-              <app-configurable-scatter3d-chart
-                *ngIf="
-                  isScatter3dChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-scatter3d-chart>
-
-              <!-- Surface Chart -->
-              <app-configurable-surface-chart
-                *ngIf="
-                  isSurfaceChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-surface-chart>
-
-              <!-- Globe Chart -->
-              <app-configurable-globe-chart
-                *ngIf="
-                  isGlobeChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-globe-chart>
-
-              <!-- Graph GL Chart -->
-              <app-configurable-graphgl-chart
-                *ngIf="
-                  isGraphGlChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-graphgl-chart>
-
-              <!-- Scatter GL Chart -->
-              <app-configurable-scattergl-chart
-                *ngIf="
-                  isScatterGlChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-scattergl-chart>
-
-              <!-- Lines GL Chart -->
-              <app-configurable-linesgl-chart
-                *ngIf="
-                  isLinesGlChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-linesgl-chart>
-
-              <!-- Map 3D Chart -->
-              <app-configurable-map3d-chart
-                *ngIf="
-                  isMap3dChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-map3d-chart>
-
-              <!-- Flow GL Chart -->
-              <app-configurable-flowgl-chart
-                *ngIf="
-                  isFlowGlChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 10"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-flowgl-chart>
-            </ng-container>
-          </div>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div class="empty-state" *ngIf="visuals.length === 0">
-        <i class="pi pi-chart-bar"></i>
-        <h3>No Visuals Available</h3>
-        <p>This analysis doesn't contain any visualizations</p>
-      </div>
-    </div>
   </div>
 </div>
 
-<!-- Maximized Visual Overlay -->
-<div
-  class="maximized-visual-overlay"
-  *ngIf="maximizedVisual"
-  (click)="minimizeVisual()"
->
-  <div class="maximized-visual-container" (click)="$event.stopPropagation()">
-    <div class="maximized-visual-header">
-      <span class="maximized-visual-title">{{ maximizedVisual.title }}</span>
-      <button
-        pButton
-        icon="pi pi-times"
-        class="p-button-text p-button-rounded close-maximize-btn"
-        (click)="minimizeVisual()"
-        pTooltip="Close"
-        tooltipPosition="left"
-      ></button>
-    </div>
-    <div class="maximized-visual-body">
-      <!-- Bar Chart Types -->
-      <app-configurable-bar-chart
-        *ngIf="isBarChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [chartType]="maximizedVisual.chartType || ''"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-bar-chart>
+<!-- Add Custom Field Dialog -->
+<app-add-custom-field-dialog
+  *ngIf="showAddCustomFieldDialog"
+  [visible]="true"
+  [datasetId]="analysisDetails?.datasetId"
+  [organisationId]="orgId"
+  [analysisId]="analysisId"
+  [datasetFields]="datasetDetails?.datasetFields || []"
+  (close)="onAddCustomFieldDialogClose($event)"
+></app-add-custom-field-dialog>
 
-      <!-- Line Chart -->
-      <app-configurable-line-chart
-        *ngIf="isLineChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-line-chart>
-
-      <!-- Area Chart Types -->
-      <app-configurable-area-chart
-        *ngIf="isAreaChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [chartType]="maximizedVisual.chartType || ''"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-area-chart>
-
-      <!-- Polar Chart -->
-      <app-configurable-polar-chart
-        *ngIf="isPolarChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-polar-chart>
-
-      <!-- Pie Chart Types -->
-      <app-configurable-pie-chart
-        *ngIf="isPieChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [chartType]="maximizedVisual.chartType || ''"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-pie-chart>
-
-      <!-- Gauge Chart Types -->
-      <app-configurable-gauge-chart
-        *ngIf="isGaugeChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [chartType]="maximizedVisual.chartType || ''"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-gauge-chart>
-
-      <!-- Number Card Chart -->
-      <app-configurable-card-chart
-        *ngIf="isCardChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-card-chart>
-
-      <!-- Heat Map Chart -->
-      <app-configurable-heatmap-chart
-        *ngIf="isHeatMapChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-heatmap-chart>
-
-      <!-- Tree Map Chart -->
-      <app-configurable-treemap-chart
-        *ngIf="isTreeMapChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-treemap-chart>
-
-      <!-- Bubble Chart -->
-      <app-configurable-bubble-chart
-        *ngIf="isBubbleChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-bubble-chart>
-
-      <!-- Box Chart -->
-      <app-configurable-box-chart
-        *ngIf="isBoxChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-box-chart>
-
-      <!-- Scatter Chart Types -->
-      <app-configurable-scatter-chart
-        *ngIf="isScatterChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [chartType]="maximizedVisual.chartType || 'scatter'"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-scatter-chart>
-
-      <!-- Funnel Chart -->
-      <app-configurable-funnel-chart
-        *ngIf="isFunnelChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-funnel-chart>
-
-      <!-- Sunburst Chart -->
-      <app-configurable-sunburst-chart
-        *ngIf="isSunburstChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-sunburst-chart>
-
-      <!-- Sankey Chart -->
-      <app-configurable-sankey-chart
-        *ngIf="isSankeyChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-sankey-chart>
-
-      <!-- Waterfall Chart -->
-      <app-configurable-waterfall-chart
-        *ngIf="isWaterfallChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-waterfall-chart>
-
-      <!-- Graph Chart -->
-      <app-configurable-graph-chart
-        *ngIf="isGraphChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-graph-chart>
-
-      <!-- Tree Chart -->
-      <app-configurable-tree-chart
-        *ngIf="isTreeChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-tree-chart>
-
-      <!-- Theme River Chart -->
-      <app-configurable-theme-river-chart
-        *ngIf="isThemeRiverChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-theme-river-chart>
-
-      <!-- Pictorial Bar Chart -->
-      <app-configurable-pictorial-bar-chart
-        *ngIf="isPictorialBarChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-pictorial-bar-chart>
-
-      <!-- Polar Bar Chart -->
-      <app-configurable-polar-bar-chart
-        *ngIf="isPolarBarChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-polar-bar-chart>
-
-      <!-- Radar Chart -->
-      <app-configurable-radar-chart
-        *ngIf="isRadarChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-radar-chart>
-
-      <!-- Candlestick Chart -->
-      <app-configurable-candlestick-chart
-        *ngIf="isCandlestickChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-candlestick-chart>
-
-      <!-- Parallel Chart -->
-      <app-configurable-parallel-chart
-        *ngIf="isParallelChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-parallel-chart>
-
-      <!-- Bar 3D Chart -->
-      <app-configurable-bar3d-chart
-        *ngIf="isBar3dChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-bar3d-chart>
-
-      <!-- Line 3D Chart -->
-      <app-configurable-line3d-chart
-        *ngIf="isLine3dChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-line3d-chart>
-
-      <!-- Scatter 3D Chart -->
-      <app-configurable-scatter3d-chart
-        *ngIf="isScatter3dChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-scatter3d-chart>
-
-      <!-- Surface Chart -->
-      <app-configurable-surface-chart
-        *ngIf="isSurfaceChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-surface-chart>
-
-      <!-- Globe Chart -->
-      <app-configurable-globe-chart
-        *ngIf="isGlobeChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-globe-chart>
-
-      <!-- Graph GL Chart -->
-      <app-configurable-graphgl-chart
-        *ngIf="isGraphGlChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-graphgl-chart>
-
-      <!-- Scatter GL Chart -->
-      <app-configurable-scattergl-chart
-        *ngIf="isScatterGlChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-scattergl-chart>
-
-      <!-- Lines GL Chart -->
-      <app-configurable-linesgl-chart
-        *ngIf="isLinesGlChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-linesgl-chart>
-
-      <!-- Map 3D Chart -->
-      <app-configurable-map3d-chart
-        *ngIf="isMap3dChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-map3d-chart>
-
-      <!-- Flow GL Chart -->
-      <app-configurable-flowgl-chart
-        *ngIf="isFlowGlChartType(maximizedVisual.chartType)"
-        [showConfigPanel]="false"
-        [chartWidth]="700"
-        [chartHeight]="400"
-        [chartConfig]="maximizedVisual.config"
-        [data]="maximizedVisual.chartData"
-      >
-      </app-configurable-flowgl-chart>
-    </div>
-  </div>
-</div>
-
+<!-- Delete Confirmation Popup -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">
     <!-- Header -->
