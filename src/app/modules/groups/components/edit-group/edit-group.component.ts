@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GROUP } from 'src/app/constants/routes';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { GroupService } from '../../services/group.service';
@@ -19,10 +20,17 @@ import { REGEX } from 'src/app/constants/regex.constant';
   templateUrl: './edit-group.component.html',
   styleUrls: ['./edit-group.component.scss'],
 })
-export class EditGroupComponent implements OnInit {
+export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   groupForm!: FormGroup;
   users: any[] = [];
   isFormDirty = false;
+  showSaveConfirm = false;
+  saveJustification = '';
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
+  }
+
   showOrganisationDropdown = true;
   categoryId!: string;
   orgId!: string;
@@ -132,8 +140,23 @@ export class EditGroupComponent implements OnInit {
 
   onSubmit(): void {
     if (this.canSubmit()) {
-      this.groupService.editGroup(this.groupForm).then(response => {
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
+      this.groupService.editGroup(this.groupForm, this.saveJustification.trim()).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.isFormDirty = false;
+          this.groupForm.markAsPristine();
           this.router.navigate([GROUP.LIST]);
         }
       });

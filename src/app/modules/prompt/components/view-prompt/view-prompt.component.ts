@@ -14,6 +14,7 @@ export class ViewPromptComponent implements OnInit {
   orgId: string = '';
   promptData: any = null;
   showDeleteConfirm = false;
+  deleteJustification = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -50,13 +51,16 @@ export class ViewPromptComponent implements OnInit {
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    if (this.promptData) {
+    if (this.promptData && this.deleteJustification.trim()) {
       this.promptService
-        .deletePrompt(this.orgId, this.promptId)
+        .deletePrompt(this.orgId, this.promptId, this.deleteJustification.trim())
         .then(response => {
+          this.showDeleteConfirm = false;
+          this.deleteJustification = '';
           if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([PROMPT.LIST]);
           }

@@ -29,6 +29,7 @@ export class ListAuditLogsComponent implements OnInit {
   isSuperAdmin = false;
   organisations: any[] = [];
   organisationOptions: any[] = [];
+  today = new Date();
 
   filterValues: any = {
     username: '',
@@ -36,6 +37,10 @@ export class ListAuditLogsComponent implements OnInit {
     action: null,
     entityName: '',
     organisationId: null,
+    status: null,
+    ipAddress: '',
+    justification: '',
+    dateRange: null,
   };
 
   moduleOptions = [
@@ -52,6 +57,11 @@ export class ListAuditLogsComponent implements OnInit {
     { label: 'Create', value: 'CREATE' },
     { label: 'Update', value: 'UPDATE' },
     { label: 'Delete', value: 'DELETE' },
+  ];
+
+  statusOptions = [
+    { label: 'Success', value: true },
+    { label: 'Failed', value: false },
   ];
 
   constructor(
@@ -116,7 +126,11 @@ export class ListAuditLogsComponent implements OnInit {
       !!this.filterValues.module ||
       !!this.filterValues.action ||
       !!this.filterValues.entityName ||
-      !!this.filterValues.organisationId
+      !!this.filterValues.organisationId ||
+      this.filterValues.status !== null ||
+      !!this.filterValues.ipAddress ||
+      !!this.filterValues.justification ||
+      !!this.filterValues.dateRange
     );
   }
 
@@ -128,6 +142,10 @@ export class ListAuditLogsComponent implements OnInit {
       action: null,
       entityName: '',
       organisationId: this.isSuperAdmin ? orgId : null,
+      status: null,
+      ipAddress: '',
+      justification: '',
+      dateRange: null,
     };
     this.onFilterChange();
   }
@@ -194,7 +212,7 @@ export class ListAuditLogsComponent implements OnInit {
 
     // Extra context fields (visualCount, userCount, columnCount, etc.)
     for (const [k, v] of Object.entries(m)) {
-      if (k === 'entity' || k === 'oldValues' || k === 'newValues') continue;
+      if (k === 'entity' || k === 'oldValues' || k === 'newValues' || k === 'justification') continue;
       if (v !== null && typeof v === 'object' && !Array.isArray(v)) continue;
       items.push({
         key: this.formatKey(k),
@@ -273,6 +291,14 @@ export class ListAuditLogsComponent implements OnInit {
       .trim();
   }
 
+  onDateRangeChange(range: Date[] | null) {
+    this.filterValues.dateRange = range;
+    // Only trigger filter when both dates are selected (or cleared)
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
+  }
+
   private getFilterParams(): any {
     const filter: any = {};
     if (this.filterValues.username)
@@ -283,10 +309,24 @@ export class ListAuditLogsComponent implements OnInit {
       filter.entityName = this.filterValues.entityName;
     if (this.filterValues.organisationId)
       filter.organisationId = this.filterValues.organisationId;
+    if (this.filterValues.status !== null)
+      filter.status = this.filterValues.status;
+    if (this.filterValues.ipAddress)
+      filter.ipAddress = this.filterValues.ipAddress;
+    if (this.filterValues.justification)
+      filter.justification = this.filterValues.justification;
+    if (this.filterValues.dateRange?.[0])
+      filter.dateFrom = this.filterValues.dateRange[0].toISOString();
+    if (this.filterValues.dateRange?.[1]) {
+      // Set end of day for the "to" date
+      const dateTo = new Date(this.filterValues.dateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.dateTo = dateTo.toISOString();
+    }
     return filter;
   }
 
-  exportLogs(format: 'excel' | 'pdf') {
+  exportLogs(format: 'pdf') {
     const filter = this.getFilterParams();
     const params: any = { format };
     if (Object.keys(filter).length > 0) {
@@ -295,13 +335,12 @@ export class ListAuditLogsComponent implements OnInit {
 
     this.auditService.exportAuditLogs(params).subscribe({
       next: (blob: Blob) => {
-        const ext = format === 'excel' ? 'xlsx' : 'pdf';
         const orgLabel =
           this.organisationOptions.find(
             (o: any) => o.value === this.filterValues.organisationId,
           )?.label || 'Organisation';
         const dateStr = new Date().toISOString().slice(0, 10);
-        const fileName = `Audit_Logs_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.${ext}`;
+        const fileName = `Audit_Logs_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.pdf`;
 
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');

@@ -19,9 +19,10 @@ export class DatasetService {
       });
   }
 
-  deleteDataset(orgId: string, datasetId: string) {
+  deleteDataset(orgId: string, datasetId: string, justification?: string) {
+    const url = DATASET.DELETE + `${orgId}` + `/${datasetId}`;
     return this.http
-      .delete(DATASET.DELETE + `${orgId}` + `/${datasetId}`)
+      .request('DELETE', url, { body: { justification } })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -237,7 +238,7 @@ export class DatasetService {
       });
   }
 
-  updateDataset(payload: any) {
+  updateDataset(payload: any, justification?: string) {
     const { id, name, description, organisation, database, sql } = payload;
 
     return this.http
@@ -248,6 +249,7 @@ export class DatasetService {
         organisation,
         database,
         sql,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

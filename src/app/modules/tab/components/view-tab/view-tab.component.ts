@@ -14,6 +14,7 @@ export class ViewTabComponent implements OnInit {
   orgId: string = '';
   tabData: any = null;
   showDeleteConfirm = false;
+  deleteJustification = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -50,12 +51,14 @@ export class ViewTabComponent implements OnInit {
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    if (this.tabData) {
-      this.tabService.deleteTab(this.orgId, this.tabData.id).then(response => {
+    if (this.tabData && this.deleteJustification.trim()) {
+      this.tabService.deleteTab(this.orgId, this.tabData.id, this.deleteJustification.trim()).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.deleteJustification = '';
           this.router.navigate([TAB.LIST]);
         }
       });

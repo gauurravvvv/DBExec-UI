@@ -30,6 +30,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   showDeleteConfirm = false;
   promptToDelete: string | null = null;
+  deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
@@ -338,15 +339,17 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.promptToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.promptToDelete) {
+    if (this.promptToDelete && this.deleteJustification.trim()) {
       this.promptService
-        .deletePrompt(this.selectedOrg, this.promptToDelete)
+        .deletePrompt(this.selectedOrg, this.promptToDelete, this.deleteJustification.trim())
         .then(response => {
           this.showDeleteConfirm = false;
           this.promptToDelete = null;
+          this.deleteJustification = '';
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
               this.loadPrompts(this.lastTableLazyLoadEvent);

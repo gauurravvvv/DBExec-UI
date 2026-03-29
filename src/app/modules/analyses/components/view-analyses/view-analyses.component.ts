@@ -18,6 +18,7 @@ export class ViewAnalysesComponent implements OnInit {
   analysisFields: any[] = [];
   visuals: any[] = [];
   showDeleteConfirm = false;
+  deleteJustification = '';
 
   // Custom field dialog
   showAddCustomFieldDialog = false;
@@ -115,17 +116,21 @@ export class ViewAnalysesComponent implements OnInit {
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    this.analysesService
-      .deleteAnalyses(this.orgId, this.analysisId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.showDeleteConfirm = false;
-          this.router.navigate([ANALYSES.LIST]);
-        }
-      });
+    if (this.deleteJustification.trim()) {
+      this.analysesService
+        .deleteAnalyses(this.orgId, this.analysisId, this.deleteJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showDeleteConfirm = false;
+            this.deleteJustification = '';
+            this.router.navigate([ANALYSES.LIST]);
+          }
+        });
+    }
   }
 
   openAddCustomFieldDialog(): void {

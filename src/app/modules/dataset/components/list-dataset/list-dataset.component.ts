@@ -39,6 +39,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   filteredDatasets: any[] = [];
 
   showDeleteConfirm = false;
+  deleteJustification = '';
   datasetToDelete: string | null = null;
   showDuplicateDialog = false;
   datasetToDuplicate: any = null;
@@ -497,17 +498,19 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.datasetToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.datasetToDelete) {
+    if (this.datasetToDelete && this.deleteJustification.trim()) {
       this.datasetService
-        .deleteDataset(this.selectedOrg, this.datasetToDelete)
+        .deleteDataset(this.selectedOrg, this.datasetToDelete, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadDatasets();
             this.showDeleteConfirm = false;
             this.datasetToDelete = null;
+            this.deleteJustification = '';
           }
         });
     }

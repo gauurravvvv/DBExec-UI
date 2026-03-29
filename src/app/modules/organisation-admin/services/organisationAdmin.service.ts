@@ -38,9 +38,11 @@ export class OrganisationAdminService {
       });
   }
 
-  deleteAdminOrganisation(orgId: string, id: string) {
+  deleteAdminOrganisation(orgId: string, id: string, justification?: string) {
     return this.http
-      .delete(ORG_ADMIN.DELETE + `${orgId}/${id}`)
+      .request('DELETE', ORG_ADMIN.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -58,7 +60,7 @@ export class OrganisationAdminService {
       });
   }
 
-  updateOrgAdmin(orgAdminForm: FormGroup) {
+  updateOrgAdmin(orgAdminForm: FormGroup, justification?: string) {
     const { id, firstName, lastName, username, email, status, organisation } =
       orgAdminForm.getRawValue();
     return this.http
@@ -70,6 +72,7 @@ export class OrganisationAdminService {
         email,
         organisation,
         status: status ? 1 : 0,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

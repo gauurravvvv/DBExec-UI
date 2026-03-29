@@ -26,12 +26,15 @@ export class ListLoginActivityComponent implements OnInit {
   isSuperAdmin = false;
   organisations: any[] = [];
   organisationOptions: any[] = [];
+  today = new Date();
 
   filterValues: any = {
     username: '',
     eventType: null,
     organisationName: '',
     organisationId: null,
+    ipAddress: '',
+    dateRange: null,
   };
 
   eventTypeOptions = [
@@ -89,12 +92,21 @@ export class ListLoginActivityComponent implements OnInit {
     this.searchSubject.next();
   }
 
+  onDateRangeChange(range: Date[] | null) {
+    this.filterValues.dateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
+  }
+
   get isFilterActive(): boolean {
     return (
       !!this.filterValues.username ||
       !!this.filterValues.eventType ||
       !!this.filterValues.organisationName ||
-      !!this.filterValues.organisationId
+      !!this.filterValues.organisationId ||
+      !!this.filterValues.ipAddress ||
+      !!this.filterValues.dateRange
     );
   }
 
@@ -111,6 +123,8 @@ export class ListLoginActivityComponent implements OnInit {
       eventType: null,
       organisationName: '',
       organisationId: this.isSuperAdmin ? orgId : null,
+      ipAddress: '',
+      dateRange: null,
     };
     this.onFilterChange();
   }
@@ -146,10 +160,19 @@ export class ListLoginActivityComponent implements OnInit {
       filter.organisationName = this.filterValues.organisationName;
     if (this.filterValues.organisationId)
       filter.organisationId = this.filterValues.organisationId;
+    if (this.filterValues.ipAddress)
+      filter.ipAddress = this.filterValues.ipAddress;
+    if (this.filterValues.dateRange?.[0])
+      filter.dateFrom = this.filterValues.dateRange[0].toISOString();
+    if (this.filterValues.dateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.dateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.dateTo = dateTo.toISOString();
+    }
     return filter;
   }
 
-  exportActivity(format: 'excel' | 'pdf') {
+  exportActivity(format: 'pdf') {
     const filter = this.getFilterParams();
     const params: any = { format };
     if (Object.keys(filter).length > 0) {
@@ -158,13 +181,12 @@ export class ListLoginActivityComponent implements OnInit {
 
     this.auditService.exportLoginActivity(params).subscribe({
       next: (blob: Blob) => {
-        const ext = format === 'excel' ? 'xlsx' : 'pdf';
         const orgLabel =
           this.organisationOptions.find(
             (o: any) => o.value === this.filterValues.organisationId,
           )?.label || 'Organisation';
         const dateStr = new Date().toISOString().slice(0, 10);
-        const fileName = `Login_Activity_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.${ext}`;
+        const fileName = `Login_Activity_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.pdf`;
 
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');

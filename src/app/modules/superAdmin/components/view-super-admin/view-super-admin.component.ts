@@ -37,6 +37,7 @@ export class ViewSuperAdminComponent implements OnInit {
   loggedInUserId: any;
   adminIdToDelete: string | null = null;
   showDeleteConfirm = false;
+  deleteJustification = '';
   showChangePasswordDialog = false;
 
   constructor(
@@ -111,18 +112,20 @@ export class ViewSuperAdminComponent implements OnInit {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.adminIdToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.adminIdToDelete) {
+    if (this.adminIdToDelete && this.deleteJustification.trim()) {
       this.onDelete(this.adminIdToDelete);
       this.showDeleteConfirm = false;
       this.adminIdToDelete = null;
+      this.deleteJustification = '';
     }
   }
 
   onDelete(adminId: string) {
-    this.superAdminService.deleteSuperAdmin(adminId).then((res: any) => {
+    this.superAdminService.deleteSuperAdmin(adminId, this.deleteJustification.trim()).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         this.router.navigate([SUPER_ADMIN.LIST]);
       }

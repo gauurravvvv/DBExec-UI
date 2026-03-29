@@ -22,6 +22,7 @@ export class ViewDatabaseComponent implements OnInit {
   orgId!: string;
   dbData: any;
   showDeleteConfirm = false;
+  deleteJustification = '';
   showTableDetails = false;
   selectedTable: any = null;
   selectedSchema: any = null;
@@ -366,14 +367,16 @@ export class ViewDatabaseComponent implements OnInit {
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    if (this.dbData) {
+    if (this.dbData && this.deleteJustification.trim()) {
       this.databaseService
-        .deleteDatabase(this.orgId, this.dbId)
+        .deleteDatabase(this.orgId, this.dbId, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.deleteJustification = '';
             this.router.navigate([DATABASE.LIST]);
           }
         });

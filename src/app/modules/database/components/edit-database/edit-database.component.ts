@@ -5,6 +5,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
 import { DATABASE } from 'src/app/constants/routes';
 import { DatabaseService } from '../../services/database.service';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import {
@@ -58,9 +59,14 @@ import {
     ]),
   ],
 })
-export class EditDatabaseComponent implements OnInit {
+export class EditDatabaseComponent implements OnInit, HasUnsavedChanges {
   databaseForm!: FormGroup;
   isFormDirty = false;
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
+  }
+
   showOrganisationDropdown = false;
   showPassword: boolean = false;
   databaseId: string = '';
@@ -68,6 +74,9 @@ export class EditDatabaseComponent implements OnInit {
   initialFormValues: any = null;
   organisationName: string = '';
   isWarningExpanded: boolean = false;
+
+  showSaveConfirm = false;
+  saveJustification = '';
 
   // Connection test
   connectionTested = false;
@@ -228,6 +237,17 @@ export class EditDatabaseComponent implements OnInit {
 
   onSubmit(): void {
     if (this.databaseForm.valid && this.connectionTested) {
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
       const formValue = this.databaseForm.getRawValue();
 
       const payload = {
@@ -244,8 +264,12 @@ export class EditDatabaseComponent implements OnInit {
         status: formValue.status ? 1 : 0,
       };
 
-      this.databaseService.updateDatabase(payload).then(response => {
+      this.databaseService.updateDatabase(payload, this.saveJustification.trim()).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.isFormDirty = false;
+          this.databaseForm.markAsPristine();
           this.router.navigate([DATABASE.LIST]);
         }
       });

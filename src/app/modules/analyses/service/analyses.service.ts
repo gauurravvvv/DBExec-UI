@@ -70,9 +70,11 @@ export class AnalysesService {
       });
   }
 
-  deleteAnalyses(orgId: string, analysisId: string) {
+  deleteAnalyses(orgId: string, analysisId: string, justification?: string) {
     return this.http
-      .delete(ANALYSES.DELETE + `${orgId}` + `/${analysisId}`)
+      .request('DELETE', ANALYSES.DELETE + `${orgId}` + `/${analysisId}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -128,7 +130,7 @@ export class AnalysesService {
       });
   }
 
-  updateAnalyses(payload: any) {
+  updateAnalyses(payload: any, justification?: string) {
     const {
       id,
       name,
@@ -148,6 +150,7 @@ export class AnalysesService {
         organisation,
         database,
         visuals,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

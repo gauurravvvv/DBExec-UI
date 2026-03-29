@@ -108,12 +108,12 @@ $radius-sm: 8px;
       .p-datatable-wrapper {
         background: var(--card-background);
       }
-
       .p-datatable-header {
         display: none;
       }
 
-      .p-datatable-thead > tr > th {
+      // Header row
+      .p-datatable-thead > tr:first-child > th {
         background: var(--hover-background);
         color: var(--text-color);
         opacity: 1;
@@ -131,39 +131,84 @@ $radius-sm: 8px;
         }
 
         &:first-child {
-          padding-left: 1.5rem;
+          padding-left: 2rem;
         }
         &:last-child {
-          padding-right: 1.5rem;
+          padding-right: 2rem;
         }
-
         &:focus {
           box-shadow: none;
         }
       }
 
+      // Filter row
+      .p-datatable-thead > tr:last-child > th {
+        padding: 0.5rem 0.75rem;
+        background: var(--card-background);
+        border-bottom: 1px solid var(--border-color);
+
+        &:first-child {
+          padding-left: 1rem;
+        }
+        &:last-child {
+          padding-right: 1rem;
+        }
+
+        app-custom-dropdown,
+        app-custom-daterange,
+        app-custom-input {
+          display: block;
+          width: 100%;
+
+          .form-field {
+            gap: 0;
+          }
+
+          .p-dropdown,
+          .p-calendar {
+            width: 100% !important;
+            min-width: 0;
+          }
+        }
+      }
+
+      // Body rows
       .p-datatable-tbody > tr {
         background: var(--card-background);
         transition: all 0.15s ease;
         border-bottom: 1px solid var(--border-color);
 
         td {
-          padding: 0.6rem 1rem;
+          padding: 0.75rem 1rem;
           vertical-align: middle;
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: 0.9rem;
 
           &:first-child {
-            padding-left: 1.5rem;
+            padding-left: 2rem;
           }
           &:last-child {
-            padding-right: 1.5rem;
+            padding-right: 2rem;
           }
         }
 
         &:hover {
           background-color: var(--hover-background) !important;
         }
+      }
+
+      // Name link
+      .dataset-name-link {
+        color: var(--text-color);
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        cursor: default;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
       }
 
       .description-text {
@@ -173,29 +218,26 @@ $radius-sm: 8px;
         text-overflow: ellipsis;
         display: block;
         max-width: 100%;
-
-        &.font-semibold {
-          font-weight: 600;
-          color: var(--text-color);
-        }
       }
 
       .date-text {
         color: var(--secondary-color);
         white-space: nowrap;
-        font-size: 0.82rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        max-width: 100%;
       }
 
-      .session-id {
-        font-family: monospace;
-        font-size: 0.8rem;
+      .user-agent-text {
+        max-width: 220px;
       }
 
       .event-badge {
         display: inline-block;
         padding: 3px 10px;
         border-radius: 4px;
-        font-size: 0.72rem;
+        font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.03em;
@@ -227,6 +269,7 @@ $radius-sm: 8px;
         }
       }
 
+      // Paginator
       .p-paginator {
         background: var(--card-background);
         border-top: 1px solid var(--border-color);
@@ -244,12 +287,10 @@ $radius-sm: 8px;
           height: 2rem;
           margin: 0 0.125rem;
           font-weight: 500;
-
           &:hover {
             background: var(--hover-background);
             color: var(--text-color);
           }
-
           &.p-highlight {
             background: var(--primary-color);
             color: #fff;
@@ -263,7 +304,6 @@ $radius-sm: 8px;
 td.text-center {
   text-align: center;
 }
-
 td.empty-message-cell {
   text-align: center;
   padding: 2rem !important;

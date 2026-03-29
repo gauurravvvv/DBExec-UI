@@ -18,7 +18,7 @@
   <div class="header-right">
     <div class="header-actions">
       <!-- Search Trigger -->
-      <div class="search-trigger" (click)="openSearchModal()">
+      <div class="search-trigger" (click)="openSearchModal()" *ngIf="userRole !== 'SUPER-ADMIN'">
         <i class="pi pi-search"></i>
         <span class="placeholder">Search anything...</span>
         <kbd class="shortcut">⌘K</kbd>
@@ -78,7 +78,7 @@
           <div class="menu-divider"></div>
           <ul>
             <li class="menu-item">
-              <a>
+              <a (click)="viewProfile(); $event.stopPropagation()">
                 <i class="pi pi-user"></i>
                 <span>My Profile</span>
               </a>

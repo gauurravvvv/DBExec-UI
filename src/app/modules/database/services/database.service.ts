@@ -18,9 +18,9 @@ export class DatabaseService {
       });
   }
 
-  deleteDatabase(orgId: string, id: string) {
+  deleteDatabase(orgId: string, id: string, justification?: string) {
     return this.http
-      .post(DATABASE.DELETE + `${orgId}/${id}`, {})
+      .post(DATABASE.DELETE + `${orgId}/${id}`, { justification })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -70,7 +70,7 @@ export class DatabaseService {
       });
   }
 
-  updateDatabase(payload: any) {
+  updateDatabase(payload: any, justification?: string) {
     const {
       id,
       name,
@@ -97,6 +97,7 @@ export class DatabaseService {
         password,
         organisation,
         status,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

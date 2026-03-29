@@ -41,6 +41,7 @@ import {
   selectSchemaByKey,
 } from '../../store';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 // Declare Monaco and window for TypeScript
@@ -53,7 +54,7 @@ declare const window: any;
   styleUrls: ['./add-dataset.component.scss'],
 })
 export class AddDatasetComponent
-  implements OnInit, OnDestroy, AfterViewInit, OnChanges
+  implements OnInit, OnDestroy, AfterViewInit, OnChanges, HasUnsavedChanges
 {
   // ViewChild for file input
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -156,6 +157,10 @@ export class AddDatasetComponent
     const query = this.currentQuery.trim();
     const defaultQuery = '-- Write your SQL query here';
     return !query || query === defaultQuery;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return !this.isQueryEmpty;
   }
 
   getFilteredTables(tables: any[]): any[] {

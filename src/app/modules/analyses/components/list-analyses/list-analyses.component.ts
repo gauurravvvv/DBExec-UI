@@ -28,6 +28,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   showDeleteConfirm = false;
   analysisToDelete: string | null = null;
+  deleteJustification = '';
   organisations: any[] = [];
   databases: any[] = [];
   selectedOrg: any = null;
@@ -315,17 +316,19 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.analysisToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.analysisToDelete) {
+    if (this.analysisToDelete && this.deleteJustification.trim()) {
       this.analysesService
-        .deleteAnalyses(this.selectedOrg, this.analysisToDelete)
+        .deleteAnalyses(this.selectedOrg, this.analysisToDelete, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadAnalyses();
             this.showDeleteConfirm = false;
             this.analysisToDelete = null;
+            this.deleteJustification = '';
           }
         });
     }

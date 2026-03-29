@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddScreenComponent } from './components/add-screen/add-screen.component';
 import { EditScreenComponent } from './components/edit-screen/edit-screen.component';
 import { ListScreenComponent } from './components/list-screen/list-screen.component';
@@ -15,9 +16,10 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddScreenComponent,
+    canDeactivate: [UnsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewScreenComponent },
-  { path: 'edit/:orgId/:id', component: EditScreenComponent },
+  { path: 'edit/:orgId/:id', component: EditScreenComponent, canDeactivate: [UnsavedChangesGuard] },
   { path: 'config/:orgId/:dbId/:id', component: ConfigureScreenComponent },
   { path: 'execute/:orgId/:dbId/:screenId', component: ExecuteScreenComponent },
 ];

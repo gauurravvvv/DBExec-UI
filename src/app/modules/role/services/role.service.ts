@@ -42,9 +42,11 @@ export class RoleService {
       });
   }
 
-  deleteRole(orgId: string, id: string) {
+  deleteRole(orgId: string, id: string, justification?: string) {
     return this.http
-      .delete(ROLE.DELETE + `${orgId}/${id}`)
+      .request('DELETE', ROLE.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -62,7 +64,7 @@ export class RoleService {
       });
   }
 
-  editRole(groupForm: FormGroup) {
+  editRole(groupForm: FormGroup, justification?: string) {
     const { id, name, description, status, users, organisation } =
       groupForm.getRawValue();
     return this.http
@@ -73,6 +75,7 @@ export class RoleService {
         status: status ? 1 : 0,
         users,
         organisation,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

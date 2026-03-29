@@ -238,3 +238,8 @@ export const AUDIT = {
   EXPORT_LOGS: '/audit/export/logs',
   EXPORT_LOGIN_ACTIVITY: '/audit/export/login-activity',
 };
+
+export const PROFILE = {
+  GET: '/profile/get',
+  CHANGE_PASSWORD: '/profile/change-password',
+};

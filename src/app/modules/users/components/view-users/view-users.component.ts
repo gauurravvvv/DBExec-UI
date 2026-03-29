@@ -13,6 +13,7 @@ export class ViewUsersComponent implements OnInit {
   userId: string = '';
   userData: any;
   showDeleteConfirm = false;
+  deleteJustification = '';
   avatarBackground: string = '';
   userInitials: string = '';
   loggedInUserId = this.globalService.getTokenDetails('userId');
@@ -71,14 +72,18 @@ export class ViewUsersComponent implements OnInit {
 
   cancelDelete() {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    this.userService.deleteUser(this.userId, this.orgId).then(response => {
-      if (this.globalService.handleSuccessService(response)) {
-        this.router.navigate([ORGANISATION_ADMIN.LIST]);
-      }
-    });
+    if (this.deleteJustification.trim()) {
+      this.userService.deleteUser(this.userId, this.orgId, this.deleteJustification.trim()).then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.deleteJustification = '';
+          this.router.navigate([ORGANISATION_ADMIN.LIST]);
+        }
+      });
+    }
   }
 
   onUnlock() {

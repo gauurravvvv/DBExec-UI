@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddUsersComponent } from './components/add-users/add-users.component';
 import { EditUsersComponent } from './components/edit-users/edit-users.component';
 import { ListUsersComponent } from './components/list-users/list-users.component';
@@ -13,9 +14,10 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddUsersComponent,
+    canDeactivate: [UnsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewUsersComponent },
-  { path: 'edit/:orgId/:id', component: EditUsersComponent },
+  { path: 'edit/:orgId/:id', component: EditUsersComponent, canDeactivate: [UnsavedChangesGuard] },
 ];
 
 @NgModule({

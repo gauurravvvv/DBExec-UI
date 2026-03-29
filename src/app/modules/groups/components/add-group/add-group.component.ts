@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { GROUP } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
@@ -21,7 +22,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
   templateUrl: './add-group.component.html',
   styleUrls: ['./add-group.component.scss'],
 })
-export class AddGroupComponent implements OnInit {
+export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   userGroupForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
@@ -42,6 +43,10 @@ export class AddGroupComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.userGroupForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   ngOnInit() {

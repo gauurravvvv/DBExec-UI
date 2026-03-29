@@ -27,6 +27,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   showDeleteConfirm = false;
   userToDelete: string | null = null;
+  deleteJustification = '';
 
   organisations: any[] = [];
   selectedOrg: any = null;
@@ -210,12 +211,13 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.userToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.userToDelete) {
+    if (this.userToDelete && this.deleteJustification.trim()) {
       this.userService
-        .deleteUser(this.userToDelete, this.selectedOrg)
+        .deleteUser(this.userToDelete, this.selectedOrg, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
@@ -223,6 +225,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             }
             this.showDeleteConfirm = false;
             this.userToDelete = null;
+            this.deleteJustification = '';
           }
         });
     }

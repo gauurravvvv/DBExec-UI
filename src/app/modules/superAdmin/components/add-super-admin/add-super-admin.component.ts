@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SuperAdminService } from '../../services/superAdmin.service';
 
@@ -11,12 +12,16 @@ import { SuperAdminService } from '../../services/superAdmin.service';
   templateUrl: './add-super-admin.component.html',
   styleUrls: ['./add-super-admin.component.scss'],
 })
-export class AddSuperAdminComponent implements OnInit {
+export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
   adminForm!: FormGroup;
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
     return this.adminForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   constructor(

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { PromptService } from '../../services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
@@ -15,7 +16,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './edit-prompt.component.html',
   styleUrls: ['./edit-prompt.component.scss'],
 })
-export class EditPromptComponent implements OnInit {
+export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   promptForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -27,6 +28,8 @@ export class EditPromptComponent implements OnInit {
   sectionData: any;
   sections: any[] = [];
   isCancelClicked = false;
+  showSaveConfirm = false;
+  saveJustification = '';
 
   constructor(
     private fb: FormBuilder,
@@ -57,6 +60,10 @@ export class EditPromptComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.promptForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   initForm(): void {
@@ -134,11 +141,27 @@ export class EditPromptComponent implements OnInit {
 
   onSubmit(): void {
     if (this.promptForm.valid) {
-      this.promptService.updatePrompt(this.promptForm).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([PROMPT.LIST]);
-        }
-      });
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
+      this.promptService
+        .updatePrompt(this.promptForm, this.saveJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.promptForm.markAsPristine();
+            this.router.navigate([PROMPT.LIST]);
+          }
+        });
     }
   }
 

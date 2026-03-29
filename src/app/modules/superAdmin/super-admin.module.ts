@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ListSuperAdminComponent } from './components/list-super-admin/list-super-admin.component';
@@ -18,6 +18,7 @@ import { SuperAdminRoutingModule } from './super-admin-routing.module';
   ],
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     AppPrimeNGModule,
     SuperAdminRoutingModule,

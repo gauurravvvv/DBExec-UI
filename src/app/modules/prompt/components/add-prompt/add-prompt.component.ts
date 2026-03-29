@@ -6,6 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -20,7 +21,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './add-prompt.component.html',
   styleUrls: ['./add-prompt.component.scss'],
 })
-export class AddPromptComponent implements OnInit, OnDestroy {
+export class AddPromptComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   // Subscription cleanup
   private destroy$ = new Subject<void>();
 
@@ -61,6 +62,10 @@ export class AddPromptComponent implements OnInit, OnDestroy {
 
   get isFormDirty(): boolean {
     return this.sectionForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   ngOnInit() {

@@ -30,6 +30,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   showDeleteConfirm = false;
   sectionToDelete: string | null = null;
+  deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
@@ -318,15 +319,17 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.sectionToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.sectionToDelete) {
+    if (this.sectionToDelete && this.deleteJustification.trim()) {
       this.sectionService
-        .deleteSection(this.selectedOrg, this.sectionToDelete)
+        .deleteSection(this.selectedOrg, this.sectionToDelete, this.deleteJustification.trim())
         .then(response => {
           this.showDeleteConfirm = false;
           this.sectionToDelete = null;
+          this.deleteJustification = '';
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
               this.loadSections(this.lastTableLazyLoadEvent);

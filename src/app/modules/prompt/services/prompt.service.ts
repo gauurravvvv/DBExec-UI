@@ -19,9 +19,11 @@ export class PromptService {
       });
   }
 
-  deletePrompt(orgId: string, id: string) {
+  deletePrompt(orgId: string, id: string, justification?: string) {
     return this.http
-      .delete(PROMPT.DELETE + `${orgId}/${id}`)
+      .request('DELETE', PROMPT.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then(response => {
         const result = JSON.parse(JSON.stringify(response));
@@ -55,7 +57,7 @@ export class PromptService {
       });
   }
 
-  updatePrompt(promptForm: FormGroup) {
+  updatePrompt(promptForm: FormGroup, justification?: string) {
     const {
       id,
       organisation,
@@ -76,6 +78,7 @@ export class PromptService {
         name,
         description,
         status: status ? 1 : 0,
+        justification,
       })
       .toPromise()
       .then(response => {

@@ -102,6 +102,7 @@ import {
   supportsDataZoom,
 } from '../../constants/charts.constants';
 import { Visual, createVisual } from '../../models';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { AnalysesService } from '../../service/analyses.service';
 import { ChartDataTransformerService } from '../../services';
 import {
@@ -131,10 +132,14 @@ interface ConfiguredFilter {
   templateUrl: './edit-analyses.component.html',
   styleUrls: ['./edit-analyses.component.scss'],
 })
-export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, HasUnsavedChanges {
   analysisId: string = '';
   orgId: string = '';
   databaseId: string = '';
+
+  hasUnsavedChanges(): boolean {
+    return false;
+  }
   datasetId: string = '';
   analysisDetails: any = null;
   datasetDetails: any = null;
@@ -2024,7 +2029,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   handleSaveDialogClose(
-    formData: { name: string; description: string } | null,
+    formData: { name: string; description: string; justification: string } | null,
   ): void {
     this.showSaveDialog = false;
 
@@ -2069,7 +2074,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy {
         })),
       };
 
-      this.analysesService.updateAnalyses(updatePayload).then(response => {
+      this.analysesService.updateAnalyses(updatePayload, formData.justification).then(response => {
         if (this.globalService.handleSuccessService(response, true)) {
           this.router.navigate([ANALYSES.LIST]);
         }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrganisationAdminService } from '../../services/organisationAdmin.service';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -12,7 +13,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
   templateUrl: './edit-org-admin.component.html',
   styleUrls: ['./edit-org-admin.component.scss'],
 })
-export class EditOrgAdminComponent implements OnInit {
+export class EditOrgAdminComponent implements OnInit, HasUnsavedChanges {
   adminForm!: FormGroup;
   isCancelClicked = false;
   organisations: any[] = [];
@@ -23,6 +24,8 @@ export class EditOrgAdminComponent implements OnInit {
   selectedOrgId: string = '';
   adminData: any;
   isLocked: boolean = false;
+  showSaveConfirm = false;
+  saveJustification = '';
 
   constructor(
     private fb: FormBuilder,
@@ -42,6 +45,10 @@ export class EditOrgAdminComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.adminForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   initForm() {
@@ -106,8 +113,22 @@ export class EditOrgAdminComponent implements OnInit {
 
   onSubmit() {
     if (this.adminForm.valid) {
-      this.orgAdminService.updateOrgAdmin(this.adminForm).then(response => {
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave() {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave() {
+    if (this.saveJustification.trim()) {
+      this.orgAdminService.updateOrgAdmin(this.adminForm, this.saveJustification.trim()).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.adminForm.markAsPristine();
           this.router.navigate([ORGANISATION_ADMIN.LIST]);
         }
       });

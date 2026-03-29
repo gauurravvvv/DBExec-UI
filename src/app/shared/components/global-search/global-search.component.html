@@ -5,46 +5,40 @@
   (click)="closeSearchModal()"
 >
   <div class="search-modal" (click)="$event.stopPropagation()">
-    <!-- Search Header -->
+    <!-- Search Input -->
     <div class="search-header">
-      <div class="search-input-row">
-        <i class="pi pi-search search-icon"></i>
-        <input
-          #searchInput
-          type="text"
-          [(ngModel)]="searchTerm"
-          (input)="onSearch()"
-          placeholder="Search anything..."
-          class="search-input"
-          autocomplete="off"
-        />
-        <div class="header-actions">
-          <kbd class="key-hint">ESC</kbd>
-          <button class="close-btn" (click)="closeSearchModal()">
-            <i class="pi pi-times"></i>
-          </button>
-        </div>
-      </div>
+      <i class="pi pi-search search-icon"></i>
+      <input
+        #searchInput
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search datasets, screens, tabs, analyses..."
+        class="search-input"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <kbd class="esc-hint" (click)="closeSearchModal()">ESC</kbd>
     </div>
 
     <!-- Filter Tabs -->
     <div class="search-filters" *ngIf="uniqueEntityTypes.length > 0">
       <button
-        class="filter-pill"
+        class="filter-chip"
         [class.active]="activeFilter === 'ALL'"
         (click)="setFilter('ALL')"
       >
         All
-        <span class="pill-count">{{ searchResults.length }}</span>
+        <span class="chip-count">{{ searchResults.length }}</span>
       </button>
       <button
-        class="filter-pill"
+        class="filter-chip"
         *ngFor="let type of uniqueEntityTypes"
         [class.active]="activeFilter === type"
         (click)="setFilter(type)"
       >
         {{ type }}
-        <span class="pill-count">{{ getCountForType(type) }}</span>
+        <span class="chip-count">{{ getCountForType(type) }}</span>
       </button>
     </div>
 
@@ -55,46 +49,43 @@
         *ngFor="let result of filteredSearchResults"
         (click)="navigateToResult(result)"
       >
-        <div class="result-icon-wrap">
+        <div class="result-icon">
           <i [class]="result.icon"></i>
         </div>
-        <div class="result-body">
-          <div class="result-title">{{ result.title }}</div>
-          <div class="result-meta">
-            <span class="result-type-tag">{{ result.entityType }}</span>
+        <div class="result-info">
+          <span class="result-name">{{ result.title }}</span>
+          <div class="result-detail">
+            <span class="result-tag">{{ result.entityType }}</span>
             <ng-container *ngIf="result.breadcrumb">
-              <span class="breadcrumb-sep"
-                ><i class="pi pi-chevron-right"></i
-              ></span>
-              <span class="result-breadcrumb">{{ result.breadcrumb }}</span>
+              <i class="pi pi-chevron-right breadcrumb-arrow"></i>
+              <span class="result-path">{{ result.breadcrumb }}</span>
             </ng-container>
           </div>
         </div>
-        <i class="pi pi-arrow-right arrow-icon"></i>
+        <i class="pi pi-arrow-right result-go"></i>
       </div>
     </div>
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0">
-      <div class="empty-icon-wrap">
-        <i class="pi pi-search"></i>
-      </div>
-      <p class="empty-title">
+      <i class="pi pi-search empty-icon"></i>
+      <p class="empty-text">
         No results for <strong>"{{ searchTerm }}"</strong>
       </p>
-      <p class="empty-hint">Try different keywords or check the spelling</p>
+      <p class="empty-sub">Try different keywords or check the spelling</p>
     </div>
 
-    <!-- Idle State (no search yet) -->
+    <!-- Idle State -->
     <div class="idle-state" *ngIf="!searchTerm">
-      <p class="idle-hint">Start typing to search across all entities</p>
+      <i class="pi pi-search idle-icon"></i>
+      <p class="idle-text">Search across all your entities</p>
     </div>
 
-    <!-- Footer Shortcuts -->
+    <!-- Footer -->
     <div class="search-footer">
-      <div class="footer-hint"><kbd>↑</kbd><kbd>↓</kbd> Navigate</div>
-      <div class="footer-hint"><kbd>↵</kbd> Open</div>
-      <div class="footer-hint"><kbd>ESC</kbd> Close</div>
+      <div class="shortcut"><kbd>↑</kbd><kbd>↓</kbd><span>Navigate</span></div>
+      <div class="shortcut"><kbd>↵</kbd><span>Open</span></div>
+      <div class="shortcut"><kbd>ESC</kbd><span>Close</span></div>
     </div>
   </div>
 </div>

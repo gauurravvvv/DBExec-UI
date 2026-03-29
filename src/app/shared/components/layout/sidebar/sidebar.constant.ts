@@ -93,7 +93,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'myProfile',
-    route: '/home/system/myProfile',
+    route: '/app/profile',
   },
   { value: 'auditLogs', route: '/app/audit-logs' },
   { value: 'loginActivity', route: '/app/login-activity' },

@@ -14,6 +14,7 @@ export class ViewOrgAdminComponent implements OnInit {
   adminId: string = '';
   adminData: any;
   showDeleteConfirm = false;
+  deleteJustification = '';
   avatarBackground: string = '';
   adminInitials: string = '';
   loggedInUserId = this.globalService.getTokenDetails('userId');
@@ -78,16 +79,20 @@ export class ViewOrgAdminComponent implements OnInit {
 
   cancelDelete() {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    this.orgAdminService
-      .deleteAdminOrganisation(this.selectedOrgId, this.adminId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([ORGANISATION_ADMIN.LIST]);
-        }
-      });
+    if (this.deleteJustification.trim()) {
+      this.orgAdminService
+        .deleteAdminOrganisation(this.selectedOrgId, this.adminId, this.deleteJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.deleteJustification = '';
+            this.router.navigate([ORGANISATION_ADMIN.LIST]);
+          }
+        });
+    }
   }
 
   onUnlock() {

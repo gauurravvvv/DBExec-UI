@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -15,7 +16,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './add-tab.component.html',
   styleUrls: ['./add-tab.component.scss'],
 })
-export class AddTabComponent implements OnInit {
+export class AddTabComponent implements OnInit, HasUnsavedChanges {
   tabForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
@@ -43,6 +44,10 @@ export class AddTabComponent implements OnInit {
   // Add getter for form dirty state
   get isFormDirty(): boolean {
     return this.tabForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   ngOnInit() {

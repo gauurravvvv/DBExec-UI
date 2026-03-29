@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -16,7 +17,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './add-section.component.html',
   styleUrls: ['./add-section.component.scss'],
 })
-export class AddSectionComponent implements OnInit {
+export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   sectionForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
@@ -48,6 +49,10 @@ export class AddSectionComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.sectionForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   ngOnInit() {

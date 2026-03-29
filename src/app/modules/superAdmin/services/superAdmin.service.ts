@@ -19,9 +19,11 @@ export class SuperAdminService {
       });
   }
 
-  deleteSuperAdmin(id: string) {
+  deleteSuperAdmin(id: string, justification?: string) {
     return this.http
-      .delete(SUPER_ADMIN.DELETE + `${id}`)
+      .request('DELETE', SUPER_ADMIN.DELETE + `${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -56,7 +58,7 @@ export class SuperAdminService {
       });
   }
 
-  updateSuperAdmin(superAdminForm: FormGroup) {
+  updateSuperAdmin(superAdminForm: FormGroup, justification?: string) {
     const { id, firstName, lastName, username, email, status } =
       superAdminForm.getRawValue();
     return this.http
@@ -67,6 +69,7 @@ export class SuperAdminService {
         username,
         email,
         status: status ? 1 : 0,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

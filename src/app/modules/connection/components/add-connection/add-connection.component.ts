@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatabaseService } from 'src/app/modules/database/services/database.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
@@ -15,12 +16,17 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './add-connection.component.html',
   styleUrls: ['./add-connection.component.scss'],
 })
-export class AddConnectionComponent implements OnInit {
+export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   connectionForm!: FormGroup;
   organisations: any[] = [];
   showPassword = false;
   databases: any[] = [];
   isFormDirty: boolean = false;
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
+  }
+
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   selectedOrg: any = null;

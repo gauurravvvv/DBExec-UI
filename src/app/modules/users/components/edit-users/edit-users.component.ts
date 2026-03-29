@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from '../../services/user.service';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -12,7 +13,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
   templateUrl: './edit-users.component.html',
   styleUrls: ['./edit-users.component.scss'],
 })
-export class EditUsersComponent implements OnInit {
+export class EditUsersComponent implements OnInit, HasUnsavedChanges {
   userForm!: FormGroup;
   isCancelClicked = false;
   organisations: any[] = [];
@@ -23,6 +24,8 @@ export class EditUsersComponent implements OnInit {
   userData: any;
   orgId: string = '';
   isLocked: boolean = false;
+  showSaveConfirm = false;
+  saveJustification = '';
 
   constructor(
     private fb: FormBuilder,
@@ -42,6 +45,10 @@ export class EditUsersComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.userForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   initForm() {
@@ -104,8 +111,22 @@ export class EditUsersComponent implements OnInit {
 
   onSubmit() {
     if (this.userForm.valid) {
-      this.userService.updateUser(this.userForm).then(response => {
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave() {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave() {
+    if (this.saveJustification.trim()) {
+      this.userService.updateUser(this.userForm, this.saveJustification.trim()).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.userForm.markAsPristine();
           this.router.navigate([USER.LIST]);
         }
       });

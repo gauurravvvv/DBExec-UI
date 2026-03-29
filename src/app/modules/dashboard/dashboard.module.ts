@@ -4,9 +4,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { EmptyRootComponent } from './empty-root/empty-root.component';
 import { SuperAdminDashboardComponent } from './super-admin-dashboard/super-admin-dashboard.component';
+import { OrgDashboardComponent } from './org-dashboard/org-dashboard.component';
 
 @NgModule({
-  declarations: [EmptyRootComponent, SuperAdminDashboardComponent],
+  declarations: [
+    EmptyRootComponent,
+    SuperAdminDashboardComponent,
+    OrgDashboardComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,

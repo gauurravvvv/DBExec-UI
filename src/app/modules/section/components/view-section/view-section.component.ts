@@ -14,6 +14,7 @@ export class ViewSectionComponent implements OnInit {
   orgId: string = '';
   tabData: any = null;
   showDeleteConfirm = false;
+  deleteJustification = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -52,14 +53,16 @@ export class ViewSectionComponent implements OnInit {
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    if (this.tabData) {
+    if (this.tabData && this.deleteJustification.trim()) {
       this.sectionService
-        .deleteSection(this.orgId, this.tabData.id)
+        .deleteSection(this.orgId, this.tabData.id, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.deleteJustification = '';
             this.router.navigate(['/app/section']);
           }
         });

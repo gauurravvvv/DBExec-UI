@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { LoadingService } from './core/services/loading.service';
 import { SessionExpiredService } from './core/services/session-expired.service';
 import { IdleTimeoutService } from './core/services/idle-timeout.service';
 import { LoginService } from './core/services/login.service';
 import { StorageService } from './core/services/storage.service';
 import { PrimeNGConfig } from 'primeng/api';
-import { delay, filter } from 'rxjs/operators';
+import { delay, filter, map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -32,6 +33,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private idleTimeoutService: IdleTimeoutService,
     private loginService: LoginService,
     private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private titleService: Title,
   ) {
     const savedTheme = localStorage.getItem('theme');
     if (!savedTheme) {
@@ -81,6 +84,14 @@ export class AppComponent implements OnInit, OnDestroy {
         ),
       )
       .subscribe(event => {
+        // Update browser tab title
+        let route = this.activatedRoute;
+        while (route.firstChild) route = route.firstChild;
+        const pageTitle = route.snapshot.data['title'];
+        this.titleService.setTitle(
+          pageTitle ? `DBExec - ${pageTitle}` : 'DBExec',
+        );
+
         if (
           event.url === '/login' ||
           event.url === '/' ||

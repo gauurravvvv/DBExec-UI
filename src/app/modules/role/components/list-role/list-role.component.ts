@@ -23,6 +23,7 @@ export class ListRoleComponent implements OnInit {
   selectedStatus: number | null = null;
   showDeleteConfirm = false;
   roleToDelete: string | null = null;
+  deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
   selectedOrg: any = {};
@@ -158,17 +159,19 @@ export class ListRoleComponent implements OnInit {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.roleToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.roleToDelete) {
+    if (this.roleToDelete && this.deleteJustification.trim()) {
       this.roleService
-        .deleteRole(this.selectedOrg.id, this.roleToDelete)
+        .deleteRole(this.selectedOrg.id, this.roleToDelete, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadRoles();
             this.showDeleteConfirm = false;
             this.roleToDelete = null;
+            this.deleteJustification = '';
           }
         });
     }

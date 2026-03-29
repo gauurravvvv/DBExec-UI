@@ -1,0 +1,33 @@
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { ROLES } from 'src/app/constants/user.constant';
+
+@Component({
+  selector: 'app-org-dashboard',
+  templateUrl: './org-dashboard.component.html',
+  styleUrls: ['./org-dashboard.component.scss'],
+})
+export class OrgDashboardComponent implements OnInit {
+  userName = '';
+  organisationName = '';
+  userRole = '';
+  isAdmin = false;
+
+  constructor(
+    private globalService: GlobalService,
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.userName = this.globalService.getTokenDetails('name') || '';
+    this.organisationName =
+      this.globalService.getTokenDetails('organisation') || '';
+    this.userRole = this.globalService.getTokenDetails('role') || '';
+    this.isAdmin = this.userRole === ROLES.ORG_ADMIN;
+  }
+
+  navigateTo(route: string) {
+    this.router.navigate([route]);
+  }
+}

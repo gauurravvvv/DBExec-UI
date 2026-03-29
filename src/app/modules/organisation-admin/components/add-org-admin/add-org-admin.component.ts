@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { OrganisationAdminService } from '../../services/organisationAdmin.service';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -14,7 +15,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './add-org-admin.component.html',
   styleUrls: ['./add-org-admin.component.scss'],
 })
-export class AddOrgAdminComponent implements OnInit {
+export class AddOrgAdminComponent implements OnInit, HasUnsavedChanges {
   adminFrom!: FormGroup;
   organisations: any[] = [];
   showOrganisationDropdown =
@@ -33,6 +34,10 @@ export class AddOrgAdminComponent implements OnInit {
   // Add getter for form dirty state
   get isFormDirty(): boolean {
     return this.adminFrom.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   ngOnInit() {

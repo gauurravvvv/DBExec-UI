@@ -112,34 +112,25 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.name"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Name"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.description"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Description"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.datasetName"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Dataset"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
                 <!-- No filter -->
@@ -264,6 +255,18 @@
           <span>This action cannot be undone</span>
         </li>
       </ul>
+
+      <div class="justification-section">
+        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <textarea
+          id="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          placeholder="Provide a reason for this action"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
     </div>
 
     <!-- Actions -->
@@ -272,7 +275,7 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()">
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
         <i class="pi pi-trash"></i>
         Delete
       </button>

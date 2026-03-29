@@ -19,9 +19,11 @@ export class ConnectionService {
       });
   }
 
-  deleteConnection(orgId: string, id: string) {
+  deleteConnection(orgId: string, id: string, justification?: string) {
     return this.http
-      .delete(CONNECTIONS.DELETE + `${orgId}/${id}`)
+      .request('DELETE', CONNECTIONS.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -64,7 +66,7 @@ export class ConnectionService {
       });
   }
 
-  updateConnection(connectionForm: FormGroup) {
+  updateConnection(connectionForm: FormGroup, justification?: string) {
     const {
       id,
       name,
@@ -85,6 +87,7 @@ export class ConnectionService {
         status: status ? 1 : 0,
         dbUsername,
         dbPassword,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

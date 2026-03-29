@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { ROLE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RoleService } from '../../services/role.service';
@@ -18,7 +19,7 @@ import { RoleService } from '../../services/role.service';
   templateUrl: './add-role.component.html',
   styleUrls: ['./add-role.component.scss'],
 })
-export class AddRoleComponent implements OnInit {
+export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   roleForm!: FormGroup;
   organisations: any[] = [];
   permissions: any[] = [];
@@ -44,6 +45,10 @@ export class AddRoleComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.roleForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   ngOnInit() {

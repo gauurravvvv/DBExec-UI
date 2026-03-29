@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SCREEN } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ScreenService } from '../../services/screen.service';
 
@@ -12,7 +13,7 @@ import { ScreenService } from '../../services/screen.service';
   templateUrl: './edit-screen.component.html',
   styleUrls: ['./edit-screen.component.scss'],
 })
-export class EditScreenComponent implements OnInit {
+export class EditScreenComponent implements OnInit, HasUnsavedChanges {
   screenForm!: FormGroup;
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
@@ -20,6 +21,8 @@ export class EditScreenComponent implements OnInit {
   screenId: string = '';
   screenData: any;
   isCancelClicked = false;
+  showSaveConfirm = false;
+  saveJustification = '';
   selectedOrgName: string = '';
   selectedDatabaseName: string = '';
 
@@ -36,6 +39,10 @@ export class EditScreenComponent implements OnInit {
   // Add getter for form dirty state
   get isFormDirty(): boolean {
     return this.screenForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   ngOnInit() {
@@ -111,11 +118,27 @@ export class EditScreenComponent implements OnInit {
 
   onSubmit() {
     if (this.screenForm.valid) {
-      this.screenService.updateScreen(this.screenForm).then(res => {
-        if (this.globalService.handleSuccessService(res, true, true)) {
-          this.router.navigate([SCREEN.LIST]);
-        }
-      });
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
+      this.screenService
+        .updateScreen(this.screenForm, this.saveJustification.trim())
+        .then(res => {
+          if (this.globalService.handleSuccessService(res, true, true)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.screenForm.markAsPristine();
+            this.router.navigate([SCREEN.LIST]);
+          }
+        });
     }
   }
 

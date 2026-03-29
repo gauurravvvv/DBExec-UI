@@ -13,6 +13,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
 export interface AnalysisFormData {
   name: string;
   description: string;
+  justification: string;
 }
 
 @Component({
@@ -28,6 +29,7 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   @Output() close = new EventEmitter<AnalysisFormData | null>();
 
   analysisForm!: FormGroup;
+  saveJustification = '';
 
   constructor(private fb: FormBuilder) {}
 
@@ -48,6 +50,7 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
         name: this.initialName,
         description: this.initialDescription,
       });
+      this.saveJustification = '';
     }
   }
 
@@ -79,18 +82,21 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   }
 
   onSubmit() {
-    if (this.analysisForm.valid) {
+    if (this.analysisForm.valid && this.saveJustification.trim()) {
       const formData: AnalysisFormData = {
         name: this.analysisForm.get('name')?.value.trim(),
         description: this.analysisForm.get('description')?.value.trim(),
+        justification: this.saveJustification.trim(),
       };
       this.close.emit(formData);
       this.analysisForm.reset();
+      this.saveJustification = '';
     }
   }
 
   onCancel() {
     this.analysisForm.reset();
+    this.saveJustification = '';
     this.close.emit(null);
   }
 }

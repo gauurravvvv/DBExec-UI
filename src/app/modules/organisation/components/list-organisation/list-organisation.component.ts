@@ -31,6 +31,7 @@ export class ListOrganisationComponent implements OnInit {
 
   showDeleteConfirm = false;
   orgIdToDelete: string | null = null;
+  deleteJustification = '';
 
   constructor(
     private organisationService: OrganisationService,
@@ -115,18 +116,20 @@ export class ListOrganisationComponent implements OnInit {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.orgIdToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.orgIdToDelete) {
+    if (this.orgIdToDelete && this.deleteJustification.trim()) {
       this.onDelete(this.orgIdToDelete);
       this.showDeleteConfirm = false;
       this.orgIdToDelete = null;
+      this.deleteJustification = '';
     }
   }
 
   onDelete(orgId: string) {
-    this.organisationService.deleteOrganisation(orgId).then((res: any) => {
+    this.organisationService.deleteOrganisation(orgId, this.deleteJustification.trim()).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         if (this.lastTableLazyLoadEvent) {
           this.loadOrganisations(this.lastTableLazyLoadEvent);

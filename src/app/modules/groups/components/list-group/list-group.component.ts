@@ -27,6 +27,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
 
   showDeleteConfirm = false;
   groupToDelete: string | null = null;
+  deleteJustification = '';
   organisations: any[] = [];
   selectedOrg: any = null;
   userRole = this.globalService.getTokenDetails('role');
@@ -184,12 +185,13 @@ export class ListGroupComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.groupToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.groupToDelete) {
+    if (this.groupToDelete && this.deleteJustification.trim()) {
       this.groupService
-        .deleteGroup(this.selectedOrg, this.groupToDelete)
+        .deleteGroup(this.selectedOrg, this.groupToDelete, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
@@ -197,6 +199,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
             }
             this.showDeleteConfirm = false;
             this.groupToDelete = null;
+            this.deleteJustification = '';
           }
         });
     }

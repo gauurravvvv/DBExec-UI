@@ -13,6 +13,7 @@ export class ViewConnectionComponent implements OnInit {
   orgId: string = '';
   connectionData: any = null;
   showDeleteConfirm = false;
+  deleteJustification = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -51,14 +52,16 @@ export class ViewConnectionComponent implements OnInit {
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    if (this.connectionData) {
+    if (this.connectionData && this.deleteJustification.trim()) {
       this.connectionService
-        .deleteConnection(this.orgId, this.connectionData.id)
+        .deleteConnection(this.orgId, this.connectionData.id, this.deleteJustification.trim())
         .then(response => {
           this.showDeleteConfirm = false;
+          this.deleteJustification = '';
           if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([CONNECTION.LIST]);
           }

@@ -16,10 +16,6 @@
       </div>
 
       <div class="header-actions flex gap-2">
-        <button class="btn-secondary" (click)="openChangePasswordDialog()">
-          <i class="pi pi-key"></i>
-          Change Password
-        </button>
         <button
           class="btn-primary"
           [disabled]="adminId == loggedInUserId"
@@ -208,6 +204,18 @@
           <span>This action cannot be undone</span>
         </li>
       </ul>
+
+      <div class="justification-section">
+        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <textarea
+          id="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          placeholder="Provide a reason for this action"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
     </div>
 
     <!-- Actions -->
@@ -216,7 +224,7 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()">
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
         <i class="pi pi-trash"></i>
         Delete
       </button>
@@ -224,8 +232,3 @@
   </div>
 </div>
 
-<app-change-password-dialog
-  [visible]="showChangePasswordDialog"
-  (close)="onPasswordDialogClose($event)"
->
-</app-change-password-dialog>

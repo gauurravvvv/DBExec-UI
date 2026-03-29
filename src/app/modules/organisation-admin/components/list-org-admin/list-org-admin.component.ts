@@ -27,6 +27,7 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
 
   showDeleteConfirm = false;
   adminToDelete: string | null = null;
+  deleteJustification = '';
 
   organisations: any[] = [];
   selectedOrg: any = null;
@@ -213,12 +214,13 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.adminToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.adminToDelete) {
+    if (this.adminToDelete && this.deleteJustification.trim()) {
       this.orgAdminService
-        .deleteAdminOrganisation(this.selectedOrg, this.adminToDelete)
+        .deleteAdminOrganisation(this.selectedOrg, this.adminToDelete, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
@@ -226,6 +228,7 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
             }
             this.showDeleteConfirm = false;
             this.adminToDelete = null;
+            this.deleteJustification = '';
           }
         });
     }

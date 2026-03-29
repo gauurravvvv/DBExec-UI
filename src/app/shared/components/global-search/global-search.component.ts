@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { Subscription, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { GlobalSearchService } from '../../services/global-search.service';
+import { GlobalService } from 'src/app/core/services/global.service';
 import { SIDEBAR_ITEMS_ROUTES } from '../layout/sidebar/sidebar.constant';
 
 @Component({
@@ -37,10 +38,14 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
     ANALYSES: 'ci ci-analyses',
   };
 
+  private userRole: string = '';
+
   constructor(
     private globalSearchService: GlobalSearchService,
+    private globalService: GlobalService,
     private router: Router,
   ) {
+    this.userRole = this.globalService.getTokenDetails('role');
     // Debounce search input
     this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -67,7 +72,9 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
     // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
     if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
       event.preventDefault(); // Prevent default browser behavior
-      this.openSearchModal();
+      if (this.userRole !== 'SUPER-ADMIN') {
+        this.openSearchModal();
+      }
     }
 
     // Check for Escape key to close modal

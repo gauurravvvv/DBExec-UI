@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { ChangePasswordDialogComponent } from './components/change-password-dialog/change-password-dialog.component';
+import { ConfirmLeaveDialogComponent } from './components/confirm-leave-dialog/confirm-leave-dialog.component';
 import { ConfigurableAreaChartComponent } from './components/configurable-area-chart/configurable-area-chart.component';
 import { ConfigurableBarChartComponent } from './components/configurable-bar-chart/configurable-bar-chart.component';
 import { ConfigurableBoxChartComponent } from './components/configurable-box-chart/configurable-box-chart.component';
@@ -56,6 +57,7 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
 @NgModule({
   declarations: [
     ChangePasswordDialogComponent,
+    ConfirmLeaveDialogComponent,
     ConfigurableBarChartComponent,
     ConfigurableLineChartComponent,
     ConfigurableAreaChartComponent,
@@ -120,6 +122,7 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
   ],
   exports: [
     ChangePasswordDialogComponent,
+    ConfirmLeaveDialogComponent,
     ConfigurableBarChartComponent,
     ConfigurableLineChartComponent,
     ConfigurableAreaChartComponent,

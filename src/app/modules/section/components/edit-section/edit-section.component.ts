@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { SectionService } from '../../services/section.service';
@@ -15,7 +16,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './edit-section.component.html',
   styleUrls: ['./edit-section.component.scss'],
 })
-export class EditSectionComponent implements OnInit {
+export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   sectionForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -26,6 +27,8 @@ export class EditSectionComponent implements OnInit {
   sectionData: any;
   tabs: any[] = [];
   isCancelClicked = false;
+  showSaveConfirm = false;
+  saveJustification = '';
 
   constructor(
     private fb: FormBuilder,
@@ -56,6 +59,10 @@ export class EditSectionComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.sectionForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   initForm(): void {
@@ -133,11 +140,27 @@ export class EditSectionComponent implements OnInit {
 
   onSubmit(): void {
     if (this.sectionForm.valid) {
-      this.sectionService.updateSection(this.sectionForm).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([SECTION.LIST]);
-        }
-      });
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
+      this.sectionService
+        .updateSection(this.sectionForm, this.saveJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.sectionForm.markAsPristine();
+            this.router.navigate([SECTION.LIST]);
+          }
+        });
     }
   }
 

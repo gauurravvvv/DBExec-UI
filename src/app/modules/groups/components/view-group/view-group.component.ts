@@ -14,6 +14,7 @@ export class ViewGroupComponent implements OnInit {
   orgId: string = '';
   groupData: any = null;
   showDeleteConfirm = false;
+  deleteJustification = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -55,14 +56,17 @@ export class ViewGroupComponent implements OnInit {
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    if (this.groupData) {
+    if (this.groupData && this.deleteJustification.trim()) {
       this.groupService
-        .deleteGroup(this.orgId, this.groupData.id)
+        .deleteGroup(this.orgId, this.groupData.id, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.showDeleteConfirm = false;
+            this.deleteJustification = '';
             this.router.navigate([GROUP.LIST]);
           }
         });

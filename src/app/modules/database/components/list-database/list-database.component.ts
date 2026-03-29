@@ -35,6 +35,7 @@ export class ListDatabaseComponent implements OnInit {
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatabase: any = null;
   showDeleteConfirm = false;
+  deleteJustification = '';
 
   constructor(
     private databaseService: DatabaseService,
@@ -187,14 +188,16 @@ export class ListDatabaseComponent implements OnInit {
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.selectedDatabase = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.selectedDatabase) {
+    if (this.selectedDatabase && this.deleteJustification.trim()) {
       this.databaseService
         .deleteDatabase(
           this.selectedDatabase.organisationId,
           this.selectedDatabase.id,
+          this.deleteJustification.trim(),
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
@@ -203,6 +206,7 @@ export class ListDatabaseComponent implements OnInit {
             }
             this.showDeleteConfirm = false;
             this.selectedDatabase = null;
+            this.deleteJustification = '';
           }
         });
     }

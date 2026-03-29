@@ -1,0 +1,142 @@
+<div class="profile-page-wrapper" *ngIf="!loading">
+  <div class="profile-content-container">
+    <!-- Header Section -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>My Profile</h2>
+      </div>
+      <div class="header-actions">
+        <button class="btn-secondary" (click)="openChangePasswordDialog()">
+          <i class="pi pi-key"></i>
+          Change Password
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="profile-details-grid">
+      <!-- Identity Section (Left) -->
+      <div class="identity-section">
+        <div class="avatar-section">
+          <div
+            class="avatar-circle"
+            [style.background-color]="avatarBackground"
+          >
+            {{ initials }}
+          </div>
+          <h3 class="profile-name">{{ fullName }}</h3>
+          <p class="profile-username">@{{ profileData?.username }}</p>
+          <div class="status-wrapper">
+            <span
+              class="status-badge"
+              [class.active]="!profileData?.isLocked && profileData?.status === 1"
+              [class.locked]="profileData?.isLocked"
+            >
+              {{
+                profileData?.isLocked
+                  ? 'Locked'
+                  : profileData?.status === 1
+                    ? 'Active'
+                    : 'Inactive'
+              }}
+            </span>
+          </div>
+        </div>
+
+        <div class="identity-meta">
+          <div class="meta-item">
+            <span class="label">Role</span>
+            <span class="value">{{ roleLabel }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="label">Member Since</span>
+            <span class="value">{{
+              profileData?.createdOn | date: 'mediumDate'
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Section (Right) -->
+      <div class="details-section">
+        <div class="section-header">
+          <h3>Account Information</h3>
+        </div>
+
+        <div class="info-grid">
+          <!-- Personal Info -->
+          <div class="info-group">
+            <h4>Personal Details</h4>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-user"></i> First Name</span>
+              <span class="value">{{ profileData?.firstName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-user"></i> Last Name</span>
+              <span class="value">{{ profileData?.lastName || 'Not provided' }}</span>
+            </div>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="info-group">
+            <h4>Contact Details</h4>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-envelope"></i> Email</span>
+              <span class="value">{{ profileData?.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-at"></i> Username</span>
+              <span class="value">{{ profileData?.username }}</span>
+            </div>
+          </div>
+
+          <!-- Organisation Info -->
+          <div class="info-group">
+            <h4>Organisation</h4>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-building"></i> Name</span>
+              <span class="value">{{ profileData?.organisationName || 'N/A' }}</span>
+            </div>
+            <div class="detail-row" *ngIf="profileData?.organisation?.description">
+              <span class="label"><i class="pi pi-info-circle"></i> Description</span>
+              <span class="value">{{ profileData.organisation.description }}</span>
+            </div>
+          </div>
+
+          <!-- System Info -->
+          <div class="info-group">
+            <h4>System</h4>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-clock"></i> Last Login</span>
+              <span class="value">{{
+                profileData?.lastLogin
+                  ? (profileData.lastLogin | date: 'medium')
+                  : 'Never'
+              }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label"><i class="pi pi-shield"></i> Role</span>
+              <span class="value">{{ roleLabel }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="profile-page-wrapper loading-state" *ngIf="loading">
+  <div class="profile-content-container">
+    <div class="loading-spinner">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Loading profile...</p>
+    </div>
+  </div>
+</div>
+
+<app-change-password-dialog
+  [visible]="showChangePasswordDialog"
+  (close)="onPasswordDialogClose($event)"
+>
+</app-change-password-dialog>

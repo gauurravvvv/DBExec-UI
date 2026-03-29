@@ -28,6 +28,7 @@ import { MonacoIntelliSenseService } from '../../services copy/monaco-intellisen
 import { QueryService } from '../../services copy/query.service';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import {
   AddDatasetActions,
   SchemaLoadingStatus,
@@ -46,7 +47,7 @@ declare const window: any;
   templateUrl: './edit-dataset.component.html',
   styleUrls: ['./edit-dataset.component.scss'],
 })
-export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
+export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit, HasUnsavedChanges {
   // ViewChild for file input
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -88,6 +89,11 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Save as Dataset Dialog
   showDatasetDialog = false;
+
+  // Save Confirmation Dialog
+  showSaveConfirm = false;
+  saveJustification = '';
+  pendingSaveData: any = null;
 
   // Results Popup
   showResultsPopup = false;
@@ -139,6 +145,10 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
     const currentQuery = this.editor.getValue().trim();
     const originalQuery = this.originalQuery.trim();
     return currentQuery !== originalQuery;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.hasQueryChanged;
   }
 
   getFilteredTables(tables: any[]): any[] {
@@ -1061,7 +1071,7 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
       // Get the SQL query
       const sql = this.editor?.getValue() || this.currentQuery;
 
-      const payload = {
+      this.pendingSaveData = {
         id: this.datasetId,
         name: formData.name,
         description: formData.description,
@@ -1070,8 +1080,24 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit {
         sql,
       };
 
-      this.datasetService.updateDataset(payload).then(response => {
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+    this.pendingSaveData = null;
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim() && this.pendingSaveData) {
+      this.datasetService.updateDataset(this.pendingSaveData, this.saveJustification.trim()).then(response => {
         if (this.globalService.handleSuccessService(response, true)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.pendingSaveData = null;
+          this.originalQuery = this.editor?.getValue() || this.currentQuery;
           this.router.navigate([DATASET.LIST]);
         }
       });

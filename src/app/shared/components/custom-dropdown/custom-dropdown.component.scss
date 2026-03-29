@@ -45,7 +45,8 @@
 :host ::ng-deep {
   .p-dropdown {
     background: var(--card-background);
-    border-color: var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
 
     &.ng-invalid.ng-touched,
     &.ng-invalid.ng-dirty {
@@ -56,6 +57,10 @@
       border-color: var(--border-color);
     }
 
+    &:hover {
+      border-color: var(--primary-color);
+    }
+
     &.p-focus {
       border-color: var(--primary-color) !important;
       box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
@@ -63,6 +68,8 @@
 
     .p-dropdown-label {
       color: var(--text-color);
+      font-size: 0.875rem;
+      padding: 0.625rem 0.75rem;
 
       &.p-placeholder {
         color: var(--text-color);

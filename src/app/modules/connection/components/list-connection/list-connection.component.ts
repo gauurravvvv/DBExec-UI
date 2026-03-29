@@ -29,6 +29,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
 
   searchTerm: string = '';
   showDeleteConfirm = false;
+  deleteJustification = '';
   tabToDelete: string | null = null;
   Math = Math;
   organisations: any[] = [];
@@ -248,15 +249,17 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.tabToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.tabToDelete) {
+    if (this.tabToDelete && this.deleteJustification.trim()) {
       this.connectionService
-        .deleteConnection(this.selectedOrg, this.tabToDelete)
+        .deleteConnection(this.selectedOrg, this.tabToDelete, this.deleteJustification.trim())
         .then(response => {
           this.showDeleteConfirm = false;
           this.tabToDelete = null;
+          this.deleteJustification = '';
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
               this.loadConnections(this.lastTableLazyLoadEvent);

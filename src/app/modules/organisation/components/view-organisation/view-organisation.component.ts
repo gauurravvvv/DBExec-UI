@@ -49,6 +49,7 @@ export class ViewOrganisationComponent implements OnInit {
   avatarBackground: string = '#2196F3';
   organisationInitials: string = '';
   showDeleteConfirm: boolean = false;
+  deleteJustification = '';
   showAnnouncementDialog: boolean = false;
   isRefreshingMasterDb: boolean = false;
 
@@ -95,16 +96,20 @@ export class ViewOrganisationComponent implements OnInit {
 
   cancelDelete() {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    this.organisationService
-      .deleteOrganisation(this.organisationId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([ORGANISATION.LIST]);
-        }
-      });
+    if (this.deleteJustification.trim()) {
+      this.organisationService
+        .deleteOrganisation(this.organisationId, this.deleteJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.deleteJustification = '';
+            this.router.navigate([ORGANISATION.LIST]);
+          }
+        });
+    }
   }
 
   refreshMasterDb() {

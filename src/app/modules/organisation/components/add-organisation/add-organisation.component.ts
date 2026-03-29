@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
 import { ORGANISATION } from 'src/app/constants/routes';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { REGEX } from 'src/app/constants/regex.constant';
 
@@ -11,10 +12,15 @@ import { REGEX } from 'src/app/constants/regex.constant';
   templateUrl: './add-organisation.component.html',
   styleUrls: ['./add-organisation.component.scss'],
 })
-export class AddOrganisationComponent implements OnInit {
+export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   orgForm!: FormGroup;
   currentStep = 0;
   isFormDirty = false;
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
+  }
+
   showPepperKey = false;
   showDbPassword = false;
   confirmationChecked = false;

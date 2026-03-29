@@ -100,24 +100,18 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.name"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Name"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.description"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Description"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
                 <!-- No filter for Type currently, or add if needed. Keeping it empty for now as requested filter list was Name, Desc, Status -->
@@ -243,6 +237,17 @@
           <span>This action cannot be undone</span>
         </li>
       </ul>
+
+      <div class="justification-section">
+        <label>Justification <span class="required">*</span></label>
+        <textarea
+          [(ngModel)]="deleteJustification"
+          placeholder="Please provide a reason for deleting this database..."
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <span class="char-count">{{ deleteJustification.length }}/500</span>
+      </div>
     </div>
 
     <!-- Actions -->
@@ -251,7 +256,7 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()">
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
         <i class="pi pi-trash"></i>
         Delete
       </button>

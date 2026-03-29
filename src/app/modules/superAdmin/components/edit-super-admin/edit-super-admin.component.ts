@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -11,16 +12,22 @@ import { REGEX } from 'src/app/constants/regex.constant';
   templateUrl: './edit-super-admin.component.html',
   styleUrls: ['./edit-super-admin.component.scss'],
 })
-export class EditSuperAdminComponent implements OnInit {
+export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
   adminForm!: FormGroup;
   adminId: string = '';
   adminData: any;
   isCancelClicked: boolean = false;
   isLocked: boolean = false;
+  showSaveConfirm = false;
+  saveJustification = '';
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
     return this.adminForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   constructor(
@@ -101,10 +108,24 @@ export class EditSuperAdminComponent implements OnInit {
 
   onSubmit(): void {
     if (this.adminForm.valid) {
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
       this.superAdminService
-        .updateSuperAdmin(this.adminForm)
+        .updateSuperAdmin(this.adminForm, this.saveJustification.trim())
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.adminForm.markAsPristine();
             this.router.navigate([SUPER_ADMIN.LIST]);
           }
         });

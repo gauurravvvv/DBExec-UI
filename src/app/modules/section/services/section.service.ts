@@ -20,9 +20,11 @@ export class SectionService {
       });
   }
 
-  deleteSection(orgId: string, id: string) {
+  deleteSection(orgId: string, id: string, justification?: string) {
     return this.http
-      .delete(SECTION.DELETE + `${orgId}/${id}`)
+      .request('DELETE', SECTION.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -55,7 +57,7 @@ export class SectionService {
       });
   }
 
-  updateSection(sectionForm: FormGroup) {
+  updateSection(sectionForm: FormGroup, justification?: string) {
     const { id, name, description, organisation, database, tab, status } =
       sectionForm.value;
     return this.http
@@ -67,6 +69,7 @@ export class SectionService {
         database,
         tab,
         status: status ? 1 : 0,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

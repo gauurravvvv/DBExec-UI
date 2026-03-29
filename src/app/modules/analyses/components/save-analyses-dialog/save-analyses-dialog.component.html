@@ -36,6 +36,20 @@
         </small>
       </div>
 
+      <!-- Justification -->
+      <div class="form-field justification-field">
+        <label for="saveJustification">Justification <span class="required">*</span></label>
+        <textarea
+          id="saveJustification"
+          [(ngModel)]="saveJustification"
+          [ngModelOptions]="{ standalone: true }"
+          placeholder="Provide a reason for this update"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ saveJustification.length }}/500</small>
+      </div>
+
       <div class="popup-actions">
         <button
           pButton
@@ -49,7 +63,7 @@
           type="submit"
           label="Save Analysis"
           class="p-button-primary btn-save"
-          [disabled]="analysisForm.invalid"
+          [disabled]="analysisForm.invalid || !saveJustification.trim()"
           (click)="onSubmit()"
         >
           <i class="pi pi-save mr-2"></i>

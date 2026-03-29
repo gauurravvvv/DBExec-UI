@@ -19,7 +19,7 @@ interface MenuItem {
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements OnInit {
-  isExpanded = true;
+  isExpanded = false;
   isMobile = false;
   menuItems: MenuItem[] = [];
 
@@ -29,8 +29,6 @@ export class SidebarComponent implements OnInit {
   ) {
     const permissions = this.globalService.getTokenDetails('permission');
     this.menuItems = this.processMenuItems(permissions);
-    // Set initial expanded state based on current route
-    this.expandMenuForCurrentRoute();
   }
 
   ngOnInit() {
@@ -60,8 +58,10 @@ export class SidebarComponent implements OnInit {
     return route || '';
   }
 
-  // Simplified method to expand menu based on current URL
+  // Expand only the parent chain of the current route; collapse everything else
   private expandMenuForCurrentRoute() {
+    this.collapseAllMenus();
+
     const currentUrl = this.router.url;
 
     // Helper function to expand parent items
@@ -89,16 +89,13 @@ export class SidebarComponent implements OnInit {
     this.isExpanded = !this.isExpanded;
     if (this.isExpanded) {
       this.expandMenuForCurrentRoute();
+    } else {
+      this.collapseAllMenus();
     }
   }
 
   toggleSidebarAndCollapseAll() {
-    this.isExpanded = !this.isExpanded;
-    if (!this.isExpanded) {
-      this.collapseAllMenus();
-    } else {
-      this.expandMenuForCurrentRoute();
-    }
+    this.toggleSidebar();
   }
 
   collapseAllMenus() {
@@ -171,22 +168,6 @@ export class SidebarComponent implements OnInit {
   }
 
   collapseAllAndToggle() {
-    // First collapse all expanded items
-    this.menuItems.forEach(item => {
-      if (item.isExpanded) {
-        item.isExpanded = false;
-        // Also collapse any sub-items
-        if (item.subPermissions) {
-          item.subPermissions.forEach(subItem => {
-            if (subItem.isExpanded) {
-              subItem.isExpanded = false;
-            }
-          });
-        }
-      }
-    });
-
-    // Then toggle the sidebar
     this.toggleSidebar();
   }
 }

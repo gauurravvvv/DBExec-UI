@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { DATABASE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatabaseService } from '../../services/database.service';
@@ -14,7 +15,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './add-database.component.html',
   styleUrls: ['./add-database.component.scss'],
 })
-export class AddDatabaseComponent implements OnInit {
+export class AddDatabaseComponent implements OnInit, HasUnsavedChanges {
   databaseForm!: FormGroup;
   organisations: any[] = [];
   private _showOrganisationDropdown = false;
@@ -35,6 +36,10 @@ export class AddDatabaseComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.databaseForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   ngOnInit(): void {

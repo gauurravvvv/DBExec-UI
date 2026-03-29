@@ -101,44 +101,16 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input
-                  pInputText
-                  type="text"
-                  [(ngModel)]="filterValues.username"
-                  (input)="onFilterChange()"
-                  placeholder="Search Username"
-                  class="w-full p-column-filter"
-                />
+                <app-custom-input [(ngModel)]="filterValues.username" (ngModelChange)="onFilterChange()" placeholder="Search Username"></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
-                  [(ngModel)]="filterValues.firstName"
-                  (input)="onFilterChange()"
-                  placeholder="Search First Name"
-                  class="w-full p-column-filter"
-                />
+                <app-custom-input [(ngModel)]="filterValues.firstName" (ngModelChange)="onFilterChange()" placeholder="Search First Name"></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
-                  [(ngModel)]="filterValues.lastName"
-                  (input)="onFilterChange()"
-                  placeholder="Search Last Name"
-                  class="w-full p-column-filter"
-                />
+                <app-custom-input [(ngModel)]="filterValues.lastName" (ngModelChange)="onFilterChange()" placeholder="Search Last Name"></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
-                  [(ngModel)]="filterValues.email"
-                  (input)="onFilterChange()"
-                  placeholder="Search Email"
-                  class="w-full p-column-filter"
-                />
+                <app-custom-input [(ngModel)]="filterValues.email" (ngModelChange)="onFilterChange()" placeholder="Search Email"></app-custom-input>
               </th>
               <th>
                 <!-- No filter for Status -->
@@ -285,6 +257,18 @@
           <span>This action cannot be undone</span>
         </li>
       </ul>
+
+      <div class="justification-section">
+        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <textarea
+          id="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          placeholder="Provide a reason for this action"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
     </div>
 
     <!-- Actions -->
@@ -293,7 +277,7 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()">
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
         <i class="pi pi-trash"></i>
         Delete
       </button>

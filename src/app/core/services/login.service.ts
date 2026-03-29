@@ -134,8 +134,24 @@ export class LoginService {
     StorageService.set(StorageType.REFRESH_TOKEN, refreshToken);
   }
 
-  public isLoggedIn() {
+  public isLoggedIn(): boolean {
     const accessToken = StorageService.get(StorageType.ACCESS_TOKEN);
-    return accessToken;
+    if (!accessToken) return false;
+
+    try {
+      const parts = accessToken.split('.');
+      if (parts.length !== 3) return false;
+
+      const payload = JSON.parse(atob(parts[1]));
+      // Check token expiry (exp is in seconds)
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        // Token expired — clear storage
+        StorageService.clear();
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

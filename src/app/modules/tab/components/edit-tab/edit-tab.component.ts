@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from '../../services/tab.service';
 
@@ -12,7 +13,7 @@ import { TabService } from '../../services/tab.service';
   templateUrl: './edit-tab.component.html',
   styleUrls: ['./edit-tab.component.scss'],
 })
-export class EditTabComponent implements OnInit {
+export class EditTabComponent implements OnInit, HasUnsavedChanges {
   tabForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -22,6 +23,8 @@ export class EditTabComponent implements OnInit {
   selectedDatabaseName: string = '';
   tabData: any;
   isCancelClicked = false;
+  showSaveConfirm = false;
+  saveJustification = '';
 
   constructor(
     private fb: FormBuilder,
@@ -50,6 +53,10 @@ export class EditTabComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.tabForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   initForm(): void {
@@ -95,11 +102,27 @@ export class EditTabComponent implements OnInit {
 
   onSubmit(): void {
     if (this.tabForm.valid) {
-      this.tabService.updateTab(this.tabForm).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([TAB.LIST]);
-        }
-      });
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
+      this.tabService
+        .updateTab(this.tabForm, this.saveJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.tabForm.markAsPristine();
+            this.router.navigate([TAB.LIST]);
+          }
+        });
     }
   }
 

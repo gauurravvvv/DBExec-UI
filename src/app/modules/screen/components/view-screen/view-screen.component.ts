@@ -52,6 +52,7 @@ export class ViewScreenComponent implements OnInit, OnDestroy {
   // Screen data (for databaseId needed by Configure route)
   databaseId = '';
   showDeleteConfirm = false;
+  deleteJustification = '';
 
   // Structure tree navigation
   structureTreeNodes: TreeNode[] = [];
@@ -490,17 +491,21 @@ export class ViewScreenComponent implements OnInit, OnDestroy {
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete(): void {
-    this.screenService
-      .deleteScreen(this.orgId, this.screenId)
-      .then((response: any) => {
-        this.showDeleteConfirm = false;
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([SCREEN.LIST]);
-        }
-      });
+    if (this.deleteJustification.trim()) {
+      this.screenService
+        .deleteScreen(this.orgId, this.screenId, this.deleteJustification.trim())
+        .then((response: any) => {
+          this.showDeleteConfirm = false;
+          this.deleteJustification = '';
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate([SCREEN.LIST]);
+          }
+        });
+    }
   }
 
   onBack(): void {

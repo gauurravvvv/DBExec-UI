@@ -203,8 +203,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   viewProfile() {
-    // Implement profile view logic
     this.showProfileMenu = false;
+    this.router.navigate(['/app/profile']);
   }
 
   toggleTheme() {

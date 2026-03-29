@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TAB, CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { ConnectionService } from '../../services/connection.service';
@@ -13,7 +14,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
   templateUrl: './edit-connection.component.html',
   styleUrls: ['./edit-connection.component.scss'],
 })
-export class EditConnectionComponent implements OnInit {
+export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
   connectionForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -24,6 +25,8 @@ export class EditConnectionComponent implements OnInit {
   connectionData: any;
   isCancelClicked = false;
   showPassword = false;
+  showSaveConfirm = false;
+  saveJustification = '';
 
   constructor(
     private fb: FormBuilder,
@@ -53,6 +56,10 @@ export class EditConnectionComponent implements OnInit {
 
   get isFormDirty(): boolean {
     return this.connectionForm.dirty;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
   }
 
   initForm(): void {
@@ -103,10 +110,24 @@ export class EditConnectionComponent implements OnInit {
 
   onSubmit(): void {
     if (this.connectionForm.valid) {
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
       this.connectionService
-        .updateConnection(this.connectionForm)
+        .updateConnection(this.connectionForm, this.saveJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.connectionForm.markAsPristine();
             this.router.navigate([CONNECTION.LIST]);
           }
         });

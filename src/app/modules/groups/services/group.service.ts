@@ -37,9 +37,11 @@ export class GroupService {
       });
   }
 
-  deleteGroup(orgId: string, id: string) {
+  deleteGroup(orgId: string, id: string, justification?: string) {
     return this.http
-      .delete(GROUP.DELETE + `${orgId}/${id}`)
+      .request('DELETE', GROUP.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -57,7 +59,7 @@ export class GroupService {
       });
   }
 
-  editGroup(groupForm: FormGroup) {
+  editGroup(groupForm: FormGroup, justification?: string) {
     const { id, name, description, status, users, organisation } =
       groupForm.getRawValue();
     return this.http
@@ -68,6 +70,7 @@ export class GroupService {
         status: status ? 1 : 0,
         users,
         organisation,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

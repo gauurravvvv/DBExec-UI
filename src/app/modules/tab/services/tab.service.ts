@@ -29,9 +29,11 @@ export class TabService {
       });
   }
 
-  deleteTab(orgId: string, id: string) {
+  deleteTab(orgId: string, id: string, justification?: string) {
     return this.http
-      .delete(TAB.DELETE + `${orgId}/${id}`)
+      .request('DELETE', TAB.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -64,7 +66,7 @@ export class TabService {
       });
   }
 
-  updateTab(tabForm: FormGroup) {
+  updateTab(tabForm: FormGroup, justification?: string) {
     const { id, name, description, organisation, database, status } =
       tabForm.getRawValue();
     return this.http
@@ -75,6 +77,7 @@ export class TabService {
         organisation,
         database,
         status: status ? 1 : 0,
+        justification,
       })
       .toPromise()
       .then((response: any) => {

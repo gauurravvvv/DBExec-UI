@@ -1,0 +1,99 @@
+<div class="org-dashboard">
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h2>Welcome, {{ userName }}</h2>
+      <p class="subtitle">{{ organisationName }}</p>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="quick-nav">
+      <div
+        class="nav-card"
+        (click)="navigateTo('/app/screen')"
+      >
+        <div class="nav-icon">
+          <i class="ci ci-screen"></i>
+        </div>
+        <div class="nav-info">
+          <h4>Screens</h4>
+          <p>View and manage screens</p>
+        </div>
+        <i class="pi pi-arrow-right nav-arrow"></i>
+      </div>
+
+      <div
+        class="nav-card"
+        (click)="navigateTo('/app/dataset')"
+      >
+        <div class="nav-icon">
+          <i class="ci ci-dataset"></i>
+        </div>
+        <div class="nav-info">
+          <h4>Datasets</h4>
+          <p>Manage your datasets</p>
+        </div>
+        <i class="pi pi-arrow-right nav-arrow"></i>
+      </div>
+
+      <div
+        class="nav-card"
+        (click)="navigateTo('/app/analyses')"
+      >
+        <div class="nav-icon">
+          <i class="ci ci-analyses"></i>
+        </div>
+        <div class="nav-info">
+          <h4>Analyses</h4>
+          <p>Visualize and analyze data</p>
+        </div>
+        <i class="pi pi-arrow-right nav-arrow"></i>
+      </div>
+
+      <div
+        class="nav-card"
+        *ngIf="isAdmin"
+        (click)="navigateTo('/app/users')"
+      >
+        <div class="nav-icon">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="nav-info">
+          <h4>Users</h4>
+          <p>Manage organisation users</p>
+        </div>
+        <i class="pi pi-arrow-right nav-arrow"></i>
+      </div>
+
+      <div
+        class="nav-card"
+        *ngIf="isAdmin"
+        (click)="navigateTo('/app/database')"
+      >
+        <div class="nav-icon">
+          <i class="pi pi-database"></i>
+        </div>
+        <div class="nav-info">
+          <h4>Databases</h4>
+          <p>Configure database connections</p>
+        </div>
+        <i class="pi pi-arrow-right nav-arrow"></i>
+      </div>
+
+      <div
+        class="nav-card"
+        *ngIf="isAdmin"
+        (click)="navigateTo('/app/audit-logs')"
+      >
+        <div class="nav-icon">
+          <i class="pi pi-list"></i>
+        </div>
+        <div class="nav-info">
+          <h4>Audit Logs</h4>
+          <p>Review activity history</p>
+        </div>
+        <i class="pi pi-arrow-right nav-arrow"></i>
+      </div>
+    </div>
+  </div>
+</div>

@@ -523,6 +523,57 @@ $radius-sm: 8px;
           }
         }
       }
+
+      .justification-section {
+        margin-top: 1rem;
+        text-align: left;
+
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--text-color);
+
+          .required {
+            color: var(--error-color);
+            margin-left: 2px;
+          }
+        }
+
+        textarea {
+          width: 100%;
+          padding: 0.65rem 0.75rem;
+          border: 1px solid var(--border-color);
+          border-radius: $radius-sm;
+          background: var(--card-background);
+          color: var(--text-color);
+          font-size: 0.85rem;
+          font-family: inherit;
+          resize: vertical;
+          transition: border-color 0.2s;
+
+          &::placeholder {
+            color: var(--secondary-color);
+            opacity: 0.6;
+          }
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+          }
+        }
+
+        .char-count {
+          display: block;
+          text-align: right;
+          margin-top: 0.25rem;
+          font-size: 0.75rem;
+          color: var(--secondary-color);
+          opacity: 0.6;
+        }
+      }
     }
 
     .popup-actions {
@@ -560,12 +611,17 @@ $radius-sm: 8px;
           background: linear-gradient(135deg, #f44336, #d32f2f);
           color: white;
           box-shadow: 0 4px 14px rgba(244, 67, 54, 0.35);
-          &:hover {
+          &:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(244, 67, 54, 0.45);
           }
           &:active {
             transform: translateY(0);
+          }
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
           }
         }
       }

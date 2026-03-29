@@ -31,33 +31,9 @@
               (onChangeEvent)="onOrganisationChange()"
             ></app-custom-dropdown>
           </div>
-
-          <div class="dropdown-field">
-            <app-custom-dropdown
-              [(ngModel)]="filterValues.eventType"
-              [options]="eventTypeOptions"
-              optionLabel="label"
-              optionValue="value"
-              label="Event Type"
-              [floatingLabel]="true"
-              [showClear]="true"
-              [autoDisplayFirst]="false"
-              placeholder="All Events"
-              (onChangeEvent)="onFilterChange()"
-            ></app-custom-dropdown>
-          </div>
         </div>
 
         <div class="toolbar-right">
-          <button
-            pButton
-            icon="pi pi-file-excel"
-            pTooltip="Export Excel"
-            tooltipPosition="top"
-            (click)="exportActivity('excel')"
-            [disabled]="totalItems === 0"
-            class="p-button-outlined p-button-success modern-button"
-          ></button>
           <button
             pButton
             icon="pi pi-file-pdf"
@@ -107,54 +83,86 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="min-width: 140px" pFrozenColumn>
+              <th style="width: 180px; min-width: 180px" pFrozenColumn>
                 <div class="th-content">Username</div>
               </th>
-              <th style="min-width: 150px">
+              <th style="width: 160px; min-width: 160px">
                 <div class="th-content">Event</div>
               </th>
-              <th style="min-width: 140px">
+              <th style="width: 160px; min-width: 160px">
                 <div class="th-content">Organisation</div>
               </th>
-              <th style="min-width: 160px">
+              <th style="width: 200px; min-width: 200px">
                 <div class="th-content">Failure Reason</div>
               </th>
-              <th style="min-width: 160px">
+              <th style="width: 220px; min-width: 220px">
                 <div class="th-content">Timestamp</div>
               </th>
-              <th style="min-width: 120px">
+              <th style="width: 160px; min-width: 160px">
                 <div class="th-content">IP Address</div>
               </th>
-              <th style="min-width: 200px">
+              <th style="width: 240px; min-width: 240px">
                 <div class="th-content">User Agent</div>
               </th>
             </tr>
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.username"
-                  (input)="onFilterChange()"
-                  placeholder="Search"
-                  class="w-full p-column-filter"
-                />
+                  (ngModelChange)="onFilterChange()"
+                  placeholder="Search user"
+                ></app-custom-input>
               </th>
-              <th><!-- Dropdown in toolbar --></th>
-              <th><!-- Organisation filter in toolbar --></th>
-              <th><!-- No filter --></th>
-              <th><!-- No filter --></th>
-              <th><!-- No filter --></th>
-              <th><!-- No filter --></th>
+              <th>
+                <app-custom-dropdown
+                  [(ngModel)]="filterValues.eventType"
+                  [options]="eventTypeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [showClear]="true"
+                  [autoDisplayFirst]="false"
+                  placeholder="All"
+                  appendTo="body"
+                  (onChangeEvent)="onFilterChange()"
+                ></app-custom-dropdown>
+              </th>
+              <th>
+                <app-custom-input
+                  [(ngModel)]="filterValues.organisationName"
+                  (ngModelChange)="onFilterChange()"
+                  placeholder="Search org"
+                ></app-custom-input>
+              </th>
+              <th><!-- Failure Reason — no filter --></th>
+              <th>
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.dateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onDateRangeChange($event)"
+                ></app-custom-daterange>
+              </th>
+              <th>
+                <app-custom-input
+                  [(ngModel)]="filterValues.ipAddress"
+                  (ngModelChange)="onFilterChange()"
+                  placeholder="Search IP"
+                ></app-custom-input>
+              </th>
+              <th><!-- User Agent — no filter --></th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-activity>
             <tr class="modern-row">
               <td pFrozenColumn>
-                <span class="description-text font-semibold">{{
-                  activity.username
-                }}</span>
+                <a
+                  class="dataset-name-link"
+                  [title]="activity.username"
+                >
+                  {{ activity.username || '-' }}
+                </a>
               </td>
               <td>
                 <span
@@ -192,10 +200,8 @@
                 }}</span>
               </td>
               <td>
-                <span class="description-text" [title]="activity.userAgent">{{
-                  activity.userAgent
-                    ? (activity.userAgent | slice: 0 : 40) + '...'
-                    : '-'
+                <span class="description-text user-agent-text" [title]="activity.userAgent">{{
+                  activity.userAgent || '-'
                 }}</span>
               </td>
             </tr>

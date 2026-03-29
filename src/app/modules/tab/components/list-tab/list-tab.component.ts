@@ -29,6 +29,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
 
   showDeleteConfirm = false;
   tabToDelete: string | null = null;
+  deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
@@ -314,16 +315,18 @@ export class ListTabComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.tabToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.tabToDelete) {
+    if (this.tabToDelete && this.deleteJustification.trim()) {
       this.tabService
-        .deleteTab(this.selectedOrg, this.tabToDelete)
+        .deleteTab(this.selectedOrg, this.tabToDelete, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.showDeleteConfirm = false;
             this.tabToDelete = null;
+            this.deleteJustification = '';
             if (this.lastTableLazyLoadEvent) {
               this.loadTabs(this.lastTableLazyLoadEvent);
             } else {

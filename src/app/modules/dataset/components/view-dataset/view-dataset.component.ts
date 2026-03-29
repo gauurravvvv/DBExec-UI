@@ -12,6 +12,7 @@ import { DatasetService } from '../../services/dataset.service';
 export class ViewDatasetComponent implements OnInit {
   datasetData: any;
   showDeleteConfirm = false;
+  deleteJustification = '';
   showDeleteFieldConfirm = false;
   showEditFieldsDialog = false;
   showEditCustomFieldDialog = false;
@@ -164,16 +165,20 @@ export class ViewDatasetComponent implements OnInit {
 
   cancelDelete() {
     this.showDeleteConfirm = false;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    this.datasetService
-      .deleteDataset(this.datasetData.organisationId, this.datasetData.id)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([DATASET.LIST]);
-        }
-      });
+    if (this.deleteJustification.trim()) {
+      this.datasetService
+        .deleteDataset(this.datasetData.organisationId, this.datasetData.id, this.deleteJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.deleteJustification = '';
+            this.router.navigate([DATASET.LIST]);
+          }
+        });
+    }
   }
 
   // Delete field methods

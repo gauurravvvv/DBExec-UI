@@ -32,9 +32,11 @@ export class ScreenService {
       });
   }
 
-  deleteScreen(orgId: string, id: string) {
+  deleteScreen(orgId: string, id: string, justification?: string) {
     return this.http
-      .delete(SCREEN.DELETE + `${orgId}/${id}`)
+      .request('DELETE', SCREEN.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -68,7 +70,7 @@ export class ScreenService {
       });
   }
 
-  updateScreen(screenForm: FormGroup) {
+  updateScreen(screenForm: FormGroup, justification?: string) {
     const { id, name, description, organisation, database, status } =
       screenForm.getRawValue();
     return this.http
@@ -79,6 +81,7 @@ export class ScreenService {
         organisation,
         database,
         status: status ? 1 : 0,
+        justification,
       })
       .toPromise()
       .then(response => {

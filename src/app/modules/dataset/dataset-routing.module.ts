@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { ListDatasetComponent } from './components/list-dataset/list-dataset.component';
 import { AddDatasetComponent } from './components/add-dataset/add-dataset.component';
 import { ViewDatasetComponent } from './components/view-dataset/view-dataset.component';
@@ -13,8 +14,9 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddDatasetComponent,
+    canDeactivate: [UnsavedChangesGuard],
   },
-  { path: 'edit/:orgId/:id', component: EditDatasetComponent },
+  { path: 'edit/:orgId/:id', component: EditDatasetComponent, canDeactivate: [UnsavedChangesGuard] },
   { path: 'view/:orgId/:id', component: ViewDatasetComponent },
 ];
 

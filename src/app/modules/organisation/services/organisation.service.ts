@@ -52,7 +52,7 @@ export class OrganisationService {
       });
   }
 
-  editOrganisation(orgForm: FormGroup) {
+  editOrganisation(orgForm: FormGroup, justification?: string) {
     const {
       id,
       name,
@@ -70,6 +70,7 @@ export class OrganisationService {
       name,
       status: status ? 1 : 0,
       description,
+      justification,
     };
 
     // Only include DB fields if they have values
@@ -88,9 +89,11 @@ export class OrganisationService {
       });
   }
 
-  deleteOrganisation(orgId: string) {
+  deleteOrganisation(orgId: string, justification?: string) {
     return this.http
-      .delete(ORGANISATION.DELETE + `${orgId}`)
+      .request('DELETE', ORGANISATION.DELETE + `${orgId}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

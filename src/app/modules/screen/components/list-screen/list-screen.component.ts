@@ -30,6 +30,7 @@ export class ListScreenComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   showDeleteConfirm = false;
   screenToDelete: string | null = null;
+  deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
   databases: any[] = [];
@@ -311,15 +312,17 @@ export class ListScreenComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.screenToDelete = null;
+    this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.screenToDelete) {
+    if (this.screenToDelete && this.deleteJustification.trim()) {
       this.screenService
-        .deleteScreen(this.selectedOrg, this.screenToDelete)
+        .deleteScreen(this.selectedOrg, this.screenToDelete, this.deleteJustification.trim())
         .then(response => {
           this.showDeleteConfirm = false;
           this.screenToDelete = null;
+          this.deleteJustification = '';
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
               this.loadScreens(this.lastTableLazyLoadEvent);

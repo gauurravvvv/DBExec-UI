@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANISATION } from 'src/app/constants/routes';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from '../../services/organisation.service';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -45,14 +46,22 @@ import {
     ]),
   ],
 })
-export class EditOrganisationComponent implements OnInit {
+export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
   orgForm!: FormGroup;
   isFormDirty = false;
+
+  hasUnsavedChanges(): boolean {
+    return this.isFormDirty;
+  }
+
   organisationId!: string;
   orgData: any;
   isCancelClicked: boolean = false;
   showDbPassword = false;
   hasMasterDb = false;
+
+  showSaveConfirm = false;
+  saveJustification = '';
 
   // Stepper
   currentStep = 0;
@@ -293,16 +302,33 @@ export class EditOrganisationComponent implements OnInit {
 
   onSubmit() {
     if (this.orgForm.valid) {
-      this.organisationService.editOrganisation(this.orgForm).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([ORGANISATION.LIST]);
-        }
-      });
+      this.showSaveConfirm = true;
     } else {
       Object.keys(this.orgForm.controls).forEach(key => {
         const control = this.orgForm.get(key);
         control?.markAsTouched();
       });
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  proceedSave(): void {
+    if (this.saveJustification.trim()) {
+      this.organisationService
+        .editOrganisation(this.orgForm, this.saveJustification.trim())
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.isFormDirty = false;
+            this.orgForm.markAsPristine();
+            this.router.navigate([ORGANISATION.LIST]);
+          }
+        });
     }
   }
 

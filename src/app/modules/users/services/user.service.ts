@@ -20,9 +20,11 @@ export class UserService {
       });
   }
 
-  deleteUser(id: string, orgId: string) {
+  deleteUser(id: string, orgId: string, justification?: string) {
     return this.http
-      .delete(USER.DELETE + `${orgId}/${id}`)
+      .request('DELETE', USER.DELETE + `${orgId}/${id}`, {
+        body: { justification },
+      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -58,7 +60,7 @@ export class UserService {
       });
   }
 
-  updateUser(userForm: FormGroup) {
+  updateUser(userForm: FormGroup, justification?: string) {
     const {
       id,
       firstName,
@@ -78,6 +80,7 @@ export class UserService {
         email,
         organisation,
         status: status ? 1 : 0,
+        justification,
       })
       .toPromise()
       .then((response: any) => {
