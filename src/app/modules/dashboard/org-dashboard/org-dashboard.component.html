@@ -8,10 +8,7 @@
 
   <div class="dashboard-content">
     <div class="quick-nav">
-      <div
-        class="nav-card"
-        (click)="navigateTo('/app/screen')"
-      >
+      <div class="nav-card" (click)="navigateTo('/app/screen')">
         <div class="nav-icon">
           <i class="ci ci-screen"></i>
         </div>
@@ -22,10 +19,7 @@
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
 
-      <div
-        class="nav-card"
-        (click)="navigateTo('/app/dataset')"
-      >
+      <div class="nav-card" (click)="navigateTo('/app/dataset')">
         <div class="nav-icon">
           <i class="ci ci-dataset"></i>
         </div>
@@ -36,10 +30,7 @@
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
 
-      <div
-        class="nav-card"
-        (click)="navigateTo('/app/analyses')"
-      >
+      <div class="nav-card" (click)="navigateTo('/app/analyses')">
         <div class="nav-icon">
           <i class="ci ci-analyses"></i>
         </div>
@@ -50,11 +41,7 @@
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
 
-      <div
-        class="nav-card"
-        *ngIf="isAdmin"
-        (click)="navigateTo('/app/users')"
-      >
+      <div class="nav-card" *ngIf="isAdmin" (click)="navigateTo('/app/users')">
         <div class="nav-icon">
           <i class="pi pi-users"></i>
         </div>

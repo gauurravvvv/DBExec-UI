@@ -18,7 +18,11 @@ const routes: Routes = [
     canDeactivate: [UnsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewPromptComponent },
-  { path: 'edit/:orgId/:id', component: EditPromptComponent, canDeactivate: [UnsavedChangesGuard] },
+  {
+    path: 'edit/:orgId/:id',
+    component: EditPromptComponent,
+    canDeactivate: [UnsavedChangesGuard],
+  },
   { path: 'config/:orgId/:id', component: ConfigPromptComponent },
 ];
 

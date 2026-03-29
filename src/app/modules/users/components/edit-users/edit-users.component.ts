@@ -122,14 +122,16 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
 
   proceedSave() {
     if (this.saveJustification.trim()) {
-      this.userService.updateUser(this.userForm, this.saveJustification.trim()).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.showSaveConfirm = false;
-          this.saveJustification = '';
-          this.userForm.markAsPristine();
-          this.router.navigate([USER.LIST]);
-        }
-      });
+      this.userService
+        .updateUser(this.userForm, this.saveJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.userForm.markAsPristine();
+            this.router.navigate([USER.LIST]);
+          }
+        });
     }
   }
 

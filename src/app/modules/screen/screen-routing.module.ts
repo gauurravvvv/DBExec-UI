@@ -19,7 +19,11 @@ const routes: Routes = [
     canDeactivate: [UnsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewScreenComponent },
-  { path: 'edit/:orgId/:id', component: EditScreenComponent, canDeactivate: [UnsavedChangesGuard] },
+  {
+    path: 'edit/:orgId/:id',
+    component: EditScreenComponent,
+    canDeactivate: [UnsavedChangesGuard],
+  },
   { path: 'config/:orgId/:dbId/:id', component: ConfigureScreenComponent },
   { path: 'execute/:orgId/:dbId/:screenId', component: ExecuteScreenComponent },
 ];

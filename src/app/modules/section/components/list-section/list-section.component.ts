@@ -325,7 +325,11 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.sectionToDelete && this.deleteJustification.trim()) {
       this.sectionService
-        .deleteSection(this.selectedOrg, this.sectionToDelete, this.deleteJustification.trim())
+        .deleteSection(
+          this.selectedOrg,
+          this.sectionToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           this.showDeleteConfirm = false;
           this.sectionToDelete = null;

@@ -57,7 +57,11 @@ export class ViewPromptComponent implements OnInit {
   proceedDelete(): void {
     if (this.promptData && this.deleteJustification.trim()) {
       this.promptService
-        .deletePrompt(this.orgId, this.promptId, this.deleteJustification.trim())
+        .deletePrompt(
+          this.orgId,
+          this.promptId,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           this.showDeleteConfirm = false;
           this.deleteJustification = '';

@@ -77,12 +77,14 @@ export class ViewUsersComponent implements OnInit {
 
   proceedDelete() {
     if (this.deleteJustification.trim()) {
-      this.userService.deleteUser(this.userId, this.orgId, this.deleteJustification.trim()).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.deleteJustification = '';
-          this.router.navigate([ORGANISATION_ADMIN.LIST]);
-        }
-      });
+      this.userService
+        .deleteUser(this.userId, this.orgId, this.deleteJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.deleteJustification = '';
+            this.router.navigate([ORGANISATION_ADMIN.LIST]);
+          }
+        });
     }
   }
 

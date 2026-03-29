@@ -62,7 +62,11 @@ export class ViewGroupComponent implements OnInit {
   proceedDelete(): void {
     if (this.groupData && this.deleteJustification.trim()) {
       this.groupService
-        .deleteGroup(this.orgId, this.groupData.id, this.deleteJustification.trim())
+        .deleteGroup(
+          this.orgId,
+          this.groupData.id,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.showDeleteConfirm = false;

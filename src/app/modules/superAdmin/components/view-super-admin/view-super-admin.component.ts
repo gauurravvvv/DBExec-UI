@@ -125,11 +125,13 @@ export class ViewSuperAdminComponent implements OnInit {
   }
 
   onDelete(adminId: string) {
-    this.superAdminService.deleteSuperAdmin(adminId, this.deleteJustification.trim()).then((res: any) => {
-      if (this.globalService.handleSuccessService(res)) {
-        this.router.navigate([SUPER_ADMIN.LIST]);
-      }
-    });
+    this.superAdminService
+      .deleteSuperAdmin(adminId, this.deleteJustification.trim())
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
+          this.router.navigate([SUPER_ADMIN.LIST]);
+        }
+      });
   }
 
   onUnlock() {

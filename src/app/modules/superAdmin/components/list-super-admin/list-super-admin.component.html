@@ -90,16 +90,32 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <app-custom-input [(ngModel)]="filterValues.username" (ngModelChange)="onFilterChange()" placeholder="Search Username"></app-custom-input>
+                <app-custom-input
+                  [(ngModel)]="filterValues.username"
+                  (ngModelChange)="onFilterChange()"
+                  placeholder="Search Username"
+                ></app-custom-input>
               </th>
               <th>
-                <app-custom-input [(ngModel)]="filterValues.firstName" (ngModelChange)="onFilterChange()" placeholder="Search First Name"></app-custom-input>
+                <app-custom-input
+                  [(ngModel)]="filterValues.firstName"
+                  (ngModelChange)="onFilterChange()"
+                  placeholder="Search First Name"
+                ></app-custom-input>
               </th>
               <th>
-                <app-custom-input [(ngModel)]="filterValues.lastName" (ngModelChange)="onFilterChange()" placeholder="Search Last Name"></app-custom-input>
+                <app-custom-input
+                  [(ngModel)]="filterValues.lastName"
+                  (ngModelChange)="onFilterChange()"
+                  placeholder="Search Last Name"
+                ></app-custom-input>
               </th>
               <th>
-                <app-custom-input [(ngModel)]="filterValues.email" (ngModelChange)="onFilterChange()" placeholder="Search Email"></app-custom-input>
+                <app-custom-input
+                  [(ngModel)]="filterValues.email"
+                  (ngModelChange)="onFilterChange()"
+                  placeholder="Search Email"
+                ></app-custom-input>
               </th>
               <th>
                 <!-- <p-dropdown [options]="statusOptions" [(ngModel)]="filterValues.status"
@@ -108,10 +124,22 @@
                                 </p-dropdown> -->
               </th>
               <th>
-                <!-- No filter for Last Login -->
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.lastLoginDateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onLastLoginDateRangeChange($event)"
+                ></app-custom-daterange>
               </th>
               <th>
-                <!-- No filter for Created On -->
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.createdDateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onCreatedDateRangeChange($event)"
+                ></app-custom-daterange>
               </th>
               <th>
                 <!-- No filter for Actions -->
@@ -252,7 +280,9 @@
       </ul>
 
       <div class="justification-section">
-        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <label for="deleteJustification"
+          >Justification <span class="required">*</span></label
+        >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
@@ -270,7 +300,11 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="!deleteJustification.trim()"
+      >
         <i class="pi pi-trash"></i>
         Delete
       </button>

@@ -27,12 +27,16 @@ export class ListSuperAdminComponent implements OnInit {
   adminIdToDelete: string | null = null;
   deleteJustification = '';
 
+  today = new Date();
+
   // Component-managed filter values
   filterValues: any = {
     username: '',
     firstName: '',
     lastName: '',
     email: '',
+    lastLoginDateRange: null,
+    createdDateRange: null,
   };
 
   constructor(
@@ -66,7 +70,9 @@ export class ListSuperAdminComponent implements OnInit {
       !!this.filterValues.username ||
       !!this.filterValues.firstName ||
       !!this.filterValues.lastName ||
-      !!this.filterValues.email
+      !!this.filterValues.email ||
+      !!this.filterValues.lastLoginDateRange ||
+      !!this.filterValues.createdDateRange
     );
   }
 
@@ -76,8 +82,24 @@ export class ListSuperAdminComponent implements OnInit {
       firstName: '',
       lastName: '',
       email: '',
+      lastLoginDateRange: null,
+      createdDateRange: null,
     };
     this.onFilterChange();
+  }
+
+  onLastLoginDateRangeChange(range: Date[] | null) {
+    this.filterValues.lastLoginDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
   }
 
   onEdit(adminId: string): void {
@@ -105,14 +127,16 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   onDelete(adminId: string) {
-    this.superAdminService.deleteSuperAdmin(adminId, this.deleteJustification.trim()).then((res: any) => {
-      if (this.globalService.handleSuccessService(res)) {
-        // Refresh current view
-        if (this.lastTableLazyLoadEvent) {
-          this.loadSuperAdmins(this.lastTableLazyLoadEvent);
+    this.superAdminService
+      .deleteSuperAdmin(adminId, this.deleteJustification.trim())
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
+          // Refresh current view
+          if (this.lastTableLazyLoadEvent) {
+            this.loadSuperAdmins(this.lastTableLazyLoadEvent);
+          }
         }
-      }
-    });
+      });
   }
 
   onUnlock(adminId: string) {
@@ -155,6 +179,24 @@ export class ListSuperAdminComponent implements OnInit {
     }
     if (this.filterValues.email) {
       filter.email = this.filterValues.email;
+    }
+    if (this.filterValues.lastLoginDateRange?.[0]) {
+      filter.lastLoginDateFrom =
+        this.filterValues.lastLoginDateRange[0].toISOString();
+    }
+    if (this.filterValues.lastLoginDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.lastLoginDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.lastLoginDateTo = dateTo.toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
     }
 
     if (Object.keys(filter).length > 0) {

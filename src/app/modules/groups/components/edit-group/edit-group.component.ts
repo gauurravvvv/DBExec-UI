@@ -151,15 +151,17 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
 
   proceedSave(): void {
     if (this.saveJustification.trim()) {
-      this.groupService.editGroup(this.groupForm, this.saveJustification.trim()).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.showSaveConfirm = false;
-          this.saveJustification = '';
-          this.isFormDirty = false;
-          this.groupForm.markAsPristine();
-          this.router.navigate([GROUP.LIST]);
-        }
-      });
+      this.groupService
+        .editGroup(this.groupForm, this.saveJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.isFormDirty = false;
+            this.groupForm.markAsPristine();
+            this.router.navigate([GROUP.LIST]);
+          }
+        });
     }
   }
 

@@ -212,7 +212,13 @@ export class ListAuditLogsComponent implements OnInit {
 
     // Extra context fields (visualCount, userCount, columnCount, etc.)
     for (const [k, v] of Object.entries(m)) {
-      if (k === 'entity' || k === 'oldValues' || k === 'newValues' || k === 'justification') continue;
+      if (
+        k === 'entity' ||
+        k === 'oldValues' ||
+        k === 'newValues' ||
+        k === 'justification'
+      )
+        continue;
       if (v !== null && typeof v === 'object' && !Array.isArray(v)) continue;
       items.push({
         key: this.formatKey(k),

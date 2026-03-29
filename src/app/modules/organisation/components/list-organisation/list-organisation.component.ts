@@ -129,14 +129,16 @@ export class ListOrganisationComponent implements OnInit {
   }
 
   onDelete(orgId: string) {
-    this.organisationService.deleteOrganisation(orgId, this.deleteJustification.trim()).then((res: any) => {
-      if (this.globalService.handleSuccessService(res)) {
-        if (this.lastTableLazyLoadEvent) {
-          this.loadOrganisations(this.lastTableLazyLoadEvent);
+    this.organisationService
+      .deleteOrganisation(orgId, this.deleteJustification.trim())
+      .then((res: any) => {
+        if (this.globalService.handleSuccessService(res)) {
+          if (this.lastTableLazyLoadEvent) {
+            this.loadOrganisations(this.lastTableLazyLoadEvent);
+          }
+          this.showDeleteConfirm = false;
+          this.orgIdToDelete = null;
         }
-        this.showDeleteConfirm = false;
-        this.orgIdToDelete = null;
-      }
-    });
+      });
   }
 }

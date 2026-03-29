@@ -626,8 +626,12 @@
       transition: color 0.15s ease;
     }
 
-    .edit-icon:hover { color: var(--primary-color); }
-    .delete-icon:hover { color: #ef4444; }
+    .edit-icon:hover {
+      color: var(--primary-color);
+    }
+    .delete-icon:hover {
+      color: #ef4444;
+    }
   }
 
   .field-card:hover .field-actions {
@@ -1771,9 +1775,15 @@
       transition: color 0.15s ease;
     }
 
-    .maximize-icon:hover { color: var(--primary-color); }
-    .change-chart-icon:hover { color: #f59e0b; }
-    .remove-icon:hover { color: #ef4444; }
+    .maximize-icon:hover {
+      color: var(--primary-color);
+    }
+    .change-chart-icon:hover {
+      color: #f59e0b;
+    }
+    .remove-icon:hover {
+      color: #ef4444;
+    }
   }
 }
 
@@ -2276,7 +2286,8 @@
     width: 90%;
     max-width: 420px;
     border-radius: 12px;
-    box-shadow: 0 20px 25px -5px var(--shadow-color),
+    box-shadow:
+      0 20px 25px -5px var(--shadow-color),
       0 8px 10px -6px var(--shadow-color);
     border: 1px solid var(--border-color);
     overflow: hidden;
@@ -2401,11 +2412,21 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

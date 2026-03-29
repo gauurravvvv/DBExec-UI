@@ -40,7 +40,9 @@
             </div>
             <div class="info-item">
               <label>Description</label>
-              <p>{{ analysisDetails.description || 'No description available' }}</p>
+              <p>
+                {{ analysisDetails.description || 'No description available' }}
+              </p>
             </div>
             <div class="info-item">
               <label>Dataset</label>
@@ -142,9 +144,7 @@
             <h3>
               <i class="pi pi-sliders-h mr-2"></i>
               Analysis Fields
-              <span class="count-badge">{{
-                analysisFields?.length || 0
-              }}</span>
+              <span class="count-badge">{{ analysisFields?.length || 0 }}</span>
             </h3>
             <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
               <i class="pi pi-plus"></i>
@@ -200,17 +200,11 @@
             <span class="count-badge">{{ visuals?.length || 0 }}</span>
           </h3>
           <div class="fields-list">
-            <div
-              class="field-item"
-              *ngFor="let visual of visuals"
-            >
+            <div class="field-item" *ngFor="let visual of visuals">
               <i class="pi pi-chart-line"></i>
               {{ visual.title || visual.name || 'Untitled Visual' }}
             </div>
-            <div
-              *ngIf="!visuals || visuals.length === 0"
-              class="no-data"
-            >
+            <div *ngIf="!visuals || visuals.length === 0" class="no-data">
               No visuals found
             </div>
           </div>
@@ -262,7 +256,9 @@
       </ul>
 
       <div class="justification-section">
-        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <label for="deleteJustification"
+          >Justification <span class="required">*</span></label
+        >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
@@ -280,7 +276,11 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="!deleteJustification.trim()"
+      >
         <i class="pi pi-trash"></i>
         Delete
       </button>

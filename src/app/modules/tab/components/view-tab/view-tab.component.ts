@@ -56,12 +56,14 @@ export class ViewTabComponent implements OnInit {
 
   proceedDelete(): void {
     if (this.tabData && this.deleteJustification.trim()) {
-      this.tabService.deleteTab(this.orgId, this.tabData.id, this.deleteJustification.trim()).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.deleteJustification = '';
-          this.router.navigate([TAB.LIST]);
-        }
-      });
+      this.tabService
+        .deleteTab(this.orgId, this.tabData.id, this.deleteJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.deleteJustification = '';
+            this.router.navigate([TAB.LIST]);
+          }
+        });
     }
   }
 }

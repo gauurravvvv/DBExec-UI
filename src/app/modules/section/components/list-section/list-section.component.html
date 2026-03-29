@@ -265,7 +265,9 @@
       </ul>
 
       <div class="justification-section">
-        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <label for="deleteJustification"
+          >Justification <span class="required">*</span></label
+        >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
@@ -283,7 +285,11 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="!deleteJustification.trim()"
+      >
         <i class="pi pi-trash"></i>
         Delete
       </button>

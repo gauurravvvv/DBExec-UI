@@ -497,7 +497,11 @@ export class ViewScreenComponent implements OnInit, OnDestroy {
   proceedDelete(): void {
     if (this.deleteJustification.trim()) {
       this.screenService
-        .deleteScreen(this.orgId, this.screenId, this.deleteJustification.trim())
+        .deleteScreen(
+          this.orgId,
+          this.screenId,
+          this.deleteJustification.trim(),
+        )
         .then((response: any) => {
           this.showDeleteConfirm = false;
           this.deleteJustification = '';

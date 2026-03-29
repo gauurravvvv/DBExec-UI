@@ -318,7 +318,11 @@ export class ListScreenComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.screenToDelete && this.deleteJustification.trim()) {
       this.screenService
-        .deleteScreen(this.selectedOrg, this.screenToDelete, this.deleteJustification.trim())
+        .deleteScreen(
+          this.selectedOrg,
+          this.screenToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           this.showDeleteConfirm = false;
           this.screenToDelete = null;

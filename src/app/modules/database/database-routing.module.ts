@@ -16,7 +16,11 @@ const routes: Routes = [
     component: AddDatabaseComponent,
     canDeactivate: [UnsavedChangesGuard],
   },
-  { path: 'edit/:orgId/:id', component: EditDatabaseComponent, canDeactivate: [UnsavedChangesGuard] },
+  {
+    path: 'edit/:orgId/:id',
+    component: EditDatabaseComponent,
+    canDeactivate: [UnsavedChangesGuard],
+  },
   { path: 'view/:orgId/:id', component: ViewDatabaseComponent },
 ];
 

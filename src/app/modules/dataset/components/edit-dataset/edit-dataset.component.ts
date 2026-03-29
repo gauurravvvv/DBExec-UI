@@ -47,7 +47,9 @@ declare const window: any;
   templateUrl: './edit-dataset.component.html',
   styleUrls: ['./edit-dataset.component.scss'],
 })
-export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit, HasUnsavedChanges {
+export class EditDatasetComponent
+  implements OnInit, OnDestroy, AfterViewInit, HasUnsavedChanges
+{
   // ViewChild for file input
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -1092,15 +1094,17 @@ export class EditDatasetComponent implements OnInit, OnDestroy, AfterViewInit, H
 
   proceedSave(): void {
     if (this.saveJustification.trim() && this.pendingSaveData) {
-      this.datasetService.updateDataset(this.pendingSaveData, this.saveJustification.trim()).then(response => {
-        if (this.globalService.handleSuccessService(response, true)) {
-          this.showSaveConfirm = false;
-          this.saveJustification = '';
-          this.pendingSaveData = null;
-          this.originalQuery = this.editor?.getValue() || this.currentQuery;
-          this.router.navigate([DATASET.LIST]);
-        }
-      });
+      this.datasetService
+        .updateDataset(this.pendingSaveData, this.saveJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, true)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.pendingSaveData = null;
+            this.originalQuery = this.editor?.getValue() || this.currentQuery;
+            this.router.navigate([DATASET.LIST]);
+          }
+        });
     }
   }
 

@@ -185,7 +185,9 @@
     <p>Are you sure you want to delete this role?</p>
 
     <div class="justification-section">
-      <label for="deleteJustification">Justification <span class="required">*</span></label>
+      <label for="deleteJustification"
+        >Justification <span class="required">*</span></label
+      >
       <textarea
         id="deleteJustification"
         [(ngModel)]="deleteJustification"
@@ -198,7 +200,13 @@
 
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">No</button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">Yes</button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="!deleteJustification.trim()"
+      >
+        Yes
+      </button>
     </div>
   </div>
 </div>

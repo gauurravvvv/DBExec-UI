@@ -80,10 +80,18 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <app-custom-input [(ngModel)]="filterValues.name" (ngModelChange)="onFilterChange('name')" placeholder="Search Name"></app-custom-input>
+                <app-custom-input
+                  [(ngModel)]="filterValues.name"
+                  (ngModelChange)="onFilterChange('name')"
+                  placeholder="Search Name"
+                ></app-custom-input>
               </th>
               <th>
-                <app-custom-input [(ngModel)]="filterValues.description" (ngModelChange)="onFilterChange('description')" placeholder="Search Description"></app-custom-input>
+                <app-custom-input
+                  [(ngModel)]="filterValues.description"
+                  (ngModelChange)="onFilterChange('description')"
+                  placeholder="Search Description"
+                ></app-custom-input>
               </th>
               <th>
                 <!-- <p-dropdown [options]="statusOptions" [(ngModel)]="filterValues.status"
@@ -194,7 +202,9 @@
       </ul>
 
       <div class="justification-section">
-        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <label for="deleteJustification"
+          >Justification <span class="required">*</span></label
+        >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
@@ -212,7 +222,11 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="!deleteJustification.trim()"
+      >
         <i class="pi pi-trash"></i>
         Delete
       </button>

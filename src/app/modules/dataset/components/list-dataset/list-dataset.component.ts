@@ -504,7 +504,11 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.datasetToDelete && this.deleteJustification.trim()) {
       this.datasetService
-        .deleteDataset(this.selectedOrg, this.datasetToDelete, this.deleteJustification.trim())
+        .deleteDataset(
+          this.selectedOrg,
+          this.datasetToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadDatasets();

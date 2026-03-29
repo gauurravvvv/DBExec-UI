@@ -59,7 +59,11 @@ export class ViewSectionComponent implements OnInit {
   proceedDelete(): void {
     if (this.tabData && this.deleteJustification.trim()) {
       this.sectionService
-        .deleteSection(this.orgId, this.tabData.id, this.deleteJustification.trim())
+        .deleteSection(
+          this.orgId,
+          this.tabData.id,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';

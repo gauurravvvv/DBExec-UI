@@ -17,7 +17,11 @@ const routes: Routes = [
     canDeactivate: [UnsavedChangesGuard],
   },
   { path: 'view/:id', component: ViewSuperAdminComponent },
-  { path: 'edit/:id', component: EditSuperAdminComponent, canDeactivate: [UnsavedChangesGuard] },
+  {
+    path: 'edit/:id',
+    component: EditSuperAdminComponent,
+    canDeactivate: [UnsavedChangesGuard],
+  },
 ];
 
 @NgModule({

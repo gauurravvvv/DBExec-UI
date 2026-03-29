@@ -42,8 +42,7 @@ export class AnalysesService {
   }
 
   addAnalyses(payload: any) {
-    const { name, description, datasetId, organisation, database } =
-      payload;
+    const { name, description, datasetId, organisation, database } = payload;
 
     return this.http
       .post(ANALYSES.ADD, {

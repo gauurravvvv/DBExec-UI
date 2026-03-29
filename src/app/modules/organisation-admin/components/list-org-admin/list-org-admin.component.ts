@@ -18,6 +18,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 export class ListOrgAdminComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
 
+  today = new Date();
   admins: any[] = [];
   limit = 10;
   totalRecords = 0;
@@ -220,7 +221,11 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.adminToDelete && this.deleteJustification.trim()) {
       this.orgAdminService
-        .deleteAdminOrganisation(this.selectedOrg, this.adminToDelete, this.deleteJustification.trim())
+        .deleteAdminOrganisation(
+          this.selectedOrg,
+          this.adminToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {

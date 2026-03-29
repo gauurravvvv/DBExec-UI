@@ -165,7 +165,11 @@ export class ListRoleComponent implements OnInit {
   proceedDelete() {
     if (this.roleToDelete && this.deleteJustification.trim()) {
       this.roleService
-        .deleteRole(this.selectedOrg.id, this.roleToDelete, this.deleteJustification.trim())
+        .deleteRole(
+          this.selectedOrg.id,
+          this.roleToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadRoles();

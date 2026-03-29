@@ -32,11 +32,13 @@ export class ListGroupComponent implements OnInit, OnDestroy {
   selectedOrg: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  today = new Date();
 
   // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
+    createdDateRange: null,
   };
 
   // Debouncing for filter changes
@@ -191,7 +193,11 @@ export class ListGroupComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.groupToDelete && this.deleteJustification.trim()) {
       this.groupService
-        .deleteGroup(this.selectedOrg, this.groupToDelete, this.deleteJustification.trim())
+        .deleteGroup(
+          this.selectedOrg,
+          this.groupToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {

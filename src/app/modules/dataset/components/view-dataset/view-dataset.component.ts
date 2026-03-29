@@ -171,7 +171,11 @@ export class ViewDatasetComponent implements OnInit {
   proceedDelete() {
     if (this.deleteJustification.trim()) {
       this.datasetService
-        .deleteDataset(this.datasetData.organisationId, this.datasetData.id, this.deleteJustification.trim())
+        .deleteDataset(
+          this.datasetData.organisationId,
+          this.datasetData.id,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';

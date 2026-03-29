@@ -80,10 +80,12 @@
       <i class="pi pi-filter"></i>
     </button>
 
-    <i class="pi pi-info-circle row-limit-hint"
-       pTooltip="Data limited to 1000 rows"
-       tooltipPosition="left"
-       [tooltipOptions]="{ tooltipStyleClass: 'row-limit-tooltip' }"></i>
+    <i
+      class="pi pi-info-circle row-limit-hint"
+      pTooltip="Data limited to 1000 rows"
+      tooltipPosition="left"
+      [tooltipOptions]="{ tooltipStyleClass: 'row-limit-tooltip' }"
+    ></i>
 
     <!-- Dataset Loading Status Indicator -->
     <div
@@ -169,15 +171,14 @@
           <div class="fields-sticky-header">
             <div class="dataset-name-section">
               <div class="dataset-name-divider">
-                <span class="dataset-name-text">{{ datasetDetails?.name }}</span>
+                <span class="dataset-name-text">{{
+                  datasetDetails?.name
+                }}</span>
               </div>
             </div>
 
             <!-- Search Input -->
-            <div
-              class="search-wrapper"
-              *ngIf="allFields.length"
-            >
+            <div class="search-wrapper" *ngIf="allFields.length">
               <span class="p-input-icon-left" style="width: 100%">
                 <i class="pi pi-search"></i>
                 <input
@@ -207,68 +208,96 @@
           <!-- Scrollable fields area -->
           <div class="fields-scroll-area">
             <!-- Dataset Fields Section -->
-            <div *ngIf="datasetDetails?.datasetFields?.length" class="fields-section-label analysis-label">
+            <div
+              *ngIf="datasetDetails?.datasetFields?.length"
+              class="fields-section-label analysis-label"
+            >
               Dataset Fields
             </div>
-          <div class="fields-list" [class.selection-mode]="activeAxisSelection">
-            <ng-container *ngFor="let field of filteredDatasetFields">
-              <div
-                *ngIf="field._scope === 'dataset'"
-                class="field-card"
-                [class.custom-field]="field.type === 2"
-                [class.selectable]="activeAxisSelection !== null"
-                (click)="onFieldClick(field)"
-              >
-                <div class="field-icon">
-                  <i class="pi" [ngClass]="getDataTypeIcon(field.dataType)"></i>
+            <div
+              class="fields-list"
+              [class.selection-mode]="activeAxisSelection"
+            >
+              <ng-container *ngFor="let field of filteredDatasetFields">
+                <div
+                  *ngIf="field._scope === 'dataset'"
+                  class="field-card"
+                  [class.custom-field]="field.type === 2"
+                  [class.selectable]="activeAxisSelection !== null"
+                  (click)="onFieldClick(field)"
+                >
+                  <div class="field-icon">
+                    <i
+                      class="pi"
+                      [ngClass]="getDataTypeIcon(field.dataType)"
+                    ></i>
+                  </div>
+                  <div class="field-info">
+                    <div class="field-name">{{ field.columnToView }}</div>
+                  </div>
                 </div>
-                <div class="field-info">
-                  <div class="field-name">{{ field.columnToView }}</div>
-                </div>
-              </div>
-            </ng-container>
-          </div>
+              </ng-container>
+            </div>
 
-          <!-- Analysis Fields Section -->
-          <div class="fields-section-label analysis-label">
-            Analysis Fields
-          </div>
-          <div class="fields-list" [class.selection-mode]="activeAxisSelection">
-            <ng-container *ngFor="let field of filteredDatasetFields">
+            <!-- Analysis Fields Section -->
+            <div class="fields-section-label analysis-label">
+              Analysis Fields
+            </div>
+            <div
+              class="fields-list"
+              [class.selection-mode]="activeAxisSelection"
+            >
+              <ng-container *ngFor="let field of filteredDatasetFields">
+                <div
+                  *ngIf="field._scope === 'analysis'"
+                  class="field-card analysis-field"
+                  [class.custom-field]="field.type === 2"
+                  [class.selectable]="activeAxisSelection !== null"
+                  (click)="onFieldClick(field)"
+                >
+                  <div class="field-icon">
+                    <i
+                      class="pi"
+                      [ngClass]="getDataTypeIcon(field.dataType)"
+                    ></i>
+                  </div>
+                  <div class="field-info">
+                    <div class="field-name">{{ field.columnToView }}</div>
+                  </div>
+                  <div *ngIf="field.type === 2" class="field-actions">
+                    <i
+                      class="pi pi-pencil field-action-icon edit-icon"
+                      (click)="
+                        openEditCustomField(field); $event.stopPropagation()
+                      "
+                      pTooltip="Edit"
+                      tooltipPosition="top"
+                    ></i>
+                    <i
+                      class="pi pi-trash field-action-icon delete-icon"
+                      (click)="
+                        confirmDeleteField(field); $event.stopPropagation()
+                      "
+                      pTooltip="Delete"
+                      tooltipPosition="top"
+                    ></i>
+                  </div>
+                </div>
+              </ng-container>
               <div
-                *ngIf="field._scope === 'analysis'"
-                class="field-card analysis-field"
-                [class.custom-field]="field.type === 2"
-                [class.selectable]="activeAxisSelection !== null"
-                (click)="onFieldClick(field)"
+                *ngIf="analysisFields.length === 0"
+                style="
+                  padding: 8px 12px;
+                  font-size: 0.75rem;
+                  color: var(--text-color-secondary);
+                  text-align: center;
+                "
               >
-                <div class="field-icon">
-                  <i class="pi" [ngClass]="getDataTypeIcon(field.dataType)"></i>
-                </div>
-                <div class="field-info">
-                  <div class="field-name">{{ field.columnToView }}</div>
-                </div>
-                <div *ngIf="field.type === 2" class="field-actions">
-                  <i
-                    class="pi pi-pencil field-action-icon edit-icon"
-                    (click)="openEditCustomField(field); $event.stopPropagation()"
-                    pTooltip="Edit"
-                    tooltipPosition="top"
-                  ></i>
-                  <i
-                    class="pi pi-trash field-action-icon delete-icon"
-                    (click)="confirmDeleteField(field); $event.stopPropagation()"
-                    pTooltip="Delete"
-                    tooltipPosition="top"
-                  ></i>
-                </div>
+                No analysis-level fields yet
               </div>
-            </ng-container>
-            <div *ngIf="analysisFields.length === 0" style="padding: 8px 12px; font-size: 0.75rem; color: var(--text-color-secondary); text-align: center;">
-              No analysis-level fields yet
             </div>
           </div>
-          </div><!-- /fields-scroll-area -->
+          <!-- /fields-scroll-area -->
         </div>
       </div>
     </div>
@@ -782,7 +811,11 @@
               class="p-button-outlined add-filter-button"
               (click)="addFilter()"
               [disabled]="!datasetDetails?.datasetFields?.length"
-              [pTooltip]="datasetDetails?.datasetFields?.length ? '' : 'Load data first to add filters'"
+              [pTooltip]="
+                datasetDetails?.datasetFields?.length
+                  ? ''
+                  : 'Load data first to add filters'
+              "
               tooltipPosition="bottom"
             ></button>
           </div>
@@ -795,21 +828,41 @@
               [class.disabled]="!filter.isEnabled"
             >
               <div class="filter-card-header">
-                <span class="filter-card-name" [pTooltip]="filter.name" tooltipPosition="top">
+                <span
+                  class="filter-card-name"
+                  [pTooltip]="filter.name"
+                  tooltipPosition="top"
+                >
                   {{ filter.name }}
                 </span>
                 <div class="filter-card-actions">
-                  <i class="pi pi-pencil" (click)="editFilter(filter)" pTooltip="Edit" tooltipPosition="top"></i>
-                  <i class="pi pi-trash" (click)="removeFilter(filter)" pTooltip="Remove" tooltipPosition="top"></i>
+                  <i
+                    class="pi pi-pencil"
+                    (click)="editFilter(filter)"
+                    pTooltip="Edit"
+                    tooltipPosition="top"
+                  ></i>
+                  <i
+                    class="pi pi-trash"
+                    (click)="removeFilter(filter)"
+                    pTooltip="Remove"
+                    tooltipPosition="top"
+                  ></i>
                 </div>
               </div>
               <div class="filter-card-meta">
                 <span class="filter-card-column">{{ filter.columnName }}</span>
-                <span class="filter-card-type">{{ getFilterTypeLabel(filter.filterType) }}</span>
+                <span class="filter-card-type">{{
+                  getFilterTypeLabel(filter.filterType)
+                }}</span>
               </div>
               <div class="filter-card-badges">
-                <span class="badge badge-mandatory" *ngIf="filter.isMandatory">Required</span>
-                <span class="badge badge-disabled" *ngIf="!filter.isEnabled">Disabled</span>
+                <span class="badge badge-mandatory" *ngIf="filter.isMandatory"
+                  >Required</span
+                >
+                <span class="badge badge-disabled" *ngIf="!filter.isEnabled"
+                  >Disabled</span
+                >
               </div>
             </div>
           </div>
@@ -838,7 +891,10 @@
       <div class="filter-dialog-form">
         <!-- Column Selection -->
         <div class="filter-dialog-field">
-          <label><i class="pi pi-table"></i> Column <span class="required">*</span></label>
+          <label
+            ><i class="pi pi-table"></i> Column
+            <span class="required">*</span></label
+          >
           <p-dropdown
             [options]="datasetDetails?.datasetFields || []"
             [(ngModel)]="filterDialogColumn"
@@ -866,7 +922,10 @@
         <!-- Type Selection Row -->
         <div class="filter-dialog-row">
           <div class="filter-dialog-field">
-            <label><i class="pi pi-filter"></i> Filter Type <span class="required">*</span></label>
+            <label
+              ><i class="pi pi-filter"></i> Filter Type
+              <span class="required">*</span></label
+            >
             <p-dropdown
               [options]="filterTypeOptions"
               [(ngModel)]="filterDialogType"
@@ -876,7 +935,10 @@
             ></p-dropdown>
           </div>
           <div class="filter-dialog-field">
-            <label><i class="pi pi-sliders-h"></i> Control Type <span class="required">*</span></label>
+            <label
+              ><i class="pi pi-sliders-h"></i> Control Type
+              <span class="required">*</span></label
+            >
             <p-dropdown
               [options]="controlTypeOptions"
               [(ngModel)]="filterDialogControl"
@@ -906,7 +968,11 @@
 
       <ng-template pTemplate="footer">
         <div class="dialog-footer">
-          <button class="btn-cancel" type="button" (click)="cancelFilterDialog()">
+          <button
+            class="btn-cancel"
+            type="button"
+            (click)="cancelFilterDialog()"
+          >
             <i class="pi pi-times"></i>
             Cancel
           </button>
@@ -914,7 +980,9 @@
             class="btn-primary"
             type="button"
             (click)="saveFilterDialog()"
-            [disabled]="!filterDialogColumn || !filterDialogType || !filterDialogControl"
+            [disabled]="
+              !filterDialogColumn || !filterDialogType || !filterDialogControl
+            "
           >
             <i class="pi pi-check"></i>
             {{ editingFilter ? 'Update Filter' : 'Add Filter' }}
@@ -1010,7 +1078,12 @@
             <!-- Placeholder when chart type selected but fields not mapped -->
             <div
               class="visual-content-placeholder"
-              *ngIf="visual.chartType && !hasRequiredChartFields(visual) && !visual.loading && !visual.error"
+              *ngIf="
+                visual.chartType &&
+                !hasRequiredChartFields(visual) &&
+                !visual.loading &&
+                !visual.error
+              "
             >
               <i class="pi pi-database"></i>
               <p>Select data fields to visualize</p>
@@ -1030,462 +1103,467 @@
 
             <!-- Chart Components (only show when loaded, not loading/error, and required fields mapped) -->
             <ng-container
-              *ngIf="!visual.loading && !visual.error && visual.chartType && hasRequiredChartFields(visual)"
+              *ngIf="
+                !visual.loading &&
+                !visual.error &&
+                visual.chartType &&
+                hasRequiredChartFields(visual)
+              "
             >
               <div class="chart-click-guard" (click)="$event.stopPropagation()">
-              <!-- Bar Chart Types -->
-              <app-configurable-bar-chart
-                *ngIf="isBarChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType"
-                [data]="visual.chartData"
-              >
-              </app-configurable-bar-chart>
+                <!-- Bar Chart Types -->
+                <app-configurable-bar-chart
+                  *ngIf="isBarChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [chartType]="visual.chartType"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-bar-chart>
 
-              <!-- Line Chart -->
-              <app-configurable-line-chart
-                *ngIf="isLineChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-line-chart>
+                <!-- Line Chart -->
+                <app-configurable-line-chart
+                  *ngIf="isLineChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-line-chart>
 
-              <!-- Area Chart Types -->
-              <app-configurable-area-chart
-                *ngIf="isAreaChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType"
-                [data]="visual.chartData"
-              >
-              </app-configurable-area-chart>
+                <!-- Area Chart Types -->
+                <app-configurable-area-chart
+                  *ngIf="isAreaChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [chartType]="visual.chartType"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-area-chart>
 
-              <!-- Polar Chart -->
-              <app-configurable-polar-chart
-                *ngIf="isPolarChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-polar-chart>
+                <!-- Polar Chart -->
+                <app-configurable-polar-chart
+                  *ngIf="isPolarChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-polar-chart>
 
-              <!-- Pie Chart Types -->
-              <app-configurable-pie-chart
-                *ngIf="isPieChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType"
-                [data]="visual.chartData"
-              >
-              </app-configurable-pie-chart>
+                <!-- Pie Chart Types -->
+                <app-configurable-pie-chart
+                  *ngIf="isPieChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [chartType]="visual.chartType"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-pie-chart>
 
-              <!-- Gauge Chart Types -->
-              <app-configurable-gauge-chart
-                *ngIf="isGaugeChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType"
-                [data]="visual.chartData"
-              >
-              </app-configurable-gauge-chart>
+                <!-- Gauge Chart Types -->
+                <app-configurable-gauge-chart
+                  *ngIf="isGaugeChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [chartType]="visual.chartType"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-gauge-chart>
 
-              <!-- Number Card Chart -->
-              <app-configurable-card-chart
-                *ngIf="isCardChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-card-chart>
+                <!-- Number Card Chart -->
+                <app-configurable-card-chart
+                  *ngIf="isCardChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-card-chart>
 
-              <!-- Heat Map Chart -->
-              <app-configurable-heatmap-chart
-                *ngIf="isHeatMapChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-heatmap-chart>
+                <!-- Heat Map Chart -->
+                <app-configurable-heatmap-chart
+                  *ngIf="isHeatMapChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-heatmap-chart>
 
-              <!-- Tree Map Chart -->
-              <app-configurable-treemap-chart
-                *ngIf="isTreeMapChartType(visual.chartType)"
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-treemap-chart>
+                <!-- Tree Map Chart -->
+                <app-configurable-treemap-chart
+                  *ngIf="isTreeMapChartType(visual.chartType)"
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-treemap-chart>
 
-              <!-- Bubble Chart -->
-              <app-configurable-bubble-chart
-                *ngIf="
-                  isBubbleChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-bubble-chart>
+                <!-- Bubble Chart -->
+                <app-configurable-bubble-chart
+                  *ngIf="
+                    isBubbleChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-bubble-chart>
 
-              <!-- Box Chart -->
-              <app-configurable-box-chart
-                *ngIf="
-                  isBoxChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-box-chart>
+                <!-- Box Chart -->
+                <app-configurable-box-chart
+                  *ngIf="
+                    isBoxChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-box-chart>
 
-              <!-- Scatter Chart Types -->
-              <app-configurable-scatter-chart
-                *ngIf="
-                  isScatterChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [chartType]="visual.chartType || 'scatter'"
-                [data]="visual.chartData"
-              >
-              </app-configurable-scatter-chart>
+                <!-- Scatter Chart Types -->
+                <app-configurable-scatter-chart
+                  *ngIf="
+                    isScatterChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [chartType]="visual.chartType || 'scatter'"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-scatter-chart>
 
-              <!-- Funnel Chart -->
-              <app-configurable-funnel-chart
-                *ngIf="
-                  isFunnelChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-funnel-chart>
+                <!-- Funnel Chart -->
+                <app-configurable-funnel-chart
+                  *ngIf="
+                    isFunnelChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-funnel-chart>
 
-              <!-- Sunburst Chart -->
-              <app-configurable-sunburst-chart
-                *ngIf="
-                  isSunburstChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-sunburst-chart>
+                <!-- Sunburst Chart -->
+                <app-configurable-sunburst-chart
+                  *ngIf="
+                    isSunburstChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-sunburst-chart>
 
-              <!-- Sankey Chart -->
-              <app-configurable-sankey-chart
-                *ngIf="
-                  isSankeyChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-sankey-chart>
+                <!-- Sankey Chart -->
+                <app-configurable-sankey-chart
+                  *ngIf="
+                    isSankeyChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-sankey-chart>
 
-              <!-- Waterfall Chart -->
-              <app-configurable-waterfall-chart
-                *ngIf="
-                  isWaterfallChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-waterfall-chart>
+                <!-- Waterfall Chart -->
+                <app-configurable-waterfall-chart
+                  *ngIf="
+                    isWaterfallChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-waterfall-chart>
 
-              <!-- Graph Chart -->
-              <app-configurable-graph-chart
-                *ngIf="
-                  isGraphChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-graph-chart>
+                <!-- Graph Chart -->
+                <app-configurable-graph-chart
+                  *ngIf="
+                    isGraphChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-graph-chart>
 
-              <!-- Tree Chart -->
-              <app-configurable-tree-chart
-                *ngIf="
-                  isTreeChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-tree-chart>
+                <!-- Tree Chart -->
+                <app-configurable-tree-chart
+                  *ngIf="
+                    isTreeChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-tree-chart>
 
-              <!-- Theme River Chart -->
-              <app-configurable-theme-river-chart
-                *ngIf="
-                  isThemeRiverChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-theme-river-chart>
+                <!-- Theme River Chart -->
+                <app-configurable-theme-river-chart
+                  *ngIf="
+                    isThemeRiverChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-theme-river-chart>
 
-              <!-- Pictorial Bar Chart -->
-              <app-configurable-pictorial-bar-chart
-                *ngIf="
-                  isPictorialBarChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-pictorial-bar-chart>
+                <!-- Pictorial Bar Chart -->
+                <app-configurable-pictorial-bar-chart
+                  *ngIf="
+                    isPictorialBarChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-pictorial-bar-chart>
 
-              <!-- Polar Bar Chart -->
-              <app-configurable-polar-bar-chart
-                *ngIf="
-                  isPolarBarChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-polar-bar-chart>
+                <!-- Polar Bar Chart -->
+                <app-configurable-polar-bar-chart
+                  *ngIf="
+                    isPolarBarChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-polar-bar-chart>
 
-              <!-- Radar Chart -->
-              <app-configurable-radar-chart
-                *ngIf="
-                  isRadarChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-radar-chart>
+                <!-- Radar Chart -->
+                <app-configurable-radar-chart
+                  *ngIf="
+                    isRadarChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-radar-chart>
 
-              <!-- Candlestick Chart -->
-              <app-configurable-candlestick-chart
-                *ngIf="
-                  isCandlestickChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-candlestick-chart>
+                <!-- Candlestick Chart -->
+                <app-configurable-candlestick-chart
+                  *ngIf="
+                    isCandlestickChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-candlestick-chart>
 
-              <!-- Parallel Chart -->
-              <app-configurable-parallel-chart
-                *ngIf="
-                  isParallelChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-parallel-chart>
+                <!-- Parallel Chart -->
+                <app-configurable-parallel-chart
+                  *ngIf="
+                    isParallelChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-parallel-chart>
 
-              <!-- Bar 3D Chart -->
-              <app-configurable-bar3d-chart
-                *ngIf="
-                  isBar3dChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-bar3d-chart>
+                <!-- Bar 3D Chart -->
+                <app-configurable-bar3d-chart
+                  *ngIf="
+                    isBar3dChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-bar3d-chart>
 
-              <!-- Line 3D Chart -->
-              <app-configurable-line3d-chart
-                *ngIf="
-                  isLine3dChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-line3d-chart>
+                <!-- Line 3D Chart -->
+                <app-configurable-line3d-chart
+                  *ngIf="
+                    isLine3dChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-line3d-chart>
 
-              <!-- Scatter 3D Chart -->
-              <app-configurable-scatter3d-chart
-                *ngIf="
-                  isScatter3dChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-scatter3d-chart>
+                <!-- Scatter 3D Chart -->
+                <app-configurable-scatter3d-chart
+                  *ngIf="
+                    isScatter3dChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-scatter3d-chart>
 
-              <!-- Surface Chart -->
-              <app-configurable-surface-chart
-                *ngIf="
-                  isSurfaceChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-surface-chart>
+                <!-- Surface Chart -->
+                <app-configurable-surface-chart
+                  *ngIf="
+                    isSurfaceChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-surface-chart>
 
-              <!-- Globe Chart -->
-              <app-configurable-globe-chart
-                *ngIf="
-                  isGlobeChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-globe-chart>
+                <!-- Globe Chart -->
+                <app-configurable-globe-chart
+                  *ngIf="
+                    isGlobeChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-globe-chart>
 
-              <!-- Graph GL Chart -->
-              <app-configurable-graphgl-chart
-                *ngIf="
-                  isGraphGlChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-graphgl-chart>
+                <!-- Graph GL Chart -->
+                <app-configurable-graphgl-chart
+                  *ngIf="
+                    isGraphGlChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-graphgl-chart>
 
-              <!-- Scatter GL Chart -->
-              <app-configurable-scattergl-chart
-                *ngIf="
-                  isScatterGlChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-scattergl-chart>
+                <!-- Scatter GL Chart -->
+                <app-configurable-scattergl-chart
+                  *ngIf="
+                    isScatterGlChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-scattergl-chart>
 
-              <!-- Lines GL Chart -->
-              <app-configurable-linesgl-chart
-                *ngIf="
-                  isLinesGlChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-linesgl-chart>
+                <!-- Lines GL Chart -->
+                <app-configurable-linesgl-chart
+                  *ngIf="
+                    isLinesGlChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-linesgl-chart>
 
-              <!-- Map 3D Chart -->
-              <app-configurable-map3d-chart
-                *ngIf="
-                  isMap3dChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-map3d-chart>
+                <!-- Map 3D Chart -->
+                <app-configurable-map3d-chart
+                  *ngIf="
+                    isMap3dChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-map3d-chart>
 
-              <!-- Flow GL Chart -->
-              <app-configurable-flowgl-chart
-                *ngIf="
-                  isFlowGlChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual)
-                "
-                [showConfigPanel]="false"
-                [chartWidth]="visual.width"
-                [chartHeight]="visual.height - 35"
-                [chartConfig]="visual.config"
-                [data]="visual.chartData"
-              >
-              </app-configurable-flowgl-chart>
+                <!-- Flow GL Chart -->
+                <app-configurable-flowgl-chart
+                  *ngIf="
+                    isFlowGlChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual)
+                  "
+                  [showConfigPanel]="false"
+                  [chartWidth]="visual.width"
+                  [chartHeight]="visual.height - 35"
+                  [chartConfig]="visual.config"
+                  [data]="visual.chartData"
+                >
+                </app-configurable-flowgl-chart>
               </div>
             </ng-container>
           </div>
@@ -1794,9 +1872,7 @@
             class="config-section"
             *ngIf="supportsGradient(focusedVisual?.chartType)"
           >
-            <div
-              class="config-row"
-            >
+            <div class="config-row">
               <label>Gradient Fill</label>
               <p-inputSwitch
                 [(ngModel)]="focusedVisual.config.gradient"
@@ -1886,7 +1962,10 @@
                 />
               </div>
               <div class="config-group">
-                <label>Bar Gap <small class="config-hint">(multi-series only)</small></label>
+                <label
+                  >Bar Gap
+                  <small class="config-hint">(multi-series only)</small></label
+                >
                 <input
                   type="text"
                   pInputText

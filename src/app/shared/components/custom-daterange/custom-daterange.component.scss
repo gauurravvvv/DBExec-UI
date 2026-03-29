@@ -39,7 +39,8 @@ app-custom-daterange {
 
       &:focus {
         border-color: var(--primary-color) !important;
-        box-shadow: 0 0 0 1px var(--primary-color-transparent, rgba(var(--primary-color-rgb), 0.15)) !important;
+        box-shadow: 0 0 0 1px
+          var(--primary-color-transparent, rgba(var(--primary-color-rgb), 0.15)) !important;
       }
     }
 

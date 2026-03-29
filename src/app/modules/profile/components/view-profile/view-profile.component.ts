@@ -108,9 +108,16 @@ export class ViewProfileComponent implements OnInit {
 
   private generateAvatarColor(name: string): string {
     const colors = [
-      '#2196F3', '#4CAF50', '#FF9800', '#9C27B0',
-      '#00BCD4', '#E91E63', '#3F51B5', '#009688',
-      '#FF5722', '#607D8B',
+      '#2196F3',
+      '#4CAF50',
+      '#FF9800',
+      '#9C27B0',
+      '#00BCD4',
+      '#E91E63',
+      '#3F51B5',
+      '#009688',
+      '#FF5722',
+      '#607D8B',
     ];
     let hash = 0;
     for (let i = 0; i < (name || '').length; i++) {

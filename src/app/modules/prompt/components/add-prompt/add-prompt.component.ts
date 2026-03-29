@@ -21,7 +21,9 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   templateUrl: './add-prompt.component.html',
   styleUrls: ['./add-prompt.component.scss'],
 })
-export class AddPromptComponent implements OnInit, OnDestroy, HasUnsavedChanges {
+export class AddPromptComponent
+  implements OnInit, OnDestroy, HasUnsavedChanges
+{
   // Subscription cleanup
   private destroy$ = new Subject<void>();
 

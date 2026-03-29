@@ -264,15 +264,17 @@ export class EditDatabaseComponent implements OnInit, HasUnsavedChanges {
         status: formValue.status ? 1 : 0,
       };
 
-      this.databaseService.updateDatabase(payload, this.saveJustification.trim()).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.showSaveConfirm = false;
-          this.saveJustification = '';
-          this.isFormDirty = false;
-          this.databaseForm.markAsPristine();
-          this.router.navigate([DATABASE.LIST]);
-        }
-      });
+      this.databaseService
+        .updateDatabase(payload, this.saveJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.isFormDirty = false;
+            this.databaseForm.markAsPristine();
+            this.router.navigate([DATABASE.LIST]);
+          }
+        });
     }
   }
 

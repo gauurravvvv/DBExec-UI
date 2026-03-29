@@ -10,7 +10,11 @@ const routes: Routes = [
     path: '',
     component: ListAnalysesComponent,
   },
-  { path: 'edit/:orgId/:id', component: EditAnalysesComponent, canDeactivate: [UnsavedChangesGuard] },
+  {
+    path: 'edit/:orgId/:id',
+    component: EditAnalysesComponent,
+    canDeactivate: [UnsavedChangesGuard],
+  },
   { path: 'view/:orgId/:id', component: ViewAnalysesComponent },
 ];
 

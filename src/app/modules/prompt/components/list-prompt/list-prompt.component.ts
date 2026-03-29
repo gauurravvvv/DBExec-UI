@@ -345,7 +345,11 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.promptToDelete && this.deleteJustification.trim()) {
       this.promptService
-        .deletePrompt(this.selectedOrg, this.promptToDelete, this.deleteJustification.trim())
+        .deletePrompt(
+          this.selectedOrg,
+          this.promptToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           this.showDeleteConfirm = false;
           this.promptToDelete = null;

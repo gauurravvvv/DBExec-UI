@@ -132,7 +132,9 @@ interface ConfiguredFilter {
   templateUrl: './edit-analyses.component.html',
   styleUrls: ['./edit-analyses.component.scss'],
 })
-export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, HasUnsavedChanges {
+export class EditAnalysesComponent
+  implements OnInit, AfterViewInit, OnDestroy, HasUnsavedChanges
+{
   analysisId: string = '';
   orgId: string = '';
   databaseId: string = '';
@@ -214,16 +216,45 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
   getDataTypeIcon(dataType: string): string {
     if (!dataType) return 'pi-bars';
     const type = dataType.toLowerCase();
-    if (type.includes('int') || type.includes('numeric') || type.includes('decimal') || type.includes('float') || type.includes('double') || type.includes('real') || type.includes('serial') || type.includes('money')) return 'pi-hashtag';
-    if (type.includes('char') || type.includes('text') || type.includes('string') || type.includes('citext') || type.includes('name')) return 'pi-align-left';
+    if (
+      type.includes('int') ||
+      type.includes('numeric') ||
+      type.includes('decimal') ||
+      type.includes('float') ||
+      type.includes('double') ||
+      type.includes('real') ||
+      type.includes('serial') ||
+      type.includes('money')
+    )
+      return 'pi-hashtag';
+    if (
+      type.includes('char') ||
+      type.includes('text') ||
+      type.includes('string') ||
+      type.includes('citext') ||
+      type.includes('name')
+    )
+      return 'pi-align-left';
     if (type.includes('bool')) return 'pi-check-square';
-    if (type.includes('timestamp') || type.includes('date') || type.includes('time') || type.includes('interval')) return 'pi-calendar';
+    if (
+      type.includes('timestamp') ||
+      type.includes('date') ||
+      type.includes('time') ||
+      type.includes('interval')
+    )
+      return 'pi-calendar';
     if (type.includes('uuid')) return 'pi-key';
     if (type.includes('json')) return 'pi-code';
     if (type.includes('array') || type.includes('[]')) return 'pi-list';
     if (type.includes('bytea') || type.includes('blob')) return 'pi-file';
-    if (type.includes('inet') || type.includes('cidr') || type.includes('macaddr')) return 'pi-globe';
-    if (type.includes('enum') || type.includes('user-defined')) return 'pi-sliders-h';
+    if (
+      type.includes('inet') ||
+      type.includes('cidr') ||
+      type.includes('macaddr')
+    )
+      return 'pi-globe';
+    if (type.includes('enum') || type.includes('user-defined'))
+      return 'pi-sliders-h';
     return 'pi-bars';
   }
 
@@ -234,10 +265,12 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   // Rebuild the cached fields list — call when datasetDetails or analysisFields change
   private rebuildAllFields(): void {
-    const datasetFields = (this.datasetDetails?.datasetFields || []).map((f: any) => ({
-      ...f,
-      _scope: 'dataset',
-    }));
+    const datasetFields = (this.datasetDetails?.datasetFields || []).map(
+      (f: any) => ({
+        ...f,
+        _scope: 'dataset',
+      }),
+    );
     const analysisFields = (this.analysisFields || []).map((f: any) => ({
       ...f,
       _scope: 'analysis',
@@ -388,7 +421,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
         if (this.analysisId) {
           this.loadAnalysis();
         }
-      })
+      }),
     );
   }
 
@@ -450,7 +483,8 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
 
     const THRESHOLD = 10;
     const widthChanged = Math.abs(newWidth - this.lastStableWidth) > THRESHOLD;
-    const heightChanged = Math.abs(newHeight - this.lastStableHeight) > THRESHOLD;
+    const heightChanged =
+      Math.abs(newHeight - this.lastStableHeight) > THRESHOLD;
 
     if (widthChanged || heightChanged) {
       this.lastStableWidth = newWidth;
@@ -525,7 +559,8 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
     visual.height = Math.max(
       100,
       Math.round(
-        visual.rowSpan * this.dynamicRowHeight + (visual.rowSpan - 1) * this.GRID_GAP,
+        visual.rowSpan * this.dynamicRowHeight +
+          (visual.rowSpan - 1) * this.GRID_GAP,
       ),
     );
     visual.widthRatio = visual.colSpan / this.GRID_COLUMNS;
@@ -726,7 +761,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
           this.transformAllVisualsChartData();
           this.cdr.detectChanges();
         }
-      })
+      }),
     );
   }
 
@@ -788,7 +823,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
       return;
     }
 
-    this.visuals.forEach((visual) => {
+    this.visuals.forEach(visual => {
       // Only transform visuals that are loaded (not in skeleton state)
       if (visual.loaded && !visual.chartData?.length) {
         this.transformSingleVisualChartData(visual);
@@ -879,7 +914,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
 
           // Set visual counter
           if (this.visuals.length > 0) {
-            this.visualCounter = Math.max(...this.visuals.map(v => Number(v.id) || 0), 0);
+            this.visualCounter = Math.max(
+              ...this.visuals.map(v => Number(v.id) || 0),
+              0,
+            );
           }
 
           this.cdr.detectChanges();
@@ -900,7 +938,6 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
   fetchVisualsIndependently(): void {
     // Create promises for all visuals
     this.visuals.forEach(visual => {
-
       this.analysesService
         .getVisual(this.orgId, this.analysisId, visual.id)
         .then(response => {
@@ -1132,9 +1169,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   editFilter(filter: ConfiguredFilter): void {
     this.editingFilter = filter;
-    this.filterDialogColumn = this.datasetDetails?.datasetFields?.find(
-      (f: any) => (f.columnName || f.columnToView) === filter.columnName,
-    ) || null;
+    this.filterDialogColumn =
+      this.datasetDetails?.datasetFields?.find(
+        (f: any) => (f.columnName || f.columnToView) === filter.columnName,
+      ) || null;
     this.filterDialogType = filter.filterType;
     this.filterDialogControl = filter.controlType;
     this.filterDialogName = filter.name;
@@ -1152,13 +1190,22 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   saveFilterDialog(): void {
-    if (!this.filterDialogColumn || !this.filterDialogType || !this.filterDialogControl) return;
+    if (
+      !this.filterDialogColumn ||
+      !this.filterDialogType ||
+      !this.filterDialogControl
+    )
+      return;
 
-    const columnName = this.filterDialogColumn.columnName || this.filterDialogColumn.columnToView;
+    const columnName =
+      this.filterDialogColumn.columnName ||
+      this.filterDialogColumn.columnToView;
     const name = this.filterDialogName || this.filterDialogColumn.columnToView;
 
     if (this.editingFilter) {
-      const idx = this.configuredFilters.findIndex(f => f.tempId === this.editingFilter!.tempId);
+      const idx = this.configuredFilters.findIndex(
+        f => f.tempId === this.editingFilter!.tempId,
+      );
       if (idx !== -1) {
         this.configuredFilters[idx] = {
           ...this.configuredFilters[idx],
@@ -1245,7 +1292,7 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   resequenceFilters(): void {
-    this.configuredFilters.forEach((f, i) => f.sequence = i);
+    this.configuredFilters.forEach((f, i) => (f.sequence = i));
   }
 
   getFilterTypeLabel(type: string): string {
@@ -1254,7 +1301,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   async loadExistingFilters(): Promise<void> {
     try {
-      const res: any = await this.analysesService.listFilters(this.orgId, this.analysisId);
+      const res: any = await this.analysesService.listFilters(
+        this.orgId,
+        this.analysisId,
+      );
       if (res?.success && res.data) {
         this.configuredFilters = (res.data || []).map((f: any) => ({
           tempId: f.id || crypto.randomUUID(),
@@ -1275,7 +1325,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
 
   addVisual(): void {
     this.visualCounter++;
-    const visual = createVisual(String(this.visualCounter), getDefaultChartConfig());
+    const visual = createVisual(
+      String(this.visualCounter),
+      getDefaultChartConfig(),
+    );
 
     // Default grid size: 12 columns (half width), 6 rows
     this.visuals.push(visual);
@@ -1335,7 +1388,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   // Stable placeholder for when no visual is focused — prevents creating throwaway objects per CD cycle
-  private readonly _placeholderVisual: Visual = createVisual('0', getDefaultChartConfig());
+  private readonly _placeholderVisual: Visual = createVisual(
+    '0',
+    getDefaultChartConfig(),
+  );
 
   /**
    * Safe getter for focused visual - use this in templates with ngModel
@@ -1355,7 +1411,10 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
     this._cachedChartCategories = [...new Set(filtered.map(c => c.category))];
     this._cachedChartsByCategory = new Map();
     for (const category of this._cachedChartCategories) {
-      this._cachedChartsByCategory.set(category, filtered.filter(c => c.category === category));
+      this._cachedChartsByCategory.set(
+        category,
+        filtered.filter(c => c.category === category),
+      );
     }
     this._lastChartSearchQuery = this.chartSearchQuery;
   }
@@ -2029,7 +2088,11 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   handleSaveDialogClose(
-    formData: { name: string; description: string; justification: string } | null,
+    formData: {
+      name: string;
+      description: string;
+      justification: string;
+    } | null,
   ): void {
     this.showSaveDialog = false;
 
@@ -2074,11 +2137,13 @@ export class EditAnalysesComponent implements OnInit, AfterViewInit, OnDestroy, 
         })),
       };
 
-      this.analysesService.updateAnalyses(updatePayload, formData.justification).then(response => {
-        if (this.globalService.handleSuccessService(response, true)) {
-          this.router.navigate([ANALYSES.LIST]);
-        }
-      });
+      this.analysesService
+        .updateAnalyses(updatePayload, formData.justification)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, true)) {
+            this.router.navigate([ANALYSES.LIST]);
+          }
+        });
     }
   }
 }

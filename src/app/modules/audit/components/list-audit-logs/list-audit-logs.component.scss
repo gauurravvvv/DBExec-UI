@@ -366,8 +366,12 @@ td.empty-message-cell {
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .popup-content {
@@ -383,8 +387,14 @@ td.empty-message-cell {
     animation: slideUp 0.25s ease-out;
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
   }
 
@@ -413,7 +423,9 @@ td.empty-message-cell {
       justify-content: center;
       flex-shrink: 0;
 
-      i { font-size: 1.1rem; }
+      i {
+        font-size: 1.1rem;
+      }
 
       &.action-create {
         background: rgba(76, 175, 80, 0.1);
@@ -509,7 +521,9 @@ td.empty-message-cell {
         background: var(--hover-background);
         color: var(--text-color);
       }
-      i { font-size: 0.85rem; }
+      i {
+        font-size: 0.85rem;
+      }
     }
   }
 
@@ -549,18 +563,33 @@ td.empty-message-cell {
       align-items: center;
       gap: 0.4rem;
 
-      &.capitalize { text-transform: capitalize; }
-      &.mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.82rem; }
-      &.val-success { color: var(--success-color); font-weight: 600; }
-      &.val-error { color: var(--error-color); font-weight: 600; }
+      &.capitalize {
+        text-transform: capitalize;
+      }
+      &.mono {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 0.82rem;
+      }
+      &.val-success {
+        color: var(--success-color);
+        font-weight: 600;
+      }
+      &.val-error {
+        color: var(--error-color);
+        font-weight: 600;
+      }
 
       .status-dot {
         width: 7px;
         height: 7px;
         border-radius: 50%;
         flex-shrink: 0;
-        &.success { background: var(--success-color); }
-        &.failed { background: var(--error-color); }
+        &.success {
+          background: var(--success-color);
+        }
+        &.failed {
+          background: var(--error-color);
+        }
       }
     }
   }
@@ -569,7 +598,9 @@ td.empty-message-cell {
   .popup-section {
     border-bottom: 1px solid var(--border-color);
 
-    &:last-child { border-bottom: none; }
+    &:last-child {
+      border-bottom: none;
+    }
   }
 
   .section-header {
@@ -624,23 +655,40 @@ td.empty-message-cell {
         text-align: left;
         border-bottom: 1px solid var(--border-color);
 
-        &:first-child { width: 30%; }
+        &:first-child {
+          width: 30%;
+        }
         &:nth-child(2),
-        &:nth-child(3) { width: 35%; }
+        &:nth-child(3) {
+          width: 35%;
+        }
       }
     }
 
     tbody tr {
       border-bottom: 1px solid var(--border-color);
-      &:last-child { border-bottom: none; }
-
-      &.changed {
-        .old-cell { color: var(--error-color); }
-        .new-cell { color: var(--success-color); font-weight: 600; }
+      &:last-child {
+        border-bottom: none;
       }
 
-      td { padding: 0.5rem 1.5rem; color: var(--text-color); }
-      .field-cell { color: var(--text-color-secondary); font-weight: 500; }
+      &.changed {
+        .old-cell {
+          color: var(--error-color);
+        }
+        .new-cell {
+          color: var(--success-color);
+          font-weight: 600;
+        }
+      }
+
+      td {
+        padding: 0.5rem 1.5rem;
+        color: var(--text-color);
+      }
+      .field-cell {
+        color: var(--text-color-secondary);
+        font-weight: 500;
+      }
     }
   }
 
@@ -652,15 +700,21 @@ td.empty-message-cell {
 
     tbody tr {
       border-bottom: 1px solid var(--border-color);
-      &:last-child { border-bottom: none; }
+      &:last-child {
+        border-bottom: none;
+      }
 
-      td { padding: 0.5rem 1.5rem; }
+      td {
+        padding: 0.5rem 1.5rem;
+      }
       .dt-label {
         width: 35%;
         color: var(--text-color-secondary);
         font-weight: 500;
       }
-      .dt-value { color: var(--text-color); }
+      .dt-value {
+        color: var(--text-color);
+      }
     }
   }
 }

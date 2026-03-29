@@ -58,7 +58,11 @@ export class ViewConnectionComponent implements OnInit {
   proceedDelete(): void {
     if (this.connectionData && this.deleteJustification.trim()) {
       this.connectionService
-        .deleteConnection(this.orgId, this.connectionData.id, this.deleteJustification.trim())
+        .deleteConnection(
+          this.orgId,
+          this.connectionData.id,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           this.showDeleteConfirm = false;
           this.deleteJustification = '';

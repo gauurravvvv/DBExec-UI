@@ -239,7 +239,11 @@
                 <span class="description-text">{{ log.ipAddress || '-' }}</span>
               </td>
               <td>
-                <span class="description-text justification-text" [title]="log.justification || ''">{{ log.justification || '-' }}</span>
+                <span
+                  class="description-text justification-text"
+                  [title]="log.justification || ''"
+                  >{{ log.justification || '-' }}</span
+                >
               </td>
             </tr>
           </ng-template>
@@ -257,25 +261,49 @@
 </div>
 
 <!-- Detail Popup -->
-<div class="detail-popup" *ngIf="showDetailDialog" (click)="showDetailDialog = false">
-  <div class="popup-content" *ngIf="selectedLog" (click)="$event.stopPropagation()">
+<div
+  class="detail-popup"
+  *ngIf="showDetailDialog"
+  (click)="showDetailDialog = false"
+>
+  <div
+    class="popup-content"
+    *ngIf="selectedLog"
+    (click)="$event.stopPropagation()"
+  >
     <!-- Header -->
     <div class="popup-header">
       <div class="popup-title-area">
         <div class="popup-icon" [ngClass]="getActionClass(selectedLog.action)">
-          <i class="pi" [ngClass]="{
-            'pi-plus-circle': selectedLog.action === 'CREATE',
-            'pi-pencil': selectedLog.action === 'UPDATE',
-            'pi-trash': selectedLog.action === 'DELETE',
-            'pi-sign-in': selectedLog.action === 'LOGIN' || selectedLog.action === 'LOGOUT',
-            'pi-key': selectedLog.action === 'RESET_PASSWORD',
-            'pi-file': !['CREATE','UPDATE','DELETE','LOGIN','LOGOUT','RESET_PASSWORD'].includes(selectedLog.action)
-          }"></i>
+          <i
+            class="pi"
+            [ngClass]="{
+              'pi-plus-circle': selectedLog.action === 'CREATE',
+              'pi-pencil': selectedLog.action === 'UPDATE',
+              'pi-trash': selectedLog.action === 'DELETE',
+              'pi-sign-in':
+                selectedLog.action === 'LOGIN' ||
+                selectedLog.action === 'LOGOUT',
+              'pi-key': selectedLog.action === 'RESET_PASSWORD',
+              'pi-file': ![
+                'CREATE',
+                'UPDATE',
+                'DELETE',
+                'LOGIN',
+                'LOGOUT',
+                'RESET_PASSWORD',
+              ].includes(selectedLog.action),
+            }"
+          ></i>
         </div>
         <div class="popup-title-text">
           <h3>{{ selectedLog.entityName || '-' }}</h3>
           <div class="popup-badges">
-            <span class="action-badge" [ngClass]="getActionClass(selectedLog.action)">{{ selectedLog.action }}</span>
+            <span
+              class="action-badge"
+              [ngClass]="getActionClass(selectedLog.action)"
+              >{{ selectedLog.action }}</span
+            >
             <span class="version-badge">v{{ selectedLog.version || 1 }}</span>
             <span class="module-badge">{{ selectedLog.module }}</span>
           </div>
@@ -294,11 +322,15 @@
       </div>
       <div class="info-item">
         <span class="info-label">Role</span>
-        <span class="info-value capitalize">{{ selectedLog.userRole || '-' }}</span>
+        <span class="info-value capitalize">{{
+          selectedLog.userRole || '-'
+        }}</span>
       </div>
       <div class="info-item">
         <span class="info-label">Timestamp</span>
-        <span class="info-value">{{ selectedLog.createdOn | date: 'medium' }}</span>
+        <span class="info-value">{{
+          selectedLog.createdOn | date: 'medium'
+        }}</span>
       </div>
       <div class="info-item">
         <span class="info-label">Status</span>
@@ -307,7 +339,11 @@
           [class.val-success]="selectedLog.responseSuccess"
           [class.val-error]="!selectedLog.responseSuccess"
         >
-          <span class="status-dot" [class.success]="selectedLog.responseSuccess" [class.failed]="!selectedLog.responseSuccess"></span>
+          <span
+            class="status-dot"
+            [class.success]="selectedLog.responseSuccess"
+            [class.failed]="!selectedLog.responseSuccess"
+          ></span>
           {{ selectedLog.responseSuccess ? 'Success' : 'Failed' }}
         </span>
       </div>

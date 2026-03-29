@@ -157,10 +157,7 @@
           <ng-template pTemplate="body" let-activity>
             <tr class="modern-row">
               <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [title]="activity.username"
-                >
+                <a class="dataset-name-link" [title]="activity.username">
                   {{ activity.username || '-' }}
                 </a>
               </td>
@@ -200,9 +197,11 @@
                 }}</span>
               </td>
               <td>
-                <span class="description-text user-agent-text" [title]="activity.userAgent">{{
-                  activity.userAgent || '-'
-                }}</span>
+                <span
+                  class="description-text user-agent-text"
+                  [title]="activity.userAgent"
+                  >{{ activity.userAgent || '-' }}</span
+                >
               </td>
             </tr>
           </ng-template>

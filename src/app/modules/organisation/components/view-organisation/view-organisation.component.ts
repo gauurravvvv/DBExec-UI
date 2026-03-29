@@ -102,7 +102,10 @@ export class ViewOrganisationComponent implements OnInit {
   proceedDelete() {
     if (this.deleteJustification.trim()) {
       this.organisationService
-        .deleteOrganisation(this.organisationId, this.deleteJustification.trim())
+        .deleteOrganisation(
+          this.organisationId,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';

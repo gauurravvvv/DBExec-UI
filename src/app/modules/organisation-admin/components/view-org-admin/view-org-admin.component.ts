@@ -85,7 +85,11 @@ export class ViewOrgAdminComponent implements OnInit {
   proceedDelete() {
     if (this.deleteJustification.trim()) {
       this.orgAdminService
-        .deleteAdminOrganisation(this.selectedOrgId, this.adminId, this.deleteJustification.trim())
+        .deleteAdminOrganisation(
+          this.selectedOrgId,
+          this.adminId,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';

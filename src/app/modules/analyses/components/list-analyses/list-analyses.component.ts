@@ -322,7 +322,11 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.analysisToDelete && this.deleteJustification.trim()) {
       this.analysesService
-        .deleteAnalyses(this.selectedOrg, this.analysisToDelete, this.deleteJustification.trim())
+        .deleteAnalyses(
+          this.selectedOrg,
+          this.analysisToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.loadAnalyses();

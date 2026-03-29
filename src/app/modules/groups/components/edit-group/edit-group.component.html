@@ -131,12 +131,12 @@
     </div>
 
     <div class="standard-delete-section">
-      <p class="delete-intro">
-        Are you sure you want to update this group?
-      </p>
+      <p class="delete-intro">Are you sure you want to update this group?</p>
 
       <div class="justification-section">
-        <label for="saveJustification">Justification <span class="required">*</span></label>
+        <label for="saveJustification"
+          >Justification <span class="required">*</span></label
+        >
         <textarea
           id="saveJustification"
           [(ngModel)]="saveJustification"
@@ -153,7 +153,11 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedSave()" [disabled]="!saveJustification.trim()">
+      <button
+        class="btn-confirm"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim()"
+      >
         <i class="pi pi-check"></i>
         Update
       </button>

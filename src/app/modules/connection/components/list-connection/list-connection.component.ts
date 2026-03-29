@@ -255,7 +255,11 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.tabToDelete && this.deleteJustification.trim()) {
       this.connectionService
-        .deleteConnection(this.selectedOrg, this.tabToDelete, this.deleteJustification.trim())
+        .deleteConnection(
+          this.selectedOrg,
+          this.tabToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           this.showDeleteConfirm = false;
           this.tabToDelete = null;

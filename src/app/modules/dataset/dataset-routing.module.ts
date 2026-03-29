@@ -16,7 +16,11 @@ const routes: Routes = [
     component: AddDatasetComponent,
     canDeactivate: [UnsavedChangesGuard],
   },
-  { path: 'edit/:orgId/:id', component: EditDatasetComponent, canDeactivate: [UnsavedChangesGuard] },
+  {
+    path: 'edit/:orgId/:id',
+    component: EditDatasetComponent,
+    canDeactivate: [UnsavedChangesGuard],
+  },
   { path: 'view/:orgId/:id', component: ViewDatasetComponent },
 ];
 

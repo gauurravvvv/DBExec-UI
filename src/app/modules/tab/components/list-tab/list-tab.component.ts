@@ -321,7 +321,11 @@ export class ListTabComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.tabToDelete && this.deleteJustification.trim()) {
       this.tabService
-        .deleteTab(this.selectedOrg, this.tabToDelete, this.deleteJustification.trim())
+        .deleteTab(
+          this.selectedOrg,
+          this.tabToDelete,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.showDeleteConfirm = false;

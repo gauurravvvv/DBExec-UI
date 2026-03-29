@@ -57,13 +57,11 @@ export class ViewAnalysesComponent implements OnInit {
   }
 
   loadDatasetInfo(datasetId: string): void {
-    this.datasetService
-      .getDataset(this.orgId, datasetId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.datasetDetails = response.data;
-        }
-      });
+    this.datasetService.getDataset(this.orgId, datasetId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.datasetDetails = response.data;
+      }
+    });
   }
 
   loadAnalysisFields(): void {
@@ -89,16 +87,45 @@ export class ViewAnalysesComponent implements OnInit {
   getDataTypeIcon(dataType: string): string {
     if (!dataType) return 'pi-tag';
     const type = dataType.toLowerCase();
-    if (type.includes('int') || type.includes('numeric') || type.includes('decimal') || type.includes('float') || type.includes('double') || type.includes('real') || type.includes('serial') || type.includes('money')) return 'pi-hashtag';
-    if (type.includes('char') || type.includes('text') || type.includes('string') || type.includes('citext') || type.includes('name')) return 'pi-align-left';
+    if (
+      type.includes('int') ||
+      type.includes('numeric') ||
+      type.includes('decimal') ||
+      type.includes('float') ||
+      type.includes('double') ||
+      type.includes('real') ||
+      type.includes('serial') ||
+      type.includes('money')
+    )
+      return 'pi-hashtag';
+    if (
+      type.includes('char') ||
+      type.includes('text') ||
+      type.includes('string') ||
+      type.includes('citext') ||
+      type.includes('name')
+    )
+      return 'pi-align-left';
     if (type.includes('bool')) return 'pi-check-square';
-    if (type.includes('timestamp') || type.includes('date') || type.includes('time') || type.includes('interval')) return 'pi-calendar';
+    if (
+      type.includes('timestamp') ||
+      type.includes('date') ||
+      type.includes('time') ||
+      type.includes('interval')
+    )
+      return 'pi-calendar';
     if (type.includes('uuid')) return 'pi-key';
     if (type.includes('json')) return 'pi-code';
     if (type.includes('array') || type.includes('[]')) return 'pi-list';
     if (type.includes('bytea') || type.includes('blob')) return 'pi-file';
-    if (type.includes('inet') || type.includes('cidr') || type.includes('macaddr')) return 'pi-globe';
-    if (type.includes('enum') || type.includes('user-defined')) return 'pi-sliders-h';
+    if (
+      type.includes('inet') ||
+      type.includes('cidr') ||
+      type.includes('macaddr')
+    )
+      return 'pi-globe';
+    if (type.includes('enum') || type.includes('user-defined'))
+      return 'pi-sliders-h';
     return 'pi-tag';
   }
 
@@ -122,7 +149,11 @@ export class ViewAnalysesComponent implements OnInit {
   proceedDelete(): void {
     if (this.deleteJustification.trim()) {
       this.analysesService
-        .deleteAnalyses(this.orgId, this.analysisId, this.deleteJustification.trim())
+        .deleteAnalyses(
+          this.orgId,
+          this.analysisId,
+          this.deleteJustification.trim(),
+        )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.showDeleteConfirm = false;

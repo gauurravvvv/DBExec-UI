@@ -124,14 +124,16 @@ export class EditOrgAdminComponent implements OnInit, HasUnsavedChanges {
 
   proceedSave() {
     if (this.saveJustification.trim()) {
-      this.orgAdminService.updateOrgAdmin(this.adminForm, this.saveJustification.trim()).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.showSaveConfirm = false;
-          this.saveJustification = '';
-          this.adminForm.markAsPristine();
-          this.router.navigate([ORGANISATION_ADMIN.LIST]);
-        }
-      });
+      this.orgAdminService
+        .updateOrgAdmin(this.adminForm, this.saveJustification.trim())
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.adminForm.markAsPristine();
+            this.router.navigate([ORGANISATION_ADMIN.LIST]);
+          }
+        });
     }
   }
 

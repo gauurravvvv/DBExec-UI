@@ -29,7 +29,9 @@
           <div class="status-wrapper">
             <span
               class="status-badge"
-              [class.active]="!profileData?.isLocked && profileData?.status === 1"
+              [class.active]="
+                !profileData?.isLocked && profileData?.status === 1
+              "
               [class.locked]="profileData?.isLocked"
             >
               {{
@@ -73,7 +75,9 @@
             </div>
             <div class="detail-row">
               <span class="label"><i class="pi pi-user"></i> Last Name</span>
-              <span class="value">{{ profileData?.lastName || 'Not provided' }}</span>
+              <span class="value">{{
+                profileData?.lastName || 'Not provided'
+              }}</span>
             </div>
           </div>
 
@@ -95,11 +99,20 @@
             <h4>Organisation</h4>
             <div class="detail-row">
               <span class="label"><i class="pi pi-building"></i> Name</span>
-              <span class="value">{{ profileData?.organisationName || 'N/A' }}</span>
+              <span class="value">{{
+                profileData?.organisationName || 'N/A'
+              }}</span>
             </div>
-            <div class="detail-row" *ngIf="profileData?.organisation?.description">
-              <span class="label"><i class="pi pi-info-circle"></i> Description</span>
-              <span class="value">{{ profileData.organisation.description }}</span>
+            <div
+              class="detail-row"
+              *ngIf="profileData?.organisation?.description"
+            >
+              <span class="label"
+                ><i class="pi pi-info-circle"></i> Description</span
+              >
+              <span class="value">{{
+                profileData.organisation.description
+              }}</span>
             </div>
           </div>
 
