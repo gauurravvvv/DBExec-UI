@@ -36,11 +36,14 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
 
+  today = new Date();
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
     datasetName: '',
+    createdDateRange: null,
   };
 
   // Debouncing for filter changes
@@ -51,7 +54,8 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     return (
       !!this.filterValues.name ||
       !!this.filterValues.description ||
-      !!this.filterValues.datasetName
+      !!this.filterValues.datasetName ||
+      !!this.filterValues.createdDateRange
     );
   }
 
@@ -184,9 +188,17 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
       name: '',
       description: '',
       datasetName: '',
+      createdDateRange: null,
     };
     // Immediately reload without filters
     this.loadAnalyses();
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
   }
 
   loadDatabases(preSelectedDbId?: string): Promise<void> {
@@ -273,6 +285,15 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.datasetName) {
       filter.datasetName = this.filterValues.datasetName;
+    }
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
     }
 
     // Add JSON stringified filter if any filter is set

@@ -97,25 +97,40 @@ export class ListDatabaseComponent implements OnInit {
     }
   }
 
+  today = new Date();
+
   filterValues: any = {
     name: '',
     description: '',
+    createdDateRange: null,
   };
 
   get isFilterActive(): boolean {
-    return !!this.filterValues.name || !!this.filterValues.description;
+    return (
+      !!this.filterValues.name ||
+      !!this.filterValues.description ||
+      !!this.filterValues.createdDateRange
+    );
   }
 
   clearFilters() {
     this.filterValues = {
       name: '',
       description: '',
+      createdDateRange: null,
     };
     this.onFilterChange();
   }
 
   onFilterChange() {
     this.searchSubject.next();
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
   }
 
   loadDatabases(event: any) {
@@ -148,6 +163,15 @@ export class ListDatabaseComponent implements OnInit {
     if (this.filterValues.name) filter.name = this.filterValues.name;
     if (this.filterValues.description)
       filter.description = this.filterValues.description;
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
+    }
 
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);

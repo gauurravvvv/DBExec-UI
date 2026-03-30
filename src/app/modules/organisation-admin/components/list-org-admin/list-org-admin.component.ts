@@ -42,6 +42,8 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
     firstName: '',
     lastName: '',
     email: '',
+    lastLoginDateRange: null,
+    createdDateRange: null,
   };
 
   // Debouncing for filter changes
@@ -53,7 +55,9 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
       !!this.filterValues.username ||
       !!this.filterValues.firstName ||
       !!this.filterValues.lastName ||
-      !!this.filterValues.email
+      !!this.filterValues.email ||
+      !!this.filterValues.lastLoginDateRange ||
+      !!this.filterValues.createdDateRange
     );
   }
 
@@ -125,9 +129,25 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
       firstName: '',
       lastName: '',
       email: '',
+      lastLoginDateRange: null,
+      createdDateRange: null,
     };
     // Immediately reload without filters
     this.loadAdmins();
+  }
+
+  onLastLoginDateRangeChange(range: Date[] | null) {
+    this.filterValues.lastLoginDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
   }
 
   loadAdmins(event?: any) {
@@ -160,6 +180,24 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.email) {
       filter.email = this.filterValues.email;
+    }
+    if (this.filterValues.lastLoginDateRange?.[0]) {
+      filter.lastLoginDateFrom =
+        this.filterValues.lastLoginDateRange[0].toISOString();
+    }
+    if (this.filterValues.lastLoginDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.lastLoginDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.lastLoginDateTo = dateTo.toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
     }
 
     // Add JSON stringified filter if any filter is set

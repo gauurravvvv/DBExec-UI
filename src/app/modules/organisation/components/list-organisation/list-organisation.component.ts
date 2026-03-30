@@ -47,19 +47,27 @@ export class ListOrganisationComponent implements OnInit {
     });
   }
 
+  today = new Date();
+
   filterValues: any = {
     name: '',
     description: '',
+    createdDateRange: null,
   };
 
   get isFilterActive(): boolean {
-    return !!this.filterValues.name || !!this.filterValues.description;
+    return (
+      !!this.filterValues.name ||
+      !!this.filterValues.description ||
+      !!this.filterValues.createdDateRange
+    );
   }
 
   clearFilters() {
     this.filterValues = {
       name: '',
       description: '',
+      createdDateRange: null,
     };
     this.onFilterChange('name');
     this.onFilterChange('description');
@@ -67,6 +75,13 @@ export class ListOrganisationComponent implements OnInit {
 
   onFilterChange(field: string) {
     this.searchSubject.next();
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange('createdDateRange');
+    }
   }
 
   loadOrganisations(event: any) {
@@ -86,6 +101,15 @@ export class ListOrganisationComponent implements OnInit {
     }
     if (this.filterValues.description) {
       filter.description = this.filterValues.description;
+    }
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
     }
 
     if (Object.keys(filter).length > 0) {

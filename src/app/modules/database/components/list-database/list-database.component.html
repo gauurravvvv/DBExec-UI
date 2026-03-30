@@ -123,7 +123,13 @@
                 </p-dropdown> -->
               </th>
               <th>
-                <!-- No filter for Created On -->
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.createdDateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onCreatedDateRangeChange($event)"
+                ></app-custom-daterange>
               </th>
               <th>
                 <!-- No filter for Actions -->

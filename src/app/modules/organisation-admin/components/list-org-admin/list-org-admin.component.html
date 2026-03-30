@@ -134,10 +134,22 @@
                 <!-- No filter for Status -->
               </th>
               <th>
-                <!-- No filter for Last Login -->
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.lastLoginDateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onLastLoginDateRangeChange($event)"
+                ></app-custom-daterange>
               </th>
               <th>
-                <!-- No filter for Created -->
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.createdDateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onCreatedDateRangeChange($event)"
+                ></app-custom-daterange>
               </th>
               <th>
                 <!-- No filter for Actions -->

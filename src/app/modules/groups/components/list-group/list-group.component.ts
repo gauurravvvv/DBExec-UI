@@ -46,7 +46,11 @@ export class ListGroupComponent implements OnInit, OnDestroy {
   private filterSubscription!: Subscription;
 
   get isFilterActive(): boolean {
-    return !!this.filterValues.name || !!this.filterValues.description;
+    return (
+      !!this.filterValues.name ||
+      !!this.filterValues.description ||
+      !!this.filterValues.createdDateRange
+    );
   }
 
   constructor(
@@ -115,9 +119,17 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     this.filterValues = {
       name: '',
       description: '',
+      createdDateRange: null,
     };
     // Immediately reload without filters
     this.loadGroups();
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
   }
 
   loadGroups(event?: any) {
@@ -144,6 +156,15 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.description) {
       filter.description = this.filterValues.description;
+    }
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
     }
 
     // Add JSON stringified filter if any filter is set
