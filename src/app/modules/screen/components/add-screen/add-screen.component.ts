@@ -115,6 +115,7 @@ export class AddScreenComponent implements OnInit, HasUnsavedChanges {
     if (this.screenForm.valid) {
       this.screenService.addScreen(this.screenForm).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.screenForm.markAsPristine();
           this.router.navigate([SCREEN.LIST]);
         }
       });

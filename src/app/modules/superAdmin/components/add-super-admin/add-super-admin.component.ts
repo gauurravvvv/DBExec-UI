@@ -74,6 +74,7 @@ export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
         .addSuperAdmin(this.adminForm)
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
+            this.adminForm.markAsPristine();
             this.router.navigate([SUPER_ADMIN.LIST]);
           }
         });

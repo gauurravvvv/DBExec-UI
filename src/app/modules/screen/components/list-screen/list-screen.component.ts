@@ -41,10 +41,13 @@ export class ListScreenComponent implements OnInit, OnDestroy {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
+  today = new Date();
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
+    createdDateRange: null,
   };
 
   // Debouncing for filter changes
@@ -52,7 +55,11 @@ export class ListScreenComponent implements OnInit, OnDestroy {
   private filterSubscription!: Subscription;
 
   get isFilterActive(): boolean {
-    return !!this.filterValues.name || !!this.filterValues.description;
+    return (
+      !!this.filterValues.name ||
+      !!this.filterValues.description ||
+      !!this.filterValues.createdDateRange
+    );
   }
 
   constructor(
@@ -255,6 +262,14 @@ export class ListScreenComponent implements OnInit, OnDestroy {
     if (this.filterValues.description) {
       filter.description = this.filterValues.description;
     }
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom = this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
+    }
 
     // Add JSON stringified filter if any filter is set
     if (Object.keys(filter).length > 0) {
@@ -290,9 +305,16 @@ export class ListScreenComponent implements OnInit, OnDestroy {
     this.filterValues = {
       name: '',
       description: '',
+      createdDateRange: null,
     };
-    // Immediately reload without filters
     this.loadScreens();
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
   }
 
   onAddNewScreen() {

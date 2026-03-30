@@ -103,7 +103,7 @@
                 <div class="th-content">Status</div>
               </th>
               <th style="width: 15%">
-                <div class="th-content">Created</div>
+                <div class="th-content">Created On</div>
               </th>
               <th style="width: 15%">
                 <div class="th-content centered-header">Actions</div>
@@ -112,28 +112,34 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.name"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Name"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.description"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Description"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
-              <th></th>
-              <th></th>
-              <th></th>
+              <th>
+                <!-- No filter for Status -->
+              </th>
+              <th>
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.createdDateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onCreatedDateRangeChange($event)"
+                ></app-custom-daterange>
+              </th>
+              <th>
+                <!-- No filter for Actions -->
+              </th>
             </tr>
           </ng-template>
 

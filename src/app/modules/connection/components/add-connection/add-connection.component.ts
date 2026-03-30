@@ -124,6 +124,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
         .addConnection(this.connectionForm)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.isFormDirty = false;
             this.router.navigate([CONNECTION.LIST]);
           }
         });

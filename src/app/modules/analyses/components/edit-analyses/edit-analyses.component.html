@@ -1609,6 +1609,7 @@
     <div
       class="config-sidebar"
       *ngIf="isConfigSidebarOpen && focusedVisualId && focusedVisual?.chartType"
+      (change)="markDirty()"
     >
       <div class="sidebar-content">
         <div class="sidebar-header-info">

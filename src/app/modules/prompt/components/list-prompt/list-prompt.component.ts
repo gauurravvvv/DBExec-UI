@@ -41,6 +41,8 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
+  today = new Date();
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
@@ -48,6 +50,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     tabName: '',
     sectionName: '',
     type: '',
+    createdDateRange: null,
   };
 
   // Debouncing for filter changes
@@ -60,7 +63,8 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       !!this.filterValues.description ||
       !!this.filterValues.tabName ||
       !!this.filterValues.sectionName ||
-      !!this.filterValues.type
+      !!this.filterValues.type ||
+      !!this.filterValues.createdDateRange
     );
   }
 
@@ -194,12 +198,16 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       tabName: '',
       sectionName: '',
       type: '',
+      createdDateRange: null,
     };
-    if (this.dt) {
-      this.dt.reset();
-    }
-    // Immediately reload without filters
     this.loadPrompts();
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
   }
 
   loadDatabases(preSelectedDbId?: string): Promise<void> {
@@ -292,6 +300,14 @@ export class ListPromptComponent implements OnInit, OnDestroy {
 
     if (this.filterValues.type) {
       filter.type = this.filterValues.type;
+    }
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom = this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
     }
 
     // Add JSON stringified filter if any filter is set

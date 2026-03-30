@@ -106,43 +106,34 @@
                 <div class="th-content">Status</div>
               </th>
               <th style="width: 12%">
-                <div class="th-content">Created</div>
+                <div class="th-content">Created On</div>
               </th>
               <th style="width: 4%">
-                <!-- Actions -->
+                <div class="th-content">Actions</div>
               </th>
             </tr>
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.name"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Name"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.description"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Description"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.tabName"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Tab"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
                 <!-- No filter for Prompts -->
@@ -151,7 +142,13 @@
                 <!-- No filter for Status -->
               </th>
               <th>
-                <!-- No filter for Created -->
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.createdDateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onCreatedDateRangeChange($event)"
+                ></app-custom-daterange>
               </th>
               <th>
                 <!-- No filter for Actions -->

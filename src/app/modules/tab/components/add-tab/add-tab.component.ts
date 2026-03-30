@@ -169,6 +169,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     if (this.tabForm.valid) {
       this.tabService.addTab(this.tabForm).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.tabForm.markAsPristine();
           this.router.navigate([TAB.LIST]);
         }
       });

@@ -107,6 +107,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
 
       this.roleService.addRole(formData).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.roleForm.markAsPristine();
           this.router.navigate([ROLE.LIST]);
         }
       });

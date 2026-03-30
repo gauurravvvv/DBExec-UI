@@ -203,6 +203,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     if (this.isFormValid()) {
       this.organisationService.addOrganisation(this.orgForm).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.isFormDirty = false;
           this.router.navigate([ORGANISATION.LIST]);
         }
       });

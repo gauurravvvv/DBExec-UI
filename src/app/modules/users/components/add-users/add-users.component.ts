@@ -101,6 +101,7 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
     if (this.userForm.valid) {
       this.userService.addUser(this.userForm).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.userForm.markAsPristine();
           this.router.navigate([USER.LIST]);
         }
       });

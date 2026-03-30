@@ -159,8 +159,10 @@ export class AddDatasetComponent
     return !query || query === defaultQuery;
   }
 
+  private _saved = false;
+
   hasUnsavedChanges(): boolean {
-    return !this.isQueryEmpty;
+    return !this.isQueryEmpty && !this._saved;
   }
 
   getFilteredTables(tables: any[]): any[] {
@@ -1279,6 +1281,7 @@ export class AddDatasetComponent
       this.datasetService.addDataset(payload).then(response => {
         if (this.globalService.handleSuccessService(response, true)) {
           // Navigate to dataset list
+          this._saved = true;
           this.router.navigate([DATASET.LIST]);
           // Dataset saved successfully
           // Now proceed with pending change if any

@@ -332,6 +332,7 @@ export class AddPromptComponent
 
       this.promptService.addPrompt(transformedData).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.sectionForm.markAsPristine();
           this.router.navigate([PROMPT.LIST]);
         }
       });

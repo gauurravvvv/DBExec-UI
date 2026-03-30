@@ -41,11 +41,14 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
+  today = new Date();
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
     tabName: '',
+    createdDateRange: null,
   };
 
   // Debouncing for filter changes
@@ -56,7 +59,8 @@ export class ListSectionComponent implements OnInit, OnDestroy {
     return (
       !!this.filterValues.name ||
       !!this.filterValues.description ||
-      !!this.filterValues.tabName
+      !!this.filterValues.tabName ||
+      !!this.filterValues.createdDateRange
     );
   }
 
@@ -188,9 +192,16 @@ export class ListSectionComponent implements OnInit, OnDestroy {
       name: '',
       description: '',
       tabName: '',
+      createdDateRange: null,
     };
-    // Immediately reload without filters
     this.loadSections();
+  }
+
+  onCreatedDateRangeChange(range: Date[] | null) {
+    this.filterValues.createdDateRange = range;
+    if (!range || (range[0] && range[1])) {
+      this.onFilterChange();
+    }
   }
 
   loadDatabases(preSelectedDbId?: string): Promise<void> {
@@ -276,6 +287,14 @@ export class ListSectionComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.tabName) {
       filter.tabName = this.filterValues.tabName;
+    }
+    if (this.filterValues.createdDateRange?.[0]) {
+      filter.createdDateFrom = this.filterValues.createdDateRange[0].toISOString();
+    }
+    if (this.filterValues.createdDateRange?.[1]) {
+      const dateTo = new Date(this.filterValues.createdDateRange[1]);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdDateTo = dateTo.toISOString();
     }
 
     // Add JSON stringified filter if any filter is set

@@ -122,6 +122,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     if (this.canSubmit()) {
       this.groupService.addGroup(this.userGroupForm).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.userGroupForm.markAsPristine();
           this.router.navigate([GROUP.LIST]);
         }
       });

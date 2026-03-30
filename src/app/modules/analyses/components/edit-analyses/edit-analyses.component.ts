@@ -139,8 +139,14 @@ export class EditAnalysesComponent
   orgId: string = '';
   databaseId: string = '';
 
+  private _isDirty = false;
+
   hasUnsavedChanges(): boolean {
-    return false;
+    return this._isDirty;
+  }
+
+  markDirty(): void {
+    this._isDirty = true;
   }
   datasetId: string = '';
   analysisDetails: any = null;
@@ -1183,6 +1189,7 @@ export class EditAnalysesComponent
   }
 
   removeFilter(filter: ConfiguredFilter): void {
+    this.markDirty();
     this.configuredFilters = this.configuredFilters.filter(
       f => f.tempId !== filter.tempId,
     );
@@ -1230,6 +1237,7 @@ export class EditAnalysesComponent
         sequence: this.configuredFilters.length,
       });
     }
+    this.markDirty();
     this.showFilterDialog = false;
   }
 
@@ -1324,6 +1332,7 @@ export class EditAnalysesComponent
   }
 
   addVisual(): void {
+    this.markDirty();
     this.visualCounter++;
     const visual = createVisual(
       String(this.visualCounter),
@@ -1647,6 +1656,7 @@ export class EditAnalysesComponent
   }
 
   setVisualChartType(chartType: any): void {
+    this.markDirty();
     const visual = this.getFocusedVisual();
     if (visual) {
       visual.chartType = chartType.id;
@@ -1656,6 +1666,7 @@ export class EditAnalysesComponent
   }
 
   removeVisual(id: string): void {
+    this.markDirty();
     this.visuals = this.visuals.filter(v => v.id !== id);
     if (this.focusedVisualId === id) {
       this.focusedVisualId = null;
@@ -1665,6 +1676,7 @@ export class EditAnalysesComponent
   }
 
   clearChartType(visual?: Visual): void {
+    this.markDirty();
     const target = visual || this.getFocusedVisual();
     if (target) {
       target.chartType = null;
@@ -1688,6 +1700,7 @@ export class EditAnalysesComponent
   }
 
   finishEditTitle(): void {
+    this.markDirty();
     this.editingTitleId = null;
   }
 
@@ -1734,6 +1747,7 @@ export class EditAnalysesComponent
 
   onFieldClick(field: any): void {
     if (this.activeAxisSelection && this.focusedVisualId) {
+      this.markDirty();
       const visual = this.getFocusedVisual();
       if (visual) {
         // Use columnToUse — this is the actual key in the raw data rows
@@ -1761,6 +1775,7 @@ export class EditAnalysesComponent
 
   clearAxisField(axis: 'x' | 'y' | 'z', event: Event): void {
     event.stopPropagation();
+    this.markDirty();
     const visual = this.getFocusedVisual();
     if (!visual) return;
 
@@ -1924,6 +1939,7 @@ export class EditAnalysesComponent
     document.removeEventListener('mouseup', mouseUpHandler);
 
     if (this.resizingVisual) {
+      this.markDirty();
       this.placeVisualsOnGrid();
       this.recalculateAllVisualDimensions();
     }
@@ -1974,6 +1990,7 @@ export class EditAnalysesComponent
   onDrop(event: DragEvent, targetVisual: any): void {
     event.preventDefault();
     if (this.draggingVisual && this.draggingVisual !== targetVisual) {
+      this.markDirty();
       const draggedIndex = this.visuals.indexOf(this.draggingVisual);
       const targetIndex = this.visuals.indexOf(targetVisual);
 
@@ -2141,6 +2158,7 @@ export class EditAnalysesComponent
         .updateAnalyses(updatePayload, formData.justification)
         .then(response => {
           if (this.globalService.handleSuccessService(response, true)) {
+            this._isDirty = false;
             this.router.navigate([ANALYSES.LIST]);
           }
         });

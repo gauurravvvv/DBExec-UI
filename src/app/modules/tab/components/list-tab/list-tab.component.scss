@@ -211,6 +211,19 @@ $radius-sm: 8px;
         }
       }
 
+      // Filter row - white background
+      .p-datatable-thead > tr:last-child > th {
+        background: var(--card-background);
+        padding: 0.5rem 0.75rem;
+
+        &:first-child {
+          padding-left: 1rem;
+        }
+        &:last-child {
+          padding-right: 1rem;
+        }
+      }
+
       // Body Rows
       .p-datatable-tbody > tr {
         background: var(--card-background);

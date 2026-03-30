@@ -37,7 +37,6 @@ export class LoginComponent implements OnInit {
         'Gaurav@1234',
         [Validators.required, Validators.pattern(REGEX.password)],
       ],
-      rememberMe: [false],
     });
   }
 

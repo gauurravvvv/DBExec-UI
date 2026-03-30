@@ -57,7 +57,7 @@
             icon="pi pi-filter-slash"
             (click)="clearFilters()"
             [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
+            class="p-button-outlined p-button-danger modern-button mr-2"
           ></button>
 
           <!-- Add Button -->
@@ -117,7 +117,7 @@
                 <div class="th-content">Status</div>
               </th>
               <th style="width: 12%">
-                <div class="th-content">Created</div>
+                <div class="th-content">Created On</div>
               </th>
               <th style="width: 9%">
                 <div class="th-content centered-header">Actions</div>
@@ -126,60 +126,51 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.name"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Name"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.description"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Description"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.tabName"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Tab"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.sectionName"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Section"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <input
-                  pInputText
-                  type="text"
+                <app-custom-input
                   [(ngModel)]="filterValues.type"
-                  (input)="onFilterChange()"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Type"
-                  class="w-full p-column-filter"
-                />
+                ></app-custom-input>
               </th>
               <th>
-                <!-- Status Filter -->
+                <!-- No filter for Status -->
               </th>
               <th>
-                <!-- No filter for Created -->
+                <app-custom-daterange
+                  [(ngModel)]="filterValues.createdDateRange"
+                  placeholder="Select range"
+                  [showButtonBar]="true"
+                  [maxDate]="today"
+                  (onChangeEvent)="onCreatedDateRangeChange($event)"
+                ></app-custom-daterange>
               </th>
               <th>
                 <!-- No filter for Actions -->
@@ -188,7 +179,7 @@
           </ng-template>
 
           <ng-template pTemplate="body" let-prompt>
-            <tr>
+            <tr class="modern-row">
               <td pFrozenColumn>
                 <a
                   class="dataset-name-link"

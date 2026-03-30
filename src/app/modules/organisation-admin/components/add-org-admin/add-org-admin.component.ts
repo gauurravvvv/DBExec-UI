@@ -104,6 +104,7 @@ export class AddOrgAdminComponent implements OnInit, HasUnsavedChanges {
         .addOrganisationAdmin(this.adminFrom)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.adminFrom.markAsPristine();
             this.router.navigate([ORGANISATION_ADMIN.LIST]);
           }
         });

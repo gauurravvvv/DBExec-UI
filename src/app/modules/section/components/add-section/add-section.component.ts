@@ -316,6 +316,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
 
       this.sectionService.addSection(transformedData).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.sectionForm.markAsPristine();
           this.router.navigate([SECTION.LIST]);
         }
       });

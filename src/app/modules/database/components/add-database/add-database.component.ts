@@ -135,6 +135,7 @@ export class AddDatabaseComponent implements OnInit, HasUnsavedChanges {
 
       this.databaseService.addDatabase(payload).then(response => {
         if (this.globalService.handleSuccessService(response)) {
+          this.databaseForm.markAsPristine();
           this.router.navigate([DATABASE.LIST]);
         }
       });
