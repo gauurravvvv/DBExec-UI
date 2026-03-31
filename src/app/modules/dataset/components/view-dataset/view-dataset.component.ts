@@ -133,14 +133,14 @@ export class ViewDatasetComponent implements OnInit {
   }
 
   onEdit() {
-    if (this.datasetData.type === 2 && this.datasetData.screenId) {
-      // Type 2 (Prompt-based): navigate to execute-screen in edit mode
+    if (this.datasetData.type === 2 && this.datasetData.queryBuilderId) {
+      // Type 2 (Prompt-based): navigate to execute-query-builder in edit mode
       this.router.navigate(
         [
-          '/app/screen/execute',
+          '/app/query-builder/execute',
           this.datasetData.organisationId,
-          this.datasetData.databaseId,
-          this.datasetData.screenId,
+          this.datasetData.datasourceId,
+          this.datasetData.queryBuilderId,
         ],
         {
           queryParams: {

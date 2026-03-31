@@ -4,8 +4,8 @@
 export interface QueryTab {
   id: string;
   title: string;
-  databaseId?: string;
-  databaseName: string;
+  datasourceId?: string;
+  datasourceName: string;
   query: string;
   result: any | null;
   isActive: boolean;

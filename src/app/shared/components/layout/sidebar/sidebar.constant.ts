@@ -33,7 +33,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'setupDB',
-    route: '/app/database',
+    route: '/app/datasource',
   },
   {
     value: 'dbConnections',
@@ -73,7 +73,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   {
     value: 'queryBuilderScreen',
-    route: '/app/screen',
+    route: '/app/query-builder',
   },
   {
     value: 'dbSchema',

@@ -7,7 +7,7 @@ import { debounceTime } from 'rxjs/operators';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { SectionService } from '../../services/section.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
@@ -33,10 +33,10 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
-  databases: any[] = [];
+  datasources: any[] = [];
   sections: any[] = [];
   selectedOrg: any = null;
-  selectedDatabase: any = null;
+  selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
@@ -65,7 +65,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private sectionService: SectionService,
     private organisationService: OrganisationService,
     private router: Router,
@@ -82,7 +82,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
       });
 
     this.route.queryParams.subscribe(params => {
-      if (params['orgId'] || params['databaseId'] || params['name']) {
+      if (params['orgId'] || params['datasourceId'] || params['name']) {
         this.handleDeepLinking(params);
       } else {
         if (this.showOrganisationDropdown) {
@@ -90,7 +90,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
         } else {
           this.selectedOrg =
             this.globalService.getTokenDetails('organisationId');
-          this.loadDatabases();
+          this.loadDatasources();
         }
       }
     });
@@ -98,7 +98,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
   handleDeepLinking(params: any) {
     const orgId = params['orgId'] ? params['orgId'] : null;
-    const databaseId = params['databaseId'] ? params['databaseId'] : null;
+    const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
     const name = params['name'];
 
     if (name) {
@@ -112,20 +112,20 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
       orgPromise.then(() => {
         if (orgId) {
-          if (databaseId) {
-            this.loadDatabases(databaseId);
+          if (datasourceId) {
+            this.loadDatasources(datasourceId);
           } else {
-            this.loadDatabases();
+            this.loadDatasources();
           }
         }
       });
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
 
-      if (databaseId) {
-        this.loadDatabases(databaseId);
+      if (datasourceId) {
+        this.loadDatasources(datasourceId);
       } else {
-        this.loadDatabases();
+        this.loadDatasources();
       }
     }
   }
@@ -156,12 +156,12 @@ export class ListSectionComponent implements OnInit, OnDestroy {
             }
 
             if (!preSelectedOrgId) {
-              this.loadDatabases();
+              this.loadDatasources();
             }
           } else {
             this.selectedOrg = null;
-            this.databases = [];
-            this.selectedDatabase = null;
+            this.datasources = [];
+            this.selectedDatasource = null;
             this.sections = [];
             this.filteredSections = [];
             this.totalRecords = 0;
@@ -174,11 +174,11 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  onDBChange(databaseId: any) {
-    this.selectedDatabase = databaseId;
+  onDBChange(datasourceId: any) {
+    this.selectedDatasource = datasourceId;
     this.loadSections();
   }
 
@@ -204,7 +204,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadDatabases(preSelectedDbId?: string): Promise<void> {
+  loadDatasources(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
       if (!this.selectedOrg) {
         resolve();
@@ -216,31 +216,31 @@ export class ListSectionComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService
-        .listDatabase(params)
+      this.datasourceService
+        .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.databases = [...(response.data.databases || [])];
-            if (this.databases.length > 0) {
+            this.datasources = [...(response.data.databases || [])];
+            if (this.datasources.length > 0) {
               if (
                 preSelectedDbId &&
-                this.databases.find(d => d.id === preSelectedDbId)
+                this.datasources.find(d => d.id === preSelectedDbId)
               ) {
-                this.selectedDatabase = preSelectedDbId;
+                this.selectedDatasource = preSelectedDbId;
               } else {
-                this.selectedDatabase = this.databases[0].id;
+                this.selectedDatasource = this.datasources[0].id;
               }
               this.loadSections();
             } else {
-              this.selectedDatabase = null;
+              this.selectedDatasource = null;
               this.sections = [];
               this.filteredSections = [];
               this.totalRecords = 0;
             }
           } else {
             this.selectedOrg = null;
-            this.databases = [];
-            this.selectedDatabase = null;
+            this.datasources = [];
+            this.selectedDatasource = null;
             this.sections = [];
             this.filteredSections = [];
             this.totalRecords = 0;
@@ -249,8 +249,8 @@ export class ListSectionComponent implements OnInit, OnDestroy {
         })
         .catch(() => {
           this.selectedOrg = null;
-          this.databases = [];
-          this.selectedDatabase = null;
+          this.datasources = [];
+          this.selectedDatasource = null;
           this.sections = [];
           this.filteredSections = [];
           this.totalRecords = 0;
@@ -260,7 +260,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   }
 
   loadSections(event?: any) {
-    if (!this.selectedDatabase) return;
+    if (!this.selectedDatasource) return;
 
     // Store the event for future reloads
     if (event) {
@@ -272,7 +272,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
     const params: any = {
       orgId: this.selectedOrg,
-      databaseId: this.selectedDatabase,
+      datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
     };
@@ -289,7 +289,8 @@ export class ListSectionComponent implements OnInit, OnDestroy {
       filter.tabName = this.filterValues.tabName;
     }
     if (this.filterValues.createdDateRange?.[0]) {
-      filter.createdDateFrom = this.filterValues.createdDateRange[0].toISOString();
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
     }
     if (this.filterValues.createdDateRange?.[1]) {
       const dateTo = new Date(this.filterValues.createdDateRange[1]);

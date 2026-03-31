@@ -30,17 +30,17 @@
             </app-custom-dropdown>
           </div>
 
-          <!-- Database Dropdown -->
+          <!-- Datasource Dropdown -->
           <div class="dropdown-field">
             <app-custom-dropdown
-              [(ngModel)]="selectedDatabase"
-              placeholder="Select Database"
-              [options]="databases"
+              [(ngModel)]="selectedDatasource"
+              placeholder="Select Datasource"
+              [options]="datasources"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
               [floatingLabel]="true"
-              label="Database"
+              label="Datasource"
               filterBy="name"
               (onChangeEvent)="onDBChange($event)"
             >

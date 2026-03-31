@@ -7,7 +7,7 @@ import { AnnouncementData } from '../announcement-dialog/announcement-dialog.com
 import { AnnouncementService } from '../../services/announcement.service';
 
 interface OrganisationConfig {
-  maxDatabases: number;
+  maxDatasources: number;
   maxAdmins: number;
   maxUsers: number;
   maxEnvironment: number;
@@ -32,7 +32,7 @@ interface OrganisationData {
   usersCount: number;
   adminsCount: number;
   groupsCount: number;
-  databasesCount: number;
+  datasourcesCount: number;
   connectionsCount: number;
   dbStatus: 'connected' | 'not_configured' | 'connection_failed';
   masterDbConfig: MasterDbConfig;

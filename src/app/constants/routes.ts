@@ -54,11 +54,11 @@ export const USER = {
   VIEW: '/app/users/view',
 };
 
-export const DATABASE = {
-  ADD: '/app/database/add',
-  LIST: '/app/database',
-  EDIT: '/app/database/edit',
-  VIEW: '/app/database/view',
+export const DATASOURCE = {
+  ADD: '/app/datasource/add',
+  LIST: '/app/datasource',
+  EDIT: '/app/datasource/edit',
+  VIEW: '/app/datasource/view',
 };
 
 export const CREDENTIAL = {
@@ -103,12 +103,12 @@ export const PROMPT = {
   CONFIG: '/app/prompt/config',
 };
 
-export const SCREEN = {
-  ADD: '/app/screen/add',
-  LIST: '/app/screen',
-  EDIT: '/app/screen/edit',
-  VIEW: '/app/screen/view',
-  CONFIG: '/app/screen/config',
+export const QUERY_BUILDER = {
+  ADD: '/app/query-builder/add',
+  LIST: '/app/query-builder',
+  EDIT: '/app/query-builder/edit',
+  VIEW: '/app/query-builder/view',
+  CONFIG: '/app/query-builder/config',
 };
 
 export const ROLE = {

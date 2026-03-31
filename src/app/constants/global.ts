@@ -1,9 +1,9 @@
 export const LOGIN_PAGE_OPTIONS = [
   {
     icon: 'eye',
-    title: 'Visual Database Explorer',
+    title: 'Visual Datasource Explorer',
     description:
-      'Navigate through your database structure with an intuitive visual interface',
+      'Navigate through your datasource structure with an intuitive visual interface',
   },
   {
     icon: 'chart-line',

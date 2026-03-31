@@ -33,11 +33,11 @@ export class SectionService {
   }
 
   addSection(formData: any) {
-    const { organisation, database, sections } = formData;
+    const { organisation, datasource, sections } = formData;
     return this.http
       .post(SECTION.ADD, {
         organisation,
-        database,
+        datasource,
         sections,
       })
       .toPromise()
@@ -58,7 +58,7 @@ export class SectionService {
   }
 
   updateSection(sectionForm: FormGroup, justification?: string) {
-    const { id, name, description, organisation, database, tab, status } =
+    const { id, name, description, organisation, datasource, tab, status } =
       sectionForm.value;
     return this.http
       .put(SECTION.UPDATE, {
@@ -66,7 +66,7 @@ export class SectionService {
         name,
         description,
         organisation,
-        database,
+        datasource,
         tab,
         status: status ? 1 : 0,
         justification,

@@ -8,7 +8,7 @@ import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { PromptService } from 'src/app/modules/prompt/services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
@@ -34,8 +34,8 @@ export class AddPromptComponent
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   selectedOrg: any = null;
   selectedTab: any = null;
-  selectedDatabase: any = null;
-  databases: any[] = [];
+  selectedDatasource: any = null;
+  datasources: any[] = [];
   tabs: any[] = [];
   hasDuplicates: boolean = false;
   duplicateRows: { [key: string]: Array<[number, number]> } = {};
@@ -55,7 +55,7 @@ export class AddPromptComponent
     private tabService: TabService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private sectionService: SectionService,
     private promptService: PromptService,
   ) {
@@ -77,7 +77,7 @@ export class AddPromptComponent
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadDatabases();
+      this.loadDatasources();
     }
 
     this.sectionForm.valueChanges
@@ -104,7 +104,7 @@ export class AddPromptComponent
         },
         Validators.required,
       ],
-      database: [{ value: '', disabled: true }, Validators.required],
+      datasource: [{ value: '', disabled: true }, Validators.required],
       tab: [{ value: '', disabled: true }, Validators.required],
       sectionGroups: this.fb.array([]),
     });
@@ -114,7 +114,7 @@ export class AddPromptComponent
     }
 
     if (!this.showOrganisationDropdown) {
-      this.sectionForm.get('database')?.enable();
+      this.sectionForm.get('datasource')?.enable();
     }
   }
 
@@ -325,7 +325,7 @@ export class AddPromptComponent
 
       const transformedData = {
         organisation: formValue.organisation,
-        database: formValue.database,
+        datasource: formValue.datasource,
         tab: formValue.tab,
         prompts: this.transformPrompts(),
       };
@@ -366,22 +366,22 @@ export class AddPromptComponent
     this.selectedOrg = this.showOrganisationDropdown
       ? null
       : { id: this.globalService.getTokenDetails('organisationId') };
-    this.selectedDatabase = null;
+    this.selectedDatasource = null;
     this.selectedTab = null;
-    this.databases = [];
+    this.datasources = [];
     this.tabs = [];
     this.sections = [];
     this.hasDuplicates = false;
     this.duplicateRows = {};
 
     // Re-disable dependent controls
-    this.sectionForm.get('database')?.disable();
+    this.sectionForm.get('datasource')?.disable();
     this.sectionForm.get('tab')?.disable();
 
     // Re-enable database for non-super-admin
     if (!this.showOrganisationDropdown) {
-      this.sectionForm.get('database')?.enable();
-      this.loadDatabases();
+      this.sectionForm.get('datasource')?.enable();
+      this.loadDatasources();
     }
   }
 
@@ -389,22 +389,22 @@ export class AddPromptComponent
     this.selectedOrg = {
       id: event.value,
     };
-    this.selectedDatabase = null;
+    this.selectedDatasource = null;
 
-    const databaseControl = this.sectionForm.get('database');
+    const datasourceControl = this.sectionForm.get('datasource');
     const tabControl = this.sectionForm.get('tab');
 
-    databaseControl?.enable();
+    datasourceControl?.enable();
     tabControl?.disable();
 
-    databaseControl?.setValue('');
+    datasourceControl?.setValue('');
     tabControl?.setValue('');
 
     this.clearAllSectionGroups();
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  private loadDatabases() {
+  private loadDatasources() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg.id,
@@ -412,16 +412,16 @@ export class AddPromptComponent
       limit: MAX_LIMIT,
     };
 
-    this.databaseService.listDatabase(params).then(response => {
+    this.datasourceService.listDatasource(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = response.data.databases || [];
+        this.datasources = response.data.databases || [];
       }
     });
   }
 
-  onDatabaseChange(event: any) {
+  onDatasourceChange(event: any) {
     if (event.value) {
-      this.selectedDatabase = {
+      this.selectedDatasource = {
         id: event.value,
       };
 
@@ -446,14 +446,14 @@ export class AddPromptComponent
 
   loadTabs() {
     // Fix #2: Add null check to prevent crash
-    if (!this.selectedOrg || !this.selectedDatabase) {
-      console.warn('loadTabs: selectedOrg or selectedDatabase is null');
+    if (!this.selectedOrg || !this.selectedDatasource) {
+      console.warn('loadTabs: selectedOrg or selectedDatasource is null');
       return;
     }
 
     const param = {
       orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
+      datasourceId: this.selectedDatasource.id,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
@@ -466,14 +466,14 @@ export class AddPromptComponent
 
   loadSections() {
     // Fix #3: Add null check to prevent crash
-    if (!this.selectedOrg || !this.selectedDatabase || !this.selectedTab) {
+    if (!this.selectedOrg || !this.selectedDatasource || !this.selectedTab) {
       console.warn('loadSections: Required selections are missing');
       return;
     }
 
     const params = {
       orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
+      datasourceId: this.selectedDatasource.id,
       tabId: this.selectedTab.id,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,

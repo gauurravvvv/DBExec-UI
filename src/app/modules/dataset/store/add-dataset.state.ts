@@ -1,10 +1,10 @@
 /**
  * Add Dataset State Interface and Initial State
- * This file defines the shape of the state with dynamic database schema keys.
+ * This file defines the shape of the state with dynamic datasource schema keys.
  * Data is stored with key format: schema_{orgId}_{dbId}
  *
  * Cache Management:
- * - Max 10 database schemas cached (LRU eviction)
+ * - Max 10 datasource schemas cached (LRU eviction)
  * - 10 minute TTL (auto-refresh stale data)
  */
 
@@ -20,7 +20,7 @@ export type SchemaLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
 
 // Individual database schema entry with access tracking
 export interface SchemaEntry {
-  data: any | null; // DatabaseSchema type
+  data: any | null; // DatasourceSchema type
   status: SchemaLoadingStatus;
   error: string | null;
   loadedAt: Date | null;

@@ -6,7 +6,7 @@ import { debounceTime } from 'rxjs/operators';
 import { CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ConnectionService } from '../../services/connection.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
@@ -33,10 +33,10 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   tabToDelete: string | null = null;
   Math = Math;
   organisations: any[] = [];
-  databases: any[] = [];
+  datasources: any[] = [];
   connections: any[] = [];
   selectedOrg: any = null;
-  selectedDatabase: any = null;
+  selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
@@ -65,7 +65,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private organisationService: OrganisationService,
     private connectionService: ConnectionService,
     private router: Router,
@@ -84,7 +84,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
       this.loadOrganisations();
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
-      this.loadDatabases();
+      this.loadDatasources();
     }
   }
 
@@ -104,11 +104,11 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
-          this.loadDatabases();
+          this.loadDatasources();
         } else {
           this.selectedOrg = null;
-          this.databases = [];
-          this.selectedDatabase = null;
+          this.datasources = [];
+          this.selectedDatasource = null;
           this.connections = [];
           this.filteredConnections = [];
           this.totalRecords = 0;
@@ -119,11 +119,11 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  onDBChange(databaseId: any) {
-    this.selectedDatabase = databaseId;
+  onDBChange(datasourceId: any) {
+    this.selectedDatasource = datasourceId;
     this.loadConnections();
   }
 
@@ -150,7 +150,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadDatabases() {
+  loadDatasources() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg,
@@ -158,30 +158,30 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
       limit: MAX_LIMIT,
     };
 
-    this.databaseService.listDatabase(params).then(
+    this.datasourceService.listDatasource(params).then(
       response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = [...(response.data.databases || [])];
-          if (this.databases.length > 0) {
-            this.selectedDatabase = this.databases[0].id;
+          this.datasources = [...(response.data.databases || [])];
+          if (this.datasources.length > 0) {
+            this.selectedDatasource = this.datasources[0].id;
             this.loadConnections();
           } else {
-            this.selectedDatabase = null;
+            this.selectedDatasource = null;
             this.connections = [];
             this.filteredConnections = [];
             this.totalRecords = 0;
           }
         } else {
-          this.selectedDatabase = null;
-          this.databases = [];
+          this.selectedDatasource = null;
+          this.datasources = [];
           this.connections = [];
           this.filteredConnections = [];
           this.totalRecords = 0;
         }
       },
       error => {
-        this.selectedDatabase = null;
-        this.databases = [];
+        this.selectedDatasource = null;
+        this.datasources = [];
         this.connections = [];
         this.filteredConnections = [];
         this.totalRecords = 0;
@@ -190,7 +190,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   }
 
   loadConnections(event?: any) {
-    if (!this.selectedDatabase) return;
+    if (!this.selectedDatasource) return;
 
     // Store the event for future reloads
     if (event) {
@@ -202,7 +202,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
 
     const params: any = {
       orgId: this.selectedOrg,
-      databaseId: this.selectedDatabase,
+      datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
     };
@@ -299,7 +299,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
       CONNECTION.EDIT,
       this.selectedOrg.id,
       ,
-      this.selectedDatabase.id,
+      this.selectedDatasource.id,
       tab.id,
     ]);
   }

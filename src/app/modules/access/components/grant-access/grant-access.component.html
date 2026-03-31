@@ -42,7 +42,7 @@
           [filter]="true"
           filterBy="name"
           [required]="true"
-          (onChangeEvent)="loadDatabases()"
+          (onChangeEvent)="loadDatasources()"
           [showError]="
             !!(
               accessForm.get('organisation')?.invalid &&
@@ -53,12 +53,12 @@
         >
         </app-custom-dropdown>
 
-        <!-- Database Dropdown -->
+        <!-- Datasource Dropdown -->
         <app-custom-dropdown
-          formControlName="database"
-          label="Database"
-          placeholder="Select Database"
-          [options]="databases"
+          formControlName="datasource"
+          label="Datasource"
+          placeholder="Select Datasource"
+          [options]="datasources"
           optionLabel="name"
           optionValue="id"
           [filter]="true"
@@ -67,11 +67,11 @@
           (onChangeEvent)="loadConnections()"
           [showError]="
             !!(
-              accessForm.get('database')?.invalid &&
-              accessForm.get('database')?.touched
+              accessForm.get('datasource')?.invalid &&
+              accessForm.get('datasource')?.touched
             )
           "
-          errorMessage="Database is required"
+          errorMessage="Datasource is required"
         >
         </app-custom-dropdown>
 

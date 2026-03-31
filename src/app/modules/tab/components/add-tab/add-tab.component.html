@@ -45,7 +45,7 @@
 
     <!-- Form Section -->
     <form [formGroup]="tabForm" class="admin-form">
-      <!-- Organisation and Database dropdowns -->
+      <!-- Organisation and Datasource dropdowns -->
       <div class="form-grid">
         <div class="form-field" *ngIf="showOrganisationDropdown">
           <app-custom-dropdown
@@ -76,10 +76,10 @@
 
         <div class="form-field">
           <app-custom-dropdown
-            formControlName="database"
-            label="Database"
-            placeholder="Select Database"
-            [options]="databases"
+            formControlName="datasource"
+            label="Datasource"
+            placeholder="Select Datasource"
+            [options]="datasources"
             optionLabel="name"
             optionValue="id"
             [filter]="true"
@@ -87,13 +87,13 @@
             [required]="true"
             [showError]="
               !!(
-                tabForm.get('database')?.invalid &&
-                tabForm.get('database')?.touched
+                tabForm.get('datasource')?.invalid &&
+                tabForm.get('datasource')?.touched
               )
             "
-            errorMessage="Database is required"
+            errorMessage="Datasource is required"
             (ngModelChange)="
-              onDatabaseChange({ value: tabForm.get('database')?.value })
+              onDatasourceChange({ value: tabForm.get('datasource')?.value })
             "
           >
           </app-custom-dropdown>
@@ -102,7 +102,7 @@
         <!-- Tab Groups -->
         <div
           class="form-field fields-container"
-          *ngIf="tabForm.get('database')?.value"
+          *ngIf="tabForm.get('datasource')?.value"
         >
           <div class="fields-header">
             <label>Tabs<span class="required">*</span></label>

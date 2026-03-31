@@ -1,0 +1,255 @@
+// View Query Builder reuses the same styles as Execute Query Builder
+@import '../execute-query-builder/execute-query-builder.component.scss';
+
+$radius-lg: 16px;
+$radius-md: 12px;
+$radius-sm: 8px;
+
+// Header action buttons (matching view-prompt pattern)
+.action-buttons {
+  .btn-primary {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+    }
+  }
+
+  .btn-configure {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+    }
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+    }
+  }
+}
+
+// Delete Confirmation Popup (matching view-prompt pattern)
+.confirmation-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+
+  .popup-content {
+    background: var(--card-background);
+    width: 90%;
+    max-width: 420px;
+    border-radius: $radius-lg;
+    box-shadow:
+      0 20px 25px -5px var(--shadow-color),
+      0 8px 10px -6px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+
+    .popup-header {
+      padding: 1.5rem 1.5rem 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      .popup-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--error-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-color);
+      }
+    }
+
+    .standard-delete-section {
+      padding: 0 2rem 1.5rem;
+
+      .delete-intro {
+        color: var(--secondary-color);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      .delete-info-list {
+        background: var(--hover-background);
+        border-radius: $radius-md;
+        padding: 1rem;
+        list-style: none;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          color: var(--text-color);
+          font-size: 0.9rem;
+          font-weight: 500;
+
+          i {
+            color: var(--secondary-color);
+            font-size: 1rem;
+          }
+
+          span {
+            flex: 1;
+          }
+        }
+      }
+
+      .justification-section {
+        margin-top: 1rem;
+        text-align: left;
+
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--text-color);
+
+          .required {
+            color: var(--error-color);
+            margin-left: 2px;
+          }
+        }
+
+        textarea {
+          width: 100%;
+          padding: 0.65rem 0.75rem;
+          border: 1px solid var(--border-color);
+          border-radius: $radius-sm;
+          background: var(--card-background);
+          color: var(--text-color);
+          font-size: 0.85rem;
+          font-family: inherit;
+          resize: vertical;
+          transition: border-color 0.2s;
+
+          &::placeholder {
+            color: var(--secondary-color);
+            opacity: 0.6;
+          }
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+          }
+        }
+
+        .char-count {
+          display: block;
+          text-align: right;
+          margin-top: 0.25rem;
+          font-size: 0.75rem;
+          color: var(--secondary-color);
+          opacity: 0.6;
+        }
+      }
+    }
+
+    .popup-actions {
+      padding: 1rem 1.5rem 1.5rem;
+      background: var(--hover-background);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 1.25rem;
+        border-radius: $radius-sm;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+
+        &.btn-cancel {
+          background: var(--card-background);
+          border-color: var(--border-color);
+          color: var(--text-color);
+
+          &:hover {
+            background: var(--hover-background);
+            border-color: var(--secondary-color);
+          }
+        }
+
+        &.btn-confirm {
+          background: var(--error-color);
+          color: white;
+          box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+
+          &:hover:not(:disabled) {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(239, 68, 68, 0.3);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

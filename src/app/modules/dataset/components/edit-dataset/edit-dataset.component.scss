@@ -285,7 +285,7 @@
 // ===================================================================
 // Database Sidebar (Left Panel)
 // ===================================================================
-.database-sidebar {
+.datasource-sidebar {
   width: 280px;
   min-width: 280px;
   background-color: var(--card-background);
@@ -420,12 +420,12 @@
     }
   }
 
-  .databases-list {
+  .datasources-list {
     padding: 0 0;
   }
 
-  .database-item {
-    .database-header {
+  .datasource-item {
+    .datasource-header {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -452,7 +452,7 @@
         color: var(--primary-color);
       }
 
-      .database-name {
+      .datasource-name {
         flex: 1;
         font-size: 14px;
         color: var(--text-color);
@@ -1456,7 +1456,7 @@ td.empty-message-cell {
     }
   }
 
-  .database-sidebar {
+  .datasource-sidebar {
     position: absolute;
     z-index: 100;
     height: 100%;

@@ -25,11 +25,11 @@ export class SuperAdminHomeComponent implements OnInit {
   organizations: any[] = [];
 
   entitiesData = {
-    totalDatabases: 0,
+    totalDatasources: 0,
     totalUsers: 0,
     totalAdmins: 0,
     totalEnvironment: 0,
-    maxDatabases: 0,
+    maxDatasources: 0,
     maxUsers: 0,
     maxAdmins: 0,
     maxEnvironment: 0,
@@ -51,9 +51,9 @@ export class SuperAdminHomeComponent implements OnInit {
 
   overviews = [
     {
-      title: 'Total Databases',
-      value: this.entitiesData.totalDatabases,
-      maxValue: this.entitiesData.maxDatabases,
+      title: 'Total Datasources',
+      value: this.entitiesData.totalDatasources,
+      maxValue: this.entitiesData.maxDatasources,
     },
     {
       title: 'Total Environments',
@@ -106,21 +106,19 @@ export class SuperAdminHomeComponent implements OnInit {
 
   loadOrganizationData(orgId: string) {
     //fetch data from dashboardAPI
-    this.homeService
-      .getSuperAdminDashboard(orgId)
-      .subscribe((res: any) => {
-        if (res) {
-          this.entitiesData.maxAdmins = res.data.maxAdmins;
-          this.entitiesData.maxDatabases = res.data.maxDatabases;
-          this.entitiesData.maxEnvironment = res.data.maxEnvironment;
-          this.entitiesData.maxUsers = res.data.maxUsers;
-          this.entitiesData.totalAdmins = res.data.adminsCount;
-          this.entitiesData.totalDatabases = res.data.databasesCount;
-          this.entitiesData.totalEnvironment = res.data.environmentCount;
-          this.entitiesData.totalUsers = res.data.usersCount;
-          this.updateStats();
-        }
-      });
+    this.homeService.getSuperAdminDashboard(orgId).subscribe((res: any) => {
+      if (res) {
+        this.entitiesData.maxAdmins = res.data.maxAdmins;
+        this.entitiesData.maxDatasources = res.data.maxDatasources;
+        this.entitiesData.maxEnvironment = res.data.maxEnvironment;
+        this.entitiesData.maxUsers = res.data.maxUsers;
+        this.entitiesData.totalAdmins = res.data.adminsCount;
+        this.entitiesData.totalDatasources = res.data.datasourcesCount;
+        this.entitiesData.totalEnvironment = res.data.environmentCount;
+        this.entitiesData.totalUsers = res.data.usersCount;
+        this.updateStats();
+      }
+    });
     // Simulate fetching data based on organization ID
     // Replace this with actual service calls
     this.activeUsers24hrs = Math.floor(Math.random() * 100);
@@ -143,9 +141,9 @@ export class SuperAdminHomeComponent implements OnInit {
 
     this.overviews = [
       {
-        title: 'Total Databases',
-        value: this.entitiesData.totalDatabases,
-        maxValue: this.entitiesData.maxDatabases,
+        title: 'Total Datasources',
+        value: this.entitiesData.totalDatasources,
+        maxValue: this.entitiesData.maxDatasources,
       },
       {
         title: 'Total Environments',
@@ -167,7 +165,7 @@ export class SuperAdminHomeComponent implements OnInit {
 
   getOverviewIcon(title: string): string {
     const icons: { [key: string]: string } = {
-      'Total Databases': 'fas fa-database',
+      'Total Datasources': 'fas fa-database',
       'Total Environments': 'fas fa-globe',
       'Total Admins': 'fas fa-user-shield',
       'Total Users': 'fas fa-users',
@@ -185,7 +183,7 @@ export class SuperAdminHomeComponent implements OnInit {
     // Implement add user functionality
   }
 
-  manageDatabase(): void {
+  manageDatasource(): void {
     // Implement database management functionality
   }
 

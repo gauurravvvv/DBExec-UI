@@ -52,7 +52,7 @@ export const USER = {
   UNLOCK: '/user/unlock/',
 };
 
-export const DATABASE = {
+export const DATASOURCE = {
   LIST: '/database/list',
   DELETE: '/database/delete/',
   ADD: '/database/add',
@@ -150,17 +150,17 @@ export const PROMPT = {
   GET_APPEARANCE: '/prompt/getAppearance/',
 };
 
-export const SCREEN = {
-  ADD: '/screen/add',
-  LIST: '/screen/list',
-  DELETE: '/screen/delete/',
-  VIEW: '/screen/get/',
-  UPDATE: '/screen/update',
-  SAVE_CONFIGURATION: '/screen/config',
-  GET_SCREEN_CONFIGURATION: '/screen/getConfig/',
-  GET_TABS: '/screen/getTabs/',
-  GET_STRUCTURE: '/screen/getStructure/',
-  EXECUTE: '/screen/execute',
+export const QUERY_BUILDER = {
+  ADD: '/query-builder/add',
+  LIST: '/query-builder/list',
+  DELETE: '/query-builder/delete/',
+  VIEW: '/query-builder/get/',
+  UPDATE: '/query-builder/update',
+  SAVE_CONFIGURATION: '/query-builder/config',
+  GET_QUERY_BUILDER_CONFIGURATION: '/query-builder/getConfig/',
+  GET_TABS: '/query-builder/getTabs/',
+  GET_STRUCTURE: '/query-builder/getStructure/',
+  EXECUTE: '/query-builder/execute',
 };
 
 export const QUERY = {

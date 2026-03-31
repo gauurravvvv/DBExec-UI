@@ -9,7 +9,7 @@ import {
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ConnectionService } from 'src/app/modules/connection/services/connection.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { AccessService } from '../../services/access.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
@@ -23,7 +23,7 @@ export class GrantAccessComponent implements OnInit {
   accessForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
-  databases: any[] = [];
+  datasources: any[] = [];
   connections: any[] = [];
   groups: any[] = [];
   showOrganisationDropdown =
@@ -34,7 +34,7 @@ export class GrantAccessComponent implements OnInit {
     private fb: FormBuilder,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private acessService: AccessService,
     private connectionService: ConnectionService,
   ) {}
@@ -48,7 +48,7 @@ export class GrantAccessComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.loadDatabases();
+      this.loadDatasources();
     }
   }
 
@@ -59,7 +59,7 @@ export class GrantAccessComponent implements OnInit {
 
     this.accessForm = this.fb.group({
       organisation: [isSuperAdmin ? null : organisationId, Validators.required],
-      database: [null, Validators.required],
+      datasource: [null, Validators.required],
       connection: [null, Validators.required],
       users: [[]],
       groups: [[]],
@@ -97,11 +97,11 @@ export class GrantAccessComponent implements OnInit {
 
   loadConnections() {
     const orgId = this.accessForm.get('organisation')?.value;
-    const databaseId = this.accessForm.get('database')?.value;
-    if (!orgId || !databaseId) return;
+    const datasourceId = this.accessForm.get('datasource')?.value;
+    if (!orgId || !datasourceId) return;
     const params = {
       orgId,
-      databaseId,
+      datasourceId,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
@@ -120,7 +120,7 @@ export class GrantAccessComponent implements OnInit {
       });
   }
 
-  loadDatabases() {
+  loadDatasources() {
     const orgId = this.accessForm.get('organisation')?.value;
     if (!orgId) return;
 
@@ -130,17 +130,17 @@ export class GrantAccessComponent implements OnInit {
       limit: MAX_LIMIT,
     };
 
-    this.databaseService
-      .listDatabase(params)
+    this.datasourceService
+      .listDatasource(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.databases = [...(response.data.databases || [])];
+          this.datasources = [...(response.data.databases || [])];
         } else {
-          this.databases = [];
+          this.datasources = [];
         }
       })
       .catch(error => {
-        this.databases = [];
+        this.datasources = [];
       });
   }
 
@@ -175,7 +175,7 @@ export class GrantAccessComponent implements OnInit {
       this.accessForm.patchValue(
         {
           organisation: null,
-          database: null,
+          datasource: null,
           connection: null,
           users: [],
           groups: [],
@@ -183,18 +183,18 @@ export class GrantAccessComponent implements OnInit {
         { emitEvent: false },
       );
 
-      // Clear databases, groups, and users arrays
-      this.databases = [];
+      // Clear datasources, groups, and users arrays
+      this.datasources = [];
       this.connections = [];
       this.groups = [];
       this.users = [];
       // Keep organisations array intact (don't clear it)
     } else if (isOrgAdmin) {
-      // For ORG_ADMIN: Set organisation from token, keep databases list, clear rest
+      // For ORG_ADMIN: Set organisation from token, keep datasources list, clear rest
       this.accessForm.patchValue(
         {
           organisation: organisationId,
-          database: null,
+          datasource: null,
           connection: null,
           users: [],
           groups: [],
@@ -203,11 +203,11 @@ export class GrantAccessComponent implements OnInit {
       );
 
       // Clear only groups and users arrays
-      this.databases = [];
+      this.datasources = [];
       this.connections = [];
       this.groups = [];
       this.users = [];
-      // Keep databases array intact (don't clear it)
+      // Keep datasources array intact (don't clear it)
     }
 
     // Mark form as pristine and untouched

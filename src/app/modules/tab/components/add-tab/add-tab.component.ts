@@ -6,7 +6,7 @@ import { TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from '../../services/tab.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
@@ -23,8 +23,8 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   selectedOrg: any = null;
-  selectedDatabase: any = null;
-  databases: any[] = [];
+  selectedDatasource: any = null;
+  datasources: any[] = [];
   isNewlyAdded: boolean = false;
   lastAddedTabIndex: number = -1;
   hasDuplicates: boolean = false;
@@ -36,7 +36,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     private tabService: TabService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
   ) {
     this.initForm();
   }
@@ -57,7 +57,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadDatabases();
+      this.loadDatasources();
     }
 
     // Subscribe to form changes to check for duplicates
@@ -78,7 +78,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
         },
         Validators.required,
       ],
-      database: [{ value: '', disabled: false }, Validators.required],
+      datasource: [{ value: '', disabled: false }, Validators.required],
       tabs: this.fb.array([]),
     });
   }
@@ -187,17 +187,17 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     this.selectedOrg = {
       id: event.value,
     };
-    this.selectedDatabase = null;
+    this.selectedDatasource = null;
 
-    this.tabForm.get('database')?.setValue('');
+    this.tabForm.get('datasource')?.setValue('');
 
     this.clearAllTabs();
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  onDatabaseChange(event: any) {
+  onDatasourceChange(event: any) {
     if (event.value) {
-      this.selectedDatabase = {
+      this.selectedDatasource = {
         id: event.value,
       };
 
@@ -206,7 +206,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  private loadDatabases() {
+  private loadDatasources() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg.id,
@@ -214,9 +214,9 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
       limit: MAX_LIMIT,
     };
 
-    this.databaseService.listDatabase(params).then(response => {
+    this.datasourceService.listDatasource(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...(response.data.databases || [])];
+        this.datasources = [...(response.data.databases || [])];
       }
     });
   }

@@ -23,7 +23,7 @@ export interface SchemaGroup {
   tables: TableSchema[];
 }
 
-export interface DatabaseSchema {
+export interface DatasourceSchema {
   name: string;
   schemas: SchemaGroup[];
 }
@@ -41,9 +41,9 @@ export interface QueryResult {
 
 export class DummyDataHelper {
   /**
-   * Get dummy database schemas with multiple databases, schemas, and tables
+   * Get dummy datasource schemas with multiple datasources, schemas, and tables
    */
-  static getDummyDatabaseSchemas(): DatabaseSchema[] {
+  static getDummyDatasourceSchemas(): DatasourceSchema[] {
     return [
       // Database 1: E-Commerce Application
       {

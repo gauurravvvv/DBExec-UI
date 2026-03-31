@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ANNOUNCEMENT, DATABASE, ORGANISATION } from 'src/app/constants/api';
+import { ANNOUNCEMENT, DATASOURCE, ORGANISATION } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -149,7 +149,7 @@ export class OrganisationService {
       });
   }
 
-  validateDatabase(payload: {
+  validateDatasource(payload: {
     type: string;
     host: string;
     port: number;
@@ -158,7 +158,7 @@ export class OrganisationService {
     password: string;
   }) {
     return this.http
-      .post(DATABASE.VALIDATE, payload)
+      .post(DATASOURCE.VALIDATE, payload)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

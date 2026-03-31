@@ -1,10 +1,10 @@
 /**
  * Add Dataset Actions
- * Actions for managing database schema data with dynamic keys.
+ * Actions for managing datasource schema data with dynamic keys.
  */
 import { createAction, props } from '@ngrx/store';
 
-// Load database schema data from API
+// Load datasource schema data from API
 export const loadSchemaData = createAction(
   '[Add Dataset] Load Schema Data',
   props<{ orgId: string; dbId: string }>(),

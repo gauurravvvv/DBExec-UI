@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   TableSchema,
   TableColumn,
-  DatabaseSchema,
+  DatasourceSchema,
 } from '../helpers/dummy-data.helper';
 import {
   SQL_KEYWORDS,
@@ -109,15 +109,15 @@ export class MonacoIntelliSenseService {
    * Register SQL completions for tables, columns, keywords, functions, and snippets
    * @returns Disposable to unregister the provider
    */
-  registerSQLCompletions(databases: DatabaseSchema[], editor: any): any {
+  registerSQLCompletions(datasources: DatasourceSchema[], editor: any): any {
     // Build flat table list + lookup maps
     const allTables: TableSchema[] = [];
     const tableByName: Map<string, TableSchema> = new Map();
     const schemaMap: Map<string, TableSchema[]> = new Map();
     const tableToSchema: Map<string, string> = new Map(); // table name → schema name
 
-    if (databases && databases.length > 0) {
-      for (const db of databases) {
+    if (datasources && datasources.length > 0) {
+      for (const db of datasources) {
         if (!db.schemas) continue;
         for (const schema of db.schemas) {
           if (!schema.tables) continue;
@@ -204,7 +204,7 @@ export class MonacoIntelliSenseService {
             return {
               suggestions: this.getDotCompletions(
                 dotMatch,
-                databases,
+                datasources,
                 allTables,
                 aliasMap,
                 schemaMap,
@@ -1076,7 +1076,7 @@ export class MonacoIntelliSenseService {
    */
   private getDotCompletions(
     dotMatch: RegExpMatchArray,
-    databases: DatabaseSchema[],
+    datasources: DatasourceSchema[],
     allTables: TableSchema[],
     aliasMap: Map<string, TableRef>,
     schemaMap: Map<string, TableSchema[]>,
@@ -1377,11 +1377,11 @@ export class MonacoIntelliSenseService {
    * Register hover provider for tables and columns
    * @returns Disposable to unregister the provider
    */
-  registerHoverProvider(databases: any[]): any {
+  registerHoverProvider(datasources: any[]): any {
     const tables: TableSchema[] = [];
 
-    if (databases && databases.length > 0) {
-      for (const db of databases) {
+    if (datasources && datasources.length > 0) {
+      for (const db of datasources) {
         if (!db.schemas) continue;
         for (const schema of db.schemas) {
           if (!schema.tables) continue;

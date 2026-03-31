@@ -5,7 +5,7 @@
       <div class="header-content">
         <h2>Prompts</h2>
         <p class="subtitle">
-          Configure database fields for data filtering and query generation
+          Configure datasource fields for data filtering and query generation
         </p>
       </div>
     </div>
@@ -31,17 +31,17 @@
             </app-custom-dropdown>
           </div>
 
-          <!-- Database Dropdown -->
+          <!-- Datasource Dropdown -->
           <div class="dropdown-field">
             <app-custom-dropdown
-              [(ngModel)]="selectedDatabase"
-              placeholder="Select Database"
-              [options]="databases"
+              [(ngModel)]="selectedDatasource"
+              placeholder="Select Datasource"
+              [options]="datasources"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
               [floatingLabel]="true"
-              label="Database"
+              label="Datasource"
               filterBy="name"
               (onChangeEvent)="onDBChange($event)"
             >

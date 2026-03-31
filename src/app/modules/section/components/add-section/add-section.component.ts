@@ -6,7 +6,7 @@ import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { SectionService } from '../../services/section.service';
@@ -24,8 +24,8 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   selectedOrg: any = null;
-  selectedDatabase: any = null;
-  databases: any[] = [];
+  selectedDatasource: any = null;
+  datasources: any[] = [];
   tabs: any[] = [];
   hasDuplicates: boolean = false;
   duplicateRows: { [key: string]: Array<[number, number]> } = {};
@@ -41,7 +41,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     private tabService: TabService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private sectionService: SectionService,
   ) {
     this.initForm();
@@ -62,7 +62,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadDatabases();
+      this.loadDatasources();
     }
 
     this.sectionForm.valueChanges.subscribe(() => {
@@ -82,7 +82,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
         },
         Validators.required,
       ],
-      database: [{ value: '', disabled: false }, Validators.required],
+      datasource: [{ value: '', disabled: false }, Validators.required],
       tabGroups: this.fb.array([]),
     });
   }
@@ -310,7 +310,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
 
       const transformedData = {
         organisation: formValue.organisation,
-        database: formValue.database,
+        datasource: formValue.datasource,
         sections: this.transformSections(formValue.tabGroups),
       };
 
@@ -352,15 +352,15 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     this.selectedOrg = {
       id: event.value,
     };
-    this.selectedDatabase = null;
+    this.selectedDatasource = null;
 
-    this.sectionForm.get('database')?.setValue('');
+    this.sectionForm.get('datasource')?.setValue('');
 
     this.clearAllTabs();
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  private loadDatabases() {
+  private loadDatasources() {
     if (!this.selectedOrg) return;
     const params = {
       orgId: this.selectedOrg.id,
@@ -368,16 +368,16 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       limit: MAX_LIMIT,
     };
 
-    this.databaseService.listDatabase(params).then(response => {
+    this.datasourceService.listDatasource(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...(response.data.databases || [])];
+        this.datasources = [...(response.data.databases || [])];
       }
     });
   }
 
-  onDatabaseChange(event: any) {
+  onDatasourceChange(event: any) {
     if (event.value) {
-      this.selectedDatabase = {
+      this.selectedDatasource = {
         id: event.value,
       };
       this.loadTabs();
@@ -391,7 +391,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   loadTabs() {
     const param = {
       orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabase.id,
+      datasourceId: this.selectedDatasource.id,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };

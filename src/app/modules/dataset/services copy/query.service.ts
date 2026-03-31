@@ -12,7 +12,7 @@ export class QueryService {
   // Query execution - use Query Server
   executeQuery(queryData: {
     orgId: string;
-    databaseId: string;
+    datasourceId: string;
     query: string;
     page?: number;
     limit?: number;
@@ -20,9 +20,9 @@ export class QueryService {
   }): Observable<any> {
     return this.httpClientService.queryPost('/query/execute', queryData);
   }
-  getDatabaseStructure(databaseId: string, orgId: string): Observable<any> {
+  getDatasourceStructure(datasourceId: string, orgId: string): Observable<any> {
     return this.httpClientService.queryPostNoLoader(`/query/getStructure`, {
-      databaseId,
+      datasourceId,
       orgId,
     });
   }
@@ -30,7 +30,7 @@ export class QueryService {
   // Save query metadata - use API Server
   saveQuery(queryData: {
     orgId: string;
-    databaseId: string;
+    datasourceId: string;
     name: string;
     query: string;
     description?: string;
@@ -65,15 +65,18 @@ export class QueryService {
   // Get query history - use Query Server
   getQueryHistory(params: {
     orgId?: string;
-    databaseId?: string;
+    datasourceId?: string;
     pageNumber?: number;
     limit?: number;
   }): Observable<any> {
     let httpParams = new HttpParams();
     if (params.orgId)
       httpParams = httpParams.set('orgId', params.orgId.toString());
-    if (params.databaseId)
-      httpParams = httpParams.set('databaseId', params.databaseId.toString());
+    if (params.datasourceId)
+      httpParams = httpParams.set(
+        'datasourceId',
+        params.datasourceId.toString(),
+      );
     if (params.pageNumber)
       httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
     if (params.limit)
@@ -86,7 +89,7 @@ export class QueryService {
 
   // Validate query - use Query Server
   validateQuery(queryData: {
-    databaseId: string;
+    datasourceId: string;
     query: string;
   }): Observable<any> {
     return this.httpClientService.queryPost('/query/validate', queryData);
@@ -94,7 +97,7 @@ export class QueryService {
 
   // Get query explain - use Query Server
   getQueryExplain(queryData: {
-    databaseId: string;
+    datasourceId: string;
     query: string;
   }): Observable<any> {
     return this.httpClientService.queryPost('/query/explain', queryData);
@@ -103,7 +106,7 @@ export class QueryService {
   // Export query results as CSV - use Query Server
   exportQueryResults(queryData: {
     orgId: string;
-    databaseId: string;
+    datasourceId: string;
     query: string;
     filter?: string;
   }): Observable<Blob> {
@@ -113,17 +116,17 @@ export class QueryService {
   }
 
   // New methods demonstrating database schema operations on Query Server
-  getDatabaseSchema(databaseId: string): Observable<any> {
-    return this.httpClientService.queryGet(`/database/schema/${databaseId}`);
+  getDatasourceSchema(datasourceId: string): Observable<any> {
+    return this.httpClientService.queryGet(`/database/schema/${datasourceId}`);
   }
 
-  getDatabaseTables(databaseId: string): Observable<any> {
-    return this.httpClientService.queryGet(`/database/tables/${databaseId}`);
+  getDatabaseTables(datasourceId: string): Observable<any> {
+    return this.httpClientService.queryGet(`/database/tables/${datasourceId}`);
   }
 
-  getTableColumns(databaseId: string, tableName: string): Observable<any> {
+  getTableColumns(datasourceId: string, tableName: string): Observable<any> {
     return this.httpClientService.queryGet(
-      `/database/columns/${databaseId}/${tableName}`,
+      `/database/columns/${datasourceId}/${tableName}`,
     );
   }
 }

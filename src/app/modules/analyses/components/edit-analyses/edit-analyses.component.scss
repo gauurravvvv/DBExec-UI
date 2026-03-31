@@ -259,7 +259,7 @@
 // ===================================================================
 // Database Sidebar (Left Panel)
 // ===================================================================
-.database-sidebar {
+.datasource-sidebar {
   width: 200px;
   min-width: 200px;
   background-color: var(--card-background);
@@ -339,7 +339,7 @@
 // ===================================================================
 // Shared Sidebar Styles
 // ===================================================================
-.database-sidebar,
+.datasource-sidebar,
 .visuals-sidebar,
 .visual-list-sidebar,
 .filter-sidebar {
@@ -2005,7 +2005,7 @@
 // Responsive Design
 // ===================================================================
 @media (max-width: 1200px) {
-  .database-sidebar,
+  .datasource-sidebar,
   .visuals-sidebar {
     width: 200px;
     min-width: 200px;
@@ -2025,7 +2025,7 @@
     }
   }
 
-  .database-sidebar,
+  .datasource-sidebar,
   .visuals-sidebar {
     width: 200px;
     min-width: 200px;

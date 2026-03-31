@@ -21,7 +21,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
   orgId: string = '';
   connectionId: string = '';
   selectedOrgName: string = '';
-  selectedDatabaseName: string = '';
+  selectedDatasourceName: string = '';
   connectionData: any;
   isCancelClicked = false;
   showPassword = false;
@@ -76,7 +76,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       organisation: [''],
-      database: [''],
+      datasource: [''],
       status: [false],
       dbUsername: ['', Validators.required],
       dbPassword: ['', Validators.required],
@@ -95,13 +95,14 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
             name: this.connectionData.name,
             description: this.connectionData.description,
             organisation: this.connectionData.organisationId,
-            database: this.connectionData.databaseId,
+            datasource: this.connectionData.datasourceId,
             status: this.connectionData.status,
             dbUsername: this.connectionData.dbUsername,
           });
 
           this.selectedOrgName = this.connectionData.organisationName || '';
-          this.selectedDatabaseName = this.connectionData.databaseName || '';
+          this.selectedDatasourceName =
+            this.connectionData.datasourceName || '';
 
           this.connectionForm.markAsPristine();
         }
@@ -141,7 +142,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
         name: this.connectionData.name,
         description: this.connectionData.description,
         organisation: this.connectionData.organisationId,
-        database: this.connectionData.databaseId,
+        datasource: this.connectionData.datasourceId,
         status: this.connectionData.status,
         dbUsername: this.connectionData.dbUsername,
         dbPassword: '',

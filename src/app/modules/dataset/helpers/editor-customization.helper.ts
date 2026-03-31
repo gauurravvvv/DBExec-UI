@@ -222,9 +222,9 @@ export class EditorCustomizationHelper {
 
   static exportScript(activeTab: any): void {
     const query = activeTab.editor?.getValue() || activeTab.query;
-    const databaseName = activeTab.databaseName || 'database';
+    const datasourceName = activeTab.datasourceName || 'datasource';
     const scriptName = activeTab.title.replace(/\s+/g, '_');
-    const fileName = `${databaseName}_${scriptName}.txt`;
+    const fileName = `${datasourceName}_${scriptName}.txt`;
 
     const blob = new Blob([query], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);

@@ -86,15 +86,15 @@
           </div>
         </div>
 
-        <!-- Database Status Banner -->
+        <!-- Datasource Status Banner -->
         <div
           class="db-status-banner connection-failed"
           *ngIf="organisationData.dbStatus === 'connection_failed'"
         >
           <i class="pi pi-exclamation-triangle"></i>
           <span
-            >Unable to connect to the master database. Please check the database
-            configuration and ensure the server is running.</span
+            >Unable to connect to the master datasource. Please check the
+            database configuration and ensure the server is running.</span
           >
         </div>
 
@@ -128,9 +128,9 @@
             <div class="stat-item">
               <i class="pi pi-database"></i>
               <span class="stat-value">{{
-                organisationData.databasesCount || 0
+                organisationData.datasourcesCount || 0
               }}</span>
-              <span class="stat-label">Databases</span>
+              <span class="stat-label">Datasources</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
@@ -143,12 +143,12 @@
           </div>
         </div>
 
-        <!-- Master Database Details -->
+        <!-- Master Datasource Details -->
         <div class="detail-group master-db-section">
           <div class="section-header-row">
             <h4>
               <i class="pi pi-database"></i>
-              Master Database
+              Master Datasource
             </h4>
             <button
               class="btn-refresh-db"
@@ -157,7 +157,7 @@
                 isRefreshingMasterDb ||
                 organisationData.dbStatus !== 'connected'
               "
-              title="Refresh master database schema to sync new entities and columns"
+              title="Refresh master datasource schema to sync new entities and columns"
             >
               <i
                 class="pi"
@@ -190,7 +190,7 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-database"></i>
-                Database Name
+                Datasource Name
               </span>
               <span class="value">{{
                 organisationData.masterDbConfig.dbName
@@ -216,10 +216,10 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-database"></i>
-                Max Databases
+                Max Datasources
               </span>
               <span class="value">{{
-                organisationData.config.maxDatabases
+                organisationData.config.maxDatasources
               }}</span>
             </div>
             <div class="detail-item">

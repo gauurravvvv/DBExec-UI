@@ -83,7 +83,7 @@
         (click)="onStepClick(1)"
       >
         <div class="step-dot">2</div>
-        <span class="step-label">Master Database</span>
+        <span class="step-label">Master Datasource</span>
       </div>
     </div>
 
@@ -166,7 +166,7 @@
         </div>
       </div>
 
-      <!-- Step 2 / No-step DB section: Master Database -->
+      <!-- Step 2 / No-step DB section: Master Datasource -->
       <div *ngIf="hasMasterDb && currentStep === 1" class="step-2-layout">
         <div class="step-2-left">
           <!-- Warning Banner -->
@@ -174,7 +174,9 @@
             <div class="warning-message" (click)="toggleWarning()">
               <div class="warning-header">
                 <i class="pi pi-exclamation-triangle"></i>
-                <span class="warning-title">Master Database Configuration</span>
+                <span class="warning-title"
+                  >Master Datasource Configuration</span
+                >
                 <i
                   class="pi"
                   [ngClass]="{
@@ -189,8 +191,9 @@
               >
                 <div class="warning-text">
                   <p>
-                    <i class="pi pi-circle-fill"></i>This is the master database
-                    that manages core system operations for this organisation.
+                    <i class="pi pi-circle-fill"></i>This is the master
+                    datasource that manages core system operations for this
+                    organisation.
                   </p>
                   <p>
                     <i class="pi pi-circle-fill"></i>Any modifications may
@@ -264,7 +267,7 @@
 
             <app-custom-input
               formControlName="dbName"
-              label="Database"
+              label="Datasource"
               placeholder="e.g. mydb"
               icon="pi-database"
               [showError]="

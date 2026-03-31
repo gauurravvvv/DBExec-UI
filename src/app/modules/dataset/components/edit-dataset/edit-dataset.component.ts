@@ -18,7 +18,7 @@ import {
   EDITOR_LOADING_CONFIG,
   MONACO_EDITOR_OPTIONS,
 } from '../../config/sql-editor.config';
-import { DatabaseSchema, QueryResult } from '../../helpers/dummy-data.helper';
+import { DatasourceSchema, QueryResult } from '../../helpers/dummy-data.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
@@ -69,7 +69,7 @@ export class EditDatasetComponent
   isExecutingQuery = false;
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
-  databases: DatabaseSchema[] = [];
+  datasources: DatasourceSchema[] = [];
   currentQuery = '';
 
   // Theme monitoring
@@ -77,8 +77,8 @@ export class EditDatasetComponent
   private currentTheme: string = 'vs-dark';
 
   // Database sidebar
-  showDatabaseSidebar = true;
-  expandedDatabases: { [key: string]: boolean } = {};
+  showDatasourceSidebar = true;
+  expandedDatasources: { [key: string]: boolean } = {};
   expandedSchemas: { [key: string]: boolean } = {};
   expandedTables: { [key: string]: boolean } = {};
   schemaSearchText = '';
@@ -87,7 +87,7 @@ export class EditDatasetComponent
   showContextMenu = false;
   contextMenuPosition: ContextMenuPosition = { x: 0, y: 0 };
   contextMenuItems: ContextMenuItem[] = [];
-  contextMenuDatabase: any | null = null;
+  contextMenuDatasource: any | null = null;
 
   // Save as Dataset Dialog
   showDatasetDialog = false;
@@ -121,12 +121,12 @@ export class EditDatasetComponent
   selectedOrgName: string = '';
   userRole: string = '';
   showOrganisationDropdown: boolean = false;
-  selectedDatabaseObj: any = null;
-  selectedDatabaseName: string = '';
+  selectedDatasourceObj: any = null;
+  selectedDatasourceName: string = '';
 
   // Database Schema Management
-  databaseSchemas: { [dbId: string]: DatabaseSchema } = {};
-  loadingDatabases: { [dbId: string]: boolean } = {};
+  datasourceSchemas: { [dbId: string]: DatasourceSchema } = {};
+  loadingDatasources: { [dbId: string]: boolean } = {};
 
   // NgRx Store Observables for schema caching
   private schemaDataObservables: Map<string, Observable<any | null>> =
@@ -205,7 +205,7 @@ export class EditDatasetComponent
         }
       }
 
-      this.executeQueryForDatabase(
+      this.executeQueryForDatasource(
         this.lastExecutedQuery,
         1,
         this.resultRows,
@@ -235,7 +235,7 @@ export class EditDatasetComponent
     document.addEventListener('click', this.closeContextMenu.bind(this));
   }
 
-  refreshSingleDatabase(dbId: string): void {
+  refreshSingleDatasource(dbId: string): void {
     if (!dbId || !this.orgId) return;
 
     const orgId = this.orgId.toString();
@@ -262,22 +262,24 @@ export class EditDatasetComponent
     });
 
     // Collapse the database itself
-    delete this.expandedDatabases[dbId];
+    delete this.expandedDatasources[dbId];
 
     // Clear local cache
-    delete this.databaseSchemas[dbId];
-    delete this.loadingDatabases[dbId];
+    delete this.datasourceSchemas[dbId];
+    delete this.loadingDatasources[dbId];
 
-    // Remove from IntelliSense databases array
-    this.databases = this.databases.filter(db => db.name !== dbId.toString());
+    // Remove from IntelliSense datasources array
+    this.datasources = this.datasources.filter(
+      db => db.name !== dbId.toString(),
+    );
 
     // Re-fetch schema for this database from API
-    this.loadDatabaseSchemaFromAPI(dbId);
+    this.loadDatasourceSchemaFromAPI(dbId);
   }
 
-  refreshSelectedDatabase(): void {
-    if (!this.selectedDatabaseObj || !this.selectedDatabaseObj.id) return;
-    this.refreshSingleDatabase(this.selectedDatabaseObj.id);
+  refreshSelectedDatasource(): void {
+    if (!this.selectedDatasourceObj || !this.selectedDatasourceObj.id) return;
+    this.refreshSingleDatasource(this.selectedDatasourceObj.id);
   }
 
   /**
@@ -422,7 +424,7 @@ export class EditDatasetComponent
   }
 
   private initMonaco(): void {
-    if (!this.selectedDatabaseObj) {
+    if (!this.selectedDatasourceObj) {
       this.isLoadingEditor = false;
       return;
     }
@@ -527,17 +529,17 @@ export class EditDatasetComponent
     if (this.editor) {
       this.completionProviderDisposable =
         this.monacoIntelliSenseService.registerSQLCompletions(
-          this.databases,
+          this.datasources,
           this.editor,
         );
       this.hoverProviderDisposable =
-        this.monacoIntelliSenseService.registerHoverProvider(this.databases);
+        this.monacoIntelliSenseService.registerHoverProvider(this.datasources);
       this.signatureHelpDisposable =
         this.monacoIntelliSenseService.registerSignatureHelpProvider();
     }
   }
 
-  private async loadDatabaseSchema(dbId: string): Promise<void> {
+  private async loadDatasourceSchema(dbId: string): Promise<void> {
     if (!dbId || !this.orgId) return Promise.resolve();
 
     const orgId = this.orgId.toString();
@@ -551,7 +553,7 @@ export class EditDatasetComponent
         .subscribe(cachedEntry => {
           if (!cachedEntry || !cachedEntry.data) {
             // No cached data, load from API
-            this.loadDatabaseSchemaFromAPI(dbId).then(resolve).catch(reject);
+            this.loadDatasourceSchemaFromAPI(dbId).then(resolve).catch(reject);
           } else {
             // Check if data is stale
             this.store
@@ -560,7 +562,7 @@ export class EditDatasetComponent
               .subscribe(isStale => {
                 if (isStale) {
                   // Data is stale, refresh from API
-                  this.loadDatabaseSchemaFromAPI(dbId)
+                  this.loadDatasourceSchemaFromAPI(dbId)
                     .then(resolve)
                     .catch(reject);
                 } else {
@@ -579,27 +581,27 @@ export class EditDatasetComponent
    */
   private applyCachedSchemaData(dbId: string, schemaData: any): void {
     // Store schema data by database ID
-    this.databaseSchemas[dbId] = schemaData;
+    this.datasourceSchemas[dbId] = schemaData;
 
-    // Update databases array for IntelliSense
-    this.databases = Object.values(this.databaseSchemas);
+    // Update datasources array for IntelliSense
+    this.datasources = Object.values(this.datasourceSchemas);
 
     // Re-register completions with new schema
     this.registerIntelliSenseProviders();
 
-    this.loadingDatabases[dbId] = false;
+    this.loadingDatasources[dbId] = false;
   }
 
   /**
-   * Load database schema from API and update store
+   * Load datasource schema from API and update store
    */
-  private async loadDatabaseSchemaFromAPI(dbId: string): Promise<void> {
+  private async loadDatasourceSchemaFromAPI(dbId: string): Promise<void> {
     if (!dbId || !this.orgId) return Promise.resolve();
 
     const orgId = this.orgId.toString();
     const dbIdStr = dbId.toString();
 
-    this.loadingDatabases[dbId] = true;
+    this.loadingDatasources[dbId] = true;
 
     // Dispatch loading action
     this.store.dispatch(
@@ -612,7 +614,7 @@ export class EditDatasetComponent
     return new Promise((resolve, reject) => {
       try {
         this.queryService
-          .getDatabaseStructure(dbId, this.selectedOrg.id)
+          .getDatasourceStructure(dbId, this.selectedOrg.id)
           .subscribe({
             next: (response: any) => {
               const schemaData =
@@ -629,16 +631,16 @@ export class EditDatasetComponent
                 );
 
                 // Store schema data by database ID
-                this.databaseSchemas[dbId] = schemaData[0];
+                this.datasourceSchemas[dbId] = schemaData[0];
               }
 
-              // Update databases array for IntelliSense
-              this.databases = Object.values(this.databaseSchemas);
+              // Update datasources array for IntelliSense
+              this.datasources = Object.values(this.datasourceSchemas);
 
               // Re-register completions with new schema
               this.registerIntelliSenseProviders();
 
-              this.loadingDatabases[dbId] = false;
+              this.loadingDatasources[dbId] = false;
               resolve();
             },
             error: (error: any) => {
@@ -651,7 +653,7 @@ export class EditDatasetComponent
                 }),
               );
 
-              this.loadingDatabases[dbId] = false;
+              this.loadingDatasources[dbId] = false;
               reject(error);
             },
           });
@@ -665,7 +667,7 @@ export class EditDatasetComponent
           }),
         );
 
-        this.loadingDatabases[dbId] = false;
+        this.loadingDatasources[dbId] = false;
         reject(error);
       }
     });
@@ -703,7 +705,7 @@ export class EditDatasetComponent
     this.resultPage = 1;
     this.resultFilterValues = {};
     this.queryResult = null;
-    this.executeQueryForDatabase(query);
+    this.executeQueryForDatasource(query);
   }
 
   /**
@@ -714,7 +716,7 @@ export class EditDatasetComponent
     this.resultPage = 1;
     this.resultFilterValues = {};
     this.queryResult = null;
-    this.executeQueryForDatabase(selectedText);
+    this.executeQueryForDatasource(selectedText);
   }
 
   clearEditor(): void {
@@ -724,11 +726,11 @@ export class EditDatasetComponent
   }
 
   exportCurrentScript(): void {
-    if (!this.editor || !this.selectedDatabaseObj) return;
+    if (!this.editor || !this.selectedDatasourceObj) return;
 
     const query = this.editor.getValue();
-    const databaseName = this.selectedDatabaseObj.name || 'database';
-    const fileName = `${databaseName}_script.sql`;
+    const datasourceName = this.selectedDatasourceObj.name || 'datasource';
+    const fileName = `${datasourceName}_script.sql`;
 
     const blob = new Blob([query], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
@@ -818,7 +820,7 @@ export class EditDatasetComponent
   }
 
   saveAsDataset(): void {
-    if (!this.selectedDatabaseObj) return;
+    if (!this.selectedDatasourceObj) return;
 
     // Show dialog
     this.showDatasetDialog = true;
@@ -845,14 +847,18 @@ export class EditDatasetComponent
     this.resultFilterValues = {};
     this.resultPage = 1;
     if (this.lastExecutedQuery) {
-      this.executeQueryForDatabase(this.lastExecutedQuery, 1, this.resultRows);
+      this.executeQueryForDatasource(
+        this.lastExecutedQuery,
+        1,
+        this.resultRows,
+      );
     }
   }
 
   exportResultsAsCsv(): void {
     if (
       !this.lastExecutedQuery ||
-      !this.selectedDatabaseObj?.id ||
+      !this.selectedDatasourceObj?.id ||
       !this.selectedOrg?.id
     )
       return;
@@ -869,7 +875,7 @@ export class EditDatasetComponent
 
     const payload: any = {
       orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabaseObj.id,
+      datasourceId: this.selectedDatasourceObj.id,
       query: this.lastExecutedQuery,
     };
 
@@ -879,8 +885,8 @@ export class EditDatasetComponent
 
     this.queryService.exportQueryResults(payload).subscribe({
       next: (blob: Blob) => {
-        const databaseName = this.selectedDatabaseObj.name || 'database';
-        const fileName = `${databaseName}_query_results.csv`;
+        const datasourceName = this.selectedDatasourceObj.name || 'datasource';
+        const fileName = `${datasourceName}_query_results.csv`;
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -929,10 +935,10 @@ export class EditDatasetComponent
       }
     }
 
-    this.executeQueryForDatabase(this.lastExecutedQuery, page, limit, filter);
+    this.executeQueryForDatasource(this.lastExecutedQuery, page, limit, filter);
   }
 
-  private executeQueryForDatabase(
+  private executeQueryForDatasource(
     query: string,
     page: number = 1,
     limit: number = this.resultRows,
@@ -942,7 +948,7 @@ export class EditDatasetComponent
       return;
     }
 
-    if (!this.selectedDatabaseObj?.id || !this.selectedOrg?.id) {
+    if (!this.selectedDatasourceObj?.id || !this.selectedOrg?.id) {
       return;
     }
 
@@ -953,7 +959,7 @@ export class EditDatasetComponent
 
     const payload: any = {
       orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabaseObj.id,
+      datasourceId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
       limit: limit,
@@ -1068,7 +1074,7 @@ export class EditDatasetComponent
     this.showDatasetDialog = false;
 
     if (formData) {
-      if (!this.selectedDatabaseObj || !this.datasetId) return;
+      if (!this.selectedDatasourceObj || !this.datasetId) return;
 
       // Get the SQL query
       const sql = this.editor?.getValue() || this.currentQuery;
@@ -1078,7 +1084,7 @@ export class EditDatasetComponent
         name: formData.name,
         description: formData.description,
         organisation: this.selectedOrg?.id,
-        database: this.selectedDatabaseObj.id,
+        datasource: this.selectedDatasourceObj.id,
         sql,
       };
 
@@ -1108,8 +1114,8 @@ export class EditDatasetComponent
     }
   }
 
-  toggleDatabaseSidebar(): void {
-    this.showDatabaseSidebar = !this.showDatabaseSidebar;
+  toggleDatasourceSidebar(): void {
+    this.showDatasourceSidebar = !this.showDatasourceSidebar;
     // Trigger Monaco editor resize after sidebar animation
     setTimeout(() => {
       if (this.editor) {
@@ -1118,12 +1124,12 @@ export class EditDatasetComponent
     }, 300);
   }
 
-  toggleDatabase(db: any): void {
-    const isExpanded = this.expandedDatabases[db.id];
+  toggleDatasource(db: any): void {
+    const isExpanded = this.expandedDatasources[db.id];
 
     if (isExpanded) {
       // Collapse - also collapse all child schemas and tables
-      this.expandedDatabases[db.id] = false;
+      this.expandedDatasources[db.id] = false;
 
       // Collapse all schemas under this database
       Object.keys(this.expandedSchemas).forEach(key => {
@@ -1140,10 +1146,10 @@ export class EditDatasetComponent
       });
     } else {
       // Expand - fetch schema if not already loaded
-      this.expandedDatabases[db.id] = true;
+      this.expandedDatasources[db.id] = true;
 
-      if (!this.databaseSchemas[db.id]) {
-        this.loadDatabaseSchema(db.id);
+      if (!this.datasourceSchemas[db.id]) {
+        this.loadDatasourceSchema(db.id);
       }
     }
   }
@@ -1204,18 +1210,18 @@ export class EditDatasetComponent
     this.editor.focus();
   }
 
-  onDatabaseContextMenu(event: MouseEvent, database: any): void {
+  onDatasourceContextMenu(event: MouseEvent, datasource: any): void {
     event.preventDefault();
     event.stopPropagation();
 
-    this.contextMenuDatabase = database;
+    this.contextMenuDatasource = datasource;
     this.contextMenuPosition = { x: event.clientX, y: event.clientY };
 
     this.contextMenuItems = [
       {
         label: 'Refresh Schema',
         icon: 'pi pi-refresh',
-        command: () => this.refreshDatabaseFromContext(),
+        command: () => this.refreshDatasourceFromContext(),
       },
     ];
 
@@ -1224,14 +1230,14 @@ export class EditDatasetComponent
 
   closeContextMenu(): void {
     this.showContextMenu = false;
-    this.contextMenuDatabase = null;
+    this.contextMenuDatasource = null;
   }
 
-  refreshDatabaseFromContext(): void {
-    if (!this.contextMenuDatabase) return;
+  refreshDatasourceFromContext(): void {
+    if (!this.contextMenuDatasource) return;
 
     // Refresh schema for this specific database
-    this.refreshSingleDatabase(this.contextMenuDatabase.id);
+    this.refreshSingleDatasource(this.contextMenuDatasource.id);
 
     this.closeContextMenu();
   }
@@ -1252,14 +1258,14 @@ export class EditDatasetComponent
         if (this.globalService.handleSuccessService(response, false)) {
           const dataset = response.data;
 
-          // Type 2 (Prompt-based): redirect to execute-screen in edit mode
-          if (dataset.type === 2 && dataset.screenId) {
+          // Type 2 (Prompt-based): redirect to execute-query-builder in edit mode
+          if (dataset.type === 2 && dataset.queryBuilderId) {
             this.router.navigate(
               [
-                '/app/screen/execute',
+                '/app/query-builder/execute',
                 dataset.organisationId,
-                dataset.databaseId,
-                dataset.screenId,
+                dataset.datasourceId,
+                dataset.queryBuilderId,
               ],
               {
                 queryParams: {
@@ -1284,15 +1290,15 @@ export class EditDatasetComponent
           this.selectedOrgName = dataset.organisationName || '';
 
           // Set database from API response
-          this.selectedDatabaseObj = {
-            id: dataset.databaseId,
-            name: dataset.databaseName,
+          this.selectedDatasourceObj = {
+            id: dataset.datasourceId,
+            name: dataset.datasourceName,
           };
-          this.selectedDatabaseName = dataset.databaseName || '';
-          this.expandedDatabases[dataset.databaseId] = true;
+          this.selectedDatasourceName = dataset.datasourceName || '';
+          this.expandedDatasources[dataset.datasourceId] = true;
 
           // Load schema for the selected database
-          this.loadDatabaseSchema(dataset.databaseId).then(() => {
+          this.loadDatasourceSchema(dataset.datasourceId).then(() => {
             // Set the SQL query in editor
             const sqlQuery = dataset.sql || '-- Write your SQL query here';
             this.initialQuery = sqlQuery;

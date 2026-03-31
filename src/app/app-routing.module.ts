@@ -48,9 +48,7 @@ const routes: Routes = [
       {
         path: 'home',
         loadChildren: () =>
-          import('./modules/home/home.module').then(
-            m => m.HomeModule,
-          ),
+          import('./modules/home/home.module').then(m => m.HomeModule),
         data: { title: 'Home' },
       },
       // Super admin only
@@ -105,13 +103,13 @@ const routes: Routes = [
       },
       // Org admin + org user
       {
-        path: 'database',
+        path: 'datasource',
         loadChildren: () =>
-          import('./modules/database/database.module').then(
-            m => m.DatabaseModule,
+          import('./modules/datasource/datasource.module').then(
+            m => m.DatasourceModule,
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Databases' },
+        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Datasources' },
       },
       {
         path: 'connections',
@@ -148,9 +146,9 @@ const routes: Routes = [
       {
         path: 'dashboard',
         loadChildren: () =>
-          import(
-            './modules/dashboard/dashboard.module'
-          ).then(m => m.DashboardModule),
+          import('./modules/dashboard/dashboard.module').then(
+            m => m.DashboardModule,
+          ),
         canActivate: [RoleGuard],
         data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Dashboards' },
       },
@@ -176,11 +174,13 @@ const routes: Routes = [
         data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Prompts' },
       },
       {
-        path: 'screen',
+        path: 'query-builder',
         loadChildren: () =>
-          import('./modules/screen/screen.module').then(m => m.ScreenModule),
+          import('./modules/query-builder/query-builder.module').then(
+            m => m.QueryBuilderModule,
+          ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Screens' },
+        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Query Builders' },
       },
       {
         path: 'audit-logs',

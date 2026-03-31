@@ -51,9 +51,9 @@ export class TabManagementHelper {
   }
 
   /**
-   * Get database context menu items
+   * Get datasource context menu items
    */
-  static getDatabaseContextMenuItems(
+  static getDatasourceContextMenuItems(
     newScriptCallback: () => void,
     refreshCallback: () => void,
     isNewScriptDisabled: boolean = false,
@@ -79,15 +79,15 @@ export class TabManagementHelper {
   static createQueryTab(
     tabCounter: number,
     title: string,
-    databaseId?: string,
-    databaseName: string = 'database',
+    datasourceId?: string,
+    datasourceName: string = 'datasource',
   ): QueryTab {
     const tabId = `tab_${tabCounter}`;
     return {
       id: tabId,
       title: title,
-      databaseId: databaseId,
-      databaseName: databaseName,
+      datasourceId: datasourceId,
+      datasourceName: datasourceName,
       query: '-- Write your SQL query here',
       result: null,
       isActive: true,

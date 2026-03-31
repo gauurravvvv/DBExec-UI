@@ -34,7 +34,7 @@ export class ConnectionService {
   addConnection(connectionForm: FormGroup) {
     const {
       organisation,
-      database,
+      datasource,
       name,
       description,
       dbUsername,
@@ -43,7 +43,7 @@ export class ConnectionService {
     return this.http
       .post(CONNECTIONS.ADD, {
         organisation,
-        database,
+        datasource,
         name,
         description,
         dbUsername,
@@ -72,7 +72,7 @@ export class ConnectionService {
       name,
       description,
       organisation,
-      database,
+      datasource,
       status,
       dbUsername,
       dbPassword,
@@ -83,7 +83,7 @@ export class ConnectionService {
         name,
         description,
         organisation,
-        database,
+        datasource,
         status: status ? 1 : 0,
         dbUsername,
         dbPassword,

@@ -19,17 +19,17 @@
         </span>
       </div>
 
-      <!-- Database Input (readonly) -->
+      <!-- Datasource Input (readonly) -->
       <div class="dropdown-field">
-        <label for="db-input">Database</label>
+        <label for="db-input">Datasource</label>
         <span class="p-input-icon-left">
           <i class="pi pi-database"></i>
           <input
             id="db-input"
             type="text"
             pInputText
-            [value]="selectedDatabaseName"
-            placeholder="Database"
+            [value]="selectedDatasourceName"
+            placeholder="Datasource"
             readonly
             [ngClass]="{ readonly: true }"
           />
@@ -43,7 +43,7 @@
         (click)="saveAsDataset()"
         [disabled]="
           isLoadingEditor ||
-          !selectedDatabaseObj ||
+          !selectedDatasourceObj ||
           !editor ||
           isQueryEmpty ||
           !hasQueryChanged
@@ -57,7 +57,10 @@
         class="p-button-text btn-export"
         (click)="resetToOriginal()"
         [disabled]="
-          isLoadingEditor || !selectedDatabaseObj || !editor || !hasQueryChanged
+          isLoadingEditor ||
+          !selectedDatasourceObj ||
+          !editor ||
+          !hasQueryChanged
         "
         title="Reset to Original"
       >
@@ -67,7 +70,7 @@
         pButton
         class="p-button-text btn-export"
         (click)="triggerFileInput()"
-        [disabled]="isLoadingEditor || !selectedDatabaseObj || !editor"
+        [disabled]="isLoadingEditor || !selectedDatasourceObj || !editor"
         title="Import SQL File"
       >
         <i class="pi pi-upload"></i>
@@ -77,7 +80,7 @@
         class="p-button-text btn-export"
         (click)="exportCurrentScript()"
         [disabled]="
-          isLoadingEditor || !selectedDatabaseObj || !editor || isQueryEmpty
+          isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
         "
         title="Export Script"
       >
@@ -88,7 +91,7 @@
         class="p-button-text btn-danger"
         (click)="clearEditor()"
         [disabled]="
-          isLoadingEditor || !selectedDatabaseObj || !editor || isQueryEmpty
+          isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
         "
         title="Clear Editor"
       >
@@ -100,7 +103,7 @@
         (click)="executeQuery()"
         [disabled]="
           isLoadingEditor ||
-          !selectedDatabaseObj ||
+          !selectedDatasourceObj ||
           !editor ||
           isExecutingQuery ||
           isQueryEmpty
@@ -117,8 +120,8 @@
 
   <!-- Main Content Area with Sidebar and Editor -->
   <div class="main-content">
-    <!-- Left Sidebar - Database Explorer -->
-    <div class="database-sidebar" [class.collapsed]="!showDatabaseSidebar">
+    <!-- Left Sidebar - Datasource Explorer -->
+    <div class="datasource-sidebar" [class.collapsed]="!showDatasourceSidebar">
       <div class="sidebar-content">
         <div class="sidebar-header">
           <h4>
@@ -128,16 +131,18 @@
           <button
             pButton
             class="p-button-text p-button-sm"
-            (click)="refreshSelectedDatabase()"
+            (click)="refreshSelectedDatasource()"
             [disabled]="
-              !selectedDatabaseObj || loadingDatabases[selectedDatabaseObj?.id]
+              !selectedDatasourceObj ||
+              loadingDatasources[selectedDatasourceObj?.id]
             "
             title="Refresh Schema"
           >
             <i
               class="pi pi-refresh"
               [class.pi-spin]="
-                selectedDatabaseObj && loadingDatabases[selectedDatabaseObj.id]
+                selectedDatasourceObj &&
+                loadingDatasources[selectedDatasourceObj.id]
               "
             ></i>
           </button>
@@ -153,10 +158,10 @@
             />
           </div>
 
-          <!-- No Database Selected Message -->
+          <!-- No Datasource Selected Message -->
           <div
             class="empty-state"
-            *ngIf="!selectedDatabaseObj && !isLoadingDataset"
+            *ngIf="!selectedDatasourceObj && !isLoadingDataset"
           >
             <i class="pi pi-database" style="font-size: 3rem; opacity: 0.3"></i>
             <p>Loading dataset information...</p>
@@ -166,26 +171,27 @@
           <div
             class="empty-state"
             *ngIf="
-              selectedDatabaseObj && loadingDatabases[selectedDatabaseObj.id]
+              selectedDatasourceObj &&
+              loadingDatasources[selectedDatasourceObj.id]
             "
           >
             <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
             <p>Loading schema...</p>
           </div>
 
-          <!-- Schema Structure (only for selected database) -->
+          <!-- Schema Structure (only for selected datasource) -->
           <div
-            class="databases-list"
+            class="datasources-list"
             *ngIf="
-              selectedDatabaseObj &&
-              databaseSchemas[selectedDatabaseObj.id] &&
-              !loadingDatabases[selectedDatabaseObj.id]
+              selectedDatasourceObj &&
+              datasourceSchemas[selectedDatasourceObj.id] &&
+              !loadingDatasources[selectedDatasourceObj.id]
             "
           >
             <div
               *ngFor="
                 let schema of getFilteredSchemas(
-                  databaseSchemas[selectedDatabaseObj.id]?.schemas || []
+                  datasourceSchemas[selectedDatasourceObj.id]?.schemas || []
                 )
               "
               class="schema-item"
@@ -193,12 +199,14 @@
               <!-- Schema Header -->
               <div
                 class="schema-header"
-                (click)="toggleSchema(selectedDatabaseObj.id, schema.name)"
+                (click)="toggleSchema(selectedDatasourceObj.id, schema.name)"
               >
                 <i
                   class="pi"
                   [ngClass]="
-                    expandedSchemas[selectedDatabaseObj.id + '.' + schema.name]
+                    expandedSchemas[
+                      selectedDatasourceObj.id + '.' + schema.name
+                    ]
                       ? 'pi-chevron-down'
                       : 'pi-chevron-right'
                   "
@@ -214,7 +222,7 @@
               <div
                 class="tables-list"
                 *ngIf="
-                  expandedSchemas[selectedDatabaseObj.id + '.' + schema.name]
+                  expandedSchemas[selectedDatasourceObj.id + '.' + schema.name]
                 "
               >
                 <div
@@ -222,7 +230,7 @@
                   class="table-item"
                   [class.expanded]="
                     isTableExpanded(
-                      selectedDatabaseObj.id,
+                      selectedDatasourceObj.id,
                       schema.name,
                       table.name
                     )
@@ -233,7 +241,7 @@
                     class="table-header"
                     (click)="
                       toggleTable(
-                        selectedDatabaseObj.id,
+                        selectedDatasourceObj.id,
                         schema.name,
                         table.name
                       )
@@ -243,7 +251,7 @@
                       class="pi"
                       [ngClass]="
                         isTableExpanded(
-                          selectedDatabaseObj.id,
+                          selectedDatasourceObj.id,
                           schema.name,
                           table.name
                         )
@@ -263,7 +271,7 @@
                     class="columns-list"
                     *ngIf="
                       isTableExpanded(
-                        selectedDatabaseObj.id,
+                        selectedDatasourceObj.id,
                         schema.name,
                         table.name
                       )
@@ -274,7 +282,7 @@
                       class="column-item"
                       (click)="
                         insertColumnName(
-                          selectedDatabaseObj.id,
+                          selectedDatasourceObj.id,
                           schema.name,
                           table.name,
                           column.name
@@ -312,7 +320,7 @@
         </div>
 
         <!-- Rotated Title (When Collapsed) -->
-        <div class="rotated-title" *ngIf="!showDatabaseSidebar">
+        <div class="rotated-title" *ngIf="!showDatasourceSidebar">
           SCHEMA EXPLORER
         </div>
       </div>
@@ -322,13 +330,13 @@
     <div class="separator">
       <button
         class="toggle-btn"
-        (click)="toggleDatabaseSidebar()"
-        title="Toggle Database Sidebar"
+        (click)="toggleDatasourceSidebar()"
+        title="Toggle Datasource Sidebar"
       >
         <i
           class="pi"
           [ngClass]="
-            showDatabaseSidebar ? 'pi-chevron-left' : 'pi-chevron-right'
+            showDatasourceSidebar ? 'pi-chevron-left' : 'pi-chevron-right'
           "
         ></i>
       </button>
@@ -345,10 +353,12 @@
           <div id="sql-editor-container" class="single-editor-container"></div>
         </div>
 
-        <!-- No Database Selected State -->
+        <!-- No Datasource Selected State -->
         <div
           class="empty-state"
-          *ngIf="!selectedDatabaseObj && !isLoadingEditor && !isLoadingDataset"
+          *ngIf="
+            !selectedDatasourceObj && !isLoadingEditor && !isLoadingDataset
+          "
         >
           <i class="pi pi-database"></i>
           <h3>Loading Dataset</h3>
@@ -385,7 +395,7 @@
       <!-- Results Status Bar (floating at bottom of editor) -->
       <div
         class="results-status-bar"
-        *ngIf="selectedDatabaseObj && queryResult"
+        *ngIf="selectedDatasourceObj && queryResult"
       >
         <div class="status-bar-left">
           <span

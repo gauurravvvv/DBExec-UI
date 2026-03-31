@@ -1,21 +1,21 @@
 import {
-  DatabaseSchema,
+  DatasourceSchema,
   SchemaGroup,
   TableSchema,
   TableColumn,
 } from './dummy-data.helper';
 
 /**
- * Helper class for transforming API responses into DatabaseSchema format
+ * Helper class for transforming API responses into DatasourceSchema format
  */
 export class SchemaTransformerHelper {
   /**
-   * Transform API response to DatabaseSchema interface
+   * Transform API response to DatasourceSchema interface
    * @param response - API response from backend
-   * @returns DatabaseSchema array
+   * @returns DatasourceSchema array
    */
-  static transformSchemaResponse(response: any): DatabaseSchema[] {
-    // Transform the API response to match our DatabaseSchema interface
+  static transformSchemaResponse(response: any): DatasourceSchema[] {
+    // Transform the API response to match our DatasourceSchema interface
     const schemas: SchemaGroup[] = [];
 
     // Handle different API response formats:
@@ -80,10 +80,10 @@ export class SchemaTransformerHelper {
     const result = [
       {
         name:
-          response.database_name ||
-          response?.data?.database_name ||
+          response.datasource_name ||
+          response?.data?.datasource_name ||
           response.name ||
-          'database',
+          'datasource',
         schemas: schemas,
       },
     ];
@@ -91,15 +91,15 @@ export class SchemaTransformerHelper {
   }
 
   /**
-   * Extract all tables from database schemas (flattened)
-   * @param databases - Array of DatabaseSchema
+   * Extract all tables from datasource schemas (flattened)
+   * @param datasources - Array of DatasourceSchema
    * @returns Array of TableSchema with flattened structure
    */
-  static extractAllTables(databases: DatabaseSchema[]): TableSchema[] {
+  static extractAllTables(datasources: DatasourceSchema[]): TableSchema[] {
     const tables: TableSchema[] = [];
 
-    if (databases && databases.length > 0) {
-      for (const db of databases) {
+    if (datasources && datasources.length > 0) {
+      for (const db of datasources) {
         for (const schema of db.schemas) {
           for (const table of schema.tables) {
             tables.push(table);
@@ -113,16 +113,16 @@ export class SchemaTransformerHelper {
 
   /**
    * Build table-to-columns mapping for quick lookups
-   * @param databases - Array of DatabaseSchema
+   * @param datasources - Array of DatasourceSchema
    * @returns Map of table names to columns
    */
-  static buildTableColumnsMap(databases: DatabaseSchema[]): {
+  static buildTableColumnsMap(datasources: DatasourceSchema[]): {
     [key: string]: TableColumn[];
   } {
     const tableColumns: { [key: string]: TableColumn[] } = {};
 
-    if (databases && databases.length > 0) {
-      for (const db of databases) {
+    if (datasources && datasources.length > 0) {
+      for (const db of datasources) {
         for (const schema of db.schemas) {
           for (const table of schema.tables) {
             const fullTableName =
@@ -140,40 +140,40 @@ export class SchemaTransformerHelper {
   }
 
   /**
-   * Find a table by name across all databases and schemas
-   * @param databases - Array of DatabaseSchema
+   * Find a table by name across all datasources and schemas
+   * @param datasources - Array of DatasourceSchema
    * @param tableName - Name of the table to find
    * @returns TableSchema or undefined
    */
   static findTableByName(
-    databases: DatabaseSchema[],
+    datasources: DatasourceSchema[],
     tableName: string,
   ): TableSchema | undefined {
-    const tables = this.extractAllTables(databases);
+    const tables = this.extractAllTables(datasources);
     return tables.find(t => t.name.toLowerCase() === tableName.toLowerCase());
   }
 
   /**
-   * Get all table names from databases
-   * @param databases - Array of DatabaseSchema
+   * Get all table names from datasources
+   * @param datasources - Array of DatasourceSchema
    * @returns Array of table names
    */
-  static getAllTableNames(databases: DatabaseSchema[]): string[] {
-    const tables = this.extractAllTables(databases);
+  static getAllTableNames(datasources: DatasourceSchema[]): string[] {
+    const tables = this.extractAllTables(datasources);
     return tables.map(t => t.name);
   }
 
   /**
    * Get column names for a specific table
-   * @param databases - Array of DatabaseSchema
+   * @param datasources - Array of DatasourceSchema
    * @param tableName - Name of the table
    * @returns Array of column names
    */
   static getColumnNamesForTable(
-    databases: DatabaseSchema[],
+    datasources: DatasourceSchema[],
     tableName: string,
   ): string[] {
-    const table = this.findTableByName(databases, tableName);
+    const table = this.findTableByName(datasources, tableName);
     return table ? table.columns.map(c => c.name) : [];
   }
 }

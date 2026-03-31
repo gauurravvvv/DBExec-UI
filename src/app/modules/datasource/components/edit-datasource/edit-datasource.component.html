@@ -1,0 +1,349 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" routerLink="/app/datasource">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Edit Datasource</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined p-button-danger"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-outlined"
+          type="submit"
+          label="Save"
+          icon="pi pi-save"
+          iconPos="left"
+          (click)="onSubmit()"
+          [disabled]="!isFormValid()"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Warning Banner -->
+    <div class="warning-container" @slideDown>
+      <div class="warning-message">
+        <div class="warning-header" (click)="toggleWarning()">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span class="warning-title"
+            >You are editing a datasource connection</span
+          >
+          <i
+            class="pi"
+            [ngClass]="{
+              'pi-chevron-down': !isWarningExpanded,
+              'pi-chevron-up': isWarningExpanded,
+            }"
+          ></i>
+        </div>
+        <div
+          class="warning-content"
+          [@expandCollapse]="isWarningExpanded ? 'expanded' : 'collapsed'"
+        >
+          <div class="warning-text">
+            <p>
+              <i class="pi pi-circle-fill"></i> Changes to connection details
+              will affect all datasets and queries using this datasource
+            </p>
+            <p>
+              <i class="pi pi-circle-fill"></i> A successful connection test is
+              required before saving
+            </p>
+            <p>
+              <i class="pi pi-circle-fill"></i> Existing connections will be
+              updated with the new credentials
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="datasourceForm" class="admin-form">
+      <div class="form-grid">
+        <!-- Name Field -->
+        <app-custom-input
+          formControlName="name"
+          label="Name"
+          placeholder="Enter name"
+          icon="pi-database"
+          [required]="true"
+          [showError]="
+            !!(
+              datasourceForm.get('name')?.invalid &&
+              datasourceForm.get('name')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('name')"
+        >
+        </app-custom-input>
+
+        <!-- Description Field -->
+        <app-custom-input
+          formControlName="description"
+          label="Description"
+          placeholder="Enter description"
+          icon="pi-align-left"
+          [showError]="
+            !!(
+              datasourceForm.get('description')?.invalid &&
+              datasourceForm.get('description')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('description')"
+        >
+        </app-custom-input>
+
+        <!-- Organisation Field (readonly) -->
+        <div class="form-field" *ngIf="showOrganisationDropdown">
+          <label for="organisation">Organisation</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-building"></i>
+            <input
+              id="organisation"
+              type="text"
+              pInputText
+              [value]="organisationName"
+              readonly
+              class="readonly"
+            />
+          </span>
+        </div>
+
+        <!-- Type Field (readonly) -->
+        <div class="form-field">
+          <label for="type">Type</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-database"></i>
+            <input
+              id="type"
+              pInputText
+              formControlName="type"
+              readonly
+              class="readonly"
+            />
+          </span>
+        </div>
+
+        <!-- Host Field -->
+        <app-custom-input
+          formControlName="host"
+          label="Host"
+          placeholder="Enter database host"
+          icon="pi-desktop"
+          [required]="true"
+          [showError]="
+            !!(
+              datasourceForm.get('host')?.invalid &&
+              datasourceForm.get('host')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('host')"
+        >
+        </app-custom-input>
+
+        <!-- Port Field -->
+        <div class="form-field">
+          <label for="port">Port<span class="required">*</span></label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-hashtag"></i>
+            <input
+              id="port"
+              type="number"
+              pInputText
+              formControlName="port"
+              placeholder="Enter database port"
+              min="1"
+              max="65535"
+              (keypress)="onPortKeyPress($event)"
+              (input)="onNumberInput($event)"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  datasourceForm.get('port')?.invalid &&
+                  datasourceForm.get('port')?.touched,
+              }"
+            />
+          </span>
+          <small
+            class="error-message"
+            *ngIf="
+              datasourceForm.get('port')?.invalid &&
+              datasourceForm.get('port')?.touched
+            "
+          >
+            {{ getErrorMessage('port') }}
+          </small>
+        </div>
+
+        <!-- Database Name Field -->
+        <app-custom-input
+          formControlName="database"
+          label="Database Name"
+          placeholder="Enter database name"
+          icon="pi-database"
+          [required]="true"
+          [showError]="
+            !!(
+              datasourceForm.get('database')?.invalid &&
+              datasourceForm.get('database')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('database')"
+        >
+        </app-custom-input>
+
+        <!-- Username Field -->
+        <app-custom-input
+          formControlName="username"
+          label="Username"
+          placeholder="Enter database username"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              datasourceForm.get('username')?.invalid &&
+              datasourceForm.get('username')?.touched
+            )
+          "
+          [errorMessage]="getErrorMessage('username')"
+        >
+        </app-custom-input>
+
+        <!-- Password Field -->
+        <div class="form-field">
+          <label for="password">Password</label>
+          <span class="p-input-icon-left p-input-icon-right">
+            <i class="pi pi-lock"></i>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              pInputText
+              formControlName="password"
+              placeholder="Leave blank to keep current password"
+              [ngClass]="{
+                'ng-invalid ng-dirty':
+                  datasourceForm.get('password')?.invalid &&
+                  datasourceForm.get('password')?.touched,
+              }"
+            />
+            <i
+              class="pi"
+              [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'"
+              style="cursor: pointer"
+              (click)="togglePassword($event)"
+            ></i>
+          </span>
+        </div>
+
+        <!-- Connection Test -->
+        <div class="form-field" *ngIf="isConnectionFieldsDirty()">
+          <div class="connection-test-section">
+            <a
+              class="test-connection-link"
+              (click)="testConnection()"
+              [class.disabled]="
+                !isConnectionFieldsValid() || connectionTestLoading
+              "
+            >
+              <i
+                class="pi"
+                [ngClass]="{
+                  'pi-spin pi-spinner': connectionTestLoading,
+                  'pi-check-circle': connectionTestResult === 'success',
+                  'pi-times-circle': connectionTestResult === 'failed',
+                  'pi-bolt': !connectionTestLoading && !connectionTestResult,
+                }"
+              ></i>
+              {{
+                connectionTestLoading
+                  ? 'Testing...'
+                  : connectionTestResult === 'success'
+                    ? 'Connection Successful'
+                    : connectionTestResult === 'failed'
+                      ? 'Connection Failed - Retry'
+                      : 'Test Connection'
+              }}
+            </a>
+            <small
+              class="connection-hint"
+              *ngIf="!connectionTested && !connectionTestLoading"
+            >
+              Connection test required before saving
+            </small>
+          </div>
+        </div>
+
+        <!-- Status Field -->
+        <div class="form-field">
+          <label for="status">Status</label>
+          <div class="status-toggle ml-3">
+            <p-inputSwitch
+              [formControlName]="'status'"
+              (onChange)="onStatusChange($event)"
+            >
+            </p-inputSwitch>
+            <span class="status-label">{{
+              datasourceForm.get('status')?.value ? 'Active' : 'Inactive'
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showSaveConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-save"></i>
+      </div>
+      <h3>Confirm Update</h3>
+    </div>
+
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        Are you sure you want to update this datasource?
+      </p>
+
+      <div class="justification-section">
+        <label for="saveJustification"
+          >Justification <span class="required">*</span></label
+        >
+        <textarea
+          id="saveJustification"
+          [(ngModel)]="saveJustification"
+          placeholder="Provide a reason for this update"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ saveJustification.length }}/500</small>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSave()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim()"
+      >
+        <i class="pi pi-check"></i>
+        Update
+      </button>
+    </div>
+  </div>
+</div>

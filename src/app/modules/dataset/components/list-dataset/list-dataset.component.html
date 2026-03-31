@@ -28,17 +28,17 @@
             </app-custom-dropdown>
           </div>
 
-          <!-- Database Dropdown -->
+          <!-- Datasource Dropdown -->
           <div class="dropdown-field">
             <app-custom-dropdown
-              [(ngModel)]="selectedDatabase"
-              placeholder="Select Database"
-              [options]="databases"
+              [(ngModel)]="selectedDatasource"
+              placeholder="Select Datasource"
+              [options]="datasources"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
               [floatingLabel]="true"
-              label="Database"
+              label="Datasource"
               filterBy="name"
               (onChangeEvent)="onDBChange($event)"
             >
@@ -367,7 +367,7 @@
         "
       >
         <i class="pi pi-inbox"></i>
-        <span>No query builders for this database</span>
+        <span>No query builders for this datasource</span>
       </div>
 
       <!-- No search results -->

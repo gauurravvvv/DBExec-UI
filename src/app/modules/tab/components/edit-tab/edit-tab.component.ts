@@ -20,7 +20,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
   orgId: string = '';
   tabId: string = '';
   selectedOrgName: string = '';
-  selectedDatabaseName: string = '';
+  selectedDatasourceName: string = '';
   tabData: any;
   isCancelClicked = false;
   showSaveConfirm = false;
@@ -73,7 +73,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       organisation: [''],
-      database: [''],
+      datasource: [''],
       status: [false],
     });
   }
@@ -88,12 +88,12 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
           name: this.tabData.name,
           description: this.tabData.description,
           organisation: this.tabData.organisationId,
-          database: this.tabData.databaseId,
+          datasource: this.tabData.datasourceId,
           status: this.tabData.status,
         });
 
         this.selectedOrgName = this.tabData.organisationName || '';
-        this.selectedDatabaseName = this.tabData.databaseName || '';
+        this.selectedDatasourceName = this.tabData.datasourceName || '';
 
         this.tabForm.markAsPristine();
       }
@@ -146,7 +146,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
         name: this.tabData.name,
         description: this.tabData.description,
         organisation: this.tabData.organisationId,
-        database: this.tabData.databaseId,
+        datasource: this.tabData.datasourceId,
         status: this.tabData.status,
       });
 

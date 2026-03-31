@@ -71,10 +71,10 @@
               </p>
             </div>
             <div class="info-item">
-              <label>Database</label>
+              <label>Datasource</label>
               <p class="with-icon">
                 <i class="pi pi-database mr-2"></i>
-                {{ datasetData.databaseName }}
+                {{ datasetData.datasourceName }}
               </p>
             </div>
             <div class="info-item">
@@ -90,7 +90,7 @@
         <!-- Query Builder Configuration (Type 2 only) -->
         <div
           class="info-section full-width"
-          *ngIf="datasetData.type === 2 && datasetData.screenId"
+          *ngIf="datasetData.type === 2 && datasetData.queryBuilderId"
         >
           <div class="section-header">
             <h3>
@@ -104,7 +104,8 @@
               <p class="with-icon">
                 <i class="pi pi-sitemap mr-2"></i>
                 {{
-                  datasetData.screenName || 'Screen #' + datasetData.screenId
+                  datasetData.queryBuilderName ||
+                    'Query Builder #' + datasetData.queryBuilderId
                 }}
               </p>
             </div>

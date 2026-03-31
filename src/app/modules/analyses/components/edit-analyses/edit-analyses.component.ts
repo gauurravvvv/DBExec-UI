@@ -137,7 +137,7 @@ export class EditAnalysesComponent
 {
   analysisId: string = '';
   orgId: string = '';
-  databaseId: string = '';
+  datasourceId: string = '';
 
   private _isDirty = false;
 
@@ -654,7 +654,7 @@ export class EditAnalysesComponent
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.analysisDetails = response.data;
-          this.databaseId = response.data.databaseId;
+          this.datasourceId = response.data.datasourceId;
           this.datasetId = response.data.datasetId;
 
           if (this.datasetId) {
@@ -2140,7 +2140,7 @@ export class EditAnalysesComponent
         description: formData.description,
         datasetId: this.datasetId,
         organisation: this.orgId,
-        database: this.databaseId,
+        datasource: this.datasourceId,
         visuals: visualConfigurations,
         filters: this.configuredFilters.map((f, i) => ({
           name: f.name,

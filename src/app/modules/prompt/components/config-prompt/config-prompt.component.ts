@@ -18,7 +18,7 @@ import { Subject } from 'rxjs';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { PromptService } from '../../services/prompt.service';
 import {
   ConfigPromptActions,
@@ -45,7 +45,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   selectedOrgName: string = '';
   selectedPromptType: string = '';
   showAddPromptValues: boolean = false;
-  selectedDatabaseName: string = '';
+  selectedDatasourceName: string = '';
   selectedTabName: string = '';
   selectedSectionName: string = '';
   sectionData: any;
@@ -130,7 +130,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private globalService: GlobalService,
     private promptService: PromptService,
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private store: Store,
   ) {
     this.initForm();
@@ -168,7 +168,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       id: [''],
       name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s-]+$')]],
       organisation: [''],
-      database: [''],
+      datasource: [''],
       tab: [''],
       section: [''],
       schema: ['', Validators.required],
@@ -295,7 +295,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           id: this.sectionData.id,
           name: this.sectionData.name,
           organisation: this.sectionData.organisationId,
-          database: this.sectionData.databaseId,
+          datasource: this.sectionData.datasourceId,
           tab: this.sectionData.section.tab.id,
           section: this.sectionData.section.id,
           type: PROMPT_TYPES.find(type => type.value === this.sectionData.type)
@@ -304,7 +304,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
         // Set display names
         this.selectedOrgName = this.sectionData.organisationName || '';
-        this.selectedDatabaseName = this.sectionData.databaseName || '';
+        this.selectedDatasourceName = this.sectionData.datasourceName || '';
         this.selectedTabName = this.sectionData.section.tab.name || '';
         this.selectedSectionName = this.sectionData.section.name || '';
         this.selectedPromptType = this.sectionData.type || '';
@@ -333,7 +333,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
   loadSchemaData() {
     const orgId = this.sectionData.organisationId.toString();
-    const dbId = this.sectionData.databaseId.toString();
+    const dbId = this.sectionData.datasourceId.toString();
 
     this.isLoadingSchema = true;
 
@@ -367,7 +367,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
    * Apply cached schema data from store
    */
   private applyCachedSchemaData(schemaData: any): void {
-    // The store contains transformed DatabaseSchema format
+    // The store contains transformed DatasourceSchema format
     // We need to extract the schemas array from it
     if (schemaData && schemaData.schemas) {
       this.staticSchemaData = schemaData.schemas;
@@ -401,11 +401,11 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
     const params = {
       orgId: this.sectionData.organisationId,
-      databaseId: this.sectionData.databaseId,
+      datasourceId: this.sectionData.datasourceId,
     };
 
-    this.databaseService
-      .listDatabaseSchemas(params)
+    this.datasourceService
+      .listDatasourceSchemas(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.staticSchemaData = response.data;
@@ -598,7 +598,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         id: this.sectionData.id,
         name: this.sectionData.name,
         organisation: this.sectionData.organisationId,
-        database: this.sectionData.databaseId,
+        datasource: this.sectionData.datasourceId,
         tab: this.sectionData.section.tab.id,
         section: this.sectionData.section.id,
         schema: null,
@@ -610,7 +610,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       });
 
       this.selectedOrgName = this.sectionData.organisationName || '';
-      this.selectedDatabaseName = this.sectionData.databaseName || '';
+      this.selectedDatasourceName = this.sectionData.datasourceName || '';
       this.selectedTabName = this.sectionData.section.tab.name || '';
       this.selectedSectionName = this.sectionData.section.name || '';
 
@@ -1570,7 +1570,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
     const params = {
       orgId: this.sectionData.organisationId,
-      databaseId: this.sectionData.databaseId,
+      datasourceId: this.sectionData.datasourceId,
       query: query.trim(),
     };
 
@@ -1703,7 +1703,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
     const params = {
       orgId: this.orgId,
-      databaseId: this.promptForm.get('database')?.value,
+      datasourceId: this.promptForm.get('datasource')?.value,
       promptId: this.promptId,
     };
 

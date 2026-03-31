@@ -33,7 +33,7 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
     TAB: 'ci ci-ribbon',
     SECTION: 'ci ci-section',
     PROMPT: 'ci ci-caret-down',
-    SCREEN: 'ci ci-screen',
+    QUERY_BUILDER: 'ci ci-screen',
     DATASET: 'ci ci-dataset',
     ANALYSES: 'ci ci-analyses',
   };
@@ -167,7 +167,7 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
     const parts: string[] = [];
 
     // Base: All items seem to have a database context
-    if (item.databaseName) parts.push(item.databaseName);
+    if (item.datasourceName) parts.push(item.datasourceName);
 
     // Context specific logic
     switch (item.entity) {
@@ -175,7 +175,7 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
         if (item.datasetName) parts.push(item.datasetName);
         break;
       case 'datasetManager': // Assuming this is dataset
-        // Already has databaseName
+        // Already has datasourceName
         break;
       case 'queryBuilderPrompt':
         if (item.tabName) parts.push(item.tabName);
@@ -186,7 +186,7 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
         break;
       case 'queryBuilderTab':
       case 'queryBuilderScreen':
-        // Direct child of database (or screen)
+        // Direct child of database (or query builder)
         break;
     }
 
@@ -242,7 +242,7 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
     if (result.link) {
       const queryParams: any = {};
       if (result.organisationId) queryParams.orgId = result.organisationId;
-      if (result.databaseId) queryParams.databaseId = result.databaseId;
+      if (result.datasourceId) queryParams.datasourceId = result.datasourceId;
       if (result.name) queryParams.name = result.name;
 
       this.router.navigate([result.link], { queryParams });

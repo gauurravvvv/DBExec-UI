@@ -7,16 +7,7 @@ import { SuperAdminHomeComponent } from './super-admin-home/super-admin-home.com
 import { OrgHomeComponent } from './org-home/org-home.component';
 
 @NgModule({
-  declarations: [
-    EmptyRootComponent,
-    SuperAdminHomeComponent,
-    OrgHomeComponent,
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    HomeRoutingModule,
-  ],
+  declarations: [EmptyRootComponent, SuperAdminHomeComponent, OrgHomeComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, HomeRoutingModule],
 })
 export class HomeModule {}

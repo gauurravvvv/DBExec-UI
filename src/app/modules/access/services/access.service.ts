@@ -19,10 +19,10 @@ export class AccessService {
   }
 
   grantAccess(payload: any) {
-    const { organisation, database, users, groups, connection } = payload;
+    const { organisation, datasource, users, groups, connection } = payload;
     const requestBody: any = {
       organisation,
-      database,
+      datasource,
       users,
       groups,
       connection,

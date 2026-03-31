@@ -192,9 +192,10 @@ export class ViewAnalysesComponent implements OnInit {
       datasetId: this.analysisDetails.datasetId,
       datasetName:
         this.analysisDetails.datasetName || this.datasetDetails?.name,
-      databaseId: this.analysisDetails.databaseId,
-      databaseName:
-        this.analysisDetails.databaseName || this.datasetDetails?.databaseName,
+      datasourceId: this.analysisDetails.datasourceId,
+      datasourceName:
+        this.analysisDetails.datasourceName ||
+        this.datasetDetails?.datasourceName,
     };
 
     this.dashboardService.addDashboard(payload).then(response => {

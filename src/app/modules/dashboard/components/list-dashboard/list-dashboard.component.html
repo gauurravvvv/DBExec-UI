@@ -28,17 +28,17 @@
             </app-custom-dropdown>
           </div>
 
-          <!-- Database Dropdown -->
+          <!-- Datasource Dropdown -->
           <div class="dropdown-field">
             <app-custom-dropdown
-              [(ngModel)]="selectedDatabase"
-              placeholder="Select Database"
-              [options]="databases"
+              [(ngModel)]="selectedDatasource"
+              placeholder="Select Datasource"
+              [options]="datasources"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
               [floatingLabel]="true"
-              label="Database"
+              label="Datasource"
               filterBy="name"
               (onChangeEvent)="onDBChange($event)"
             >
@@ -90,7 +90,7 @@
                 <div class="th-content">Dataset</div>
               </th>
               <th style="width: 15%">
-                <div class="th-content">Database</div>
+                <div class="th-content">Datasource</div>
               </th>
               <th style="width: 15%">
                 <div class="th-content">Created On</div>
@@ -124,9 +124,9 @@
               </th>
               <th>
                 <app-custom-input
-                  [(ngModel)]="filterValues.databaseName"
+                  [(ngModel)]="filterValues.datasourceName"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search Database"
+                  placeholder="Search Datasource"
                 ></app-custom-input>
               </th>
               <th>
@@ -168,8 +168,11 @@
                 </span>
               </td>
               <td>
-                <span class="description-text" [title]="dashboard.databaseName">
-                  {{ dashboard.databaseName }}
+                <span
+                  class="description-text"
+                  [title]="dashboard.datasourceName"
+                >
+                  {{ dashboard.datasourceName }}
                 </span>
               </td>
               <td>
@@ -214,7 +217,9 @@
     </div>
 
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to delete this dashboard?</p>
+      <p class="delete-intro">
+        Are you sure you want to delete this dashboard?
+      </p>
 
       <ul class="delete-info-list">
         <li>

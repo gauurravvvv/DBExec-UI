@@ -7,7 +7,7 @@ import { debounceTime } from 'rxjs/operators';
 import { TAB } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from '../../services/tab.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
@@ -32,10 +32,10 @@ export class ListTabComponent implements OnInit, OnDestroy {
   deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
-  databases: any[] = [];
+  datasources: any[] = [];
   tabs: any[] = [];
   selectedOrg: any = null;
-  selectedDatabase: any = null;
+  selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
@@ -62,7 +62,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private organisationService: OrganisationService,
     private tabService: TabService,
     private router: Router,
@@ -79,7 +79,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
       });
 
     this.route.queryParams.subscribe(params => {
-      if (params['orgId'] || params['databaseId'] || params['name']) {
+      if (params['orgId'] || params['datasourceId'] || params['name']) {
         this.handleDeepLinking(params);
       } else {
         if (this.showOrganisationDropdown) {
@@ -87,7 +87,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
         } else {
           this.selectedOrg =
             this.globalService.getTokenDetails('organisationId');
-          this.loadDatabases();
+          this.loadDatasources();
         }
       }
     });
@@ -101,11 +101,11 @@ export class ListTabComponent implements OnInit, OnDestroy {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  onDBChange(databaseId: any) {
-    this.selectedDatabase = databaseId;
+  onDBChange(datasourceId: any) {
+    this.selectedDatasource = datasourceId;
     this.loadTabs();
   }
 
@@ -132,7 +132,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
 
   handleDeepLinking(params: any) {
     const orgId = params['orgId'] ? params['orgId'] : null;
-    const databaseId = params['databaseId'] ? params['databaseId'] : null;
+    const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
     const name = params['name'];
 
     if (name) {
@@ -147,25 +147,25 @@ export class ListTabComponent implements OnInit, OnDestroy {
         : this.loadOrganisations();
 
       orgPromise.then(() => {
-        // If we specifically requested an orgId, the loadOrganisations method DOES NOT trigger loadDatabases automatically.
+        // If we specifically requested an orgId, the loadOrganisations method DOES NOT trigger loadDatasources automatically.
         // So we must manually trigger it here.
         if (orgId) {
-          if (databaseId) {
-            this.loadDatabases(databaseId);
+          if (datasourceId) {
+            this.loadDatasources(datasourceId);
           } else {
-            this.loadDatabases();
+            this.loadDatasources();
           }
         }
-        // If orgId was NOT requested, loadOrganisations() already triggered loadDatabases(), so we're done.
+        // If orgId was NOT requested, loadOrganisations() already triggered loadDatasources(), so we're done.
       });
     } else {
       // For non-super admin, org is fixed
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
 
-      if (databaseId) {
-        this.loadDatabases(databaseId);
+      if (datasourceId) {
+        this.loadDatasources(datasourceId);
       } else {
-        this.loadDatabases();
+        this.loadDatasources();
       }
     }
   }
@@ -188,14 +188,14 @@ export class ListTabComponent implements OnInit, OnDestroy {
             } else {
               this.selectedOrg = this.organisations[0].id;
             }
-            // Only load databases if we are NOT in deep linking flow (handled by caller) OR if we want default behavior
+            // Only load datasources if we are NOT in deep linking flow (handled by caller) OR if we want default behavior
             if (!preSelectedOrgId) {
-              this.loadDatabases();
+              this.loadDatasources();
             }
           } else {
             this.selectedOrg = null;
-            this.databases = [];
-            this.selectedDatabase = null;
+            this.datasources = [];
+            this.selectedDatasource = null;
             this.tabs = [];
             this.filteredTabs = [];
             this.totalRecords = 0;
@@ -206,7 +206,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadDatabases(preSelectedDbId?: string): Promise<void> {
+  loadDatasources(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
       if (!this.selectedOrg) {
         resolve();
@@ -218,31 +218,31 @@ export class ListTabComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService
-        .listDatabase(params)
+      this.datasourceService
+        .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.databases = [...(response.data.databases || [])];
-            if (this.databases.length > 0) {
+            this.datasources = [...(response.data.databases || [])];
+            if (this.datasources.length > 0) {
               if (
                 preSelectedDbId &&
-                this.databases.find(d => d.id === preSelectedDbId)
+                this.datasources.find(d => d.id === preSelectedDbId)
               ) {
-                this.selectedDatabase = preSelectedDbId;
+                this.selectedDatasource = preSelectedDbId;
               } else {
-                this.selectedDatabase = this.databases[0].id;
+                this.selectedDatasource = this.datasources[0].id;
               }
               this.loadTabs();
             } else {
-              this.selectedDatabase = null;
+              this.selectedDatasource = null;
               this.tabs = [];
               this.filteredTabs = [];
               this.totalRecords = 0;
             }
           } else {
             this.selectedOrg = null;
-            this.databases = [];
-            this.selectedDatabase = null;
+            this.datasources = [];
+            this.selectedDatasource = null;
             this.tabs = [];
             this.filteredTabs = [];
             this.totalRecords = 0;
@@ -251,8 +251,8 @@ export class ListTabComponent implements OnInit, OnDestroy {
         })
         .catch(() => {
           this.selectedOrg = null;
-          this.databases = [];
-          this.selectedDatabase = null;
+          this.datasources = [];
+          this.selectedDatasource = null;
           this.tabs = [];
           this.filteredTabs = [];
           this.totalRecords = 0;
@@ -262,7 +262,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
   }
 
   loadTabs(event?: any) {
-    if (!this.selectedDatabase) return;
+    if (!this.selectedDatasource) return;
 
     // Store the event for future reloads
     if (event) {
@@ -274,7 +274,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
 
     const params: any = {
       orgId: this.selectedOrg,
-      databaseId: this.selectedDatabase,
+      datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
     };
@@ -288,7 +288,8 @@ export class ListTabComponent implements OnInit, OnDestroy {
       filter.description = this.filterValues.description;
     }
     if (this.filterValues.createdDateRange?.[0]) {
-      filter.createdDateFrom = this.filterValues.createdDateRange[0].toISOString();
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
     }
     if (this.filterValues.createdDateRange?.[1]) {
       const dateTo = new Date(this.filterValues.createdDateRange[1]);

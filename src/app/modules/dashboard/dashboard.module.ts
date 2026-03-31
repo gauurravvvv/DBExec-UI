@@ -8,10 +8,7 @@ import { ListDashboardComponent } from './components/list-dashboard/list-dashboa
 import { ViewDashboardComponent } from './components/view-dashboard/view-dashboard.component';
 
 @NgModule({
-  declarations: [
-    ListDashboardComponent,
-    ViewDashboardComponent,
-  ],
+  declarations: [ListDashboardComponent, ViewDashboardComponent],
   imports: [
     CommonModule,
     FormsModule,

@@ -174,7 +174,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
 
     const formValue = this.orgForm.value;
     this.organisationService
-      .validateDatabase({
+      .validateDatasource({
         type: 'postgres',
         host: formValue.dbHost,
         port: formValue.dbPort,

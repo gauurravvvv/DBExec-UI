@@ -337,22 +337,22 @@ export class SqlQueryDialogComponent
     }
 
     // Transform schema data to the format expected by MonacoIntelliSenseService
-    const databases = this.transformSchemaData();
+    const datasources = this.transformSchemaData();
 
-    if (databases.length === 0 || !this.editor) {
+    if (datasources.length === 0 || !this.editor) {
       return;
     }
 
     // Register completion provider using the service
     this.completionProviderDisposable =
       this.monacoIntelliSenseService.registerSQLCompletions(
-        databases,
+        datasources,
         this.editor,
       );
 
     // Register hover provider using the service
     this.hoverProviderDisposable =
-      this.monacoIntelliSenseService.registerHoverProvider(databases);
+      this.monacoIntelliSenseService.registerHoverProvider(datasources);
 
     // Register signature help provider
     this.signatureHelpDisposable =
@@ -365,7 +365,7 @@ export class SqlQueryDialogComponent
    * Input format (staticSchemaData from config-prompt):
    * [{ schema_name: string, tables: [{ table_name, table_alias, columns: [{ name, type }] }] }]
    *
-   * Output format (DatabaseSchema for MonacoIntelliSenseService):
+   * Output format (DatasourceSchema for MonacoIntelliSenseService):
    * [{ name: string, schemas: [{ name, tables: [{ name, columns: [{ name, type, nullable, isPrimaryKey, isForeignKey }] }] }] }]
    */
   private transformSchemaData(): any[] {
@@ -393,7 +393,7 @@ export class SqlQueryDialogComponent
     // Return as a database structure expected by the service
     return [
       {
-        name: 'database',
+        name: 'datasource',
         schemas: schemas,
       },
     ];

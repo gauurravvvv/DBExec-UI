@@ -15,8 +15,8 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { DatasetService } from '../../services/dataset.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
-import { ScreenService } from 'src/app/modules/screen/services/screen.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';
 import { AnalysesService } from 'src/app/modules/analyses/service/analyses.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
@@ -51,9 +51,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   qbTotalRecords = 0;
   qbActiveIndex = -1;
   organisations: any[] = [];
-  databases: any[] = [];
+  datasources: any[] = [];
   selectedOrg: any = null;
-  selectedDatabase: any = null;
+  selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
 
@@ -99,8 +99,8 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     private router: Router,
     private globalService: GlobalService,
     private datasetService: DatasetService,
-    private databaseService: DatabaseService,
-    private screenService: ScreenService,
+    private datasourceService: DatasourceService,
+    private queryBuilderService: QueryBuilderService,
     private analysesService: AnalysesService,
     private route: ActivatedRoute,
   ) {}
@@ -121,7 +121,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       });
 
     this.route.queryParams.subscribe(params => {
-      if (params['orgId'] || params['databaseId'] || params['name']) {
+      if (params['orgId'] || params['datasourceId'] || params['name']) {
         this.handleDeepLinking(params);
       } else {
         if (this.showOrganisationDropdown) {
@@ -129,7 +129,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         } else {
           this.selectedOrg =
             this.globalService.getTokenDetails('organisationId');
-          this.loadDatabases();
+          this.loadDatasources();
         }
       }
     });
@@ -137,7 +137,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   handleDeepLinking(params: any) {
     const orgId = params['orgId'] ? params['orgId'] : null;
-    const databaseId = params['databaseId'] ? params['databaseId'] : null;
+    const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
     const name = params['name'];
 
     if (name) {
@@ -151,20 +151,20 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
       orgPromise.then(() => {
         if (orgId) {
-          if (databaseId) {
-            this.loadDatabases(databaseId);
+          if (datasourceId) {
+            this.loadDatasources(datasourceId);
           } else {
-            this.loadDatabases();
+            this.loadDatasources();
           }
         }
       });
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
 
-      if (databaseId) {
-        this.loadDatabases(databaseId);
+      if (datasourceId) {
+        this.loadDatasources(datasourceId);
       } else {
-        this.loadDatabases();
+        this.loadDatasources();
       }
     }
   }
@@ -199,12 +199,12 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
             }
 
             if (!preSelectedOrgId) {
-              this.loadDatabases();
+              this.loadDatasources();
             }
           } else {
             this.selectedOrg = null;
-            this.databases = [];
-            this.selectedDatabase = null;
+            this.datasources = [];
+            this.selectedDatasource = null;
             this.datasets = [];
             this.filteredDatasets = [];
             this.totalRecords = 0;
@@ -217,11 +217,11 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  onDBChange(databaseId: any) {
-    this.selectedDatabase = databaseId;
+  onDBChange(datasourceId: any) {
+    this.selectedDatasource = datasourceId;
     this.loadDatasets();
   }
 
@@ -247,7 +247,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadDatabases(preSelectedDbId?: string): Promise<void> {
+  loadDatasources(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
       if (!this.selectedOrg) {
         resolve();
@@ -259,31 +259,31 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService
-        .listDatabase(params)
+      this.datasourceService
+        .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.databases = response.data.databases || [];
-            if (this.databases.length > 0) {
+            this.datasources = response.data.databases || [];
+            if (this.datasources.length > 0) {
               if (
                 preSelectedDbId &&
-                this.databases.find(d => d.id === preSelectedDbId)
+                this.datasources.find(d => d.id === preSelectedDbId)
               ) {
-                this.selectedDatabase = preSelectedDbId;
+                this.selectedDatasource = preSelectedDbId;
               } else {
-                this.selectedDatabase = this.databases[0].id;
+                this.selectedDatasource = this.datasources[0].id;
               }
               this.loadDatasets();
             } else {
-              this.selectedDatabase = null;
+              this.selectedDatasource = null;
               this.datasets = [];
               this.filteredDatasets = [];
               this.totalRecords = 0;
             }
           } else {
             this.selectedOrg = null;
-            this.databases = [];
-            this.selectedDatabase = null;
+            this.datasources = [];
+            this.selectedDatasource = null;
             this.datasets = [];
             this.filteredDatasets = [];
             this.totalRecords = 0;
@@ -292,8 +292,8 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
         })
         .catch(() => {
           this.selectedOrg = null;
-          this.databases = [];
-          this.selectedDatabase = null;
+          this.datasources = [];
+          this.selectedDatasource = null;
           this.datasets = [];
           this.filteredDatasets = [];
           this.totalRecords = 0;
@@ -303,7 +303,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   }
 
   loadDatasets(event?: any) {
-    if (!this.selectedOrg || !this.selectedDatabase) return;
+    if (!this.selectedOrg || !this.selectedDatasource) return;
 
     // Store the event for future reloads
     if (event) {
@@ -315,7 +315,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
     const params: any = {
       orgId: this.selectedOrg,
-      databaseId: this.selectedDatabase,
+      datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
     };
@@ -416,12 +416,12 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   }
 
   private loadQueryBuilders() {
-    if (!this.selectedOrg || !this.selectedDatabase) return;
+    if (!this.selectedOrg || !this.selectedDatasource) return;
 
     this.loadingQueryBuilders = true;
     const params: any = {
       orgId: this.selectedOrg,
-      databaseId: this.selectedDatabase,
+      datasourceId: this.selectedDatasource,
       page: 1,
       limit: MAX_LIMIT,
     };
@@ -431,11 +431,11 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify({ name: term });
     }
 
-    this.screenService
-      .listScreen(params)
+    this.queryBuilderService
+      .listQueryBuilder(params)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.queryBuilders = response.data?.screens || [];
+          this.queryBuilders = response.data?.queryBuilders || [];
           this.qbTotalRecords =
             response.data?.count || this.queryBuilders.length;
         } else {
@@ -451,13 +451,13 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       });
   }
 
-  onQueryBuilderSelect(screen: any) {
+  onQueryBuilderSelect(queryBuilder: any) {
     this.showQueryBuilderPopup = false;
     this.router.navigate([
-      '/app/screen/execute',
+      '/app/query-builder/execute',
       this.selectedOrg,
-      this.selectedDatabase,
-      screen.id,
+      this.selectedDatasource,
+      queryBuilder.id,
     ]);
   }
 
@@ -478,7 +478,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           description: result.description,
           datasetId: this.analysisDatasetId,
           organisation: this.selectedOrg,
-          database: this.selectedDatabase,
+          datasource: this.selectedDatasource,
         })
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response, true)) {

@@ -86,12 +86,12 @@
         >
         </app-custom-dropdown>
 
-        <!-- Database Dropdown -->
+        <!-- Datasource Dropdown -->
         <app-custom-dropdown
-          formControlName="database"
-          label="Database"
-          placeholder="Select Database"
-          [options]="databases"
+          formControlName="datasource"
+          label="Datasource"
+          placeholder="Select Datasource"
+          [options]="datasources"
           optionLabel="name"
           optionValue="id"
           [filter]="true"
@@ -99,19 +99,19 @@
           [required]="true"
           [showError]="
             !!(
-              connectionForm.get('database')?.invalid &&
-              connectionForm.get('database')?.touched
+              connectionForm.get('datasource')?.invalid &&
+              connectionForm.get('datasource')?.touched
             )
           "
-          errorMessage="Database is required"
+          errorMessage="Datasource is required"
         >
         </app-custom-dropdown>
 
         <!-- DB Username -->
         <app-custom-input
           formControlName="dbUsername"
-          label="Database Username"
-          placeholder="Enter Database Username"
+          label="Datasource Username"
+          placeholder="Enter Datasource Username"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -120,14 +120,14 @@
               connectionForm.get('dbUsername')?.touched
             )
           "
-          errorMessage="Database Username is required"
+          errorMessage="Datasource Username is required"
         >
         </app-custom-input>
 
         <!-- DB Password -->
         <div class="form-field">
           <label for="password"
-            >Database Password<span class="required"> *</span></label
+            >Datasource Password<span class="required"> *</span></label
           >
           <span class="p-input-icon-left p-input-icon-right">
             <i class="pi pi-lock"></i>
@@ -156,7 +156,7 @@
               connectionForm.get('dbPassword')?.touched
             "
           >
-            Database Password is required
+            Datasource Password is required
           </small>
         </div>
       </div>

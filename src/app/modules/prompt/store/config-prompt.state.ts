@@ -1,10 +1,10 @@
 /**
  * Config Prompt State Interface and Initial State
- * This file defines the shape of the state with dynamic database schema keys.
+ * This file defines the shape of the state with dynamic datasource schema keys.
  * Data is stored with key format: schema_{orgId}_{dbId}
  *
  * Cache Management:
- * - Max 10 database schemas cached (LRU eviction)
+ * - Max 10 datasource schemas cached (LRU eviction)
  * - 10 minute TTL (auto-refresh stale data)
  */
 

@@ -32,11 +32,11 @@ export class PromptService {
   }
 
   addPrompt(promptForm: any) {
-    const { organisation, database, tab, prompts } = promptForm;
+    const { organisation, datasource, tab, prompts } = promptForm;
     return this.http
       .post(PROMPT.ADD, {
         organisation,
-        database,
+        datasource,
         tab,
         prompts,
       })
@@ -61,7 +61,7 @@ export class PromptService {
     const {
       id,
       organisation,
-      database,
+      datasource,
       tab,
       section,
       name,
@@ -72,7 +72,7 @@ export class PromptService {
       .put(PROMPT.UPDATE, {
         id,
         organisation,
-        database,
+        datasource,
         tab,
         section,
         name,
@@ -134,7 +134,7 @@ export class PromptService {
     return this.http
       .post(PROMPT.GET_PROMPT_VALUES_BY_SQL, {
         orgId: params.orgId,
-        databaseId: params.databaseId,
+        datasourceId: params.datasourceId,
         query: params.query,
       })
       .toPromise()
@@ -148,7 +148,7 @@ export class PromptService {
     return this.http
       .put(PROMPT.REFRSH_PROMPT_VALUES_BY_SQL, {
         organisation: params.orgId,
-        databaseId: params.databaseId,
+        datasourceId: params.datasourceId,
         promptId: params.promptId,
       })
       .toPromise()

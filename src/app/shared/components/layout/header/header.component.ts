@@ -59,7 +59,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     },
     {
       id: '2',
-      message: 'Database "Main DB" is now connected',
+      message: 'Datasource "Main DB" is now connected',
       time: new Date(Date.now() - 3600000), // 1 hour ago
       read: true,
       icon: 'pi-database',

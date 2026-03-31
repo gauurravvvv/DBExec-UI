@@ -17,13 +17,13 @@ import { debounceTime, first } from 'rxjs/operators';
 import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import {
   EDITOR_LOADING_CONFIG,
   MONACO_EDITOR_OPTIONS,
 } from '../../config/sql-editor.config';
-import { DatabaseSchema, QueryResult } from '../../helpers/dummy-data.helper';
+import { DatasourceSchema, QueryResult } from '../../helpers/dummy-data.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
@@ -60,7 +60,7 @@ export class AddDatasetComponent
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   // Removed ViewChild as we now use dynamic containers per tab
-  @Input() databaseId?: string;
+  @Input() datasourceId?: string;
   @Input() orgId?: string;
   @Input() initialQuery?: string;
 
@@ -70,7 +70,7 @@ export class AddDatasetComponent
   isExecutingQuery = false;
   monacoLoadFailed = false;
   queryResult: QueryResult | null = null;
-  databases: DatabaseSchema[] = [];
+  datasources: DatasourceSchema[] = [];
   currentQuery = '';
 
   // Theme monitoring
@@ -81,19 +81,19 @@ export class AddDatasetComponent
   private boundCloseContextMenu = this.closeContextMenu.bind(this);
 
   // Database sidebar
-  showDatabaseSidebar = true;
-  expandedDatabases: { [key: string]: boolean } = {};
+  showDatasourceSidebar = true;
+  expandedDatasources: { [key: string]: boolean } = {};
   expandedSchemas: { [key: string]: boolean } = {};
   expandedTables: { [key: string]: boolean } = {};
   schemaSearchText = '';
-  selectedDatabase: string = '';
+  selectedDatasource: string = '';
   selectedSchema: string = '';
 
   // Context Menu
   showContextMenu = false;
   contextMenuPosition: ContextMenuPosition = { x: 0, y: 0 };
   contextMenuItems: ContextMenuItem[] = [];
-  contextMenuDatabase: any | null = null;
+  contextMenuDatasource: any | null = null;
 
   // Save as Dataset Dialog
   showDatasetDialog = false;
@@ -114,7 +114,7 @@ export class AddDatasetComponent
 
   // Change Confirmation Dialog
   showChangeConfirmDialog = false;
-  pendingDatabaseChange: any = null;
+  pendingDatasourceChange: any = null;
   pendingOrgChange: any = null;
 
   // IntelliSense provider disposables
@@ -127,13 +127,13 @@ export class AddDatasetComponent
   selectedOrg: any = {};
   userRole: string = '';
   showOrganisationDropdown: boolean = false;
-  availableDatabases: any[] = [];
-  selectedDatabaseObj: any = null;
+  availableDatasources: any[] = [];
+  selectedDatasourceObj: any = null;
 
   // Database Schema Management
-  databaseSchemas: { [dbId: string]: DatabaseSchema } = {};
-  loadingDatabases: { [dbId: string]: boolean } = {};
-  isLoadingDatabases: boolean = false;
+  datasourceSchemas: { [dbId: string]: DatasourceSchema } = {};
+  loadingDatasources: { [dbId: string]: boolean } = {};
+  isLoadingDatasources: boolean = false;
 
   // NgRx Store Observables for schema caching
   private schemaDataObservables: Map<string, Observable<any | null>> =
@@ -143,12 +143,12 @@ export class AddDatasetComponent
     Observable<SchemaLoadingStatus>
   > = new Map();
 
-  get filteredAvailableDatabases(): any[] {
+  get filteredAvailableDatasources(): any[] {
     if (!this.schemaSearchText) {
-      return this.availableDatabases;
+      return this.availableDatasources;
     }
     const search = this.schemaSearchText.toLowerCase();
-    return this.availableDatabases.filter(db =>
+    return this.availableDatasources.filter(db =>
       db.name.toLowerCase().includes(search),
     );
   }
@@ -190,7 +190,7 @@ export class AddDatasetComponent
 
   constructor(
     private queryService: QueryService,
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private monacoIntelliSenseService: MonacoIntelliSenseService,
     private sqlFormatterService: SqlFormatterService,
     private sqlValidatorService: SqlValidatorService,
@@ -221,7 +221,7 @@ export class AddDatasetComponent
         }
       }
 
-      this.executeQueryForDatabase(
+      this.executeQueryForDatasource(
         this.lastExecutedQuery,
         1,
         this.resultRows,
@@ -236,7 +236,7 @@ export class AddDatasetComponent
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadDatabases();
+      this.loadDatasources();
       this.initializeComponent();
     }
   }
@@ -260,14 +260,14 @@ export class AddDatasetComponent
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0];
-          this.loadDatabases();
+          this.loadDatasources();
           this.initializeComponent();
         }
       }
     });
   }
 
-  onDatabaseChange(event: any): void {
+  onDatasourceChange(event: any): void {
     const selectedDb = event.value;
     if (!selectedDb || !selectedDb.id) return;
 
@@ -278,29 +278,29 @@ export class AddDatasetComponent
     const isDefaultContent = editorValue === defaultContent.trim();
 
     // Only show confirmation if there's actual user content (not empty and not default)
-    if (hasContent && !isDefaultContent && this.selectedDatabaseObj) {
+    if (hasContent && !isDefaultContent && this.selectedDatasourceObj) {
       // Show confirmation dialog
-      this.pendingDatabaseChange = selectedDb;
+      this.pendingDatasourceChange = selectedDb;
       this.showChangeConfirmDialog = true;
       // Revert dropdown to current selection
       setTimeout(() => {
-        this.selectedDatabaseObj = this.selectedDatabaseObj;
+        this.selectedDatasourceObj = this.selectedDatasourceObj;
       }, 0);
       return;
     }
 
-    this.proceedWithDatabaseChange(selectedDb);
+    this.proceedWithDatasourceChange(selectedDb);
   }
 
-  private proceedWithDatabaseChange(selectedDb: any): void {
+  private proceedWithDatasourceChange(selectedDb: any): void {
     // Reset editor and results
     this.resetEditor();
 
     // Expand the database in the tree
-    this.expandedDatabases[selectedDb.id] = true;
+    this.expandedDatasources[selectedDb.id] = true;
 
     // Always load schema from API (don't use cached data)
-    this.loadDatabaseSchema(selectedDb.id).then(() => {
+    this.loadDatasourceSchema(selectedDb.id).then(() => {
       // Initialize editor if not already done
       if (!this.editor) {
         setTimeout(() => this.loadMonacoEditor(), 100);
@@ -308,54 +308,54 @@ export class AddDatasetComponent
     });
   }
 
-  loadDatabases(): void {
+  loadDatasources(): void {
     if (!this.selectedOrg || !this.selectedOrg.id) return;
 
-    this.isLoadingDatabases = true;
-    this.selectedDatabaseObj = null;
+    this.isLoadingDatasources = true;
+    this.selectedDatasourceObj = null;
     const params = {
       orgId: this.selectedOrg.id,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
 
-    this.databaseService
-      .listDatabase(params)
+    this.datasourceService
+      .listDatasource(params)
       .then(response => {
-        this.isLoadingDatabases = false;
+        this.isLoadingDatasources = false;
         if (this.globalService.handleSuccessService(response, false)) {
-          this.availableDatabases = response.data.databases || [];
+          this.availableDatasources = response.data.databases || [];
 
           // Auto-select the first database and load its schema
-          if (this.availableDatabases.length > 0) {
-            this.selectedDatabaseObj = this.availableDatabases[0];
-            this.proceedWithDatabaseChange(this.selectedDatabaseObj);
+          if (this.availableDatasources.length > 0) {
+            this.selectedDatasourceObj = this.availableDatasources[0];
+            this.proceedWithDatasourceChange(this.selectedDatasourceObj);
           }
         }
       })
       .catch(() => {
-        this.isLoadingDatabases = false;
+        this.isLoadingDatasources = false;
       });
   }
 
-  refreshDatabases(): void {
-    // Collapse all expanded databases
-    this.expandedDatabases = {};
+  refreshDatasources(): void {
+    // Collapse all expanded datasources
+    this.expandedDatasources = {};
     this.expandedSchemas = {};
     this.expandedTables = {};
 
     // Clear all cached schema data
-    this.databaseSchemas = {};
-    this.loadingDatabases = {};
+    this.datasourceSchemas = {};
+    this.loadingDatasources = {};
 
-    // Clear the databases array for IntelliSense
-    this.databases = [];
+    // Clear the datasources array for IntelliSense
+    this.datasources = [];
 
     // Reload the database list
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  refreshSingleDatabase(dbId: string): void {
+  refreshSingleDatasource(dbId: string): void {
     if (!dbId || !this.selectedOrg?.id) return;
 
     const orgId = this.selectedOrg.id.toString();
@@ -382,22 +382,24 @@ export class AddDatasetComponent
     });
 
     // Collapse the database itself
-    delete this.expandedDatabases[dbId];
+    delete this.expandedDatasources[dbId];
 
     // Clear local cache
-    delete this.databaseSchemas[dbId];
-    delete this.loadingDatabases[dbId];
+    delete this.datasourceSchemas[dbId];
+    delete this.loadingDatasources[dbId];
 
-    // Remove from IntelliSense databases array
-    this.databases = this.databases.filter(db => db.name !== dbId.toString());
+    // Remove from IntelliSense datasources array
+    this.datasources = this.datasources.filter(
+      db => db.name !== dbId.toString(),
+    );
 
     // Re-fetch schema for this database from API
-    this.loadDatabaseSchemaFromAPI(dbId);
+    this.loadDatasourceSchemaFromAPI(dbId);
   }
 
-  refreshSelectedDatabase(): void {
-    if (!this.selectedDatabaseObj || !this.selectedDatabaseObj.id) return;
-    this.refreshSingleDatabase(this.selectedDatabaseObj.id);
+  refreshSelectedDatasource(): void {
+    if (!this.selectedDatasourceObj || !this.selectedDatasourceObj.id) return;
+    this.refreshSingleDatasource(this.selectedDatasourceObj.id);
   }
 
   onOrgChange(event: any): void {
@@ -432,13 +434,13 @@ export class AddDatasetComponent
     this.resetEditor();
 
     // Clear existing data
-    this.availableDatabases = [];
-    this.selectedDatabaseObj = null;
-    this.databaseSchemas = {};
-    this.expandedDatabases = {};
+    this.availableDatasources = [];
+    this.selectedDatasourceObj = null;
+    this.datasourceSchemas = {};
+    this.expandedDatasources = {};
 
-    // Reload databases for the new organisation
-    this.loadDatabases();
+    // Reload datasources for the new organisation
+    this.loadDatasources();
   }
 
   /**
@@ -598,7 +600,7 @@ export class AddDatasetComponent
   }
 
   private initMonaco(): void {
-    if (!this.selectedDatabaseObj) {
+    if (!this.selectedDatasourceObj) {
       this.isLoadingEditor = false;
       return;
     }
@@ -704,17 +706,17 @@ export class AddDatasetComponent
     if (this.editor) {
       this.completionProviderDisposable =
         this.monacoIntelliSenseService.registerSQLCompletions(
-          this.databases,
+          this.datasources,
           this.editor,
         );
       this.hoverProviderDisposable =
-        this.monacoIntelliSenseService.registerHoverProvider(this.databases);
+        this.monacoIntelliSenseService.registerHoverProvider(this.datasources);
       this.signatureHelpDisposable =
         this.monacoIntelliSenseService.registerSignatureHelpProvider();
     }
   }
 
-  private async loadDatabaseSchema(dbId: string): Promise<void> {
+  private async loadDatasourceSchema(dbId: string): Promise<void> {
     if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
 
     const orgId = this.selectedOrg.id.toString();
@@ -728,7 +730,7 @@ export class AddDatasetComponent
         .subscribe(cachedEntry => {
           if (!cachedEntry || !cachedEntry.data) {
             // No cached data, load from API
-            this.loadDatabaseSchemaFromAPI(dbId).then(resolve).catch(reject);
+            this.loadDatasourceSchemaFromAPI(dbId).then(resolve).catch(reject);
           } else {
             // Check if data is stale
             this.store
@@ -737,7 +739,7 @@ export class AddDatasetComponent
               .subscribe(isStale => {
                 if (isStale) {
                   // Data is stale, refresh from API
-                  this.loadDatabaseSchemaFromAPI(dbId)
+                  this.loadDatasourceSchemaFromAPI(dbId)
                     .then(resolve)
                     .catch(reject);
                 } else {
@@ -756,27 +758,27 @@ export class AddDatasetComponent
    */
   private applyCachedSchemaData(dbId: string, schemaData: any): void {
     // Store schema data by database ID
-    this.databaseSchemas[dbId] = schemaData;
+    this.datasourceSchemas[dbId] = schemaData;
 
-    // Update databases array for IntelliSense
-    this.databases = Object.values(this.databaseSchemas);
+    // Update datasources array for IntelliSense
+    this.datasources = Object.values(this.datasourceSchemas);
 
     // Re-register completions with new schema
     this.registerIntelliSenseProviders();
 
-    this.loadingDatabases[dbId] = false;
+    this.loadingDatasources[dbId] = false;
   }
 
   /**
-   * Load database schema from API and update store
+   * Load datasource schema from API and update store
    */
-  private async loadDatabaseSchemaFromAPI(dbId: string): Promise<void> {
+  private async loadDatasourceSchemaFromAPI(dbId: string): Promise<void> {
     if (!dbId || !this.selectedOrg?.id) return Promise.resolve();
 
     const orgId = this.selectedOrg.id.toString();
     const dbIdStr = dbId.toString();
 
-    this.loadingDatabases[dbId] = true;
+    this.loadingDatasources[dbId] = true;
 
     // Dispatch loading action
     this.store.dispatch(
@@ -789,7 +791,7 @@ export class AddDatasetComponent
     return new Promise((resolve, reject) => {
       try {
         this.queryService
-          .getDatabaseStructure(dbId, this.selectedOrg.id)
+          .getDatasourceStructure(dbId, this.selectedOrg.id)
           .subscribe({
             next: (response: any) => {
               const schemaData =
@@ -806,16 +808,16 @@ export class AddDatasetComponent
                 );
 
                 // Store schema data by database ID
-                this.databaseSchemas[dbId] = schemaData[0];
+                this.datasourceSchemas[dbId] = schemaData[0];
               }
 
-              // Update databases array for IntelliSense
-              this.databases = Object.values(this.databaseSchemas);
+              // Update datasources array for IntelliSense
+              this.datasources = Object.values(this.datasourceSchemas);
 
               // Re-register completions with new schema
               this.registerIntelliSenseProviders();
 
-              this.loadingDatabases[dbId] = false;
+              this.loadingDatasources[dbId] = false;
               resolve();
             },
             error: (error: any) => {
@@ -828,7 +830,7 @@ export class AddDatasetComponent
                 }),
               );
 
-              this.loadingDatabases[dbId] = false;
+              this.loadingDatasources[dbId] = false;
               reject(error);
             },
           });
@@ -842,7 +844,7 @@ export class AddDatasetComponent
           }),
         );
 
-        this.loadingDatabases[dbId] = false;
+        this.loadingDatasources[dbId] = false;
         reject(error);
       }
     });
@@ -880,7 +882,7 @@ export class AddDatasetComponent
     this.resultPage = 1;
     this.resultFilterValues = {};
     this.queryResult = null;
-    this.executeQueryForDatabase(query);
+    this.executeQueryForDatasource(query);
   }
 
   /**
@@ -891,7 +893,7 @@ export class AddDatasetComponent
     this.resultPage = 1;
     this.resultFilterValues = {};
     this.queryResult = null;
-    this.executeQueryForDatabase(selectedText);
+    this.executeQueryForDatasource(selectedText);
   }
 
   clearEditor(): void {
@@ -901,11 +903,11 @@ export class AddDatasetComponent
   }
 
   exportCurrentScript(): void {
-    if (!this.editor || !this.selectedDatabaseObj) return;
+    if (!this.editor || !this.selectedDatasourceObj) return;
 
     const query = this.editor.getValue();
-    const databaseName = this.selectedDatabaseObj.name || 'database';
-    const fileName = `${databaseName}_script.sql`;
+    const datasourceName = this.selectedDatasourceObj.name || 'datasource';
+    const fileName = `${datasourceName}_script.sql`;
 
     const blob = new Blob([query], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
@@ -987,7 +989,7 @@ export class AddDatasetComponent
   }
 
   saveAsDataset(): void {
-    if (!this.selectedDatabaseObj) return;
+    if (!this.selectedDatasourceObj) return;
 
     // Show dialog
     this.showDatasetDialog = true;
@@ -1004,9 +1006,9 @@ export class AddDatasetComponent
     // Proceed with change without saving
     this.showChangeConfirmDialog = false;
 
-    if (this.pendingDatabaseChange) {
-      this.proceedWithDatabaseChange(this.pendingDatabaseChange);
-      this.pendingDatabaseChange = null;
+    if (this.pendingDatasourceChange) {
+      this.proceedWithDatasourceChange(this.pendingDatasourceChange);
+      this.pendingDatasourceChange = null;
     }
 
     if (this.pendingOrgChange) {
@@ -1017,7 +1019,7 @@ export class AddDatasetComponent
 
   onCancelChange(): void {
     this.showChangeConfirmDialog = false;
-    this.pendingDatabaseChange = null;
+    this.pendingDatasourceChange = null;
     this.pendingOrgChange = null;
   }
 
@@ -1042,14 +1044,18 @@ export class AddDatasetComponent
     this.resultFilterValues = {};
     this.resultPage = 1;
     if (this.lastExecutedQuery) {
-      this.executeQueryForDatabase(this.lastExecutedQuery, 1, this.resultRows);
+      this.executeQueryForDatasource(
+        this.lastExecutedQuery,
+        1,
+        this.resultRows,
+      );
     }
   }
 
   exportResultsAsCsv(): void {
     if (
       !this.lastExecutedQuery ||
-      !this.selectedDatabaseObj?.id ||
+      !this.selectedDatasourceObj?.id ||
       !this.selectedOrg?.id
     )
       return;
@@ -1066,7 +1072,7 @@ export class AddDatasetComponent
 
     const payload: any = {
       orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabaseObj.id,
+      datasourceId: this.selectedDatasourceObj.id,
       query: this.lastExecutedQuery,
     };
 
@@ -1076,8 +1082,8 @@ export class AddDatasetComponent
 
     this.queryService.exportQueryResults(payload).subscribe({
       next: (blob: Blob) => {
-        const databaseName = this.selectedDatabaseObj.name || 'database';
-        const fileName = `${databaseName}_query_results.csv`;
+        const datasourceName = this.selectedDatasourceObj.name || 'datasource';
+        const fileName = `${datasourceName}_query_results.csv`;
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -1126,10 +1132,10 @@ export class AddDatasetComponent
       }
     }
 
-    this.executeQueryForDatabase(this.lastExecutedQuery, page, limit, filter);
+    this.executeQueryForDatasource(this.lastExecutedQuery, page, limit, filter);
   }
 
-  private executeQueryForDatabase(
+  private executeQueryForDatasource(
     query: string,
     page: number = 1,
     limit: number = this.resultRows,
@@ -1139,7 +1145,7 @@ export class AddDatasetComponent
       return;
     }
 
-    if (!this.selectedDatabaseObj?.id || !this.selectedOrg?.id) {
+    if (!this.selectedDatasourceObj?.id || !this.selectedOrg?.id) {
       return;
     }
 
@@ -1150,7 +1156,7 @@ export class AddDatasetComponent
 
     const payload: any = {
       orgId: this.selectedOrg.id,
-      databaseId: this.selectedDatabaseObj.id,
+      datasourceId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
       limit: limit,
@@ -1265,7 +1271,7 @@ export class AddDatasetComponent
     this.showDatasetDialog = false;
 
     if (formData) {
-      if (!this.selectedDatabaseObj) return;
+      if (!this.selectedDatasourceObj) return;
 
       // Get the SQL query
       const sql = this.editor?.getValue() || this.currentQuery;
@@ -1274,7 +1280,7 @@ export class AddDatasetComponent
         name: formData.name,
         description: formData.description,
         organisation: this.selectedOrg?.id,
-        database: this.selectedDatabaseObj.id,
+        datasource: this.selectedDatasourceObj.id,
         sql,
       };
 
@@ -1285,9 +1291,9 @@ export class AddDatasetComponent
           this.router.navigate([DATASET.LIST]);
           // Dataset saved successfully
           // Now proceed with pending change if any
-          if (this.pendingDatabaseChange) {
-            this.proceedWithDatabaseChange(this.pendingDatabaseChange);
-            this.pendingDatabaseChange = null;
+          if (this.pendingDatasourceChange) {
+            this.proceedWithDatasourceChange(this.pendingDatasourceChange);
+            this.pendingDatasourceChange = null;
           }
           if (this.pendingOrgChange) {
             this.proceedWithOrgChange(this.pendingOrgChange);
@@ -1298,8 +1304,8 @@ export class AddDatasetComponent
     }
   }
 
-  toggleDatabaseSidebar(): void {
-    this.showDatabaseSidebar = !this.showDatabaseSidebar;
+  toggleDatasourceSidebar(): void {
+    this.showDatasourceSidebar = !this.showDatasourceSidebar;
     // Trigger Monaco editor resize after sidebar animation
     setTimeout(() => {
       if (this.editor) {
@@ -1308,12 +1314,12 @@ export class AddDatasetComponent
     }, 300);
   }
 
-  toggleDatabase(db: any): void {
-    const isExpanded = this.expandedDatabases[db.id];
+  toggleDatasource(db: any): void {
+    const isExpanded = this.expandedDatasources[db.id];
 
     if (isExpanded) {
       // Collapse - also collapse all child schemas and tables
-      this.expandedDatabases[db.id] = false;
+      this.expandedDatasources[db.id] = false;
 
       // Collapse all schemas under this database
       Object.keys(this.expandedSchemas).forEach(key => {
@@ -1330,10 +1336,10 @@ export class AddDatasetComponent
       });
     } else {
       // Expand - fetch schema if not already loaded
-      this.expandedDatabases[db.id] = true;
+      this.expandedDatasources[db.id] = true;
 
-      if (!this.databaseSchemas[db.id]) {
-        this.loadDatabaseSchema(db.id);
+      if (!this.datasourceSchemas[db.id]) {
+        this.loadDatasourceSchema(db.id);
       }
     }
   }
@@ -1397,18 +1403,18 @@ export class AddDatasetComponent
     this.editor.focus();
   }
 
-  onDatabaseContextMenu(event: MouseEvent, database: any): void {
+  onDatasourceContextMenu(event: MouseEvent, datasource: any): void {
     event.preventDefault();
     event.stopPropagation();
 
-    this.contextMenuDatabase = database;
+    this.contextMenuDatasource = datasource;
     this.contextMenuPosition = { x: event.clientX, y: event.clientY };
 
     this.contextMenuItems = [
       {
         label: 'Refresh Schema',
         icon: 'pi pi-refresh',
-        command: () => this.refreshDatabaseFromContext(),
+        command: () => this.refreshDatasourceFromContext(),
       },
     ];
 
@@ -1417,14 +1423,14 @@ export class AddDatasetComponent
 
   closeContextMenu(): void {
     this.showContextMenu = false;
-    this.contextMenuDatabase = null;
+    this.contextMenuDatasource = null;
   }
 
-  refreshDatabaseFromContext(): void {
-    if (!this.contextMenuDatabase) return;
+  refreshDatasourceFromContext(): void {
+    if (!this.contextMenuDatasource) return;
 
     // Refresh schema for this specific database
-    this.refreshSingleDatabase(this.contextMenuDatabase.id);
+    this.refreshSingleDatasource(this.contextMenuDatasource.id);
 
     this.closeContextMenu();
   }

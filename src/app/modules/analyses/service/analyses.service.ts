@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import {
-  DATABASE,
+  DATASOURCE,
   DATASET,
   SUPER_ADMIN,
   ANALYSES,
@@ -21,7 +21,7 @@ export class AnalysesService {
       .get(
         DATASET.LIST +
           `/${params.orgId}` +
-          `/${params.databaseId}` +
+          `/${params.datasourceId}` +
           `/${params.pageNumber}/${params.limit}`,
       )
       .toPromise()
@@ -42,7 +42,7 @@ export class AnalysesService {
   }
 
   addAnalyses(payload: any) {
-    const { name, description, datasetId, organisation, database } = payload;
+    const { name, description, datasetId, organisation, datasource } = payload;
 
     return this.http
       .post(ANALYSES.ADD, {
@@ -50,7 +50,7 @@ export class AnalysesService {
         description,
         datasetId,
         organisation,
-        database,
+        datasource,
       })
       .toPromise()
       .then((response: any) => {
@@ -136,7 +136,7 @@ export class AnalysesService {
       description,
       datasetId,
       organisation,
-      database,
+      datasource,
       visuals,
     } = payload;
 
@@ -147,7 +147,7 @@ export class AnalysesService {
         description,
         datasetId,
         organisation,
-        database,
+        datasource,
         visuals,
         justification,
       })
@@ -215,7 +215,7 @@ export class AnalysesService {
       });
   }
 
-  updateDatabase(payload: any) {
+  updateDatasource(payload: any) {
     const {
       id,
       name,
@@ -223,7 +223,7 @@ export class AnalysesService {
       type,
       host,
       port,
-      database,
+      datasource,
       username,
       password,
       organisation,
@@ -231,14 +231,14 @@ export class AnalysesService {
       status,
     } = payload;
     return this.http
-      .put(DATABASE.UPDATE, {
+      .put(DATASOURCE.UPDATE, {
         id,
         name,
         description,
         type,
         host,
         port,
-        database,
+        datasource,
         username,
         password,
         organisation,
@@ -252,9 +252,11 @@ export class AnalysesService {
       });
   }
 
-  listDatabaseSchemas(params: any) {
+  listDatasourceSchemas(params: any) {
     return this.http
-      .get(DATABASE.LIST_SCHEMAS + `${params.orgId}` + `/${params.databaseId}`)
+      .get(
+        DATASOURCE.LIST_SCHEMAS + `${params.orgId}` + `/${params.datasourceId}`,
+      )
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -265,9 +267,9 @@ export class AnalysesService {
   listSchemaTables(params: any) {
     return this.http
       .get(
-        DATABASE.LIST_SCHEMA_TABLES +
+        DATASOURCE.LIST_SCHEMA_TABLES +
           `${params.orgId}` +
-          `/${params.databaseId}` +
+          `/${params.datasourceId}` +
           `/${params.schemaName}`,
       )
       .toPromise()
@@ -280,9 +282,9 @@ export class AnalysesService {
   listTableColumns(params: any) {
     return this.http
       .get(
-        DATABASE.LIST_TABLE_COLUMNS +
+        DATASOURCE.LIST_TABLE_COLUMNS +
           `${params.orgId}` +
-          `/${params.databaseId}` +
+          `/${params.datasourceId}` +
           `/${params.schemaName}` +
           `/${params.tableName}`,
       )
@@ -318,7 +320,7 @@ export class AnalysesService {
   }
 
   updateDataset(payload: any) {
-    const { id, name, description, organisation, database, sql } = payload;
+    const { id, name, description, organisation, datasource, sql } = payload;
 
     return this.http
       .put(DATASET.UPDATE, {
@@ -326,7 +328,7 @@ export class AnalysesService {
         name,
         description,
         organisation,
-        database,
+        datasource,
         sql,
       })
       .toPromise()

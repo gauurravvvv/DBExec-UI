@@ -7,7 +7,7 @@ import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
@@ -29,9 +29,9 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   dashboardToDelete: string | null = null;
   deleteJustification = '';
   organisations: any[] = [];
-  databases: any[] = [];
+  datasources: any[] = [];
   selectedOrg: any = null;
-  selectedDatabase: any = null;
+  selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
 
@@ -41,7 +41,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     name: '',
     analysisName: '',
     datasetName: '',
-    databaseName: '',
+    datasourceName: '',
     createdDateRange: null,
   };
 
@@ -53,7 +53,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
       !!this.filterValues.name ||
       !!this.filterValues.analysisName ||
       !!this.filterValues.datasetName ||
-      !!this.filterValues.databaseName ||
+      !!this.filterValues.datasourceName ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -63,7 +63,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     private router: Router,
     private globalService: GlobalService,
     private dashboardService: DashboardService,
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private route: ActivatedRoute,
   ) {}
 
@@ -77,9 +77,8 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg =
-        this.globalService.getTokenDetails('organisationId');
-      this.loadDatabases();
+      this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+      this.loadDatasources();
     }
   }
 
@@ -101,11 +100,11 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
           this.organisations = response.data.orgs || [];
           if (this.organisations.length > 0) {
             this.selectedOrg = this.organisations[0].id;
-            this.loadDatabases();
+            this.loadDatasources();
           } else {
             this.selectedOrg = null;
-            this.databases = [];
-            this.selectedDatabase = null;
+            this.datasources = [];
+            this.selectedDatasource = null;
             this.dashboards = [];
             this.totalRecords = 0;
           }
@@ -117,11 +116,11 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    this.loadDatabases();
+    this.loadDatasources();
   }
 
-  onDBChange(databaseId: any) {
-    this.selectedDatabase = databaseId;
+  onDBChange(datasourceId: any) {
+    this.selectedDatasource = datasourceId;
     this.loadDashboards();
   }
 
@@ -134,7 +133,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
       name: '',
       analysisName: '',
       datasetName: '',
-      databaseName: '',
+      datasourceName: '',
       createdDateRange: null,
     };
     this.loadDashboards();
@@ -147,7 +146,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadDatabases(): Promise<void> {
+  loadDatasources(): Promise<void> {
     return new Promise(resolve => {
       if (!this.selectedOrg) {
         resolve();
@@ -159,23 +158,23 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
         limit: MAX_LIMIT,
       };
 
-      this.databaseService
-        .listDatabase(params)
+      this.datasourceService
+        .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.databases = response.data.databases || [];
-            if (this.databases.length > 0) {
-              this.selectedDatabase = this.databases[0].id;
+            this.datasources = response.data.databases || [];
+            if (this.datasources.length > 0) {
+              this.selectedDatasource = this.datasources[0].id;
               this.loadDashboards();
             } else {
-              this.selectedDatabase = null;
+              this.selectedDatasource = null;
               this.dashboards = [];
               this.totalRecords = 0;
             }
           } else {
             this.selectedOrg = null;
-            this.databases = [];
-            this.selectedDatabase = null;
+            this.datasources = [];
+            this.selectedDatasource = null;
             this.dashboards = [];
             this.totalRecords = 0;
           }
@@ -183,8 +182,8 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
         })
         .catch(() => {
           this.selectedOrg = null;
-          this.databases = [];
-          this.selectedDatabase = null;
+          this.datasources = [];
+          this.selectedDatasource = null;
           this.dashboards = [];
           this.totalRecords = 0;
           resolve();
@@ -193,7 +192,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   }
 
   loadDashboards(event?: any) {
-    if (!this.selectedOrg || !this.selectedDatabase) return;
+    if (!this.selectedOrg || !this.selectedDatasource) return;
 
     if (event) {
       this.lastTableLazyLoadEvent = event;
@@ -204,7 +203,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
     const params: any = {
       orgId: this.selectedOrg,
-      databaseId: this.selectedDatabase,
+      datasourceId: this.selectedDatasource,
       page: page,
       limit: limit,
     };
@@ -219,8 +218,8 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     if (this.filterValues.datasetName) {
       filter.datasetName = this.filterValues.datasetName;
     }
-    if (this.filterValues.databaseName) {
-      filter.databaseName = this.filterValues.databaseName;
+    if (this.filterValues.datasourceName) {
+      filter.datasourceName = this.filterValues.datasourceName;
     }
     if (this.filterValues.createdDateRange?.[0]) {
       filter.createdDateFrom =

@@ -69,7 +69,7 @@
             </app-custom-input>
           </div>
 
-          <!-- Organisation and Database fields (disabled) -->
+          <!-- Organisation and Datasource fields (disabled) -->
           <div class="form-field" *ngIf="showOrganisationDropdown">
             <label for="organisation">Organisation</label>
             <span class="p-input-icon-left">
@@ -85,14 +85,14 @@
           </div>
 
           <div class="form-field">
-            <label for="database">Database</label>
+            <label for="database">Datasource</label>
             <span class="p-input-icon-left">
               <i class="pi pi-database"></i>
               <input
-                id="database"
+                id="datasource"
                 type="text"
                 pInputText
-                [value]="selectedDatabaseName"
+                [value]="selectedDatasourceName"
                 disabled
               />
             </span>

@@ -78,7 +78,7 @@
         (click)="onStepClick(1)"
       >
         <div class="step-dot">2</div>
-        <span class="step-label">Master Database</span>
+        <span class="step-label">Master Datasource</span>
       </div>
     </div>
 
@@ -231,7 +231,7 @@
         </div>
       </div>
 
-      <!-- Step 2: Master Database -->
+      <!-- Step 2: Master Datasource -->
       <div *ngIf="currentStep === 1" class="step-2-layout">
         <!-- Left Column: Form Fields -->
         <div class="step-2-left">
@@ -294,7 +294,7 @@
 
             <app-custom-input
               formControlName="dbName"
-              label="Database"
+              label="Datasource"
               placeholder="e.g. mydb"
               icon="pi-database"
               [required]="true"
@@ -435,7 +435,7 @@
         <div class="step-2-right">
           <div class="acknowledgments-container">
             <div class="acknowledgments-title">
-              Database Configuration Acknowledgments
+              Datasource Configuration Acknowledgments
             </div>
             <div class="acknowledgment-card">
               <div class="p-field-checkbox">
@@ -448,7 +448,7 @@
                 </p-checkbox>
                 <div class="acknowledgment-content">
                   <label for="dbAcknowledgment" class="acknowledgment-label">
-                    Database Administrator Privileges
+                    Datasource Administrator Privileges
                   </label>
                   <p class="acknowledgment-text">
                     I acknowledge that the username provided has admin

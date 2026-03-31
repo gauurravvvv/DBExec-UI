@@ -23,7 +23,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   orgId: string = '';
   sectionId: string = '';
   selectedOrgName: string = '';
-  selectedDatabaseName: string = '';
+  selectedDatasourceName: string = '';
   sectionData: any;
   tabs: any[] = [];
   isCancelClicked = false;
@@ -79,7 +79,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       organisation: [''],
-      database: [''],
+      datasource: [''],
       status: [false],
       tab: ['', Validators.required],
     });
@@ -97,13 +97,13 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
             name: this.sectionData.name,
             description: this.sectionData.description,
             organisation: this.sectionData.organisationId,
-            database: this.sectionData.databaseId,
+            datasource: this.sectionData.datasourceId,
             tab: this.sectionData.tabId,
             status: this.sectionData.status,
           });
 
           this.selectedOrgName = this.sectionData.organisationName || '';
-          this.selectedDatabaseName = this.sectionData.databaseName || '';
+          this.selectedDatasourceName = this.sectionData.datasourceName || '';
 
           this.loadTabData();
 
@@ -115,7 +115,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   loadTabData() {
     const param = {
       orgId: this.sectionData.organisationId,
-      databaseId: this.sectionData.databaseId,
+      datasourceId: this.sectionData.datasourceId,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
@@ -171,7 +171,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
         name: this.sectionData.name,
         description: this.sectionData.description,
         organisation: this.sectionData.organisation,
-        database: this.sectionData.database,
+        datasource: this.sectionData.datasource,
         status: this.sectionData.status,
       });
 

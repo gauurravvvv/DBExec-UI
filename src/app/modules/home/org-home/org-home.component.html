@@ -8,13 +8,13 @@
 
   <div class="home-content">
     <div class="quick-nav">
-      <div class="nav-card" (click)="navigateTo('/app/screen')">
+      <div class="nav-card" (click)="navigateTo('/app/query-builder')">
         <div class="nav-icon">
           <i class="ci ci-screen"></i>
         </div>
         <div class="nav-info">
-          <h4>Screens</h4>
-          <p>View and manage screens</p>
+          <h4>Query Builders</h4>
+          <p>View and manage query builders</p>
         </div>
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
@@ -55,14 +55,14 @@
       <div
         class="nav-card"
         *ngIf="isAdmin"
-        (click)="navigateTo('/app/database')"
+        (click)="navigateTo('/app/datasource')"
       >
         <div class="nav-icon">
           <i class="pi pi-database"></i>
         </div>
         <div class="nav-info">
-          <h4>Databases</h4>
-          <p>Configure database connections</p>
+          <h4>Datasources</h4>
+          <p>Configure datasource connections</p>
         </div>
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>

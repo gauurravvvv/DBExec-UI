@@ -73,13 +73,13 @@
           </app-custom-dropdown>
         </div>
 
-        <!-- Database dropdown -->
+        <!-- Datasource dropdown -->
         <div class="form-field">
           <app-custom-dropdown
-            formControlName="database"
-            label="Database"
-            placeholder="Select Database"
-            [options]="databases"
+            formControlName="datasource"
+            label="Datasource"
+            placeholder="Select Datasource"
+            [options]="datasources"
             optionLabel="name"
             optionValue="id"
             [filter]="true"
@@ -87,13 +87,15 @@
             [required]="true"
             [showError]="
               !!(
-                sectionForm.get('database')?.invalid &&
-                sectionForm.get('database')?.touched
+                sectionForm.get('datasource')?.invalid &&
+                sectionForm.get('datasource')?.touched
               )
             "
-            errorMessage="Database is required"
+            errorMessage="Datasource is required"
             (ngModelChange)="
-              onDatabaseChange({ value: sectionForm.get('database')?.value })
+              onDatasourceChange({
+                value: sectionForm.get('datasource')?.value,
+              })
             "
           >
           </app-custom-dropdown>

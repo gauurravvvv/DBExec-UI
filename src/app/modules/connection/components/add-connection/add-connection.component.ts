@@ -5,7 +5,7 @@ import { CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatabaseService } from 'src/app/modules/database/services/database.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { ConnectionService } from '../../services/connection.service';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -20,7 +20,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   connectionForm!: FormGroup;
   organisations: any[] = [];
   showPassword = false;
-  databases: any[] = [];
+  datasources: any[] = [];
   isFormDirty: boolean = false;
 
   hasUnsavedChanges(): boolean {
@@ -30,14 +30,14 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   selectedOrg: any = null;
-  selectedDatabase: any = null;
+  selectedDatasource: any = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
-    private databaseService: DatabaseService,
+    private datasourceService: DatasourceService,
     private connectionService: ConnectionService,
   ) {
     this.initForm();
@@ -50,7 +50,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
-      this.loadDatabases();
+      this.loadDatasources();
     }
   }
 
@@ -72,7 +72,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
           : this.globalService.getTokenDetails('organisationId'),
         Validators.required,
       ],
-      database: ['', Validators.required],
+      datasource: ['', Validators.required],
       dbUsername: ['', Validators.required],
       dbPassword: ['', Validators.required],
     });
@@ -95,7 +95,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  private loadDatabases() {
+  private loadDatasources() {
     const orgId = this.connectionForm.get('organisation')?.value;
     if (!orgId) return;
     const params = {
@@ -104,17 +104,17 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       limit: MAX_LIMIT,
     };
 
-    this.databaseService.listDatabase(params).then(response => {
+    this.datasourceService.listDatasource(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.databases = [...(response.data.databases || [])];
+        this.datasources = [...(response.data.databases || [])];
       }
     });
   }
 
   onOrganisationChange(orgId: any) {
-    this.connectionForm.get('database')?.reset();
-    this.databases = [];
-    this.loadDatabases();
+    this.connectionForm.get('datasource')?.reset();
+    this.datasources = [];
+    this.loadDatasources();
     this.updateFormDirtyState();
   }
 
@@ -147,7 +147,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     this.isFormDirty =
       this.connectionForm.dirty ||
       this.connectionForm.get('organisation')?.value !== '' ||
-      this.connectionForm.get('database')?.value !== '';
+      this.connectionForm.get('datasource')?.value !== '';
   }
 
   getNameError(): string {

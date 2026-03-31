@@ -42,11 +42,11 @@ export class TabService {
   }
 
   addTab(tabForm: FormGroup) {
-    const { organisation, database, tabs } = tabForm.value;
+    const { organisation, datasource, tabs } = tabForm.value;
     return this.http
       .post(TAB.ADD, {
         organisation,
-        database,
+        datasource,
         tabs,
       })
       .toPromise()
@@ -67,7 +67,7 @@ export class TabService {
   }
 
   updateTab(tabForm: FormGroup, justification?: string) {
-    const { id, name, description, organisation, database, status } =
+    const { id, name, description, organisation, datasource, status } =
       tabForm.getRawValue();
     return this.http
       .put(TAB.UPDATE, {
@@ -75,7 +75,7 @@ export class TabService {
         name,
         description,
         organisation,
-        database,
+        datasource,
         status: status ? 1 : 0,
         justification,
       })

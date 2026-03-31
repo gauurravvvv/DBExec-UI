@@ -23,7 +23,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   orgId: string = '';
   promptId: string = '';
   selectedOrgName: string = '';
-  selectedDatabaseName: string = '';
+  selectedDatasourceName: string = '';
   selectedTabName: string = '';
   sectionData: any;
   sections: any[] = [];
@@ -80,7 +80,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       organisation: [''],
-      database: [''],
+      datasource: [''],
       tab: [''],
       section: ['', Validators.required],
       status: [false],
@@ -97,14 +97,14 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
           name: this.sectionData.name,
           description: this.sectionData.description,
           organisation: this.sectionData.organisationId,
-          database: this.sectionData.databaseId,
+          datasource: this.sectionData.datasourceId,
           tab: this.sectionData.section.tab.id,
           section: this.sectionData.section.id,
           status: this.sectionData.status,
         });
 
         this.selectedOrgName = this.sectionData.organisationName || '';
-        this.selectedDatabaseName = this.sectionData.databaseName || '';
+        this.selectedDatasourceName = this.sectionData.datasourceName || '';
         this.selectedTabName = this.sectionData.section.tab.name || '';
         this.loadSectionData();
 
@@ -174,7 +174,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
         description: this.sectionData.description,
         organisation: this.sectionData.organisationId,
         section: this.sectionData.section.id,
-        database: this.sectionData.databaseId,
+        datasource: this.sectionData.datasourceId,
         status: this.sectionData.status,
       });
 
