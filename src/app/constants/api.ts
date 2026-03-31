@@ -53,16 +53,16 @@ export const USER = {
 };
 
 export const DATASOURCE = {
-  LIST: '/database/list',
-  DELETE: '/database/delete/',
-  ADD: '/database/add',
-  VIEW: '/database/get/',
-  UPDATE: '/database/update',
-  LIST_SCHEMAS: '/database/schema/list/',
-  LIST_SCHEMA_TABLES: '/database/table/list/',
-  LIST_TABLE_COLUMNS: '/database/table/columns/list/',
-  RUN_QUERY: '/database/runQuery',
-  VALIDATE: '/database/validate',
+  LIST: '/datasource/list',
+  DELETE: '/datasource/delete/',
+  ADD: '/datasource/add',
+  VIEW: '/datasource/get/',
+  UPDATE: '/datasource/update',
+  LIST_SCHEMAS: '/datasource/schema/list/',
+  LIST_SCHEMA_TABLES: '/datasource/table/list/',
+  LIST_TABLE_COLUMNS: '/datasource/table/columns/list/',
+  RUN_QUERY: '/datasource/runQuery',
+  VALIDATE: '/datasource/validate',
 };
 
 export const ENVIRONMENT = {

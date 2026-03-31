@@ -161,7 +161,18 @@
                 ></app-custom-input>
               </th>
               <th>
-                <!-- No filter for Status -->
+                <app-custom-dropdown
+                  [(ngModel)]="filterValues.status"
+                  [options]="statusOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="All"
+                  [showClear]="true"
+                  [filter]="false"
+                  [autoDisplayFirst]="false"
+                  appendTo="body"
+                  (onChangeEvent)="onFilterChange()"
+                ></app-custom-dropdown>
               </th>
               <th>
                 <app-custom-daterange

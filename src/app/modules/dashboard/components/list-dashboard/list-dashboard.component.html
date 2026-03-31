@@ -89,10 +89,13 @@
               <th style="width: 18%">
                 <div class="th-content">Dataset</div>
               </th>
-              <th style="width: 15%">
+              <th style="width: 14%">
                 <div class="th-content">Datasource</div>
               </th>
-              <th style="width: 15%">
+              <th style="width: 8%">
+                <div class="th-content">Status</div>
+              </th>
+              <th style="width: 13%">
                 <div class="th-content">Created On</div>
               </th>
               <th style="width: 5%">
@@ -128,6 +131,20 @@
                   (ngModelChange)="onFilterChange()"
                   placeholder="Search Datasource"
                 ></app-custom-input>
+              </th>
+              <th>
+                <app-custom-dropdown
+                  [(ngModel)]="filterValues.status"
+                  [options]="statusOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="All"
+                  [showClear]="true"
+                  [filter]="false"
+                  [autoDisplayFirst]="false"
+                  appendTo="body"
+                  (onChangeEvent)="onFilterChange()"
+                ></app-custom-dropdown>
               </th>
               <th>
                 <app-custom-daterange
@@ -176,6 +193,18 @@
                 </span>
               </td>
               <td>
+                <span
+                  class="status-indicator"
+                  [ngClass]="{
+                    active: dashboard.status === 1,
+                    inactive: dashboard.status !== 1,
+                  }"
+                >
+                  <span class="dot"></span>
+                  {{ dashboard.status === 1 ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
                 <span class="date-text">{{
                   dashboard.createdOn | date: 'medium'
                 }}</span>
@@ -196,7 +225,7 @@
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="6" class="empty-message-cell text-center">
+              <td colspan="7" class="empty-message-cell text-center">
                 No dashboards found
               </td>
             </tr>

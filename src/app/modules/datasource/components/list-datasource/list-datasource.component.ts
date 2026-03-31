@@ -99,9 +99,15 @@ export class ListDatasourceComponent implements OnInit {
 
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+  ];
+
   filterValues: any = {
     name: '',
     description: '',
+    status: null,
     createdDateRange: null,
   };
 
@@ -109,6 +115,7 @@ export class ListDatasourceComponent implements OnInit {
     return (
       !!this.filterValues.name ||
       !!this.filterValues.description ||
+      this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -117,6 +124,7 @@ export class ListDatasourceComponent implements OnInit {
     this.filterValues = {
       name: '',
       description: '',
+      status: null,
       createdDateRange: null,
     };
     this.onFilterChange();
@@ -163,6 +171,12 @@ export class ListDatasourceComponent implements OnInit {
     if (this.filterValues.name) filter.name = this.filterValues.name;
     if (this.filterValues.description)
       filter.description = this.filterValues.description;
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
+      filter.status = this.filterValues.status;
+    }
     if (this.filterValues.createdDateRange?.[0]) {
       filter.createdDateFrom =
         this.filterValues.createdDateRange[0].toISOString();

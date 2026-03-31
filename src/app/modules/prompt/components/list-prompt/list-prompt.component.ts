@@ -43,6 +43,11 @@ export class ListPromptComponent implements OnInit, OnDestroy {
 
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+  ];
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
@@ -50,6 +55,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     tabName: '',
     sectionName: '',
     type: '',
+    status: null,
     createdDateRange: null,
   };
 
@@ -64,6 +70,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       !!this.filterValues.tabName ||
       !!this.filterValues.sectionName ||
       !!this.filterValues.type ||
+      this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -198,6 +205,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       tabName: '',
       sectionName: '',
       type: '',
+      status: null,
       createdDateRange: null,
     };
     this.loadPrompts();
@@ -300,6 +308,12 @@ export class ListPromptComponent implements OnInit, OnDestroy {
 
     if (this.filterValues.type) {
       filter.type = this.filterValues.type;
+    }
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
+      filter.status = this.filterValues.status;
     }
     if (this.filterValues.createdDateRange?.[0]) {
       filter.createdDateFrom =

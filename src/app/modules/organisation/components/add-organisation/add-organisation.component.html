@@ -152,40 +152,22 @@
             >
             </app-custom-dropdown>
 
-            <div class="form-field">
-              <label for="pepperKey"
-                >Pepper Key<span class="required"> *</span></label
-              >
-              <span class="p-input-icon-left p-input-icon-right">
-                <i class="pi pi-lock"></i>
-                <input
-                  id="pepperKey"
-                  type="password"
-                  pInputText
-                  formControlName="pepperKey"
-                  placeholder="Min 32 characters"
-                  [ngClass]="{
-                    'ng-invalid ng-dirty':
-                      orgForm.get('pepperKey')?.invalid &&
-                      orgForm.get('pepperKey')?.touched,
-                  }"
-                />
-                <i
-                  class="pi pi-eye"
-                  style="cursor: pointer"
-                  (click)="togglePepperKeyVisibility($event)"
-                ></i>
-              </span>
-              <small
-                class="error-message"
-                *ngIf="
+            <app-custom-input
+              formControlName="pepperKey"
+              label="Pepper Key"
+              placeholder="Min 32 characters"
+              icon="pi-lock"
+              [required]="true"
+              [showPasswordToggle]="true"
+              [showError]="
+                !!(
                   orgForm.get('pepperKey')?.invalid &&
                   orgForm.get('pepperKey')?.touched
-                "
-              >
-                {{ getPepperKeyError() }}
-              </small>
-            </div>
+                )
+              "
+              [errorMessage]="getPepperKeyError()"
+            >
+            </app-custom-input>
           </div>
         </div>
 

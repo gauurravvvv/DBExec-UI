@@ -38,11 +38,17 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+  ];
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
     datasetName: '',
+    status: null,
     createdDateRange: null,
   };
 
@@ -55,6 +61,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
       !!this.filterValues.name ||
       !!this.filterValues.description ||
       !!this.filterValues.datasetName ||
+      this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -188,6 +195,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
       name: '',
       description: '',
       datasetName: '',
+      status: null,
       createdDateRange: null,
     };
     // Immediately reload without filters
@@ -285,6 +293,12 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.datasetName) {
       filter.datasetName = this.filterValues.datasetName;
+    }
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
+      filter.status = this.filterValues.status;
     }
     if (this.filterValues.createdDateRange?.[0]) {
       filter.createdDateFrom =

@@ -28,9 +28,11 @@ export class CustomInputComponent implements ControlValueAccessor {
   @Input() autoResize = false;
   @Input() inputDisabled = false;
   @Input() showError = false;
+  @Input() showPasswordToggle = false;
 
   value = '';
   disabled = false;
+  passwordVisible = false;
 
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
@@ -59,5 +61,17 @@ export class CustomInputComponent implements ControlValueAccessor {
 
   onBlur(): void {
     this.onTouched();
+  }
+
+  get inputType(): string {
+    if (this.showPasswordToggle) {
+      return this.passwordVisible ? 'text' : 'password';
+    }
+    return this.type;
+  }
+
+  togglePasswordVisibility(event: Event): void {
+    event.stopPropagation();
+    this.passwordVisible = !this.passwordVisible;
   }
 }

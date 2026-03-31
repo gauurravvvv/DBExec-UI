@@ -36,12 +36,19 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+    { label: 'User Locked', value: 2 },
+  ];
+
   // Filter values for column filtering
   filterValues: any = {
     username: '',
     firstName: '',
     lastName: '',
     email: '',
+    status: null,
     lastLoginDateRange: null,
     createdDateRange: null,
   };
@@ -56,6 +63,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       !!this.filterValues.firstName ||
       !!this.filterValues.lastName ||
       !!this.filterValues.email ||
+      this.filterValues.status !== null ||
       !!this.filterValues.lastLoginDateRange ||
       !!this.filterValues.createdDateRange
     );
@@ -128,6 +136,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       firstName: '',
       lastName: '',
       email: '',
+      status: null,
       lastLoginDateRange: null,
       createdDateRange: null,
     };
@@ -179,6 +188,12 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.email) {
       filter.email = this.filterValues.email;
+    }
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
+      filter.status = this.filterValues.status;
     }
     if (this.filterValues.lastLoginDateRange?.[0]) {
       filter.lastLoginDateFrom =

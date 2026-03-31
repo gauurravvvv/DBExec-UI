@@ -115,18 +115,18 @@ export class QueryService {
     });
   }
 
-  // New methods demonstrating database schema operations on Query Server
+  // New methods demonstrating datasource schema operations on Query Server
   getDatasourceSchema(datasourceId: string): Observable<any> {
-    return this.httpClientService.queryGet(`/database/schema/${datasourceId}`);
+    return this.httpClientService.queryGet(`/datasource/schema/${datasourceId}`);
   }
 
-  getDatabaseTables(datasourceId: string): Observable<any> {
-    return this.httpClientService.queryGet(`/database/tables/${datasourceId}`);
+  getDatasourceTables(datasourceId: string): Observable<any> {
+    return this.httpClientService.queryGet(`/datasource/tables/${datasourceId}`);
   }
 
   getTableColumns(datasourceId: string, tableName: string): Observable<any> {
     return this.httpClientService.queryGet(
-      `/database/columns/${datasourceId}/${tableName}`,
+      `/datasource/columns/${datasourceId}/${tableName}`,
     );
   }
 }

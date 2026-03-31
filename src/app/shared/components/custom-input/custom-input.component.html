@@ -23,25 +23,39 @@
   </ng-container>
   <!-- Input Mode -->
   <ng-template #inputBlock>
-    <span class="p-input-icon-left" *ngIf="icon; else noIconInput">
-      <i class="pi {{ icon }}"></i>
-      <input
-        [type]="type"
-        pInputText
-        [placeholder]="placeholder"
-        [value]="value"
-        [disabled]="disabled || inputDisabled"
-        [readonly]="readonly"
-        [attr.maxlength]="maxLength"
-        [attr.minlength]="minLength"
-        [ngClass]="{ 'ng-invalid ng-dirty': showError }"
-        (input)="onInputChange($event)"
-        (blur)="onBlur()"
-      />
-    </span>
+    <ng-container *ngIf="icon || showPasswordToggle; else noIconInput">
+      <span
+        [ngClass]="{
+          'p-input-icon-left': icon,
+          'p-input-icon-right': showPasswordToggle,
+        }"
+      >
+        <i *ngIf="icon" class="pi {{ icon }}"></i>
+        <input
+          [type]="inputType"
+          pInputText
+          [placeholder]="placeholder"
+          [value]="value"
+          [disabled]="disabled || inputDisabled"
+          [readonly]="readonly"
+          [attr.maxlength]="maxLength"
+          [attr.minlength]="minLength"
+          [ngClass]="{ 'ng-invalid ng-dirty': showError }"
+          (input)="onInputChange($event)"
+          (blur)="onBlur()"
+        />
+        <i
+          *ngIf="showPasswordToggle"
+          class="pi"
+          [ngClass]="passwordVisible ? 'pi-eye-slash' : 'pi-eye'"
+          style="cursor: pointer"
+          (click)="togglePasswordVisibility($event)"
+        ></i>
+      </span>
+    </ng-container>
     <ng-template #noIconInput>
       <input
-        [type]="type"
+        [type]="inputType"
         pInputText
         [placeholder]="placeholder"
         [value]="value"

@@ -43,11 +43,17 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
 
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+  ];
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
     dbUsername: '',
+    status: null,
     createdDateRange: null,
   };
 
@@ -60,6 +66,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
       !!this.filterValues.name ||
       !!this.filterValues.description ||
       !!this.filterValues.dbUsername ||
+      this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -137,6 +144,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
       name: '',
       description: '',
       dbUsername: '',
+      status: null,
       createdDateRange: null,
     };
     // Immediately reload without filters
@@ -217,6 +225,12 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.dbUsername) {
       filter.dbUsername = this.filterValues.dbUsername;
+    }
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
+      filter.status = this.filterValues.status;
     }
     if (this.filterValues.createdDateRange?.[0]) {
       filter.createdDateFrom =

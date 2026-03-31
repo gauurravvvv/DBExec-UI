@@ -21,7 +21,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     return this.isFormDirty;
   }
 
-  showPepperKey = false;
   showDbPassword = false;
   confirmationChecked = false;
   dbAcknowledgment = false;
@@ -233,17 +232,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     { value: 'aes-192-cbc', label: 'aes-192-cbc' },
     { value: 'aes-128-cbc', label: 'aes-128-cbc' },
   ];
-
-  togglePepperKeyVisibility(event: Event) {
-    event.preventDefault();
-    this.showPepperKey = !this.showPepperKey;
-    const pepperKeyInput = document.getElementById(
-      'pepperKey',
-    ) as HTMLInputElement;
-    if (pepperKeyInput) {
-      pepperKeyInput.type = this.showPepperKey ? 'text' : 'password';
-    }
-  }
 
   toggleDbPasswordVisibility(event: Event) {
     event.preventDefault();

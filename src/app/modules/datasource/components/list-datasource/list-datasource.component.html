@@ -117,10 +117,18 @@
                 <!-- No filter for Type currently, or add if needed. Keeping it empty for now as requested filter list was Name, Desc, Status -->
               </th>
               <th>
-                <!-- <p-dropdown [options]="statusOptions" [(ngModel)]="filterValues.status" (onChange)="onFilterChange()"
-                  placeholder="Select Status" [showClear]="true" [style]="{'width':'100%'}" appendTo="body"
-                  styleClass="w-full p-column-filter">
-                </p-dropdown> -->
+                <app-custom-dropdown
+                  [(ngModel)]="filterValues.status"
+                  [options]="statusOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="All"
+                  [showClear]="true"
+                  [filter]="false"
+                  [autoDisplayFirst]="false"
+                  appendTo="body"
+                  (onChangeEvent)="onFilterChange()"
+                ></app-custom-dropdown>
               </th>
               <th>
                 <app-custom-daterange

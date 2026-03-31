@@ -6,6 +6,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { ROLES } from 'src/app/constants/user.constant';
 import { REGEX } from 'src/app/constants/regex.constant';
+import { HOME_ROUTES } from 'src/app/shared/components/layout/sidebar/sidebar.constant';
 
 @Component({
   selector: 'app-login',
@@ -48,19 +49,19 @@ export class LoginComponent implements OnInit {
       this.loginService.login(this.loginForm).then((res: any) => {
         if (this.globalService.handleSuccessService(res, true, false)) {
           const role = this.globalService.getTokenDetails('role');
-          let dashboardRoute = '/app/dashboard';
+          let homeRoute = HOME_ROUTES.ORG_USER;
           switch (role) {
             case ROLES.SUPER_ADMIN:
-              dashboardRoute = '/app/dashboard/super-admin';
+              homeRoute = HOME_ROUTES.SUPER_ADMIN;
               break;
             case ROLES.ORG_ADMIN:
-              dashboardRoute = '/app/dashboard/org-admin';
+              homeRoute = HOME_ROUTES.ORG_ADMIN;
               break;
             case ROLES.ORG_USER:
-              dashboardRoute = '/app/dashboard/org-user';
+              homeRoute = HOME_ROUTES.ORG_USER;
               break;
           }
-          this.router.navigateByUrl(dashboardRoute, {
+          this.router.navigateByUrl(homeRoute, {
             replaceUrl: true,
           });
         } else {

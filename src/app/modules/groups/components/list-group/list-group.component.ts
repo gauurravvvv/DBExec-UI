@@ -34,10 +34,16 @@ export class ListGroupComponent implements OnInit, OnDestroy {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+  ];
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
+    status: null,
     createdDateRange: null,
   };
 
@@ -49,6 +55,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     return (
       !!this.filterValues.name ||
       !!this.filterValues.description ||
+      this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -119,6 +126,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     this.filterValues = {
       name: '',
       description: '',
+      status: null,
       createdDateRange: null,
     };
     // Immediately reload without filters
@@ -156,6 +164,12 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.description) {
       filter.description = this.filterValues.description;
+    }
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
+      filter.status = this.filterValues.status;
     }
     if (this.filterValues.createdDateRange?.[0]) {
       filter.createdDateFrom =

@@ -43,11 +43,17 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+  ];
+
   // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
     tabName: '',
+    status: null,
     createdDateRange: null,
   };
 
@@ -60,6 +66,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
       !!this.filterValues.name ||
       !!this.filterValues.description ||
       !!this.filterValues.tabName ||
+      this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -192,6 +199,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
       name: '',
       description: '',
       tabName: '',
+      status: null,
       createdDateRange: null,
     };
     this.loadSections();
@@ -287,6 +295,12 @@ export class ListSectionComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.tabName) {
       filter.tabName = this.filterValues.tabName;
+    }
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
+      filter.status = this.filterValues.status;
     }
     if (this.filterValues.createdDateRange?.[0]) {
       filter.createdDateFrom =

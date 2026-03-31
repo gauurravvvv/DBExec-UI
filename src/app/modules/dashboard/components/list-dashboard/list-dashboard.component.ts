@@ -37,11 +37,17 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+  ];
+
   filterValues: any = {
     name: '',
     analysisName: '',
     datasetName: '',
     datasourceName: '',
+    status: null,
     createdDateRange: null,
   };
 
@@ -54,6 +60,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
       !!this.filterValues.analysisName ||
       !!this.filterValues.datasetName ||
       !!this.filterValues.datasourceName ||
+      this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -134,6 +141,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
       analysisName: '',
       datasetName: '',
       datasourceName: '',
+      status: null,
       createdDateRange: null,
     };
     this.loadDashboards();
@@ -220,6 +228,12 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     }
     if (this.filterValues.datasourceName) {
       filter.datasourceName = this.filterValues.datasourceName;
+    }
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
+      filter.status = this.filterValues.status;
     }
     if (this.filterValues.createdDateRange?.[0]) {
       filter.createdDateFrom =
