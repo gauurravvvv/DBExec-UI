@@ -9,7 +9,7 @@ export const AUTH = {
   RESEND_SETUP_LINK: '/auth/resend-setup-link',
 };
 
-export const DASHBOARD = {
+export const HOME = {
   SUPER_ADMIN: '/dashboard/super-admin/',
 };
 
@@ -242,4 +242,11 @@ export const AUDIT = {
 export const PROFILE = {
   GET: '/profile/get',
   CHANGE_PASSWORD: '/profile/change-password',
+};
+
+export const DASHBOARD = {
+  ADD: '/dashboard/add',
+  GET: '/dashboard/get/',
+  LIST: '/dashboard/list',
+  DELETE: '/dashboard/delete/',
 };

@@ -9,7 +9,7 @@ import { LoginService } from 'src/app/core/services/login.service';
 import { GlobalService } from '../services/global.service';
 import { ROLES } from 'src/app/constants/user.constant';
 import {
-  DASHBOARD_ROUTES,
+  HOME_ROUTES,
   AUTH_ROUTES,
 } from 'src/app/shared/components/layout/sidebar/sidebar.constant';
 
@@ -27,11 +27,11 @@ export class AuthGuard implements CanActivate {
     const role = this.globalService.getTokenDetails('role');
     switch (role) {
       case ROLES.SUPER_ADMIN:
-        return DASHBOARD_ROUTES.SUPER_ADMIN;
+        return HOME_ROUTES.SUPER_ADMIN;
       case ROLES.ORG_ADMIN:
-        return DASHBOARD_ROUTES.ORG_ADMIN;
+        return HOME_ROUTES.ORG_ADMIN;
       case ROLES.ORG_USER:
-        return DASHBOARD_ROUTES.ORG_USER;
+        return HOME_ROUTES.ORG_USER;
       default:
         return AUTH_ROUTES.LOGIN;
     }
@@ -43,8 +43,8 @@ export class AuthGuard implements CanActivate {
   ): boolean {
     if (state.url === '/login') {
       if (this.authService.isLoggedIn()) {
-        const dashboardRoute = this.getDefaultRouteByRole();
-        this.router.navigate([dashboardRoute]);
+        const homeRoute = this.getDefaultRouteByRole();
+        this.router.navigate([homeRoute]);
         return false;
       }
       return true;

@@ -4,11 +4,11 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { ROLES } from 'src/app/constants/user.constant';
 
 @Component({
-  selector: 'app-org-dashboard',
-  templateUrl: './org-dashboard.component.html',
-  styleUrls: ['./org-dashboard.component.scss'],
+  selector: 'app-org-home',
+  templateUrl: './org-home.component.html',
+  styleUrls: ['./org-home.component.scss'],
 })
-export class OrgDashboardComponent implements OnInit {
+export class OrgHomeComponent implements OnInit {
   userName = '';
   organisationName = '';
   userRole = '';

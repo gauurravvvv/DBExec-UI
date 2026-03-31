@@ -42,16 +42,16 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'home',
         pathMatch: 'full',
       },
       {
-        path: 'dashboard',
+        path: 'home',
         loadChildren: () =>
-          import('./modules/dashboard/dashboard.module').then(
-            m => m.DashboardModule,
+          import('./modules/home/home.module').then(
+            m => m.HomeModule,
           ),
-        data: { title: 'Dashboard' },
+        data: { title: 'Home' },
       },
       // Super admin only
       {
@@ -144,6 +144,15 @@ const routes: Routes = [
           ),
         canActivate: [RoleGuard],
         data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Analyses' },
+      },
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import(
+            './modules/dashboard/dashboard.module'
+          ).then(m => m.DashboardModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Dashboards' },
       },
       {
         path: 'tab',

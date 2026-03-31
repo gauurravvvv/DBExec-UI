@@ -24,13 +24,13 @@ export class EmptyRootComponent implements OnInit {
 
     switch (role) {
       case ROLES.SUPER_ADMIN:
-        this.router.navigate(['/app/dashboard/super-admin']);
+        this.router.navigate(['/app/home/super-admin']);
         break;
       case ROLES.ORG_ADMIN:
-        this.router.navigate(['/app/dashboard/org-admin']);
+        this.router.navigate(['/app/home/org-admin']);
         break;
       case ROLES.ORG_USER:
-        this.router.navigate(['/app/dashboard/org-user']);
+        this.router.navigate(['/app/home/org-user']);
         break;
       default:
         this.router.navigate(['/login']);

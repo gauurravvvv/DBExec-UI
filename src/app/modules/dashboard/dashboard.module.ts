@@ -1,22 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { DashboardRoutingModule } from './dashboard-routing.module';
-import { EmptyRootComponent } from './empty-root/empty-root.component';
-import { SuperAdminDashboardComponent } from './super-admin-dashboard/super-admin-dashboard.component';
-import { OrgDashboardComponent } from './org-dashboard/org-dashboard.component';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
+import { ListDashboardComponent } from './components/list-dashboard/list-dashboard.component';
+import { ViewDashboardComponent } from './components/view-dashboard/view-dashboard.component';
 
 @NgModule({
   declarations: [
-    EmptyRootComponent,
-    SuperAdminDashboardComponent,
-    OrgDashboardComponent,
+    ListDashboardComponent,
+    ViewDashboardComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
     DashboardRoutingModule,
+    SharedModule,
+    AppPrimeNGModule,
   ],
 })
 export class DashboardModule {}

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ANALYSES } from 'src/app/constants/routes';
+import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../service/analyses.service';
+import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
 @Component({
   selector: 'app-view-analyses',
@@ -20,6 +22,10 @@ export class ViewAnalysesComponent implements OnInit {
   showDeleteConfirm = false;
   deleteJustification = '';
 
+  // Publish dialog
+  showPublishDialog = false;
+  publishForm = { name: '', description: '' };
+
   // Custom field dialog
   showAddCustomFieldDialog = false;
 
@@ -29,6 +35,7 @@ export class ViewAnalysesComponent implements OnInit {
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private analysesService: AnalysesService,
+    private dashboardService: DashboardService,
   ) {}
 
   ngOnInit(): void {
@@ -162,6 +169,41 @@ export class ViewAnalysesComponent implements OnInit {
           }
         });
     }
+  }
+
+  openPublishDialog(): void {
+    this.publishForm = { name: '', description: '' };
+    this.showPublishDialog = true;
+  }
+
+  cancelPublish(): void {
+    this.showPublishDialog = false;
+    this.publishForm = { name: '', description: '' };
+  }
+
+  proceedPublish(): void {
+    if (!this.publishForm.name?.trim()) return;
+
+    const payload = {
+      name: this.publishForm.name.trim(),
+      description: this.publishForm.description?.trim() || '',
+      analysisId: this.analysisDetails.id,
+      analysisName: this.analysisDetails.name,
+      datasetId: this.analysisDetails.datasetId,
+      datasetName:
+        this.analysisDetails.datasetName || this.datasetDetails?.name,
+      databaseId: this.analysisDetails.databaseId,
+      databaseName:
+        this.analysisDetails.databaseName || this.datasetDetails?.databaseName,
+    };
+
+    this.dashboardService.addDashboard(payload).then(response => {
+      if (this.globalService.handleSuccessService(response)) {
+        this.showPublishDialog = false;
+        this.publishForm = { name: '', description: '' };
+        this.router.navigate([DB_ROUTES.VIEW, this.orgId, response.data.id]);
+      }
+    });
   }
 
   openAddCustomFieldDialog(): void {

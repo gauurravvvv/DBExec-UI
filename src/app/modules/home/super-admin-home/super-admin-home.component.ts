@@ -3,12 +3,12 @@ import { ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { GlobalService } from 'src/app/core/services/global.service';
 // import { OrganisationService } from '../../organisation/organisation.service';
-import { DashboardService } from '../services/dashboard.service';
+import { HomeService } from '../services/home.service';
 
 @Component({
-  selector: 'app-super-admin-dashboard',
-  templateUrl: './super-admin-dashboard.component.html',
-  styleUrls: ['./super-admin-dashboard.component.scss'],
+  selector: 'app-super-admin-home',
+  templateUrl: './super-admin-home.component.html',
+  styleUrls: ['./super-admin-home.component.scss'],
   animations: [
     trigger('fadeInUp', [
       transition(':enter', [
@@ -21,7 +21,7 @@ import { DashboardService } from '../services/dashboard.service';
     ]),
   ],
 })
-export class SuperAdminDashboardComponent implements OnInit {
+export class SuperAdminHomeComponent implements OnInit {
   organizations: any[] = [];
 
   entitiesData = {
@@ -76,7 +76,7 @@ export class SuperAdminDashboardComponent implements OnInit {
     private route: ActivatedRoute,
     private globalService: GlobalService,
     // private orgService: OrganisationService,
-    private dashboardService: DashboardService,
+    private homeService: HomeService,
   ) {}
 
   ngOnInit(): void {
@@ -106,7 +106,7 @@ export class SuperAdminDashboardComponent implements OnInit {
 
   loadOrganizationData(orgId: string) {
     //fetch data from dashboardAPI
-    this.dashboardService
+    this.homeService
       .getSuperAdminDashboard(orgId)
       .subscribe((res: any) => {
         if (res) {

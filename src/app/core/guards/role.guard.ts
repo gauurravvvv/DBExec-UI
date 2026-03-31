@@ -7,7 +7,7 @@ import {
 } from '@angular/router';
 import { GlobalService } from '../services/global.service';
 import {
-  DASHBOARD_ROUTES,
+  HOME_ROUTES,
   AUTH_ROUTES,
 } from 'src/app/shared/components/layout/sidebar/sidebar.constant';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -48,20 +48,20 @@ export class RoleGuard implements CanActivate {
       return true;
     }
 
-    // Redirect to user's own dashboard
-    const dashboardRoute = this.getDashboardByRole(userRole);
-    this.router.navigate([dashboardRoute]);
+    // Redirect to user's own home
+    const homeRoute = this.getHomeByRole(userRole);
+    this.router.navigate([homeRoute]);
     return false;
   }
 
-  private getDashboardByRole(role: string): string {
+  private getHomeByRole(role: string): string {
     switch (role) {
       case ROLES.SUPER_ADMIN:
-        return DASHBOARD_ROUTES.SUPER_ADMIN;
+        return HOME_ROUTES.SUPER_ADMIN;
       case ROLES.ORG_ADMIN:
-        return DASHBOARD_ROUTES.ORG_ADMIN;
+        return HOME_ROUTES.ORG_ADMIN;
       case ROLES.ORG_USER:
-        return DASHBOARD_ROUTES.ORG_USER;
+        return HOME_ROUTES.ORG_USER;
       default:
         return AUTH_ROUTES.LOGIN;
     }

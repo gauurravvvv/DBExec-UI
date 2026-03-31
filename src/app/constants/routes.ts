@@ -124,3 +124,8 @@ export const CONNECTION = {
   EDIT: '/app/connections/edit',
   VIEW: '/app/connections/view',
 };
+
+export const DASHBOARD = {
+  LIST: '/app/dashboard',
+  VIEW: '/app/dashboard/view',
+};

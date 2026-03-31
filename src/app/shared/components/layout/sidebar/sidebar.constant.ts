@@ -1,7 +1,7 @@
 export const SIDEBAR_ITEMS_ROUTES = [
   {
-    value: 'dashbaord',
-    route: '/app/dashboard',
+    value: 'home',
+    route: '/app/home',
   },
   {
     value: 'superAdmin',
@@ -97,12 +97,13 @@ export const SIDEBAR_ITEMS_ROUTES = [
   },
   { value: 'auditLogs', route: '/app/audit-logs' },
   { value: 'loginActivity', route: '/app/login-activity' },
+  { value: 'dashboard', route: '/app/dashboard' },
 ];
 
-export const DASHBOARD_ROUTES = {
-  SUPER_ADMIN: '/app/dashboard/super-admin',
-  ORG_ADMIN: '/app/dashboard/org-admin',
-  ORG_USER: '/app/dashboard/org-user',
+export const HOME_ROUTES = {
+  SUPER_ADMIN: '/app/home/super-admin',
+  ORG_ADMIN: '/app/home/org-admin',
+  ORG_USER: '/app/home/org-user',
 };
 
 export const AUTH_ROUTES = {
