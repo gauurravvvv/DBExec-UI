@@ -47,90 +47,55 @@
       <p class="text-500 mb-4">Sign in to continue to DBExec</p>
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="p-fluid">
         <div class="field mb-4">
-          <span class="p-input-icon-left">
-            <i class="pi pi-building"></i>
-            <input
-              pInputText
-              id="organisation"
-              formControlName="organisation"
-              placeholder="Organisation"
-              class="p-inputtext-lg"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  loginForm.get('organisation')?.invalid &&
-                  loginForm.get('organisation')?.touched,
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              loginForm.get('organisation')?.invalid &&
-              loginForm.get('organisation')?.touched
+          <app-custom-input
+            formControlName="organisation"
+            placeholder="Organisation"
+            icon="pi-building"
+            styleClass="p-inputtext-lg"
+            [showError]="
+              !!(
+                loginForm.get('organisation')?.invalid &&
+                loginForm.get('organisation')?.touched
+              )
             "
+            [errorMessage]="getErrorMessage('organisation')"
           >
-            {{ getErrorMessage('organisation') }}
-          </small>
+          </app-custom-input>
         </div>
 
         <div class="field mb-4">
-          <span class="p-input-icon-left">
-            <i class="pi pi-user"></i>
-            <input
-              pInputText
-              id="username"
-              formControlName="username"
-              placeholder="Username"
-              class="p-inputtext-lg"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  loginForm.get('username')?.invalid &&
-                  loginForm.get('username')?.touched,
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              loginForm.get('username')?.invalid &&
-              loginForm.get('username')?.touched
+          <app-custom-input
+            formControlName="username"
+            placeholder="Username"
+            icon="pi-user"
+            styleClass="p-inputtext-lg"
+            [showError]="
+              !!(
+                loginForm.get('username')?.invalid &&
+                loginForm.get('username')?.touched
+              )
             "
+            [errorMessage]="getErrorMessage('username')"
           >
-            {{ getErrorMessage('username') }}
-          </small>
+          </app-custom-input>
         </div>
 
         <div class="field mb-4">
-          <span class="p-input-icon-left p-input-icon-right">
-            <i class="pi pi-lock"></i>
-            <input
-              pInputText
-              type="password"
-              id="password"
-              formControlName="password"
-              placeholder="Password"
-              class="p-inputtext-lg"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  loginForm.get('password')?.invalid &&
-                  loginForm.get('password')?.touched,
-              }"
-            />
-            <i
-              class="pi pi-eye"
-              style="cursor: pointer"
-              (click)="togglePassword($event)"
-            ></i>
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
-              loginForm.get('password')?.invalid &&
-              loginForm.get('password')?.touched
+          <app-custom-input
+            formControlName="password"
+            placeholder="Password"
+            icon="pi-lock"
+            styleClass="p-inputtext-lg"
+            [showPasswordToggle]="true"
+            [showError]="
+              !!(
+                loginForm.get('password')?.invalid &&
+                loginForm.get('password')?.touched
+              )
             "
+            [errorMessage]="getErrorMessage('password')"
           >
-            {{ getErrorMessage('password') }}
-          </small>
+          </app-custom-input>
         </div>
 
         <div class="flex align-items-center justify-content-end mb-4">

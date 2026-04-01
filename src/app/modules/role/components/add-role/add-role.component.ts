@@ -121,6 +121,17 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  getNameError(): string {
+    const nameControl = this.roleForm.get('name');
+    if (nameControl?.errors?.['required']) {
+      return 'Name is required';
+    }
+    if (nameControl?.errors?.['pattern']) {
+      return 'Name can only contain letters, spaces and hyphens';
+    }
+    return '';
+  }
+
   onCancel() {
     this.roleForm.reset({
       organisation:

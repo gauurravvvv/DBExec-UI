@@ -88,8 +88,11 @@
           </div>
 
           <div class="config-group" *ngIf="config.showXAxisLabel">
-            <label>X Axis Label</label>
-            <input type="text" pInputText [(ngModel)]="config.xAxisLabel" />
+            <app-custom-input
+              [(ngModel)]="config.xAxisLabel"
+              label="X Axis Label"
+            >
+            </app-custom-input>
           </div>
 
           <div class="config-row">
@@ -98,8 +101,11 @@
           </div>
 
           <div class="config-group" *ngIf="config.showYAxisLabel">
-            <label>Y Axis Label</label>
-            <input type="text" pInputText [(ngModel)]="config.yAxisLabel" />
+            <app-custom-input
+              [(ngModel)]="config.yAxisLabel"
+              label="Y Axis Label"
+            >
+            </app-custom-input>
           </div>
 
           <div class="config-row">

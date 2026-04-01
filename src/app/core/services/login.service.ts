@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { AUTH } from 'src/app/constants/api';
 import { StorageType } from 'src/app/constants/storageType';
@@ -10,8 +10,10 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class LoginService {
+export class LoginService implements OnDestroy {
   isForgetPasswordForm = false;
+  private refreshTimer: any = null;
+
   constructor(private http: HttpClient) {}
 
   login(loginForm: UntypedFormGroup) {
@@ -128,10 +130,70 @@ export class LoginService {
 
   public setAccessToken(accessToken: string) {
     StorageService.set(StorageType.ACCESS_TOKEN, accessToken);
+    this.scheduleTokenRefresh(accessToken);
   }
 
   public setRefreshToken(refreshToken: string) {
     StorageService.set(StorageType.REFRESH_TOKEN, refreshToken);
+  }
+
+  /**
+   * Schedule a proactive token refresh at 80% of the access token's lifetime.
+   * This prevents the token from actually expiring during active use,
+   * avoiding the 440 → refresh → retry cycle.
+   */
+  public scheduleTokenRefresh(accessToken?: string): void {
+    this.clearRefreshTimer();
+
+    const token = accessToken || StorageService.get(StorageType.ACCESS_TOKEN);
+    if (!token) return;
+
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return;
+
+      const payload = JSON.parse(atob(parts[1]));
+      if (!payload.exp || !payload.iat) return;
+
+      const issuedAt = payload.iat * 1000;
+      const expiresAt = payload.exp * 1000;
+      const lifetime = expiresAt - issuedAt;
+      // Refresh at 80% of lifetime (e.g., 12 min for a 15-min token)
+      const refreshAt = issuedAt + lifetime * 0.8;
+      const delay = refreshAt - Date.now();
+
+      if (delay <= 0) return; // Already past refresh point
+
+      this.refreshTimer = setTimeout(() => {
+        const refreshToken = StorageService.get(StorageType.REFRESH_TOKEN);
+        if (!refreshToken) return;
+
+        // Use X-Skip-Loader to avoid showing the loading spinner
+        this.refreshAccessToken().subscribe({
+          next: (response: any) => {
+            if (response.status && response.data?.accessToken) {
+              this.setAccessToken(response.data.accessToken);
+            }
+          },
+          error: () => {
+            // Proactive refresh failed — the reactive interceptor will handle it
+          },
+        });
+      }, delay);
+    } catch {
+      // Token parsing failed — skip scheduling
+    }
+  }
+
+  private clearRefreshTimer(): void {
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = null;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.clearRefreshTimer();
   }
 
   public isLoggedIn(): boolean {
@@ -145,7 +207,13 @@ export class LoginService {
       const payload = JSON.parse(atob(parts[1]));
       // Check token expiry (exp is in seconds)
       if (payload.exp && payload.exp * 1000 < Date.now()) {
-        // Token expired — clear storage
+        // Access token expired — but if refresh token exists, user can still recover
+        // The HTTP interceptor will handle the 440 → refresh flow automatically
+        const refreshToken = StorageService.get(StorageType.REFRESH_TOKEN);
+        if (refreshToken) {
+          return true; // Still "logged in" — interceptor will refresh on next API call
+        }
+        // Both tokens gone — fully clear and logout
         StorageService.clear();
         return false;
       }

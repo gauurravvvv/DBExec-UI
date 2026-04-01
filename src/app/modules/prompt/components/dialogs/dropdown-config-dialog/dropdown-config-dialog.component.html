@@ -21,13 +21,12 @@
         <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
 
         <div class="config-group">
-          <label>Placeholder Text</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.placeholder"
+            label="Placeholder Text"
             placeholder="e.g., Select an option"
-          />
+          >
+          </app-custom-input>
         </div>
 
         <!-- ── BEHAVIOUR ── -->
@@ -58,13 +57,12 @@
 
         <ng-container *ngIf="config.filter">
           <div class="config-group">
-            <label>Filter Placeholder</label>
-            <input
-              type="text"
-              pInputText
+            <app-custom-input
               [(ngModel)]="config.filterPlaceholder"
+              label="Filter Placeholder"
               placeholder="e.g., Search..."
-            />
+            >
+            </app-custom-input>
             <small class="hint">Placeholder inside the search box</small>
           </div>
 
@@ -109,24 +107,22 @@
         </div>
 
         <div class="config-group">
-          <label>Empty Message</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.emptyMessage"
+            label="Empty Message"
             placeholder="e.g., No results found"
-          />
+          >
+          </app-custom-input>
           <small class="hint">Shown when there are no options</small>
         </div>
 
         <div class="config-group" *ngIf="config.filter">
-          <label>Empty Filter Message</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.emptyFilterMessage"
+            label="Empty Filter Message"
             placeholder="e.g., No results found"
-          />
+          >
+          </app-custom-input>
           <small class="hint">Shown when filter returns no matches</small>
         </div>
 
@@ -144,15 +140,13 @@
         </div>
 
         <div class="config-group" *ngIf="config.virtualScroll">
-          <label>Item Height (px)</label>
-          <input
-            type="number"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.virtualScrollItemSize"
+            label="Item Height (px)"
             placeholder="38"
-            min="24"
-            max="80"
-          />
+            type="number"
+          >
+          </app-custom-input>
           <small class="hint">Height of each option row in pixels</small>
         </div>
       </div>

@@ -228,7 +228,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
         .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.datasources = [...(response.data.databases || [])];
+            this.datasources = [...(response.data.datasources || [])];
             if (this.datasources.length > 0) {
               if (
                 preSelectedDbId &&

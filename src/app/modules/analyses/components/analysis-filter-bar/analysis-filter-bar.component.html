@@ -94,13 +94,12 @@
         "
       >
         <label>{{ filter.name }}</label>
-        <input
-          pInputText
-          type="text"
+        <app-custom-input
           [placeholder]="filter.config?.placeholder || 'Search ' + filter.name"
           [(ngModel)]="appliedValues[filter.id]"
-          (input)="onFilterChange(filter, appliedValues[filter.id])"
-        />
+          (ngModelChange)="onFilterChange(filter, appliedValues[filter.id])"
+        >
+        </app-custom-input>
       </div>
     </ng-container>
   </div>

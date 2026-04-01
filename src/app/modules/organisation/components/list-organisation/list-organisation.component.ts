@@ -77,18 +77,18 @@ export class ListOrganisationComponent implements OnInit {
       status: null,
       createdDateRange: null,
     };
-    this.onFilterChange('name');
-    this.onFilterChange('description');
+    this.onFilterChange();
+    this.onFilterChange();
   }
 
-  onFilterChange(field: string) {
+  onFilterChange() {
     this.searchSubject.next();
   }
 
   onCreatedDateRangeChange(range: Date[] | null) {
     this.filterValues.createdDateRange = range;
     if (!range || (range[0] && range[1])) {
-      this.onFilterChange('createdDateRange');
+      this.onFilterChange();
     }
   }
 

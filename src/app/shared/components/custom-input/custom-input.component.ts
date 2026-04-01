@@ -29,6 +29,7 @@ export class CustomInputComponent implements ControlValueAccessor {
   @Input() inputDisabled = false;
   @Input() showError = false;
   @Input() showPasswordToggle = false;
+  @Input() styleClass = '';
 
   value = '';
   disabled = false;

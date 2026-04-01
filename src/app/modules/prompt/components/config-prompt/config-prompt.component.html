@@ -53,87 +53,73 @@
         <div class="form-grid left-column">
           <div class="form-row full-width">
             <div class="form-field half-width">
-              <label for="name">Name</label>
-              <span class="p-input-icon-left">
-                <i class="pi pi-tag"></i>
-                <input
-                  id="name"
-                  type="text"
-                  pInputText
-                  [value]="promptForm.get('name')?.value"
-                  disabled
-                />
-              </span>
+              <app-custom-input
+                [ngModel]="promptForm.get('name')?.value"
+                [ngModelOptions]="{ standalone: true }"
+                label="Name"
+                icon="pi-tag"
+                [inputDisabled]="true"
+              >
+              </app-custom-input>
             </div>
 
             <div class="form-field half-width">
-              <label for="name">Type</label>
-              <span class="p-input-icon-left">
-                <i class="pi pi-tag"></i>
-                <input
-                  id="name"
-                  type="text"
-                  pInputText
-                  [value]="promptForm.get('type')?.value"
-                  disabled
-                />
-              </span>
+              <app-custom-input
+                [ngModel]="promptForm.get('type')?.value"
+                [ngModelOptions]="{ standalone: true }"
+                label="Type"
+                icon="pi-tag"
+                [inputDisabled]="true"
+              >
+              </app-custom-input>
             </div>
           </div>
           <div class="form-row full-width">
             <div class="form-field" *ngIf="showOrganisationDropdown">
-              <label for="organisation">Organisation</label>
-              <span class="p-input-icon-left">
-                <i class="pi pi-building"></i>
-                <input
-                  id="organisation"
-                  type="text"
-                  pInputText
-                  [value]="selectedOrgName"
-                  disabled
-                />
-              </span>
+              <app-custom-input
+                [ngModel]="selectedOrgName"
+                [ngModelOptions]="{ standalone: true }"
+                label="Organisation"
+                placeholder="Organisation"
+                icon="pi-building"
+                [inputDisabled]="true"
+              >
+              </app-custom-input>
             </div>
             <div class="form-field">
-              <label for="database">Datasource</label>
-              <span class="p-input-icon-left">
-                <i class="pi pi-database"></i>
-                <input
-                  id="datasource"
-                  type="text"
-                  pInputText
-                  [value]="selectedDatasourceName"
-                  disabled
-                />
-              </span>
+              <app-custom-input
+                [ngModel]="selectedDatasourceName"
+                [ngModelOptions]="{ standalone: true }"
+                label="Datasource"
+                placeholder="Datasource"
+                icon="pi-database"
+                [inputDisabled]="true"
+              >
+              </app-custom-input>
             </div>
           </div>
           <div class="form-row">
             <div class="form-field">
-              <label for="tab">Tab</label>
-              <span class="p-input-icon-left">
-                <i class="pi pi-box"></i>
-                <input
-                  id="tab"
-                  type="text"
-                  pInputText
-                  [value]="selectedTabName"
-                  disabled
-                />
-              </span>
+              <app-custom-input
+                [ngModel]="selectedTabName"
+                [ngModelOptions]="{ standalone: true }"
+                label="Tab"
+                placeholder="Tab"
+                icon="pi-box"
+                [inputDisabled]="true"
+              >
+              </app-custom-input>
             </div>
             <div class="form-field">
-              <label for="section">Section</label>
-              <span class="p-input-icon-left">
-                <i class="pi pi-box"></i>
-                <input
-                  id="section"
-                  type="text"
-                  pInputText
-                  [value]="selectedSectionName"
-                  disabled
-                />
-              </span>
+              <app-custom-input
+                [ngModel]="selectedSectionName"
+                [ngModelOptions]="{ standalone: true }"
+                label="Section"
+                placeholder="Section"
+                icon="pi-box"
+                [inputDisabled]="true"
+              >
+              </app-custom-input>
             </div>
           </div>
           <div class="section-header">

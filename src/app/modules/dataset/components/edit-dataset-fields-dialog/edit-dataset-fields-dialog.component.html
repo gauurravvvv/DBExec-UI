@@ -5,26 +5,22 @@
       <!-- Form Content -->
       <div class="form-field" *ngIf="editableField">
         <div class="input-group">
-          <label>Field name to use</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="editableField.columnToUse"
+            label="Field name to use"
             placeholder="Column name"
-            autocomplete="off"
-            disabled
-          />
+            [inputDisabled]="true"
+          >
+          </app-custom-input>
         </div>
         <div class="input-group">
-          <label>Field name to show</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="editableField.columnToView"
+            label="Field name to show"
             placeholder="Display name"
-            autocomplete="off"
             (ngModelChange)="onFieldChange()"
-          />
+          >
+          </app-custom-input>
         </div>
       </div>
 

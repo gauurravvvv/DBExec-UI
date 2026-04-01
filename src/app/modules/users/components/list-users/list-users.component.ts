@@ -39,7 +39,6 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   statusOptions = [
     { label: 'Active', value: 1 },
     { label: 'Inactive', value: 0 },
-    { label: 'User Locked', value: 2 },
   ];
 
   // Filter values for column filtering

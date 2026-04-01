@@ -104,36 +104,26 @@
         >
         </app-custom-input>
 
-        <!-- Organisation Field (readonly) -->
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <label for="organisation">Organisation</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-building"></i>
-            <input
-              id="organisation"
-              type="text"
-              pInputText
-              [value]="organisationName"
-              readonly
-              class="readonly"
-            />
-          </span>
-        </div>
+        <!-- Organisation Field (disabled) -->
+        <app-custom-input
+          *ngIf="showOrganisationDropdown"
+          [ngModel]="organisationName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Organisation"
+          placeholder="Organisation"
+          icon="pi-building"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
-        <!-- Type Field (readonly) -->
-        <div class="form-field">
-          <label for="type">Type</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-database"></i>
-            <input
-              id="type"
-              pInputText
-              formControlName="type"
-              readonly
-              class="readonly"
-            />
-          </span>
-        </div>
+        <!-- Type Field (disabled) -->
+        <app-custom-input
+          formControlName="type"
+          label="Type"
+          icon="pi-database"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
         <!-- Host Field -->
         <app-custom-input
@@ -153,37 +143,22 @@
         </app-custom-input>
 
         <!-- Port Field -->
-        <div class="form-field">
-          <label for="port">Port<span class="required">*</span></label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-hashtag"></i>
-            <input
-              id="port"
-              type="number"
-              pInputText
-              formControlName="port"
-              placeholder="Enter database port"
-              min="1"
-              max="65535"
-              (keypress)="onPortKeyPress($event)"
-              (input)="onNumberInput($event)"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  datasourceForm.get('port')?.invalid &&
-                  datasourceForm.get('port')?.touched,
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
+        <app-custom-input
+          formControlName="port"
+          label="Port"
+          placeholder="Enter database port"
+          icon="pi-hashtag"
+          type="number"
+          [required]="true"
+          [showError]="
+            !!(
               datasourceForm.get('port')?.invalid &&
               datasourceForm.get('port')?.touched
-            "
-          >
-            {{ getErrorMessage('port') }}
-          </small>
-        </div>
+            )
+          "
+          [errorMessage]="getErrorMessage('port')"
+        >
+        </app-custom-input>
 
         <!-- Database Name Field -->
         <app-custom-input
@@ -220,30 +195,14 @@
         </app-custom-input>
 
         <!-- Password Field -->
-        <div class="form-field">
-          <label for="password">Password</label>
-          <span class="p-input-icon-left p-input-icon-right">
-            <i class="pi pi-lock"></i>
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              pInputText
-              formControlName="password"
-              placeholder="Leave blank to keep current password"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  datasourceForm.get('password')?.invalid &&
-                  datasourceForm.get('password')?.touched,
-              }"
-            />
-            <i
-              class="pi"
-              [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'"
-              style="cursor: pointer"
-              (click)="togglePassword($event)"
-            ></i>
-          </span>
-        </div>
+        <app-custom-input
+          formControlName="password"
+          label="Password"
+          placeholder="Leave blank to keep current password"
+          icon="pi-lock"
+          [showPasswordToggle]="true"
+        >
+        </app-custom-input>
 
         <!-- Connection Test -->
         <div class="form-field" *ngIf="isConnectionFieldsDirty()">

@@ -63,37 +63,28 @@
         >
         </app-custom-input>
 
-        <!-- Organisation Field (readonly) -->
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <label for="organisation">Organisation</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-building"></i>
-            <input
-              id="organisation"
-              type="text"
-              pInputText
-              [value]="selectedOrgName"
-              disabled
-              class="readonly"
-            />
-          </span>
-        </div>
+        <!-- Organisation Field (disabled) -->
+        <app-custom-input
+          *ngIf="showOrganisationDropdown"
+          [ngModel]="selectedOrgName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Organisation"
+          placeholder="Organisation"
+          icon="pi-building"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
-        <!-- Datasource Field (readonly) -->
-        <div class="form-field">
-          <label for="database">Datasource</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-database"></i>
-            <input
-              id="datasource"
-              type="text"
-              pInputText
-              [value]="selectedDatasourceName"
-              disabled
-              class="readonly"
-            />
-          </span>
-        </div>
+        <!-- Datasource Field (disabled) -->
+        <app-custom-input
+          [ngModel]="selectedDatasourceName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Datasource"
+          placeholder="Datasource"
+          icon="pi-database"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
         <!-- Status Toggle -->
         <app-custom-toggle
@@ -124,40 +115,22 @@
         </app-custom-input>
 
         <!-- DB Password -->
-        <div class="form-field">
-          <label for="password"
-            >Datasource Password<span class="required"> *</span></label
-          >
-          <span class="p-input-icon-left p-input-icon-right">
-            <i class="pi pi-lock"></i>
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              pInputText
-              formControlName="dbPassword"
-              placeholder="Enter password"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  connectionForm.get('dbPassword')?.invalid &&
-                  connectionForm.get('dbPassword')?.touched,
-              }"
-            />
-            <i
-              class="pi pi-eye"
-              style="cursor: pointer"
-              (click)="togglePassword($event)"
-            ></i>
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
+        <app-custom-input
+          formControlName="dbPassword"
+          label="Datasource Password"
+          placeholder="Enter password"
+          icon="pi-lock"
+          [required]="true"
+          [showPasswordToggle]="true"
+          [showError]="
+            !!(
               connectionForm.get('dbPassword')?.invalid &&
               connectionForm.get('dbPassword')?.touched
-            "
-          >
-            Datasource Password is required
-          </small>
-        </div>
+            )
+          "
+          errorMessage="Datasource Password is required"
+        >
+        </app-custom-input>
       </div>
     </form>
   </div>

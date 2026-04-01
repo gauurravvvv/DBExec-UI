@@ -195,7 +195,7 @@ export class ListDatasourceComponent implements OnInit {
       .listDatasource(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.dbs = response.data.databases || [];
+          this.dbs = response.data.datasources || [];
           this.totalItems = response.data.count || 0;
         } else {
           // If response not successful, clear the list

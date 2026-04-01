@@ -69,34 +69,27 @@
           </app-custom-input>
         </div>
 
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <label for="organisation">Organisation</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-building"></i>
-            <input
-              id="organisation"
-              type="text"
-              pInputText
-              [value]="selectedOrgName"
-              disabled
-            />
-          </span>
-        </div>
+        <app-custom-input
+          *ngIf="showOrganisationDropdown"
+          [ngModel]="selectedOrgName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Organisation"
+          placeholder="Organisation"
+          icon="pi-building"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
         <!-- Datasource field (disabled) -->
-        <div class="form-field">
-          <label for="database">Datasource</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-database"></i>
-            <input
-              id="datasource"
-              type="text"
-              pInputText
-              [value]="selectedDatasourceName"
-              disabled
-            />
-          </span>
-        </div>
+        <app-custom-input
+          [ngModel]="selectedDatasourceName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Datasource"
+          placeholder="Datasource"
+          icon="pi-database"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
         <!-- Status -->
         <app-custom-toggle

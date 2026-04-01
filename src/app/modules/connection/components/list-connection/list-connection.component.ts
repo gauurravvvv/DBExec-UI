@@ -169,7 +169,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
     this.datasourceService.listDatasource(params).then(
       response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.datasources = [...(response.data.databases || [])];
+          this.datasources = [...(response.data.datasources || [])];
           if (this.datasources.length > 0) {
             this.selectedDatasource = this.datasources[0].id;
             this.loadConnections();

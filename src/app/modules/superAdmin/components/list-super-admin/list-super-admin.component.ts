@@ -32,7 +32,6 @@ export class ListSuperAdminComponent implements OnInit {
   statusOptions = [
     { label: 'Active', value: 1 },
     { label: 'Inactive', value: 0 },
-    { label: 'Locked', value: 2 },
   ];
 
   // Component-managed filter values

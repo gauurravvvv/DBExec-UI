@@ -21,13 +21,12 @@
         <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
 
         <div class="config-group">
-          <label>Placeholder Text</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.placeholder"
+            label="Placeholder Text"
             placeholder="e.g., Select options"
-          />
+          >
+          </app-custom-input>
         </div>
 
         <!-- ── DISPLAY ── -->
@@ -48,28 +47,25 @@
         </div>
 
         <div class="config-group">
-          <label>Max Labels Before Count</label>
-          <input
-            type="number"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.maxSelectedLabels"
+            label="Max Labels Before Count"
             placeholder="3"
-            min="1"
-            max="20"
-          />
+            type="number"
+          >
+          </app-custom-input>
           <small class="hint"
             >Show labels up to this count, then show "N items selected"</small
           >
         </div>
 
         <div class="config-group" *ngIf="config.displayMode === 'comma'">
-          <label>Selected Items Label Template</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.selectedItemsLabel"
+            label="Selected Items Label Template"
             [placeholder]="'{0} items selected'"
-          />
+          >
+          </app-custom-input>
           <small class="hint"
             >Use <code>{{ '{0}' }}</code> as count placeholder</small
           >
@@ -109,14 +105,13 @@
         </div>
 
         <div class="config-group" *ngIf="limitEnabled">
-          <label>Selection Limit</label>
-          <input
-            type="number"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.selectionLimit"
+            label="Selection Limit"
             placeholder="5"
-            min="1"
-          />
+            type="number"
+          >
+          </app-custom-input>
         </div>
 
         <!-- ── FILTER ── -->
@@ -166,23 +161,21 @@
         </div>
 
         <div class="config-group">
-          <label>Empty Message</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.emptyMessage"
+            label="Empty Message"
             placeholder="e.g., No results found"
-          />
+          >
+          </app-custom-input>
         </div>
 
         <div class="config-group" *ngIf="config.filter">
-          <label>Empty Filter Message</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.emptyFilterMessage"
+            label="Empty Filter Message"
             placeholder="e.g., No results found"
-          />
+          >
+          </app-custom-input>
         </div>
 
         <!-- ── PERFORMANCE ── -->
@@ -199,15 +192,13 @@
         </div>
 
         <div class="config-group" *ngIf="config.virtualScroll">
-          <label>Item Height (px)</label>
-          <input
-            type="number"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.virtualScrollItemSize"
+            label="Item Height (px)"
             placeholder="38"
-            min="24"
-            max="80"
-          />
+            type="number"
+          >
+          </app-custom-input>
         </div>
       </div>
       <div class="apply-preview-action">

@@ -370,7 +370,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
 
     this.datasourceService.listDatasource(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.datasources = [...(response.data.databases || [])];
+        this.datasources = [...(response.data.datasources || [])];
       }
     });
   }

@@ -94,20 +94,14 @@
           >
           </app-custom-dropdown>
 
-          <!-- Type Field (readonly) -->
-          <div class="form-field">
-            <label for="type">Type</label>
-            <span class="p-input-icon-left">
-              <i class="pi pi-database"></i>
-              <input
-                id="type"
-                pInputText
-                formControlName="type"
-                readonly
-                class="readonly"
-              />
-            </span>
-          </div>
+          <!-- Type Field (disabled) -->
+          <app-custom-input
+            formControlName="type"
+            label="Type"
+            icon="pi-database"
+            [inputDisabled]="true"
+          >
+          </app-custom-input>
 
           <!-- Host Field -->
           <app-custom-input
@@ -127,37 +121,22 @@
           </app-custom-input>
 
           <!-- Port Field -->
-          <div class="form-field">
-            <label for="port">Port<span class="required"> *</span></label>
-            <span class="p-input-icon-left">
-              <i class="pi pi-hashtag"></i>
-              <input
-                id="port"
-                type="number"
-                pInputText
-                formControlName="port"
-                placeholder="Enter database port"
-                min="1"
-                max="65535"
-                (keypress)="onPortKeyPress($event)"
-                [ngClass]="{
-                  'ng-invalid ng-dirty':
-                    datasourceForm.get('port')?.invalid &&
-                    datasourceForm.get('port')?.touched,
-                }"
-                class="p-inputtext"
-              />
-            </span>
-            <small
-              class="error-message"
-              *ngIf="
+          <app-custom-input
+            formControlName="port"
+            label="Port"
+            placeholder="Enter database port"
+            icon="pi-hashtag"
+            type="number"
+            [required]="true"
+            [showError]="
+              !!(
                 datasourceForm.get('port')?.invalid &&
                 datasourceForm.get('port')?.touched
-              "
-            >
-              {{ getErrorMessage('port') }}
-            </small>
-          </div>
+              )
+            "
+            [errorMessage]="getErrorMessage('port')"
+          >
+          </app-custom-input>
 
           <!-- Database Name Field -->
           <app-custom-input
@@ -194,42 +173,22 @@
           </app-custom-input>
 
           <!-- Database Password Field -->
-          <div class="form-field">
-            <label for="password"
-              >Password<span class="required"> *</span></label
-            >
-            <span class="p-input-icon-left p-input-icon-right">
-              <i class="pi pi-lock"></i>
-              <input
-                id="password"
-                [type]="showPassword ? 'text' : 'password'"
-                pInputText
-                formControlName="password"
-                placeholder="Enter database password"
-                [ngClass]="{
-                  'ng-invalid ng-dirty':
-                    datasourceForm.get('password')?.invalid &&
-                    datasourceForm.get('password')?.touched,
-                }"
-                class="p-inputtext"
-              />
-              <i
-                class="pi"
-                [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'"
-                style="cursor: pointer"
-                (click)="togglePassword($event)"
-              ></i>
-            </span>
-            <small
-              class="error-message"
-              *ngIf="
+          <app-custom-input
+            formControlName="password"
+            label="Password"
+            placeholder="Enter database password"
+            icon="pi-lock"
+            [required]="true"
+            [showPasswordToggle]="true"
+            [showError]="
+              !!(
                 datasourceForm.get('password')?.invalid &&
                 datasourceForm.get('password')?.touched
-              "
-            >
-              {{ getErrorMessage('password') }}
-            </small>
-          </div>
+              )
+            "
+            [errorMessage]="getErrorMessage('password')"
+          >
+          </app-custom-input>
 
           <!-- Connection Test -->
           <div class="form-field">

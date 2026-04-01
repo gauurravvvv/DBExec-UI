@@ -95,52 +95,29 @@
         </div>
 
         <!-- Role Name -->
-        <div class="form-field">
-          <label for="name">Name<span class="required"> *</span></label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-box"></i>
-            <input
-              id="name"
-              type="text"
-              pInputText
-              formControlName="name"
-              placeholder="Enter name"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  roleForm.get('name')?.invalid &&
-                  roleForm.get('name')?.touched,
-              }"
-            />
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
+        <app-custom-input
+          formControlName="name"
+          label="Name"
+          placeholder="Enter name"
+          icon="pi-box"
+          [required]="true"
+          [showError]="
+            !!(
               roleForm.get('name')?.invalid && roleForm.get('name')?.touched
-            "
-          >
-            <span *ngIf="roleForm.get('name')?.errors?.['required']"
-              >Name is required</span
-            >
-            <span *ngIf="roleForm.get('name')?.errors?.['pattern']"
-              >Name can only contain letters, spaces and hyphens</span
-            >
-          </small>
-        </div>
+            )
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
 
         <!-- Description -->
-        <div class="form-field">
-          <label for="description">Description</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-align-left"></i>
-            <input
-              id="description"
-              type="text"
-              pInputText
-              formControlName="description"
-              placeholder="Enter description"
-            />
-          </span>
-        </div>
+        <app-custom-input
+          formControlName="description"
+          label="Description"
+          placeholder="Enter description"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
       </div>
 
       <!-- Permissions Section -->

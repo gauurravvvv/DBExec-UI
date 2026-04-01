@@ -132,12 +132,11 @@
 
         <div class="sidebar-content-inner">
           <div class="schema-search">
-            <input
-              type="text"
-              placeholder="Search tables..."
+            <app-custom-input
               [(ngModel)]="schemaSearchText"
-              class="search-input"
-            />
+              placeholder="Search tables..."
+              icon="pi-search"
+            ></app-custom-input>
           </div>
 
           <!-- No Datasource Selected Message -->

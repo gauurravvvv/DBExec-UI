@@ -121,16 +121,11 @@
         <div class="sidebar-content-inner">
           <!-- Search Input -->
           <div class="search-wrapper" *ngIf="visuals.length > 0">
-            <span class="p-input-icon-left" style="width: 100%">
-              <i class="pi pi-search"></i>
-              <input
-                type="text"
-                pInputText
-                placeholder="Search visuals..."
-                [(ngModel)]="visualListSearchQuery"
-                style="width: 100%"
-              />
-            </span>
+            <app-custom-input
+              [(ngModel)]="visualListSearchQuery"
+              placeholder="Search visuals..."
+              icon="pi-search"
+            ></app-custom-input>
           </div>
 
           <!-- Empty State -->
@@ -179,16 +174,11 @@
 
             <!-- Search Input -->
             <div class="search-wrapper" *ngIf="allFields.length">
-              <span class="p-input-icon-left" style="width: 100%">
-                <i class="pi pi-search"></i>
-                <input
-                  type="text"
-                  pInputText
-                  placeholder="Search fields..."
-                  [(ngModel)]="datasetFieldsSearchQuery"
-                  style="width: 100%"
-                />
-              </span>
+              <app-custom-input
+                [(ngModel)]="datasetFieldsSearchQuery"
+                placeholder="Search fields..."
+                icon="pi-search"
+              ></app-custom-input>
             </div>
 
             <!-- Add Analysis Field Button -->
@@ -356,16 +346,11 @@
             </div>
             <!-- Search Input for Charts -->
             <div class="chart-search-wrapper">
-              <span class="p-input-icon-left" style="width: 100%">
-                <i class="pi pi-search"></i>
-                <input
-                  type="text"
-                  pInputText
-                  placeholder="Search charts..."
-                  [(ngModel)]="chartSearchQuery"
-                  style="width: 100%"
-                />
-              </span>
+              <app-custom-input
+                [(ngModel)]="chartSearchQuery"
+                placeholder="Search charts..."
+                icon="pi-search"
+              ></app-custom-input>
             </div>
             <div class="chart-categories">
               <div
@@ -909,14 +894,13 @@
 
         <!-- Filter Name -->
         <div class="filter-dialog-field">
-          <label><i class="pi pi-tag"></i> Display Name</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="filterDialogName"
+            label="Display Name"
+            icon="pi-tag"
             placeholder="Filter label (defaults to column name)"
-            [style]="{ width: '100%' }"
-          />
+          >
+          </app-custom-input>
         </div>
 
         <!-- Type Selection Row -->
@@ -1626,14 +1610,13 @@
         <div class="sidebar-content-inner config-form">
           <!-- Visual Title -->
           <div class="config-group">
-            <label>Visual Title</label>
-            <input
-              type="text"
-              pInputText
+            <app-custom-input
               [(ngModel)]="focusedVisual.title"
-              maxlength="100"
+              label="Visual Title"
               placeholder="Enter visual title"
-            />
+              [maxLength]="100"
+            >
+            </app-custom-input>
           </div>
 
           <!-- Color Scheme -->
@@ -1683,11 +1666,11 @@
               class="config-group"
               *ngIf="focusedVisual.config.showXAxisLabel"
             >
-              <input
-                type="text"
-                pInputText
+              <app-custom-input
                 [(ngModel)]="focusedVisual.config.xAxisLabel"
-              />
+                placeholder="X Axis Label"
+              >
+              </app-custom-input>
             </div>
             <div class="config-row">
               <label>Y Axis Name</label>
@@ -1699,11 +1682,11 @@
               class="config-group"
               *ngIf="focusedVisual.config.showYAxisLabel"
             >
-              <input
-                type="text"
-                pInputText
+              <app-custom-input
                 [(ngModel)]="focusedVisual.config.yAxisLabel"
-              />
+                placeholder="Y Axis Label"
+              >
+              </app-custom-input>
             </div>
             <div class="config-group">
               <label>X Label Rotation</label>
@@ -1954,34 +1937,28 @@
             <div class="config-section">
               <div class="section-title">Bar Options</div>
               <div class="config-group">
-                <label>Bar Width</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.barWidth"
+                  label="Bar Width"
                   placeholder="auto"
-                />
-              </div>
-              <div class="config-group">
-                <label
-                  >Bar Gap
-                  <small class="config-hint">(multi-series only)</small></label
                 >
-                <input
-                  type="text"
-                  pInputText
-                  [(ngModel)]="focusedVisual.config.barGap"
-                  placeholder="30%"
-                />
+                </app-custom-input>
               </div>
               <div class="config-group">
-                <label>Category Gap</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
+                  [(ngModel)]="focusedVisual.config.barGap"
+                  label="Bar Gap"
+                  placeholder="30%"
+                >
+                </app-custom-input>
+              </div>
+              <div class="config-group">
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.barCategoryGap"
+                  label="Category Gap"
                   placeholder="20%"
-                />
+                >
+                </app-custom-input>
               </div>
               <div class="config-row">
                 <label>Round Edges</label>
@@ -2554,12 +2531,11 @@
                 </p-inputNumber>
               </div>
               <div class="config-group">
-                <label>Units</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.units"
-                />
+                  label="Units"
+                >
+                </app-custom-input>
               </div>
               <ng-container *ngIf="focusedVisual?.chartType === 'gauge'">
                 <div class="config-group">
@@ -3024,22 +3000,20 @@
                 </p-inputNumber>
               </div>
               <div class="config-group">
-                <label>Min Size</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.funnelMinSize"
+                  label="Min Size"
                   placeholder="0%"
-                />
+                >
+                </app-custom-input>
               </div>
               <div class="config-group">
-                <label>Max Size</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.funnelMaxSize"
+                  label="Max Size"
                   placeholder="100%"
-                />
+                >
+                </app-custom-input>
               </div>
               <div class="config-group">
                 <label>Orientation</label>
@@ -3066,13 +3040,12 @@
                 ></p-inputSwitch>
               </div>
               <div class="config-group">
-                <label>Outer Radius</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.sunburstRadius"
+                  label="Outer Radius"
                   placeholder="90%"
-                />
+                >
+                </app-custom-input>
               </div>
               <div class="config-group">
                 <label>Node Click</label>
@@ -3399,13 +3372,12 @@
                 ></p-inputSwitch>
               </div>
               <div class="config-group">
-                <label>Edge Fork Position</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.treeEdgeForkPosition"
+                  label="Edge Fork Position"
                   placeholder="e.g. 50%"
-                />
+                >
+                </app-custom-input>
               </div>
             </div>
           </ng-container>
@@ -3477,14 +3449,12 @@
                 </p-dropdown>
               </div>
               <div class="config-group">
-                <label>Symbol Margin</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.pictorialSymbolMargin"
+                  label="Symbol Margin"
                   placeholder="auto or number"
-                  style="width: 100%"
-                />
+                >
+                </app-custom-input>
               </div>
             </div>
           </ng-container>
@@ -3591,14 +3561,12 @@
                 />
               </div>
               <div class="config-group">
-                <label>Bar Width</label>
-                <input
-                  type="text"
-                  pInputText
+                <app-custom-input
                   [(ngModel)]="focusedVisual.config.candleBarWidth"
+                  label="Bar Width"
                   placeholder="auto or number"
-                  style="width: 100%"
-                />
+                >
+                </app-custom-input>
               </div>
             </div>
           </ng-container>

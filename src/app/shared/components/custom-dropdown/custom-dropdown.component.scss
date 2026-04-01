@@ -11,10 +11,9 @@
 
     label {
       font-weight: 500;
-      color: var(--text-color);
-      opacity: 0.6;
+      color: color-mix(in srgb, var(--text-color) 60%, transparent);
       background: var(--card-background);
-      padding: 0 8px;
+      padding: 2px 8px;
       margin-left: -4px;
       z-index: 1;
 
@@ -43,6 +42,12 @@
 }
 
 :host ::ng-deep {
+  // Hide placeholder when floating label is in resting position (no value, not focused)
+  // to prevent overlap between the label and placeholder text
+  .p-float-label .p-dropdown:not(.p-focus) .p-dropdown-label.p-placeholder {
+    opacity: 0;
+  }
+
   .p-dropdown {
     background: var(--card-background);
     border: 1px solid var(--border-color);

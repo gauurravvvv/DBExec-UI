@@ -71,22 +71,16 @@
         >
         </app-custom-input>
 
-        <!-- Username (readonly) -->
-        <div class="form-field">
-          <label for="username">Username<span class="required">*</span></label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-user-edit"></i>
-            <input
-              id="username"
-              type="text"
-              pInputText
-              formControlName="username"
-              placeholder="Enter username"
-              readonly
-              [ngClass]="{ readonly: true }"
-            />
-          </span>
-        </div>
+        <!-- Username (disabled) -->
+        <app-custom-input
+          formControlName="username"
+          label="Username"
+          placeholder="Enter username"
+          icon="pi-user-edit"
+          [required]="true"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
         <!-- Email -->
         <app-custom-input

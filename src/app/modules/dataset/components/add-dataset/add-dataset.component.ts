@@ -324,7 +324,7 @@ export class AddDatasetComponent
       .then(response => {
         this.isLoadingDatasources = false;
         if (this.globalService.handleSuccessService(response, false)) {
-          this.availableDatasources = response.data.databases || [];
+          this.availableDatasources = response.data.datasources || [];
 
           // Auto-select the first database and load its schema
           if (this.availableDatasources.length > 0) {

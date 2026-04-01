@@ -125,40 +125,22 @@
         </app-custom-input>
 
         <!-- DB Password -->
-        <div class="form-field">
-          <label for="password"
-            >Datasource Password<span class="required"> *</span></label
-          >
-          <span class="p-input-icon-left p-input-icon-right">
-            <i class="pi pi-lock"></i>
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              pInputText
-              formControlName="dbPassword"
-              placeholder="Enter password"
-              [ngClass]="{
-                'ng-invalid ng-dirty':
-                  connectionForm.get('dbPassword')?.invalid &&
-                  connectionForm.get('dbPassword')?.touched,
-              }"
-            />
-            <i
-              class="pi pi-eye"
-              style="cursor: pointer"
-              (click)="togglePassword($event)"
-            ></i>
-          </span>
-          <small
-            class="error-message"
-            *ngIf="
+        <app-custom-input
+          formControlName="dbPassword"
+          label="Datasource Password"
+          placeholder="Enter password"
+          icon="pi-lock"
+          [required]="true"
+          [showPasswordToggle]="true"
+          [showError]="
+            !!(
               connectionForm.get('dbPassword')?.invalid &&
               connectionForm.get('dbPassword')?.touched
-            "
-          >
-            Datasource Password is required
-          </small>
-        </div>
+            )
+          "
+          errorMessage="Datasource Password is required"
+        >
+        </app-custom-input>
       </div>
     </form>
   </div>

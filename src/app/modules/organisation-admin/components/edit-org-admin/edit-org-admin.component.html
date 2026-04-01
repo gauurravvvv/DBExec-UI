@@ -71,39 +71,28 @@
         >
         </app-custom-input>
 
-        <!-- Organisation (readonly) -->
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <label for="organisation">Organisation</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-building"></i>
-            <input
-              id="organisation"
-              type="text"
-              pInputText
-              [value]="selectedOrgName"
-              placeholder="Organisation"
-              readonly
-              class="readonly"
-            />
-          </span>
-        </div>
+        <!-- Organisation (disabled) -->
+        <app-custom-input
+          *ngIf="showOrganisationDropdown"
+          [ngModel]="selectedOrgName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Organisation"
+          placeholder="Organisation"
+          icon="pi-building"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
-        <!-- Username (readonly) -->
-        <div class="form-field">
-          <label for="username">Username<span class="required">*</span></label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-user-edit"></i>
-            <input
-              id="username"
-              type="text"
-              pInputText
-              formControlName="username"
-              placeholder="Enter username"
-              readonly
-              class="readonly"
-            />
-          </span>
-        </div>
+        <!-- Username (disabled) -->
+        <app-custom-input
+          formControlName="username"
+          label="Username"
+          placeholder="Enter username"
+          icon="pi-user-edit"
+          [required]="true"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
 
         <!-- Email -->
         <app-custom-input

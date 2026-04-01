@@ -241,37 +241,22 @@
               >
               </app-custom-input>
 
-              <div class="form-field">
-                <label for="dbPort">Port<span class="required"> *</span></label>
-                <span class="p-input-icon-left">
-                  <i class="pi pi-hashtag"></i>
-                  <input
-                    id="dbPort"
-                    type="number"
-                    pInputText
-                    formControlName="dbPort"
-                    placeholder="e.g. 5432"
-                    min="1"
-                    max="65535"
-                    (keypress)="onPortKeyPress($event)"
-                    [ngClass]="{
-                      'ng-invalid ng-dirty':
-                        orgForm.get('dbPort')?.invalid &&
-                        orgForm.get('dbPort')?.touched,
-                    }"
-                    class="p-inputtext"
-                  />
-                </span>
-                <small
-                  class="error-message"
-                  *ngIf="
+              <app-custom-input
+                formControlName="dbPort"
+                label="Port"
+                placeholder="e.g. 5432"
+                icon="pi-hashtag"
+                type="number"
+                [required]="true"
+                [showError]="
+                  !!(
                     orgForm.get('dbPort')?.invalid &&
                     orgForm.get('dbPort')?.touched
-                  "
-                >
-                  {{ getDbFieldError('dbPort') }}
-                </small>
-              </div>
+                  )
+                "
+                [errorMessage]="getDbFieldError('dbPort')"
+              >
+              </app-custom-input>
             </div>
 
             <app-custom-input
@@ -307,41 +292,22 @@
               >
               </app-custom-input>
 
-              <div class="form-field">
-                <label for="dbPassword"
-                  >Password<span class="required"> *</span></label
-                >
-                <span class="p-input-icon-left p-input-icon-right">
-                  <i class="pi pi-lock"></i>
-                  <input
-                    id="dbPassword"
-                    [type]="showDbPassword ? 'text' : 'password'"
-                    pInputText
-                    formControlName="dbPassword"
-                    placeholder="Enter password"
-                    [ngClass]="{
-                      'ng-invalid ng-dirty':
-                        orgForm.get('dbPassword')?.invalid &&
-                        orgForm.get('dbPassword')?.touched,
-                    }"
-                    class="p-inputtext"
-                  />
-                  <i
-                    class="pi pi-eye"
-                    style="cursor: pointer"
-                    (click)="toggleDbPasswordVisibility($event)"
-                  ></i>
-                </span>
-                <small
-                  class="error-message"
-                  *ngIf="
+              <app-custom-input
+                formControlName="dbPassword"
+                label="Password"
+                placeholder="Enter password"
+                icon="pi-lock"
+                [required]="true"
+                [showPasswordToggle]="true"
+                [showError]="
+                  !!(
                     orgForm.get('dbPassword')?.invalid &&
                     orgForm.get('dbPassword')?.touched
-                  "
-                >
-                  {{ getDbFieldError('dbPassword') }}
-                </small>
-              </div>
+                  )
+                "
+                [errorMessage]="getDbFieldError('dbPassword')"
+              >
+              </app-custom-input>
             </div>
 
             <!-- Test Connection (text link) -->

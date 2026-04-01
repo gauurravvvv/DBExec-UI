@@ -17,13 +17,12 @@
         <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
 
         <div class="config-group">
-          <label>Placeholder Text</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.placeholder"
+            label="Placeholder Text"
             placeholder="e.g., Enter text"
-          />
+          >
+          </app-custom-input>
         </div>
         <div class="config-group">
           <label>Input Mode</label>
@@ -85,13 +84,12 @@
           </p-inputNumber>
         </div>
         <div class="config-group">
-          <label>Pattern (Regex, optional)</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.pattern"
+            label="Pattern (Regex, optional)"
             placeholder="e.g., ^[A-Za-z]+$"
-          />
+          >
+          </app-custom-input>
           <small class="hint">Leave empty for no pattern validation</small>
         </div>
         <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>

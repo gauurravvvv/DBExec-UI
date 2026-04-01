@@ -67,23 +67,17 @@
         >
         </app-custom-input>
 
-        <!-- Organisation (readonly) -->
-        <div class="form-field">
-          <label for="organisation">Organisation</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-building"></i>
-            <input
-              id="organisation"
-              type="text"
-              pInputText
-              [value]="selectedOrgName"
-              placeholder="Organisation"
-              readonly
-              class="readonly"
-            />
-          </span>
-          <input type="hidden" formControlName="organisation" />
-        </div>
+        <!-- Organisation (disabled) -->
+        <app-custom-input
+          [ngModel]="selectedOrgName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Organisation"
+          placeholder="Organisation"
+          icon="pi-building"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
+        <input type="hidden" formControlName="organisation" />
 
         <!-- Users Multiselect -->
         <app-custom-multiselect
@@ -134,16 +128,15 @@
       <p class="delete-intro">Are you sure you want to update this group?</p>
 
       <div class="justification-section">
-        <label for="saveJustification"
-          >Justification <span class="required">*</span></label
-        >
-        <textarea
-          id="saveJustification"
+        <app-custom-input
           [(ngModel)]="saveJustification"
+          label="Justification"
           placeholder="Provide a reason for this update"
-          rows="3"
-          maxlength="500"
-        ></textarea>
+          inputMode="textarea"
+          [rows]="3"
+          [maxLength]="500"
+          [required]="true"
+        ></app-custom-input>
         <small class="char-count">{{ saveJustification.length }}/500</small>
       </div>
     </div>

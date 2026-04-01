@@ -29,16 +29,12 @@
         </div>
 
         <div class="search-box">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input
-              type="text"
-              pInputText
-              [(ngModel)]="fieldSearchQuery"
-              placeholder="Search fields..."
-              (ngModelChange)="onFieldSearch()"
-            />
-          </span>
+          <app-custom-input
+            [(ngModel)]="fieldSearchQuery"
+            placeholder="Search fields..."
+            icon="pi-search"
+            (ngModelChange)="onFieldSearch()"
+          ></app-custom-input>
         </div>
 
         <div class="fields-list">
@@ -119,11 +115,13 @@
 
           <!-- Error Fallback -->
           <div class="editor-fallback" *ngIf="monacoLoadFailed">
-            <textarea
+            <app-custom-input
               [(ngModel)]="customField.columnToUse"
               placeholder="Enter your formula here..."
+              inputMode="textarea"
+              [rows]="5"
               (ngModelChange)="onFormulaChange()"
-            ></textarea>
+            ></app-custom-input>
           </div>
 
           <small class="hint">
@@ -199,16 +197,12 @@
         </div>
 
         <div class="search-box">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input
-              type="text"
-              pInputText
-              [(ngModel)]="functionSearchQuery"
-              placeholder="Search functions..."
-              (ngModelChange)="onFunctionSearch()"
-            />
-          </span>
+          <app-custom-input
+            [(ngModel)]="functionSearchQuery"
+            placeholder="Search functions..."
+            icon="pi-search"
+            (ngModelChange)="onFunctionSearch()"
+          ></app-custom-input>
         </div>
 
         <div class="categories-list">

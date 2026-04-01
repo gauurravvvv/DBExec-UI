@@ -39,7 +39,6 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
   statusOptions = [
     { label: 'Active', value: 1 },
     { label: 'Inactive', value: 0 },
-    { label: 'Locked', value: 2 },
   ];
 
   // Filter values for column filtering

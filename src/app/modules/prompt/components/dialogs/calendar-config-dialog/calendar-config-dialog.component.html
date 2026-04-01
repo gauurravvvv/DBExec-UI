@@ -21,13 +21,12 @@
         <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
 
         <div class="config-group">
-          <label>Placeholder Text</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.placeholder"
+            label="Placeholder Text"
             placeholder="e.g., Select a date"
-          />
+          >
+          </app-custom-input>
         </div>
 
         <div class="config-group">

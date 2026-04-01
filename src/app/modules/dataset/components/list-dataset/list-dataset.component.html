@@ -32,7 +32,6 @@
           <div class="dropdown-field">
             <app-custom-dropdown
               [(ngModel)]="selectedDatasource"
-              placeholder="Select Datasource"
               [options]="datasources"
               optionLabel="name"
               optionValue="id"
@@ -257,16 +256,15 @@
       </ul>
 
       <div class="justification-section">
-        <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
-        >
-        <textarea
-          id="deleteJustification"
+        <app-custom-input
           [(ngModel)]="deleteJustification"
+          label="Justification"
           placeholder="Provide a reason for this deletion"
-          rows="3"
-          maxlength="500"
-        ></textarea>
+          inputMode="textarea"
+          [rows]="3"
+          [maxLength]="500"
+          [required]="true"
+        ></app-custom-input>
         <small class="char-count">{{ deleteJustification.length }}/500</small>
       </div>
     </div>

@@ -109,9 +109,10 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Start idle tracking if already logged in on page load
+    // Start idle tracking and proactive token refresh if already logged in on page load
     if (this.loginService.isLoggedIn()) {
       this.idleTimeoutService.start();
+      this.loginService.scheduleTokenRefresh();
     }
   }
 

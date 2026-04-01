@@ -170,7 +170,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
         .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.datasources = response.data.databases || [];
+            this.datasources = response.data.datasources || [];
             if (this.datasources.length > 0) {
               this.selectedDatasource = this.datasources[0].id;
               this.loadDashboards();

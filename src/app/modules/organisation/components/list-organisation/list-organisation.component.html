@@ -82,14 +82,14 @@
               <th pFrozenColumn>
                 <app-custom-input
                   [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange('name')"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Name"
                 ></app-custom-input>
               </th>
               <th>
                 <app-custom-input
                   [(ngModel)]="filterValues.description"
-                  (ngModelChange)="onFilterChange('description')"
+                  (ngModelChange)="onFilterChange()"
                   placeholder="Search Description"
                 ></app-custom-input>
               </th>
@@ -102,7 +102,8 @@
                   placeholder="All"
                   [showClear]="true"
                   [filter]="false"
-                  (onChangeEvent)="onFilterChange('status')"
+                  appendTo="body"
+                  (onChangeEvent)="onFilterChange()"
                 ></app-custom-dropdown>
               </th>
               <th>

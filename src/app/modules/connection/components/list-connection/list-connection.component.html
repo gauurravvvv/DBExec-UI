@@ -34,13 +34,12 @@
           <div class="dropdown-field">
             <app-custom-dropdown
               [(ngModel)]="selectedDatasource"
-              placeholder="Select Datasource"
               [options]="datasources"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
-              [floatingLabel]="true"
               label="Datasource"
+              [floatingLabel]="true"
               filterBy="name"
               (onChangeEvent)="onDBChange($event)"
             >

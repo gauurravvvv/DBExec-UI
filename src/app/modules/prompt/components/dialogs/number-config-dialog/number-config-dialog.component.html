@@ -17,13 +17,12 @@
         <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
 
         <div class="config-group">
-          <label>Placeholder Text</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.placeholder"
+            label="Placeholder Text"
             placeholder="e.g., Enter number"
-          />
+          >
+          </app-custom-input>
         </div>
         <div class="config-group">
           <label>Minimum Value (optional)</label>
@@ -77,22 +76,20 @@
         <div class="section-label"><i class="pi pi-tag"></i> Format</div>
 
         <div class="config-group">
-          <label>Prefix</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.prefix"
+            label="Prefix"
             placeholder="e.g., $"
-          />
+          >
+          </app-custom-input>
         </div>
         <div class="config-group">
-          <label>Suffix</label>
-          <input
-            type="text"
-            pInputText
+          <app-custom-input
             [(ngModel)]="config.suffix"
+            label="Suffix"
             placeholder="e.g., kg"
-          />
+          >
+          </app-custom-input>
         </div>
 
         <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
