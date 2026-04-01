@@ -29,12 +29,19 @@ export class ListSuperAdminComponent implements OnInit {
 
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+    { label: 'Locked', value: 2 },
+  ];
+
   // Component-managed filter values
   filterValues: any = {
     username: '',
     firstName: '',
     lastName: '',
     email: '',
+    status: null,
     lastLoginDateRange: null,
     createdDateRange: null,
   };
@@ -71,6 +78,7 @@ export class ListSuperAdminComponent implements OnInit {
       !!this.filterValues.firstName ||
       !!this.filterValues.lastName ||
       !!this.filterValues.email ||
+      this.filterValues.status !== null ||
       !!this.filterValues.lastLoginDateRange ||
       !!this.filterValues.createdDateRange
     );
@@ -82,6 +90,7 @@ export class ListSuperAdminComponent implements OnInit {
       firstName: '',
       lastName: '',
       email: '',
+      status: null,
       lastLoginDateRange: null,
       createdDateRange: null,
     };
@@ -197,6 +206,9 @@ export class ListSuperAdminComponent implements OnInit {
       const dateTo = new Date(this.filterValues.createdDateRange[1]);
       dateTo.setHours(23, 59, 59, 999);
       filter.createdDateTo = dateTo.toISOString();
+    }
+    if (this.filterValues.status !== null && this.filterValues.status !== undefined) {
+      filter.status = this.filterValues.status;
     }
 
     if (Object.keys(filter).length > 0) {

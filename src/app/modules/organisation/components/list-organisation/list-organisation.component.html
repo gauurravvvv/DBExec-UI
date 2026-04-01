@@ -94,10 +94,16 @@
                 ></app-custom-input>
               </th>
               <th>
-                <!-- <p-dropdown [options]="statusOptions" [(ngModel)]="filterValues.status"
-                                    (onChange)="onFilterChange('status')" placeholder="Select Status" [showClear]="true"
-                                    [style]="{'width':'100%'}" appendTo="body" styleClass="w-full p-column-filter">
-                                </p-dropdown> -->
+                <app-custom-dropdown
+                  [(ngModel)]="filterValues.status"
+                  [options]="statusOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="All"
+                  [showClear]="true"
+                  [filter]="false"
+                  (onChangeEvent)="onFilterChange('status')"
+                ></app-custom-dropdown>
               </th>
               <th>
                 <app-custom-daterange

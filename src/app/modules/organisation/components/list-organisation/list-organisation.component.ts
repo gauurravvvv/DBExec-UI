@@ -49,9 +49,15 @@ export class ListOrganisationComponent implements OnInit {
 
   today = new Date();
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+  ];
+
   filterValues: any = {
     name: '',
     description: '',
+    status: null,
     createdDateRange: null,
   };
 
@@ -59,6 +65,7 @@ export class ListOrganisationComponent implements OnInit {
     return (
       !!this.filterValues.name ||
       !!this.filterValues.description ||
+      this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
     );
   }
@@ -67,6 +74,7 @@ export class ListOrganisationComponent implements OnInit {
     this.filterValues = {
       name: '',
       description: '',
+      status: null,
       createdDateRange: null,
     };
     this.onFilterChange('name');
@@ -110,6 +118,9 @@ export class ListOrganisationComponent implements OnInit {
       const dateTo = new Date(this.filterValues.createdDateRange[1]);
       dateTo.setHours(23, 59, 59, 999);
       filter.createdDateTo = dateTo.toISOString();
+    }
+    if (this.filterValues.status !== null && this.filterValues.status !== undefined) {
+      filter.status = this.filterValues.status;
     }
 
     if (Object.keys(filter).length > 0) {

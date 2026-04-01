@@ -36,12 +36,19 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 },
+    { label: 'Locked', value: 2 },
+  ];
+
   // Filter values for column filtering
   filterValues: any = {
     username: '',
     firstName: '',
     lastName: '',
     email: '',
+    status: null,
     lastLoginDateRange: null,
     createdDateRange: null,
   };
@@ -56,6 +63,7 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
       !!this.filterValues.firstName ||
       !!this.filterValues.lastName ||
       !!this.filterValues.email ||
+      this.filterValues.status !== null ||
       !!this.filterValues.lastLoginDateRange ||
       !!this.filterValues.createdDateRange
     );
@@ -129,6 +137,7 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
       firstName: '',
       lastName: '',
       email: '',
+      status: null,
       lastLoginDateRange: null,
       createdDateRange: null,
     };
@@ -198,6 +207,9 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
       const dateTo = new Date(this.filterValues.createdDateRange[1]);
       dateTo.setHours(23, 59, 59, 999);
       filter.createdDateTo = dateTo.toISOString();
+    }
+    if (this.filterValues.status !== null && this.filterValues.status !== undefined) {
+      filter.status = this.filterValues.status;
     }
 
     // Add JSON stringified filter if any filter is set
