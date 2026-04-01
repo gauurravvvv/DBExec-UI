@@ -23,12 +23,32 @@ interface MasterDbConfig {
   dbType: string;
 }
 
+interface AppVersion {
+  id: string;
+  version: string;
+  migrationName: string;
+  description: string;
+  sequence: number;
+}
+
+interface MigrationHistory {
+  id: string;
+  version: string;
+  direction: string;
+  status: string;
+  executedAt: string;
+  executedBy: string;
+  errorLog?: string;
+}
+
 interface OrganisationData {
   id: string;
   name: string;
   status: number;
   createdOn: Date;
   config: OrganisationConfig;
+  currentVersion: string;
+  latestVersion: string;
   usersCount: number;
   adminsCount: number;
   groupsCount: number;
@@ -53,6 +73,13 @@ export class ViewOrganisationComponent implements OnInit {
   showAnnouncementDialog: boolean = false;
   isRefreshingMasterDb: boolean = false;
 
+  // Version management
+  versions: AppVersion[] = [];
+  migrationHistory: MigrationHistory[] = [];
+  selectedVersion: string = '';
+  isMigrating: boolean = false;
+  isLoadingVersions: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -75,8 +102,56 @@ export class ViewOrganisationComponent implements OnInit {
         if (this.globalService.handleSuccessService(response, false)) {
           this.organisationData = response.data;
           this.setOrganisationInitials();
+          this.loadVersions();
         }
       });
+  }
+
+  loadVersions() {
+    this.isLoadingVersions = true;
+    this.organisationService
+      .getOrgVersions(this.organisationId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.versions = response.data.versions || [];
+          this.migrationHistory = response.data.history || [];
+          this.selectedVersion =
+            this.organisationData.currentVersion || '0.0.0';
+        }
+        this.isLoadingVersions = false;
+      })
+      .catch(() => {
+        this.isLoadingVersions = false;
+      });
+  }
+
+  migrateOrg() {
+    if (
+      !this.selectedVersion ||
+      this.selectedVersion === this.organisationData.currentVersion
+    ) {
+      return;
+    }
+    this.isMigrating = true;
+    this.organisationService
+      .migrateOrg(this.organisationId, this.selectedVersion)
+      .then(response => {
+        this.globalService.handleSuccessService(response);
+        this.isMigrating = false;
+        if (response.status) {
+          this.loadOrganisationData();
+        }
+      })
+      .catch(() => {
+        this.isMigrating = false;
+      });
+  }
+
+  get isAtLatest(): boolean {
+    return (
+      this.organisationData?.currentVersion ===
+      this.organisationData?.latestVersion
+    );
   }
 
   setOrganisationInitials() {

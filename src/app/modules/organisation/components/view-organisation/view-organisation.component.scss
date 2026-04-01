@@ -300,6 +300,207 @@ $radius-sm: 8px;
     }
   }
 
+  // Schema Version Section
+  .version-section {
+    .version-info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .version-badge-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .version-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 20px;
+      border-radius: $radius-sm;
+      border: 1px solid var(--border-color);
+      background: var(--hover-background);
+      min-width: 100px;
+
+      .version-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--secondary-color);
+        font-weight: 600;
+      }
+
+      .version-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-color);
+      }
+
+      &.current {
+        border-color: var(--primary-color);
+        background: rgba(33, 150, 243, 0.06);
+
+        .version-value {
+          color: var(--primary-color);
+        }
+      }
+
+      &.latest.up-to-date {
+        border-color: var(--success-color);
+        background: rgba(76, 175, 80, 0.06);
+
+        .version-value {
+          color: var(--success-color);
+        }
+      }
+    }
+
+    .version-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .version-select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: $radius-sm;
+      background: var(--card-background);
+      color: var(--text-color);
+      font-size: 0.85rem;
+      min-width: 240px;
+      cursor: pointer;
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .btn-migrate {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.5rem 1.2rem;
+      border-radius: $radius-sm;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border: none;
+      background: linear-gradient(135deg, #ff9800, #f57c00);
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+
+      i {
+        font-size: 0.85rem;
+      }
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(255, 152, 0, 0.4);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    .migration-history {
+      margin-top: 20px;
+
+      h5 {
+        margin: 0 0 10px;
+        font-size: 0.85rem;
+        color: var(--secondary-color);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background: var(--hover-background);
+        border-left: 3px solid var(--border-color);
+        font-size: 0.8rem;
+
+        &.success {
+          border-left-color: var(--success-color);
+        }
+
+        &.failed {
+          border-left-color: var(--error-color);
+        }
+
+        .history-main {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .history-version {
+          font-weight: 700;
+          color: var(--text-color);
+        }
+
+        .history-direction {
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-size: 0.7rem;
+          font-weight: 600;
+          background: rgba(33, 150, 243, 0.1);
+          color: var(--primary-color);
+        }
+
+        .history-status {
+          font-weight: 600;
+          font-size: 0.75rem;
+        }
+
+        .history-date {
+          color: var(--secondary-color);
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .version-loading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 0;
+      color: var(--secondary-color);
+      font-size: 0.85rem;
+
+      i {
+        font-size: 1rem;
+      }
+    }
+  }
+
   // Database Status Banner
   .db-status-banner {
     display: flex;

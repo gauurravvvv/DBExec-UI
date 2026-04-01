@@ -40,6 +40,8 @@ export const ORGANISATION = {
   VIEW: '/org/get/',
   EDIT: '/org/update',
   REFRESH_MASTER_DB: '/org/refresh-master-db/',
+  VERSIONS: '/org/versions/',
+  MIGRATE: '/org/migrate/',
 };
 
 export const USER = {

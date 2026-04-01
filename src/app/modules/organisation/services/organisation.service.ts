@@ -149,6 +149,26 @@ export class OrganisationService {
       });
   }
 
+  getOrgVersions(orgId: string) {
+    return this.http
+      .get(ORGANISATION.VERSIONS + `${orgId}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  migrateOrg(orgId: string, targetVersion: string) {
+    return this.http
+      .post(ORGANISATION.MIGRATE + `${orgId}`, { targetVersion })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   validateDatasource(payload: {
     type: string;
     host: string;

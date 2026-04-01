@@ -208,6 +208,77 @@
           </div>
         </div>
 
+        <!-- Schema Version Section -->
+        <div class="detail-group version-section">
+          <div class="section-header-row">
+            <h4>
+              <i class="pi pi-tag"></i>
+              Schema Version
+            </h4>
+          </div>
+
+          <div class="version-info-row">
+            <div class="version-badge-group">
+              <div class="version-badge current">
+                <span class="version-label">Current</span>
+                <span class="version-value">v{{ organisationData.currentVersion || '0.0.0' }}</span>
+              </div>
+              <div class="version-badge latest" [class.up-to-date]="isAtLatest">
+                <span class="version-label">Latest</span>
+                <span class="version-value">v{{ organisationData.latestVersion || '0.0.0' }}</span>
+              </div>
+            </div>
+
+            <div class="version-actions" *ngIf="versions.length > 0">
+              <select
+                class="version-select"
+                [(ngModel)]="selectedVersion"
+                [disabled]="isMigrating"
+              >
+                <option *ngFor="let v of versions" [value]="v.version">
+                  v{{ v.version }} — {{ v.description }}
+                </option>
+              </select>
+              <button
+                class="btn-migrate"
+                (click)="migrateOrg()"
+                [disabled]="isMigrating || selectedVersion === organisationData.currentVersion || organisationData.dbStatus !== 'connected'"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="isMigrating ? 'pi-spin pi-spinner' : 'pi-arrow-right'"
+                ></i>
+                {{ isMigrating ? 'Migrating...' : 'Migrate' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Migration History -->
+          <div class="migration-history" *ngIf="migrationHistory.length > 0">
+            <h5>Recent Migration History</h5>
+            <div class="history-list">
+              <div
+                class="history-item"
+                *ngFor="let h of migrationHistory"
+                [class.success]="h.status === 'SUCCESS'"
+                [class.failed]="h.status === 'FAILED'"
+              >
+                <div class="history-main">
+                  <span class="history-version">v{{ h.version }}</span>
+                  <span class="history-direction">{{ h.direction }}</span>
+                  <span class="history-status">{{ h.status }}</span>
+                </div>
+                <span class="history-date">{{ h.executedAt | date: 'medium' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="version-loading" *ngIf="isLoadingVersions">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Loading version info...</span>
+          </div>
+        </div>
+
         <!-- Second Row -->
         <div class="second-row">
           <!-- Configuration Limits -->
