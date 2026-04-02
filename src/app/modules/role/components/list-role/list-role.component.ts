@@ -26,7 +26,7 @@ export class ListRoleComponent implements OnInit {
   deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
-  selectedOrg: any = {};
+  selectedOrgId: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
@@ -57,9 +57,7 @@ export class ListRoleComponent implements OnInit {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.selectedOrg = {
-        id: this.globalService.getTokenDetails('organisationId'),
-      };
+      this.selectedOrgId = this.globalService.getTokenDetails('organisationId');
       this.loadRoles();
     }
   }
@@ -74,23 +72,23 @@ export class ListRoleComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
+          this.selectedOrgId = this.organisations[0].id;
           this.loadRoles();
         }
       }
     });
   }
 
-  onOrgChange(event: any) {
-    this.selectedOrg = event.value;
+  onOrgChange(value: any) {
+    this.selectedOrgId = value;
     this.currentPage = 1;
     this.loadRoles();
   }
 
   loadRoles() {
-    if (!this.selectedOrg) return;
+    if (!this.selectedOrgId) return;
     const params = {
-      orgId: this.selectedOrg.id,
+      orgId: this.selectedOrgId,
       pageNumber: this.currentPage,
       limit: this.pageSize,
     };
@@ -148,7 +146,7 @@ export class ListRoleComponent implements OnInit {
   }
 
   onEdit(id: string) {
-    this.router.navigate([ROLE.EDIT, this.selectedOrg.id, id]);
+    this.router.navigate([ROLE.EDIT, this.selectedOrgId, id]);
   }
 
   confirmDelete(id: string) {
@@ -166,7 +164,7 @@ export class ListRoleComponent implements OnInit {
     if (this.roleToDelete && this.deleteJustification.trim()) {
       this.roleService
         .deleteRole(
-          this.selectedOrg.id,
+          this.selectedOrgId,
           this.roleToDelete,
           this.deleteJustification.trim(),
         )

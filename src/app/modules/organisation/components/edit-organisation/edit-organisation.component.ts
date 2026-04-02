@@ -6,45 +6,11 @@ import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from '../../services/organisation.service';
 import { REGEX } from 'src/app/constants/regex.constant';
-import {
-  trigger,
-  state,
-  style,
-  transition,
-  animate,
-} from '@angular/animations';
 
 @Component({
   selector: 'app-edit-organisation',
   templateUrl: './edit-organisation.component.html',
   styleUrls: ['./edit-organisation.component.scss'],
-  animations: [
-    trigger('slideDown', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-10px)' }),
-        animate(
-          '300ms ease-out',
-          style({ opacity: 1, transform: 'translateY(0)' }),
-        ),
-      ]),
-    ]),
-    trigger('expandCollapse', [
-      state(
-        'collapsed',
-        style({ height: '0', opacity: '0', overflow: 'hidden', padding: '0' }),
-      ),
-      state(
-        'expanded',
-        style({
-          height: '*',
-          opacity: '1',
-          overflow: 'hidden',
-          padding: '1rem',
-        }),
-      ),
-      transition('collapsed <=> expanded', [animate('200ms ease-in-out')]),
-    ]),
-  ],
 })
 export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
   orgForm!: FormGroup;
@@ -65,9 +31,6 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
 
   // Stepper
   currentStep = 0;
-
-  // Warning
-  isWarningExpanded = false;
 
   // Connection test
   connectionTested = false;
@@ -131,10 +94,10 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
       dbUsername: ['', [Validators.required]],
       dbPassword: [''],
       // Security config
-      maxLoginAttempts: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
-      accountLockDurationHours: [1, [Validators.required, Validators.min(0), Validators.max(720)]],
+      maxLoginAttempts: [5, [Validators.required, Validators.min(3), Validators.max(10)]],
+      accountLockDurationHours: [1, [Validators.required, Validators.min(0), Validators.max(24)]],
       passwordHistoryLimit: [5, [Validators.required, Validators.min(1), Validators.max(24)]],
-      sessionInactivityTimeout: [30, [Validators.required, Validators.min(5), Validators.max(480)]],
+      sessionInactivityTimeout: [30, [Validators.required, Validators.min(5), Validators.max(1440)]],
       // Email config
       emailProvider: [null],
       smtpHost: [''],
@@ -146,6 +109,11 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
       sesAccessKeyId: [''],
       sesSecretAccessKey: [''],
       sesFrom: [''],
+    });
+
+    // Update email field validators when provider changes
+    this.orgForm.get('emailProvider')?.valueChanges.subscribe(provider => {
+      this.updateEmailValidators(provider);
     });
 
     this.orgForm.valueChanges.subscribe(() => {
@@ -283,6 +251,46 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     return this.orgForm.get('emailProvider')?.value;
   }
 
+  updateEmailValidators(provider: string | null) {
+    const smtpFields = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpFrom'];
+    const sesFields = ['sesRegion', 'sesAccessKeyId', 'sesFrom'];
+    const allFields = [...smtpFields, ...sesFields];
+
+    // Clear all first
+    allFields.forEach(f => {
+      this.orgForm.get(f)?.clearValidators();
+      this.orgForm.get(f)?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    if (provider === 'SMTP') {
+      this.orgForm.get('smtpHost')?.setValidators([Validators.required, Validators.maxLength(255)]);
+      this.orgForm.get('smtpPort')?.setValidators([Validators.required, Validators.min(1), Validators.max(65535)]);
+      this.orgForm.get('smtpUser')?.setValidators([Validators.required, Validators.maxLength(255)]);
+      this.orgForm.get('smtpFrom')?.setValidators([Validators.required, Validators.email]);
+    } else if (provider === 'SES') {
+      this.orgForm.get('sesRegion')?.setValidators([Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-z]{2}-[a-z]+-\d{1,2}$/)]);
+      this.orgForm.get('sesAccessKeyId')?.setValidators([Validators.required, Validators.minLength(16), Validators.maxLength(128)]);
+      this.orgForm.get('sesFrom')?.setValidators([Validators.required, Validators.email]);
+    }
+
+    allFields.forEach(f => {
+      this.orgForm.get(f)?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
+  getEmailFieldError(fieldName: string): string {
+    const control = this.orgForm.get(fieldName);
+    if (!control?.errors || !control.touched) return '';
+    if (control.errors['required']) return 'This field is required';
+    if (control.errors['email']) return 'Please enter a valid email address';
+    if (control.errors['maxlength']) return `Must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control.errors['minlength']) return `Must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
+    if (control.errors['max']) return `Maximum value is ${control.errors['max'].max}`;
+    if (control.errors['pattern']) return 'Invalid format (e.g. us-east-1)';
+    return '';
+  }
+
   isStep3Valid(): boolean {
     const securityValid = ['maxLoginAttempts', 'accountLockDurationHours', 'passwordHistoryLimit', 'sessionInactivityTimeout']
       .every(f => this.orgForm.get(f)?.valid);
@@ -326,11 +334,6 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     } else if (step === 2 && this.currentStep === 1) {
       this.currentStep = 2;
     }
-  }
-
-  // Warning toggle
-  toggleWarning() {
-    this.isWarningExpanded = !this.isWarningExpanded;
   }
 
   // Connection test
@@ -476,6 +479,15 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
       return `Description must be at least ${control.errors['minlength'].requiredLength} characters`;
     if (control?.errors?.['maxlength'])
       return `Description must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    return '';
+  }
+
+  getSecurityFieldError(fieldName: string): string {
+    const control = this.orgForm.get(fieldName);
+    if (!control?.errors || !control.touched) return '';
+    if (control.errors['required']) return 'This field is required';
+    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
+    if (control.errors['max']) return `Maximum value is ${control.errors['max'].max}`;
     return '';
   }
 

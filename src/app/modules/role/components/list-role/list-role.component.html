@@ -26,21 +26,18 @@
 
           <!-- Organisation Dropdown -->
           <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-            <span class="p-float-label">
-              <p-dropdown
-                [options]="organisations"
-                [(ngModel)]="selectedOrg"
-                optionLabel="name"
-                [filter]="true"
-                filterBy="name"
-                [style]="{ width: '100%' }"
-                [panelStyle]="{ width: '100%' }"
-                (onChange)="onOrgChange($event)"
-                inputId="org-dropdown"
-              >
-              </p-dropdown>
-              <label for="org-dropdown">Organisation</label>
-            </span>
+            <app-custom-dropdown
+              [(ngModel)]="selectedOrgId"
+              [options]="organisations"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              label="Organisation"
+              [floatingLabel]="true"
+              filterBy="name"
+              (onChangeEvent)="onOrgChange($event)"
+            >
+            </app-custom-dropdown>
           </div>
         </div>
       </div>
@@ -81,7 +78,7 @@
                 <td>
                   <a
                     class="admin-name"
-                    [routerLink]="['/app/role/view', selectedOrg.id, role.id]"
+                    [routerLink]="['/app/role/view', selectedOrgId, role.id]"
                   >
                     {{ role?.name }}
                   </a>

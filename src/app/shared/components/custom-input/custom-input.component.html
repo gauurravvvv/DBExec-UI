@@ -2,6 +2,7 @@
   <label *ngIf="label">
     {{ label }}
     <span class="required" *ngIf="required">*</span>
+    <i *ngIf="tooltip" class="pi pi-info-circle label-tooltip" [pTooltip]="tooltip" tooltipPosition="top"></i>
   </label>
   <!-- Textarea Mode -->
   <ng-container *ngIf="inputMode === 'textarea'; else inputBlock">
@@ -71,6 +72,9 @@
       />
     </ng-template>
   </ng-template>
+  <small class="hint-message" *ngIf="hint && !(showError && errorMessage)">
+    {{ hint }}
+  </small>
   <small class="error-message" *ngIf="showError && errorMessage">
     {{ errorMessage }}
   </small>

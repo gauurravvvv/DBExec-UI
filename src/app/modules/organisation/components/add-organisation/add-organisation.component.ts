@@ -94,10 +94,10 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       dbPassword: ['', [Validators.required]],
       adminEmail: ['', [Validators.required, Validators.email]],
       // Security config
-      maxLoginAttempts: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
-      accountLockDurationHours: [1, [Validators.required, Validators.min(0), Validators.max(720)]],
+      maxLoginAttempts: [5, [Validators.required, Validators.min(3), Validators.max(10)]],
+      accountLockDurationHours: [1, [Validators.required, Validators.min(0), Validators.max(24)]],
       passwordHistoryLimit: [5, [Validators.required, Validators.min(1), Validators.max(24)]],
-      sessionInactivityTimeout: [30, [Validators.required, Validators.min(5), Validators.max(480)]],
+      sessionInactivityTimeout: [30, [Validators.required, Validators.min(5), Validators.max(1440)]],
       // Email config
       emailProvider: [null],
       smtpHost: [''],
@@ -109,6 +109,11 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       sesAccessKeyId: [''],
       sesSecretAccessKey: [''],
       sesFrom: [''],
+    });
+
+    // Update email field validators when provider changes
+    this.orgForm.get('emailProvider')?.valueChanges.subscribe(provider => {
+      this.updateEmailValidators(provider);
     });
 
     // Reset connection test when DB fields change
@@ -147,6 +152,45 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
 
   get selectedEmailProvider(): string | null {
     return this.orgForm.get('emailProvider')?.value;
+  }
+
+  updateEmailValidators(provider: string | null) {
+    const smtpFields = ['smtpHost', 'smtpPort', 'smtpUser', 'smtpFrom'];
+    const sesFields = ['sesRegion', 'sesAccessKeyId', 'sesFrom'];
+    const allFields = [...smtpFields, ...sesFields];
+
+    allFields.forEach(f => {
+      this.orgForm.get(f)?.clearValidators();
+      this.orgForm.get(f)?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    if (provider === 'SMTP') {
+      this.orgForm.get('smtpHost')?.setValidators([Validators.required, Validators.maxLength(255)]);
+      this.orgForm.get('smtpPort')?.setValidators([Validators.required, Validators.min(1), Validators.max(65535)]);
+      this.orgForm.get('smtpUser')?.setValidators([Validators.required, Validators.maxLength(255)]);
+      this.orgForm.get('smtpFrom')?.setValidators([Validators.required, Validators.email]);
+    } else if (provider === 'SES') {
+      this.orgForm.get('sesRegion')?.setValidators([Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-z]{2}-[a-z]+-\d{1,2}$/)]);
+      this.orgForm.get('sesAccessKeyId')?.setValidators([Validators.required, Validators.minLength(16), Validators.maxLength(128)]);
+      this.orgForm.get('sesFrom')?.setValidators([Validators.required, Validators.email]);
+    }
+
+    allFields.forEach(f => {
+      this.orgForm.get(f)?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
+  getEmailFieldError(fieldName: string): string {
+    const control = this.orgForm.get(fieldName);
+    if (!control?.errors || !control.touched) return '';
+    if (control.errors['required']) return 'This field is required';
+    if (control.errors['email']) return 'Please enter a valid email address';
+    if (control.errors['maxlength']) return `Must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control.errors['minlength']) return `Must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
+    if (control.errors['max']) return `Maximum value is ${control.errors['max'].max}`;
+    if (control.errors['pattern']) return 'Invalid format (e.g. us-east-1)';
+    return '';
   }
 
   isStep3Valid(): boolean {
@@ -320,6 +364,15 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       return `Pepper key must be at least ${control.errors['minlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
       return 'Pepper key can only contain letters, numbers and special characters (no spaces)';
+    return '';
+  }
+
+  getSecurityFieldError(fieldName: string): string {
+    const control = this.orgForm.get(fieldName);
+    if (!control?.errors || !control.touched) return '';
+    if (control.errors['required']) return 'This field is required';
+    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
+    if (control.errors['max']) return `Maximum value is ${control.errors['max'].max}`;
     return '';
   }
 

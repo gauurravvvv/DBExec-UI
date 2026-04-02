@@ -583,8 +583,12 @@
     width: 0;
   }
 
-  &.step-2 .step-line::before {
+  &.step-2 .step-line:nth-child(2)::before {
     width: 100%;
+  }
+
+  &.step-2 .step-line:nth-child(4)::before {
+    width: 0;
   }
 
   &.step-3 .step-line::before {
@@ -890,20 +894,6 @@
     font-size: 0.85rem;
     flex-shrink: 0;
     margin-top: 2px;
-  }
-}
-
-// Field hint (standalone)
-.field-hint {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: #e68a00;
-  font-size: 0.78rem;
-  margin-top: -0.5rem;
-
-  i {
-    font-size: 0.7rem;
   }
 }
 

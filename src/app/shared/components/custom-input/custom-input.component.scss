@@ -13,6 +13,31 @@
       color: var(--error-color);
       margin-left: 4px;
     }
+
+    .label-tooltip {
+      margin-left: 6px;
+      font-size: 0.8rem;
+      color: var(--text-color);
+      opacity: 0.4;
+      cursor: help;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  /* Hide number input spinners */
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
   }
 
   .p-input-icon-left {
@@ -37,6 +62,10 @@
         color: var(--text-color);
         opacity: 0.4;
       }
+    }
+
+    &.p-input-icon-right input {
+      padding-right: 2.5rem;
     }
   }
 
@@ -67,6 +96,12 @@
       color: var(--text-color);
       opacity: 0.4;
     }
+  }
+
+  .hint-message {
+    color: var(--text-color);
+    opacity: 0.5;
+    font-size: 12px;
   }
 
   .error-message {
