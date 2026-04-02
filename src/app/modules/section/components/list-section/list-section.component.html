@@ -77,7 +77,7 @@
           [lazy]="true"
           (onLazyLoad)="loadSections($event)"
           [totalRecords]="totalRecords"
-          [globalFilterFields]="['name', 'description', 'tabName']"
+          [globalFilterFields]="['name', 'description', 'tab.name']"
           [rowHover]="true"
           dataKey="id"
           currentPageReportTemplate="{first} - {last} of {totalRecords}"
@@ -182,7 +182,7 @@
               </td>
               <td>
                 <span class="tab-badge">
-                  {{ section.tabName || 'N/A' }}
+                  {{ section.tab?.name || 'N/A' }}
                 </span>
               </td>
               <td>

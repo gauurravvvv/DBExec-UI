@@ -127,7 +127,6 @@ export interface TabApiResponse {
   organisationId: string;
   organisationName: string;
   datasourceId: string;
-  datasourceName: string;
   tabControlName: string;
   sequence: number;
   status: number;
@@ -143,7 +142,6 @@ export interface SectionApiResponse {
   organisationId: string;
   organisationName: string;
   datasourceId: string;
-  datasourceName: string;
   status: number;
   sequence: number;
   createdOn: string;
@@ -159,7 +157,6 @@ export interface PromptApiResponse {
   organisationId: string;
   organisationName: string;
   datasourceId: string;
-  datasourceName: string;
   status: number;
   type: string;
   validation: string | null;

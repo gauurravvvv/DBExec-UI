@@ -102,7 +102,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
 
           this.selectedOrgName = this.connectionData.organisationName || '';
           this.selectedDatasourceName =
-            this.connectionData.datasourceName || '';
+            this.connectionData.datasource?.name || '';
 
           this.connectionForm.markAsPristine();
         }

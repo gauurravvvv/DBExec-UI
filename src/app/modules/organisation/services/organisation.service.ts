@@ -31,20 +31,55 @@ export class OrganisationService {
       dbUsername,
       dbPassword,
       adminEmail,
+      maxLoginAttempts,
+      accountLockDurationHours,
+      passwordHistoryLimit,
+      sessionInactivityTimeout,
+      emailProvider,
+      smtpHost,
+      smtpPort,
+      smtpUser,
+      smtpPassword,
+      smtpFrom,
+      sesRegion,
+      sesAccessKeyId,
+      sesSecretAccessKey,
+      sesFrom,
     } = orgForm.value;
+
+    const payload: any = {
+      name,
+      description,
+      encryptionAlgorithm,
+      pepperKey,
+      dbHost,
+      dbPort,
+      dbName,
+      dbUsername,
+      dbPassword,
+      adminEmail,
+      maxLoginAttempts,
+      accountLockDurationHours,
+      passwordHistoryLimit,
+      sessionInactivityTimeout,
+      emailProvider,
+    };
+
+    if (emailProvider === 'SMTP') {
+      payload.smtpHost = smtpHost;
+      payload.smtpPort = smtpPort;
+      payload.smtpUser = smtpUser;
+      if (smtpPassword) payload.smtpPassword = smtpPassword;
+      payload.smtpFrom = smtpFrom;
+    } else if (emailProvider === 'SES') {
+      payload.sesRegion = sesRegion;
+      payload.sesAccessKeyId = sesAccessKeyId;
+      if (sesSecretAccessKey) payload.sesSecretAccessKey = sesSecretAccessKey;
+      payload.sesFrom = sesFrom;
+    }
+
     return this.http
-      .post(ORGANISATION.ADD, {
-        name,
-        description,
-        encryptionAlgorithm,
-        pepperKey,
-        dbHost,
-        dbPort,
-        dbName,
-        dbUsername,
-        dbPassword,
-        adminEmail,
-      })
+      .post(ORGANISATION.ADD, payload)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -55,7 +90,6 @@ export class OrganisationService {
   editOrganisation(orgForm: FormGroup, justification?: string) {
     const {
       id,
-      name,
       status,
       description,
       dbHost,
@@ -63,11 +97,25 @@ export class OrganisationService {
       dbName,
       dbUsername,
       dbPassword,
+      maxLoginAttempts,
+      accountLockDurationHours,
+      passwordHistoryLimit,
+      sessionInactivityTimeout,
+      emailProvider,
+      smtpHost,
+      smtpPort,
+      smtpUser,
+      smtpPassword,
+      smtpFrom,
+      sesRegion,
+      sesAccessKeyId,
+      sesSecretAccessKey,
+      sesFrom,
     } = orgForm.getRawValue();
 
     const payload: any = {
       id,
-      name,
+      // Organisation name cannot be updated after creation
       status: status ? 1 : 0,
       description,
       justification,
@@ -79,6 +127,27 @@ export class OrganisationService {
     if (dbName) payload.dbName = dbName;
     if (dbUsername) payload.dbUsername = dbUsername;
     if (dbPassword) payload.dbPassword = dbPassword;
+
+    // Security config
+    payload.maxLoginAttempts = maxLoginAttempts;
+    payload.accountLockDurationHours = accountLockDurationHours;
+    payload.passwordHistoryLimit = passwordHistoryLimit;
+    payload.sessionInactivityTimeout = sessionInactivityTimeout;
+
+    // Email config
+    payload.emailProvider = emailProvider;
+    if (emailProvider === 'SMTP') {
+      payload.smtpHost = smtpHost;
+      payload.smtpPort = smtpPort;
+      payload.smtpUser = smtpUser;
+      if (smtpPassword) payload.smtpPassword = smtpPassword;
+      payload.smtpFrom = smtpFrom;
+    } else if (emailProvider === 'SES') {
+      payload.sesRegion = sesRegion;
+      payload.sesAccessKeyId = sesAccessKeyId;
+      if (sesSecretAccessKey) payload.sesSecretAccessKey = sesSecretAccessKey;
+      payload.sesFrom = sesFrom;
+    }
 
     return this.http
       .put(ORGANISATION.EDIT, payload)

@@ -100,7 +100,7 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
 
           this.selectedOrgName = this.queryBuilderData.organisationName || '';
           this.selectedDatasourceName =
-            this.queryBuilderData.datasourceName || '';
+            this.queryBuilderData.datasource?.name || '';
 
           this.queryBuilderForm.markAsPristine();
         }

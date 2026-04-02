@@ -83,8 +83,8 @@
           [globalFilterFields]="[
             'name',
             'description',
-            'tabName',
-            'sectionName',
+            'tab.name',
+            'section.name',
           ]"
           [rowHover]="true"
           dataKey="id"
@@ -205,12 +205,12 @@
               </td>
               <td>
                 <span class="description-text">
-                  {{ prompt.tabName || 'N/A' }}
+                  {{ prompt.tab?.name || 'N/A' }}
                 </span>
               </td>
               <td>
                 <span class="description-text">
-                  {{ prompt.sectionName || 'N/A' }}
+                  {{ prompt.section?.name || 'N/A' }}
                 </span>
               </td>
               <td>

@@ -93,6 +93,22 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       dbUsername: ['', [Validators.required]],
       dbPassword: ['', [Validators.required]],
       adminEmail: ['', [Validators.required, Validators.email]],
+      // Security config
+      maxLoginAttempts: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
+      accountLockDurationHours: [1, [Validators.required, Validators.min(0), Validators.max(720)]],
+      passwordHistoryLimit: [5, [Validators.required, Validators.min(1), Validators.max(24)]],
+      sessionInactivityTimeout: [30, [Validators.required, Validators.min(5), Validators.max(480)]],
+      // Email config
+      emailProvider: [null],
+      smtpHost: [''],
+      smtpPort: [587],
+      smtpUser: [''],
+      smtpPassword: [''],
+      smtpFrom: [''],
+      sesRegion: [''],
+      sesAccessKeyId: [''],
+      sesSecretAccessKey: [''],
+      sesFrom: [''],
     });
 
     // Reset connection test when DB fields change
@@ -125,9 +141,25 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     return fields.every(f => this.orgForm.get(f)?.valid) || false;
   }
 
+  isStep2Valid(): boolean {
+    return this.isDbConnectionFieldsValid();
+  }
+
+  get selectedEmailProvider(): string | null {
+    return this.orgForm.get('emailProvider')?.value;
+  }
+
+  isStep3Valid(): boolean {
+    const securityValid = ['maxLoginAttempts', 'accountLockDurationHours', 'passwordHistoryLimit', 'sessionInactivityTimeout']
+      .every(f => this.orgForm.get(f)?.valid);
+    return securityValid;
+  }
+
   nextStep() {
     if (this.currentStep === 0 && this.isStep1Valid()) {
       this.currentStep = 1;
+    } else if (this.currentStep === 1) {
+      this.currentStep = 2;
     }
   }
 
@@ -162,6 +194,8 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       this.currentStep = step;
     } else if (step === 1 && this.currentStep === 0 && this.isStep1Valid()) {
       this.currentStep = 1;
+    } else if (step === 2 && this.currentStep === 1) {
+      this.currentStep = 2;
     }
   }
 
@@ -221,6 +255,15 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     this.orgForm.markAsPristine();
     Object.keys(this.orgForm.controls).forEach(key => {
       this.orgForm.get(key)?.setValue('');
+    });
+    // Restore security defaults
+    this.orgForm.patchValue({
+      maxLoginAttempts: 5,
+      accountLockDurationHours: 1,
+      passwordHistoryLimit: 5,
+      sessionInactivityTimeout: 30,
+      emailProvider: null,
+      smtpPort: 587,
     });
   }
 

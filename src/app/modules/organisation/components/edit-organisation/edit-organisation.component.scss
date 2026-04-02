@@ -300,11 +300,16 @@
   &.step-2 .step-line::before {
     width: 100%;
   }
+
+  &.step-3 .step-line::before {
+    width: 100%;
+  }
 }
 
 // Two-column layouts for steps
 .step-1-layout,
-.step-2-layout {
+.step-2-layout,
+.step-3-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2.5rem;
@@ -316,21 +321,21 @@
 }
 
 .step-1-left,
-.step-2-left {
+.step-2-left,
+.step-3-left {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 .step-1-right,
-.step-2-right {
+.step-2-right,
+.step-3-right {
   padding-top: 0;
 
   .readonly-info-container {
     width: 100%;
     margin-top: 0;
-    position: sticky;
-    top: 0;
   }
 }
 
@@ -355,6 +360,24 @@
     i {
       color: var(--primary-color);
       font-size: 1rem;
+    }
+  }
+
+  .db-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    app-custom-input {
+      width: 100% !important;
+    }
+
+    .form-field {
+      width: 100% !important;
     }
   }
 
@@ -645,6 +668,94 @@
       }
     }
   }
+}
+
+// Field hint (standalone)
+.field-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #e68a00;
+  font-size: 0.78rem;
+  margin-top: -0.5rem;
+
+  i {
+    font-size: 0.7rem;
+  }
+}
+
+// Email provider toggle
+.email-provider-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  .provider-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+    background: var(--surface-card, rgba(255,255,255,0.03));
+    color: var(--text-color, #ccc);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+
+    &:hover {
+      border-color: var(--primary-color, #3b82f6);
+    }
+
+    &.active {
+      background: var(--primary-color, #3b82f6);
+      border-color: var(--primary-color, #3b82f6);
+      color: white;
+    }
+  }
+}
+
+.email-fields {
+  margin-top: 0.5rem;
+
+  .db-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    app-custom-input {
+      width: 100% !important;
+    }
+  }
+
+  app-custom-input {
+    width: 100%;
+    display: block;
+    margin-bottom: 1.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.no-provider-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--surface-card, rgba(255,255,255,0.03));
+  border-radius: 6px;
+  border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+  color: var(--text-secondary-color, #888);
+  font-size: 0.85rem;
 }
 
 .confirmation-popup {

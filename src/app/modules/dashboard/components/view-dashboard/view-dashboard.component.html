@@ -82,21 +82,21 @@
               <label>Analysis</label>
               <p class="with-icon">
                 <i class="pi pi-chart-bar mr-2"></i>
-                {{ dashboard.analysisName }}
+                {{ dashboard.analysis?.name }}
               </p>
             </div>
             <div class="info-item">
               <label>Dataset</label>
               <p class="with-icon">
                 <i class="pi pi-table mr-2"></i>
-                {{ dashboard.datasetName }}
+                {{ dashboard.analysis?.dataset?.name }}
               </p>
             </div>
             <div class="info-item">
               <label>Datasource</label>
               <p class="with-icon">
                 <i class="pi pi-database mr-2"></i>
-                {{ dashboard.datasourceName }}
+                {{ dashboard.analysis?.datasource?.name }}
               </p>
             </div>
           </div>

@@ -304,7 +304,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
         // Set display names
         this.selectedOrgName = this.sectionData.organisationName || '';
-        this.selectedDatasourceName = this.sectionData.datasourceName || '';
+        this.selectedDatasourceName = this.sectionData.datasource?.name || '';
         this.selectedTabName = this.sectionData.section.tab.name || '';
         this.selectedSectionName = this.sectionData.section.name || '';
         this.selectedPromptType = this.sectionData.type || '';
@@ -610,7 +610,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       });
 
       this.selectedOrgName = this.sectionData.organisationName || '';
-      this.selectedDatasourceName = this.sectionData.datasourceName || '';
+      this.selectedDatasourceName = this.sectionData.datasource?.name || '';
       this.selectedTabName = this.sectionData.section.tab.name || '';
       this.selectedSectionName = this.sectionData.section.name || '';
 

@@ -166,23 +166,23 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   getBreadcrumb(item: any): string {
     const parts: string[] = [];
 
-    // Base: All items seem to have a database context
-    if (item.datasourceName) parts.push(item.datasourceName);
+    // Base: All items have a datasource context via JOIN
+    if (item.datasource?.name) parts.push(item.datasource.name);
 
     // Context specific logic
     switch (item.entity) {
       case 'analyses':
-        if (item.datasetName) parts.push(item.datasetName);
+        if (item.dataset?.name) parts.push(item.dataset.name);
         break;
       case 'datasetManager': // Assuming this is dataset
-        // Already has datasourceName
+        // Already has datasource name
         break;
       case 'queryBuilderPrompt':
-        if (item.tabName) parts.push(item.tabName);
-        if (item.sectionName) parts.push(item.sectionName);
+        if (item.tab?.name) parts.push(item.tab.name);
+        if (item.section?.name) parts.push(item.section.name);
         break;
       case 'queryBuilderSection':
-        if (item.tabName) parts.push(item.tabName);
+        if (item.tab?.name) parts.push(item.tab.name);
         break;
       case 'queryBuilderTab':
       case 'queryBuilderScreen':

@@ -393,6 +393,44 @@ $radius-sm: 8px;
   }
 }
 
+  // Provider badge
+  .provider-badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+
+    &.smtp {
+      background: rgba(33, 150, 243, 0.1);
+      color: #2196f3;
+    }
+
+    &.ses {
+      background: rgba(255, 152, 0, 0.1);
+      color: #e68a00;
+    }
+
+    &.none {
+      background: var(--hover-background);
+      color: var(--secondary-color);
+    }
+  }
+
+  // Masked value
+  .masked-value {
+    letter-spacing: 1px;
+    opacity: 0.7;
+  }
+
+  // Encryption divider
+  .encryption-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 12px 0;
+  }
+
 // Responsive adjustments
 @media screen and (max-width: 768px) {
   .view-organisation-wrapper {

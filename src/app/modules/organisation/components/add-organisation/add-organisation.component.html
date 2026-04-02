@@ -21,39 +21,38 @@
           [disabled]="!isFormDirty || orgForm.pristine"
           (click)="onCancel()"
         ></button>
-        <ng-container *ngIf="currentStep === 0">
-          <button
-            pButton
-            type="button"
-            label="Next"
-            icon="pi pi-arrow-right"
-            iconPos="right"
-            (click)="nextStep()"
-            class="p-button-primary btn-save"
-            [disabled]="!isStep1Valid()"
-          ></button>
-        </ng-container>
-        <ng-container *ngIf="currentStep === 1">
-          <button
-            pButton
-            type="button"
-            label="Previous"
-            icon="pi pi-arrow-left"
-            iconPos="left"
-            class="p-button-outlined btn-cancel"
-            (click)="previousStep()"
-          ></button>
-          <button
-            pButton
-            class="p-button-primary btn-save"
-            type="submit"
-            label="Save"
-            icon="pi pi-save"
-            iconPos="left"
-            (click)="onSubmit()"
-            [disabled]="!isFormValid()"
-          ></button>
-        </ng-container>
+        <button
+          *ngIf="currentStep > 0"
+          pButton
+          type="button"
+          label="Previous"
+          icon="pi pi-arrow-left"
+          iconPos="left"
+          class="p-button-outlined btn-cancel"
+          (click)="previousStep()"
+        ></button>
+        <button
+          *ngIf="currentStep === 0 || currentStep === 1"
+          pButton
+          type="button"
+          label="Next"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          (click)="nextStep()"
+          class="p-button-primary btn-save"
+          [disabled]="currentStep === 0 ? !isStep1Valid() : false"
+        ></button>
+        <button
+          *ngIf="currentStep === 2"
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          icon="pi pi-save"
+          iconPos="left"
+          (click)="onSubmit()"
+          [disabled]="!isFormValid()"
+        ></button>
       </div>
     </div>
 
@@ -75,10 +74,23 @@
       <div
         class="step"
         [class.active]="currentStep === 1"
+        [class.completed]="currentStep > 1"
         (click)="onStepClick(1)"
       >
-        <div class="step-dot">2</div>
+        <div class="step-dot">
+          <i class="pi pi-check" *ngIf="currentStep > 1"></i>
+          <span *ngIf="currentStep <= 1">2</span>
+        </div>
         <span class="step-label">Master Datasource</span>
+      </div>
+      <div class="step-line"></div>
+      <div
+        class="step"
+        [class.active]="currentStep === 2"
+        (click)="onStepClick(2)"
+      >
+        <div class="step-dot">3</div>
+        <span class="step-label">Security & Email</span>
       </div>
     </div>
 
@@ -431,6 +443,103 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Security & Email Configuration -->
+      <div *ngIf="currentStep === 2" class="step-3-layout">
+        <div class="step-3-left">
+          <!-- Security Settings -->
+          <div class="form-group-section">
+            <div class="group-header">
+              <i class="pi pi-shield"></i>
+              <span>Security Settings</span>
+            </div>
+            <div class="db-fields-row">
+              <app-custom-input formControlName="maxLoginAttempts" label="Max Login Attempts" type="number" icon="pi-lock" [required]="true"></app-custom-input>
+              <app-custom-input formControlName="accountLockDurationHours" label="Account Lock Duration (Hours)" type="number" icon="pi-clock" [required]="true"></app-custom-input>
+            </div>
+            <small class="field-hint"><i class="pi pi-info-circle"></i> 0 hours = permanent lock (admin must unlock manually)</small>
+            <div class="db-fields-row">
+              <app-custom-input formControlName="passwordHistoryLimit" label="Password History Limit" type="number" icon="pi-history" [required]="true"></app-custom-input>
+              <app-custom-input formControlName="sessionInactivityTimeout" label="Session Timeout (Minutes)" type="number" icon="pi-stopwatch" [required]="true"></app-custom-input>
+            </div>
+          </div>
+
+          <!-- Email Configuration -->
+          <div class="form-group-section">
+            <div class="group-header">
+              <i class="pi pi-envelope"></i>
+              <span>Email Configuration</span>
+            </div>
+
+            <!-- Provider toggle -->
+            <div class="email-provider-toggle">
+              <button type="button" class="provider-btn" [class.active]="selectedEmailProvider === 'SMTP'" (click)="orgForm.get('emailProvider')?.setValue('SMTP')">
+                <i class="pi pi-server"></i> SMTP
+              </button>
+              <button type="button" class="provider-btn" [class.active]="selectedEmailProvider === 'SES'" (click)="orgForm.get('emailProvider')?.setValue('SES')">
+                <i class="pi pi-cloud"></i> AWS SES
+              </button>
+              <button type="button" class="provider-btn" [class.active]="!selectedEmailProvider" (click)="orgForm.get('emailProvider')?.setValue(null)">
+                <i class="pi pi-ban"></i> None
+              </button>
+            </div>
+
+            <!-- SMTP fields -->
+            <div *ngIf="selectedEmailProvider === 'SMTP'" class="email-fields">
+              <div class="db-fields-row">
+                <app-custom-input formControlName="smtpHost" label="SMTP Host" placeholder="e.g. smtp.gmail.com" icon="pi-server"></app-custom-input>
+                <app-custom-input formControlName="smtpPort" label="SMTP Port" placeholder="e.g. 587" type="number" icon="pi-hashtag"></app-custom-input>
+              </div>
+              <div class="db-fields-row">
+                <app-custom-input formControlName="smtpUser" label="SMTP Username" icon="pi-user"></app-custom-input>
+                <app-custom-input formControlName="smtpPassword" label="SMTP Password" placeholder="Enter SMTP password" icon="pi-lock" [showPasswordToggle]="true"></app-custom-input>
+              </div>
+              <app-custom-input formControlName="smtpFrom" label="From Email" placeholder="e.g. noreply@company.com" icon="pi-at"></app-custom-input>
+            </div>
+
+            <!-- SES fields -->
+            <div *ngIf="selectedEmailProvider === 'SES'" class="email-fields">
+              <app-custom-input formControlName="sesRegion" label="AWS Region" placeholder="e.g. us-east-1" icon="pi-globe"></app-custom-input>
+              <div class="db-fields-row">
+                <app-custom-input formControlName="sesAccessKeyId" label="Access Key ID" placeholder="e.g. AKIAIOSFODNN7EXAMPLE" icon="pi-key"></app-custom-input>
+                <app-custom-input formControlName="sesSecretAccessKey" label="Secret Access Key" placeholder="Enter secret access key" icon="pi-lock" [showPasswordToggle]="true"></app-custom-input>
+              </div>
+              <app-custom-input formControlName="sesFrom" label="From Email" placeholder="e.g. noreply@company.com" icon="pi-at"></app-custom-input>
+            </div>
+
+            <!-- No provider message -->
+            <div *ngIf="!selectedEmailProvider" class="no-provider-message">
+              <i class="pi pi-info-circle"></i>
+              <span>Emails will be sent using the global system configuration.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-3-right">
+          <!-- Encryption Info (read-only reference from Step 1) -->
+          <div class="readonly-info-container">
+            <div class="readonly-info-title">
+              <i class="pi pi-shield"></i>
+              Encryption Configuration
+            </div>
+            <div class="readonly-info-card">
+              <div class="info-row">
+                <span class="info-label">Encryption Method</span>
+                <span class="info-value">{{ orgForm.get('encryptionAlgorithm')?.value || 'Not configured' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Pepper Key</span>
+                <span class="info-value masked">{{ orgForm.get('pepperKey')?.value ? '********' : 'Not set' }}</span>
+              </div>
+              <p class="readonly-note">
+                <i class="pi pi-lock"></i>
+                Encryption settings cannot be modified after creation.
+              </p>
+            </div>
+          </div>
+
         </div>
       </div>
     </form>

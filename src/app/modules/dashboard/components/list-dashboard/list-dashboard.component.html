@@ -174,21 +174,21 @@
                 </a>
               </td>
               <td>
-                <span class="description-text" [title]="dashboard.analysisName">
-                  {{ dashboard.analysisName }}
+                <span class="description-text" [title]="dashboard.analysis?.name">
+                  {{ dashboard.analysis?.name }}
                 </span>
               </td>
               <td>
-                <span class="description-text" [title]="dashboard.datasetName">
-                  {{ dashboard.datasetName }}
+                <span class="description-text" [title]="dashboard.analysis?.dataset?.name">
+                  {{ dashboard.analysis?.dataset?.name }}
                 </span>
               </td>
               <td>
                 <span
                   class="description-text"
-                  [title]="dashboard.datasourceName"
+                  [title]="dashboard.analysis?.datasource?.name"
                 >
-                  {{ dashboard.datasourceName }}
+                  {{ dashboard.analysis?.datasource?.name }}
                 </span>
               </td>
               <td>

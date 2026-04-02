@@ -59,7 +59,7 @@
               <label>Datasource</label>
               <p class="with-icon">
                 <i class="pi pi-database mr-2"></i>
-                {{ datasetDetails?.datasourceName || 'N/A' }}
+                {{ datasetDetails?.datasource?.name || 'N/A' }}
               </p>
             </div>
             <div class="info-item">
@@ -275,7 +275,7 @@
         </div>
         <div class="info-row">
           <i class="pi pi-database"></i>
-          <span>{{ datasetDetails?.datasourceName || 'N/A' }}</span>
+          <span>{{ datasetDetails?.datasource?.name || 'N/A' }}</span>
         </div>
       </div>
     </div>

@@ -188,14 +188,8 @@ export class ViewAnalysesComponent implements OnInit {
       name: this.publishForm.name.trim(),
       description: this.publishForm.description?.trim() || '',
       analysisId: this.analysisDetails.id,
-      analysisName: this.analysisDetails.name,
       datasetId: this.analysisDetails.datasetId,
-      datasetName:
-        this.analysisDetails.datasetName || this.datasetDetails?.name,
       datasourceId: this.analysisDetails.datasourceId,
-      datasourceName:
-        this.analysisDetails.datasourceName ||
-        this.datasetDetails?.datasourceName,
     };
 
     this.dashboardService.addDashboard(payload).then(response => {

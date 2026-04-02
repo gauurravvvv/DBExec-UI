@@ -104,7 +104,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
         });
 
         this.selectedOrgName = this.sectionData.organisationName || '';
-        this.selectedDatasourceName = this.sectionData.datasourceName || '';
+        this.selectedDatasourceName = this.sectionData.datasource?.name || '';
         this.selectedTabName = this.sectionData.section.tab.name || '';
         this.loadSectionData();
 

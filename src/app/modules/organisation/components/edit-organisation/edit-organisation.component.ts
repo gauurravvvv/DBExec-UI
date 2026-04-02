@@ -130,13 +130,30 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
       ],
       dbUsername: ['', [Validators.required]],
       dbPassword: [''],
+      // Security config
+      maxLoginAttempts: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
+      accountLockDurationHours: [1, [Validators.required, Validators.min(0), Validators.max(720)]],
+      passwordHistoryLimit: [5, [Validators.required, Validators.min(1), Validators.max(24)]],
+      sessionInactivityTimeout: [30, [Validators.required, Validators.min(5), Validators.max(480)]],
+      // Email config
+      emailProvider: [null],
+      smtpHost: [''],
+      smtpPort: [587],
+      smtpUser: [''],
+      smtpPassword: [''],
+      smtpFrom: [''],
+      sesRegion: [''],
+      sesAccessKeyId: [''],
+      sesSecretAccessKey: [''],
+      sesFrom: [''],
     });
 
     this.orgForm.valueChanges.subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
-      const currentValue = this.orgForm.value;
+      const currentValue = this.orgForm.getRawValue();
+      const config = this.orgData?.orgConfig;
       const originalValue: any = {
         id: this.orgData?.id,
         name: this.orgData?.name,
@@ -147,6 +164,20 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
         dbName: this.orgData?.masterDbConfig?.dbName || '',
         dbUsername: this.orgData?.masterDbConfig?.username || '',
         dbPassword: '',
+        maxLoginAttempts: config?.maxLoginAttempts ?? 5,
+        accountLockDurationHours: config?.accountLockDurationHours ?? 1,
+        passwordHistoryLimit: config?.passwordHistoryLimit ?? 5,
+        sessionInactivityTimeout: config?.sessionInactivityTimeout ?? 30,
+        emailProvider: config?.emailProvider || null,
+        smtpHost: config?.smtpHost || '',
+        smtpPort: config?.smtpPort || 587,
+        smtpUser: config?.smtpUser || '',
+        smtpPassword: '',
+        smtpFrom: config?.smtpFrom || '',
+        sesRegion: config?.sesRegion || '',
+        sesAccessKeyId: config?.sesAccessKeyId || '',
+        sesSecretAccessKey: '',
+        sesFrom: config?.sesFrom || '',
       };
 
       this.isFormDirty = Object.keys(currentValue).some(
@@ -184,14 +215,38 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
             dbUsername: this.orgData.masterDbConfig?.username || '',
             dbPassword: '',
           });
+
+          const config = this.orgData.orgConfig;
+          if (config) {
+            this.orgForm.patchValue({
+              maxLoginAttempts: config.maxLoginAttempts ?? 5,
+              accountLockDurationHours: config.accountLockDurationHours ?? 1,
+              passwordHistoryLimit: config.passwordHistoryLimit ?? 5,
+              sessionInactivityTimeout: config.sessionInactivityTimeout ?? 30,
+              emailProvider: config.emailProvider || null,
+              smtpHost: config.smtpHost || '',
+              smtpPort: config.smtpPort || 587,
+              smtpUser: config.smtpUser || '',
+              smtpPassword: '',  // Never returned from API
+              smtpFrom: config.smtpFrom || '',
+              sesRegion: config.sesRegion || '',
+              sesAccessKeyId: config.sesAccessKeyId || '',
+              sesSecretAccessKey: '',  // Never returned from API
+              sesFrom: config.sesFrom || '',
+            });
+          }
           this.isFormDirty = false;
+
+          // Organisation name cannot be changed after creation
+          this.orgForm.get('name')?.disable();
         }
       });
   }
 
   // Step validation
   isStep1Valid(): boolean {
-    const nameValid = this.orgForm.get('name')?.valid || false;
+    const nameControl = this.orgForm.get('name');
+    const nameValid = nameControl?.disabled || nameControl?.valid || false;
     const descValid = this.orgForm.get('description')?.valid || false;
     return nameValid && descValid;
   }
@@ -220,24 +275,56 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     );
   }
 
+  isStep2Valid(): boolean {
+    return this.isDbConnectionFieldsValid();
+  }
+
+  get selectedEmailProvider(): string | null {
+    return this.orgForm.get('emailProvider')?.value;
+  }
+
+  isStep3Valid(): boolean {
+    const securityValid = ['maxLoginAttempts', 'accountLockDurationHours', 'passwordHistoryLimit', 'sessionInactivityTimeout']
+      .every(f => this.orgForm.get(f)?.valid);
+    return securityValid;
+  }
+
   // Step navigation
   nextStep() {
     if (this.currentStep === 0 && this.isStep1Valid()) {
-      this.currentStep = 1;
+      if (this.hasMasterDb) {
+        this.currentStep = 1;
+      } else {
+        this.currentStep = 2;
+      }
+    } else if (this.currentStep === 1) {
+      this.currentStep = 2;
     }
   }
 
   previousStep() {
-    if (this.currentStep > 0) {
+    if (this.currentStep === 2 && !this.hasMasterDb) {
+      this.currentStep = 0;
+    } else if (this.currentStep > 0) {
       this.currentStep--;
     }
   }
 
   onStepClick(step: number) {
     if (step < this.currentStep) {
-      this.currentStep = step;
-    } else if (step === 1 && this.currentStep === 0 && this.isStep1Valid()) {
+      if (step === 0) {
+        this.currentStep = 0;
+      } else if (step === 1 && this.hasMasterDb) {
+        this.currentStep = 1;
+      } else if (step === 2) {
+        this.currentStep = 2;
+      }
+    } else if (step === 1 && this.currentStep === 0 && this.isStep1Valid() && this.hasMasterDb) {
       this.currentStep = 1;
+    } else if (step === 2 && this.currentStep === 0 && this.isStep1Valid() && !this.hasMasterDb) {
+      this.currentStep = 2;
+    } else if (step === 2 && this.currentStep === 1) {
+      this.currentStep = 2;
     }
   }
 
@@ -333,6 +420,7 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
   }
 
   onCancel() {
+    const config = this.orgData?.orgConfig;
     this.orgForm.patchValue({
       id: this.orgData.id,
       name: this.orgData.name,
@@ -343,6 +431,20 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
       dbName: this.orgData.masterDbConfig?.dbName || '',
       dbUsername: this.orgData.masterDbConfig?.username || '',
       dbPassword: '',
+      maxLoginAttempts: config?.maxLoginAttempts ?? 5,
+      accountLockDurationHours: config?.accountLockDurationHours ?? 1,
+      passwordHistoryLimit: config?.passwordHistoryLimit ?? 5,
+      sessionInactivityTimeout: config?.sessionInactivityTimeout ?? 30,
+      emailProvider: config?.emailProvider || null,
+      smtpHost: config?.smtpHost || '',
+      smtpPort: config?.smtpPort || 587,
+      smtpUser: config?.smtpUser || '',
+      smtpPassword: '',
+      smtpFrom: config?.smtpFrom || '',
+      sesRegion: config?.sesRegion || '',
+      sesAccessKeyId: config?.sesAccessKeyId || '',
+      sesSecretAccessKey: '',
+      sesFrom: config?.sesFrom || '',
     });
     this.orgForm.markAsPristine();
     this.isCancelClicked = true;

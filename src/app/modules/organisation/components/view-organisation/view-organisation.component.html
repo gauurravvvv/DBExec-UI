@@ -144,7 +144,7 @@
         </div>
 
         <!-- Master Datasource Details -->
-        <div class="detail-group master-db-section">
+        <div class="detail-group master-db-section" *ngIf="organisationData.masterDbConfig">
           <div class="section-header-row">
             <h4>
               <i class="pi pi-database"></i>
@@ -208,7 +208,143 @@
           </div>
         </div>
 
-        <!-- Second Row -->
+        <!-- Security & Email Row -->
+        <div class="second-row" *ngIf="organisationData.orgConfig">
+          <!-- Security Settings -->
+          <div class="detail-group">
+            <h4>
+              <i class="pi pi-shield"></i>
+              Security Settings
+            </h4>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-lock"></i>
+                Max Login Attempts
+              </span>
+              <span class="value">{{ organisationData.orgConfig.maxLoginAttempts }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-clock"></i>
+                Account Lock Duration
+              </span>
+              <span class="value">
+                {{ organisationData.orgConfig.accountLockDurationHours === 0
+                  ? 'Permanent (admin must unlock)'
+                  : organisationData.orgConfig.accountLockDurationHours + ' hour(s)' }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-history"></i>
+                Password History Limit
+              </span>
+              <span class="value">{{ organisationData.orgConfig.passwordHistoryLimit }} password(s)</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-stopwatch"></i>
+                Session Inactivity Timeout
+              </span>
+              <span class="value">{{ organisationData.orgConfig.sessionInactivityTimeout }} minutes</span>
+            </div>
+          </div>
+
+          <!-- Email & Encryption -->
+          <div class="detail-group">
+            <h4>
+              <i class="pi pi-envelope"></i>
+              Email Configuration
+            </h4>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-cog"></i>
+                Email Provider
+              </span>
+              <span class="value">
+                <span class="provider-badge" [ngClass]="organisationData.orgConfig.emailProvider?.toLowerCase() || 'none'">
+                  {{ organisationData.orgConfig.emailProvider || 'Global (Default)' }}
+                </span>
+              </span>
+            </div>
+
+            <!-- SMTP Details -->
+            <ng-container *ngIf="organisationData.orgConfig.emailProvider === 'SMTP'">
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-server"></i>
+                  SMTP Host
+                </span>
+                <span class="value">{{ organisationData.orgConfig.smtpHost || '—' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-hashtag"></i>
+                  SMTP Port
+                </span>
+                <span class="value">{{ organisationData.orgConfig.smtpPort || '—' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-user"></i>
+                  SMTP Username
+                </span>
+                <span class="value">{{ organisationData.orgConfig.smtpUser || '—' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-at"></i>
+                  From Email
+                </span>
+                <span class="value">{{ organisationData.orgConfig.smtpFrom || '—' }}</span>
+              </div>
+            </ng-container>
+
+            <!-- SES Details -->
+            <ng-container *ngIf="organisationData.orgConfig.emailProvider === 'SES'">
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-globe"></i>
+                  AWS Region
+                </span>
+                <span class="value">{{ organisationData.orgConfig.sesRegion || '—' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-key"></i>
+                  Access Key ID
+                </span>
+                <span class="value masked-value">{{ organisationData.orgConfig.sesAccessKeyId ? (organisationData.orgConfig.sesAccessKeyId | slice:0:4) + '••••••••' : '—' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-at"></i>
+                  From Email
+                </span>
+                <span class="value">{{ organisationData.orgConfig.sesFrom || '—' }}</span>
+              </div>
+            </ng-container>
+
+            <!-- Encryption Info -->
+            <div class="encryption-divider"></div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-shield"></i>
+                Encryption Algorithm
+              </span>
+              <span class="value">{{ organisationData.orgConfig.encryptionAlgorithm || organisationData.encryptionAlgorithm || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-lock"></i>
+                Pepper Key
+              </span>
+              <span class="value masked-value">••••••••••••••••</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Third Row -->
         <div class="second-row">
           <!-- Configuration Limits -->
           <div class="detail-group">

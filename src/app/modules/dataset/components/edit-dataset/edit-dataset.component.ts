@@ -1292,9 +1292,9 @@ export class EditDatasetComponent
           // Set database from API response
           this.selectedDatasourceObj = {
             id: dataset.datasourceId,
-            name: dataset.datasourceName,
+            name: dataset.datasource?.name,
           };
-          this.selectedDatasourceName = dataset.datasourceName || '';
+          this.selectedDatasourceName = dataset.datasource?.name || '';
           this.expandedDatasources[dataset.datasourceId] = true;
 
           // Load schema for the selected database

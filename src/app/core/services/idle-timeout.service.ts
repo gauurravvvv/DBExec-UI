@@ -1,12 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject, Subscription, merge, fromEvent } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
+import { StorageService } from 'src/app/core/services/storage.service';
+import { StorageType } from 'src/app/constants/storageType';
 
 @Injectable({
   providedIn: 'root',
 })
 export class IdleTimeoutService implements OnDestroy {
-  private readonly IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
   private readonly COUNTDOWN_SECONDS = 60;
 
   private idleWarning$ = new Subject<number>();
@@ -60,11 +61,17 @@ export class IdleTimeoutService implements OnDestroy {
     this.resetIdleTimer();
   }
 
+  private getIdleTimeoutMs(): number {
+    const stored = StorageService.get(StorageType.SESSION_INACTIVITY_TIMEOUT);
+    const minutes = stored ? parseInt(stored, 10) : 30;
+    return (isNaN(minutes) || minutes < 5 ? 30 : minutes) * 60 * 1000;
+  }
+
   private resetIdleTimer(): void {
     this.clearIdleTimer();
     this.idleTimer = setTimeout(() => {
       this.startCountdown();
-    }, this.IDLE_TIMEOUT_MS);
+    }, this.getIdleTimeoutMs());
   }
 
   private startCountdown(): void {

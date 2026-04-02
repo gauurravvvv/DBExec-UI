@@ -15,6 +15,22 @@ interface OrganisationConfig {
   maxGroups: number;
 }
 
+interface OrgConfig {
+  encryptionAlgorithm: string;
+  maxLoginAttempts: number;
+  accountLockDurationHours: number;
+  passwordHistoryLimit: number;
+  sessionInactivityTimeout: number;
+  emailProvider: string | null;
+  smtpHost: string | null;
+  smtpPort: number | null;
+  smtpUser: string | null;
+  smtpFrom: string | null;
+  sesRegion: string | null;
+  sesAccessKeyId: string | null;
+  sesFrom: string | null;
+}
+
 interface MasterDbConfig {
   hostname: string;
   port: number;
@@ -36,6 +52,8 @@ interface OrganisationData {
   connectionsCount: number;
   dbStatus: 'connected' | 'not_configured' | 'connection_failed';
   masterDbConfig: MasterDbConfig;
+  orgConfig: OrgConfig;
+  encryptionAlgorithm: string;
 }
 
 @Component({

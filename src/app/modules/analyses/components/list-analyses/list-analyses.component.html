@@ -72,7 +72,6 @@
             'name',
             'description',
             'status',
-            'datasourceName',
           ]"
           [rowHover]="true"
           dataKey="id"
@@ -182,8 +181,8 @@
                 </span>
               </td>
               <td>
-                <span class="description-text" [title]="analysis.datasetName">
-                  {{ analysis.datasetName }}
+                <span class="description-text" [title]="analysis.dataset?.name">
+                  {{ analysis.dataset?.name }}
                 </span>
               </td>
               <td>

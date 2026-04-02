@@ -103,7 +103,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
           });
 
           this.selectedOrgName = this.sectionData.organisationName || '';
-          this.selectedDatasourceName = this.sectionData.datasourceName || '';
+          this.selectedDatasourceName = this.sectionData.datasource?.name || '';
 
           this.loadTabData();
 

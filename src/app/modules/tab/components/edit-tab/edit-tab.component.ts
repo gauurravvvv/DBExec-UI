@@ -93,7 +93,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
         });
 
         this.selectedOrgName = this.tabData.organisationName || '';
-        this.selectedDatasourceName = this.tabData.datasourceName || '';
+        this.selectedDatasourceName = this.tabData.datasource?.name || '';
 
         this.tabForm.markAsPristine();
       }
