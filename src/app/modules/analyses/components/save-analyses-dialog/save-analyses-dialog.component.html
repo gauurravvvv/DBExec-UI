@@ -36,8 +36,8 @@
         </small>
       </div>
 
-      <!-- Justification -->
-      <div class="form-field justification-field">
+      <!-- Justification (for updates only) -->
+      <div class="form-field justification-field" *ngIf="showJustification">
         <label for="saveJustification"
           >Justification <span class="required">*</span></label
         >
@@ -65,7 +65,7 @@
           type="submit"
           label="Save Analysis"
           class="p-button-primary btn-save"
-          [disabled]="analysisForm.invalid || !saveJustification.trim()"
+          [disabled]="analysisForm.invalid || (showJustification && !saveJustification.trim())"
           (click)="onSubmit()"
         >
           <i class="pi pi-save mr-2"></i>

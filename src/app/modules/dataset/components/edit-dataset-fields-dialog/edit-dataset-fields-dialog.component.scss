@@ -65,6 +65,22 @@
             font-size: 13px;
           }
 
+          .type-hint {
+            color: var(--text-color);
+            opacity: 0.5;
+            font-size: 11px;
+            margin-top: 4px;
+            display: block;
+          }
+
+          .char-count {
+            color: var(--text-color);
+            opacity: 0.5;
+            font-size: 11px;
+            text-align: right;
+            display: block;
+          }
+
           input {
             width: 100%;
             background: var(--card-background);

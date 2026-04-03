@@ -44,6 +44,23 @@
             characters
           </small>
         </div>
+
+        <!-- Justification (for updates) -->
+        <div class="form-field justification-section" *ngIf="showJustification">
+          <label for="justification"
+            >Justification <span class="required">*</span></label
+          >
+          <textarea
+            id="justification"
+            formControlName="justification"
+            placeholder="Provide a reason for this update"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+          <small class="char-count">
+            {{ datasetForm.get('justification')?.value?.length || 0 }}/500
+          </small>
+        </div>
       </form>
     </div>
 

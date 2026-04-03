@@ -239,13 +239,14 @@
                   <span
                     class="field-datatype"
                     *ngIf="entity.dataType"
-                    [pTooltip]="entity.dataType"
+                    [pTooltip]="'Source: ' + entity.dataType"
                     tooltipPosition="top"
                   >
                     <i
                       class="pi"
                       [ngClass]="getDataTypeIcon(entity.dataType)"
                     ></i>
+                    <span class="datatype-label">{{ getDataTypeLabel(entity.dataType) }}</span>
                   </span>
                   <div class="field-actions">
                     <button

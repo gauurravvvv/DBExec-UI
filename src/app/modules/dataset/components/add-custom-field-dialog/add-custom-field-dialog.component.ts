@@ -21,6 +21,7 @@ import {
 } from '../../config/formula-editor.config';
 import { DatasetService } from '../../services/dataset.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ANALYTICAL_TYPES } from '../edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
 import {
   CustomFieldData,
   DEFAULT_CUSTOM_FIELD,
@@ -57,7 +58,9 @@ export class AddCustomFieldDialogComponent
     columnToView: '',
     columnToUse: '',
     formula: '',
+    dataType: 'text',
   };
+  analyticalTypes = ANALYTICAL_TYPES;
 
   isSaveEnabled = false;
   isSubmitting = false;
@@ -127,6 +130,7 @@ export class AddCustomFieldDialogComponent
               this.editFieldData.columnToUse ||
               '',
             formula: this.editFieldData.formula || '',
+            dataType: this.editFieldData.dataType || 'text',
           };
         } else {
           // Add mode - reset form
@@ -134,6 +138,7 @@ export class AddCustomFieldDialogComponent
             columnToView: '',
             columnToUse: '',
             formula: '',
+            dataType: 'text',
           };
         }
 
@@ -448,6 +453,7 @@ export class AddCustomFieldDialogComponent
         columnNameToView: this.customField.columnToView,
         customLogic: this.customField.columnToUse,
         used_field_ids: usedCustomFieldIds,
+        dataType: this.customField.dataType,
       };
 
       this.datasetService
@@ -469,6 +475,7 @@ export class AddCustomFieldDialogComponent
         name: this.customField.columnToView,
         customLogic: this.customField.columnToUse,
         used_field_ids: usedCustomFieldIds,
+        dataType: this.customField.dataType,
       };
 
       // Include analysisId for analysis-level custom fields

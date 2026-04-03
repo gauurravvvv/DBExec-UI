@@ -95,6 +95,37 @@ export class ViewDatasetComponent implements OnInit {
     return 'pi-tag';
   }
 
+  getDataTypeLabel(dataType: string): string {
+    if (!dataType) return '';
+    const t = dataType.toLowerCase();
+    if (t.includes('int') || t.includes('serial')) return 'Integer';
+    if (
+      t.includes('numeric') ||
+      t.includes('decimal') ||
+      t.includes('float') ||
+      t.includes('double') ||
+      t.includes('real') ||
+      t.includes('money')
+    )
+      return 'Decimal';
+    if (t.includes('bool')) return 'Boolean';
+    if (t.includes('timestamp')) return 'Date & Time';
+    if (t.includes('date') || t.includes('time') || t.includes('interval'))
+      return 'Date';
+    if (t.includes('json')) return 'JSON';
+    if (
+      t.includes('char') ||
+      t.includes('text') ||
+      t.includes('string') ||
+      t.includes('citext') ||
+      t.includes('name')
+    )
+      return 'Text';
+    if (t.includes('uuid')) return 'UUID';
+    if (t.includes('array') || t.includes('[]')) return 'Array';
+    return dataType;
+  }
+
   formatPromptValue(prompt: any): string {
     if (prompt.isRange) {
       return `${prompt.startValue ?? '-'} to ${prompt.endValue ?? '-'}`;

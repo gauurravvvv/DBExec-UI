@@ -13,6 +13,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
 export interface DatasetFormData {
   name: string;
   description: string;
+  justification?: string;
 }
 
 @Component({
@@ -25,6 +26,7 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   @Input() initialName = '';
   @Input() initialDescription = '';
   @Input() dialogTitle = 'Save as Dataset';
+  @Input() showJustification = false;
   @Output() close = new EventEmitter<DatasetFormData | null>();
 
   datasetForm!: FormGroup;
@@ -47,7 +49,16 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
       this.datasetForm.patchValue({
         name: this.initialName,
         description: this.initialDescription,
+        justification: '',
       });
+
+      const justificationControl = this.datasetForm.get('justification');
+      if (this.showJustification) {
+        justificationControl?.setValidators([Validators.required, Validators.maxLength(500)]);
+      } else {
+        justificationControl?.clearValidators();
+      }
+      justificationControl?.updateValueAndValidity();
     }
   }
 
@@ -63,6 +74,7 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         ],
       ],
       description: ['', [Validators.maxLength(500)]],
+      justification: ['', [Validators.maxLength(500)]],
     });
   }
 
@@ -84,6 +96,9 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         name: this.datasetForm.get('name')?.value.trim(),
         description: this.datasetForm.get('description')?.value.trim(),
       };
+      if (this.showJustification) {
+        formData.justification = this.datasetForm.get('justification')?.value.trim();
+      }
       this.close.emit(formData);
       this.datasetForm.reset();
     }

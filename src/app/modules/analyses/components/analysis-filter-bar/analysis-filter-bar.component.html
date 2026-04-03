@@ -59,8 +59,8 @@
         <p-slider
           [(ngModel)]="appliedValues[filter.id]"
           [range]="true"
-          [min]="filter.config?.rangeMin || 0"
-          [max]="filter.config?.rangeMax || 100"
+          [min]="filter.config?.rangeMin ?? 0"
+          [max]="filter.config?.rangeMax ?? 100"
           (onSlideEnd)="
             onFilterChange(filter, {
               min: $event.values[0],
@@ -79,10 +79,13 @@
             filter.filterType === 'time_range' ? 'range' : 'single'
           "
           [showClear]="true"
+          [showIcon]="true"
+          [showTime]="filter.config?.includeTime || false"
           [placeholder]="filter.config?.placeholder || 'Select date'"
           (onSelect)="onFilterChange(filter, appliedValues[filter.id])"
           appendTo="body"
-          dateFormat="yy-mm-dd"
+          [dateFormat]="filter.config?.dateFormat || 'yy-mm-dd'"
+          [numberOfMonths]="filter.filterType === 'time_range' ? 2 : 1"
         ></p-calendar>
       </div>
 

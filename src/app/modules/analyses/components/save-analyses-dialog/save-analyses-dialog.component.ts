@@ -13,7 +13,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
 export interface AnalysisFormData {
   name: string;
   description: string;
-  justification: string;
+  justification?: string;
 }
 
 @Component({
@@ -26,6 +26,7 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   @Input() initialName = '';
   @Input() initialDescription = '';
   @Input() dialogTitle = 'Save Analysis';
+  @Input() showJustification = false;
   @Output() close = new EventEmitter<AnalysisFormData | null>();
 
   analysisForm!: FormGroup;
@@ -82,12 +83,15 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   }
 
   onSubmit() {
-    if (this.analysisForm.valid && this.saveJustification.trim()) {
+    const justificationValid = !this.showJustification || this.saveJustification.trim();
+    if (this.analysisForm.valid && justificationValid) {
       const formData: AnalysisFormData = {
         name: this.analysisForm.get('name')?.value.trim(),
         description: this.analysisForm.get('description')?.value.trim(),
-        justification: this.saveJustification.trim(),
       };
+      if (this.showJustification) {
+        formData.justification = this.saveJustification.trim();
+      }
       this.close.emit(formData);
       this.analysisForm.reset();
       this.saveJustification = '';

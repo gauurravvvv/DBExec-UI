@@ -30,8 +30,9 @@ export class AnalysisFilterBarComponent implements OnInit {
         this.orgId,
         this.analysisId,
       );
-      if (res?.success) {
+      if (res?.status) {
         this.filters = (res.data || []).filter((f: any) => f.isEnabled);
+        this.initializeDefaults();
         this.loadAllFilterValues();
       }
     } catch (err) {
@@ -49,7 +50,7 @@ export class AnalysisFilterBarComponent implements OnInit {
           this.orgId,
           f.id,
         );
-        if (res?.success) {
+        if (res?.status) {
           this.filterValues[f.id] = res.data || [];
         }
       } catch (err) {
@@ -57,6 +58,26 @@ export class AnalysisFilterBarComponent implements OnInit {
       }
     });
     await Promise.all(promises);
+  }
+
+  private initializeDefaults(): void {
+    for (const f of this.filters) {
+      const config = f.config || {};
+      if (f.filterType === 'category' && config.defaultValue) {
+        this.appliedValues[f.id] = config.defaultValue;
+      } else if (f.filterType === 'numeric_equality' && config.defaultValue != null) {
+        this.appliedValues[f.id] = config.defaultValue;
+      } else if (f.filterType === 'numeric_range' && (config.rangeMin != null || config.rangeMax != null)) {
+        this.appliedValues[f.id] = { min: config.rangeMin, max: config.rangeMax };
+      } else if (f.filterType === 'time_equality' && config.defaultValue) {
+        this.appliedValues[f.id] = new Date(config.defaultValue);
+      } else if (f.filterType === 'time_range') {
+        const dates: Date[] = [];
+        if (config.dateRangeStart) dates.push(new Date(config.dateRangeStart));
+        if (config.dateRangeEnd) dates.push(new Date(config.dateRangeEnd));
+        if (dates.length > 0) this.appliedValues[f.id] = dates;
+      }
+    }
   }
 
   onFilterChange(filter: any, value: any): void {
@@ -82,6 +103,7 @@ export class AnalysisFilterBarComponent implements OnInit {
           filterType: f.filterType,
           operator:
             f.config?.matchOperator || this.getDefaultOperator(f.filterType),
+          nullOption: f.nullOption || 'ALL_VALUES',
         };
 
         if (f.filterType === 'category') {
@@ -96,19 +118,18 @@ export class AnalysisFilterBarComponent implements OnInit {
             base.operator = 'BETWEEN';
           } else {
             base.values = [val];
-            base.operator = 'EQUALS';
           }
         } else if (
           f.filterType === 'time_range' ||
           f.filterType === 'time_equality'
         ) {
           if (Array.isArray(val) && val.length === 2) {
-            base.dateRangeStart = val[0];
-            base.dateRangeEnd = val[1];
+            base.dateRangeStart = val[0] instanceof Date ? val[0].toISOString() : val[0];
+            base.dateRangeEnd = val[1] instanceof Date ? val[1].toISOString() : val[1];
             base.operator = 'BETWEEN';
           } else {
-            base.values = [val];
-            base.operator = 'EQUALS';
+            const dateVal = val instanceof Date ? val.toISOString() : val;
+            base.values = [dateVal];
           }
         }
 

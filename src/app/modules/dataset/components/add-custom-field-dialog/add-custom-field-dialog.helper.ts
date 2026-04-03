@@ -10,6 +10,7 @@ export interface CustomFieldData {
   columnToView: string;
   columnToUse: string;
   formula: string;
+  dataType: string;
 }
 
 /**
@@ -19,6 +20,7 @@ export const DEFAULT_CUSTOM_FIELD: CustomFieldData = {
   columnToView: '',
   columnToUse: '',
   formula: '',
+  dataType: 'text',
 };
 
 /**

@@ -92,10 +92,6 @@ export class EditDatasetComponent
   // Save as Dataset Dialog
   showDatasetDialog = false;
 
-  // Save Confirmation Dialog
-  showSaveConfirm = false;
-  saveJustification = '';
-  pendingSaveData: any = null;
 
   // Results Popup
   showResultsPopup = false;
@@ -1079,7 +1075,7 @@ export class EditDatasetComponent
       // Get the SQL query
       const sql = this.editor?.getValue() || this.currentQuery;
 
-      this.pendingSaveData = {
+      const saveData = {
         id: this.datasetId,
         name: formData.name,
         description: formData.description,
@@ -1088,25 +1084,10 @@ export class EditDatasetComponent
         sql,
       };
 
-      this.showSaveConfirm = true;
-    }
-  }
-
-  cancelSave(): void {
-    this.showSaveConfirm = false;
-    this.saveJustification = '';
-    this.pendingSaveData = null;
-  }
-
-  proceedSave(): void {
-    if (this.saveJustification.trim() && this.pendingSaveData) {
       this.datasetService
-        .updateDataset(this.pendingSaveData, this.saveJustification.trim())
+        .updateDataset(saveData, (formData.justification || '').trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response, true)) {
-            this.showSaveConfirm = false;
-            this.saveJustification = '';
-            this.pendingSaveData = null;
             this.originalQuery = this.editor?.getValue() || this.currentQuery;
             this.router.navigate([DATASET.LIST]);
           }

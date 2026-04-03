@@ -126,6 +126,7 @@ export class DatasetService {
       columnNameToView,
       customLogic,
       used_field_ids,
+      dataType,
     } = payload;
 
     const requestBody: any = {
@@ -139,6 +140,11 @@ export class DatasetService {
     // Include customLogic only if provided (for custom fields)
     if (customLogic !== undefined) {
       requestBody.customLogic = customLogic;
+    }
+
+    // Include dataType if provided
+    if (dataType !== undefined) {
+      requestBody.dataType = dataType;
     }
 
     return this.http
@@ -282,6 +288,7 @@ export class DatasetService {
       name,
       customLogic,
       used_field_ids,
+      dataType,
       analysisId,
     } = payload;
     const requestBody: any = {
@@ -291,6 +298,11 @@ export class DatasetService {
       customLogic,
       used_field_ids,
     };
+
+    // Include dataType if provided
+    if (dataType) {
+      requestBody.dataType = dataType;
+    }
 
     // Include analysisId for analysis-level custom fields
     if (analysisId) {

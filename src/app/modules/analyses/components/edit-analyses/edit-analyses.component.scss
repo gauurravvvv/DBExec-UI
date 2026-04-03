@@ -817,13 +817,8 @@
 
   .add-visual-button {
     width: 100%;
-    font-weight: 600;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+    font-size: 12px;
+    padding: 6px 8px;
   }
 
   // Add Filter Section
@@ -836,13 +831,8 @@
 
   .add-filter-button {
     width: 100%;
-    font-weight: 600;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+    font-size: 12px;
+    padding: 6px 8px;
   }
 
   .filter-list-empty {
@@ -956,6 +946,21 @@
     font-size: 10px;
     color: var(--primary-color);
     font-weight: 500;
+  }
+
+  .filter-card-config {
+    margin-top: 3px;
+
+    small {
+      font-size: 9px;
+      color: var(--secondary-color);
+      opacity: 0.8;
+      line-height: 1.3;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .filter-card-badges {
@@ -2156,6 +2161,27 @@
       background: var(--hover-background);
       border-top: 1px solid var(--border-color);
     }
+
+    // Fix calendar trigger icon color inside dialog (dialog button styles override it to white)
+    .p-datepicker-trigger,
+    .p-calendar .p-button {
+      background: var(--hover-background) !important;
+      color: var(--secondary-color) !important;
+      border-color: var(--border-color) !important;
+
+      .pi {
+        color: var(--secondary-color) !important;
+      }
+
+      &:hover {
+        color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+
+        .pi {
+          color: var(--primary-color) !important;
+        }
+      }
+    }
   }
 }
 
@@ -2187,6 +2213,19 @@
     .required {
       color: var(--danger-color, #e74c3c);
       margin-left: -2px;
+    }
+  }
+
+  .field-hint {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.8;
+
+    i {
+      font-size: 0.7rem;
     }
   }
 }

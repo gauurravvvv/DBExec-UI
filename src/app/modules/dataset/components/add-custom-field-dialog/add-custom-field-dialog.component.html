@@ -93,6 +93,21 @@
           </small>
         </div>
 
+        <div class="form-field">
+          <app-custom-dropdown
+            [options]="analyticalTypes"
+            [(ngModel)]="customField.dataType"
+            label="Data Type"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select data type"
+            [filter]="true"
+            [autoDisplayFirst]="false"
+            appendTo="body"
+          >
+          </app-custom-dropdown>
+        </div>
+
         <div class="form-field custom-logic-field">
           <label>Custom Logic <span class="required">*</span></label>
 

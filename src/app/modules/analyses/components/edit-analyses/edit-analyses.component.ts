@@ -122,10 +122,53 @@ interface ConfiguredFilter {
   filterType: string;
   controlType: string;
   config: any;
+  nullOption: string;
   isEnabled: boolean;
   isMandatory: boolean;
   sequence: number;
 }
+
+const FILTER_OPERATORS: Record<string, { label: string; value: string }[]> = {
+  category: [
+    { label: 'Equals', value: 'EQUALS' },
+    { label: 'Does Not Equal', value: 'DOES_NOT_EQUAL' },
+    { label: 'Contains', value: 'CONTAINS' },
+    { label: 'Does Not Contain', value: 'DOES_NOT_CONTAIN' },
+    { label: 'Starts With', value: 'STARTS_WITH' },
+    { label: 'Ends With', value: 'ENDS_WITH' },
+  ],
+  numeric_equality: [
+    { label: 'Equals', value: 'EQUALS' },
+    { label: 'Not Equals', value: 'NOT_EQUALS' },
+    { label: 'Greater Than', value: 'GREATER_THAN' },
+    { label: 'Greater Than or Equal', value: 'GREATER_THAN_OR_EQUAL' },
+    { label: 'Less Than', value: 'LESS_THAN' },
+    { label: 'Less Than or Equal', value: 'LESS_THAN_OR_EQUAL' },
+  ],
+  numeric_range: [{ label: 'Between', value: 'BETWEEN' }],
+  time_equality: [
+    { label: 'Equals', value: 'EQUALS' },
+    { label: 'Before', value: 'BEFORE' },
+    { label: 'After', value: 'AFTER' },
+  ],
+  time_range: [{ label: 'Between', value: 'BETWEEN' }],
+};
+
+const NULL_OPTIONS = [
+  { label: 'All Values', value: 'ALL_VALUES' },
+  { label: 'Non-Nulls Only', value: 'NON_NULLS_ONLY' },
+  { label: 'Nulls Only', value: 'NULLS_ONLY' },
+];
+
+const DATE_FORMAT_OPTIONS = [
+  { label: 'YYYY-MM-DD', value: 'yy-mm-dd' },
+  { label: 'DD/MM/YYYY', value: 'dd/mm/yy' },
+  { label: 'MM/DD/YYYY', value: 'mm/dd/yy' },
+  { label: 'DD-MM-YYYY', value: 'dd-mm-yy' },
+  { label: 'MM-DD-YYYY', value: 'mm-dd-yy' },
+  { label: 'YYYY/MM/DD', value: 'yy/mm/dd' },
+  { label: 'DD.MM.YYYY', value: 'dd.mm.yy' },
+];
 
 @Component({
   selector: 'app-edit-analyses',
@@ -185,6 +228,14 @@ export class EditAnalysesComponent
   filterDialogName: string = '';
   filterDialogEnabled: boolean = true;
   filterDialogMandatory: boolean = false;
+  filterDialogOperator: string = '';
+  filterDialogNullOption: string = 'ALL_VALUES';
+  filterDialogDefaultValue: any = null;
+  filterDialogPlaceholder: string = '';
+  filterDialogIncludeTime: boolean = false;
+  filterDialogDateFormat: string = 'yy-mm-dd';
+  filterDialogCategoryValues: any[] = [];
+  isLoadingFilterValues: boolean = false;
 
   // Filter dropdown options
   filterTypeOptions = [
@@ -196,6 +247,9 @@ export class EditAnalysesComponent
   ];
 
   controlTypeOptions: { label: string; value: string }[] = [];
+  operatorOptions: { label: string; value: string }[] = [];
+  nullOptions = NULL_OPTIONS;
+  dateFormatOptions = DATE_FORMAT_OPTIONS;
 
   // Search queries
   visualListSearchQuery: string = '';
@@ -1177,26 +1231,57 @@ export class EditAnalysesComponent
     this.editingFilter = filter;
     this.filterDialogColumn =
       this.datasetDetails?.datasetFields?.find(
-        (f: any) => (f.columnName || f.columnToView) === filter.columnName,
+        (f: any) =>
+          f.columnName === filter.columnName ||
+          f.columnToView === filter.columnName ||
+          f.columnToUse === filter.columnName,
       ) || null;
     this.filterDialogType = filter.filterType;
     this.filterDialogControl = filter.controlType;
     this.filterDialogName = filter.name;
     this.filterDialogEnabled = filter.isEnabled;
     this.filterDialogMandatory = filter.isMandatory;
+
+    // Load config values
+    const config = filter.config || {};
+    this.filterDialogOperator = config.matchOperator || '';
+    this.filterDialogNullOption = filter.nullOption || 'ALL_VALUES';
+    this.filterDialogPlaceholder = config.placeholder || '';
+    this.filterDialogIncludeTime = config.includeTime || false;
+    this.filterDialogDateFormat = config.dateFormat || 'yy-mm-dd';
+    this.filterDialogDefaultValue = this.extractDefaultValue(config, filter.filterType);
+
     this.updateControlTypeOptions();
+    this.updateOperatorOptions();
+
+    // Load distinct values for category filters
+    if (filter.filterType === 'category') {
+      this.loadColumnDistinctValues();
+    }
+
     this.showFilterDialog = true;
   }
 
-  removeFilter(filter: ConfiguredFilter): void {
-    this.markDirty();
-    this.configuredFilters = this.configuredFilters.filter(
-      f => f.tempId !== filter.tempId,
-    );
-    this.resequenceFilters();
+  isDeletingFilter: string | null = null;
+
+  async removeFilter(filter: ConfiguredFilter): Promise<void> {
+    if (this.isDeletingFilter) return; // prevent double-click
+    this.isDeletingFilter = filter.tempId;
+    try {
+      const res: any = await this.analysesService.deleteFilter(this.orgId, filter.tempId);
+      if (this.globalService.handleSuccessService(res, true)) {
+        await this.loadExistingFilters();
+      }
+    } catch (err) {
+      this.globalService.handleErrorService(err);
+    } finally {
+      this.isDeletingFilter = null;
+    }
   }
 
-  saveFilterDialog(): void {
+  isSavingFilter: boolean = false;
+
+  async saveFilterDialog(): Promise<void> {
     if (
       !this.filterDialogColumn ||
       !this.filterDialogType ||
@@ -1204,41 +1289,106 @@ export class EditAnalysesComponent
     )
       return;
 
+    // Validate numeric range: min must be <= max
+    if (this.filterDialogType === 'numeric_range') {
+      const val = this.filterDialogDefaultValue;
+      if (
+        val?.min !== null && val?.min !== undefined &&
+        val?.max !== null && val?.max !== undefined &&
+        Number(val.min) > Number(val.max)
+      ) {
+        this.globalService.handleErrorService({
+          status: false,
+          message: 'Range minimum cannot be greater than maximum',
+        });
+        return;
+      }
+    }
+
+    // Validate time range: start must be before end
+    if (this.filterDialogType === 'time_range') {
+      const val = this.filterDialogDefaultValue;
+      if (
+        Array.isArray(val) && val[0] instanceof Date && val[1] instanceof Date &&
+        val[0].getTime() > val[1].getTime()
+      ) {
+        this.globalService.handleErrorService({
+          status: false,
+          message: 'Start date cannot be after end date',
+        });
+        return;
+      }
+    }
+
     const columnName =
       this.filterDialogColumn.columnName ||
       this.filterDialogColumn.columnToView;
     const name = this.filterDialogName || this.filterDialogColumn.columnToView;
 
-    if (this.editingFilter) {
-      const idx = this.configuredFilters.findIndex(
-        f => f.tempId === this.editingFilter!.tempId,
-      );
-      if (idx !== -1) {
-        this.configuredFilters[idx] = {
-          ...this.configuredFilters[idx],
+    // Build config object from dialog fields
+    const config: any = {};
+    if (this.filterDialogOperator) {
+      config.matchOperator = this.filterDialogOperator;
+    }
+    if (this.filterDialogPlaceholder) {
+      config.placeholder = this.filterDialogPlaceholder;
+    }
+    if (this.filterDialogType === 'time_equality' || this.filterDialogType === 'time_range') {
+      config.includeTime = this.filterDialogIncludeTime;
+      config.dateFormat = this.filterDialogDateFormat;
+    }
+    this.buildDefaultValueConfig(config, this.filterDialogType);
+
+    this.isSavingFilter = true;
+
+    try {
+      let res: any;
+      if (this.editingFilter) {
+        // Update existing filter via API
+        res = await this.analysesService.updateFilter({
+          id: this.editingFilter.tempId,
+          organisation: this.orgId,
           name,
           columnName,
           filterType: this.filterDialogType,
           controlType: this.filterDialogControl,
+          config,
+          nullOption: this.filterDialogNullOption || 'ALL_VALUES',
           isEnabled: this.filterDialogEnabled,
           isMandatory: this.filterDialogMandatory,
-        };
+          sequence: this.editingFilter.sequence,
+        });
+      } else {
+        // Add new filter via API
+        res = await this.analysesService.addFilters({
+          analysisId: this.analysisId,
+          organisation: this.orgId,
+          filters: [
+            {
+              name,
+              columnName,
+              filterType: this.filterDialogType,
+              controlType: this.filterDialogControl,
+              config,
+              nullOption: this.filterDialogNullOption || 'ALL_VALUES',
+              isEnabled: this.filterDialogEnabled,
+              isMandatory: this.filterDialogMandatory,
+              sequence: this.configuredFilters.length,
+            },
+          ],
+        });
       }
-    } else {
-      this.configuredFilters.push({
-        tempId: crypto.randomUUID(),
-        name,
-        columnName,
-        filterType: this.filterDialogType,
-        controlType: this.filterDialogControl,
-        config: {},
-        isEnabled: this.filterDialogEnabled,
-        isMandatory: this.filterDialogMandatory,
-        sequence: this.configuredFilters.length,
-      });
+
+      if (this.globalService.handleSuccessService(res, true)) {
+        this.showFilterDialog = false;
+        await this.loadExistingFilters();
+      }
+      // If handleSuccessService returned false, dialog stays open — user sees error toast
+    } catch (err) {
+      this.globalService.handleErrorService(err);
+    } finally {
+      this.isSavingFilter = false;
     }
-    this.markDirty();
-    this.showFilterDialog = false;
   }
 
   cancelFilterDialog(): void {
@@ -1252,19 +1402,101 @@ export class EditAnalysesComponent
     this.filterDialogName = '';
     this.filterDialogEnabled = true;
     this.filterDialogMandatory = false;
+    this.filterDialogOperator = '';
+    this.filterDialogNullOption = 'ALL_VALUES';
+    this.filterDialogDefaultValue = null;
+    this.filterDialogPlaceholder = '';
+    this.filterDialogIncludeTime = false;
+    this.filterDialogDateFormat = 'yy-mm-dd';
+    this.filterDialogCategoryValues = [];
+    this.isLoadingFilterValues = false;
     this.controlTypeOptions = [];
+    this.operatorOptions = [];
   }
 
   onFilterTypeChange(): void {
     this.updateControlTypeOptions();
+    this.updateOperatorOptions();
     if (this.controlTypeOptions.length > 0) {
       this.filterDialogControl = this.controlTypeOptions[0].value;
+    }
+    if (this.operatorOptions.length > 0) {
+      this.filterDialogOperator = this.operatorOptions[0].value;
+    }
+
+    // Reset time-specific fields when switching away from time types
+    const isTimeType = this.filterDialogType === 'time_equality' || this.filterDialogType === 'time_range';
+    if (!isTimeType) {
+      this.filterDialogIncludeTime = false;
+      this.filterDialogDateFormat = 'yy-mm-dd';
+    }
+
+    // Reset default value when type changes — initialize with appropriate shape
+    if (this.filterDialogType === 'numeric_range') {
+      this.filterDialogDefaultValue = { min: null, max: null };
+    } else if (this.filterDialogType === 'time_range') {
+      this.filterDialogDefaultValue = null;
+    } else if (this.filterDialogType === 'category') {
+      this.filterDialogDefaultValue = [];
+    } else {
+      this.filterDialogDefaultValue = null;
+    }
+
+    // Reset category values when switching away from category
+    if (this.filterDialogType !== 'category') {
+      this.filterDialogCategoryValues = [];
+    }
+
+    // Load distinct values for category filters
+    if (this.filterDialogType === 'category' && this.filterDialogColumn) {
+      this.loadColumnDistinctValues();
+    }
+  }
+
+  onDateFormatChange(): void {
+    // Force p-calendar to re-render its display text by cloning the Date value.
+    // PrimeNG caches the formatted string; a new object reference triggers change detection.
+    const val = this.filterDialogDefaultValue;
+    if (val === null || val === undefined) return;
+
+    if (val instanceof Date) {
+      this.filterDialogDefaultValue = new Date(val.getTime());
+    } else if (Array.isArray(val)) {
+      this.filterDialogDefaultValue = val.map(
+        (d: Date | null) => (d instanceof Date ? new Date(d.getTime()) : d),
+      );
+    }
+  }
+
+  onIncludeTimeChange(): void {
+    const val = this.filterDialogDefaultValue;
+    if (val === null || val === undefined) return;
+
+    if (!this.filterDialogIncludeTime) {
+      // Switching to "Date Only" — strip time component
+      if (val instanceof Date) {
+        this.filterDialogDefaultValue = new Date(
+          val.getFullYear(), val.getMonth(), val.getDate(),
+        );
+      } else if (Array.isArray(val)) {
+        this.filterDialogDefaultValue = val.map(
+          (d: Date | null) =>
+            d instanceof Date ? new Date(d.getFullYear(), d.getMonth(), d.getDate()) : d,
+        );
+      }
+    } else {
+      // Switching to "Date & Time" — keep existing dates (time defaults to 00:00), force re-render
+      this.onDateFormatChange();
     }
   }
 
   onFilterColumnChange(): void {
     if (this.filterDialogColumn && !this.filterDialogName) {
       this.filterDialogName = this.filterDialogColumn.columnToView;
+    }
+    // Load distinct values for category filters when column changes
+    if (this.filterDialogType === 'category' && this.filterDialogColumn) {
+      this.loadColumnDistinctValues();
     }
   }
 
@@ -1299,6 +1531,167 @@ export class EditAnalysesComponent
     }
   }
 
+  updateOperatorOptions(): void {
+    this.operatorOptions = FILTER_OPERATORS[this.filterDialogType] || [];
+  }
+
+  getOperatorLabel(filterType: string, operatorValue: string): string {
+    const ops = FILTER_OPERATORS[filterType] || [];
+    return ops.find(o => o.value === operatorValue)?.label || operatorValue;
+  }
+
+  getNullOptionLabel(value: string): string {
+    return NULL_OPTIONS.find(o => o.value === value)?.label || value;
+  }
+
+  async loadColumnDistinctValues(): Promise<void> {
+    if (!this.filterDialogColumn || !this.datasetId || !this.orgId) return;
+
+    this.isLoadingFilterValues = true;
+    this.filterDialogCategoryValues = [];
+
+    try {
+      // Try store first for quick access
+      const rows = await this.store
+        .select(selectDatasetData(this.orgId, this.datasetId))
+        .pipe(first())
+        .toPromise();
+
+      if (rows && rows.length > 0) {
+        const colName =
+          this.filterDialogColumn.columnName ||
+          this.filterDialogColumn.columnToUse ||
+          this.filterDialogColumn.columnToView;
+        const uniqueValues = [
+          ...new Set(
+            rows
+              .map((row: any) => row[colName])
+              .filter((v: any) => v !== null && v !== undefined),
+          ),
+        ].sort();
+        this.filterDialogCategoryValues = uniqueValues.map((v: any) => ({
+          label: String(v),
+          value: String(v),
+        }));
+      } else if (this.editingFilter?.tempId) {
+        // Fallback: fetch from API when store has no data (e.g., cache expired)
+        const res: any = await this.analysesService.getFilterValues(
+          this.orgId,
+          this.editingFilter.tempId,
+        );
+        if (res?.status && res.data) {
+          this.filterDialogCategoryValues = (res.data || []).map((v: any) => ({
+            label: String(v),
+            value: String(v),
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load distinct values', err);
+    } finally {
+      this.isLoadingFilterValues = false;
+    }
+  }
+
+  private extractDefaultValue(config: any, filterType: string): any {
+    switch (filterType) {
+      case 'category':
+        return config.defaultValue || config.categoryValues || [];
+      case 'numeric_equality':
+        return config.defaultValue ?? null;
+      case 'numeric_range':
+        return {
+          min: config.rangeMin ?? null,
+          max: config.rangeMax ?? null,
+        };
+      case 'time_equality':
+        return config.defaultValue ? new Date(config.defaultValue) : null;
+      case 'time_range':
+        const dates: Date[] = [];
+        if (config.dateRangeStart) dates.push(new Date(config.dateRangeStart));
+        if (config.dateRangeEnd) dates.push(new Date(config.dateRangeEnd));
+        return dates.length > 0 ? dates : null;
+      default:
+        return null;
+    }
+  }
+
+  private buildDefaultValueConfig(config: any, filterType: string): void {
+    const val = this.filterDialogDefaultValue;
+    if (val === null || val === undefined) return;
+
+    switch (filterType) {
+      case 'category':
+        if (Array.isArray(val) && val.length > 0) {
+          config.defaultValue = val;
+        }
+        break;
+      case 'numeric_equality':
+        if (val !== null && val !== '') {
+          config.defaultValue = val;
+        }
+        break;
+      case 'numeric_range':
+        if (val?.min !== null && val?.min !== undefined) {
+          config.rangeMin = val.min;
+        }
+        if (val?.max !== null && val?.max !== undefined) {
+          config.rangeMax = val.max;
+        }
+        break;
+      case 'time_equality':
+        if (val) {
+          config.defaultValue = val instanceof Date ? val.toISOString() : val;
+        }
+        break;
+      case 'time_range':
+        if (Array.isArray(val) && val[0]) {
+          config.dateRangeStart =
+            val[0] instanceof Date ? val[0].toISOString() : val[0];
+        }
+        if (Array.isArray(val) && val[1]) {
+          config.dateRangeEnd =
+            val[1] instanceof Date ? val[1].toISOString() : val[1];
+        }
+        break;
+    }
+  }
+
+  getFilterConfigSummary(filter: ConfiguredFilter): string {
+    const parts: string[] = [];
+    const config = filter.config || {};
+    if (config.matchOperator) {
+      parts.push(this.getOperatorLabel(filter.filterType, config.matchOperator));
+    }
+    if (filter.nullOption && filter.nullOption !== 'ALL_VALUES') {
+      parts.push(this.getNullOptionLabel(filter.nullOption));
+    }
+    if (config.placeholder) {
+      parts.push(`"${config.placeholder}"`);
+    }
+    if (config.defaultValue) {
+      if (Array.isArray(config.defaultValue)) {
+        parts.push(`Default: ${config.defaultValue.length} values`);
+      } else {
+        parts.push(`Default: ${config.defaultValue}`);
+      }
+    }
+    if (config.rangeMin !== undefined || config.rangeMax !== undefined) {
+      parts.push(`Range: ${config.rangeMin ?? '...'} - ${config.rangeMax ?? '...'}`);
+    }
+    if (config.dateRangeStart || config.dateRangeEnd) {
+      parts.push('Date range set');
+    }
+    if (config.dateFormat) {
+      const fmt = DATE_FORMAT_OPTIONS.find(o => o.value === config.dateFormat);
+      parts.push(fmt ? fmt.label : config.dateFormat);
+    }
+    if (config.includeTime) {
+      parts.push('With time');
+    }
+    return parts.join(' · ');
+  }
+
   resequenceFilters(): void {
     this.configuredFilters.forEach((f, i) => (f.sequence = i));
   }
@@ -1313,7 +1706,7 @@ export class EditAnalysesComponent
         this.orgId,
         this.analysisId,
       );
-      if (res?.success && res.data) {
+      if (res?.status && res.data) {
         this.configuredFilters = (res.data || []).map((f: any) => ({
           tempId: f.id || crypto.randomUUID(),
           name: f.name,
@@ -1321,13 +1714,16 @@ export class EditAnalysesComponent
           filterType: f.filterType,
           controlType: f.controlType,
           config: f.config || {},
-          isEnabled: f.isEnabled,
-          isMandatory: f.isMandatory,
-          sequence: f.sequence,
+          nullOption: f.nullOption || 'ALL_VALUES',
+          isEnabled: f.isEnabled !== false,
+          isMandatory: f.isMandatory || false,
+          sequence: f.sequence ?? 0,
         }));
+      } else if (res && !res.status) {
+        this.globalService.handleSuccessService(res, false, true);
       }
     } catch (err) {
-      console.error('Failed to load existing filters', err);
+      this.globalService.handleErrorService(err);
     }
   }
 
@@ -2108,7 +2504,7 @@ export class EditAnalysesComponent
     formData: {
       name: string;
       description: string;
-      justification: string;
+      justification?: string;
     } | null,
   ): void {
     this.showSaveDialog = false;
@@ -2142,16 +2538,6 @@ export class EditAnalysesComponent
         organisation: this.orgId,
         datasource: this.datasourceId,
         visuals: visualConfigurations,
-        filters: this.configuredFilters.map((f, i) => ({
-          name: f.name,
-          columnName: f.columnName,
-          filterType: f.filterType,
-          controlType: f.controlType,
-          config: f.config || {},
-          isEnabled: f.isEnabled,
-          isMandatory: f.isMandatory,
-          sequence: i,
-        })),
       };
 
       this.analysesService

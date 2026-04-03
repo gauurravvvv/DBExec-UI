@@ -586,18 +586,23 @@ $radius-sm: 8px;
               .field-datatype {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                width: 26px;
-                height: 26px;
+                gap: 5px;
                 color: var(--primary-color);
                 opacity: 0.8;
                 background: rgba(var(--primary-rgb), 0.08);
-                border-radius: 50%;
+                border-radius: 12px;
+                padding: 3px 10px 3px 6px;
                 cursor: default;
                 flex-shrink: 0;
 
                 i {
-                  font-size: 12px;
+                  font-size: 11px;
+                }
+
+                .datatype-label {
+                  font-size: 11px;
+                  font-weight: 500;
+                  white-space: nowrap;
                 }
               }
 

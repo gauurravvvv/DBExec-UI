@@ -18,9 +18,33 @@
             [(ngModel)]="editableField.columnToView"
             label="Field name to show"
             placeholder="Display name"
+            [maxLength]="MAX_NAME_LENGTH"
+            [showError]="!!nameError"
+            [errorMessage]="nameError"
             (ngModelChange)="onFieldChange()"
           >
           </app-custom-input>
+          <small class="char-count">
+            {{ editableField.columnToView?.length || 0 }}/{{ MAX_NAME_LENGTH }}
+          </small>
+        </div>
+        <div class="input-group">
+          <app-custom-dropdown
+            [options]="analyticalTypes"
+            [ngModel]="editableField.dataType"
+            (ngModelChange)="onDataTypeChange($event)"
+            label="Data Type"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select data type"
+            [filter]="true"
+            [autoDisplayFirst]="false"
+            appendTo="body"
+          >
+          </app-custom-dropdown>
+          <small class="type-hint">
+            Changing the data type affects how this field is interpreted in visualizations
+          </small>
         </div>
       </div>
 

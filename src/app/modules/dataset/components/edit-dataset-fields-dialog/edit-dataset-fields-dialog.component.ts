@@ -14,6 +14,16 @@ export interface DatasetFieldsData {
   fields: any[];
 }
 
+export const ANALYTICAL_TYPES = [
+  { label: 'Text', value: 'text', icon: 'pi pi-align-left' },
+  { label: 'Integer', value: 'integer', icon: 'pi pi-hashtag' },
+  { label: 'Decimal', value: 'numeric', icon: 'pi pi-hashtag' },
+  { label: 'Boolean', value: 'boolean', icon: 'pi pi-check-square' },
+  { label: 'Date', value: 'date', icon: 'pi pi-calendar' },
+  { label: 'Date & Time', value: 'timestamp', icon: 'pi pi-calendar' },
+  { label: 'JSON', value: 'json', icon: 'pi pi-code' },
+];
+
 @Component({
   selector: 'app-edit-dataset-fields-dialog',
   templateUrl: './edit-dataset-fields-dialog.component.html',
@@ -30,6 +40,11 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
   originalField: any = null;
   isSaveEnabled = false;
   isSubmitting = false;
+  analyticalTypes = ANALYTICAL_TYPES;
+  nameError = '';
+
+  readonly MIN_NAME_LENGTH = 1;
+  readonly MAX_NAME_LENGTH = 128;
 
   constructor(
     private datasetService: DatasetService,
@@ -45,12 +60,45 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['visible'] && this.visible && this.field) {
-      // Patch the form with the already-loaded field data
-      this.editableField = { ...this.field };
-      this.originalField = { ...this.field };
+      // Normalize dataType to match analytical types
+      const normalizedType = this.normalizeDataType(this.field.dataType);
+      this.editableField = { ...this.field, dataType: normalizedType };
+      this.originalField = { ...this.field, dataType: normalizedType };
       this.isSaveEnabled = false;
       this.isSubmitting = false;
     }
+  }
+
+  /**
+   * Map raw postgres types to our simplified analytical types.
+   */
+  normalizeDataType(rawType: string): string {
+    if (!rawType) return 'text';
+    const t = rawType.toLowerCase();
+    if (t.includes('int') || t.includes('serial')) return 'integer';
+    if (
+      t.includes('numeric') ||
+      t.includes('decimal') ||
+      t.includes('float') ||
+      t.includes('double') ||
+      t.includes('real') ||
+      t.includes('money')
+    )
+      return 'numeric';
+    if (t.includes('bool')) return 'boolean';
+    if (t.includes('timestamp')) return 'timestamp';
+    if (t.includes('date') || t.includes('time') || t.includes('interval'))
+      return 'date';
+    if (t.includes('json')) return 'json';
+    if (
+      t.includes('char') ||
+      t.includes('text') ||
+      t.includes('string') ||
+      t.includes('citext') ||
+      t.includes('name')
+    )
+      return 'text';
+    return 'text';
   }
 
   trackByIndex(index: number): number {
@@ -58,10 +106,32 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
   }
 
   onFieldChange() {
-    // Enable save button if columnToView has changed
-    this.isSaveEnabled =
+    this.validateName();
+    // Enable save button if columnToView or dataType has changed and name is valid
+    const nameChanged =
       this.editableField?.columnToView?.trim() !==
       this.originalField?.columnToView?.trim();
+    const typeChanged =
+      this.editableField?.dataType !== this.originalField?.dataType;
+    this.isSaveEnabled = (nameChanged || typeChanged) && !this.nameError;
+  }
+
+  validateName() {
+    const name = this.editableField?.columnToView?.trim() || '';
+    if (!name) {
+      this.nameError = 'Field name is required';
+    } else if (name.length < this.MIN_NAME_LENGTH) {
+      this.nameError = `Field name must be at least ${this.MIN_NAME_LENGTH} character`;
+    } else if (name.length > this.MAX_NAME_LENGTH) {
+      this.nameError = `Field name must not exceed ${this.MAX_NAME_LENGTH} characters`;
+    } else {
+      this.nameError = '';
+    }
+  }
+
+  onDataTypeChange(value: string) {
+    this.editableField.dataType = value;
+    this.onFieldChange();
   }
 
   onSubmit() {
@@ -71,12 +141,17 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
 
     this.isSubmitting = true;
 
-    const payload = {
+    const payload: any = {
       fieldId: this.editableField.id,
       datasetId: this.editableField.datasetId,
       columnNameToView: this.editableField.columnToView,
       organisation: this.editableField.organisationId,
     };
+
+    // Include dataType if it changed
+    if (this.editableField.dataType !== this.originalField.dataType) {
+      payload.dataType = this.editableField.dataType;
+    }
 
     this.datasetService.updateDatasetMapping(payload).then(response => {
       if (this.globalService.handleSuccessService(response, true)) {
