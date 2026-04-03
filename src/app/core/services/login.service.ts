@@ -46,7 +46,10 @@ export class LoginService implements OnDestroy {
           );
 
           if (result.data.sessionInactivityTimeout) {
-            StorageService.set(StorageType.SESSION_INACTIVITY_TIMEOUT, result.data.sessionInactivityTimeout.toString());
+            StorageService.set(
+              StorageType.SESSION_INACTIVITY_TIMEOUT,
+              result.data.sessionInactivityTimeout.toString(),
+            );
           }
         }
         return result;

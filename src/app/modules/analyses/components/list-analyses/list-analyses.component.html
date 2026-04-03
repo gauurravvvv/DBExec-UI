@@ -68,11 +68,7 @@
           [lazy]="true"
           (onLazyLoad)="loadAnalyses($event)"
           [totalRecords]="totalRecords"
-          [globalFilterFields]="[
-            'name',
-            'description',
-            'status',
-          ]"
+          [globalFilterFields]="['name', 'description', 'status']"
           [rowHover]="true"
           dataKey="id"
           currentPageReportTemplate="{first} - {last} of {totalRecords}"

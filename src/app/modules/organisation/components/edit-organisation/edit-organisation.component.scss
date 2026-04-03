@@ -616,8 +616,8 @@
   .provider-btn {
     flex: 1;
     padding: 0.6rem 1rem;
-    border: 1px solid var(--border-color, rgba(255,255,255,0.1));
-    background: var(--surface-card, rgba(255,255,255,0.03));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    background: var(--surface-card, rgba(255, 255, 255, 0.03));
     color: var(--text-color, #ccc);
     border-radius: 6px;
     cursor: pointer;
@@ -674,9 +674,9 @@
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  background: var(--surface-card, rgba(255,255,255,0.03));
+  background: var(--surface-card, rgba(255, 255, 255, 0.03));
   border-radius: 6px;
-  border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
   color: var(--text-secondary-color, #888);
   font-size: 0.85rem;
 }

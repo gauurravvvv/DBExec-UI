@@ -94,10 +94,22 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
       dbUsername: ['', [Validators.required]],
       dbPassword: [''],
       // Security config
-      maxLoginAttempts: [5, [Validators.required, Validators.min(3), Validators.max(10)]],
-      accountLockDurationHours: [1, [Validators.required, Validators.min(0), Validators.max(24)]],
-      passwordHistoryLimit: [5, [Validators.required, Validators.min(1), Validators.max(24)]],
-      sessionInactivityTimeout: [30, [Validators.required, Validators.min(5), Validators.max(1440)]],
+      maxLoginAttempts: [
+        5,
+        [Validators.required, Validators.min(3), Validators.max(10)],
+      ],
+      accountLockDurationHours: [
+        1,
+        [Validators.required, Validators.min(0), Validators.max(24)],
+      ],
+      passwordHistoryLimit: [
+        5,
+        [Validators.required, Validators.min(1), Validators.max(24)],
+      ],
+      sessionInactivityTimeout: [
+        30,
+        [Validators.required, Validators.min(5), Validators.max(1440)],
+      ],
       // Email config
       emailProvider: [null],
       smtpHost: [''],
@@ -195,11 +207,11 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
               smtpHost: config.smtpHost || '',
               smtpPort: config.smtpPort || 587,
               smtpUser: config.smtpUser || '',
-              smtpPassword: '',  // Never returned from API
+              smtpPassword: '', // Never returned from API
               smtpFrom: config.smtpFrom || '',
               sesRegion: config.sesRegion || '',
               sesAccessKeyId: config.sesAccessKeyId || '',
-              sesSecretAccessKey: '',  // Never returned from API
+              sesSecretAccessKey: '', // Never returned from API
               sesFrom: config.sesFrom || '',
             });
           }
@@ -263,14 +275,40 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     });
 
     if (provider === 'SMTP') {
-      this.orgForm.get('smtpHost')?.setValidators([Validators.required, Validators.maxLength(255)]);
-      this.orgForm.get('smtpPort')?.setValidators([Validators.required, Validators.min(1), Validators.max(65535)]);
-      this.orgForm.get('smtpUser')?.setValidators([Validators.required, Validators.maxLength(255)]);
-      this.orgForm.get('smtpFrom')?.setValidators([Validators.required, Validators.email]);
+      this.orgForm
+        .get('smtpHost')
+        ?.setValidators([Validators.required, Validators.maxLength(255)]);
+      this.orgForm
+        .get('smtpPort')
+        ?.setValidators([
+          Validators.required,
+          Validators.min(1),
+          Validators.max(65535),
+        ]);
+      this.orgForm
+        .get('smtpUser')
+        ?.setValidators([Validators.required, Validators.maxLength(255)]);
+      this.orgForm
+        .get('smtpFrom')
+        ?.setValidators([Validators.required, Validators.email]);
     } else if (provider === 'SES') {
-      this.orgForm.get('sesRegion')?.setValidators([Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-z]{2}-[a-z]+-\d{1,2}$/)]);
-      this.orgForm.get('sesAccessKeyId')?.setValidators([Validators.required, Validators.minLength(16), Validators.maxLength(128)]);
-      this.orgForm.get('sesFrom')?.setValidators([Validators.required, Validators.email]);
+      this.orgForm
+        .get('sesRegion')
+        ?.setValidators([
+          Validators.required,
+          Validators.maxLength(50),
+          Validators.pattern(/^[a-z]{2}-[a-z]+-\d{1,2}$/),
+        ]);
+      this.orgForm
+        .get('sesAccessKeyId')
+        ?.setValidators([
+          Validators.required,
+          Validators.minLength(16),
+          Validators.maxLength(128),
+        ]);
+      this.orgForm
+        .get('sesFrom')
+        ?.setValidators([Validators.required, Validators.email]);
     }
 
     allFields.forEach(f => {
@@ -283,17 +321,25 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     if (!control?.errors || !control.touched) return '';
     if (control.errors['required']) return 'This field is required';
     if (control.errors['email']) return 'Please enter a valid email address';
-    if (control.errors['maxlength']) return `Must not exceed ${control.errors['maxlength'].requiredLength} characters`;
-    if (control.errors['minlength']) return `Must be at least ${control.errors['minlength'].requiredLength} characters`;
-    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
-    if (control.errors['max']) return `Maximum value is ${control.errors['max'].max}`;
+    if (control.errors['maxlength'])
+      return `Must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control.errors['minlength'])
+      return `Must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control.errors['min'])
+      return `Minimum value is ${control.errors['min'].min}`;
+    if (control.errors['max'])
+      return `Maximum value is ${control.errors['max'].max}`;
     if (control.errors['pattern']) return 'Invalid format (e.g. us-east-1)';
     return '';
   }
 
   isStep3Valid(): boolean {
-    const securityValid = ['maxLoginAttempts', 'accountLockDurationHours', 'passwordHistoryLimit', 'sessionInactivityTimeout']
-      .every(f => this.orgForm.get(f)?.valid);
+    const securityValid = [
+      'maxLoginAttempts',
+      'accountLockDurationHours',
+      'passwordHistoryLimit',
+      'sessionInactivityTimeout',
+    ].every(f => this.orgForm.get(f)?.valid);
     return securityValid;
   }
 
@@ -327,9 +373,19 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
       } else if (step === 2) {
         this.currentStep = 2;
       }
-    } else if (step === 1 && this.currentStep === 0 && this.isStep1Valid() && this.hasMasterDb) {
+    } else if (
+      step === 1 &&
+      this.currentStep === 0 &&
+      this.isStep1Valid() &&
+      this.hasMasterDb
+    ) {
       this.currentStep = 1;
-    } else if (step === 2 && this.currentStep === 0 && this.isStep1Valid() && !this.hasMasterDb) {
+    } else if (
+      step === 2 &&
+      this.currentStep === 0 &&
+      this.isStep1Valid() &&
+      !this.hasMasterDb
+    ) {
       this.currentStep = 2;
     } else if (step === 2 && this.currentStep === 1) {
       this.currentStep = 2;
@@ -486,8 +542,10 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     const control = this.orgForm.get(fieldName);
     if (!control?.errors || !control.touched) return '';
     if (control.errors['required']) return 'This field is required';
-    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
-    if (control.errors['max']) return `Maximum value is ${control.errors['max'].max}`;
+    if (control.errors['min'])
+      return `Minimum value is ${control.errors['min'].min}`;
+    if (control.errors['max'])
+      return `Maximum value is ${control.errors['max'].max}`;
     return '';
   }
 

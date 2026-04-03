@@ -102,9 +102,7 @@
           icon="pi-box"
           [required]="true"
           [showError]="
-            !!(
-              roleForm.get('name')?.invalid && roleForm.get('name')?.touched
-            )
+            !!(roleForm.get('name')?.invalid && roleForm.get('name')?.touched)
           "
           [errorMessage]="getNameError()"
         >

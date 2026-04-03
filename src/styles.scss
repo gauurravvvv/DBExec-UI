@@ -545,14 +545,16 @@
 }
 .p-inputtext:enabled:focus {
   border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 1px var(--primary-color-transparent, rgba(33, 150, 243, 0.2)) !important;
+  box-shadow: 0 0 0 1px
+    var(--primary-color-transparent, rgba(33, 150, 243, 0.2)) !important;
 }
 .p-dropdown:not(.p-disabled):hover {
   border-color: var(--primary-color) !important;
 }
 .p-dropdown:not(.p-disabled).p-focus {
   border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 1px var(--primary-color-transparent, rgba(33, 150, 243, 0.2)) !important;
+  box-shadow: 0 0 0 1px
+    var(--primary-color-transparent, rgba(33, 150, 243, 0.2)) !important;
 }
 .p-dropdown .p-ink {
   background-color: rgba(33, 150, 243, 0.16) !important;
@@ -567,7 +569,8 @@
 }
 .p-multiselect:not(.p-disabled).p-focus {
   border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 1px var(--primary-color-transparent, rgba(33, 150, 243, 0.2)) !important;
+  box-shadow: 0 0 0 1px
+    var(--primary-color-transparent, rgba(33, 150, 243, 0.2)) !important;
 }
 // Global multiselect panel styles (needed for appendTo="body" panels)
 .p-multiselect-panel {

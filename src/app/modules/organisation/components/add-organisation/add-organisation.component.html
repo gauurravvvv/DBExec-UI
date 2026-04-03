@@ -456,12 +456,72 @@
               <span>Security Settings</span>
             </div>
             <div class="db-fields-row">
-              <app-custom-input formControlName="maxLoginAttempts" label="Max Login Attempts" type="number" icon="pi-lock" [required]="true" tooltip="Allowed range: 3 – 10 attempts" [showError]="!!(orgForm.get('maxLoginAttempts')?.invalid && orgForm.get('maxLoginAttempts')?.touched)" [errorMessage]="getSecurityFieldError('maxLoginAttempts')"></app-custom-input>
-              <app-custom-input formControlName="accountLockDurationHours" label="Account Lock Duration (Hours)" type="number" icon="pi-clock" [required]="true" tooltip="Allowed range: 0 – 24 hours. Set 0 for permanent lock (admin must unlock manually)" [showError]="!!(orgForm.get('accountLockDurationHours')?.invalid && orgForm.get('accountLockDurationHours')?.touched)" [errorMessage]="getSecurityFieldError('accountLockDurationHours')"></app-custom-input>
+              <app-custom-input
+                formControlName="maxLoginAttempts"
+                label="Max Login Attempts"
+                type="number"
+                icon="pi-lock"
+                [required]="true"
+                tooltip="Allowed range: 3 – 10 attempts"
+                [showError]="
+                  !!(
+                    orgForm.get('maxLoginAttempts')?.invalid &&
+                    orgForm.get('maxLoginAttempts')?.touched
+                  )
+                "
+                [errorMessage]="getSecurityFieldError('maxLoginAttempts')"
+              ></app-custom-input>
+              <app-custom-input
+                formControlName="accountLockDurationHours"
+                label="Account Lock Duration (Hours)"
+                type="number"
+                icon="pi-clock"
+                [required]="true"
+                tooltip="Allowed range: 0 – 24 hours. Set 0 for permanent lock (admin must unlock manually)"
+                [showError]="
+                  !!(
+                    orgForm.get('accountLockDurationHours')?.invalid &&
+                    orgForm.get('accountLockDurationHours')?.touched
+                  )
+                "
+                [errorMessage]="
+                  getSecurityFieldError('accountLockDurationHours')
+                "
+              ></app-custom-input>
             </div>
             <div class="db-fields-row">
-              <app-custom-input formControlName="passwordHistoryLimit" label="Password History Limit" type="number" icon="pi-history" [required]="true" tooltip="Allowed range: 1 – 24 passwords remembered" [showError]="!!(orgForm.get('passwordHistoryLimit')?.invalid && orgForm.get('passwordHistoryLimit')?.touched)" [errorMessage]="getSecurityFieldError('passwordHistoryLimit')"></app-custom-input>
-              <app-custom-input formControlName="sessionInactivityTimeout" label="Idle Session Timeout (Minutes)" type="number" icon="pi-sign-out" [required]="true" tooltip="Allowed range: 5 – 1440 minutes (up to 24 hours). User is logged out after this period of inactivity" [showError]="!!(orgForm.get('sessionInactivityTimeout')?.invalid && orgForm.get('sessionInactivityTimeout')?.touched)" [errorMessage]="getSecurityFieldError('sessionInactivityTimeout')"></app-custom-input>
+              <app-custom-input
+                formControlName="passwordHistoryLimit"
+                label="Password History Limit"
+                type="number"
+                icon="pi-history"
+                [required]="true"
+                tooltip="Allowed range: 1 – 24 passwords remembered"
+                [showError]="
+                  !!(
+                    orgForm.get('passwordHistoryLimit')?.invalid &&
+                    orgForm.get('passwordHistoryLimit')?.touched
+                  )
+                "
+                [errorMessage]="getSecurityFieldError('passwordHistoryLimit')"
+              ></app-custom-input>
+              <app-custom-input
+                formControlName="sessionInactivityTimeout"
+                label="Idle Session Timeout (Minutes)"
+                type="number"
+                icon="pi-sign-out"
+                [required]="true"
+                tooltip="Allowed range: 5 – 1440 minutes (up to 24 hours). User is logged out after this period of inactivity"
+                [showError]="
+                  !!(
+                    orgForm.get('sessionInactivityTimeout')?.invalid &&
+                    orgForm.get('sessionInactivityTimeout')?.touched
+                  )
+                "
+                [errorMessage]="
+                  getSecurityFieldError('sessionInactivityTimeout')
+                "
+              ></app-custom-input>
             </div>
           </div>
 
@@ -474,13 +534,28 @@
 
             <!-- Provider toggle -->
             <div class="email-provider-toggle">
-              <button type="button" class="provider-btn" [class.active]="selectedEmailProvider === 'SMTP'" (click)="orgForm.get('emailProvider')?.setValue('SMTP')">
+              <button
+                type="button"
+                class="provider-btn"
+                [class.active]="selectedEmailProvider === 'SMTP'"
+                (click)="orgForm.get('emailProvider')?.setValue('SMTP')"
+              >
                 <i class="pi pi-server"></i> SMTP
               </button>
-              <button type="button" class="provider-btn" [class.active]="selectedEmailProvider === 'SES'" (click)="orgForm.get('emailProvider')?.setValue('SES')">
+              <button
+                type="button"
+                class="provider-btn"
+                [class.active]="selectedEmailProvider === 'SES'"
+                (click)="orgForm.get('emailProvider')?.setValue('SES')"
+              >
                 <i class="pi pi-cloud"></i> AWS SES
               </button>
-              <button type="button" class="provider-btn" [class.active]="!selectedEmailProvider" (click)="orgForm.get('emailProvider')?.setValue(null)">
+              <button
+                type="button"
+                class="provider-btn"
+                [class.active]="!selectedEmailProvider"
+                (click)="orgForm.get('emailProvider')?.setValue(null)"
+              >
                 <i class="pi pi-ban"></i> None
               </button>
             </div>
@@ -488,30 +563,137 @@
             <!-- SMTP fields -->
             <div *ngIf="selectedEmailProvider === 'SMTP'" class="email-fields">
               <div class="db-fields-row">
-                <app-custom-input formControlName="smtpHost" label="SMTP Host" placeholder="e.g. smtp.gmail.com" icon="pi-server" [required]="true" [showError]="!!(orgForm.get('smtpHost')?.invalid && orgForm.get('smtpHost')?.touched)" [errorMessage]="getEmailFieldError('smtpHost')"></app-custom-input>
-                <app-custom-input formControlName="smtpPort" label="SMTP Port" placeholder="e.g. 587" type="number" icon="pi-hashtag" [required]="true" [showError]="!!(orgForm.get('smtpPort')?.invalid && orgForm.get('smtpPort')?.touched)" [errorMessage]="getEmailFieldError('smtpPort')"></app-custom-input>
+                <app-custom-input
+                  formControlName="smtpHost"
+                  label="SMTP Host"
+                  placeholder="e.g. smtp.gmail.com"
+                  icon="pi-server"
+                  [required]="true"
+                  [showError]="
+                    !!(
+                      orgForm.get('smtpHost')?.invalid &&
+                      orgForm.get('smtpHost')?.touched
+                    )
+                  "
+                  [errorMessage]="getEmailFieldError('smtpHost')"
+                ></app-custom-input>
+                <app-custom-input
+                  formControlName="smtpPort"
+                  label="SMTP Port"
+                  placeholder="e.g. 587"
+                  type="number"
+                  icon="pi-hashtag"
+                  [required]="true"
+                  [showError]="
+                    !!(
+                      orgForm.get('smtpPort')?.invalid &&
+                      orgForm.get('smtpPort')?.touched
+                    )
+                  "
+                  [errorMessage]="getEmailFieldError('smtpPort')"
+                ></app-custom-input>
               </div>
               <div class="db-fields-row">
-                <app-custom-input formControlName="smtpUser" label="SMTP Username" placeholder="e.g. user@gmail.com" icon="pi-user" [required]="true" [showError]="!!(orgForm.get('smtpUser')?.invalid && orgForm.get('smtpUser')?.touched)" [errorMessage]="getEmailFieldError('smtpUser')"></app-custom-input>
-                <app-custom-input formControlName="smtpPassword" label="SMTP Password" placeholder="Enter SMTP password" icon="pi-lock" [showPasswordToggle]="true"></app-custom-input>
+                <app-custom-input
+                  formControlName="smtpUser"
+                  label="SMTP Username"
+                  placeholder="e.g. user@gmail.com"
+                  icon="pi-user"
+                  [required]="true"
+                  [showError]="
+                    !!(
+                      orgForm.get('smtpUser')?.invalid &&
+                      orgForm.get('smtpUser')?.touched
+                    )
+                  "
+                  [errorMessage]="getEmailFieldError('smtpUser')"
+                ></app-custom-input>
+                <app-custom-input
+                  formControlName="smtpPassword"
+                  label="SMTP Password"
+                  placeholder="Enter SMTP password"
+                  icon="pi-lock"
+                  [showPasswordToggle]="true"
+                ></app-custom-input>
               </div>
-              <app-custom-input formControlName="smtpFrom" label="From Email" placeholder="e.g. noreply@company.com" icon="pi-at" [required]="true" [showError]="!!(orgForm.get('smtpFrom')?.invalid && orgForm.get('smtpFrom')?.touched)" [errorMessage]="getEmailFieldError('smtpFrom')"></app-custom-input>
+              <app-custom-input
+                formControlName="smtpFrom"
+                label="From Email"
+                placeholder="e.g. noreply@company.com"
+                icon="pi-at"
+                [required]="true"
+                [showError]="
+                  !!(
+                    orgForm.get('smtpFrom')?.invalid &&
+                    orgForm.get('smtpFrom')?.touched
+                  )
+                "
+                [errorMessage]="getEmailFieldError('smtpFrom')"
+              ></app-custom-input>
             </div>
 
             <!-- SES fields -->
             <div *ngIf="selectedEmailProvider === 'SES'" class="email-fields">
-              <app-custom-input formControlName="sesRegion" label="AWS Region" placeholder="e.g. us-east-1" icon="pi-globe" [required]="true" [showError]="!!(orgForm.get('sesRegion')?.invalid && orgForm.get('sesRegion')?.touched)" [errorMessage]="getEmailFieldError('sesRegion')"></app-custom-input>
+              <app-custom-input
+                formControlName="sesRegion"
+                label="AWS Region"
+                placeholder="e.g. us-east-1"
+                icon="pi-globe"
+                [required]="true"
+                [showError]="
+                  !!(
+                    orgForm.get('sesRegion')?.invalid &&
+                    orgForm.get('sesRegion')?.touched
+                  )
+                "
+                [errorMessage]="getEmailFieldError('sesRegion')"
+              ></app-custom-input>
               <div class="db-fields-row">
-                <app-custom-input formControlName="sesAccessKeyId" label="Access Key ID" placeholder="e.g. AKIAIOSFODNN7EXAMPLE" icon="pi-key" [required]="true" [showError]="!!(orgForm.get('sesAccessKeyId')?.invalid && orgForm.get('sesAccessKeyId')?.touched)" [errorMessage]="getEmailFieldError('sesAccessKeyId')"></app-custom-input>
-                <app-custom-input formControlName="sesSecretAccessKey" label="Secret Access Key" placeholder="Enter secret access key" icon="pi-lock" [showPasswordToggle]="true"></app-custom-input>
+                <app-custom-input
+                  formControlName="sesAccessKeyId"
+                  label="Access Key ID"
+                  placeholder="e.g. AKIAIOSFODNN7EXAMPLE"
+                  icon="pi-key"
+                  [required]="true"
+                  [showError]="
+                    !!(
+                      orgForm.get('sesAccessKeyId')?.invalid &&
+                      orgForm.get('sesAccessKeyId')?.touched
+                    )
+                  "
+                  [errorMessage]="getEmailFieldError('sesAccessKeyId')"
+                ></app-custom-input>
+                <app-custom-input
+                  formControlName="sesSecretAccessKey"
+                  label="Secret Access Key"
+                  placeholder="Enter secret access key"
+                  icon="pi-lock"
+                  [showPasswordToggle]="true"
+                ></app-custom-input>
               </div>
-              <app-custom-input formControlName="sesFrom" label="From Email" placeholder="e.g. noreply@company.com" icon="pi-at" [required]="true" [showError]="!!(orgForm.get('sesFrom')?.invalid && orgForm.get('sesFrom')?.touched)" [errorMessage]="getEmailFieldError('sesFrom')"></app-custom-input>
+              <app-custom-input
+                formControlName="sesFrom"
+                label="From Email"
+                placeholder="e.g. noreply@company.com"
+                icon="pi-at"
+                [required]="true"
+                [showError]="
+                  !!(
+                    orgForm.get('sesFrom')?.invalid &&
+                    orgForm.get('sesFrom')?.touched
+                  )
+                "
+                [errorMessage]="getEmailFieldError('sesFrom')"
+              ></app-custom-input>
             </div>
 
             <!-- No provider message -->
             <div *ngIf="!selectedEmailProvider" class="no-provider-message">
               <i class="pi pi-info-circle"></i>
-              <span>Emails will be sent using the global system configuration.</span>
+              <span
+                >Emails will be sent using the global system
+                configuration.</span
+              >
             </div>
           </div>
         </div>
@@ -526,11 +708,15 @@
             <div class="readonly-info-card">
               <div class="info-row">
                 <span class="info-label">Encryption Method</span>
-                <span class="info-value">{{ orgForm.get('encryptionAlgorithm')?.value || 'Not configured' }}</span>
+                <span class="info-value">{{
+                  orgForm.get('encryptionAlgorithm')?.value || 'Not configured'
+                }}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Pepper Key</span>
-                <span class="info-value masked">{{ orgForm.get('pepperKey')?.value ? '********' : 'Not set' }}</span>
+                <span class="info-value masked">{{
+                  orgForm.get('pepperKey')?.value ? '********' : 'Not set'
+                }}</span>
               </div>
               <p class="readonly-note">
                 <i class="pi pi-lock"></i>
@@ -538,7 +724,6 @@
               </p>
             </div>
           </div>
-
         </div>
       </div>
     </form>

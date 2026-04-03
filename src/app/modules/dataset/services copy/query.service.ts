@@ -117,11 +117,15 @@ export class QueryService {
 
   // New methods demonstrating datasource schema operations on Query Server
   getDatasourceSchema(datasourceId: string): Observable<any> {
-    return this.httpClientService.queryGet(`/datasource/schema/${datasourceId}`);
+    return this.httpClientService.queryGet(
+      `/datasource/schema/${datasourceId}`,
+    );
   }
 
   getDatasourceTables(datasourceId: string): Observable<any> {
-    return this.httpClientService.queryGet(`/datasource/tables/${datasourceId}`);
+    return this.httpClientService.queryGet(
+      `/datasource/tables/${datasourceId}`,
+    );
   }
 
   getTableColumns(datasourceId: string, tableName: string): Observable<any> {

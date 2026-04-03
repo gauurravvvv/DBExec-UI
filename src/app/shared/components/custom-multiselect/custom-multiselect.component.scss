@@ -42,7 +42,9 @@
 }
 
 :host ::ng-deep {
-  .p-float-label .p-multiselect:not(.p-focus) .p-multiselect-label.p-placeholder {
+  .p-float-label
+    .p-multiselect:not(.p-focus)
+    .p-multiselect-label.p-placeholder {
     opacity: 0;
   }
 

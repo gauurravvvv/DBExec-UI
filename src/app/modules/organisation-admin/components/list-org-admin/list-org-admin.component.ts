@@ -207,7 +207,10 @@ export class ListOrgAdminComponent implements OnInit, OnDestroy {
       dateTo.setHours(23, 59, 59, 999);
       filter.createdDateTo = dateTo.toISOString();
     }
-    if (this.filterValues.status !== null && this.filterValues.status !== undefined) {
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
       filter.status = this.filterValues.status;
     }
 
