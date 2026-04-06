@@ -247,6 +247,7 @@ export const PROFILE = {
 export const DASHBOARD = {
   ADD: '/dashboard/add',
   GET: '/dashboard/get/',
+  RENDER: '/dashboard/render/',
   LIST: '/dashboard/list',
   DELETE: '/dashboard/delete/',
 };

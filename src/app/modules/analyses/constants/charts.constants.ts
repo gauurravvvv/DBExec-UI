@@ -19,7 +19,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-vertical-2d',
     name: 'Grouped Vertical',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-align-left',
     category: 'Bar Charts',
     description:
       'Compares multiple data series side-by-side within each category',
@@ -27,7 +27,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-horizontal-2d',
     name: 'Grouped Horizontal',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-align-left',
     category: 'Bar Charts',
     description:
       'Displays multiple series horizontally for easy comparison across groups',
@@ -36,7 +36,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-vertical-stacked',
     name: 'Stacked Vertical',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-database',
     category: 'Bar Charts',
     description:
       'Shows part-to-whole relationships by stacking bars vertically',
@@ -44,16 +44,15 @@ export const CHART_TYPES = [
   {
     id: 'bar-horizontal-stacked',
     name: 'Stacked Horizontal',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-list',
     category: 'Bar Charts',
     description:
       'Presents stacked data horizontally to show composition and totals',
-    rotate: true,
   },
   {
     id: 'bar-vertical-normalized',
     name: 'Normalized Vertical',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-percentage',
     category: 'Bar Charts',
     description:
       'Displays proportions as percentages with bars normalized to 100%',
@@ -61,7 +60,7 @@ export const CHART_TYPES = [
   {
     id: 'bar-horizontal-normalized',
     name: 'Normalized Horizontal',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-percentage',
     category: 'Bar Charts',
     description: 'Shows percentage distribution horizontally across categories',
     rotate: true,
@@ -88,14 +87,14 @@ export const CHART_TYPES = [
   {
     id: 'area',
     name: 'Area Chart',
-    icon: 'pi pi-chart-line',
+    icon: 'pi pi-arrow-up',
     category: 'Area Charts',
     description: 'Shows trends over time with filled areas under the line',
   },
   {
     id: 'area-stacked',
     name: 'Stacked Area',
-    icon: 'pi pi-chart-line',
+    icon: 'pi pi-server',
     category: 'Area Charts',
     description:
       'Illustrates cumulative totals and individual contributions over time',
@@ -103,7 +102,7 @@ export const CHART_TYPES = [
   {
     id: 'area-normalized',
     name: 'Normalized Area',
-    icon: 'pi pi-chart-line',
+    icon: 'pi pi-percentage',
     category: 'Area Charts',
     description:
       'Displays proportional trends normalized to 100% at each point',
@@ -266,7 +265,7 @@ export const CHART_TYPES = [
   {
     id: 'line-stacked',
     name: 'Stacked Line',
-    icon: 'pi pi-chart-line',
+    icon: 'pi pi-arrows-v',
     category: 'Line Charts',
     description:
       'Shows cumulative trends by stacking multiple data series on a line chart',
@@ -274,7 +273,7 @@ export const CHART_TYPES = [
   {
     id: 'line-step',
     name: 'Step Line',
-    icon: 'pi pi-chart-line',
+    icon: 'pi pi-angle-right',
     category: 'Line Charts',
     description:
       'Displays data as a step function with sharp transitions between values',
@@ -284,7 +283,7 @@ export const CHART_TYPES = [
   {
     id: 'half-donut',
     name: 'Half Donut',
-    icon: 'pi pi-circle',
+    icon: 'pi pi-minus',
     category: 'Pie Charts',
     description:
       'Semi-circle donut chart showing proportions in a 180-degree arc',
@@ -292,7 +291,7 @@ export const CHART_TYPES = [
   {
     id: 'nested-pie',
     name: 'Nested Pie',
-    icon: 'pi pi-circle',
+    icon: 'pi pi-circle-fill',
     category: 'Pie Charts',
     description:
       'Multi-ring pie chart with inner summary and outer detail rings',
@@ -300,7 +299,7 @@ export const CHART_TYPES = [
   {
     id: 'rose',
     name: 'Rose Chart',
-    icon: 'pi pi-circle',
+    icon: 'pi pi-sun',
     category: 'Pie Charts',
     description:
       'Nightingale rose chart where slices vary in radius to show magnitude differences',
@@ -310,7 +309,7 @@ export const CHART_TYPES = [
   {
     id: 'waterfall',
     name: 'Waterfall Chart',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-sort-amount-down',
     category: 'Bar Charts',
     description:
       'Shows cumulative effect of sequential positive and negative values on a total',
@@ -352,7 +351,7 @@ export const CHART_TYPES = [
   {
     id: 'candlestick',
     name: 'Candlestick Chart',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-building',
     category: 'Financial',
     description:
       'Shows open, high, low, close values for financial time series data',
@@ -445,6 +444,44 @@ export const CHART_TYPES = [
     category: '3D Charts',
     description:
       'WebGL-accelerated vector field flow visualization for wind, current, or magnetic field data',
+  },
+
+  // 2D Geographic Maps
+  {
+    id: 'world-map',
+    name: 'World Map',
+    icon: 'pi pi-globe',
+    category: 'Maps',
+    description:
+      'Choropleth world map using color intensity to show values by country or region',
+  },
+
+  // 2D Flow Lines
+  {
+    id: 'flow-lines',
+    name: 'Flow Lines',
+    icon: 'pi pi-arrow-right-arrow-left',
+    category: 'Flow',
+    description:
+      'Animated directed flow lines between nodes, visualizing movement and connections on a flat canvas',
+  },
+
+  // 3D Globe overlay charts
+  {
+    id: 'lines3d',
+    name: 'Lines 3D',
+    icon: 'pi pi-chart-line',
+    category: '3D Charts',
+    description:
+      'Animated polyline arcs rendered on a 3D globe using longitude/latitude coordinates',
+  },
+  {
+    id: 'polygons3d',
+    name: 'Polygons 3D',
+    icon: 'pi pi-map',
+    category: '3D Charts',
+    description:
+      'Extruded 3D polygon regions rendered on a globe, grouped by name with longitude/latitude vertices',
   },
 ];
 
@@ -973,6 +1010,31 @@ export const DEFAULT_CHART_CONFIG = {
 
   // === GL Charts ===
   nodeSize: 10, // graphGL node symbolSize
+
+  // === World Map Chart ===
+  worldMapRoam: true, // series.roam (zoom/pan)
+  worldMapShowLabels: false, // series.label.show
+  worldMapVisualMapMin: null, // visualMap.min (null = auto from data)
+  worldMapVisualMapMax: null, // visualMap.max (null = auto from data)
+
+  // === Flow Lines Chart ===
+  flowLinesEffect: true, // series.effect.show
+  flowLinesCurveness: 0.3, // series.lineStyle.curveness
+  flowLinesWidth: 3, // series.lineStyle.width (max, scales with value)
+  flowLinesEffectSymbolSize: 4, // series.effect.symbolSize
+  flowLinesEffectPeriod: 4, // series.effect.period (seconds)
+
+  // === Lines 3D Chart (globe overlay) ===
+  lines3DEffect: true, // series.effect.show
+  lines3DEffectPeriod: 4, // series.effect.period (seconds)
+  lines3DTrailWidth: 4, // series.effect.trailWidth
+  lines3DTrailLength: 0.2, // series.effect.trailLength (0-1)
+  lines3DLineWidth: 3, // series.lineStyle.width
+
+  // === Polygons 3D Chart (globe overlay) ===
+  polygons3DBorderWidth: 1, // series.itemStyle.borderWidth
+  polygons3DBorderColor: '#ffffff', // series.itemStyle.borderColor
+  polygons3DOpacity: 0.8, // series.itemStyle.opacity
 };
 
 // ============================================================
@@ -1555,6 +1617,56 @@ const GLOBE_DATA = [
 ];
 
 /**
+ * Lines 3D data: polyline as [lng, lat] coordinate pairs
+ */
+const LINES_3D_DATA = [
+  [-74.0, 40.7],
+  [-0.12, 51.5],
+  [139.7, 35.7],
+  [151.2, -33.9],
+  [72.9, 19.1],
+  [-46.6, -23.6],
+  [55.3, 25.2],
+  [103.8, 1.35],
+];
+
+/**
+ * Polygons 3D data: grouped polygon vertices [{name, coords: [[lng, lat], ...]}]
+ */
+const POLYGONS_3D_DATA = [
+  {
+    name: 'North America',
+    coords: [
+      [-130, 55],
+      [-70, 55],
+      [-70, 25],
+      [-130, 25],
+      [-130, 55],
+    ],
+  },
+  {
+    name: 'Europe',
+    coords: [
+      [-10, 60],
+      [30, 60],
+      [30, 35],
+      [-10, 35],
+      [-10, 60],
+    ],
+  },
+  {
+    name: 'East Asia',
+    coords: [
+      [100, 50],
+      [145, 50],
+      [145, 20],
+      [100, 20],
+      [100, 50],
+    ],
+  },
+];
+
+/**
  * Scatter GL data: large dataset of 2D points
  */
 const SCATTER_GL_DATA = Array.from({ length: 500 }, () => [
@@ -1697,6 +1809,8 @@ export const DUMMY_CHART_DATA: { [chartType: string]: any } = {
   linesgl: LINES_GL_DATA,
   map3d: MAP_3D_DATA,
   flowgl: FLOW_GL_DATA,
+  lines3d: LINES_3D_DATA,
+  polygons3d: POLYGONS_3D_DATA,
 };
 
 /**
@@ -1779,6 +1893,14 @@ const MAP3D_CHART_TYPES = ['map3d'];
 
 const FLOWGL_CHART_TYPES = ['flowgl'];
 
+const WORLD_MAP_CHART_TYPES = ['world-map'];
+
+const FLOW_LINES_CHART_TYPES = ['flow-lines'];
+
+const LINES3D_CHART_TYPES = ['lines3d'];
+
+const POLYGONS3D_CHART_TYPES = ['polygons3d'];
+
 const NO_AXIS_CHART_TYPES = [
   'pie',
   'pie-advanced',
@@ -1808,6 +1930,10 @@ const NO_AXIS_CHART_TYPES = [
   'line3d',
   'scatter3d',
   'map3d',
+  'world-map',
+  'flow-lines',
+  'lines3d',
+  'polygons3d',
 ];
 
 const NO_GRADIENT_CHART_TYPES = [
@@ -1832,6 +1958,10 @@ const NO_GRADIENT_CHART_TYPES = [
   'line3d',
   'scatter3d',
   'map3d',
+  'world-map',
+  'flow-lines',
+  'lines3d',
+  'polygons3d',
 ];
 
 // Helper functions for chart type checking
@@ -2005,6 +2135,26 @@ export function isFlowGlChartType(chartType: string | null): boolean {
   return FLOWGL_CHART_TYPES.includes(chartType);
 }
 
+export function isWorldMapChartType(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return WORLD_MAP_CHART_TYPES.includes(chartType);
+}
+
+export function isFlowLinesChartType(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return FLOW_LINES_CHART_TYPES.includes(chartType);
+}
+
+export function isLines3dChartType(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return LINES3D_CHART_TYPES.includes(chartType);
+}
+
+export function isPolygons3dChartType(chartType: string | null): boolean {
+  if (!chartType) return false;
+  return POLYGONS3D_CHART_TYPES.includes(chartType);
+}
+
 export function hasAxisLabels(chartType: string | null): boolean {
   if (!chartType) return false;
   return !NO_AXIS_CHART_TYPES.includes(chartType);
@@ -2012,7 +2162,7 @@ export function hasAxisLabels(chartType: string | null): boolean {
 
 export function is3DCoordinateChartType(chartType: string | null): boolean {
   if (!chartType) return false;
-  return ['bar3d', 'line3d', 'scatter3d', 'surface', 'map3d'].includes(
+  return ['bar3d', 'line3d', 'scatter3d', 'surface', 'map3d', 'polygons3d'].includes(
     chartType,
   );
 }
@@ -2078,6 +2228,10 @@ export function supportsLegend(chartType: string | null): boolean {
     'globe',
     'surface',
     'map3d',
+    'world-map',
+    'flow-lines',
+    'lines3d',
+    'polygons3d',
   ];
   return !noLegendTypes.includes(chartType);
 }
@@ -2109,6 +2263,10 @@ export function supportsEmphasis(chartType: string | null): boolean {
     'globe',
     'surface',
     'map3d',
+    'world-map',
+    'flow-lines',
+    'lines3d',
+    'polygons3d',
   ];
   return !noEmphasisTypes.includes(chartType);
 }

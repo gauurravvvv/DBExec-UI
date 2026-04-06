@@ -9,7 +9,6 @@ import { AnalysesRoutingModule } from './analyses-routing.module';
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
-import { AnalysisFilterBarComponent } from './components/analysis-filter-bar/analysis-filter-bar.component';
 import { ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer } from './store';
 
 @NgModule({
@@ -17,7 +16,6 @@ import { ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer } from './store';
     EditAnalysesComponent,
     ViewAnalysesComponent,
     ListAnalysesComponent,
-    AnalysisFilterBarComponent,
   ],
   imports: [
     CommonModule,

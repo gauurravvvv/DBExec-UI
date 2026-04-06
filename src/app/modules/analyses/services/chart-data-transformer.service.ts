@@ -26,6 +26,9 @@ const BUBBLE_CHART_TYPE = 'bubble';
 const BOX_CHART_TYPE = 'box-chart';
 const SANKEY_CHART_TYPE = 'sankey';
 const GRAPH_CHART_TYPE = 'graph';
+const FLOW_LINES_CHART_TYPE = 'flow-lines';
+const LINES3D_CHART_TYPE = 'lines3d';
+const POLYGONS3D_CHART_TYPE = 'polygons3d';
 const THREE_D_CHART_TYPES = ['bar3d', 'line3d', 'scatter3d'];
 
 /**
@@ -88,6 +91,21 @@ export class ChartDataTransformerService {
       // Graph chart uses same 3-field format as sankey
       if (chartType === GRAPH_CHART_TYPE) {
         return this.transformToSankeyFormat(rawData, mapping);
+      }
+
+      // Flow-lines uses sankey source→target→value format
+      if (chartType === FLOW_LINES_CHART_TYPE) {
+        return this.transformToSankeyFormat(rawData, mapping);
+      }
+
+      // Lines 3D: [[lng, lat], ...] coordinate pairs for globe polyline
+      if (chartType === LINES3D_CHART_TYPE) {
+        return this.transformTo3DFormat(rawData, mapping);
+      }
+
+      // Polygons 3D: grouped polygon vertices by name
+      if (chartType === POLYGONS3D_CHART_TYPE) {
+        return this.transformToPolygons3DFormat(rawData, mapping);
       }
 
       // 3D charts need [[x, y, z], ...] coordinate format
@@ -501,6 +519,39 @@ export class ChartDataTransformerService {
   }
 
   /**
+   * Transform data to polygons3D format: [{name, coords: [[lng, lat], ...]}]
+   * Groups rows by xAxisColumn (name) and collects [lng, lat] pairs from y/z columns
+   */
+  private transformToPolygons3DFormat(
+    rawData: any[],
+    mapping: ChartDataMapping,
+  ): any[] {
+    if (!mapping.xAxisColumn || !mapping.yAxisColumn || !mapping.zAxisColumn) {
+      return [];
+    }
+
+    const polyMap = new Map<string, number[][]>();
+
+    rawData.forEach(row => {
+      const name = this.formatLabelValue(row[mapping.xAxisColumn!]);
+      const lng = this.toNumber(row[mapping.yAxisColumn!]);
+      const lat = this.toNumber(row[mapping.zAxisColumn!]);
+
+      if (!isFinite(lng) || !isFinite(lat)) return;
+
+      if (!polyMap.has(name)) {
+        polyMap.set(name, []);
+      }
+      polyMap.get(name)!.push([lng, lat]);
+    });
+
+    return Array.from(polyMap.entries()).map(([name, coords]) => ({
+      name,
+      coords,
+    }));
+  }
+
+  /**
    * Transform data to 3D coordinate format: [[x, y, z], ...]
    * Used for bar3d, line3d, scatter3d chart types
    */
@@ -534,6 +585,7 @@ export class ChartDataTransformerService {
       chartType === BUBBLE_CHART_TYPE ||
       chartType === SANKEY_CHART_TYPE ||
       chartType === GRAPH_CHART_TYPE ||
+      chartType === POLYGONS3D_CHART_TYPE ||
       (!!chartType && THREE_D_CHART_TYPES.includes(chartType))
     );
   }
@@ -559,8 +611,24 @@ export class ChartDataTransformerService {
       return { field1: 'Category', field2: 'Values' };
     }
 
-    if (chartType === SANKEY_CHART_TYPE || chartType === GRAPH_CHART_TYPE) {
+    if (
+      chartType === SANKEY_CHART_TYPE ||
+      chartType === GRAPH_CHART_TYPE ||
+      chartType === FLOW_LINES_CHART_TYPE
+    ) {
       return { field1: 'Source', field2: 'Target', field3: 'Value' };
+    }
+
+    if (chartType === 'world-map') {
+      return { field1: 'Region', field2: 'Value' };
+    }
+
+    if (chartType === LINES3D_CHART_TYPE) {
+      return { field1: 'Longitude', field2: 'Latitude' };
+    }
+
+    if (chartType === POLYGONS3D_CHART_TYPE) {
+      return { field1: 'Name', field2: 'Longitude', field3: 'Latitude' };
     }
 
     if (chartType && THREE_D_CHART_TYPES.includes(chartType)) {

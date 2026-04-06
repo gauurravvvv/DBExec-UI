@@ -185,11 +185,15 @@ export class ViewAnalysesComponent implements OnInit {
     if (!this.publishForm.name?.trim()) return;
 
     const payload = {
+      orgId: this.analysisDetails.organisationId,
       name: this.publishForm.name.trim(),
       description: this.publishForm.description?.trim() || '',
       analysisId: this.analysisDetails.id,
+      analysisName: this.analysisDetails.name,
       datasetId: this.analysisDetails.datasetId,
+      datasetName: this.analysisDetails.dataset?.name || '',
       datasourceId: this.analysisDetails.datasourceId,
+      datasourceName: this.analysisDetails.datasource?.name || '',
     };
 
     this.dashboardService.addDashboard(payload).then(response => {

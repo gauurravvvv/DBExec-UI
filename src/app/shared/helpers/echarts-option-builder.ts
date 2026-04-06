@@ -2442,6 +2442,190 @@ export function buildMap3DChartOption(data: any[], config: any): any {
 // ========= Flow GL Chart =========
 // Renders a vector field as directional arrows on a cartesian grid.
 // Data format: [{ data: [[x, y, vx, vy], ...] }]
+// ========= World Map Chart =========
+// Renders a choropleth world map. Requires 'world' map to be registered via echarts.registerMap().
+// Data format: [{ name: 'Country', value: number }, ...]
+export function buildWorldMapChartOption(data: any[], config: any): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const values = data.map((d: any) => (typeof d.value === 'number' ? d.value : 0));
+  const minVal = config.worldMapVisualMapMin ?? (values.length ? Math.min(...values) : 0);
+  const maxVal = config.worldMapVisualMapMax ?? (values.length ? Math.max(...values) : 100);
+  const colorLow = colors[colors.length - 1] || '#e0f3f8';
+  const colorHigh = colors[0] || '#08589e';
+
+  return {
+    ...buildAnimation(config),
+    tooltip: {
+      show: !config.tooltipDisabled,
+      trigger: 'item',
+      formatter: (params: any) => `${params.name}: ${params.value ?? 'N/A'}`,
+    },
+    visualMap: {
+      min: minVal,
+      max: maxVal,
+      text: ['High', 'Low'],
+      realtime: false,
+      calculable: true,
+      orient: 'vertical',
+      left: 0,
+      bottom: 20,
+      inRange: {
+        color: [colorLow, colorHigh],
+      },
+    },
+    series: [
+      {
+        type: 'map',
+        mapType: 'world',
+        roam: config.worldMapRoam !== false,
+        label: {
+          show: config.worldMapShowLabels || false,
+          fontSize: 10,
+        },
+        emphasis: {
+          label: { show: true },
+          itemStyle: { areaColor: adjustColorOpacity(colorHigh, 0.8) },
+        },
+        itemStyle: {
+          borderColor: '#aaa',
+          borderWidth: 0.5,
+        },
+        data: data,
+      },
+    ],
+  };
+}
+
+// ========= Flow Lines Chart =========
+// Renders animated directional flow lines on a cartesian plane using auto-layout.
+// Sources are placed on the left, targets on the right, mixed nodes in the middle.
+// Data format: nodes: [{ name }], links: [{ source, target, value }]
+export function buildFlowLinesChartOption(
+  nodes: any[],
+  links: any[],
+  config: any,
+): any {
+  const colors = getColors(config.colorScheme || 'default');
+  const primaryColor = colors[0] || '#5470c6';
+
+  // Determine node columns based on connectivity
+  const sourceSet = new Set<string>(links.map((l: any) => String(l.source)));
+  const targetSet = new Set<string>(links.map((l: any) => String(l.target)));
+
+  const leftNodes: string[] = [];
+  const middleNodes: string[] = [];
+  const rightNodes: string[] = [];
+
+  nodes.forEach((n: any) => {
+    const name = String(n.name);
+    const isSource = sourceSet.has(name);
+    const isTarget = targetSet.has(name);
+    if (isSource && !isTarget) leftNodes.push(name);
+    else if (isTarget && !isSource) rightNodes.push(name);
+    else middleNodes.push(name);
+  });
+
+  // Fallback: if all nodes are both source and target, split by appearance order
+  if (leftNodes.length === 0 && rightNodes.length === 0 && middleNodes.length > 0) {
+    const half = Math.ceil(middleNodes.length / 2);
+    leftNodes.push(...middleNodes.splice(0, half));
+    rightNodes.push(...middleNodes);
+    middleNodes.length = 0;
+  }
+
+  // Assign (x, y) positions in [0, 100] coordinate space
+  const nodePos: { [name: string]: [number, number] } = {};
+  const assignY = (names: string[], xVal: number): void => {
+    names.forEach((name, i) => {
+      const y = ((i + 1) / (names.length + 1)) * 100;
+      nodePos[name] = [xVal, y];
+    });
+  };
+  assignY(leftNodes, 10);
+  assignY(middleNodes, 50);
+  assignY(rightNodes, 88);
+
+  // Fallback position for nodes without explicit mapping
+  nodes.forEach((n: any, i: number) => {
+    const name = String(n.name);
+    if (!nodePos[name]) {
+      nodePos[name] = [50, ((i + 1) / (nodes.length + 1)) * 100];
+    }
+  });
+
+  const scatterData = nodes.map((n: any) => {
+    const pos = nodePos[String(n.name)] || [50, 50];
+    return { name: String(n.name), value: [pos[0], pos[1]] };
+  });
+
+  const lineData = links.map((l: any) => {
+    const src = nodePos[String(l.source)] || [10, 50];
+    const tgt = nodePos[String(l.target)] || [88, 50];
+    return {
+      coords: [src, tgt],
+      value: l.value ?? 1,
+    };
+  });
+
+  const maxVal = Math.max(...links.map((l: any) => l.value ?? 1), 1);
+  const showEffect = config.flowLinesEffect !== false;
+
+  return {
+    ...buildAnimation(config),
+    tooltip: {
+      show: !config.tooltipDisabled,
+      formatter: (params: any) => {
+        if (params.seriesType === 'scatter') return String(params.name);
+        const link = links[params.dataIndex];
+        if (link) return `${link.source} → ${link.target}: ${link.value ?? 1}`;
+        return '';
+      },
+    },
+    xAxis: { show: false, min: 0, max: 100 },
+    yAxis: { show: false, min: 0, max: 100 },
+    series: [
+      {
+        type: 'lines',
+        coordinateSystem: 'cartesian2d',
+        data: lineData,
+        polyline: false,
+        lineStyle: {
+          width: (params: any) => {
+            const val = params.data?.value ?? 1;
+            return Math.max(1, Math.min(6, (val / maxVal) * (config.flowLinesWidth ?? 3)));
+          },
+          color: primaryColor,
+          curveness: config.flowLinesCurveness ?? 0.3,
+          opacity: 0.6,
+        },
+        effect: {
+          show: showEffect,
+          period: config.flowLinesEffectPeriod ?? 4,
+          trailLength: 0.7,
+          color: primaryColor,
+          symbolSize: config.flowLinesEffectSymbolSize ?? 4,
+        },
+      },
+      {
+        type: 'scatter',
+        coordinateSystem: 'cartesian2d',
+        data: scatterData,
+        symbolSize: 12,
+        itemStyle: { color: primaryColor, borderColor: '#fff', borderWidth: 2 },
+        label: {
+          show: true,
+          formatter: (params: any) => String(params.name),
+          position: 'right',
+          fontSize: 11,
+          color: 'inherit',
+        },
+        emphasis: { scale: 1.4 },
+        z: 2,
+      },
+    ],
+  };
+}
+
 export function buildFlowGLChartOption(data: any[], config: any): any {
   let vectorData: any[] = [];
   if (data.length > 0 && data[0].data) {
@@ -2529,6 +2713,126 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
           return Math.max(6, (mag / maxMag) * 22);
         },
         itemStyle: { opacity: 0.85 },
+      },
+    ],
+  };
+}
+
+// ========= Lines 3D Chart =========
+export function buildLines3DChartOption(data: any[], config: any): any {
+  // Data format: [[lng, lat], ...] — pairs of geographic coordinates
+  // Each consecutive pair forms a directed arc on the globe
+  const colors = getColors(config.colorScheme);
+  const lineColor = colors[0] || '#00e5ff';
+
+  let segments: { coords: number[][] }[] = [];
+  if (Array.isArray(data) && data.length > 1) {
+    const pts: number[][] = [];
+    if (Array.isArray(data[0])) {
+      data.forEach((pt: number[]) => {
+        if (isFinite(pt[0]) && isFinite(pt[1])) pts.push([pt[0], pt[1]]);
+      });
+    }
+    for (let i = 0; i < pts.length - 1; i++) {
+      segments.push({ coords: [pts[i], pts[i + 1]] });
+    }
+  }
+
+  const showEffect = config.lines3DEffect !== false;
+
+  return {
+    ...buildAnimation(config),
+    globe: {
+      baseColor: config.globeBaseColor || '#1c3561',
+      shading: 'color',
+      viewControl: {
+        autoRotate: config.autoRotate !== false,
+        autoRotateSpeed: config.autoRotateSpeed || 8,
+        distance: 200,
+      },
+      light: {
+        main: { intensity: 1.0, shadow: false },
+        ambient: { intensity: 0.8 },
+      },
+      atmosphere: { show: true },
+    },
+    series: [
+      {
+        type: 'lines3D',
+        coordinateSystem: 'globe',
+        data: segments,
+        lineStyle: {
+          color: lineColor,
+          width: config.lines3DLineWidth ?? 3,
+          opacity: 1.0,
+        },
+        effect: {
+          show: showEffect,
+          period: config.lines3DEffectPeriod ?? 3,
+          trailWidth: config.lines3DTrailWidth ?? 5,
+          trailLength: config.lines3DTrailLength ?? 0.25,
+          trailColor: colors[1] || '#ffffff',
+          trailOpacity: 1.0,
+        },
+      },
+    ],
+  };
+}
+
+// ========= Polygons 3D Chart =========
+// Uses geo3D coordinate system (requires 'polygons3d_world' map to be registered).
+// Data format: [{ name, coords: [[lng, lat], ...] }, ...]
+export function buildPolygons3DChartOption(data: any[], config: any): any {
+  const colors = getColors(config.colorScheme);
+
+  let polygonData: { name: string; coords: number[][] }[] = [];
+  if (Array.isArray(data) && data.length > 0 && data[0]?.coords) {
+    polygonData = data;
+  }
+
+  // Assign each polygon a color from the active color scheme
+  const seriesData = polygonData.map((poly, i) => ({
+    name: poly.name,
+    coords: [poly.coords],
+    itemStyle: {
+      color: colors[i % colors.length],
+      opacity: config.polygons3DOpacity ?? 0.85,
+      borderWidth: config.polygons3DBorderWidth ?? 1,
+      borderColor: config.polygons3DBorderColor || '#ffffff',
+    },
+  }));
+
+  return {
+    ...buildAnimation(config),
+    geo3D: {
+      map: 'polygons3d_world',
+      shading: 'lambert',
+      viewControl: {
+        autoRotate: config.autoRotate !== false,
+        autoRotateSpeed: config.autoRotateSpeed || 4,
+        alpha: 40,
+        beta: 0,
+        distance: 80,
+      },
+      light: {
+        main: { intensity: 1.5, shadow: false },
+        ambient: { intensity: 0.6 },
+      },
+      itemStyle: {
+        color: '#1a2a4a',
+        borderColor: '#3a5a8a',
+        borderWidth: 0.5,
+      },
+      groundPlane: { show: false },
+      boxWidth: 100,
+      boxHeight: 10,
+    },
+    series: [
+      {
+        type: 'polygons3D',
+        coordinateSystem: 'geo3D',
+        multiPolygon: false,
+        data: seriesData,
       },
     ],
   };

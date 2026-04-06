@@ -1,0 +1,95 @@
+.filter-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.filter-control {
+  min-width: 160px;
+  max-width: 240px;
+  width: 200px;
+}
+
+:host ::ng-deep {
+  .filter-control {
+    .p-multiselect {
+      width: 100%;
+
+      .p-multiselect-label {
+        max-height: 36px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.slider-control {
+  min-width: 200px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0.65rem 1.25rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 0.85rem;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-apply {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+    }
+  }
+
+  .btn-clear {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+    &:hover:not(:disabled) {
+      background: var(--hover-background);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+}

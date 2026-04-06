@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AnalysesService } from '../../service/analyses.service';
+import { AnalysesService } from '../../../modules/analyses/service/analyses.service';
 
 @Component({
   selector: 'app-analysis-filter-bar',
@@ -51,7 +51,10 @@ export class AnalysisFilterBarComponent implements OnInit {
           f.id,
         );
         if (res?.status) {
-          this.filterValues[f.id] = res.data || [];
+          this.filterValues[f.id] = (res.data || []).map((v: any) => ({
+            label: String(v),
+            value: String(v),
+          }));
         }
       } catch (err) {
         console.error(`Failed to load values for filter ${f.name}`, err);
@@ -68,7 +71,7 @@ export class AnalysisFilterBarComponent implements OnInit {
       } else if (f.filterType === 'numeric_equality' && config.defaultValue != null) {
         this.appliedValues[f.id] = config.defaultValue;
       } else if (f.filterType === 'numeric_range' && (config.rangeMin != null || config.rangeMax != null)) {
-        this.appliedValues[f.id] = { min: config.rangeMin, max: config.rangeMax };
+        this.appliedValues[f.id] = [config.rangeMin ?? 0, config.rangeMax ?? 100];
       } else if (f.filterType === 'time_equality' && config.defaultValue) {
         this.appliedValues[f.id] = new Date(config.defaultValue);
       } else if (f.filterType === 'time_range') {
@@ -112,7 +115,11 @@ export class AnalysisFilterBarComponent implements OnInit {
           f.filterType === 'numeric_range' ||
           f.filterType === 'numeric_equality'
         ) {
-          if (typeof val === 'object' && val.min !== undefined) {
+          if (Array.isArray(val) && val.length === 2) {
+            base.rangeMin = val[0];
+            base.rangeMax = val[1];
+            base.operator = 'BETWEEN';
+          } else if (typeof val === 'object' && val.min !== undefined) {
             base.rangeMin = val.min;
             base.rangeMax = val.max;
             base.operator = 'BETWEEN';

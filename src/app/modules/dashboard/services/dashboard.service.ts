@@ -38,6 +38,16 @@ export class DashboardService {
       });
   }
 
+  renderDashboard(orgId: string, id: string) {
+    return this.http
+      .get(DASHBOARD.RENDER + `${orgId}/${id}`)
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   deleteDashboard(orgId: string, id: string, justification: string) {
     return this.http
       .request('DELETE', DASHBOARD.DELETE + `${orgId}/${id}`, {

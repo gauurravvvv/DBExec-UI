@@ -1,0 +1,11 @@
+<p-accordion>
+  <p-accordionTab [selected]="expanded">
+    <ng-template pTemplate="header">
+      <div class="accordion-header-content">
+        <i *ngIf="icon" [class]="icon"></i>
+        <span>{{ header }}</span>
+      </div>
+    </ng-template>
+    <ng-content></ng-content>
+  </p-accordionTab>
+</p-accordion>

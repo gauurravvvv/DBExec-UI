@@ -38,6 +38,10 @@ import { ConfigurableScatterGlChartComponent } from './components/configurable-s
 import { ConfigurableLinesGlChartComponent } from './components/configurable-linesgl-chart/configurable-linesgl-chart.component';
 import { ConfigurableMap3dChartComponent } from './components/configurable-map3d-chart/configurable-map3d-chart.component';
 import { ConfigurableFlowGlChartComponent } from './components/configurable-flowgl-chart/configurable-flowgl-chart.component';
+import { ConfigurableWorldMapChartComponent } from './components/configurable-world-map-chart/configurable-world-map-chart.component';
+import { ConfigurableFlowLinesChartComponent } from './components/configurable-flow-lines-chart/configurable-flow-lines-chart.component';
+import { ConfigurableLines3dChartComponent } from './components/configurable-lines3d-chart/configurable-lines3d-chart.component';
+import { ConfigurablePolygons3dChartComponent } from './components/configurable-polygons3d-chart/configurable-polygons3d-chart.component';
 import { CustomCalendarComponent } from './components/custom-calendar/custom-calendar.component';
 import { CustomCheckboxComponent } from './components/custom-checkbox/custom-checkbox.component';
 import { CustomDaterangeComponent } from './components/custom-daterange/custom-daterange.component';
@@ -52,6 +56,8 @@ import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
 import { AddCustomFieldDialogComponent } from '../modules/dataset/components/add-custom-field-dialog/add-custom-field-dialog.component';
 import { SaveAnalysesDialogComponent } from '../modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
+import { AnalysisFilterBarComponent } from './components/analysis-filter-bar/analysis-filter-bar.component';
+import { CustomAccordionComponent } from './components/custom-accordion/custom-accordion.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 
 @NgModule({
@@ -92,6 +98,10 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     ConfigurableLinesGlChartComponent,
     ConfigurableMap3dChartComponent,
     ConfigurableFlowGlChartComponent,
+    ConfigurableWorldMapChartComponent,
+    ConfigurableFlowLinesChartComponent,
+    ConfigurableLines3dChartComponent,
+    ConfigurablePolygons3dChartComponent,
     CustomCalendarComponent,
     CustomCheckboxComponent,
     CustomDaterangeComponent,
@@ -106,6 +116,8 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     GlobalSearchComponent,
     AddCustomFieldDialogComponent,
     SaveAnalysesDialogComponent,
+    AnalysisFilterBarComponent,
+    CustomAccordionComponent,
   ],
   imports: [
     CommonModule,
@@ -157,6 +169,10 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     ConfigurableLinesGlChartComponent,
     ConfigurableMap3dChartComponent,
     ConfigurableFlowGlChartComponent,
+    ConfigurableWorldMapChartComponent,
+    ConfigurableFlowLinesChartComponent,
+    ConfigurableLines3dChartComponent,
+    ConfigurablePolygons3dChartComponent,
     CustomCalendarComponent,
     CustomCheckboxComponent,
     CustomDaterangeComponent,
@@ -171,6 +187,8 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     GlobalSearchComponent,
     AddCustomFieldDialogComponent,
     SaveAnalysesDialogComponent,
+    AnalysisFilterBarComponent,
+    CustomAccordionComponent,
   ],
 })
 export class SharedModule {}

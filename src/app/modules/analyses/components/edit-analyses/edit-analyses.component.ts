@@ -17,6 +17,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import {
   CHART_TYPES,
+  getDummyData,
   COLOR_SCHEMES,
   LEGEND_POSITIONS,
   LEGEND_TYPES,
@@ -92,6 +93,10 @@ import {
   isLinesGlChartType,
   isMap3dChartType,
   isFlowGlChartType,
+  isWorldMapChartType,
+  isFlowLinesChartType,
+  isLines3dChartType,
+  isPolygons3dChartType,
   supportsGradient,
   supportsDataLabel,
   supportsLegend,
@@ -1806,6 +1811,12 @@ export class EditAnalysesComponent
     return this.getFocusedVisual() || this._placeholderVisual;
   }
 
+  get focusedVisualMappedFieldCount(): number {
+    const v = this.getFocusedVisual();
+    if (!v) return 0;
+    return [v.xAxisColumn, v.yAxisColumn, v.zAxisColumn].filter(Boolean).length;
+  }
+
   get canSave(): boolean {
     return this.visuals.some(v => v.chartType !== null);
   }
@@ -1851,6 +1862,16 @@ export class EditAnalysesComponent
         chart.description.toLowerCase().includes(query) ||
         chart.category.toLowerCase().includes(query),
     );
+  }
+
+  getVisualChartIcon(chartType: string | null | undefined): string {
+    if (!chartType) return 'pi pi-chart-bar';
+    return CHART_TYPES.find(c => c.id === chartType)?.icon ?? 'pi pi-chart-bar';
+  }
+
+  getVisualChartLabel(chartType: string | null | undefined): string {
+    if (!chartType) return 'No chart selected';
+    return CHART_TYPES.find(c => c.id === chartType)?.name ?? chartType;
   }
 
   // Wrapper methods for chart type checking
@@ -1990,6 +2011,34 @@ export class EditAnalysesComponent
     return isFlowGlChartType(chartType ?? null);
   }
 
+  isWorldMapChartType(chartType: string | null | undefined): boolean {
+    return isWorldMapChartType(chartType ?? null);
+  }
+
+  isFlowLinesChartType(chartType: string | null | undefined): boolean {
+    return isFlowLinesChartType(chartType ?? null);
+  }
+
+  isLines3dChartType(chartType: string | null | undefined): boolean {
+    return isLines3dChartType(chartType ?? null);
+  }
+
+  isPolygons3dChartType(chartType: string | null | undefined): boolean {
+    return isPolygons3dChartType(chartType ?? null);
+  }
+
+  /**
+   * Returns real chart data when available, otherwise falls back to
+   * the built-in dummy dataset for the given chart type.
+   * Used by charts that should show a live preview before fields are mapped.
+   */
+  getDisplayData(visual: any): any {
+    if (visual?.chartData?.length) {
+      return visual.chartData;
+    }
+    return getDummyData(visual?.chartType);
+  }
+
   hasAxisLabels(chartType: string | null | undefined): boolean {
     return hasAxisLabels(chartType ?? null);
   }
@@ -2035,6 +2084,10 @@ export class EditAnalysesComponent
     // 3D coordinate charts need x + y + z
     if (is3DCoordinateChartType(visual.chartType)) {
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
+    }
+    // lines3d needs longitude AND latitude (x + y), even though it has no axis labels
+    if (isLines3dChartType(visual.chartType)) {
+      return !!(visual.xAxisColumn && visual.yAxisColumn);
     }
     // No-axis charts only need at least one field
     if (!hasAxisLabels(visual.chartType)) {
