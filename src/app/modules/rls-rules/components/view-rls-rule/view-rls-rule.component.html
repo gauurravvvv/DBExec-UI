@@ -1,0 +1,117 @@
+<div class="view-category-wrapper">
+  <div class="view-category-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>RLS Rule Details</h2>
+      </div>
+      <div class="header-actions">
+        <button class="btn-primary" (click)="onEdit()">
+          <i class="pi pi-pencil"></i> Edit
+        </button>
+        <button class="btn-danger" type="button" (click)="confirmDelete()">
+          <i class="pi pi-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+
+    <div class="content-section" *ngIf="ruleData">
+      <div class="details-grid">
+        <!-- Basic Information -->
+        <div class="info-section">
+          <h3><i class="pi pi-info-circle mr-2"></i> Basic Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Rule Name</label>
+              <p>{{ ruleData.name }}</p>
+            </div>
+            <div class="info-item">
+              <label>Description</label>
+              <p>{{ ruleData.description || 'No description available' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Dataset</label>
+              <p class="with-icon"><i class="pi pi-table mr-2"></i>{{ ruleData.datasetName || 'N/A' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Status</label>
+              <span class="status-badge" [class.active]="ruleData.isEnabled">
+                <i class="pi" [ngClass]="ruleData.isEnabled ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                {{ ruleData.isEnabled ? 'Enabled' : 'Disabled' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Created On</label>
+              <p class="with-icon"><i class="pi pi-calendar mr-2"></i>{{ ruleData.createdOn | date: 'medium' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule Configuration -->
+        <div class="info-section">
+          <h3><i class="pi pi-shield mr-2"></i> Rule Configuration</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Scope</label>
+              <p><i class="pi mr-2" [ngClass]="ruleData.scope === 'user' ? 'pi-user' : 'pi-users'"></i>{{ ruleData.scope === 'user' ? 'User' : 'Group' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Applies To</label>
+              <p>{{ ruleData.scopeName || 'N/A' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Column Name</label>
+              <p class="with-icon"><i class="pi pi-filter mr-2"></i>{{ ruleData.columnName }}</p>
+            </div>
+            <div class="info-item">
+              <label>Operator</label>
+              <p>{{ ruleData.operator }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Values -->
+        <div class="info-section">
+          <h3><i class="pi pi-list mr-2"></i> Allowed Values <span class="count-badge">{{ ruleData.values?.length || 0 }}</span></h3>
+          <div class="fields-list">
+            <div class="field-item" *ngFor="let val of ruleData.values">
+              <i class="pi pi-check"></i> {{ val }}
+            </div>
+            <div *ngIf="!ruleData.values || ruleData.values.length === 0" class="no-data">
+              No values defined
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation -->
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon"><i class="pi pi-trash"></i></div>
+      <h3>Confirm Delete</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">Are you sure you want to delete this RLS rule?</p>
+      <ul class="delete-info-list">
+        <li><i class="pi pi-info-circle"></i><span>This will permanently remove the rule</span></li>
+        <li><i class="pi pi-info-circle"></i><span>Users/groups will no longer be restricted by this rule</span></li>
+        <li><i class="pi pi-info-circle"></i><span>This action cannot be undone</span></li>
+      </ul>
+      <div class="justification-section">
+        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <textarea id="deleteJustification" [(ngModel)]="deleteJustification" placeholder="Provide a reason for this action" rows="3" maxlength="500"></textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()"><i class="pi pi-times"></i> Cancel</button>
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()"><i class="pi pi-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
