@@ -1,0 +1,225 @@
+.add-admin-wrapper {
+  height: 100%;
+
+  .add-admin-container {
+    background: var(--card-background);
+    border-radius: 8px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      position: sticky;
+      top: 0;
+      background: var(--card-background);
+      z-index: 1;
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .back-button {
+          padding: 0 !important;
+          width: 36px;
+          height: 36px;
+          border-radius: 50% !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent !important;
+          color: var(--text-color) !important;
+          min-width: 0;
+          border: none !important;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: var(--hover-background) !important;
+          }
+
+          i {
+            font-size: 1.1rem;
+          }
+        }
+
+        h2 {
+          margin: 0;
+          font-size: 24px;
+          font-weight: 600;
+          color: var(--text-color);
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+
+        .btn-cancel {
+          background: var(--card-background) !important;
+          border: 1px solid var(--border-color) !important;
+          color: var(--text-color) !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: 6px !important;
+          font-weight: 600;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+          &:hover:not(:disabled) {
+            background: var(--hover-background) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        .btn-save {
+          background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+          color: white !important;
+          border: none !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: 6px !important;
+          font-weight: 600;
+          box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+          transition: all 0.2s ease;
+
+          &:hover:not(:disabled) {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--secondary-color) !important;
+            box-shadow: none;
+          }
+
+          i {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+
+    .admin-form {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+      display: flex;
+      justify-content: left;
+
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+
+        &:hover {
+          background: var(--secondary-color);
+        }
+      }
+
+      // For Firefox
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        width: 50%;
+        align-content: flex-start;
+
+        @media (max-width: 992px) {
+          width: 75%;
+        }
+
+        @media (max-width: 768px) {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .add-admin-wrapper {
+    padding: 10px;
+
+    .add-admin-container {
+      padding: 15px;
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+
+        .action-buttons {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    }
+  }
+}
+
+// Override PrimeNG button styles
+:host ::ng-deep {
+  .p-button {
+    &.p-button-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-color) !important;
+      padding: 0.5rem !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        color: var(--text-color) !important;
+      }
+    }
+
+    &.p-button-outlined {
+      background: transparent !important;
+      border: 1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+
+      &:hover:not(:disabled) {
+        background: rgba(var(--primary-rgb), 0.04) !important;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      &.p-button-danger {
+        border-color: var(--error-color) !important;
+        color: var(--error-color) !important;
+
+        &:hover:not(:disabled) {
+          background: rgba(var(--error-rgb), 0.04) !important;
+        }
+      }
+    }
+  }
+}
