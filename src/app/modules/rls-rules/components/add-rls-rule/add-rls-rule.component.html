@@ -1,0 +1,61 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" routerLink="/app/rls-rules">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Add RLS Rule</h2>
+      </div>
+      <div class="action-buttons">
+        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" (click)="onCancel()"></button>
+        <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()" [disabled]="rlsForm.invalid">
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="rlsForm" class="admin-form">
+      <div class="form-grid">
+        <app-custom-input formControlName="name" label="Rule Name" placeholder="Enter rule name" [required]="true"
+          [showError]="!!(rlsForm.get('name')?.invalid && rlsForm.get('name')?.touched)" [errorMessage]="getNameError()">
+        </app-custom-input>
+
+        <app-custom-input formControlName="description" label="Description" placeholder="Enter description" inputMode="textarea" [rows]="3">
+        </app-custom-input>
+
+        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation" placeholder="Select Organisation"
+          [options]="organisations" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
+          [showError]="!!(rlsForm.get('organisation')?.invalid && rlsForm.get('organisation')?.touched)" errorMessage="Organisation is required">
+        </app-custom-dropdown>
+
+        <app-custom-dropdown formControlName="datasetId" label="Dataset" placeholder="Select Dataset"
+          [options]="datasets" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
+          [showError]="!!(rlsForm.get('datasetId')?.invalid && rlsForm.get('datasetId')?.touched)" errorMessage="Dataset is required">
+        </app-custom-dropdown>
+
+        <app-custom-dropdown formControlName="scope" label="Scope" placeholder="Select Scope"
+          [options]="scopeOptions" optionLabel="label" optionValue="value" [required]="true"
+          [showError]="!!(rlsForm.get('scope')?.invalid && rlsForm.get('scope')?.touched)" errorMessage="Scope is required">
+        </app-custom-dropdown>
+
+        <app-custom-dropdown formControlName="scopeId" label="Applies To" [placeholder]="rlsForm.get('scope')?.value === 'user' ? 'Select User' : 'Select Group'"
+          [options]="scopeTargets" optionLabel="label" optionValue="value" [filter]="true" [required]="true"
+          [showError]="!!(rlsForm.get('scopeId')?.invalid && rlsForm.get('scopeId')?.touched)" errorMessage="Selection is required">
+        </app-custom-dropdown>
+
+        <app-custom-input formControlName="columnName" label="Column Name" placeholder="Enter column name" [required]="true"
+          [showError]="!!(rlsForm.get('columnName')?.invalid && rlsForm.get('columnName')?.touched)" errorMessage="Column name is required">
+        </app-custom-input>
+
+        <app-custom-dropdown formControlName="operator" label="Operator" placeholder="Select Operator"
+          [options]="operatorOptions" optionLabel="label" optionValue="value" [required]="true">
+        </app-custom-dropdown>
+
+        <app-custom-input formControlName="values" label="Values" placeholder="Enter comma-separated values (e.g., US, UK, IN)" [required]="true"
+          [showError]="!!(rlsForm.get('values')?.invalid && rlsForm.get('values')?.touched)" errorMessage="At least one value is required">
+        </app-custom-input>
+      </div>
+    </form>
+  </div>
+</div>
