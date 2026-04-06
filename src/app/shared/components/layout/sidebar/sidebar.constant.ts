@@ -28,6 +28,10 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/access',
   },
   {
+    value: 'rlsRules',
+    route: '/app/rls-rules',
+  },
+  {
     value: 'userMapper',
     route: '/home/users',
   },

@@ -129,3 +129,10 @@ export const DASHBOARD = {
   LIST: '/app/dashboard',
   VIEW: '/app/dashboard/view',
 };
+
+export const RLS_RULE = {
+  ADD: '/app/rls-rules/add',
+  LIST: '/app/rls-rules',
+  EDIT: '/app/rls-rules/edit',
+  VIEW: '/app/rls-rules/view',
+};

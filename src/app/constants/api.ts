@@ -251,3 +251,11 @@ export const DASHBOARD = {
   LIST: '/dashboard/list',
   DELETE: '/dashboard/delete/',
 };
+
+export const RLS_RULE = {
+  ADD: '/rls-rule/add',
+  UPDATE: '/rls-rule/update',
+  DELETE: '/rls-rule/delete/',
+  LIST: '/rls-rule/list/',
+  VIEW: '/rls-rule/get/',
+};
