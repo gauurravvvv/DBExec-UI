@@ -83,7 +83,8 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   }
 
   onSubmit() {
-    const justificationValid = !this.showJustification || this.saveJustification.trim();
+    const justificationValid =
+      !this.showJustification || this.saveJustification.trim();
     if (this.analysisForm.valid && justificationValid) {
       const formData: AnalysisFormData = {
         name: this.analysisForm.get('name')?.value.trim(),

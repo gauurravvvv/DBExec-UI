@@ -54,7 +54,10 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
 
       const justificationControl = this.datasetForm.get('justification');
       if (this.showJustification) {
-        justificationControl?.setValidators([Validators.required, Validators.maxLength(500)]);
+        justificationControl?.setValidators([
+          Validators.required,
+          Validators.maxLength(500),
+        ]);
       } else {
         justificationControl?.clearValidators();
       }
@@ -97,7 +100,9 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         description: this.datasetForm.get('description')?.value.trim(),
       };
       if (this.showJustification) {
-        formData.justification = this.datasetForm.get('justification')?.value.trim();
+        formData.justification = this.datasetForm
+          .get('justification')
+          ?.value.trim();
       }
       this.close.emit(formData);
       this.datasetForm.reset();

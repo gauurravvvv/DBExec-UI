@@ -2162,9 +2162,14 @@ export function hasAxisLabels(chartType: string | null): boolean {
 
 export function is3DCoordinateChartType(chartType: string | null): boolean {
   if (!chartType) return false;
-  return ['bar3d', 'line3d', 'scatter3d', 'surface', 'map3d', 'polygons3d'].includes(
-    chartType,
-  );
+  return [
+    'bar3d',
+    'line3d',
+    'scatter3d',
+    'surface',
+    'map3d',
+    'polygons3d',
+  ].includes(chartType);
 }
 
 export function supportsGradient(chartType: string | null): boolean {

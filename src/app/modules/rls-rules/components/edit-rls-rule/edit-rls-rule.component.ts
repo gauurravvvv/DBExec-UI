@@ -63,7 +63,14 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   initForm(): void {
     this.rlsForm = this.fb.group({
       id: [''],
-      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+        ],
+      ],
       description: [''],
       organisation: ['', Validators.required],
       datasetId: ['', Validators.required],
@@ -92,33 +99,37 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadRuleData(): void {
-    this.rlsRulesService.viewRule(this.orgId, this.ruleId).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        const rule = response.data;
-        this.datasetName = rule.datasetName || '';
+    this.rlsRulesService
+      .viewRule(this.orgId, this.ruleId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const rule = response.data;
+          this.datasetName = rule.datasetName || '';
 
-        // Load scope targets before patching form
-        this.loadScopeTargetsForScope(rule.scope, () => {
-          this.rlsForm.patchValue({
-            id: rule.id,
-            name: rule.name,
-            description: rule.description || '',
-            organisation: rule.organisationId,
-            datasetId: rule.datasetId,
-            scope: rule.scope,
-            scopeId: rule.scopeId,
-            columnName: rule.columnName,
-            operator: rule.operator,
-            values: Array.isArray(rule.values) ? rule.values.join(', ') : rule.values || '',
-            isEnabled: rule.isEnabled,
+          // Load scope targets before patching form
+          this.loadScopeTargetsForScope(rule.scope, () => {
+            this.rlsForm.patchValue({
+              id: rule.id,
+              name: rule.name,
+              description: rule.description || '',
+              organisation: rule.organisationId,
+              datasetId: rule.datasetId,
+              scope: rule.scope,
+              scopeId: rule.scopeId,
+              columnName: rule.columnName,
+              operator: rule.operator,
+              values: Array.isArray(rule.values)
+                ? rule.values.join(', ')
+                : rule.values || '',
+              isEnabled: rule.isEnabled,
+            });
+
+            this.originalFormValue = this.rlsForm.value;
+            this.isFormDirty = false;
+            this.rlsForm.markAsPristine();
           });
-
-          this.originalFormValue = this.rlsForm.value;
-          this.isFormDirty = false;
-          this.rlsForm.markAsPristine();
-        });
-      }
-    });
+        }
+      });
   }
 
   loadScopeTargets(): void {
@@ -158,7 +169,8 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   checkFormDirty(): void {
     if (!this.originalFormValue) return;
     const currentValue = this.rlsForm.value;
-    this.isFormDirty = JSON.stringify(this.originalFormValue) !== JSON.stringify(currentValue);
+    this.isFormDirty =
+      JSON.stringify(this.originalFormValue) !== JSON.stringify(currentValue);
   }
 
   onSubmit(): void {
@@ -177,9 +189,13 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       const formVal = this.rlsForm.value;
       const payload = {
         ...formVal,
-        values: typeof formVal.values === 'string'
-          ? formVal.values.split(',').map((v: string) => v.trim()).filter((v: string) => v)
-          : formVal.values,
+        values:
+          typeof formVal.values === 'string'
+            ? formVal.values
+                .split(',')
+                .map((v: string) => v.trim())
+                .filter((v: string) => v)
+            : formVal.values,
         justification: this.saveJustification.trim(),
       };
 
@@ -208,8 +224,10 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   getNameError(): string {
     const control = this.rlsForm.get('name');
     if (control?.errors?.['required']) return 'Rule name is required';
-    if (control?.errors?.['minlength']) return `Name must be at least ${control.errors['minlength'].requiredLength} characters`;
-    if (control?.errors?.['maxlength']) return `Name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['minlength'])
+      return `Name must be at least ${control.errors['minlength'].requiredLength} characters`;
+    if (control?.errors?.['maxlength'])
+      return `Name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     return '';
   }
 }

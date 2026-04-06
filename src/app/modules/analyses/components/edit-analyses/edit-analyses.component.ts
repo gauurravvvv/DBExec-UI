@@ -1254,7 +1254,10 @@ export class EditAnalysesComponent
     this.filterDialogPlaceholder = config.placeholder || '';
     this.filterDialogIncludeTime = config.includeTime || false;
     this.filterDialogDateFormat = config.dateFormat || 'yy-mm-dd';
-    this.filterDialogDefaultValue = this.extractDefaultValue(config, filter.filterType);
+    this.filterDialogDefaultValue = this.extractDefaultValue(
+      config,
+      filter.filterType,
+    );
 
     this.updateControlTypeOptions();
     this.updateOperatorOptions();
@@ -1273,7 +1276,10 @@ export class EditAnalysesComponent
     if (this.isDeletingFilter) return; // prevent double-click
     this.isDeletingFilter = filter.tempId;
     try {
-      const res: any = await this.analysesService.deleteFilter(this.orgId, filter.tempId);
+      const res: any = await this.analysesService.deleteFilter(
+        this.orgId,
+        filter.tempId,
+      );
       if (this.globalService.handleSuccessService(res, true)) {
         await this.loadExistingFilters();
       }
@@ -1298,8 +1304,10 @@ export class EditAnalysesComponent
     if (this.filterDialogType === 'numeric_range') {
       const val = this.filterDialogDefaultValue;
       if (
-        val?.min !== null && val?.min !== undefined &&
-        val?.max !== null && val?.max !== undefined &&
+        val?.min !== null &&
+        val?.min !== undefined &&
+        val?.max !== null &&
+        val?.max !== undefined &&
         Number(val.min) > Number(val.max)
       ) {
         this.globalService.handleErrorService({
@@ -1314,7 +1322,9 @@ export class EditAnalysesComponent
     if (this.filterDialogType === 'time_range') {
       const val = this.filterDialogDefaultValue;
       if (
-        Array.isArray(val) && val[0] instanceof Date && val[1] instanceof Date &&
+        Array.isArray(val) &&
+        val[0] instanceof Date &&
+        val[1] instanceof Date &&
         val[0].getTime() > val[1].getTime()
       ) {
         this.globalService.handleErrorService({
@@ -1338,7 +1348,10 @@ export class EditAnalysesComponent
     if (this.filterDialogPlaceholder) {
       config.placeholder = this.filterDialogPlaceholder;
     }
-    if (this.filterDialogType === 'time_equality' || this.filterDialogType === 'time_range') {
+    if (
+      this.filterDialogType === 'time_equality' ||
+      this.filterDialogType === 'time_range'
+    ) {
       config.includeTime = this.filterDialogIncludeTime;
       config.dateFormat = this.filterDialogDateFormat;
     }
@@ -1430,7 +1443,9 @@ export class EditAnalysesComponent
     }
 
     // Reset time-specific fields when switching away from time types
-    const isTimeType = this.filterDialogType === 'time_equality' || this.filterDialogType === 'time_range';
+    const isTimeType =
+      this.filterDialogType === 'time_equality' ||
+      this.filterDialogType === 'time_range';
     if (!isTimeType) {
       this.filterDialogIncludeTime = false;
       this.filterDialogDateFormat = 'yy-mm-dd';
@@ -1467,8 +1482,8 @@ export class EditAnalysesComponent
     if (val instanceof Date) {
       this.filterDialogDefaultValue = new Date(val.getTime());
     } else if (Array.isArray(val)) {
-      this.filterDialogDefaultValue = val.map(
-        (d: Date | null) => (d instanceof Date ? new Date(d.getTime()) : d),
+      this.filterDialogDefaultValue = val.map((d: Date | null) =>
+        d instanceof Date ? new Date(d.getTime()) : d,
       );
     }
   }
@@ -1481,12 +1496,15 @@ export class EditAnalysesComponent
       // Switching to "Date Only" — strip time component
       if (val instanceof Date) {
         this.filterDialogDefaultValue = new Date(
-          val.getFullYear(), val.getMonth(), val.getDate(),
+          val.getFullYear(),
+          val.getMonth(),
+          val.getDate(),
         );
       } else if (Array.isArray(val)) {
-        this.filterDialogDefaultValue = val.map(
-          (d: Date | null) =>
-            d instanceof Date ? new Date(d.getFullYear(), d.getMonth(), d.getDate()) : d,
+        this.filterDialogDefaultValue = val.map((d: Date | null) =>
+          d instanceof Date
+            ? new Date(d.getFullYear(), d.getMonth(), d.getDate())
+            : d,
         );
       }
     } else {
@@ -1666,7 +1684,9 @@ export class EditAnalysesComponent
     const parts: string[] = [];
     const config = filter.config || {};
     if (config.matchOperator) {
-      parts.push(this.getOperatorLabel(filter.filterType, config.matchOperator));
+      parts.push(
+        this.getOperatorLabel(filter.filterType, config.matchOperator),
+      );
     }
     if (filter.nullOption && filter.nullOption !== 'ALL_VALUES') {
       parts.push(this.getNullOptionLabel(filter.nullOption));
@@ -1682,7 +1702,9 @@ export class EditAnalysesComponent
       }
     }
     if (config.rangeMin !== undefined || config.rangeMax !== undefined) {
-      parts.push(`Range: ${config.rangeMin ?? '...'} - ${config.rangeMax ?? '...'}`);
+      parts.push(
+        `Range: ${config.rangeMin ?? '...'} - ${config.rangeMax ?? '...'}`,
+      );
     }
     if (config.dateRangeStart || config.dateRangeEnd) {
       parts.push('Date range set');

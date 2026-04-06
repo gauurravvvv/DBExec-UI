@@ -64,7 +64,9 @@ import {
   templateUrl: './view-dashboard.component.html',
   styleUrls: ['./view-dashboard.component.scss'],
 })
-export class ViewDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ViewDashboardComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   orgId = '';
   dashboardId = '';
   dashboard: any = null;

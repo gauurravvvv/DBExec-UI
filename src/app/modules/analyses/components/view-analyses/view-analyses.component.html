@@ -148,7 +148,7 @@
             <h3>
               <i class="pi pi-sliders-h mr-2"></i>
               Analysis Fields
-              <span class="count-badge">{{ analysisFields?.length || 0 }}</span>
+              <span class="count-badge">{{ analysisFields.length || 0 }}</span>
             </h3>
             <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
               <i class="pi pi-plus"></i>
@@ -201,7 +201,7 @@
           <h3>
             <i class="pi pi-chart-bar mr-2"></i>
             Visuals
-            <span class="count-badge">{{ visuals?.length || 0 }}</span>
+            <span class="count-badge">{{ visuals.length || 0 }}</span>
           </h3>
           <div class="fields-list">
             <div class="field-item" *ngFor="let visual of visuals">
@@ -288,7 +288,7 @@
       <button
         class="btn-confirm btn-publish-confirm"
         (click)="proceedPublish()"
-        [disabled]="!publishForm.name?.trim()"
+        [disabled]="!publishForm.name.trim()"
       >
         <i class="pi pi-send"></i>
         Publish

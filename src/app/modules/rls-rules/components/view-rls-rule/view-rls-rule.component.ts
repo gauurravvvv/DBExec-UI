@@ -30,11 +30,13 @@ export class ViewRlsRuleComponent implements OnInit {
   }
 
   loadRuleDetails() {
-    this.rlsRulesService.viewRule(this.orgId, this.ruleId).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.ruleData = response.data;
-      }
-    });
+    this.rlsRulesService
+      .viewRule(this.orgId, this.ruleId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.ruleData = response.data;
+        }
+      });
   }
 
   onEdit() {
@@ -57,7 +59,11 @@ export class ViewRlsRuleComponent implements OnInit {
   proceedDelete(): void {
     if (this.ruleData && this.deleteJustification.trim()) {
       this.rlsRulesService
-        .deleteRule(this.orgId, this.ruleData.id, this.deleteJustification.trim())
+        .deleteRule(
+          this.orgId,
+          this.ruleData.id,
+          this.deleteJustification.trim(),
+        )
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             this.showDeleteConfirm = false;

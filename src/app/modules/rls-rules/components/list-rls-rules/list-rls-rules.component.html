@@ -187,13 +187,13 @@
                 }}</span>
               </td>
               <td>
-                <span class="description-text">{{
-                  rule.operator || '-'
-                }}</span>
+                <span class="description-text">{{ rule.operator || '-' }}</span>
               </td>
               <td>
                 <span class="pill" *ngIf="rule.values?.length">
-                  {{ rule.values.length }} value{{ rule.values.length !== 1 ? 's' : '' }}
+                  {{ rule.values.length }} value{{
+                    rule.values.length !== 1 ? 's' : ''
+                  }}
                 </span>
                 <span *ngIf="!rule.values?.length">-</span>
               </td>
@@ -242,8 +242,12 @@
           <ng-template pTemplate="emptymessage">
             <tr>
               <td colspan="7" class="empty-message-cell text-center">
-                <span *ngIf="!selectedDatasetId">Please select a dataset to view RLS rules</span>
-                <span *ngIf="selectedDatasetId">No RLS rules found for this dataset</span>
+                <span *ngIf="!selectedDatasetId"
+                  >Please select a dataset to view RLS rules</span
+                >
+                <span *ngIf="selectedDatasetId"
+                  >No RLS rules found for this dataset</span
+                >
               </td>
             </tr>
           </ng-template>
@@ -274,7 +278,10 @@
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Affected users/groups will have unrestricted access to this data</span>
+          <span
+            >Affected users/groups will have unrestricted access to this
+            data</span
+          >
         </li>
         <li>
           <i class="pi pi-info-circle"></i>

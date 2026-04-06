@@ -107,7 +107,8 @@ $radius-sm: 8px;
             &:focus {
               outline: none;
               border-color: var(--primary-color);
-              box-shadow: 0 0 0 1px var(--primary-color-transparent, rgba(33, 150, 243, 0.2));
+              box-shadow: 0 0 0 1px
+                var(--primary-color-transparent, rgba(33, 150, 243, 0.2));
             }
 
             &::placeholder {
