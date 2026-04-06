@@ -95,6 +95,15 @@ const routes: Routes = [
         data: { roles: ['ORG-ADMIN'], title: 'Groups' },
       },
       {
+        path: 'rls-rules',
+        loadChildren: () =>
+          import('./modules/rls-rules/rls-rules.module').then(
+            m => m.RlsRulesModule,
+          ),
+        canActivate: [RoleGuard],
+        data: { roles: ['ORG-ADMIN'], title: 'RLS Rules' },
+      },
+      {
         path: 'access',
         loadChildren: () =>
           import('./modules/access/access.module').then(m => m.AccessModule),
