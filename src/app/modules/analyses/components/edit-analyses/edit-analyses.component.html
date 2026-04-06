@@ -99,7 +99,7 @@
         </div>
         <div *ngSwitchCase="'loaded'" class="status-loaded">
           <i class="pi pi-check-circle"></i>
-          <span>{{ rawGraphData?.length || 0 }} rows loaded</span>
+          <span>{{ rawGraphData.length || 0 }} rows loaded</span>
         </div>
         <div *ngSwitchCase="'error'" class="status-error">
           <i class="pi pi-exclamation-circle"></i>
@@ -151,7 +151,9 @@
               </div>
               <div class="visual-info">
                 <div class="visual-name">{{ visual.title }}</div>
-                <div class="visual-type-label">{{ getVisualChartLabel(visual.chartType) }}</div>
+                <div class="visual-type-label">
+                  {{ getVisualChartLabel(visual.chartType) }}
+                </div>
               </div>
             </div>
           </div>
@@ -318,9 +320,9 @@
         <div class="sidebar-header-info">
           <div class="dataset-label">
             {{
-              focusedVisualId && !focusedVisual?.chartType
+              focusedVisualId && !focusedVisual.chartType
                 ? 'Chart Type'
-                : focusedVisualId && focusedVisual?.chartType
+                : focusedVisualId && focusedVisual.chartType
                   ? 'Field Mapping'
                   : 'Charts'
             }}
@@ -370,7 +372,7 @@
                   <div
                     class="chart-type-card"
                     *ngFor="let chartType of getChartsByCategory(category)"
-                    [class.selected]="focusedVisual?.chartType === chartType.id"
+                    [class.selected]="focusedVisual.chartType === chartType.id"
                     (click)="setVisualChartType(chartType)"
                     [pTooltip]="chartType.description"
                     tooltipPosition="bottom"
@@ -586,9 +588,13 @@
                 [class.has-value]="focusedVisual.xAxisColumn"
                 (click)="startAxisSelection('x')"
               >
-                <div class="axis-label">{{
-                  isPolygons3dChartType(focusedVisual.chartType) ? 'Name' : 'X-Axis'
-                }}</div>
+                <div class="axis-label">
+                  {{
+                    isPolygons3dChartType(focusedVisual.chartType)
+                      ? 'Name'
+                      : 'X-Axis'
+                  }}
+                </div>
                 <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
                   <span>{{
                     getFieldDisplayName(focusedVisual.xAxisColumn)
@@ -613,9 +619,13 @@
                 [class.has-value]="focusedVisual.yAxisColumn"
                 (click)="startAxisSelection('y')"
               >
-                <div class="axis-label">{{
-                  isPolygons3dChartType(focusedVisual.chartType) ? 'Longitude' : 'Y-Axis'
-                }}</div>
+                <div class="axis-label">
+                  {{
+                    isPolygons3dChartType(focusedVisual.chartType)
+                      ? 'Longitude'
+                      : 'Y-Axis'
+                  }}
+                </div>
                 <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
                   <span>{{
                     getFieldDisplayName(focusedVisual.yAxisColumn)
@@ -640,9 +650,13 @@
                 [class.has-value]="focusedVisual.zAxisColumn"
                 (click)="startAxisSelection('z')"
               >
-                <div class="axis-label">{{
-                  isPolygons3dChartType(focusedVisual.chartType) ? 'Latitude' : 'Z-Axis'
-                }}</div>
+                <div class="axis-label">
+                  {{
+                    isPolygons3dChartType(focusedVisual.chartType)
+                      ? 'Latitude'
+                      : 'Z-Axis'
+                  }}
+                </div>
                 <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
                   <span>{{
                     getFieldDisplayName(focusedVisual.zAxisColumn)
@@ -897,9 +911,17 @@
                     tooltipPosition="top"
                   ></i>
                   <i
-                    [class]="isDeletingFilter === filter.tempId ? 'pi pi-spin pi-spinner' : 'pi pi-trash'"
+                    [class]="
+                      isDeletingFilter === filter.tempId
+                        ? 'pi pi-spin pi-spinner'
+                        : 'pi pi-trash'
+                    "
                     (click)="removeFilter(filter)"
-                    [pTooltip]="isDeletingFilter === filter.tempId ? 'Deleting...' : 'Remove'"
+                    [pTooltip]="
+                      isDeletingFilter === filter.tempId
+                        ? 'Deleting...'
+                        : 'Remove'
+                    "
                     tooltipPosition="top"
                     [style.pointer-events]="isDeletingFilter ? 'none' : 'auto'"
                   ></i>
@@ -1041,12 +1063,21 @@
             [(ngModel)]="filterDialogDefaultValue"
             label="Default Values"
             optionValue="value"
-            placeholder="{{ isLoadingFilterValues ? 'Loading values...' : 'Select default values...' }}"
+            placeholder="{{
+              isLoadingFilterValues
+                ? 'Loading values...'
+                : 'Select default values...'
+            }}"
             [filter]="true"
             display="chip"
             appendTo="body"
           ></app-custom-multiselect>
-          <small class="field-hint" *ngIf="filterDialogCategoryValues.length === 0 && !isLoadingFilterValues">
+          <small
+            class="field-hint"
+            *ngIf="
+              filterDialogCategoryValues.length === 0 && !isLoadingFilterValues
+            "
+          >
             <i class="pi pi-info-circle"></i> Load data to see available values
           </small>
         </div>
@@ -1087,7 +1118,10 @@
         <!-- Date Format & Time Options — for time-based filters -->
         <div
           class="filter-dialog-row"
-          *ngIf="filterDialogType === 'time_equality' || filterDialogType === 'time_range'"
+          *ngIf="
+            filterDialogType === 'time_equality' ||
+            filterDialogType === 'time_range'
+          "
         >
           <div class="filter-dialog-field">
             <app-custom-dropdown
@@ -1103,7 +1137,9 @@
           <div class="filter-dialog-field">
             <app-custom-toggle
               [ngModel]="filterDialogIncludeTime"
-              (ngModelChange)="filterDialogIncludeTime = $event; onIncludeTimeChange()"
+              (ngModelChange)="
+                filterDialogIncludeTime = $event; onIncludeTimeChange()
+              "
               label="Include Time"
               trueLabel="Date & Time"
               falseLabel="Date Only"
@@ -1119,7 +1155,11 @@
           <app-custom-calendar
             [(ngModel)]="filterDialogDefaultValue"
             label="Default Date"
-            [placeholder]="filterDialogIncludeTime ? 'Select date & time...' : 'Select date...'"
+            [placeholder]="
+              filterDialogIncludeTime
+                ? 'Select date & time...'
+                : 'Select date...'
+            "
             [showTime]="filterDialogIncludeTime"
             [showIcon]="true"
             [dateFormat]="filterDialogDateFormat"
@@ -1135,7 +1175,11 @@
           <app-custom-daterange
             [(ngModel)]="filterDialogDefaultValue"
             label="Date Range"
-            [placeholder]="filterDialogIncludeTime ? 'Select date & time range...' : 'Select date range...'"
+            [placeholder]="
+              filterDialogIncludeTime
+                ? 'Select date & time range...'
+                : 'Select date range...'
+            "
             [showTime]="filterDialogIncludeTime"
             [showIcon]="true"
             [dateFormat]="filterDialogDateFormat"
@@ -1196,7 +1240,13 @@
               class="pi"
               [ngClass]="isSavingFilter ? 'pi-spin pi-spinner' : 'pi-check'"
             ></i>
-            {{ isSavingFilter ? 'Saving...' : editingFilter ? 'Update Filter' : 'Add Filter' }}
+            {{
+              isSavingFilter
+                ? 'Saving...'
+                : editingFilter
+                  ? 'Update Filter'
+                  : 'Add Filter'
+            }}
           </button>
         </div>
       </ng-template>
@@ -1238,7 +1288,12 @@
             <!-- Chart type and action buttons -->
             <div class="visual-action-buttons">
               <i
-                *ngIf="visual.chartType && (hasRequiredChartFields(visual) || isLines3dChartType(visual.chartType) || isPolygons3dChartType(visual.chartType))"
+                *ngIf="
+                  visual.chartType &&
+                  (hasRequiredChartFields(visual) ||
+                    isLines3dChartType(visual.chartType) ||
+                    isPolygons3dChartType(visual.chartType))
+                "
                 class="pi pi-window-maximize action-icon maximize-icon"
                 (click)="maximizeVisual(visual, $event)"
                 pTooltip="Maximize"
@@ -1826,7 +1881,8 @@
               *ngIf="
                 !visual.loading &&
                 !visual.error &&
-                (isLines3dChartType(visual.chartType) || isPolygons3dChartType(visual.chartType))
+                (isLines3dChartType(visual.chartType) ||
+                  isPolygons3dChartType(visual.chartType))
               "
               (click)="$event.stopPropagation()"
             >

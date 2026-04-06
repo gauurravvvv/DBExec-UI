@@ -28,10 +28,6 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/access',
   },
   {
-    value: 'rlsRules',
-    route: '/app/rls-rules',
-  },
-  {
     value: 'userMapper',
     route: '/home/users',
   },
@@ -102,6 +98,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'auditLogs', route: '/app/audit-logs' },
   { value: 'loginActivity', route: '/app/login-activity' },
   { value: 'dashboard', route: '/app/dashboard' },
+  { value: 'rlsRules', route: '/app/rls-rules' },
 ];
 
 export const HOME_ROUTES = {

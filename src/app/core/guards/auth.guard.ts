@@ -37,11 +37,18 @@ export class AuthGuard implements CanActivate {
     }
   }
 
+  private readonly AUTH_ONLY_ROUTES = [
+    '/login',
+    '/forgot-password',
+    '/reset-password',
+  ];
+
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot,
   ): boolean {
-    if (state.url === '/login') {
+    const isAuthPage = this.AUTH_ONLY_ROUTES.some(r => state.url.startsWith(r));
+    if (isAuthPage) {
       if (this.authService.isLoggedIn()) {
         const homeRoute = this.getDefaultRouteByRole();
         this.router.navigate([homeRoute]);

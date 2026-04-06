@@ -92,7 +92,6 @@ export class EditDatasetComponent
   // Save as Dataset Dialog
   showDatasetDialog = false;
 
-
   // Results Popup
   showResultsPopup = false;
   resultRows = 25;

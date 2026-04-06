@@ -25,6 +25,7 @@ export class AnalysisFilterBarComponent implements OnInit {
 
   async loadFilters(): Promise<void> {
     if (!this.orgId || !this.analysisId) return;
+    this.isLoading = true;
     try {
       const res: any = await this.analysesService.listFilters(
         this.orgId,
@@ -32,11 +33,14 @@ export class AnalysisFilterBarComponent implements OnInit {
       );
       if (res?.status) {
         this.filters = (res.data || []).filter((f: any) => f.isEnabled);
+        // Load live options FIRST, then validate defaults against them
+        await this.loadAllFilterValues();
         this.initializeDefaults();
-        this.loadAllFilterValues();
       }
     } catch (err) {
       console.error('Failed to load filters', err);
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -63,23 +67,83 @@ export class AnalysisFilterBarComponent implements OnInit {
     await Promise.all(promises);
   }
 
+  /**
+   * Validates and sets defaults from filter config against live dropdown options.
+   * - Category defaults are matched case-insensitively against live values
+   * - Stale/missing defaults are silently dropped
+   * - Array defaults on single-select (dropdown) take the first valid match
+   * - Numeric defaults are type-coerced to numbers
+   */
   private initializeDefaults(): void {
     for (const f of this.filters) {
       const config = f.config || {};
+
       if (f.filterType === 'category' && config.defaultValue) {
-        this.appliedValues[f.id] = config.defaultValue;
-      } else if (f.filterType === 'numeric_equality' && config.defaultValue != null) {
-        this.appliedValues[f.id] = config.defaultValue;
-      } else if (f.filterType === 'numeric_range' && (config.rangeMin != null || config.rangeMax != null)) {
-        this.appliedValues[f.id] = [config.rangeMin ?? 0, config.rangeMax ?? 100];
+        this.initializeCategoryDefault(f, config);
+      } else if (
+        f.filterType === 'numeric_equality' &&
+        config.defaultValue != null
+      ) {
+        this.appliedValues[f.id] = Number(config.defaultValue);
+      } else if (
+        f.filterType === 'numeric_range' &&
+        (config.rangeMin != null || config.rangeMax != null)
+      ) {
+        this.appliedValues[f.id] = [
+          Number(config.rangeMin ?? 0),
+          Number(config.rangeMax ?? 100),
+        ];
       } else if (f.filterType === 'time_equality' && config.defaultValue) {
-        this.appliedValues[f.id] = new Date(config.defaultValue);
+        const d = new Date(config.defaultValue);
+        if (!isNaN(d.getTime())) {
+          this.appliedValues[f.id] = d;
+        }
       } else if (f.filterType === 'time_range') {
         const dates: Date[] = [];
-        if (config.dateRangeStart) dates.push(new Date(config.dateRangeStart));
-        if (config.dateRangeEnd) dates.push(new Date(config.dateRangeEnd));
+        if (config.dateRangeStart) {
+          const d = new Date(config.dateRangeStart);
+          if (!isNaN(d.getTime())) dates.push(d);
+        }
+        if (config.dateRangeEnd) {
+          const d = new Date(config.dateRangeEnd);
+          if (!isNaN(d.getTime())) dates.push(d);
+        }
         if (dates.length > 0) this.appliedValues[f.id] = dates;
       }
+    }
+  }
+
+  /**
+   * Validates category defaults against live dropdown/multiselect options.
+   * Uses case-insensitive matching and resolves to the exact-case live value.
+   */
+  private initializeCategoryDefault(filter: any, config: any): void {
+    const liveOptions = this.filterValues[filter.id] || [];
+    // Build a lookup map: lowercase → exact-case live value
+    const liveLookup = new Map<string, string>();
+    for (const opt of liveOptions) {
+      liveLookup.set(String(opt.value).toLowerCase(), opt.value);
+    }
+
+    // Normalize defaults to string array regardless of config shape
+    const rawDefaults = Array.isArray(config.defaultValue)
+      ? config.defaultValue
+      : [config.defaultValue];
+    const stringDefaults = rawDefaults.map((d: any) => String(d));
+
+    // Match against live options (case-insensitive), resolve to exact case
+    const validDefaults = stringDefaults
+      .map((d: string) => liveLookup.get(d.toLowerCase()))
+      .filter((v: string | undefined): v is string => v !== undefined);
+
+    if (validDefaults.length === 0) return;
+
+    if (filter.controlType === 'dropdown') {
+      // Single-select: use first valid match
+      this.appliedValues[filter.id] = validDefaults[0];
+    } else if (filter.controlType === 'list') {
+      // Multi-select: use all valid matches
+      this.appliedValues[filter.id] = validDefaults;
     }
   }
 
@@ -131,8 +195,10 @@ export class AnalysisFilterBarComponent implements OnInit {
           f.filterType === 'time_equality'
         ) {
           if (Array.isArray(val) && val.length === 2) {
-            base.dateRangeStart = val[0] instanceof Date ? val[0].toISOString() : val[0];
-            base.dateRangeEnd = val[1] instanceof Date ? val[1].toISOString() : val[1];
+            base.dateRangeStart =
+              val[0] instanceof Date ? val[0].toISOString() : val[0];
+            base.dateRangeEnd =
+              val[1] instanceof Date ? val[1].toISOString() : val[1];
             base.operator = 'BETWEEN';
           } else {
             const dateVal = val instanceof Date ? val.toISOString() : val;

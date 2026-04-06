@@ -24,7 +24,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 1rem;
-    align-items: start;
+    align-items: flex-start;
   }
 
   .status-toggle-field {

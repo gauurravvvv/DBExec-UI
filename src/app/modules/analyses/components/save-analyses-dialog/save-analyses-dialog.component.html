@@ -65,7 +65,10 @@
           type="submit"
           label="Save Analysis"
           class="p-button-primary btn-save"
-          [disabled]="analysisForm.invalid || (showJustification && !saveJustification.trim())"
+          [disabled]="
+            analysisForm.invalid ||
+            (showJustification && !saveJustification.trim())
+          "
           (click)="onSubmit()"
         >
           <i class="pi pi-save mr-2"></i>

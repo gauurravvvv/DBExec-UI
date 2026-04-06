@@ -158,7 +158,7 @@
         flex-direction: column;
         gap: 20px;
         width: 100%;
-        align-content: start;
+        align-content: flex-start;
 
         // Constrain custom components to 50% width
         app-custom-input,

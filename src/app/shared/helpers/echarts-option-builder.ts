@@ -2447,9 +2447,13 @@ export function buildMap3DChartOption(data: any[], config: any): any {
 // Data format: [{ name: 'Country', value: number }, ...]
 export function buildWorldMapChartOption(data: any[], config: any): any {
   const colors = getColors(config.colorScheme || 'default');
-  const values = data.map((d: any) => (typeof d.value === 'number' ? d.value : 0));
-  const minVal = config.worldMapVisualMapMin ?? (values.length ? Math.min(...values) : 0);
-  const maxVal = config.worldMapVisualMapMax ?? (values.length ? Math.max(...values) : 100);
+  const values = data.map((d: any) =>
+    typeof d.value === 'number' ? d.value : 0,
+  );
+  const minVal =
+    config.worldMapVisualMapMin ?? (values.length ? Math.min(...values) : 0);
+  const maxVal =
+    config.worldMapVisualMapMax ?? (values.length ? Math.max(...values) : 100);
   const colorLow = colors[colors.length - 1] || '#e0f3f8';
   const colorHigh = colors[0] || '#08589e';
 
@@ -2526,7 +2530,11 @@ export function buildFlowLinesChartOption(
   });
 
   // Fallback: if all nodes are both source and target, split by appearance order
-  if (leftNodes.length === 0 && rightNodes.length === 0 && middleNodes.length > 0) {
+  if (
+    leftNodes.length === 0 &&
+    rightNodes.length === 0 &&
+    middleNodes.length > 0
+  ) {
     const half = Math.ceil(middleNodes.length / 2);
     leftNodes.push(...middleNodes.splice(0, half));
     rightNodes.push(...middleNodes);
@@ -2592,7 +2600,10 @@ export function buildFlowLinesChartOption(
         lineStyle: {
           width: (params: any) => {
             const val = params.data?.value ?? 1;
-            return Math.max(1, Math.min(6, (val / maxVal) * (config.flowLinesWidth ?? 3)));
+            return Math.max(
+              1,
+              Math.min(6, (val / maxVal) * (config.flowLinesWidth ?? 3)),
+            );
           },
           color: primaryColor,
           curveness: config.flowLinesCurveness ?? 0.3,

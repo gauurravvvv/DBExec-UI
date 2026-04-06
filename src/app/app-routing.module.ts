@@ -23,11 +23,13 @@ const routes: Routes = [
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
+    canActivate: [AuthGuard],
     data: { title: 'Forgot Password' },
   },
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
+    canActivate: [AuthGuard],
     data: { title: 'Reset Password' },
   },
   {

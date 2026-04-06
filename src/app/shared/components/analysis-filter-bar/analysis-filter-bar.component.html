@@ -10,7 +10,7 @@
           optionValue="value"
           [placeholder]="filter.config?.placeholder || 'Select ' + filter.name"
           [showClear]="true"
-          [filter]="(filterValues[filter.id]?.length || 0) > 10"
+          [filter]="(filterValues[filter.id] || []).length > 10"
           [(ngModel)]="appliedValues[filter.id]"
           (onChangeEvent)="onFilterChange(filter, $event)"
           [appendTo]="'body'"
@@ -25,7 +25,7 @@
           optionLabel="label"
           optionValue="value"
           [placeholder]="filter.config?.placeholder || 'Select ' + filter.name"
-          [filter]="(filterValues[filter.id]?.length || 0) > 10"
+          [filter]="(filterValues[filter.id] || []).length > 10"
           [(ngModel)]="appliedValues[filter.id]"
           display="comma"
           [maxSelectedLabels]="1"
@@ -107,11 +107,7 @@
       <i class="pi pi-check"></i>
       Apply
     </button>
-    <button
-      class="btn-clear"
-      (click)="clearFilters()"
-      *ngIf="hasActiveFilters"
-    >
+    <button class="btn-clear" (click)="clearFilters()" *ngIf="hasActiveFilters">
       <i class="pi pi-times"></i>
       Clear
     </button>
