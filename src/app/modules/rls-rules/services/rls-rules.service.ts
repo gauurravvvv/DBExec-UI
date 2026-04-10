@@ -8,9 +8,9 @@ import { RLS_RULE } from 'src/app/constants/api';
 export class RlsRulesService {
   constructor(private http: HttpClient) {}
 
-  listRules(orgId: string, datasetId: string) {
+  listRules(orgId: string, datasourceId: string, params?: any) {
     return this.http
-      .get(RLS_RULE.LIST + `${orgId}/${datasetId}`)
+      .get(RLS_RULE.LIST, { params: { orgId, datasourceId, ...params } })
       .toPromise()
       .then((response: any) => JSON.parse(JSON.stringify(response)));
   }
@@ -40,6 +40,29 @@ export class RlsRulesService {
     return this.http
       .request('DELETE', RLS_RULE.DELETE + `${orgId}/${ruleId}`, {
         body: { justification },
+      })
+      .toPromise()
+      .then((response: any) => JSON.parse(JSON.stringify(response)));
+  }
+
+  listAssignments(orgId: string, ruleId: string) {
+    return this.http
+      .get(RLS_RULE.LIST_ASSIGNMENTS + `${orgId}/${ruleId}`)
+      .toPromise()
+      .then((response: any) => JSON.parse(JSON.stringify(response)));
+  }
+
+  addAssignment(payload: any) {
+    return this.http
+      .post(RLS_RULE.ADD_ASSIGNMENT, payload)
+      .toPromise()
+      .then((response: any) => JSON.parse(JSON.stringify(response)));
+  }
+
+  deleteAssignment(orgId: string, assignmentId: string) {
+    return this.http
+      .request('DELETE', RLS_RULE.DELETE_ASSIGNMENT + `${orgId}/${assignmentId}`, {
+        body: {},
       })
       .toPromise()
       .then((response: any) => JSON.parse(JSON.stringify(response)));

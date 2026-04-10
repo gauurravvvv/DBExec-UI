@@ -159,6 +159,124 @@
   }
 }
 
+.conditions-section {
+  .conditions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .conditions-label {
+      font-weight: 500;
+      color: var(--text-color);
+      font-size: 0.9rem;
+
+      .required {
+        color: var(--error-color);
+        margin-left: 2px;
+      }
+    }
+
+    .btn-add-condition {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: transparent;
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(33, 150, 243, 0.06);
+      }
+
+      i {
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .conditions-hint {
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.55;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .condition-row {
+    padding: 14px;
+    background: var(--hover-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: rgba(var(--primary-rgb), 0.3);
+    }
+
+    .condition-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .condition-top-row {
+        display: grid;
+        grid-template-columns: 1fr 130px 36px;
+        gap: 8px;
+        align-items: flex-start;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr 36px;
+        }
+      }
+
+      .condition-values-row {
+        width: 100%;
+      }
+    }
+  }
+
+  .btn-remove-condition {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--secondary-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+      background: rgba(244, 67, 54, 0.08);
+      border-color: var(--error-color);
+      color: var(--error-color);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    i {
+      font-size: 0.8rem;
+    }
+  }
+}
+
 @media (max-width: 576px) {
   .add-admin-wrapper {
     padding: 10px;

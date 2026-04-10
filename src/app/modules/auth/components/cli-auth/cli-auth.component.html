@@ -1,0 +1,142 @@
+<div class="login-container">
+  <!-- Left Section - Marketing Content -->
+  <div class="marketing-section">
+    <div class="brand mb-5">
+      <i class="ci ci-app-icon mr-2"></i>
+      <span>DBExec</span>
+    </div>
+    <h1 class="headline">Authorize Your<br />CLI Access</h1>
+    <p class="subtitle">Powerful . Intuitive . Secure</p>
+    <div class="features-grid">
+      <div class="feature-item" *ngFor="let feature of features">
+        <div class="feature-icon">
+          <i class="pi pi-{{ feature.icon }}"></i>
+        </div>
+        <div class="feature-content">
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="security-badge">
+      <i class="pi pi-shield"></i>
+      Enterprise-Grade Security
+    </div>
+  </div>
+
+  <!-- Right Section - Auth Content -->
+  <div class="login-section">
+    <div class="login-box">
+
+      <!-- Prompt State — Code Entry -->
+      <ng-container *ngIf="pageState === 'prompt'">
+        <h2>Authorize CLI</h2>
+        <p class="text-500 mb-4">Enter the code from your terminal to grant access</p>
+
+        <div class="code-input-wrapper">
+          <input
+            #codeInput
+            type="text"
+            class="code-input"
+            [class.code-input-error]="codeError"
+            placeholder="XXXXXXXX"
+            maxlength="8"
+            autocomplete="off"
+            spellcheck="false"
+            [value]="code"
+            (input)="onCodeInput($event)"
+            (keydown.enter)="authorize()"
+          />
+          <div class="code-error" *ngIf="codeError">
+            <i class="pi pi-exclamation-circle"></i>
+            {{ codeError }}
+          </div>
+        </div>
+
+        <div class="user-info" *ngIf="userName || userOrg">
+          <div class="user-detail" *ngIf="userName">
+            <span class="label">User</span>
+            <span class="value">{{ userName }}</span>
+          </div>
+          <div class="user-detail" *ngIf="userRole">
+            <span class="label">Role</span>
+            <span class="value">{{ userRole }}</span>
+          </div>
+          <div class="user-detail" *ngIf="userOrg">
+            <span class="label">Organisation</span>
+            <span class="value">{{ userOrg }}</span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button
+            pButton
+            type="button"
+            label="Authorize"
+            icon="pi pi-check"
+            class="p-button-lg authorize-btn"
+            (click)="authorize()"
+            [disabled]="actionInProgress || code.length !== 8"
+          ></button>
+          <button
+            pButton
+            type="button"
+            label="Deny"
+            icon="pi pi-times"
+            class="p-button-lg p-button-outlined deny-btn"
+            (click)="deny()"
+            [disabled]="actionInProgress || code.length !== 8"
+          ></button>
+        </div>
+      </ng-container>
+
+      <!-- Authorizing State -->
+      <div *ngIf="pageState === 'authorizing'" class="status-container">
+        <i class="pi pi-spin pi-spinner status-icon status-icon-loading"></i>
+        <h2>Authorizing...</h2>
+        <p class="text-500">Transferring your session to the CLI</p>
+      </div>
+
+      <!-- Success State -->
+      <div *ngIf="pageState === 'success'" class="status-container">
+        <i class="pi pi-check-circle status-icon status-icon-success"></i>
+        <h2>Authorized</h2>
+        <p class="text-500">{{ message }}</p>
+        <p class="hint-text">You can close this tab and return to your terminal.</p>
+      </div>
+
+      <!-- Denied State -->
+      <div *ngIf="pageState === 'denied'" class="status-container">
+        <i class="pi pi-ban status-icon status-icon-denied"></i>
+        <h2>Access Denied</h2>
+        <p class="text-500">{{ message }}</p>
+      </div>
+
+      <!-- Not Logged In State -->
+      <div *ngIf="pageState === 'not-logged-in'" class="status-container">
+        <i class="pi pi-sign-in status-icon status-icon-expired"></i>
+        <h2>Not Logged In</h2>
+        <p class="text-500 mb-4">{{ message }}</p>
+        <button
+          pButton
+          type="button"
+          label="Go to Login"
+          routerLink="/login"
+          class="p-button-lg"
+        ></button>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="pageState === 'error'" class="status-container">
+        <i class="pi pi-exclamation-triangle status-icon status-icon-error"></i>
+        <h2>Something Went Wrong</h2>
+        <p class="text-500">{{ message }}</p>
+        <a class="forgot-password status-link" routerLink="/login">
+          Back to Login
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>

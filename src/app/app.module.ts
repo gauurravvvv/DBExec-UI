@@ -34,6 +34,7 @@ import { HomeComponent } from './shared/components/layout/home/home.component';
 import { SidebarComponent } from './shared/components/layout/sidebar/sidebar.component';
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
+import { CliAuthComponent } from './modules/auth/components/cli-auth/cli-auth.component';
 import { SharedModule } from './shared/shared.module';
 import { AnnouncementDialogModule } from './modules/organisation/components/announcement-dialog/announcement-dialog.module';
 
@@ -44,6 +45,7 @@ import { AnnouncementDialogModule } from './modules/organisation/components/anno
     ForgotPasswordComponent,
     ResetPasswordComponent,
     SetPasswordComponent,
+    CliAuthComponent,
     HomeComponent,
     HeaderComponent,
     SidebarComponent,

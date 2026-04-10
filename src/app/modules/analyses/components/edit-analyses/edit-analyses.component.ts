@@ -241,6 +241,7 @@ export class EditAnalysesComponent
   filterDialogDateFormat: string = 'yy-mm-dd';
   filterDialogCategoryValues: any[] = [];
   isLoadingFilterValues: boolean = false;
+  columnValuesCache: { [columnName: string]: { label: string; value: string }[] } = {};
 
   // Filter dropdown options
   filterTypeOptions = [
@@ -1462,14 +1463,11 @@ export class EditAnalysesComponent
       this.filterDialogDefaultValue = null;
     }
 
-    // Reset category values when switching away from category
-    if (this.filterDialogType !== 'category') {
-      this.filterDialogCategoryValues = [];
-    }
-
-    // Load distinct values for category filters
+    // When switching to category, populate from cache if available
     if (this.filterDialogType === 'category' && this.filterDialogColumn) {
       this.loadColumnDistinctValues();
+    } else {
+      this.filterDialogCategoryValues = [];
     }
   }
 
@@ -1517,8 +1515,8 @@ export class EditAnalysesComponent
     if (this.filterDialogColumn && !this.filterDialogName) {
       this.filterDialogName = this.filterDialogColumn.columnToView;
     }
-    // Load distinct values for category filters when column changes
-    if (this.filterDialogType === 'category' && this.filterDialogColumn) {
+    // Load distinct values when column changes (cached, so safe to call always)
+    if (this.filterDialogColumn) {
       this.loadColumnDistinctValues();
     }
   }
@@ -1570,44 +1568,35 @@ export class EditAnalysesComponent
   async loadColumnDistinctValues(): Promise<void> {
     if (!this.filterDialogColumn || !this.datasetId || !this.orgId) return;
 
+    const colName =
+      this.filterDialogColumn.columnName ||
+      this.filterDialogColumn.columnToUse ||
+      this.filterDialogColumn.columnToView;
+
+    if (!colName) return;
+
+    // Return cached values if available
+    if (this.columnValuesCache[colName]) {
+      this.filterDialogCategoryValues = this.columnValuesCache[colName];
+      return;
+    }
+
     this.isLoadingFilterValues = true;
     this.filterDialogCategoryValues = [];
 
     try {
-      // Try store first for quick access
-      const rows = await this.store
-        .select(selectDatasetData(this.orgId, this.datasetId))
-        .pipe(first())
-        .toPromise();
-
-      if (rows && rows.length > 0) {
-        const colName =
-          this.filterDialogColumn.columnName ||
-          this.filterDialogColumn.columnToUse ||
-          this.filterDialogColumn.columnToView;
-        const uniqueValues = [
-          ...new Set(
-            rows
-              .map((row: any) => row[colName])
-              .filter((v: any) => v !== null && v !== undefined),
-          ),
-        ].sort();
-        this.filterDialogCategoryValues = uniqueValues.map((v: any) => ({
+      const res: any = await this.datasetService.getDistinctColumnValues(
+        this.orgId,
+        this.datasetId,
+        colName,
+      );
+      if (res?.status && res.data) {
+        const mapped = (res.data || []).map((v: any) => ({
           label: String(v),
           value: String(v),
         }));
-      } else if (this.editingFilter?.tempId) {
-        // Fallback: fetch from API when store has no data (e.g., cache expired)
-        const res: any = await this.analysesService.getFilterValues(
-          this.orgId,
-          this.editingFilter.tempId,
-        );
-        if (res?.status && res.data) {
-          this.filterDialogCategoryValues = (res.data || []).map((v: any) => ({
-            label: String(v),
-            value: String(v),
-          }));
-        }
+        this.columnValuesCache[colName] = mapped;
+        this.filterDialogCategoryValues = mapped;
       }
     } catch (err) {
       console.error('Failed to load distinct values', err);

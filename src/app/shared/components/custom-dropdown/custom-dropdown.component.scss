@@ -8,20 +8,6 @@
   .p-float-label {
     display: block;
     width: 100%;
-
-    label {
-      font-weight: 500;
-      color: color-mix(in srgb, var(--text-color) 60%, transparent);
-      background: var(--card-background);
-      padding: 2px 8px;
-      margin-left: -4px;
-      z-index: 1;
-
-      .required {
-        color: var(--error-color);
-        margin-left: 4px;
-      }
-    }
   }
 
   .normal-label {
@@ -42,6 +28,27 @@
 }
 
 :host ::ng-deep {
+  // Floating label styles — background cuts through border, no vertical padding
+  .p-float-label label {
+    font-weight: 500;
+    color: color-mix(in srgb, var(--text-color) 60%, transparent);
+    background: var(--card-background);
+    z-index: 1;
+
+    .required {
+      color: var(--error-color);
+      margin-left: 4px;
+    }
+  }
+
+  // Floated state: sit precisely on top border line
+  .p-float-label:focus-within label,
+  .p-float-label .p-inputwrapper-filled ~ label,
+  .p-float-label .p-inputwrapper-focus ~ label {
+    top: -0.55rem !important;
+    font-size: 0.75rem !important;
+  }
+
   // Hide placeholder when floating label is in resting position (no value, not focused)
   // to prevent overlap between the label and placeholder text
   .p-float-label .p-dropdown:not(.p-focus) .p-dropdown-label.p-placeholder {
