@@ -122,7 +122,8 @@
           pButton
           type="button"
           label="Go to Login"
-          routerLink="/login"
+          [routerLink]="['/login']"
+          [queryParams]="{ returnUrl: '/cli-auth' }"
           class="p-button-lg"
         ></button>
       </div>
