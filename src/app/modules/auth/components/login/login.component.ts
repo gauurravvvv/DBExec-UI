@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
@@ -19,9 +19,12 @@ export class LoginComponent implements OnInit {
   features = LOGIN_PAGE_OPTIONS;
   loginError = '';
 
+  private returnUrl: string | null = null;
+
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private loginService: LoginService,
     private globalService: GlobalService,
   ) {
@@ -41,7 +44,9 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+  }
 
   onSubmit(): void {
     if (this.loginForm.valid) {
@@ -61,7 +66,8 @@ export class LoginComponent implements OnInit {
               homeRoute = HOME_ROUTES.ORG_USER;
               break;
           }
-          this.router.navigateByUrl(homeRoute, {
+          const target = this.returnUrl || homeRoute;
+          this.router.navigateByUrl(target, {
             replaceUrl: true,
           });
         } else {
