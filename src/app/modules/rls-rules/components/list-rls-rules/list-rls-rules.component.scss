@@ -314,6 +314,50 @@ $radius-sm: 8px;
         white-space: nowrap;
       }
 
+      // Conditions Summary
+      .conditions-summary {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+
+        .conditions-count-badge {
+          background: rgba(33, 150, 243, 0.1);
+          color: var(--primary-color);
+          padding: 2px 8px;
+          border-radius: 99px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+
+        .condition-preview {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.78rem;
+          color: var(--text-color);
+          opacity: 0.75;
+
+          .cond-col {
+            font-weight: 500;
+          }
+
+          .cond-op {
+            color: var(--primary-color);
+            font-size: 0.72rem;
+            font-weight: 600;
+            opacity: 0.8;
+          }
+        }
+
+        .more-conds {
+          font-size: 0.75rem;
+          color: var(--text-color);
+          opacity: 0.5;
+        }
+      }
+
       // Status Indicator
       .status-indicator {
         display: inline-flex;
@@ -368,6 +412,11 @@ $radius-sm: 8px;
           &.edit-btn:hover {
             background: rgba(33, 150, 243, 0.1);
             color: #2196f3;
+          }
+
+          &.assign-btn:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
           }
 
           &.delete-btn:hover {

@@ -3,6 +3,113 @@ $radius-lg: 16px;
 $radius-md: 12px;
 $radius-sm: 8px;
 
+.conditions-table {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+
+  .conditions-table-header {
+    display: grid;
+    grid-template-columns: 28px 1fr 110px 1fr;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--hover-background);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.65;
+    border-bottom: 1px solid var(--border-color);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    span:first-child { visibility: hidden; }
+  }
+
+  .condition-table-row {
+    display: grid;
+    grid-template-columns: 28px 1fr 110px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.15s ease;
+
+    &:last-child { border-bottom: none; }
+
+    &:hover { background: var(--hover-background); }
+
+    .cond-index {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--hover-background);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-color);
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+
+    .cond-column {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: var(--text-color);
+      font-weight: 500;
+
+      i {
+        color: var(--primary-color);
+        font-size: 0.75rem;
+        opacity: 0.7;
+      }
+    }
+
+    .operator-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 10px;
+      background: rgba(33, 150, 243, 0.1);
+      color: var(--primary-color);
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      width: fit-content;
+    }
+
+    .cond-values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      .value-chip {
+        padding: 3px 10px;
+        background: var(--hover-background);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 0.8rem;
+        color: var(--text-color);
+      }
+    }
+  }
+}
+
+.and-note {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--text-color);
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .view-category-wrapper {
   height: 100%;
 
@@ -346,6 +453,45 @@ h3 {
 .action-buttons {
   display: flex;
   gap: 12px;
+}
+
+.assignments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.assignment-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--hover-background);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+
+  i {
+    color: var(--primary-color);
+    font-size: 1rem;
+  }
+
+  .assignment-name {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    font-weight: 500;
+  }
+
+  .assignment-type-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(var(--primary-rgb), 0.12);
+    color: var(--primary-color);
+    font-weight: 600;
+    text-transform: capitalize;
+  }
 }
 
 // 5. Popups & Modals - Enhanced Premium Design

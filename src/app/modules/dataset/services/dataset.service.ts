@@ -348,6 +348,16 @@ export class DatasetService {
       });
   }
 
+  getDistinctColumnValues(orgId: string, datasetId: string, columnName: string) {
+    return this.http
+      .post(DATASET.DISTINCT_VALUES + `${orgId}/${datasetId}`, { columnName })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   deleteDatasetField(orgId: string, datasetId: string, fieldId: string) {
     return this.http
       .delete(DATASET.DELETE_FIELD + `${orgId}/${datasetId}/${fieldId}`)

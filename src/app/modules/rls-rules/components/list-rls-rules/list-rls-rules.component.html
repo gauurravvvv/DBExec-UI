@@ -30,20 +30,20 @@
             </app-custom-dropdown>
           </div>
 
-          <!-- Dataset Dropdown -->
+          <!-- Datasource Dropdown -->
           <div class="dropdown-field">
             <app-custom-dropdown
-              [(ngModel)]="selectedDatasetId"
-              [options]="datasets"
+              [(ngModel)]="selectedDatasource"
+              [options]="datasources"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
-              label="Dataset"
+              label="Datasource"
               [floatingLabel]="true"
               filterBy="name"
               [autoDisplayFirst]="false"
-              placeholder="Select Dataset"
-              (onChangeEvent)="onDatasetChange($event)"
+              placeholder="Select Datasource"
+              (onChangeEvent)="onDatasourceChange($event)"
             >
             </app-custom-dropdown>
           </div>
@@ -75,11 +75,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="filteredRules"
+          [value]="rules"
           [rows]="10"
           [paginator]="true"
+          [lazy]="true"
+          (onLazyLoad)="loadRules($event)"
           [totalRecords]="totalRecords"
-          [globalFilterFields]="['name', 'scope', 'columnName', 'status']"
           [rowHover]="true"
           dataKey="id"
           currentPageReportTemplate="{first} - {last} of {totalRecords}"
@@ -91,25 +92,19 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 20%" pFrozenColumn>
+              <th style="width: 22%" pFrozenColumn>
                 <div class="th-content">Name</div>
               </th>
-              <th style="width: 12%">
-                <div class="th-content">Scope</div>
-              </th>
               <th style="width: 18%">
-                <div class="th-content">Column</div>
+                <div class="th-content">Dataset</div>
               </th>
-              <th style="width: 12%">
-                <div class="th-content">Operator</div>
-              </th>
-              <th style="width: 12%">
-                <div class="th-content">Values</div>
+              <th style="width: 32%">
+                <div class="th-content">Conditions</div>
               </th>
               <th style="width: 12%">
                 <div class="th-content">Status</div>
               </th>
-              <th style="width: 14%">
+              <th style="width: 16%">
                 <div class="th-content">Actions</div>
               </th>
             </tr>
@@ -123,31 +118,14 @@
                 ></app-custom-input>
               </th>
               <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.scope"
-                  [options]="scopeOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="All"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                ></app-custom-dropdown>
-              </th>
-              <th>
                 <app-custom-input
-                  [(ngModel)]="filterValues.columnName"
+                  [(ngModel)]="filterValues.datasetName"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search Column"
+                  placeholder="Search Dataset"
                 ></app-custom-input>
               </th>
               <th>
-                <!-- No filter for Operator -->
-              </th>
-              <th>
-                <!-- No filter for Values -->
+                <!-- No filter for Conditions -->
               </th>
               <th>
                 <app-custom-dropdown
@@ -179,23 +157,27 @@
                 </a>
               </td>
               <td>
-                <span class="pill">{{ rule.scope }}</span>
-              </td>
-              <td>
-                <span class="description-text" [title]="rule.columnName">{{
-                  rule.columnName || '-'
-                }}</span>
-              </td>
-              <td>
-                <span class="description-text">{{ rule.operator || '-' }}</span>
-              </td>
-              <td>
-                <span class="pill" *ngIf="rule.values?.length">
-                  {{ rule.values.length }} value{{
-                    rule.values.length !== 1 ? 's' : ''
-                  }}
+                <span class="description-text" [title]="rule.dataset?.name">
+                  {{ rule.dataset?.name || '-' }}
                 </span>
-                <span *ngIf="!rule.values?.length">-</span>
+              </td>
+              <td>
+                <div class="conditions-summary" *ngIf="rule.conditions?.length; else noConds">
+                  <span class="conditions-count-badge">
+                    {{ rule.conditions.length }}
+                    condition{{ rule.conditions.length !== 1 ? 's' : '' }}
+                  </span>
+                  <ng-container *ngFor="let c of rule.conditions; let i = index">
+                    <span class="condition-preview" *ngIf="i < 2">
+                      <span class="cond-col">{{ c.columnName }}</span>
+                      <span class="cond-op">{{ c.operator }}</span>
+                    </span>
+                  </ng-container>
+                  <span class="more-conds" *ngIf="rule.conditions.length > 2">
+                    +{{ rule.conditions.length - 2 }} more
+                  </span>
+                </div>
+                <ng-template #noConds><span>-</span></ng-template>
               </td>
               <td>
                 <span
@@ -228,6 +210,14 @@
                     <i class="pi pi-pencil"></i>
                   </button>
                   <button
+                    class="icon-btn assign-btn"
+                    (click)="onManageAssignments(rule)"
+                    pTooltip="Manage Assignments"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="pi pi-users"></i>
+                  </button>
+                  <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(rule.id)"
                     pTooltip="Delete"
@@ -241,12 +231,12 @@
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="7" class="empty-message-cell text-center">
-                <span *ngIf="!selectedDatasetId"
-                  >Please select a dataset to view RLS rules</span
+              <td colspan="5" class="empty-message-cell text-center">
+                <span *ngIf="!selectedDatasource"
+                  >Please select a datasource to view RLS rules</span
                 >
-                <span *ngIf="selectedDatasetId"
-                  >No RLS rules found for this dataset</span
+                <span *ngIf="selectedDatasource"
+                  >No RLS rules found for this datasource</span
                 >
               </td>
             </tr>
@@ -256,6 +246,13 @@
     </div>
   </div>
 </div>
+
+<app-manage-rls-assignments
+  *ngIf="showAssignmentsPanel && activeRuleForAssignment"
+  [rule]="activeRuleForAssignment"
+  [orgId]="selectedOrg"
+  (closed)="onAssignmentsPanelClose()"
+></app-manage-rls-assignments>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">

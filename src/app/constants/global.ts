@@ -93,5 +93,32 @@ export const SET_PASSWORD_PAGE_OPTIONS = [
   },
 ];
 
+export const CLI_AUTH_PAGE_OPTIONS = [
+  {
+    icon: 'desktop',
+    title: 'CLI Access',
+    description:
+      'Securely connect your terminal to DBExec without sharing credentials',
+  },
+  {
+    icon: 'shield',
+    title: 'Device Code Flow',
+    description:
+      'Industry-standard authorization — your password never leaves the browser',
+  },
+  {
+    icon: 'clock',
+    title: 'Short-Lived Codes',
+    description:
+      'Authorization codes expire in 5 minutes for maximum security',
+  },
+  {
+    icon: 'lock',
+    title: 'Single-Use Tokens',
+    description:
+      'Each authorization code can only be used once — no replay attacks',
+  },
+];
+
 export const MAX_LIMIT = 10000000;
 export const DEFAULT_PAGE = 1;

@@ -7,6 +7,7 @@ export const AUTH = {
   SET_PASSWORD: '/auth/set-password',
   VERIFY_SETUP_TOKEN: '/auth/verify-setup-token',
   RESEND_SETUP_LINK: '/auth/resend-setup-link',
+  CLI_AUTHORIZE: '/auth/cli/authorize',
 };
 
 export const HOME = {
@@ -114,6 +115,7 @@ export const DATASET = {
   VALIDATE_FIELD: '/dataset/validate/field',
   ADD_FIELD: '/dataset/add/field',
   RUN_QUERY: '/dataset/run',
+  DISTINCT_VALUES: '/dataset/distinct-values/',  // POST /:orgId/:datasetId, body: { columnName }
   DUPLICATE: '/dataset/duplicate/',
 };
 
@@ -256,6 +258,9 @@ export const RLS_RULE = {
   ADD: '/rls-rule/add',
   UPDATE: '/rls-rule/update',
   DELETE: '/rls-rule/delete/',
-  LIST: '/rls-rule/list/',
+  LIST: '/rls-rule/list',
   VIEW: '/rls-rule/get/',
+  LIST_ASSIGNMENTS: '/rls-rule/assignment/list/',
+  ADD_ASSIGNMENT: '/rls-rule/assignment/add',
+  DELETE_ASSIGNMENT: '/rls-rule/assignment/delete/',
 };

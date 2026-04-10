@@ -7,6 +7,7 @@ import { RoleGuard } from './core/guards/role.guard';
 import { HomeComponent } from './shared/components/layout/home/home.component';
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
+import { CliAuthComponent } from './modules/auth/components/cli-auth/cli-auth.component';
 
 const routes: Routes = [
   {
@@ -36,6 +37,11 @@ const routes: Routes = [
     path: 'set-password',
     component: SetPasswordComponent,
     data: { title: 'Set Password' },
+  },
+  {
+    path: 'cli-auth',
+    component: CliAuthComponent,
+    data: { title: 'CLI Authentication' },
   },
   {
     path: 'app',

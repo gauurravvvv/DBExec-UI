@@ -25,7 +25,6 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="rlsForm.invalid"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -50,8 +49,6 @@
           formControlName="description"
           label="Description"
           placeholder="Enter description"
-          inputMode="textarea"
-          [rows]="3"
         >
         </app-custom-input>
 
@@ -65,6 +62,7 @@
           optionValue="id"
           [filter]="true"
           filterBy="name"
+          [autoDisplayFirst]="false"
           [required]="true"
           [showError]="
             !!(
@@ -77,6 +75,22 @@
         </app-custom-dropdown>
 
         <app-custom-dropdown
+          [ngModel]="selectedDatasource"
+          [ngModelOptions]="{ standalone: true }"
+          label="Datasource"
+          placeholder="Select Datasource"
+          [options]="datasources"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [autoDisplayFirst]="false"
+          [required]="true"
+          (onChangeEvent)="onDatasourceChange($event)"
+        >
+        </app-custom-dropdown>
+
+        <app-custom-dropdown
           formControlName="datasetId"
           label="Dataset"
           placeholder="Select Dataset"
@@ -85,6 +99,7 @@
           optionValue="id"
           [filter]="true"
           filterBy="name"
+          [autoDisplayFirst]="false"
           [required]="true"
           [showError]="
             !!(
@@ -96,80 +111,95 @@
         >
         </app-custom-dropdown>
 
-        <app-custom-dropdown
-          formControlName="scope"
-          label="Scope"
-          placeholder="Select Scope"
-          [options]="scopeOptions"
-          optionLabel="label"
-          optionValue="value"
-          [required]="true"
-          [showError]="
-            !!(rlsForm.get('scope')?.invalid && rlsForm.get('scope')?.touched)
-          "
-          errorMessage="Scope is required"
-        >
-        </app-custom-dropdown>
+        <!-- Filter Conditions -->
+        <div class="conditions-section" formArrayName="conditions">
+          <div class="conditions-header">
+            <span class="conditions-label">
+              Filter Conditions <span class="required">*</span>
+            </span>
+            <button
+              type="button"
+              class="btn-add-condition"
+              (click)="addCondition()"
+            >
+              <i class="pi pi-plus"></i> Add Condition
+            </button>
+          </div>
+          <div class="conditions-hint">
+            <i class="pi pi-info-circle"></i>
+            All conditions are AND-ed. Select values for each column condition.
+          </div>
+          <div
+            class="condition-row"
+            *ngFor="let cond of conditions.controls; let i = index"
+            [formGroupName]="i"
+          >
+            <div class="condition-fields">
+              <div class="condition-top-row">
+                <app-custom-dropdown
+                  formControlName="columnName"
+                  [options]="datasetColumns"
+                  optionLabel="columnToView"
+                  optionValue="columnToUse"
+                  placeholder="Select column"
+                  [filter]="true"
+                  filterBy="columnToView"
+                  [autoDisplayFirst]="false"
+                  [required]="true"
+                  [showError]="!!(conditions.at(i).get('columnName')?.invalid && conditions.at(i).get('columnName')?.touched)"
+                  errorMessage="Column is required"
+                  (onChangeEvent)="onColumnChange(i, $event)"
+                ></app-custom-dropdown>
+                <app-custom-dropdown
+                  formControlName="operator"
+                  [options]="operatorOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [autoDisplayFirst]="false"
+                  [required]="true"
+                ></app-custom-dropdown>
+                <button
+                  type="button"
+                  class="btn-remove-condition"
+                  (click)="removeCondition(i)"
+                  [disabled]="conditions.length === 1"
+                  pTooltip="Remove condition"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+              <div class="condition-values-row">
+                <app-custom-multiselect
+                  formControlName="values"
+                  [options]="getColumnValues(i)"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select values"
+                  [filter]="true"
+                  filterBy="label"
+                  [showToggleAll]="true"
+                  display="chip"
+                  [maxSelectedLabels]="5"
+                  selectedItemsLabel="{0} values selected"
+                  [required]="true"
+                  [showError]="!!(conditions.at(i).get('values')?.invalid && conditions.at(i).get('values')?.touched)"
+                  errorMessage="At least one value is required"
+                ></app-custom-multiselect>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <app-custom-dropdown
-          formControlName="scopeId"
-          label="Applies To"
-          [placeholder]="
-            rlsForm.get('scope')?.value === 'user'
-              ? 'Select User'
-              : 'Select Group'
-          "
-          [options]="scopeTargets"
-          optionLabel="label"
-          optionValue="value"
-          [filter]="true"
-          [required]="true"
-          [showError]="
-            !!(
-              rlsForm.get('scopeId')?.invalid && rlsForm.get('scopeId')?.touched
-            )
-          "
-          errorMessage="Selection is required"
+        <app-custom-toggle
+          formControlName="isEnabled"
+          label="Enabled"
+          [trueValue]="true"
+          [falseValue]="false"
+          trueLabel="Enabled"
+          falseLabel="Disabled"
         >
-        </app-custom-dropdown>
-
-        <app-custom-input
-          formControlName="columnName"
-          label="Column Name"
-          placeholder="Enter column name"
-          [required]="true"
-          [showError]="
-            !!(
-              rlsForm.get('columnName')?.invalid &&
-              rlsForm.get('columnName')?.touched
-            )
-          "
-          errorMessage="Column name is required"
-        >
-        </app-custom-input>
-
-        <app-custom-dropdown
-          formControlName="operator"
-          label="Operator"
-          placeholder="Select Operator"
-          [options]="operatorOptions"
-          optionLabel="label"
-          optionValue="value"
-          [required]="true"
-        >
-        </app-custom-dropdown>
-
-        <app-custom-input
-          formControlName="values"
-          label="Values"
-          placeholder="Enter comma-separated values (e.g., US, UK, IN)"
-          [required]="true"
-          [showError]="
-            !!(rlsForm.get('values')?.invalid && rlsForm.get('values')?.touched)
-          "
-          errorMessage="At least one value is required"
-        >
-        </app-custom-input>
+        </app-custom-toggle>
       </div>
     </form>
   </div>

@@ -60,54 +60,53 @@
           </div>
         </div>
 
-        <!-- Rule Configuration -->
-        <div class="info-section">
-          <h3><i class="pi pi-shield mr-2"></i> Rule Configuration</h3>
-          <div class="info-grid">
-            <div class="info-item">
-              <label>Scope</label>
-              <p>
-                <i
-                  class="pi mr-2"
-                  [ngClass]="ruleData.scope === 'user' ? 'pi-user' : 'pi-users'"
-                ></i
-                >{{ ruleData.scope === 'user' ? 'User' : 'Group' }}
-              </p>
-            </div>
-            <div class="info-item">
-              <label>Applies To</label>
-              <p>{{ ruleData.scopeName || 'N/A' }}</p>
-            </div>
-            <div class="info-item">
-              <label>Column Name</label>
-              <p class="with-icon">
-                <i class="pi pi-filter mr-2"></i>{{ ruleData.columnName }}
-              </p>
-            </div>
-            <div class="info-item">
-              <label>Operator</label>
-              <p>{{ ruleData.operator }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Values -->
+        <!-- Assignments -->
         <div class="info-section">
           <h3>
-            <i class="pi pi-list mr-2"></i> Allowed Values
-            <span class="count-badge">{{ ruleData.values?.length || 0 }}</span>
+            <i class="pi pi-users mr-2"></i> Assignments
+            <span class="count-badge">{{ ruleData.assignments?.length || 0 }}</span>
           </h3>
-          <div class="fields-list">
-            <div class="field-item" *ngFor="let val of ruleData.values">
-              <i class="pi pi-check"></i> {{ val }}
-            </div>
-            <div
-              *ngIf="!ruleData.values || ruleData.values.length === 0"
-              class="no-data"
-            >
-              No values defined
+          <div class="assignments-list" *ngIf="ruleData.assignments?.length; else noAssignments">
+            <div class="assignment-item" *ngFor="let a of ruleData.assignments">
+              <i class="pi" [ngClass]="a.scope === 'user' ? 'pi-user' : 'pi-users'"></i>
+              <span class="assignment-name">{{ a.scopeName || a.scopeId }}</span>
+              <span class="assignment-type-badge">{{ a.scope }}</span>
             </div>
           </div>
+          <ng-template #noAssignments>
+            <div class="no-data">No assignments yet</div>
+          </ng-template>
+        </div>
+
+        <!-- Filter Conditions -->
+        <div class="info-section">
+          <h3>
+            <i class="pi pi-filter mr-2"></i> Filter Conditions
+            <span class="count-badge">{{ ruleData.conditions?.length || 0 }}</span>
+          </h3>
+          <div class="conditions-table" *ngIf="ruleData.conditions?.length; else noConditions">
+            <div class="conditions-table-header">
+              <span>Column</span>
+              <span>Operator</span>
+              <span>Values</span>
+            </div>
+            <div class="condition-table-row" *ngFor="let cond of ruleData.conditions; let i = index">
+              <span class="cond-index">{{ i + 1 }}</span>
+              <span class="cond-column">
+                <i class="pi pi-filter-fill"></i> {{ cond.columnName }}
+              </span>
+              <span class="operator-badge">{{ cond.operator }}</span>
+              <div class="cond-values">
+                <span class="value-chip" *ngFor="let v of cond.values">{{ v }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noConditions>
+            <div class="no-data">No conditions defined</div>
+          </ng-template>
+          <p class="and-note" *ngIf="ruleData.conditions?.length > 1">
+            <i class="pi pi-info-circle"></i> All conditions are AND-ed together
+          </p>
         </div>
       </div>
     </div>

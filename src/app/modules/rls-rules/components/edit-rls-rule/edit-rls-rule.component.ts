@@ -1,13 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RLS_RULE } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { UserService } from 'src/app/modules/users/services/user.service';
-import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { RlsRulesService } from '../../services/rls-rules.service';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
+import { REGEX } from 'src/app/constants/regex.constant';
+
+function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+  if (!value || !Array.isArray(value) || value.length === 0) {
+    return { required: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-edit-rls-rule',
@@ -16,19 +30,15 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 })
 export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   rlsForm!: FormGroup;
-  scopeTargets: any[] = [];
   isFormDirty = false;
   showSaveConfirm = false;
   saveJustification = '';
   ruleId!: string;
   orgId!: string;
   originalFormValue: any;
-  datasetName = '';
-
-  scopeOptions = [
-    { label: 'User', value: 'user' },
-    { label: 'Group', value: 'group' },
-  ];
+  datasetColumns: any[] = [];
+  columnValuesCache: { [columnName: string]: { label: string; value: string }[] } = {};
+  isLoadingColumnValues: { [columnName: string]: boolean } = {};
 
   operatorOptions = [
     { label: 'IN', value: 'IN' },
@@ -37,14 +47,17 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     { label: 'BETWEEN', value: 'BETWEEN' },
   ];
 
+  get conditions(): FormArray {
+    return this.rlsForm.get('conditions') as FormArray;
+  }
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private globalService: GlobalService,
-    private userService: UserService,
-    private groupService: GroupService,
     private rlsRulesService: RlsRulesService,
+    private datasetService: DatasetService,
   ) {}
 
   hasUnsavedChanges(): boolean {
@@ -69,33 +82,40 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
           Validators.required,
           Validators.minLength(2),
           Validators.maxLength(100),
+          Validators.pattern(REGEX.orgName),
         ],
       ],
       description: [''],
       organisation: ['', Validators.required],
       datasetId: ['', Validators.required],
-      scope: ['', Validators.required],
-      scopeId: ['', Validators.required],
-      columnName: ['', [Validators.required, Validators.maxLength(255)]],
-      operator: ['IN', Validators.required],
-      values: ['', Validators.required],
+      conditions: this.fb.array([this.createCondition()]),
       isEnabled: [true],
     });
 
     this.rlsForm.valueChanges.subscribe(() => {
       this.checkFormDirty();
     });
+  }
 
-    // When scope changes, reload scope targets
-    this.rlsForm.get('scope')?.valueChanges.subscribe(value => {
-      if (value && this.orgId) {
-        this.loadScopeTargets();
-        // Only clear scopeId if user actively changed it (not during initial load)
-        if (this.originalFormValue) {
-          this.rlsForm.patchValue({ scopeId: '' }, { emitEvent: false });
-        }
-      }
+  createCondition(c?: any): FormGroup {
+    return this.fb.group({
+      columnName: [c?.columnName || '', Validators.required],
+      operator: [c?.operator || 'IN', Validators.required],
+      values: [
+        Array.isArray(c?.values) ? c.values : (c?.values ? [c.values] : []),
+        nonEmptyArray,
+      ],
     });
+  }
+
+  addCondition() {
+    this.conditions.push(this.createCondition());
+  }
+
+  removeCondition(index: number) {
+    if (this.conditions.length > 1) {
+      this.conditions.removeAt(index);
+    }
   }
 
   loadRuleData(): void {
@@ -104,23 +124,32 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
           const rule = response.data;
-          this.datasetName = rule.datasetName || '';
 
-          // Load scope targets before patching form
-          this.loadScopeTargetsForScope(rule.scope, () => {
+          // Load dataset columns first so dropdowns have options
+          this.loadDatasetColumns(rule.organisationId, rule.datasetId, () => {
+            // Rebuild conditions FormArray from saved data
+            this.conditions.clear();
+            const savedConditions = rule.conditions?.length
+              ? rule.conditions
+              : [{ columnName: '', operator: 'IN', values: [] }];
+            savedConditions.forEach((c: any) => {
+              this.conditions.push(this.createCondition(c));
+              // Load distinct values for each existing condition column
+              if (c.columnName) {
+                this.loadDistinctValuesForColumn(
+                  c.columnName,
+                  rule.organisationId,
+                  rule.datasetId,
+                );
+              }
+            });
+
             this.rlsForm.patchValue({
               id: rule.id,
               name: rule.name,
               description: rule.description || '',
               organisation: rule.organisationId,
               datasetId: rule.datasetId,
-              scope: rule.scope,
-              scopeId: rule.scopeId,
-              columnName: rule.columnName,
-              operator: rule.operator,
-              values: Array.isArray(rule.values)
-                ? rule.values.join(', ')
-                : rule.values || '',
               isEnabled: rule.isEnabled,
             });
 
@@ -132,38 +161,60 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
-  loadScopeTargets(): void {
-    const scope = this.rlsForm.get('scope')?.value;
-    this.loadScopeTargetsForScope(scope);
+  loadDatasetColumns(orgId?: string, datasetId?: string, callback?: () => void): void {
+    const org = orgId || this.orgId;
+    const dataset = datasetId || this.rlsForm.get('datasetId')?.value;
+    if (!org || !dataset) {
+      if (callback) callback();
+      return;
+    }
+
+    this.columnValuesCache = {};
+    this.isLoadingColumnValues = {};
+    this.datasetService.getDataset(org, dataset).then((response: any) => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.datasetColumns = (response.data.datasetFields || []).map((f: any) => ({
+          ...f,
+          columnToView: f.columnToView || f.columnToUse,
+        }));
+      }
+      if (callback) callback();
+    });
   }
 
-  loadScopeTargetsForScope(scope: string, callback?: () => void): void {
-    if (!this.orgId || !scope) return;
-    const params = { orgId: this.orgId, page: DEFAULT_PAGE, limit: MAX_LIMIT };
+  async loadDistinctValuesForColumn(columnName: string, orgId?: string, datasetId?: string): Promise<void> {
+    if (!columnName || this.columnValuesCache[columnName]) return;
 
-    if (scope === 'user') {
-      this.userService.listUser(params).then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.scopeTargets = (response.data.users || []).map((u: any) => ({
-            label: `${u.firstName} ${u.lastName}`,
-            value: u.id,
-          }));
-        }
-        if (callback) callback();
-      });
-    } else if (scope === 'group') {
-      this.groupService.listGroupps(params).then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.scopeTargets = (response.data.groups || []).map((g: any) => ({
-            label: g.name,
-            value: g.id,
-          }));
-        }
-        if (callback) callback();
-      });
-    } else {
-      if (callback) callback();
+    const org = orgId || this.orgId;
+    const dataset = datasetId || this.rlsForm.get('datasetId')?.value;
+    if (!org || !dataset) return;
+
+    this.isLoadingColumnValues[columnName] = true;
+    try {
+      const res: any = await this.datasetService.getDistinctColumnValues(org, dataset, columnName);
+      if (res?.status && res.data) {
+        this.columnValuesCache[columnName] = (res.data || []).map((v: any) => ({
+          label: String(v),
+          value: String(v),
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to load distinct values for column', columnName, err);
+    } finally {
+      this.isLoadingColumnValues[columnName] = false;
     }
+  }
+
+  onColumnChange(index: number, selectedValue?: string): void {
+    if (selectedValue) {
+      this.conditions.at(index)?.get('values')?.setValue([]);
+      this.loadDistinctValuesForColumn(selectedValue);
+    }
+  }
+
+  getColumnValues(index: number): { label: string; value: string }[] {
+    const columnName = this.conditions.at(index)?.get('columnName')?.value;
+    return columnName ? this.columnValuesCache[columnName] || [] : [];
   }
 
   checkFormDirty(): void {
@@ -174,6 +225,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   onSubmit(): void {
+    this.rlsForm.markAllAsTouched();
     if (this.rlsForm.valid && this.isFormDirty) {
       this.showSaveConfirm = true;
     }
@@ -189,13 +241,11 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       const formVal = this.rlsForm.value;
       const payload = {
         ...formVal,
-        values:
-          typeof formVal.values === 'string'
-            ? formVal.values
-                .split(',')
-                .map((v: string) => v.trim())
-                .filter((v: string) => v)
-            : formVal.values,
+        conditions: formVal.conditions.map((c: any) => ({
+          columnName: c.columnName,
+          operator: c.operator,
+          values: Array.isArray(c.values) ? c.values : [c.values],
+        })),
         justification: this.saveJustification.trim(),
       };
 
@@ -228,6 +278,9 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       return `Name must be at least ${control.errors['minlength'].requiredLength} characters`;
     if (control?.errors?.['maxlength'])
       return `Name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
   }
+
 }

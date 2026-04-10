@@ -1,16 +1,31 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { RLS_RULE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
-import { UserService } from 'src/app/modules/users/services/user.service';
-import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { RlsRulesService } from '../../services/rls-rules.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { REGEX } from 'src/app/constants/regex.constant';
+
+function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+  if (!value || !Array.isArray(value) || value.length === 0) {
+    return { required: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-add-rls-rule',
@@ -19,16 +34,18 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 })
 export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   rlsForm!: FormGroup;
+
   organisations: any[] = [];
+  datasources: any[] = [];
   datasets: any[] = [];
-  scopeTargets: any[] = []; // users or groups depending on scope
+  datasetColumns: any[] = [];
+  columnValuesCache: { [columnName: string]: { label: string; value: string }[] } = {};
+  isLoadingColumnValues: { [columnName: string]: boolean } = {};
+
+  selectedDatasource: string = '';
+
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
-
-  scopeOptions = [
-    { label: 'User', value: 'user' },
-    { label: 'Group', value: 'group' },
-  ];
 
   operatorOptions = [
     { label: 'IN', value: 'IN' },
@@ -37,14 +54,17 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     { label: 'BETWEEN', value: 'BETWEEN' },
   ];
 
+  get conditions(): FormArray {
+    return this.rlsForm.get('conditions') as FormArray;
+  }
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private globalService: GlobalService,
     private organisationService: OrganisationService,
+    private datasourceService: DatasourceService,
     private datasetService: DatasetService,
-    private userService: UserService,
-    private groupService: GroupService,
     private rlsRulesService: RlsRulesService,
   ) {
     this.initForm();
@@ -62,7 +82,12 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.loadDatasets();
+      this.rlsForm
+        .get('organisation')
+        ?.setValue(this.globalService.getTokenDetails('organisationId'), {
+          emitEvent: false,
+        });
+      this.loadDatasources();
     }
   }
 
@@ -74,6 +99,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
           Validators.required,
           Validators.minLength(2),
           Validators.maxLength(100),
+          Validators.pattern(REGEX.orgName),
         ],
       ],
       description: [''],
@@ -84,109 +110,195 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         Validators.required,
       ],
       datasetId: ['', Validators.required],
-      scope: ['', Validators.required],
-      scopeId: ['', Validators.required],
-      columnName: ['', [Validators.required, Validators.maxLength(255)]],
-      operator: ['IN', Validators.required],
-      values: ['', Validators.required], // comma-separated string, converted to array on submit
+      conditions: this.fb.array([this.createCondition()]),
       isEnabled: [true],
     });
 
-    // When organisation changes, reload datasets and clear dependent fields
+    // Org changes → reload datasources, clear downstream
     this.rlsForm.get('organisation')?.valueChanges.subscribe(value => {
       if (value) {
-        this.loadDatasets();
+        this.selectedDatasource = '';
+        this.datasources = [];
+        this.datasets = [];
+        this.datasetColumns = [];
+        this.columnValuesCache = {};
+        this.isLoadingColumnValues = {};
+        this.resetConditions();
         this.rlsForm.patchValue(
-          { datasetId: '', scope: '', scopeId: '' },
+          { datasetId: '' },
           { emitEvent: false },
         );
-        this.scopeTargets = [];
+        this.loadDatasources();
       }
     });
 
-    // When scope changes, reload scope targets (users or groups)
-    this.rlsForm.get('scope')?.valueChanges.subscribe(value => {
+    // Dataset changes → load columns, reset conditions
+    this.rlsForm.get('datasetId')?.valueChanges.subscribe(value => {
+      this.datasetColumns = [];
+      this.columnValuesCache = {};
+      this.isLoadingColumnValues = {};
+      this.resetConditions();
       if (value) {
-        this.loadScopeTargets();
-        this.rlsForm.patchValue({ scopeId: '' }, { emitEvent: false });
+        this.loadDatasetColumns();
       }
     });
   }
 
-  loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
+  createCondition(): FormGroup {
+    return this.fb.group({
+      columnName: ['', Validators.required],
+      operator: ['IN', Validators.required],
+      values: [[], nonEmptyArray],
+    });
+  }
 
+  addCondition() {
+    this.conditions.push(this.createCondition());
+    this.rlsForm.markAsDirty();
+  }
+
+  removeCondition(index: number) {
+    if (this.conditions.length > 1) {
+      this.conditions.removeAt(index);
+      this.rlsForm.markAsDirty();
+    }
+  }
+
+  resetConditions(): void {
+    this.conditions.clear();
+    this.conditions.push(this.createCondition());
+  }
+
+  loadOrganisations() {
+    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs;
+        this.organisations = response.data.orgs || [];
       }
     });
+  }
+
+  loadDatasources() {
+    const orgId = this.rlsForm.get('organisation')?.value;
+    if (!orgId) return;
+
+    const params = { orgId, pageNumber: DEFAULT_PAGE, limit: MAX_LIMIT };
+    this.datasourceService.listDatasource(params).then((response: any) => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.datasources = response.data.datasources || [];
+        this.selectedDatasource = '';
+        this.datasets = [];
+        this.rlsForm.patchValue(
+          { datasetId: '' },
+          { emitEvent: false },
+        );
+      } else {
+        this.datasources = [];
+      }
+    });
+  }
+
+  onDatasourceChange(datasourceId: string) {
+    this.selectedDatasource = datasourceId;
+    this.datasets = [];
+    this.datasetColumns = [];
+    this.columnValuesCache = {};
+    this.isLoadingColumnValues = {};
+    this.resetConditions();
+    this.rlsForm.patchValue(
+      { datasetId: '' },
+      { emitEvent: false },
+    );
+    if (datasourceId) {
+      this.loadDatasets();
+    }
   }
 
   loadDatasets() {
     const orgId = this.rlsForm.get('organisation')?.value;
-    if (!orgId) return;
+    if (!orgId || !this.selectedDatasource) return;
 
     const params = {
       orgId,
+      datasourceId: this.selectedDatasource,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
 
     this.datasetService.listDatasets(params).then((response: any) => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.datasets = response.data.datasets || response.data || [];
+        this.datasets = response.data.datasets || [];
+      } else {
+        this.datasets = [];
       }
     });
   }
 
-  loadScopeTargets() {
+  loadDatasetColumns(): void {
     const orgId = this.rlsForm.get('organisation')?.value;
-    const scope = this.rlsForm.get('scope')?.value;
-    if (!orgId || !scope) return;
+    const datasetId = this.rlsForm.get('datasetId')?.value;
+    if (!orgId || !datasetId) return;
 
-    const params = {
-      orgId,
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
+    this.datasetService.getDataset(orgId, datasetId).then((response: any) => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.datasetColumns = (response.data.datasetFields || []).map((f: any) => ({
+          ...f,
+          columnToView: f.columnToView || f.columnToUse,
+        }));
+      }
+    });
+  }
 
-    if (scope === 'user') {
-      this.userService.listUser(params).then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.scopeTargets = (response.data.users || []).map((u: any) => ({
-            label: `${u.firstName} ${u.lastName}`,
-            value: u.id,
-          }));
-        }
-      });
-    } else if (scope === 'group') {
-      this.groupService.listGroupps(params).then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.scopeTargets = (response.data.groups || []).map((g: any) => ({
-            label: g.name,
-            value: g.id,
-          }));
-        }
-      });
+  async loadDistinctValuesForColumn(columnName: string): Promise<void> {
+    if (!columnName) return;
+
+    // Return from cache if available
+    if (this.columnValuesCache[columnName]) return;
+
+    const orgId = this.rlsForm.get('organisation')?.value;
+    const datasetId = this.rlsForm.get('datasetId')?.value;
+    if (!orgId || !datasetId) return;
+
+    this.isLoadingColumnValues[columnName] = true;
+
+    try {
+      const res: any = await this.datasetService.getDistinctColumnValues(orgId, datasetId, columnName);
+      if (res?.status && res.data) {
+        this.columnValuesCache[columnName] = (res.data || []).map((v: any) => ({
+          label: String(v),
+          value: String(v),
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to load distinct values for column', columnName, err);
+    } finally {
+      this.isLoadingColumnValues[columnName] = false;
     }
   }
 
+  onColumnChange(index: number, selectedValue?: string): void {
+    if (selectedValue) {
+      this.conditions.at(index)?.get('values')?.setValue([]);
+      this.loadDistinctValuesForColumn(selectedValue);
+    }
+  }
+
+  getColumnValues(index: number): { label: string; value: string }[] {
+    const columnName = this.conditions.at(index)?.get('columnName')?.value;
+    return columnName ? this.columnValuesCache[columnName] || [] : [];
+  }
+
   onSubmit() {
+    this.rlsForm.markAllAsTouched();
     if (this.rlsForm.valid) {
       const formVal = this.rlsForm.value;
       const payload = {
         ...formVal,
-        values:
-          typeof formVal.values === 'string'
-            ? formVal.values
-                .split(',')
-                .map((v: string) => v.trim())
-                .filter((v: string) => v)
-            : formVal.values,
+        conditions: formVal.conditions.map((c: any) => ({
+          columnName: c.columnName,
+          operator: c.operator,
+          values: Array.isArray(c.values) ? c.values : [c.values],
+        })),
       };
 
       this.rlsRulesService.addRule(payload).then((response: any) => {
@@ -209,6 +321,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       return `Name must be at least ${control.errors['minlength'].requiredLength} characters`;
     if (control?.errors?.['maxlength'])
       return `Name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+    if (control?.errors?.['pattern'])
+      return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
   }
 }

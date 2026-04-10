@@ -1,0 +1,92 @@
+<div class="confirmation-popup">
+  <div class="popup-content assignments-popup">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-users"></i>
+      </div>
+      <h3>Manage Assignments</h3>
+      <p class="popup-subtitle">{{ rule?.name }}</p>
+    </div>
+
+    <!-- Add Assignment Form -->
+    <div class="add-assignment-section">
+      <div class="add-assignment-form">
+        <app-custom-dropdown
+          [(ngModel)]="newScope"
+          [options]="scopeOptions"
+          optionLabel="label"
+          optionValue="value"
+          label="Scope"
+          placeholder="Select Scope"
+          [autoDisplayFirst]="false"
+          (onChangeEvent)="onScopeChange($event)"
+        ></app-custom-dropdown>
+
+        <app-custom-dropdown
+          [(ngModel)]="newScopeId"
+          [options]="scopeTargets"
+          optionLabel="label"
+          optionValue="value"
+          [label]="newScope === 'user' ? 'User' : 'Group'"
+          [placeholder]="newScope === 'user' ? 'Select User' : 'Select Group'"
+          [filter]="true"
+          [autoDisplayFirst]="false"
+          [disabled]="!newScope || scopeTargetsLoading"
+        ></app-custom-dropdown>
+
+        <button
+          class="btn-add-assignment"
+          (click)="addAssignment()"
+          [disabled]="!newScope || !newScopeId || isAddingAssignment"
+        >
+          <i class="pi pi-plus"></i>
+          {{ isAddingAssignment ? 'Adding...' : 'Add Assignment' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Assignments List -->
+    <div class="assignments-list-section">
+      <div class="section-label">
+        Current Assignments
+        <span class="count-badge">{{ assignments.length }}</span>
+      </div>
+
+      <div class="loading-state" *ngIf="isLoadingAssignments">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Loading assignments...</span>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoadingAssignments && assignments.length === 0">
+        <i class="pi pi-users"></i>
+        <p>No assignments yet. Add users or groups above.</p>
+      </div>
+
+      <div class="assignment-list" *ngIf="!isLoadingAssignments && assignments.length > 0">
+        <div class="assignment-row" *ngFor="let a of assignments">
+          <i class="pi" [ngClass]="a.scope === 'user' ? 'pi-user' : 'pi-users'"></i>
+          <div class="assignment-info">
+            <span class="assignment-name">{{ a.scopeName || a.scopeId }}</span>
+            <span class="assignment-type">{{ a.scope }}</span>
+          </div>
+          <button
+            class="btn-remove"
+            (click)="removeAssignment(a)"
+            pTooltip="Remove assignment"
+            tooltipPosition="left"
+          >
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="close()">
+        <i class="pi pi-times"></i> Close
+      </button>
+    </div>
+  </div>
+</div>
