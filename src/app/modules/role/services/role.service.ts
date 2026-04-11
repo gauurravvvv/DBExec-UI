@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { GROUP, ROLE } from 'src/app/constants/api';
-import { IParams } from 'src/app/core/interfaces/global.interface';
+import { ROLE } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -10,13 +9,15 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 export class RoleService {
   constructor(private http: HttpClient) {}
 
-  listRoles(params: IParams) {
+  listRoles(orgId: string, params?: { page?: number; limit?: number; filter?: any }) {
+    const queryParams: any = { orgId };
+    if (params?.page) queryParams.page = params.page;
+    if (params?.limit) queryParams.limit = params.limit;
+    if (params?.filter && Object.keys(params.filter).length > 0) {
+      queryParams.filter = JSON.stringify(params.filter);
+    }
     return this.http
-      .get(
-        ROLE.LIST +
-          `/${params.orgId}` +
-          `/${params.pageNumber}/${params.limit}`,
-      )
+      .get(ROLE.LIST, { params: queryParams })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -24,17 +25,14 @@ export class RoleService {
       });
   }
 
-  addRole(categoryForm: FormGroup) {
-    const { name, description, organisation, environments, users } =
-      categoryForm.value;
+  addRole(data: {
+    name: string;
+    description?: string;
+    organisation: string;
+    selectedPermissions: any[];
+  }) {
     return this.http
-      .post(ROLE.ADD, {
-        name,
-        description,
-        organisation,
-        environments,
-        users,
-      })
+      .post(ROLE.ADD, data)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -54,9 +52,9 @@ export class RoleService {
       });
   }
 
-  viewRole(orgId: string, categoryId: string) {
+  viewRole(orgId: string, roleId: string) {
     return this.http
-      .get(ROLE.VIEW + `${orgId}/${categoryId}`)
+      .get(ROLE.VIEW + `${orgId}/${roleId}`)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -64,19 +62,19 @@ export class RoleService {
       });
   }
 
-  editRole(groupForm: FormGroup, justification?: string) {
-    const { id, name, description, status, users, organisation } =
-      groupForm.getRawValue();
+  editRole(
+    data: {
+      id: string;
+      name: string;
+      description?: string;
+      organisation: string;
+      selectedPermissions: any[];
+      status: number;
+    },
+    justification?: string,
+  ) {
     return this.http
-      .put(ROLE.UPDATE, {
-        id,
-        name,
-        description,
-        status: status ? 1 : 0,
-        users,
-        organisation,
-        justification,
-      })
+      .put(ROLE.UPDATE, { ...data, justification })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));
@@ -84,9 +82,9 @@ export class RoleService {
       });
   }
 
-  listPermissions(orgId: string, type: string) {
+  listPermissions() {
     return this.http
-      .get(ROLE.LIST_PERMISSIONS + `${orgId}/${type}`)
+      .get(ROLE.LIST_PERMISSIONS)
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

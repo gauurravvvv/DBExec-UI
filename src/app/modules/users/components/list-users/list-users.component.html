@@ -27,13 +27,31 @@
             >
             </app-custom-dropdown>
           </div>
+
+          <!-- Role Filter Dropdown -->
+          <div class="dropdown-field">
+            <app-custom-dropdown
+              [(ngModel)]="selectedRole"
+              [options]="roles"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              label="Filter by Role"
+              [floatingLabel]="true"
+              filterBy="name"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              (onChangeEvent)="onRoleChange($event)"
+            >
+            </app-custom-dropdown>
+          </div>
         </div>
 
         <div class="toolbar-right">
           <!-- Clear Filters Button -->
           <button
             pButton
-            label="Clear Filters"
+            label="Clear"
             icon="pi pi-filter-slash"
             (click)="clearFilters()"
             [disabled]="!isFilterActive"
@@ -82,8 +100,11 @@
               <th style="width: 12%">
                 <div class="th-content">Last Name</div>
               </th>
-              <th style="width: 18%">
+              <th style="width: 16%">
                 <div class="th-content">Email</div>
+              </th>
+              <th style="width: 10%">
+                <div class="th-content">Role</div>
               </th>
               <th style="width: 10%">
                 <div class="th-content">Status</div>
@@ -127,6 +148,9 @@
                   (ngModelChange)="onFilterChange()"
                   placeholder="Search Email"
                 ></app-custom-input>
+              </th>
+              <th>
+                <!-- No filter for Role (use toolbar dropdown) -->
               </th>
               <th>
                 <app-custom-dropdown
@@ -185,6 +209,9 @@
                 <span class="description-text" [title]="user.email">{{
                   user.email
                 }}</span>
+              </td>
+              <td>
+                <span class="description-text">{{ user.roleName || '—' }}</span>
               </td>
               <td>
                 <span

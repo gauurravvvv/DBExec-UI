@@ -12,16 +12,16 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/organisation',
   },
   {
-    value: 'orgAdmin',
-    route: '/app/org-admin',
-  },
-  {
     value: 'userManagement',
     route: '/app/users',
   },
   {
     value: 'userGroupManagement',
     route: '/app/group',
+  },
+  {
+    value: 'roleManagement',
+    route: '/app/role',
   },
   {
     value: 'accessManagement',
@@ -38,10 +38,6 @@ export const SIDEBAR_ITEMS_ROUTES = [
   {
     value: 'dbConnections',
     route: '/app/connections',
-  },
-  {
-    value: 'setupRole',
-    route: '/app/role',
   },
   {
     value: 'dbExecStudio',
@@ -103,8 +99,8 @@ export const SIDEBAR_ITEMS_ROUTES = [
 
 export const HOME_ROUTES = {
   SUPER_ADMIN: '/app/home/super-admin',
-  ORG_ADMIN: '/app/home/org-admin',
-  ORG_USER: '/app/home/org-user',
+  ORG_ADMIN: '/app/home/org',
+  ORG_USER: '/app/home/org',
 };
 
 export const AUTH_ROUTES = {

@@ -24,16 +24,6 @@ export const SUPER_ADMIN = {
   UNLOCK: '/super-admin/unlock/',
 };
 
-export const ORG_ADMIN = {
-  LIST: '/org-admin/list',
-  DELETE: '/org-admin/delete/',
-  ADD: '/org-admin/add',
-  VIEW: '/org-admin/get/',
-  UPDATE: '/org-admin/update',
-  UPDATE_PASSWORD: '/org-admin/update/password',
-  UNLOCK: '/org-admin/unlock/',
-};
-
 export const ORGANISATION = {
   LIST: '/org/list',
   ADD: '/org/add',
@@ -183,7 +173,7 @@ export const ROLE = {
   DELETE: '/role/delete/',
   VIEW: '/role/get/',
   UPDATE: '/role/update',
-  LIST_PERMISSIONS: '/role/get-permissions/',
+  LIST_PERMISSIONS: '/role/permissions',
 };
 
 export const ACCESS = {

@@ -22,19 +22,10 @@ export class EmptyRootComponent implements OnInit {
       return;
     }
 
-    switch (role) {
-      case ROLES.SUPER_ADMIN:
-        this.router.navigate(['/app/home/super-admin']);
-        break;
-      case ROLES.ORG_ADMIN:
-        this.router.navigate(['/app/home/org-admin']);
-        break;
-      case ROLES.ORG_USER:
-        this.router.navigate(['/app/home/org-user']);
-        break;
-      default:
-        this.router.navigate(['/login']);
-        break;
+    if (role === ROLES.SUPER_ADMIN) {
+      this.router.navigate(['/app/home/super-admin']);
+    } else {
+      this.router.navigate(['/app/home/org']);
     }
   }
 }

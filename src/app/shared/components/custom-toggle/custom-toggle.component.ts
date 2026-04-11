@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -20,11 +20,12 @@ export class CustomToggleComponent implements ControlValueAccessor {
   @Input() trueLabel = 'Active';
   @Input() falseLabel = 'Inactive';
   @Input() showStatusLabel = true;
+  @Output() onChange = new EventEmitter<{ checked: boolean }>();
 
   value: any = false;
   disabled = false;
 
-  private onChange: (value: any) => void = () => {};
+  private _onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};
 
   get isChecked(): boolean {
@@ -40,7 +41,7 @@ export class CustomToggleComponent implements ControlValueAccessor {
   }
 
   registerOnChange(fn: (value: any) => void): void {
-    this.onChange = fn;
+    this._onChange = fn;
   }
 
   registerOnTouched(fn: () => void): void {
@@ -53,7 +54,8 @@ export class CustomToggleComponent implements ControlValueAccessor {
 
   onToggleChange(checked: boolean): void {
     this.value = checked ? this.trueValue : this.falseValue;
-    this.onChange(this.value);
+    this._onChange(this.value);
     this.onTouched();
+    this.onChange.emit({ checked });
   }
 }

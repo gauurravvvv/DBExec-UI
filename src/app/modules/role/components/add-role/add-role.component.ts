@@ -13,6 +13,7 @@ import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RoleService } from '../../services/role.service';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-role',
@@ -27,11 +28,6 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
   selectedOrg: any = null;
   permissionControls: { [key: string]: FormControl } = {};
-
-  roleTypes = [
-    { label: 'Admin', value: 1 },
-    { label: 'User', value: 2 },
-  ];
 
   constructor(
     private fb: FormBuilder,
@@ -58,6 +54,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
       this.selectedOrg = {
         id: this.globalService.getTokenDetails('organisationId'),
       };
+      this.loadPermissions();
     }
   }
 
@@ -75,16 +72,14 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
       ],
       name: ['', [Validators.required, Validators.pattern(REGEX.firstName)]],
       description: [''],
-      type: [null, Validators.required],
-      selectedPermissions: [[]],
     });
   }
 
   loadOrganisations() {
     const params = {
-      pageNumber: 1,
-      limit: 100,
-    };
+         page: DEFAULT_PAGE,
+         limit: MAX_LIMIT,
+       };
 
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
@@ -93,24 +88,39 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
+  loadPermissions() {
+    this.roleService.listPermissions().then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.permissions = [...(response.data.permissions || [])];
+        this.initializePermissionControls(this.permissions);
+      }
+    });
+  }
+
   onSubmit() {
     if (this.roleForm.valid) {
-      // Get all selected permissions
-      const selectedPermissions = Object.entries(this.permissionControls)
-        .filter(([_, control]) => control.value)
-        .map(([key]) => key);
+      const selectedPermissions = this.buildSelectedPermissions(
+        this.permissions,
+      );
 
-      const formData = {
-        ...this.roleForm.value,
-        selectedPermissions,
-      };
+      if (selectedPermissions.length === 0) {
+        return;
+      }
 
-      this.roleService.addRole(formData).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.roleForm.markAsPristine();
-          this.router.navigate([ROLE.LIST]);
-        }
-      });
+      const formValues = this.roleForm.value;
+      this.roleService
+        .addRole({
+          name: formValues.name,
+          description: formValues.description || undefined,
+          organisation: formValues.organisation,
+          selectedPermissions,
+        })
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.roleForm.markAsPristine();
+            this.router.navigate([ROLE.LIST]);
+          }
+        });
     } else {
       Object.keys(this.roleForm.controls).forEach(key => {
         const control = this.roleForm.get(key);
@@ -119,6 +129,26 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
         }
       });
     }
+  }
+
+  private buildSelectedPermissions(permissions: any[]): any[] {
+    const result: any[] = [];
+    for (const perm of permissions) {
+      if (perm.subPermissions) {
+        const selectedSubs = perm.subPermissions.filter(
+          (sub: any) => this.permissionControls[sub.value]?.value,
+        );
+        if (
+          selectedSubs.length > 0 ||
+          this.permissionControls[perm.value]?.value
+        ) {
+          result.push({ ...perm, subPermissions: selectedSubs });
+        }
+      } else if (this.permissionControls[perm.value]?.value) {
+        result.push(perm);
+      }
+    }
+    return result;
   }
 
   getNameError(): string {
@@ -142,32 +172,21 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     this.selectedOrg = null;
     this.permissions = [];
     this.permissionControls = {};
+    if (!this.showOrganisationDropdown) {
+      this.selectedOrg = {
+        id: this.globalService.getTokenDetails('organisationId'),
+      };
+      this.loadPermissions();
+    }
   }
 
   onOrganisationChange(event: any) {
-    this.selectedOrg = event.value
-      ? {
-          id: event.value,
-        }
-      : null;
-
-    this.roleForm.patchValue({
-      type: null,
-    });
-
+    this.selectedOrg = event.value ? { id: event.value } : null;
     this.permissions = [];
     this.permissionControls = {};
-  }
-
-  onRoleTypeChange(type: any) {
-    this.roleService
-      .listPermissions(this.selectedOrg.id, type.value)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.permissions = [...response.data];
-          this.initializePermissionControls(this.permissions);
-        }
-      });
+    if (this.selectedOrg) {
+      this.loadPermissions();
+    }
   }
 
   getPermissionControl(permissionValue: string): FormControl {
@@ -180,12 +199,10 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   onPermissionChange(permission: any, event: any) {
     const checked = event.checked;
 
-    // If parent permission is toggled
     if (permission.subPermissions) {
       this.updateChildPermissions(permission.subPermissions, checked);
     }
 
-    // If child permission is toggled on, ensure parent is toggled on
     if (checked && permission.parentId !== '0') {
       this.updateParentPermission(permission);
     }

@@ -8,6 +8,7 @@ import { HomeComponent } from './shared/components/layout/home/home.component';
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
 import { CliAuthComponent } from './modules/auth/components/cli-auth/cli-auth.component';
+import { PERMISSIONS } from './constants/permissions.constant';
 
 const routes: Routes = [
   {
@@ -59,7 +60,6 @@ const routes: Routes = [
           import('./modules/home/home.module').then(m => m.HomeModule),
         data: { title: 'Home' },
       },
-      // Super admin only
       {
         path: 'super-admin',
         loadChildren: () =>
@@ -78,29 +78,19 @@ const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['SUPER-ADMIN'], title: 'Organisations' },
       },
-      // Org admin only
-      {
-        path: 'org-admin',
-        loadChildren: () =>
-          import('./modules/organisation-admin/organisation-admin.module').then(
-            m => m.OrgAdminModule,
-          ),
-        canActivate: [RoleGuard],
-        data: { roles: ['SUPER-ADMIN', 'ORG-ADMIN'], title: 'Org Admins' },
-      },
       {
         path: 'users',
         loadChildren: () =>
           import('./modules/users/users.module').then(m => m.UsersModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN'], title: 'Users' },
+        data: { permission: PERMISSIONS.USER_MANAGEMENT, title: 'Users' },
       },
       {
         path: 'group',
         loadChildren: () =>
           import('./modules/groups/group.module').then(m => m.GroupModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN'], title: 'Groups' },
+        data: {  permission: PERMISSIONS.USER_GROUP, title: 'Groups' },
       },
       {
         path: 'rls-rules',
@@ -109,16 +99,16 @@ const routes: Routes = [
             m => m.RlsRulesModule,
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN'], title: 'RLS Rules' },
+        data: {  permission: PERMISSIONS.RLS_RULES, title: 'RLS Rules' },
       },
       {
         path: 'access',
         loadChildren: () =>
           import('./modules/access/access.module').then(m => m.AccessModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN'], title: 'Access' },
+        data: { permission: PERMISSIONS.ACCESS_MANAGEMENT, title: 'Access' },
       },
-      // Org admin + org user
+      // Permission-gated
       {
         path: 'datasource',
         loadChildren: () =>
@@ -126,7 +116,7 @@ const routes: Routes = [
             m => m.DatasourceModule,
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Datasources' },
+        data: { permission: PERMISSIONS.SETUP_DB, title: 'Datasources' },
       },
       {
         path: 'connections',
@@ -135,21 +125,21 @@ const routes: Routes = [
             m => m.ConnectionsModule,
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Connections' },
+        data: { permission: PERMISSIONS.DB_CONNECTIONS, title: 'Connections' },
       },
       {
         path: 'role',
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN'], title: 'Roles' },
+        data: {  permission: PERMISSIONS.ROLE_MANAGEMENT, title: 'Roles' },
       },
       {
         path: 'dataset',
         loadChildren: () =>
           import('./modules/dataset/dataset.module').then(m => m.DatasetModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Dataset' },
+        data: { permission: PERMISSIONS.DATASET, title: 'Dataset' },
       },
       {
         path: 'analyses',
@@ -158,7 +148,7 @@ const routes: Routes = [
             m => m.AnalysesModule,
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Analyses' },
+        data: { permission: PERMISSIONS.ANALYSES, title: 'Analyses' },
       },
       {
         path: 'dashboard',
@@ -167,28 +157,28 @@ const routes: Routes = [
             m => m.DashboardModule,
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Dashboards' },
+        data: { permission: PERMISSIONS.DASHBOARD, title: 'Dashboards' },
       },
       {
         path: 'tab',
         loadChildren: () =>
           import('./modules/tab/tab.module').then(m => m.TabModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Tabs' },
+        data: { permission: PERMISSIONS.QB_TAB, title: 'Tabs' },
       },
       {
         path: 'section',
         loadChildren: () =>
           import('./modules/section/section.module').then(m => m.SectionModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Sections' },
+        data: { permission: PERMISSIONS.QB_SECTION, title: 'Sections' },
       },
       {
         path: 'prompt',
         loadChildren: () =>
           import('./modules/prompt/prompt.module').then(m => m.PromptModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Prompts' },
+        data: { permission: PERMISSIONS.QB_PROMPT, title: 'Prompts' },
       },
       {
         path: 'query-builder',
@@ -197,14 +187,14 @@ const routes: Routes = [
             m => m.QueryBuilderModule,
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN', 'ORG-USER'], title: 'Query Builders' },
+        data: { permission: PERMISSIONS.QB_SCREEN, title: 'Query Builders' },
       },
       {
         path: 'audit-logs',
         loadChildren: () =>
           import('./modules/audit/audit.module').then(m => m.AuditModule),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN'], title: 'Audit Logs' },
+        data: {  permission: PERMISSIONS.AUDIT_LOGS, title: 'Audit Logs' },
       },
       {
         path: 'login-activity',
@@ -213,7 +203,7 @@ const routes: Routes = [
             m => m.LoginActivityModule,
           ),
         canActivate: [RoleGuard],
-        data: { roles: ['ORG-ADMIN'], title: 'Login Activity' },
+        data: {  permission: PERMISSIONS.LOGIN_ACTIVITY, title: 'Login Activity' },
       },
       // All roles
       {

@@ -32,38 +32,33 @@ export class RoleGuard implements CanActivate {
       return false;
     }
 
-    // Super admin has access to everything
+    // Super admin bypasses all checks
     if (userRole === ROLES.SUPER_ADMIN) {
       return true;
     }
 
     const allowedRoles: string[] = route.data['roles'];
+    const requiredPermission: string = route.data['permission'];
 
-    // If no roles specified, allow all authenticated users
-    if (!allowedRoles || allowedRoles.length === 0) {
-      return true;
+    // Check system role first
+    if (allowedRoles?.length > 0 && !allowedRoles.includes(userRole)) {
+      this.router.navigate([this.getHomeByRole(userRole)]);
+      return false;
     }
 
-    if (allowedRoles.includes(userRole)) {
-      return true;
+    // Check module-level permission if specified
+    if (requiredPermission && !this.globalService.hasPermission(requiredPermission)) {
+      this.router.navigate([this.getHomeByRole(userRole)]);
+      return false;
     }
 
-    // Redirect to user's own home
-    const homeRoute = this.getHomeByRole(userRole);
-    this.router.navigate([homeRoute]);
-    return false;
+    return true;
   }
 
   private getHomeByRole(role: string): string {
-    switch (role) {
-      case ROLES.SUPER_ADMIN:
-        return HOME_ROUTES.SUPER_ADMIN;
-      case ROLES.ORG_ADMIN:
-        return HOME_ROUTES.ORG_ADMIN;
-      case ROLES.ORG_USER:
-        return HOME_ROUTES.ORG_USER;
-      default:
-        return AUTH_ROUTES.LOGIN;
+    if (role === ROLES.SUPER_ADMIN) {
+      return HOME_ROUTES.SUPER_ADMIN;
     }
+    return HOME_ROUTES.ORG_ADMIN;
   }
 }

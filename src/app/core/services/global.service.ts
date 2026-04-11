@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { StorageType } from '../../constants/storageType';
 import { StorageService } from './storage.service';
 import { MessageService } from 'primeng/api';
+import { ROLES } from '../../constants/user.constant';
 
 interface IAPIResponse {
   code: number;
@@ -129,6 +130,26 @@ export class GlobalService {
       this.router.navigateByUrl('');
       return null;
     }
+  }
+
+  /**
+   * Returns true if the logged-in user has the given permission value
+   * anywhere in their permissions tree. Super admins always return true.
+   */
+  hasPermission(permissionValue: string): boolean {
+    const userRole = this.getTokenDetails('role');
+    if (userRole === ROLES.SUPER_ADMIN) return true;
+    const permissions = this.getTokenDetails('permission');
+    if (!permissions || !Array.isArray(permissions)) return false;
+    return this.checkPermissionTree(permissions, permissionValue);
+  }
+
+  private checkPermissionTree(permissions: any[], value: string): boolean {
+    for (const perm of permissions) {
+      if (perm.value === value) return true;
+      if (perm.subPermissions && this.checkPermissionTree(perm.subPermissions, value)) return true;
+    }
+    return false;
   }
 
   camelCase(input: string): string {
