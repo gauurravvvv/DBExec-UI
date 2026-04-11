@@ -1,1 +1,95 @@
-<p>view-role works!</p>
+<div class="view-role-wrapper" *ngIf="roleData">
+  <div class="view-role-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          (click)="goBack()"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Role Details</h2>
+      </div>
+      <div class="header-actions">
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="onEdit()"
+        >
+          <i class="pi pi-pencil"></i> Edit
+        </button>
+      </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="profile-container">
+      <div class="details-grid">
+        <!-- First Row: Role icon + Role Info -->
+        <div class="first-row">
+          <!-- Role Icon Section -->
+          <div class="avatar-section">
+            <div class="role-icon-circle">
+              <i class="pi pi-shield"></i>
+            </div>
+            <h3 class="role-name">{{ roleData.name }}</h3>
+            <span *ngIf="roleData.isDefault === 1" class="default-badge">Default</span>
+          </div>
+
+          <!-- Role Information -->
+          <div class="detail-group">
+            <h4>Role Information</h4>
+            <div class="detail-item" *ngIf="roleData.description">
+              <span class="label">
+                <i class="pi pi-align-left"></i>
+                Description
+              </span>
+              <span class="value">{{ roleData.description }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-check-circle"></i>
+                Status
+              </span>
+              <span class="value">
+                <span class="status-badge" [class.active]="roleData.status === 1">
+                  {{ roleData.status === 1 ? 'Active' : 'Inactive' }}
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permissions Section -->
+      <div class="permissions-section" *ngIf="permissions.length > 0">
+        <h4 class="section-title">Screen Permissions</h4>
+        <div class="permission-columns">
+          <div class="column" *ngFor="let permission of permissions">
+            <div class="column-header">{{ permission.label }}</div>
+            <div class="permission-items">
+              <div class="permission-item" *ngIf="!permission.subPermissions">
+                <span class="item-label">{{ permission.label }}</span>
+                <i class="pi pi-check-circle perm-enabled"></i>
+              </div>
+              <ng-container *ngIf="permission.subPermissions">
+                <div
+                  class="permission-item"
+                  *ngFor="let subPerm of permission.subPermissions"
+                >
+                  <span class="item-label">{{ subPerm.label }}</span>
+                  <i class="pi pi-check-circle perm-enabled"></i>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="permissions.length === 0" class="no-permissions">
+        No permissions configured for this role.
+      </div>
+    </div>
+  </div>
+</div>

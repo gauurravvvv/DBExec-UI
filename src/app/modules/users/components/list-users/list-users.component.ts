@@ -7,6 +7,7 @@ import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { RoleService } from 'src/app/modules/role/services/role.service';
 import { UserService } from '../../services/user.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
@@ -30,7 +31,9 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   deleteJustification = '';
 
   organisations: any[] = [];
+  roles: any[] = [];
   selectedOrg: any = null;
+  selectedRole: string | null = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
@@ -64,13 +67,15 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       !!this.filterValues.email ||
       this.filterValues.status !== null ||
       !!this.filterValues.lastLoginDateRange ||
-      !!this.filterValues.createdDateRange
+      !!this.filterValues.createdDateRange ||
+      !!this.selectedRole
     );
   }
 
   constructor(
     private userService: UserService,
     private organisationService: OrganisationService,
+    private roleService: RoleService,
     private router: Router,
     private globalService: GlobalService,
   ) {}
@@ -87,6 +92,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       this.loadOrganisations();
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+      this.loadRoles();
     }
   }
 
@@ -107,6 +113,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
         this.organisations = response.data.orgs;
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
+          this.loadRoles();
           // Trigger load after org is selected
           this.loadUsers();
         } else {
@@ -119,8 +126,26 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadRoles() {
+    const orgId = this.selectedOrg || this.globalService.getTokenDetails('organisationId');
+    if (!orgId) return;
+    this.roleService.listRoles(orgId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.roles = response.data.roles || [];
+      }
+    });
+  }
+
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
+    this.selectedRole = null;
+    this.roles = [];
+    this.loadRoles();
+    this.loadUsers();
+  }
+
+  onRoleChange(roleId: string | null) {
+    this.selectedRole = roleId;
     this.loadUsers();
   }
 
@@ -139,6 +164,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       lastLoginDateRange: null,
       createdDateRange: null,
     };
+    this.selectedRole = null;
     // Immediately reload without filters
     this.loadUsers();
   }
@@ -173,6 +199,10 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       page: page,
       limit: limit,
     };
+
+    if (this.selectedRole) {
+      params.roleId = this.selectedRole;
+    }
 
     // Build filter object
     const filter: any = {};

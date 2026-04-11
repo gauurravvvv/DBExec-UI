@@ -5,6 +5,7 @@ import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { RoleService } from 'src/app/modules/role/services/role.service';
 import { UserService } from '../../services/user.service';
 import { REGEX } from 'src/app/constants/regex.constant';
 
@@ -17,6 +18,7 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
   userForm!: FormGroup;
   isCancelClicked = false;
   organisations: any[] = [];
+  roles: any[] = [];
   userId: string = '';
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
@@ -32,6 +34,7 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private route: ActivatedRoute,
     private userService: UserService,
+    private roleService: RoleService,
     private globalService: GlobalService,
   ) {
     this.initForm();
@@ -40,7 +43,20 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
   ngOnInit() {
     this.userId = this.route.snapshot.params['id'];
     this.orgId = this.route.snapshot.params['orgId'];
+    this.loadRoles();
     this.loadAdminData();
+  }
+
+  loadRoles() {
+    const orgId =
+      this.orgId || this.globalService.getTokenDetails('organisationId');
+    this.roleService.listRoles(orgId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.roles = (response.data.roles || []).filter(
+          (r: any) => r.status === 1,
+        );
+      }
+    });
   }
 
   get isFormDirty(): boolean {
@@ -84,6 +100,7 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
       email: ['', [Validators.required, Validators.email]],
       organisation: ['', Validators.required],
       status: [],
+      roleId: [''],
     });
   }
 
@@ -103,6 +120,7 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
           email: this.userData.email,
           organisation: this.userData.organisationId,
           status: this.userData.status,
+          roleId: this.userData.roleId || '',
         });
         this.selectedOrgName = this.userData.organisationName;
       }
@@ -144,6 +162,7 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
       email: this.userData.email,
       organisation: this.userData.organisationId,
       status: this.userData.status,
+      roleId: this.userData.roleId || '',
     });
     this.selectedOrgName = this.userData.organisationName;
     this.isCancelClicked = true;

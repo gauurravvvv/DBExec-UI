@@ -44,7 +44,6 @@ export class ListAuditLogsComponent implements OnInit {
   };
 
   moduleOptions = [
-    { label: 'Org Admin', value: 'org-admin' },
     { label: 'User', value: 'user' },
     { label: 'Datasource', value: 'datasource' },
     { label: 'Group', value: 'group' },

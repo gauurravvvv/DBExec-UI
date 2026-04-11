@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ORGANISATION_ADMIN } from 'src/app/constants/routes';
+import { USER } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from '../../services/user.service';
 
@@ -82,7 +82,7 @@ export class ViewUsersComponent implements OnInit {
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';
-            this.router.navigate([ORGANISATION_ADMIN.LIST]);
+            this.router.navigate([USER.LIST]);
           }
         });
     }

@@ -6,6 +6,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { RoleService } from 'src/app/modules/role/services/role.service';
 import { UserService } from '../../services/user.service';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
@@ -18,6 +19,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 export class AddUsersComponent implements OnInit, HasUnsavedChanges {
   userForm!: FormGroup;
   organisations: any[] = [];
+  roles: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
 
@@ -26,6 +28,7 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private userService: UserService,
     private organisationService: OrganisationService,
+    private roleService: RoleService,
     private globalService: GlobalService,
   ) {
     this.initForm();
@@ -42,6 +45,8 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
   ngOnInit() {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
+    } else {
+      this.loadRoles(this.globalService.getTokenDetails('organisationId'));
     }
   }
 
@@ -81,6 +86,7 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
           : this.globalService.getTokenDetails('organisationId'),
         Validators.required,
       ],
+      roleId: ['', Validators.required],
     });
   }
 
@@ -95,6 +101,25 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
         this.organisations = response.data.orgs;
       }
     });
+  }
+
+  loadRoles(orgId: string) {
+    if (!orgId) return;
+    this.roleService.listRoles(orgId).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.roles = (response.data.roles || []).filter(
+          (r: any) => r.status === 1,
+        );
+      }
+    });
+  }
+
+  onOrganisationChange(orgId: string) {
+    this.roles = [];
+    this.userForm.patchValue({ roleId: '' });
+    if (orgId) {
+      this.loadRoles(orgId);
+    }
   }
 
   onSubmit() {

@@ -1,1 +1,158 @@
-<p>edit-role works!</p>
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text" routerLink="/app/role">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Edit Role</h2>
+        <span *ngIf="isDefault" class="default-badge">Default</span>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="roleForm.invalid || !isFormDirty"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form [formGroup]="roleForm" class="admin-form">
+      <div class="basic-info-section">
+        <!-- Role Name -->
+        <app-custom-input
+          formControlName="name"
+          label="Name"
+          placeholder="Enter name"
+          icon="pi-box"
+          [required]="true"
+          [inputDisabled]="isDefault"
+          [showError]="
+            !!(roleForm.get('name')?.invalid && roleForm.get('name')?.touched)
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Description -->
+        <app-custom-input
+          formControlName="description"
+          label="Description"
+          placeholder="Enter description"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+
+        <!-- Status -->
+        <div *ngIf="!isDefault">
+          <app-custom-toggle
+            formControlName="status"
+            label="Status"
+            [trueValue]="1"
+            [falseValue]="0"
+            trueLabel="Active"
+            falseLabel="Inactive"
+          >
+          </app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- Permissions Section -->
+      <div class="permissions-section" *ngIf="permissions.length > 0">
+        <label class="section-title"
+          >Screen Permissions<span class="required"> *</span></label
+        >
+
+        <div class="permissions-grid">
+          <div class="permission-columns">
+            <div class="column" *ngFor="let permission of permissions">
+              <div class="column-header">{{ permission.label }}</div>
+              <div class="permission-items">
+                <div class="permission-item" *ngIf="!permission.subPermissions">
+                  <span class="item-label">{{ permission.label }}</span>
+                  <app-custom-toggle
+                    [formControl]="getPermissionControl(permission.value)"
+                    (onChange)="onPermissionChange(permission, $event)"
+                    trueLabel="Enable"
+                    falseLabel="Disable"
+                  ></app-custom-toggle>
+                </div>
+
+                <ng-container *ngIf="permission.subPermissions">
+                  <div
+                    class="permission-item"
+                    *ngFor="let subPerm of permission.subPermissions"
+                  >
+                    <span class="item-label">{{ subPerm.label }}</span>
+                    <app-custom-toggle
+                      [formControl]="getPermissionControl(subPerm.value)"
+                      (onChange)="onPermissionChange(subPerm, $event)"
+                      trueLabel="Enable"
+                      falseLabel="Disable"
+                    ></app-custom-toggle>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showSaveConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-save"></i>
+      </div>
+      <h3>Confirm Update</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">Are you sure you want to update this role?</p>
+      <div class="justification-section">
+        <label for="saveJustification"
+          >Justification <span class="required">*</span></label
+        >
+        <textarea
+          id="saveJustification"
+          [(ngModel)]="saveJustification"
+          placeholder="Provide a reason for this update"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ saveJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSave()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim()"
+      >
+        <i class="pi pi-check"></i>
+        Update
+      </button>
+    </div>
+  </div>
+</div>

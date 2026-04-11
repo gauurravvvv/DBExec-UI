@@ -13,13 +13,13 @@
           pButton
           type="button"
           label="Cancel"
-          class="p-button-outlined p-button-danger"
+          class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
         ></button>
         <button
           pButton
-          class="p-button-outlined"
+          class="p-button-primary btn-save"
           type="submit"
           label="Save"
           (click)="onSubmit()"
@@ -34,71 +34,11 @@
     <form [formGroup]="roleForm" class="admin-form">
       <!-- Basic Info Section -->
       <div class="basic-info-section">
-        <!-- Organisation -->
-        <div class="form-field" *ngIf="showOrganisationDropdown">
-          <label for="organisation"
-            >Organisation<span class="required"> *</span></label
-          >
-          <p-dropdown
-            [options]="organisations"
-            optionLabel="name"
-            optionValue="id"
-            formControlName="organisation"
-            [filter]="true"
-            filterBy="name"
-            [style]="{ width: '100%' }"
-            [panelStyle]="{ width: '100%' }"
-            placeholder="Select Organisation"
-            (onChange)="onOrganisationChange($event)"
-            [ngClass]="{
-              'ng-invalid ng-dirty':
-                roleForm.get('organisation')?.invalid &&
-                roleForm.get('organisation')?.touched,
-            }"
-          >
-          </p-dropdown>
-          <small
-            class="error-message"
-            *ngIf="
-              roleForm.get('organisation')?.invalid &&
-              roleForm.get('organisation')?.touched
-            "
-          >
-            Organisation is required
-          </small>
-        </div>
-
-        <!-- Role Type -->
-        <div class="form-field" *ngIf="selectedOrg">
-          <label for="type">Role Type<span class="required"> *</span></label>
-          <div class="role-type-container">
-            <div class="radio-group">
-              <div class="radio-option" *ngFor="let type of roleTypes">
-                <p-radioButton
-                  [value]="type.value"
-                  formControlName="type"
-                  [inputId]="'type_' + type.value"
-                  (onClick)="onRoleTypeChange(type)"
-                ></p-radioButton>
-                <label [for]="'type_' + type.value">{{ type.label }}</label>
-              </div>
-            </div>
-          </div>
-          <small
-            class="error-message"
-            *ngIf="
-              roleForm.get('type')?.invalid && roleForm.get('type')?.touched
-            "
-          >
-            Role Type is required
-          </small>
-        </div>
-
         <!-- Role Name -->
         <app-custom-input
           formControlName="name"
-          label="Name"
-          placeholder="Enter name"
+          label="Role Name"
+          placeholder="Enter role name"
           icon="pi-box"
           [required]="true"
           [showError]="
@@ -111,11 +51,34 @@
         <!-- Description -->
         <app-custom-input
           formControlName="description"
-          label="Description"
-          placeholder="Enter description"
+          label="Role Description"
+          placeholder="Enter role description"
           icon="pi-align-left"
         >
         </app-custom-input>
+
+        <!-- Organisation -->
+        <app-custom-dropdown
+          *ngIf="showOrganisationDropdown"
+          formControlName="organisation"
+          label="Organisation"
+          placeholder="Select Organisation"
+          [options]="organisations"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
+          [showError]="
+            !!(
+              roleForm.get('organisation')?.invalid &&
+              roleForm.get('organisation')?.touched
+            )
+          "
+          errorMessage="Organisation is required"
+          (onChangeEvent)="onOrganisationChange({ value: $event })"
+        >
+        </app-custom-dropdown>
       </div>
 
       <!-- Permissions Section -->
@@ -131,22 +94,26 @@
               <div class="permission-items">
                 <div class="permission-item" *ngIf="!permission.subPermissions">
                   <span class="item-label">{{ permission.label }}</span>
-                  <p-inputSwitch
+                  <app-custom-toggle
                     [formControl]="getPermissionControl(permission.value)"
                     (onChange)="onPermissionChange(permission, $event)"
-                  ></p-inputSwitch>
+                     trueLabel="Enable"
+            falseLabel="Disable"
+                  ></app-custom-toggle>
                 </div>
 
                 <ng-container *ngIf="permission.subPermissions">
                   <div
                     class="permission-item"
                     *ngFor="let subPerm of permission.subPermissions"
+                    
                   >
                     <span class="item-label">{{ subPerm.label }}</span>
-                    <p-inputSwitch
-                      [formControl]="getPermissionControl(subPerm.value)"
-                      (onChange)="onPermissionChange(subPerm, $event)"
-                    ></p-inputSwitch>
+
+                    <app-custom-toggle [formControl]="getPermissionControl(subPerm.value)"
+                    trueLabel="Enable"
+            falseLabel="Disable" (onChange)="onPermissionChange(subPerm, $event)">
+                    </app-custom-toggle>
                   </div>
                 </ng-container>
               </div>

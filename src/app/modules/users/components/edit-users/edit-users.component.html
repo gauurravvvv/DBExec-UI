@@ -115,6 +115,20 @@
         >
         </app-custom-input>
 
+        <!-- Role -->
+        <app-custom-dropdown
+          formControlName="roleId"
+          label="Role"
+          placeholder="Select Role"
+          [options]="roles"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [showError]="false"
+        >
+        </app-custom-dropdown>
+
         <!-- Status -->
         <div>
           <app-custom-toggle

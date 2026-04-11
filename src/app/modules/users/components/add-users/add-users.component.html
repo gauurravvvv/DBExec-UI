@@ -90,6 +90,28 @@
             )
           "
           errorMessage="Organisation is required"
+          (onChangeEvent)="onOrganisationChange($event)"
+        >
+        </app-custom-dropdown>
+
+        <!-- Role -->
+        <app-custom-dropdown
+          formControlName="roleId"
+          label="Role"
+          placeholder="Select Role"
+          [options]="roles"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('roleId')?.invalid &&
+              userForm.get('roleId')?.touched
+            )
+          "
+          errorMessage="Role is required"
         >
         </app-custom-dropdown>
 

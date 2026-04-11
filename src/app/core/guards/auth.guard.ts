@@ -25,16 +25,13 @@ export class AuthGuard implements CanActivate {
 
   private getDefaultRouteByRole(): string {
     const role = this.globalService.getTokenDetails('role');
-    switch (role) {
-      case ROLES.SUPER_ADMIN:
-        return HOME_ROUTES.SUPER_ADMIN;
-      case ROLES.ORG_ADMIN:
-        return HOME_ROUTES.ORG_ADMIN;
-      case ROLES.ORG_USER:
-        return HOME_ROUTES.ORG_USER;
-      default:
-        return AUTH_ROUTES.LOGIN;
+    if (role === ROLES.SUPER_ADMIN) {
+      return HOME_ROUTES.SUPER_ADMIN;
     }
+    if (role) {
+      return HOME_ROUTES.ORG_ADMIN;
+    }
+    return AUTH_ROUTES.LOGIN;
   }
 
   private readonly AUTH_ONLY_ROUTES = [

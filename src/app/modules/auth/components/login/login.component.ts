@@ -54,18 +54,9 @@ export class LoginComponent implements OnInit {
       this.loginService.login(this.loginForm).then((res: any) => {
         if (this.globalService.handleSuccessService(res, true, false)) {
           const role = this.globalService.getTokenDetails('role');
-          let homeRoute = HOME_ROUTES.ORG_USER;
-          switch (role) {
-            case ROLES.SUPER_ADMIN:
-              homeRoute = HOME_ROUTES.SUPER_ADMIN;
-              break;
-            case ROLES.ORG_ADMIN:
-              homeRoute = HOME_ROUTES.ORG_ADMIN;
-              break;
-            case ROLES.ORG_USER:
-              homeRoute = HOME_ROUTES.ORG_USER;
-              break;
-          }
+          const homeRoute = role === ROLES.SUPER_ADMIN
+            ? HOME_ROUTES.SUPER_ADMIN
+            : HOME_ROUTES.ORG_ADMIN;
           const target = this.returnUrl || homeRoute;
           this.router.navigateByUrl(target, {
             replaceUrl: true,

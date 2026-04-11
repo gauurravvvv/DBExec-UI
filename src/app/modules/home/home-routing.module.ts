@@ -17,16 +17,8 @@ const routes: Routes = [
     data: { roles: ['SUPER-ADMIN'] },
   },
   {
-    path: 'org-admin',
+    path: 'org',
     component: OrgHomeComponent,
-    canActivate: [RoleGuard],
-    data: { roles: ['ORG-ADMIN'] },
-  },
-  {
-    path: 'org-user',
-    component: OrgHomeComponent,
-    canActivate: [RoleGuard],
-    data: { roles: ['ORG-USER'] },
   },
 ];
 
