@@ -97,8 +97,8 @@
                   <app-custom-toggle
                     [formControl]="getPermissionControl(permission.value)"
                     (onChange)="onPermissionChange(permission, $event)"
-                     trueLabel="Enable"
-            falseLabel="Disable"
+                    [showStatusLabel]="false"
+                    [disabled]="permission.value === 'home'"
                   ></app-custom-toggle>
                 </div>
 
@@ -110,10 +110,11 @@
                   >
                     <span class="item-label">{{ subPerm.label }}</span>
 
-                    <app-custom-toggle [formControl]="getPermissionControl(subPerm.value)"
-                    trueLabel="Enable"
-            falseLabel="Disable" (onChange)="onPermissionChange(subPerm, $event)">
-                    </app-custom-toggle>
+                    <app-custom-toggle
+                      [formControl]="getPermissionControl(subPerm.value)"
+                      (onChange)="onPermissionChange(subPerm, $event)"
+                      [showStatusLabel]="false"
+                    ></app-custom-toggle>
                   </div>
                 </ng-container>
               </div>

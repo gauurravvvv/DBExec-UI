@@ -256,7 +256,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
 
   private addPermissionControls(permissions: any[]) {
     permissions.forEach(perm => {
-      this.permissionControls[perm.value] = new FormControl(false);
+      this.permissionControls[perm.value] = new FormControl(perm.value === 'home' ? true : false);
       if (perm.subPermissions) {
         this.addPermissionControls(perm.subPermissions);
       }
