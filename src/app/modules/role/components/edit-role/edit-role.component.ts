@@ -111,7 +111,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
     collectValues(existing);
 
     Object.entries(this.permissionControls).forEach(([key, ctrl]) => {
-      ctrl.setValue(enabledValues.has(key), { emitEvent: false });
+      ctrl.setValue(key === 'home' ? true : enabledValues.has(key), { emitEvent: false });
     });
   }
 
@@ -200,6 +200,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
     if (checked && permission.parentId !== '0') {
       this.updateParentPermission(permission);
     }
+    this.roleForm.markAsDirty();
   }
 
   private updateChildPermissions(permissions: any[], checked: boolean) {
@@ -246,7 +247,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
 
   private addPermissionControls(permissions: any[]) {
     permissions.forEach(perm => {
-      this.permissionControls[perm.value] = new FormControl(false);
+      this.permissionControls[perm.value] = new FormControl(perm.value === 'home' ? true : false);
       if (perm.subPermissions) {
         this.addPermissionControls(perm.subPermissions);
       }

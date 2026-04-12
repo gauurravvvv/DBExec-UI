@@ -88,8 +88,8 @@
                   <app-custom-toggle
                     [formControl]="getPermissionControl(permission.value)"
                     (onChange)="onPermissionChange(permission, $event)"
-                    trueLabel="Enable"
-                    falseLabel="Disable"
+                    [showStatusLabel]="false"
+                    [disabled]="permission.value === 'home'"
                   ></app-custom-toggle>
                 </div>
 
@@ -102,8 +102,7 @@
                     <app-custom-toggle
                       [formControl]="getPermissionControl(subPerm.value)"
                       (onChange)="onPermissionChange(subPerm, $event)"
-                      trueLabel="Enable"
-                      falseLabel="Disable"
+                      [showStatusLabel]="false"
                     ></app-custom-toggle>
                   </div>
                 </ng-container>
