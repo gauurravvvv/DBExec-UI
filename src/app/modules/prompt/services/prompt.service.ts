@@ -31,6 +31,18 @@ export class PromptService {
       });
   }
 
+  bulkDeletePrompt(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', PROMPT.BULK_DELETE + orgId, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   addPrompt(promptForm: any) {
     const { organisation, datasource, tab, prompts } = promptForm;
     return this.http

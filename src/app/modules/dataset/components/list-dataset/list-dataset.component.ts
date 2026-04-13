@@ -38,7 +38,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   datasets: any[] = [];
   filteredDatasets: any[] = [];
 
+  selectedDatasets: any[] = [];
   showDeleteConfirm = false;
+  bulkDelete = false;
   deleteJustification = '';
   datasetToDelete: string | null = null;
   showDuplicateDialog = false;
@@ -79,6 +81,12 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   // Debouncing for QB search
   private qbFilter$ = new Subject<void>();
   private qbFilterSubscription!: Subscription;
+
+  get selectedCount(): number {
+    return this.selectedDatasets?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   get isFilterActive(): boolean {
     return (
@@ -233,6 +241,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedDatasets = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -313,8 +322,18 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   loadDatasets(event?: any) {
     if (!this.selectedOrg || !this.selectedDatasource) return;
 
-    // Store the event for future reloads
+    // Clear selection when page/sort changes
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedDatasets = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -530,31 +549,77 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.datasetToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.datasetToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.datasetToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.datasetToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedDatasets.map((d: any) => d.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.datasetService
+        .bulkDeleteDataset(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedDatasets = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.datasetToDelete) {
       this.datasetService
         .deleteDataset(
           this.selectedOrg,
           this.datasetToDelete,
-          this.deleteJustification.trim(),
+          reason,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.loadDatasets();
-            this.showDeleteConfirm = false;
-            this.datasetToDelete = null;
-            this.deleteJustification = '';
+            this.selectedDatasets = this.selectedDatasets.filter(
+              (d: any) => d.id !== this.datasetToDelete,
+            );
+            this.refreshList();
           }
-        });
+        })
+        .finally(() => this.closeDeletePopup());
+    }
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.datasetToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadDatasets(this.lastTableLazyLoadEvent);
+    } else {
+      this.loadDatasets();
     }
   }
 }

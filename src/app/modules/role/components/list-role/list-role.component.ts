@@ -23,8 +23,11 @@ export class ListRoleComponent implements OnInit, OnDestroy {
   totalRecords = 0;
   lastTableLazyLoadEvent: any;
 
+  selectedRoles: any[] = [];
+
   showDeleteConfirm = false;
   roleToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
 
   organisations: any[] = [];
@@ -106,13 +109,21 @@ export class ListRoleComponent implements OnInit, OnDestroy {
     });
   }
 
+  get selectedCount(): number {
+    return this.selectedRoles?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => event?.data?.isDefault !== 1;
+
   onOrgChange(orgId: any) {
     this.selectedOrgId = orgId;
+    this.selectedRoles = [];
     this.lastTableLazyLoadEvent = null;
     this.loadRoles();
   }
 
   onFilterChange() {
+    this.selectedRoles = [];
     this.filter$.next();
   }
 
@@ -138,6 +149,16 @@ export class ListRoleComponent implements OnInit, OnDestroy {
     if (!this.selectedOrgId) return;
 
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedRoles = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -186,35 +207,77 @@ export class ListRoleComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.roleToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.roleToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.roleToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.roleToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedRoles.map(r => r.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.roleService
+        .bulkDeleteRole(ids, reason, this.selectedOrgId)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedRoles = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.roleToDelete) {
       this.roleService
         .deleteRole(
           this.selectedOrgId,
           this.roleToDelete,
-          this.deleteJustification.trim(),
+          reason,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadRoles(this.lastTableLazyLoadEvent);
-            } else {
-              this.loadRoles();
-            }
-            this.showDeleteConfirm = false;
-            this.roleToDelete = null;
-            this.deleteJustification = '';
+            this.selectedRoles = this.selectedRoles.filter(
+              r => r.id !== this.roleToDelete,
+            );
+            this.refreshList();
           }
         });
+    }
+    this.closeDeletePopup();
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.roleToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadRoles(this.lastTableLazyLoadEvent);
+    } else {
+      this.loadRoles();
     }
   }
 }

@@ -149,6 +149,16 @@ export class DatasourceService {
       });
   }
 
+  bulkDeleteDatasource(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .post(DATASOURCE.BULK_DELETE + `${orgId}`, { ids, justification })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   runQuery(params: any) {
     return this.http
       .post(DATASOURCE.RUN_QUERY, {

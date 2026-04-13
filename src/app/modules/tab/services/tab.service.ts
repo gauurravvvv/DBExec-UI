@@ -41,6 +41,18 @@ export class TabService {
       });
   }
 
+  bulkDeleteTab(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', TAB.BULK_DELETE + orgId, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   addTab(tabForm: FormGroup) {
     const { organisation, datasource, tabs } = tabForm.value;
     return this.http

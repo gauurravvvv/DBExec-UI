@@ -27,10 +27,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="
-            userGroupForm.invalid ||
-            userGroupForm.get('users')?.value?.length <= 1
-          "
+          [disabled]="!canSubmit()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -88,6 +85,27 @@
         >
         </app-custom-dropdown>
 
+        <!-- Role Dropdown -->
+        <app-custom-dropdown
+          formControlName="roleId"
+          label="Role"
+          placeholder="Select Role"
+          [options]="roles"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
+          [showError]="
+            !!(
+              userGroupForm.get('roleId')?.invalid &&
+              userGroupForm.get('roleId')?.touched
+            )
+          "
+          errorMessage="Role is required"
+        >
+        </app-custom-dropdown>
+
         <!-- Users Multiselect -->
         <app-custom-multiselect
           formControlName="users"
@@ -97,7 +115,7 @@
           optionLabel="username"
           optionValue="id"
           [filter]="true"
-          filterBy="name"
+          filterBy="username"
           display="chip"
           [required]="true"
           [showError]="
@@ -106,7 +124,7 @@
               userGroupForm.get('users')?.touched
             )
           "
-          errorMessage="At least two users are required"
+          [errorMessage]="getUsersError()"
         >
         </app-custom-multiselect>
       </div>

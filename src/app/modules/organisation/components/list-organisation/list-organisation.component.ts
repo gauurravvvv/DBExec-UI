@@ -29,8 +29,11 @@ export class ListOrganisationComponent implements OnInit {
   organisations: any[] = [];
   totalItems = 0;
 
+  selectedOrgs: any[] = [];
+
   showDeleteConfirm = false;
   orgIdToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
 
   constructor(
@@ -82,8 +85,15 @@ export class ListOrganisationComponent implements OnInit {
   }
 
   onFilterChange() {
+    this.selectedOrgs = [];
     this.searchSubject.next();
   }
+
+  get selectedCount(): number {
+    return this.selectedOrgs?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   onCreatedDateRangeChange(range: Date[] | null) {
     this.filterValues.createdDateRange = range;
@@ -93,6 +103,16 @@ export class ListOrganisationComponent implements OnInit {
   }
 
   loadOrganisations(event: any) {
+    const prev = this.lastTableLazyLoadEvent;
+    if (
+      prev &&
+      (prev.first !== event.first ||
+        prev.rows !== event.rows ||
+        prev.sortField !== event.sortField ||
+        prev.sortOrder !== event.sortOrder)
+    ) {
+      this.selectedOrgs = [];
+    }
     this.lastTableLazyLoadEvent = event;
     const page = event.first / event.rows + 1;
     const limit = event.rows;
@@ -148,21 +168,62 @@ export class ListOrganisationComponent implements OnInit {
 
   confirmDelete(orgId: string) {
     this.orgIdToDelete = orgId;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.orgIdToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.orgIdToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.orgIdToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedOrgs.map(o => o.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.organisationService
+        .bulkDeleteOrganisation(ids, reason)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedOrgs = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.orgIdToDelete) {
       this.onDelete(this.orgIdToDelete);
-      this.showDeleteConfirm = false;
-      this.orgIdToDelete = null;
-      this.deleteJustification = '';
+    }
+    this.closeDeletePopup();
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.orgIdToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadOrganisations(this.lastTableLazyLoadEvent);
     }
   }
 
@@ -171,11 +232,8 @@ export class ListOrganisationComponent implements OnInit {
       .deleteOrganisation(orgId, this.deleteJustification.trim())
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
-          if (this.lastTableLazyLoadEvent) {
-            this.loadOrganisations(this.lastTableLazyLoadEvent);
-          }
-          this.showDeleteConfirm = false;
-          this.orgIdToDelete = null;
+          this.selectedOrgs = this.selectedOrgs.filter(o => o.id !== orgId);
+          this.refreshList();
         }
       });
   }

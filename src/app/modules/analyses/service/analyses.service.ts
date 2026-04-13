@@ -81,6 +81,18 @@ export class AnalysesService {
       });
   }
 
+  bulkDeleteAnalyses(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', ANALYSES.BULK_DELETE + orgId, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   viewAnalyses(orgId: string, analysisId: string) {
     return this.http
       .get(ANALYSES.VIEW + `${orgId}/${analysisId}`)

@@ -28,7 +28,9 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   filteredConnections: any[] = [];
 
   searchTerm: string = '';
+  selectedConnections: any[] = [];
   showDeleteConfirm = false;
+  bulkDelete = false;
   deleteJustification = '';
   tabToDelete: string | null = null;
   Math = Math;
@@ -60,6 +62,12 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
   private filterSubscription!: Subscription;
+
+  get selectedCount(): number {
+    return this.selectedConnections?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   get isFilterActive(): boolean {
     return (
@@ -135,6 +143,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedConnections = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -200,8 +209,18 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   loadConnections(event?: any) {
     if (!this.selectedDatasource) return;
 
-    // Store the event for future reloads
+    // Clear selection when page/sort changes
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedConnections = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -278,33 +297,75 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.tabToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.tabToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.tabToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.tabToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedConnections.map((c: any) => c.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.connectionService
+        .bulkDeleteConnection(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedConnections = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.tabToDelete) {
       this.connectionService
         .deleteConnection(
           this.selectedOrg,
           this.tabToDelete,
-          this.deleteJustification.trim(),
+          reason,
         )
         .then(response => {
-          this.showDeleteConfirm = false;
-          this.tabToDelete = null;
-          this.deleteJustification = '';
           if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadConnections(this.lastTableLazyLoadEvent);
-            }
+            this.selectedConnections = this.selectedConnections.filter(
+              (c: any) => c.id !== this.tabToDelete,
+            );
+            this.refreshList();
           }
-        });
+        })
+        .finally(() => this.closeDeletePopup());
+    }
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.tabToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadConnections(this.lastTableLazyLoadEvent);
     }
   }
 

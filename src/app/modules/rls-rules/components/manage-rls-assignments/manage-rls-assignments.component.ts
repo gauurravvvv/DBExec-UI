@@ -81,7 +81,7 @@ export class ManageRlsAssignmentsComponent implements OnInit {
         this.scopeTargetsLoading = false;
       });
     } else if (scope === 'group') {
-      this.groupService.listGroupps(params).then((response: any) => {
+      this.groupService.listGroups(params).then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.scopeTargets = (response.data.groups || []).map((g: any) => ({
             label: g.name,

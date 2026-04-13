@@ -40,6 +40,18 @@ export class RoleService {
       });
   }
 
+  bulkDeleteRole(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', ROLE.BULK_DELETE + orgId, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   deleteRole(orgId: string, id: string, justification?: string) {
     return this.http
       .request('DELETE', ROLE.DELETE + `${orgId}/${id}`, {

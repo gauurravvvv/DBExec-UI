@@ -44,6 +44,18 @@ export class QueryBuilderService {
       });
   }
 
+  bulkDeleteQueryBuilder(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', QUERY_BUILDER.BULK_DELETE + orgId, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   addQueryBuilder(queryBuilderForm: FormGroup) {
     const { organisation, datasource, name, description } =
       queryBuilderForm.value;

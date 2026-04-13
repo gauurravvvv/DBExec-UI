@@ -34,7 +34,9 @@ export class ListDatasourceComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatasource: any = null;
+  selectedDatasources: any[] = [];
   showDeleteConfirm = false;
+  bulkDelete = false;
   deleteJustification = '';
 
   constructor(
@@ -130,7 +132,14 @@ export class ListDatasourceComponent implements OnInit {
     this.onFilterChange();
   }
 
+  get selectedCount(): number {
+    return this.selectedDatasources?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
+
   onFilterChange() {
+    this.selectedDatasources = [];
     this.searchSubject.next();
   }
 
@@ -143,6 +152,16 @@ export class ListDatasourceComponent implements OnInit {
 
   loadDatasources(event: any) {
     if (!event) return;
+    const prev = this.lastTableLazyLoadEvent;
+    if (
+      prev &&
+      (prev.first !== event.first ||
+        prev.rows !== event.rows ||
+        prev.sortField !== event.sortField ||
+        prev.sortOrder !== event.sortOrder)
+    ) {
+      this.selectedDatasources = [];
+    }
     this.lastTableLazyLoadEvent = event;
     const page = event.first / event.rows + 1;
     const limit = event.rows;
@@ -220,33 +239,79 @@ export class ListDatasourceComponent implements OnInit {
 
   confirmDelete(datasource: any): void {
     this.selectedDatasource = datasource;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.selectedDatasource = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.selectedDatasource = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.selectedDatasource && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedDatasources.map((d: any) => d.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      let orgId = this.selectedOrg;
+      if (typeof orgId === 'object' && orgId !== null) {
+        orgId = orgId.id;
+      }
+      this.datasourceService
+        .bulkDeleteDatasource(ids, reason, orgId)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedDatasources = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.selectedDatasource) {
       this.datasourceService
         .deleteDatasource(
           this.selectedDatasource.organisationId,
           this.selectedDatasource.id,
-          this.deleteJustification.trim(),
+          reason,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadDatasources(this.lastTableLazyLoadEvent);
-            }
-            this.showDeleteConfirm = false;
-            this.selectedDatasource = null;
-            this.deleteJustification = '';
+            this.selectedDatasources = this.selectedDatasources.filter(
+              (d: any) => d.id !== this.selectedDatasource.id,
+            );
+            this.refreshList();
           }
-        });
+        })
+        .finally(() => this.closeDeletePopup());
+    }
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.selectedDatasource = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadDatasources(this.lastTableLazyLoadEvent);
     }
   }
 }

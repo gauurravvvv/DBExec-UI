@@ -27,9 +27,11 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
   filteredSections: any[] = [];
 
+  selectedSections: any[] = [];
   searchTerm: string = '';
   showDeleteConfirm = false;
   sectionToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
@@ -60,6 +62,12 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
   private filterSubscription!: Subscription;
+
+  get selectedCount(): number {
+    return this.selectedSections?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   get isFilterActive(): boolean {
     return (
@@ -190,6 +198,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedSections = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -202,6 +211,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
       status: null,
       createdDateRange: null,
     };
+    this.selectedSections = [];
     this.loadSections();
   }
 
@@ -270,8 +280,18 @@ export class ListSectionComponent implements OnInit, OnDestroy {
   loadSections(event?: any) {
     if (!this.selectedDatasource) return;
 
-    // Store the event for future reloads
+    // Clear selection when page/sort changes
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedSections = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -347,33 +367,73 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.sectionToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.sectionToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.sectionToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.sectionToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedSections.map(s => s.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
       this.sectionService
-        .deleteSection(
-          this.selectedOrg,
-          this.sectionToDelete,
-          this.deleteJustification.trim(),
-        )
-        .then(response => {
-          this.showDeleteConfirm = false;
-          this.sectionToDelete = null;
-          this.deleteJustification = '';
-          if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadSections(this.lastTableLazyLoadEvent);
-            }
+        .bulkDeleteSection(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedSections = [];
+            this.refreshList();
           }
-        });
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.sectionToDelete) {
+      this.sectionService
+        .deleteSection(this.selectedOrg, this.sectionToDelete, reason)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.selectedSections = this.selectedSections.filter(
+              s => s.id !== this.sectionToDelete,
+            );
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+    }
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.sectionToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadSections(this.lastTableLazyLoadEvent);
+    } else {
+      this.loadSections();
     }
   }
 

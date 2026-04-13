@@ -158,6 +158,18 @@ export class OrganisationService {
       });
   }
 
+  bulkDeleteOrganisation(ids: string[], justification?: string) {
+    return this.http
+      .request('DELETE', ORGANISATION.BULK_DELETE, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   deleteOrganisation(orgId: string, justification?: string) {
     return this.http
       .request('DELETE', ORGANISATION.DELETE + `${orgId}`, {

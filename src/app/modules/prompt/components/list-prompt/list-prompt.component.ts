@@ -27,9 +27,11 @@ export class ListPromptComponent implements OnInit, OnDestroy {
 
   filteredPrompts: any[] = [];
 
+  selectedPrompts: any[] = [];
   searchTerm: string = '';
   showDeleteConfirm = false;
   promptToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
@@ -62,6 +64,12 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
   private filterSubscription!: Subscription;
+
+  get selectedCount(): number {
+    return this.selectedPrompts?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   get isFilterActive(): boolean {
     return (
@@ -194,6 +202,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedPrompts = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -208,6 +217,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       status: null,
       createdDateRange: null,
     };
+    this.selectedPrompts = [];
     this.loadPrompts();
   }
 
@@ -276,8 +286,18 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   loadPrompts(event?: any) {
     if (!this.selectedDatasource) return;
 
-    // Store the event for future reloads
+    // Clear selection when page/sort changes
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedPrompts = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -364,35 +384,73 @@ export class ListPromptComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.promptToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.promptToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.promptToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.promptToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedPrompts.map(p => p.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
       this.promptService
-        .deletePrompt(
-          this.selectedOrg,
-          this.promptToDelete,
-          this.deleteJustification.trim(),
-        )
-        .then(response => {
-          this.showDeleteConfirm = false;
-          this.promptToDelete = null;
-          this.deleteJustification = '';
-          if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadPrompts(this.lastTableLazyLoadEvent);
-            } else {
-              this.loadPrompts();
-            }
+        .bulkDeletePrompt(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedPrompts = [];
+            this.refreshList();
           }
-        });
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.promptToDelete) {
+      this.promptService
+        .deletePrompt(this.selectedOrg, this.promptToDelete, reason)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.selectedPrompts = this.selectedPrompts.filter(
+              p => p.id !== this.promptToDelete,
+            );
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+    }
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.promptToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadPrompts(this.lastTableLazyLoadEvent);
+    } else {
+      this.loadPrompts();
     }
   }
 }

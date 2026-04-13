@@ -9,7 +9,7 @@ import { GROUP } from 'src/app/constants/api';
 export class GroupService {
   constructor(private http: HttpClient) {}
 
-  listGroupps(params: any) {
+  listGroups(params: any) {
     return this.http
       .get(GROUP.LIST, { params })
       .toPromise()
@@ -20,15 +20,27 @@ export class GroupService {
   }
 
   addGroup(categoryForm: FormGroup) {
-    const { name, description, organisation, environments, users } =
+    const { name, description, organisation, roleId, users } =
       categoryForm.value;
     return this.http
       .post(GROUP.ADD, {
         name,
         description,
         organisation,
-        environments,
+        roleId,
         users,
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
+  bulkDeleteGroup(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', GROUP.BULK_DELETE + orgId, {
+        body: { ids, justification },
       })
       .toPromise()
       .then((response: any) => {
@@ -60,7 +72,7 @@ export class GroupService {
   }
 
   editGroup(groupForm: FormGroup, justification?: string) {
-    const { id, name, description, status, users, organisation } =
+    const { id, name, description, status, users, organisation, roleId } =
       groupForm.getRawValue();
     return this.http
       .put(GROUP.EDIT, {
@@ -70,6 +82,7 @@ export class GroupService {
         status: status ? 1 : 0,
         users,
         organisation,
+        roleId,
         justification,
       })
       .toPromise()

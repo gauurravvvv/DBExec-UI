@@ -27,11 +27,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="
-            groupForm.invalid ||
-            !isFormDirty ||
-            groupForm.get('users')?.value?.length <= 1
-          "
+          [disabled]="!canSubmit()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -77,9 +73,19 @@
           [inputDisabled]="true"
         >
         </app-custom-input>
-        <input type="hidden" formControlName="organisation" />
 
-        <!-- Users Multiselect -->
+        <!-- Role (disabled) -->
+        <app-custom-input
+          [ngModel]="selectedRoleName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Role"
+          placeholder="Role"
+          icon="pi-id-card"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
+
+        <!-- Users Multiselect (all removable on edit) -->
         <app-custom-multiselect
           formControlName="users"
           label="Users"
@@ -90,13 +96,6 @@
           [filter]="true"
           filterBy="username"
           display="chip"
-          [required]="true"
-          [showError]="
-            !!(
-              groupForm.get('users')?.invalid && groupForm.get('users')?.touched
-            )
-          "
-          errorMessage="At least two users are required"
         >
         </app-custom-multiselect>
 

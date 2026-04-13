@@ -20,6 +20,18 @@ export class UserService {
       });
   }
 
+  bulkDeleteUser(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', USER.BULK_DELETE + orgId, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   deleteUser(id: string, orgId: string, justification?: string) {
     return this.http
       .request('DELETE', USER.DELETE + `${orgId}/${id}`, {
