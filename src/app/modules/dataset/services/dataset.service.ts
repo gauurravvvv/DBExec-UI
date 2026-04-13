@@ -30,6 +30,18 @@ export class DatasetService {
       });
   }
 
+  bulkDeleteDataset(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', DATASET.BULK_DELETE + `${orgId}`, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   addDataset(payload: any) {
     const { name, description, organisation, datasource, sql } = payload;
 

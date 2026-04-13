@@ -31,6 +31,18 @@ export class ConnectionService {
       });
   }
 
+  bulkDeleteConnection(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', CONNECTIONS.BULK_DELETE + `${orgId}`, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   addConnection(connectionForm: FormGroup) {
     const {
       organisation,

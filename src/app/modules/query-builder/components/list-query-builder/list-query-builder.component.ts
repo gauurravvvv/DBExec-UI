@@ -27,9 +27,11 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
 
   filteredQueryBuilders: any[] = [];
 
+  selectedQueryBuilders: any[] = [];
   searchTerm: string = '';
   showDeleteConfirm = false;
   queryBuilderToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
@@ -59,6 +61,12 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
   private filterSubscription!: Subscription;
+
+  get selectedCount(): number {
+    return this.selectedQueryBuilders?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   get isFilterActive(): boolean {
     return (
@@ -246,8 +254,18 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
   loadQueryBuilders(event?: any) {
     if (!this.selectedDatasource) return;
 
-    // Store the event for future reloads
+    // Clear selection when page/sort changes
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedQueryBuilders = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -311,6 +329,7 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedQueryBuilders = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -322,6 +341,7 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
       status: null,
       createdDateRange: null,
     };
+    this.selectedQueryBuilders = [];
     this.loadQueryBuilders();
   }
 
@@ -343,35 +363,73 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.queryBuilderToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.queryBuilderToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.queryBuilderToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.queryBuilderToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedQueryBuilders.map(q => q.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
       this.queryBuilderService
-        .deleteQueryBuilder(
-          this.selectedOrg,
-          this.queryBuilderToDelete,
-          this.deleteJustification.trim(),
-        )
-        .then(response => {
-          this.showDeleteConfirm = false;
-          this.queryBuilderToDelete = null;
-          this.deleteJustification = '';
-          if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadQueryBuilders(this.lastTableLazyLoadEvent);
-            } else {
-              this.loadQueryBuilders();
-            }
+        .bulkDeleteQueryBuilder(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedQueryBuilders = [];
+            this.refreshList();
           }
-        });
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.queryBuilderToDelete) {
+      this.queryBuilderService
+        .deleteQueryBuilder(this.selectedOrg, this.queryBuilderToDelete, reason)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.selectedQueryBuilders = this.selectedQueryBuilders.filter(
+              q => q.id !== this.queryBuilderToDelete,
+            );
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+    }
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.queryBuilderToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadQueryBuilders(this.lastTableLazyLoadEvent);
+    } else {
+      this.loadQueryBuilders();
     }
   }
 

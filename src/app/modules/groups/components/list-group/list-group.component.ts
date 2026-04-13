@@ -7,6 +7,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GROUP } from 'src/app/constants/routes';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { RoleService } from 'src/app/modules/role/services/role.service';
 import { GroupService } from '../../services/group.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
@@ -25,11 +26,16 @@ export class ListGroupComponent implements OnInit, OnDestroy {
   groups: any[] = [];
   filteredGroups: any[] = [];
 
+  selectedGroups: any[] = [];
+
   showDeleteConfirm = false;
   groupToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
   organisations: any[] = [];
+  roles: any[] = [];
   selectedOrg: any = null;
+  selectedRole: string | null = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   today = new Date();
@@ -56,13 +62,15 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       !!this.filterValues.name ||
       !!this.filterValues.description ||
       this.filterValues.status !== null ||
-      !!this.filterValues.createdDateRange
+      !!this.filterValues.createdDateRange ||
+      !!this.selectedRole
     );
   }
 
   constructor(
     private groupService: GroupService,
     private organisationService: OrganisationService,
+    private roleService: RoleService,
     private router: Router,
     private globalService: GlobalService,
   ) {}
@@ -79,6 +87,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       this.loadOrganisations();
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
+      this.loadRoles();
       this.loadGroups();
     }
   }
@@ -100,6 +109,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
+          this.loadRoles();
           // Trigger load after org is selected
           this.loadGroups();
         } else {
@@ -112,12 +122,37 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadRoles() {
+    if (!this.selectedOrg) return;
+    this.roleService.listRoles(this.selectedOrg).then(response => {
+      if (this.globalService.handleSuccessService(response, false)) {
+        this.roles = response.data.roles || [];
+      }
+    });
+  }
+
+  get selectedCount(): number {
+    return this.selectedGroups?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
+
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
+    this.selectedRole = null;
+    this.selectedGroups = [];
+    this.roles = [];
+    this.loadRoles();
+    this.loadGroups();
+  }
+
+  onRoleChange(roleId: string | null) {
+    this.selectedRole = roleId;
     this.loadGroups();
   }
 
   onFilterChange() {
+    this.selectedGroups = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -129,6 +164,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       status: null,
       createdDateRange: null,
     };
+    this.selectedRole = null;
     // Immediately reload without filters
     this.loadGroups();
   }
@@ -145,6 +181,16 @@ export class ListGroupComponent implements OnInit, OnDestroy {
 
     // Store the event for future reloads
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedGroups = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -156,6 +202,10 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       page: page,
       limit: limit,
     };
+
+    if (this.selectedRole) {
+      params.roleId = this.selectedRole;
+    }
 
     // Build filter object
     const filter: any = {};
@@ -187,12 +237,12 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     }
 
     this.groupService
-      .listGroupps(params)
+      .listGroups(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.groups = response.data.groups || [];
           this.filteredGroups = [...this.groups];
-          this.totalRecords = response.data.totalItems || this.groups.length;
+          this.totalRecords = response.data.count || this.groups.length;
         } else {
           this.groups = [];
           this.filteredGroups = [];
@@ -216,33 +266,77 @@ export class ListGroupComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.groupToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.groupToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.groupToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.groupToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedGroups.map(g => g.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.groupService
+        .bulkDeleteGroup(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedGroups = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.groupToDelete) {
       this.groupService
         .deleteGroup(
           this.selectedOrg,
           this.groupToDelete,
-          this.deleteJustification.trim(),
+          reason,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadGroups(this.lastTableLazyLoadEvent);
-            }
-            this.showDeleteConfirm = false;
-            this.groupToDelete = null;
-            this.deleteJustification = '';
+            this.selectedGroups = this.selectedGroups.filter(
+              g => g.id !== this.groupToDelete,
+            );
+            this.refreshList();
           }
         });
+    }
+    this.closeDeletePopup();
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.groupToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadGroups(this.lastTableLazyLoadEvent);
+    } else {
+      this.loadGroups();
     }
   }
 }

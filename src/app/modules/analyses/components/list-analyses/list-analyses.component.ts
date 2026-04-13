@@ -26,8 +26,11 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   analyses: any[] = [];
   filteredAnalyses: any[] = [];
 
+  selectedAnalyses: any[] = [];
+
   showDeleteConfirm = false;
   analysisToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
   organisations: any[] = [];
   datasources: any[] = [];
@@ -55,6 +58,12 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
   private filterSubscription!: Subscription;
+
+  get selectedCount(): number {
+    return this.selectedAnalyses?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   get isFilterActive(): boolean {
     return (
@@ -186,6 +195,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedAnalyses = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -267,8 +277,18 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   loadAnalyses(event?: any) {
     if (!this.selectedOrg || !this.selectedDatasource) return;
 
-    // Store the event for future reloads
+    // Clear selection when page/sort changes
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedAnalyses = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -345,31 +365,69 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.analysisToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.analysisToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.analysisToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.analysisToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedAnalyses.map(a => a.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.analysesService
+        .bulkDeleteAnalyses(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedAnalyses = [];
+            this.loadAnalyses();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.analysisToDelete) {
       this.analysesService
         .deleteAnalyses(
           this.selectedOrg,
           this.analysisToDelete,
-          this.deleteJustification.trim(),
+          reason,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.selectedAnalyses = this.selectedAnalyses.filter(
+              a => a.id !== this.analysisToDelete,
+            );
             this.loadAnalyses();
-            this.showDeleteConfirm = false;
-            this.analysisToDelete = null;
-            this.deleteJustification = '';
           }
         });
     }
+    this.closeDeletePopup();
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.analysisToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
   }
 }

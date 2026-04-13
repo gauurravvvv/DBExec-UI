@@ -26,8 +26,11 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   filteredUsers: any[] = [];
 
+  selectedUsers: any[] = [];
+
   showDeleteConfirm = false;
   userToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
 
   organisations: any[] = [];
@@ -136,9 +139,16 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     });
   }
 
+  get selectedCount(): number {
+    return this.selectedUsers?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => !!event?.data?.canDelete;
+
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
     this.selectedRole = null;
+    this.selectedUsers = [];
     this.roles = [];
     this.loadRoles();
     this.loadUsers();
@@ -150,6 +160,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedUsers = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -188,6 +199,16 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
     // Store the event for future reloads
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedUsers = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -288,33 +309,77 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.userToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.userToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.userToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.userToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedUsers.map(u => u.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.userService
+        .bulkDeleteUser(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedUsers = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.userToDelete) {
       this.userService
         .deleteUser(
           this.userToDelete,
           this.selectedOrg,
-          this.deleteJustification.trim(),
+          reason,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            if (this.lastTableLazyLoadEvent) {
-              this.loadUsers(this.lastTableLazyLoadEvent);
-            }
-            this.showDeleteConfirm = false;
-            this.userToDelete = null;
-            this.deleteJustification = '';
+            this.selectedUsers = this.selectedUsers.filter(
+              u => u.id !== this.userToDelete,
+            );
+            this.refreshList();
           }
         });
+    }
+    this.closeDeletePopup();
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.userToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadUsers(this.lastTableLazyLoadEvent);
+    } else {
+      this.loadUsers();
     }
   }
 }

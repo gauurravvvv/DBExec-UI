@@ -13,9 +13,12 @@ import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
+import { RoleService } from 'src/app/modules/role/services/role.service';
 import { GroupService } from '../../services/group.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
+
+const MIN_USERS = 1;
 
 @Component({
   selector: 'app-add-group',
@@ -24,11 +27,11 @@ import { REGEX } from 'src/app/constants/regex.constant';
 })
 export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   userGroupForm!: FormGroup;
-  showPassword = false;
   organisations: any[] = [];
+  roles: any[] = [];
+  users: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
-  users: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -37,6 +40,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     private globalService: GlobalService,
     private groupService: GroupService,
     private userService: UserService,
+    private roleService: RoleService,
   ) {
     this.initForm();
   }
@@ -53,7 +57,8 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      this.loadUsers();
+      // Non-super-admin: org pre-set, load roles for it
+      this.loadRoles();
     }
   }
 
@@ -75,45 +80,76 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
           : this.globalService.getTokenDetails('organisationId'),
         Validators.required,
       ],
-      users: ['', [Validators.required, this.minUsersValidator(2)]],
+      roleId: ['', Validators.required],
+      users: [[], [Validators.required, this.minUsersValidator(MIN_USERS)]],
     });
 
+    // Org change → reset role+users, reload roles
     this.userGroupForm.get('organisation')?.valueChanges.subscribe(value => {
+      this.userGroupForm.patchValue(
+        { roleId: '', users: [] },
+        { emitEvent: false },
+      );
+      this.roles = [];
+      this.users = [];
+      if (value) {
+        this.loadRoles();
+      }
+    });
+
+    // Role change → reset users, reload users of that role
+    this.userGroupForm.get('roleId')?.valueChanges.subscribe(value => {
+      this.userGroupForm.patchValue({ users: [] }, { emitEvent: false });
+      this.users = [];
       if (value) {
         this.loadUsers();
-        this.userGroupForm.patchValue({ users: [] }, { emitEvent: false });
-      } else {
-        this.users = [];
       }
     });
   }
 
   loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
-
+    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs;
+        this.organisations = response.data.orgs || [];
       }
     });
   }
 
-  loadUsers() {
+  loadRoles() {
     const orgId = this.userGroupForm.get('organisation')?.value;
     if (!orgId) return;
 
+    this.roleService
+      .listRoles(orgId, { page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          // Only active roles
+          this.roles = (response.data.roles || []).filter(
+            (r: any) => r.status === 1,
+          );
+        }
+      });
+  }
+
+  loadUsers() {
+    const orgId = this.userGroupForm.get('organisation')?.value;
+    const roleId = this.userGroupForm.get('roleId')?.value;
+    if (!orgId || !roleId) return;
+
     const params = {
       orgId,
+      roleId,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
 
     this.userService.listUser(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.users = response.data.users;
+        // Only active users
+        this.users = (response.data.users || []).filter(
+          (u: any) => u.status === 1,
+        );
       }
     });
   }
@@ -130,14 +166,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   }
 
   onCancel() {
-    this.userGroupForm.reset();
-    Object.keys(this.userGroupForm.controls).forEach(key => {
-      if (key === 'users') {
-        this.userGroupForm.get(key)?.setValue([]);
-      } else {
-        this.userGroupForm.get(key)?.setValue('');
-      }
-    });
+    this.router.navigate([GROUP.LIST]);
   }
 
   minUsersValidator(min: number) {
@@ -152,7 +181,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
 
   canSubmit(): boolean {
     const users = this.userGroupForm.get('users')?.value || [];
-    return this.userGroupForm.valid && users.length > 1;
+    return this.userGroupForm.valid && users.length >= MIN_USERS;
   }
 
   getNameError(): string {
@@ -164,6 +193,14 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       return `Group name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
       return 'Group name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+    return '';
+  }
+
+  getUsersError(): string {
+    const control = this.userGroupForm.get('users');
+    if (control?.errors?.['required'] || control?.errors?.['minUsers']) {
+      return `At least ${MIN_USERS} user is required`;
+    }
     return '';
   }
 }

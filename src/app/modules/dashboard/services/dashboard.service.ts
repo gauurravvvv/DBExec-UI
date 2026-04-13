@@ -59,4 +59,16 @@ export class DashboardService {
         return result;
       });
   }
+
+  bulkDeleteDashboard(ids: string[], justification: string | undefined, orgId: string) {
+    return this.http
+      .request('DELETE', DASHBOARD.BULK_DELETE + orgId, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
 }

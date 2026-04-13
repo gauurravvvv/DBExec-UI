@@ -17,6 +17,7 @@ export const HOME = {
 export const SUPER_ADMIN = {
   LIST: '/super-admin/list',
   DELETE: '/super-admin/delete/',
+  BULK_DELETE: '/super-admin/delete/bulk',
   ADD: '/super-admin/add',
   VIEW: '/super-admin/get/',
   UPDATE: '/super-admin/update',
@@ -28,6 +29,7 @@ export const ORGANISATION = {
   LIST: '/org/list',
   ADD: '/org/add',
   DELETE: '/org/delete/',
+  BULK_DELETE: '/org/delete/bulk',
   VIEW: '/org/get/',
   EDIT: '/org/update',
   REFRESH_MASTER_DB: '/org/refresh-master-db/',
@@ -36,6 +38,7 @@ export const ORGANISATION = {
 export const USER = {
   LIST: '/user/list',
   DELETE: '/user/delete/',
+  BULK_DELETE: '/user/delete/bulk/',
   ADD: '/user/add',
   VIEW: '/user/get/',
   UPDATE: '/user/update',
@@ -46,6 +49,7 @@ export const USER = {
 export const DATASOURCE = {
   LIST: '/datasource/list',
   DELETE: '/datasource/delete/',
+  BULK_DELETE: '/datasource/delete/bulk/',
   ADD: '/datasource/add',
   VIEW: '/datasource/get/',
   UPDATE: '/datasource/update',
@@ -75,6 +79,7 @@ export const CATEGORY = {
 export const GROUP = {
   LIST: '/group/list',
   DELETE: '/group/delete/',
+  BULK_DELETE: '/group/delete/bulk/',
   ADD: '/group/add',
   VIEW: '/group/get/',
   EDIT: '/group/update',
@@ -96,6 +101,7 @@ export const DATASET = {
   ADD_VIA_BUILDER: '/dataset/add/builder',
   LIST: '/dataset/list',
   DELETE: '/dataset/delete/',
+  BULK_DELETE: '/dataset/delete/bulk/',
   VIEW: '/dataset/get/',
   VIEW_FIELD: '/dataset/get/field/',
   UPDATE: '/dataset/update',
@@ -113,6 +119,7 @@ export const TAB = {
   ADD: '/tab/add',
   LIST: '/tab/list',
   DELETE: '/tab/delete/',
+  BULK_DELETE: '/tab/delete/bulk/',
   VIEW: '/tab/get/',
   UPDATE: '/tab/update',
   GET_ALL: '/tab/listAll',
@@ -123,6 +130,7 @@ export const SECTION = {
   ADD: '/section/add',
   LIST: '/section/list',
   DELETE: '/section/delete/',
+  BULK_DELETE: '/section/delete/bulk/',
   VIEW: '/section/get/',
   UPDATE: '/section/update',
   GET_PROMPTS: '/section/getPrompts/',
@@ -132,6 +140,7 @@ export const PROMPT = {
   ADD: '/prompt/add',
   LIST: '/prompt/list',
   DELETE: '/prompt/delete/',
+  BULK_DELETE: '/prompt/delete/bulk/',
   VIEW: '/prompt/get/',
   UPDATE: '/prompt/update',
   CONFIG: '/prompt/config',
@@ -146,6 +155,7 @@ export const QUERY_BUILDER = {
   ADD: '/query-builder/add',
   LIST: '/query-builder/list',
   DELETE: '/query-builder/delete/',
+  BULK_DELETE: '/query-builder/delete/bulk/',
   VIEW: '/query-builder/get/',
   UPDATE: '/query-builder/update',
   SAVE_CONFIGURATION: '/query-builder/config',
@@ -171,6 +181,7 @@ export const ROLE = {
   ADD: '/role/add',
   LIST: '/role/list',
   DELETE: '/role/delete/',
+  BULK_DELETE: '/role/delete/bulk/',
   VIEW: '/role/get/',
   UPDATE: '/role/update',
   LIST_PERMISSIONS: '/role/permissions',
@@ -185,6 +196,7 @@ export const CONNECTIONS = {
   ADD: '/connections/add',
   LIST: '/connections/list',
   DELETE: '/connections/delete/',
+  BULK_DELETE: '/connections/delete/bulk/',
   VIEW: '/connections/get/',
   UPDATE: '/connections/update',
 };
@@ -193,6 +205,7 @@ export const ANALYSES = {
   ADD: '/analyses/add',
   LIST: '/analyses/list',
   DELETE: '/analyses/delete/',
+  BULK_DELETE: '/analyses/delete/bulk/',
   VIEW: '/analyses/get/',
   UPDATE: '/analyses/update',
   VIEW_VISUAL: '/analyses/visual/',
@@ -242,6 +255,7 @@ export const DASHBOARD = {
   RENDER: '/dashboard/render/',
   LIST: '/dashboard/list',
   DELETE: '/dashboard/delete/',
+  BULK_DELETE: '/dashboard/delete/bulk/',
 };
 
 export const RLS_RULE = {

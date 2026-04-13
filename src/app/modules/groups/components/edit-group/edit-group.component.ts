@@ -1,11 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GROUP } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
@@ -27,15 +21,15 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   showSaveConfirm = false;
   saveJustification = '';
 
+  categoryId!: string;
+  orgId!: string;
+  selectedOrgName = '';
+  selectedRoleName = '';
+  originalFormValue: any;
+
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
   }
-
-  showOrganisationDropdown = true;
-  categoryId!: string;
-  orgId!: string;
-  selectedOrgName: string = '';
-  originalFormValue: any;
 
   constructor(
     private fb: FormBuilder,
@@ -70,24 +64,14 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      organisation: ['', Validators.required],
-      users: ['', [Validators.required, this.minUsersValidator(2)]],
+      // Org + role immutable once group created
+      organisation: [{ value: '', disabled: true }, Validators.required],
+      roleId: [{ value: '', disabled: true }, Validators.required],
+      users: [[]],
       status: [1],
     });
 
-    this.groupForm.valueChanges.subscribe(() => {
-      this.checkFormDirty();
-    });
-  }
-
-  minUsersValidator(min: number) {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const users = control.value as any[];
-      if (!users || users.length < min) {
-        return { minUsers: { min, actual: users?.length || 0 } };
-      }
-      return null;
-    };
+    this.groupForm.valueChanges.subscribe(() => this.checkFormDirty());
   }
 
   loadGroupData(): void {
@@ -95,18 +79,20 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         const groupData = response.data;
 
-        this.groupForm.patchValue({
-          organisation: groupData.organisationId,
-        });
         this.selectedOrgName = groupData.organisationName || '';
+        this.selectedRoleName = groupData.roleName || '';
 
-        this.loadUsers({
-          orgId: groupData.organisationId,
-          page: DEFAULT_PAGE,
-          limit: MAX_LIMIT,
-        });
+        // Load users scoped by group's stored role
+        if (groupData.roleId) {
+          this.loadUsers({
+            orgId: groupData.organisationId,
+            roleId: groupData.roleId,
+            page: DEFAULT_PAGE,
+            limit: MAX_LIMIT,
+          });
+        }
 
-        const usersIds = groupData.userGroups.map(
+        const userIds = (groupData.userGroups || []).map(
           (mapping: any) => mapping.userId,
         );
 
@@ -114,11 +100,13 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
           id: groupData.id,
           name: groupData.name,
           description: groupData.description,
-          users: usersIds,
+          organisation: groupData.organisationId,
+          roleId: groupData.roleId,
+          users: userIds,
           status: groupData.status,
         });
 
-        this.originalFormValue = this.groupForm.value;
+        this.originalFormValue = this.groupForm.getRawValue();
         this.isFormDirty = false;
         this.groupForm.markAsPristine();
       }
@@ -128,14 +116,15 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   loadUsers(params: any): void {
     this.userService.listUser(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.users = [...response.data.users];
+        this.users = (response.data.users || []).filter(
+          (u: any) => u.status === 1,
+        );
       }
     });
   }
 
   canSubmit(): boolean {
-    const users = this.groupForm.get('users')?.value || [];
-    return this.groupForm.valid && users.length > 1 && this.isFormDirty;
+    return this.groupForm.valid && this.isFormDirty;
   }
 
   onSubmit(): void {
@@ -177,7 +166,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
 
   checkFormDirty(): void {
     if (!this.originalFormValue) return;
-    const currentValue = this.groupForm.value;
+    const currentValue = this.groupForm.getRawValue();
     this.isFormDirty =
       JSON.stringify(this.originalFormValue) !== JSON.stringify(currentValue);
   }
@@ -193,4 +182,5 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
       return 'Group name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
   }
+
 }

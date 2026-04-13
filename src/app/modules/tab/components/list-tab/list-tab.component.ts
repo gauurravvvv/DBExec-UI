@@ -27,8 +27,10 @@ export class ListTabComponent implements OnInit, OnDestroy {
 
   filteredTabs: any[] = [];
 
+  selectedTabs: any[] = [];
   showDeleteConfirm = false;
   tabToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
@@ -58,6 +60,12 @@ export class ListTabComponent implements OnInit, OnDestroy {
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
   private filterSubscription!: Subscription;
+
+  get selectedCount(): number {
+    return this.selectedTabs?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   get isFilterActive(): boolean {
     return (
@@ -117,6 +125,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedTabs = [];
     // Trigger debounced API call
     this.filter$.next();
   }
@@ -128,6 +137,7 @@ export class ListTabComponent implements OnInit, OnDestroy {
       status: null,
       createdDateRange: null,
     };
+    this.selectedTabs = [];
     this.loadTabs();
   }
 
@@ -272,8 +282,18 @@ export class ListTabComponent implements OnInit, OnDestroy {
   loadTabs(event?: any) {
     if (!this.selectedDatasource) return;
 
-    // Store the event for future reloads
+    // Clear selection when page/sort changes
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedTabs = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -346,35 +366,73 @@ export class ListTabComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.tabToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.tabToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.tabToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.tabToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedTabs.map(t => t.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
       this.tabService
-        .deleteTab(
-          this.selectedOrg,
-          this.tabToDelete,
-          this.deleteJustification.trim(),
-        )
+        .bulkDeleteTab(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedTabs = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.tabToDelete) {
+      this.tabService
+        .deleteTab(this.selectedOrg, this.tabToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.showDeleteConfirm = false;
-            this.tabToDelete = null;
-            this.deleteJustification = '';
-            if (this.lastTableLazyLoadEvent) {
-              this.loadTabs(this.lastTableLazyLoadEvent);
-            } else {
-              this.loadTabs();
-            }
+            this.selectedTabs = this.selectedTabs.filter(
+              t => t.id !== this.tabToDelete,
+            );
+            this.refreshList();
           }
-        });
+        })
+        .finally(() => this.closeDeletePopup());
+    }
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.tabToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadTabs(this.lastTableLazyLoadEvent);
+    } else {
+      this.loadTabs();
     }
   }
 

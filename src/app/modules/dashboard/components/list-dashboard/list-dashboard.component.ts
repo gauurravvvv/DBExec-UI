@@ -25,8 +25,11 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   dashboards: any[] = [];
 
+  selectedDashboards: any[] = [];
+
   showDeleteConfirm = false;
   dashboardToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
   organisations: any[] = [];
   datasources: any[] = [];
@@ -53,6 +56,12 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   private filter$ = new Subject<void>();
   private filterSubscription!: Subscription;
+
+  get selectedCount(): number {
+    return this.selectedDashboards?.length || 0;
+  }
+
+  isRowSelectable = (event: any) => true;
 
   get isFilterActive(): boolean {
     return (
@@ -132,6 +141,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   }
 
   onFilterChange() {
+    this.selectedDashboards = [];
     this.filter$.next();
   }
 
@@ -202,7 +212,18 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   loadDashboards(event?: any) {
     if (!this.selectedOrg || !this.selectedDatasource) return;
 
+    // Clear selection when page/sort changes
     if (event) {
+      const prev = this.lastTableLazyLoadEvent;
+      if (
+        prev &&
+        (prev.first !== event.first ||
+          prev.rows !== event.rows ||
+          prev.sortField !== event.sortField ||
+          prev.sortOrder !== event.sortOrder)
+      ) {
+        this.selectedDashboards = [];
+      }
       this.lastTableLazyLoadEvent = event;
     }
 
@@ -272,31 +293,69 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.dashboardToDelete = id;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.dashboardToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.dashboardToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.dashboardToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedDashboards.map(d => d.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.dashboardService
+        .bulkDeleteDashboard(ids, reason, this.selectedOrg)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedDashboards = [];
+            this.loadDashboards();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.dashboardToDelete) {
       this.dashboardService
         .deleteDashboard(
           this.selectedOrg,
           this.dashboardToDelete,
-          this.deleteJustification.trim(),
+          reason,
         )
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.selectedDashboards = this.selectedDashboards.filter(
+              d => d.id !== this.dashboardToDelete,
+            );
             this.loadDashboards();
-            this.showDeleteConfirm = false;
-            this.dashboardToDelete = null;
-            this.deleteJustification = '';
           }
         });
     }
+    this.closeDeletePopup();
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.dashboardToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
   }
 }

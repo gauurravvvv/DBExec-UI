@@ -1496,6 +1496,13 @@ aw-wizard-navigation-bar.horizontal ul.steps-indicator li {
 }
 .p-checkbox .p-checkbox-box {
   border-color: var(--checkbox-color);
+  border-radius: 50%;
+}
+.p-datatable .p-datatable-thead > tr > th:has(> p-tableHeaderCheckbox),
+.p-datatable .p-datatable-tbody > tr > td:has(> p-tableCheckbox) {
+  width: 2rem;
+  padding: 0.25rem 0.5rem !important;
+  text-align: center;
 }
 .p-inputtext {
   border: 1px solid var(--theme-grey-3);

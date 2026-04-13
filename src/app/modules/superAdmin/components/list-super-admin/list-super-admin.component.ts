@@ -23,8 +23,11 @@ export class ListSuperAdminComponent implements OnInit {
   superAdmins: any[] = [];
   totalItems = 0;
 
+  selectedAdmins: any[] = [];
+
   showDeleteConfirm = false;
   adminIdToDelete: string | null = null;
+  bulkDelete = false;
   deleteJustification = '';
 
   today = new Date();
@@ -68,8 +71,19 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   onFilterChange() {
+    this.selectedAdmins = [];
     this.searchSubject.next();
   }
+
+  get selectedCount(): number {
+    return this.selectedAdmins?.length || 0;
+  }
+
+  get deletableAdmins(): any[] {
+    return this.superAdmins.filter(a => a.canDelete);
+  }
+
+  isRowSelectable = (event: any) => !!event?.data?.canDelete;
 
   get isFilterActive(): boolean {
     return (
@@ -116,21 +130,62 @@ export class ListSuperAdminComponent implements OnInit {
 
   confirmDelete(adminId: string) {
     this.adminIdToDelete = adminId;
+    this.bulkDelete = false;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmBulkDelete() {
+    if (this.selectedCount === 0) return;
+    this.adminIdToDelete = null;
+    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.adminIdToDelete = null;
+    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
   proceedDelete() {
-    if (this.adminIdToDelete && this.deleteJustification.trim()) {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.bulkDelete) {
+      const ids = this.selectedAdmins.map(a => a.id);
+      if (ids.length === 0) {
+        this.cancelDelete();
+        return;
+      }
+      this.superAdminService
+        .bulkDeleteSuperAdmin(ids, reason)
+        .then((res: any) => {
+          if (this.globalService.handleSuccessService(res)) {
+            this.selectedAdmins = [];
+            this.refreshList();
+          }
+        })
+        .finally(() => this.closeDeletePopup());
+      return;
+    }
+
+    if (this.adminIdToDelete) {
       this.onDelete(this.adminIdToDelete);
-      this.showDeleteConfirm = false;
-      this.adminIdToDelete = null;
-      this.deleteJustification = '';
+    }
+    this.closeDeletePopup();
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.adminIdToDelete = null;
+    this.bulkDelete = false;
+    this.deleteJustification = '';
+  }
+
+  private refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadSuperAdmins(this.lastTableLazyLoadEvent);
     }
   }
 
@@ -139,10 +194,10 @@ export class ListSuperAdminComponent implements OnInit {
       .deleteSuperAdmin(adminId, this.deleteJustification.trim())
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
-          // Refresh current view
-          if (this.lastTableLazyLoadEvent) {
-            this.loadSuperAdmins(this.lastTableLazyLoadEvent);
-          }
+          this.selectedAdmins = this.selectedAdmins.filter(
+            a => a.id !== adminId,
+          );
+          this.refreshList();
         }
       });
   }
@@ -163,6 +218,17 @@ export class ListSuperAdminComponent implements OnInit {
 
   loadSuperAdmins(event: any) {
     // this.loading = true; // REMOVED
+    // Clear selection when page/sort changes (not on same-page re-fetch after delete)
+    const prev = this.lastTableLazyLoadEvent;
+    if (
+      prev &&
+      (prev.first !== event.first ||
+        prev.rows !== event.rows ||
+        prev.sortField !== event.sortField ||
+        prev.sortOrder !== event.sortOrder)
+    ) {
+      this.selectedAdmins = [];
+    }
     this.lastTableLazyLoadEvent = event;
 
     const page = event.first / event.rows + 1;

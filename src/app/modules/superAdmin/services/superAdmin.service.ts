@@ -31,6 +31,18 @@ export class SuperAdminService {
       });
   }
 
+  bulkDeleteSuperAdmin(ids: string[], justification?: string) {
+    return this.http
+      .request('DELETE', SUPER_ADMIN.BULK_DELETE, {
+        body: { ids, justification },
+      })
+      .toPromise()
+      .then((response: any) => {
+        const result = JSON.parse(JSON.stringify(response));
+        return result;
+      });
+  }
+
   addSuperAdmin(superAdminForm: FormGroup) {
     const { firstName, lastName, username, email } = superAdminForm.value;
     return this.http
