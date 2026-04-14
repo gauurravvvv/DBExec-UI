@@ -45,7 +45,7 @@ export class UserService {
   }
 
   addUser(userForm: FormGroup) {
-    const { firstName, lastName, username, email, organisation, roleId } =
+    const { firstName, lastName, username, email, organisation, groupIds } =
       userForm.value;
     return this.http
       .post(USER.ADD, {
@@ -54,7 +54,7 @@ export class UserService {
         username,
         email,
         organisation,
-        roleId,
+        groupIds,
       })
       .toPromise()
       .then((response: any) => {
@@ -82,7 +82,7 @@ export class UserService {
       email,
       status,
       organisation,
-      roleId,
+      groupIds,
     } = userForm.getRawValue();
     return this.http
       .put(USER.UPDATE, {
@@ -93,7 +93,7 @@ export class UserService {
         email,
         organisation,
         status: status ? 1 : 0,
-        roleId: roleId || undefined,
+        groupIds: groupIds || [],
         justification,
       })
       .toPromise()

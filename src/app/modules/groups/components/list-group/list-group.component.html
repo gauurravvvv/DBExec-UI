@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>User Groups</h2>
+        <h2>Groups</h2>
         <p class="subtitle">
           Manage user groups to streamline access and permissions
         </p>
@@ -16,114 +16,59 @@
         <div class="toolbar-left">
           <!-- Organisation Dropdown -->
           <div class="dropdown-field" *ngIf="showOrganisationDropdown">
-            <app-custom-dropdown
-              [(ngModel)]="selectedOrg"
-              [options]="organisations"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              label="Organisation"
-              [floatingLabel]="true"
-              filterBy="name"
-              (onChangeEvent)="onOrgChange($event)"
-            >
+            <app-custom-dropdown [(ngModel)]="selectedOrg" [options]="organisations" optionLabel="name" optionValue="id"
+              [filter]="true" label="Organisation" [floatingLabel]="true" filterBy="name"
+              (onChangeEvent)="onOrgChange($event)">
             </app-custom-dropdown>
           </div>
 
-          <!-- Role Filter Dropdown -->
-          <div class="dropdown-field">
-            <app-custom-dropdown
-              [(ngModel)]="selectedRole"
-              [options]="roles"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              label="Filter by Role"
-              [floatingLabel]="true"
-              filterBy="name"
-              [showClear]="true"
-              [autoDisplayFirst]="false"
-              (onChangeEvent)="onRoleChange($event)"
-            >
-            </app-custom-dropdown>
-          </div>
         </div>
 
         <div class="toolbar-right">
           <!-- Bulk Delete Button -->
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="'Delete (' + selectedCount + ')'"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button mr-2"
-          ></button>
+          <button *ngIf="selectedCount > 0" pButton [label]="'Delete (' + selectedCount + ')'" icon="pi pi-trash"
+            (click)="confirmBulkDelete()" class="p-button-raised p-button-danger modern-button mr-2"></button>
 
           <!-- Clear Filters Button -->
-          <button
-            pButton
-            label="Clear"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button mr-2"
-          ></button>
+          <button pButton label="Clear" icon="pi pi-filter-slash" (click)="clearFilters()" [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button mr-2"></button>
 
           <!-- Add Button -->
-          <button
-            pButton
-            label="Add"
-            icon="pi pi-plus"
-            (click)="onAddNewCategory()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
+          <button pButton label="Add" icon="pi pi-plus" (click)="onAddNewCategory()"
+            class="p-button-raised p-button-primary modern-button"></button>
         </div>
       </div>
 
       <!-- Table -->
       <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="filteredGroups"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadGroups($event)"
-          [totalRecords]="totalRecords"
-          [globalFilterFields]="['name', 'description', 'status']"
-          [rowHover]="true"
-          dataKey="id"
-          [(selection)]="selectedGroups"
-          [rowSelectable]="isRowSelectable"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="calc(100vh - 440px)"
-        >
+        <p-table #dt [value]="filteredGroups" [rows]="10" [paginator]="true" [lazy]="true"
+          (onLazyLoad)="loadGroups($event)" [totalRecords]="totalRecords"
+          [globalFilterFields]="['name', 'description', 'status']" [rowHover]="true" dataKey="id"
+          [(selection)]="selectedGroups" [rowSelectable]="isRowSelectable"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10, 25, 50, 100]" styleClass="p-datatable-sm modern-table" [scrollable]="true"
+          scrollHeight="calc(100vh - 440px)" [tableStyle]="{'min-width': '64rem'}">
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 2rem" pFrozenColumn>
+              <th style="width: 3rem" pFrozenColumn>
                 <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
               </th>
-              <th style="width: 22%" pFrozenColumn>
+              <th style="width: 12rem" pFrozenColumn>
                 <div class="th-content">Name</div>
               </th>
-              <th style="width: 28%">
+              <th style="width: 16rem">
                 <div class="th-content">Description</div>
               </th>
-              <th style="width: 15%">
+              <th style="width: 10rem">
                 <div class="th-content">Role</div>
               </th>
-              <th style="width: 10%">
+              <th style="width: 7rem">
                 <div class="th-content">Status</div>
               </th>
-              <th style="width: 15%">
+              <th style="width: 10rem">
                 <div class="th-content">Created On</div>
               </th>
-              <th style="width: 10%">
+              <th style="width: 6rem">
                 <div class="th-content">Actions</div>
               </th>
             </tr>
@@ -131,44 +76,27 @@
             <tr>
               <th pFrozenColumn></th>
               <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange()"
-                  placeholder="Search Name"
-                ></app-custom-input>
+                <app-custom-input [(ngModel)]="filterValues.name" (ngModelChange)="onFilterChange()"
+                  placeholder="Search Name"></app-custom-input>
               </th>
               <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.description"
-                  (ngModelChange)="onFilterChange()"
-                  placeholder="Search Description"
-                ></app-custom-input>
+                <app-custom-input [(ngModel)]="filterValues.description" (ngModelChange)="onFilterChange()"
+                  placeholder="Search Description"></app-custom-input>
               </th>
               <th>
-                <!-- No filter for Role (use toolbar dropdown) -->
+                <app-custom-dropdown [(ngModel)]="selectedRole" [options]="roles" optionLabel="name" optionValue="id"
+                  placeholder="All" [showClear]="true" [filter]="true" filterBy="name" [autoDisplayFirst]="false"
+                  appendTo="body" (onChangeEvent)="onRoleChange($event)"></app-custom-dropdown>
               </th>
               <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="All"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                ></app-custom-dropdown>
+                <app-custom-dropdown [(ngModel)]="filterValues.status" [options]="statusOptions" optionLabel="label"
+                  optionValue="value" placeholder="All" [showClear]="true" [filter]="false" [autoDisplayFirst]="false"
+                  appendTo="body" (onChangeEvent)="onFilterChange()"></app-custom-dropdown>
               </th>
               <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  placeholder="Select range"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
+                <app-custom-daterange [(ngModel)]="filterValues.createdDateRange" placeholder="Select range"
+                  [showButtonBar]="true" [maxDate]="today"
+                  (onChangeEvent)="onCreatedDateRangeChange($event)"></app-custom-daterange>
               </th>
               <th>
                 <!-- No filter for Actions -->
@@ -178,32 +106,29 @@
           <ng-template pTemplate="body" let-group>
             <tr class="modern-row">
               <td pFrozenColumn>
-                <p-tableCheckbox [value]="group"></p-tableCheckbox>
+                <p-tableCheckbox
+                  [value]="group"
+                  [disabled]="group.isDefault === 1"
+                ></p-tableCheckbox>
               </td>
               <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/group/view', selectedOrg, group.id]"
-                >
+                <a class="dataset-name-link" [routerLink]="['/app/group/view', selectedOrg, group.id]">
                   {{ group.name }}
                 </a>
               </td>
               <td>
                 <span class="description-text" [title]="group.description">{{
                   group.description || '-'
-                }}</span>
+                  }}</span>
               </td>
               <td>
                 <span class="description-text">{{ group.roleName || '—' }}</span>
               </td>
               <td>
-                <span
-                  class="status-indicator"
-                  [ngClass]="{
+                <span class="status-indicator" [ngClass]="{
                     active: group.status === 1,
                     inactive: group.status !== 1,
-                  }"
-                >
+                  }">
                   <span class="dot"></span>
                   {{ group.status === 1 ? 'Active' : 'Inactive' }}
                 </span>
@@ -211,14 +136,14 @@
               <td>
                 <span class="date-text">{{
                   group.createdOn | date: 'medium'
-                }}</span>
+                  }}</span>
               </td>
               <td>
                 <div class="row-actions">
                   <button
                     class="icon-btn edit-btn"
                     (click)="onEdit(group.id)"
-                    pTooltip="Edit"
+                    [pTooltip]="group.isDefault === 1 ? 'Manage users' : 'Edit'"
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-pencil"></i>
@@ -226,8 +151,9 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(group.id)"
-                    pTooltip="Delete"
+                    [pTooltip]="group.isDefault === 1 ? 'Cannot delete default group' : 'Delete'"
                     tooltipPosition="bottom"
+                    [disabled]="group.isDefault === 1"
                   >
                     <i class="pi pi-trash"></i>
                   </button>
@@ -282,16 +208,9 @@
       </ul>
 
       <div class="justification-section">
-        <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
-        >
-        <textarea
-          id="deleteJustification"
-          [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this action"
-          rows="3"
-          maxlength="500"
-        ></textarea>
+        <label for="deleteJustification">Justification <span class="required">*</span></label>
+        <textarea id="deleteJustification" [(ngModel)]="deleteJustification"
+          placeholder="Provide a reason for this action" rows="3" maxlength="500"></textarea>
         <small class="char-count">{{ deleteJustification.length }}/500</small>
       </div>
     </div>
@@ -302,11 +221,7 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button
-        class="btn-confirm"
-        (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
-      >
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="!deleteJustification.trim()">
         <i class="pi pi-trash"></i>
         Delete
       </button>

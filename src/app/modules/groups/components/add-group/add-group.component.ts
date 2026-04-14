@@ -18,7 +18,7 @@ import { GroupService } from '../../services/group.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 
-const MIN_USERS = 1;
+const MIN_USERS = 0;
 
 @Component({
   selector: 'app-add-group',
@@ -57,8 +57,9 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      // Non-super-admin: org pre-set, load roles for it
+      // Non-super-admin: org pre-set, load roles and users for it
       this.loadRoles();
+      this.loadUsers();
     }
   }
 
@@ -81,10 +82,10 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
         Validators.required,
       ],
       roleId: ['', Validators.required],
-      users: [[], [Validators.required, this.minUsersValidator(MIN_USERS)]],
+      users: [[]],
     });
 
-    // Org change → reset role+users, reload roles
+    // Org change → reset role+users, reload roles and users
     this.userGroupForm.get('organisation')?.valueChanges.subscribe(value => {
       this.userGroupForm.patchValue(
         { roleId: '', users: [] },
@@ -94,14 +95,6 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       this.users = [];
       if (value) {
         this.loadRoles();
-      }
-    });
-
-    // Role change → reset users, reload users of that role
-    this.userGroupForm.get('roleId')?.valueChanges.subscribe(value => {
-      this.userGroupForm.patchValue({ users: [] }, { emitEvent: false });
-      this.users = [];
-      if (value) {
         this.loadUsers();
       }
     });
@@ -134,19 +127,16 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
 
   loadUsers() {
     const orgId = this.userGroupForm.get('organisation')?.value;
-    const roleId = this.userGroupForm.get('roleId')?.value;
-    if (!orgId || !roleId) return;
+    if (!orgId) return;
 
     const params = {
       orgId,
-      roleId,
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
 
     this.userService.listUser(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        // Only active users
         this.users = (response.data.users || []).filter(
           (u: any) => u.status === 1,
         );
@@ -180,8 +170,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   }
 
   canSubmit(): boolean {
-    const users = this.userGroupForm.get('users')?.value || [];
-    return this.userGroupForm.valid && users.length >= MIN_USERS;
+    return this.userGroupForm.valid;
   }
 
   getNameError(): string {

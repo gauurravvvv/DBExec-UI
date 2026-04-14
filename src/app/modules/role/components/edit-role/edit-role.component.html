@@ -55,6 +55,7 @@
           label="Description"
           placeholder="Enter description"
           icon="pi-align-left"
+          [inputDisabled]="isDefault"
         >
         </app-custom-input>
 
@@ -89,7 +90,7 @@
                     [formControl]="getPermissionControl(permission.value)"
                     (onChange)="onPermissionChange(permission, $event)"
                     [showStatusLabel]="false"
-                    [disabled]="permission.value === 'home'"
+                    [disabled]="permission.value === 'home' || isDefault"
                   ></app-custom-toggle>
                 </div>
 
@@ -103,6 +104,7 @@
                       [formControl]="getPermissionControl(subPerm.value)"
                       (onChange)="onPermissionChange(subPerm, $event)"
                       [showStatusLabel]="false"
+                      [disabled]="isDefault"
                     ></app-custom-toggle>
                   </div>
                 </ng-container>

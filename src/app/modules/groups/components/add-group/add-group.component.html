@@ -106,25 +106,17 @@
         >
         </app-custom-dropdown>
 
-        <!-- Users Multiselect -->
+        <!-- Users Multiselect (optional - can add later) -->
         <app-custom-multiselect
           formControlName="users"
           label="Users"
-          placeholder="Select Users"
+          placeholder="Select Users (optional)"
           [options]="users"
           optionLabel="username"
           optionValue="id"
           [filter]="true"
           filterBy="username"
           display="chip"
-          [required]="true"
-          [showError]="
-            !!(
-              userGroupForm.get('users')?.invalid &&
-              userGroupForm.get('users')?.touched
-            )
-          "
-          [errorMessage]="getUsersError()"
         >
         </app-custom-multiselect>
       </div>

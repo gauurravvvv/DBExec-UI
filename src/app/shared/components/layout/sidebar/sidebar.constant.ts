@@ -16,7 +16,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/users',
   },
   {
-    value: 'userGroupManagement',
+    value: 'groupManagement',
     route: '/app/group',
   },
   {

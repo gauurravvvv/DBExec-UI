@@ -3,32 +3,16 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button
-          pButton
-          class="p-button-text back-button"
-          routerLink="/app/users"
-        >
+        <button pButton class="p-button-text back-button" routerLink="/app/users">
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Add User</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          label="Cancel"
-          class="p-button-outlined btn-cancel"
-          [disabled]="!isFormDirty"
-          (click)="onCancel()"
-        ></button>
-        <button
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          label="Save"
-          (click)="onSubmit()"
-          [disabled]="userForm.invalid"
-        >
+        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" [disabled]="!isFormDirty"
+          (click)="onCancel()"></button>
+        <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
+          [disabled]="userForm.invalid">
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -38,120 +22,73 @@
     <form [formGroup]="userForm" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
-        <app-custom-input
-          formControlName="firstName"
-          label="First Name"
-          placeholder="Enter first name"
-          icon="pi-user"
-          [required]="true"
-          [showError]="
+        <app-custom-input formControlName="firstName" label="First Name" placeholder="Enter first name" icon="pi-user"
+          [required]="true" [showError]="
             !!(
               userForm.get('firstName')?.invalid &&
               userForm.get('firstName')?.touched
             )
-          "
-          [errorMessage]="getFirstNameError()"
-        >
+          " [errorMessage]="getFirstNameError()">
         </app-custom-input>
 
         <!-- Last Name -->
-        <app-custom-input
-          formControlName="lastName"
-          label="Last Name"
-          placeholder="Enter last name"
-          icon="pi-user"
-          [required]="true"
-          [showError]="
+        <app-custom-input formControlName="lastName" label="Last Name" placeholder="Enter last name" icon="pi-user"
+          [required]="true" [showError]="
             !!(
               userForm.get('lastName')?.invalid &&
               userForm.get('lastName')?.touched
             )
-          "
-          [errorMessage]="getLastNameError()"
-        >
+          " [errorMessage]="getLastNameError()">
         </app-custom-input>
 
-        <!-- Organisation Dropdown -->
-        <app-custom-dropdown
-          *ngIf="showOrganisationDropdown"
-          formControlName="organisation"
-          label="Organisation"
-          placeholder="Select Organisation"
-          [options]="organisations"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [required]="true"
-          [showError]="
-            !!(
-              userForm.get('organisation')?.invalid &&
-              userForm.get('organisation')?.touched
-            )
-          "
-          errorMessage="Organisation is required"
-          (onChangeEvent)="onOrganisationChange($event)"
-        >
-        </app-custom-dropdown>
 
-        <!-- Role -->
-        <app-custom-dropdown
-          formControlName="roleId"
-          label="Role"
-          placeholder="Select Role"
-          [options]="roles"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [required]="true"
-          [showError]="
-            !!(
-              userForm.get('roleId')?.invalid &&
-              userForm.get('roleId')?.touched
-            )
-          "
-          errorMessage="Role is required"
-        >
-        </app-custom-dropdown>
 
         <!-- Username -->
-        <app-custom-input
-          formControlName="username"
-          label="Username"
-          placeholder="Enter username"
-          icon="pi-user-edit"
-          [required]="true"
-          [showError]="
+        <app-custom-input formControlName="username" label="Username" placeholder="Enter username" icon="pi-user-edit"
+          [required]="true" [showError]="
             !!(
               userForm.get('username')?.invalid &&
               userForm.get('username')?.touched
             )
-          "
-          [errorMessage]="getUsernameError()"
-        >
+          " [errorMessage]="getUsernameError()">
         </app-custom-input>
 
         <!-- Email -->
-        <app-custom-input
-          formControlName="email"
-          label="Email"
-          placeholder="Enter email address"
-          icon="pi-envelope"
-          type="email"
-          [required]="true"
-          [showError]="
+        <app-custom-input formControlName="email" label="Email" placeholder="Enter email address" icon="pi-envelope"
+          type="email" [required]="true" [showError]="
             !!(userForm.get('email')?.invalid && userForm.get('email')?.touched)
-          "
-          [errorMessage]="
+          " [errorMessage]="
             userForm.get('email')?.errors?.['required']
               ? 'Email is required'
               : userForm.get('email')?.errors?.['email']
                 ? 'Please enter a valid email'
                 : ''
-          "
-        >
+          ">
         </app-custom-input>
+
+        <!-- Organisation Dropdown -->
+        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation"
+          placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
+          [filter]="true" filterBy="name" [required]="true" [showError]="
+                    !!(
+                      userForm.get('organisation')?.invalid &&
+                      userForm.get('organisation')?.touched
+                    )
+                  " errorMessage="Organisation is required" (onChangeEvent)="onOrganisationChange($event)">
+        </app-custom-dropdown>
+
+        <!-- Groups -->
+        <div class="form-field">
+          <label>Groups <span class="required">*</span></label>
+          <app-custom-multiselect formControlName="groupIds" [options]="groups" optionLabel="name" optionValue="id"
+            placeholder="Select groups" display="chip" [filter]="true" appendTo="body"></app-custom-multiselect>
+          <small class="error-text" *ngIf="
+                        userForm.get('groupIds')?.touched &&
+                        userForm.get('groupIds')?.errors?.['required']
+                      ">
+            At least one group is required
+          </small>
+        </div>
       </div>
     </form>
   </div>

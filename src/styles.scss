@@ -2186,3 +2186,20 @@ body {
 .card-toolbar .dropdown-field {
   min-width: 200px;
 }
+
+// Circular table checkboxes + tight column width
+.modern-table {
+  .p-checkbox .p-checkbox-box {
+    border-radius: 50% !important;
+  }
+
+  .p-datatable-thead > tr > th:first-child,
+  .p-datatable-tbody > tr > td:first-child {
+    width: 2.5rem !important;
+    max-width: 2.5rem !important;
+    min-width: 2.5rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0 !important;
+    text-align: center;
+  }
+}
