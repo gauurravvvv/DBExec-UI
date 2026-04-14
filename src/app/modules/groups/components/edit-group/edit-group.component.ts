@@ -26,6 +26,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   selectedOrgName = '';
   selectedRoleName = '';
   originalFormValue: any;
+  isDefaultGroup = false;
 
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
@@ -82,19 +83,18 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
         this.selectedOrgName = groupData.organisationName || '';
         this.selectedRoleName = groupData.roleName || '';
 
-        // Load users scoped by group's stored role
-        if (groupData.roleId) {
-          this.loadUsers({
-            orgId: groupData.organisationId,
-            roleId: groupData.roleId,
-            page: DEFAULT_PAGE,
-            limit: MAX_LIMIT,
-          });
-        }
+        // Load all active users for this org
+        this.loadUsers({
+          orgId: groupData.organisationId,
+          page: DEFAULT_PAGE,
+          limit: MAX_LIMIT,
+        });
 
         const userIds = (groupData.userGroups || []).map(
           (mapping: any) => mapping.userId,
         );
+
+        this.isDefaultGroup = groupData.isDefault === 1;
 
         this.groupForm.patchValue({
           id: groupData.id,
@@ -105,6 +105,13 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
           users: userIds,
           status: groupData.status,
         });
+
+        // Lock name, description, status for default groups
+        if (this.isDefaultGroup) {
+          this.groupForm.get('name')?.disable();
+          this.groupForm.get('description')?.disable();
+          this.groupForm.get('status')?.disable();
+        }
 
         this.originalFormValue = this.groupForm.getRawValue();
         this.isFormDirty = false;

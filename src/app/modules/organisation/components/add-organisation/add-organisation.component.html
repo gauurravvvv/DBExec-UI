@@ -537,10 +537,18 @@
               <button
                 type="button"
                 class="provider-btn"
+                [class.active]="!selectedEmailProvider"
+                (click)="orgForm.get('emailProvider')?.setValue(null)"
+              >
+                <i class="pi pi-cog"></i> System Default
+              </button>
+              <button
+                type="button"
+                class="provider-btn"
                 [class.active]="selectedEmailProvider === 'SMTP'"
                 (click)="orgForm.get('emailProvider')?.setValue('SMTP')"
               >
-                <i class="pi pi-server"></i> SMTP
+                <i class="pi pi-server"></i> Custom SMTP
               </button>
               <button
                 type="button"
@@ -548,15 +556,7 @@
                 [class.active]="selectedEmailProvider === 'SES'"
                 (click)="orgForm.get('emailProvider')?.setValue('SES')"
               >
-                <i class="pi pi-cloud"></i> AWS SES
-              </button>
-              <button
-                type="button"
-                class="provider-btn"
-                [class.active]="!selectedEmailProvider"
-                (click)="orgForm.get('emailProvider')?.setValue(null)"
-              >
-                <i class="pi pi-ban"></i> None
+                <i class="pi pi-cloud"></i> Custom AWS SES
               </button>
             </div>
 
@@ -691,8 +691,8 @@
             <div *ngIf="!selectedEmailProvider" class="no-provider-message">
               <i class="pi pi-info-circle"></i>
               <span
-                >Emails will be sent using the global system
-                configuration.</span
+                >Emails will be sent using the system default
+                configuration managed by the system administrator.</span
               >
             </div>
           </div>

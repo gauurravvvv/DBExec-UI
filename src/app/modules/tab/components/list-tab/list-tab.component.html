@@ -100,28 +100,29 @@
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
           scrollHeight="calc(100vh - 440px)"
+          [tableStyle]="{'min-width': '61rem'}"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 2rem" pFrozenColumn>
+              <th style="width: 3rem" pFrozenColumn>
                 <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
               </th>
-              <th style="width: 25%" pFrozenColumn>
+              <th style="width: 12rem" pFrozenColumn>
                 <div class="th-content">Name</div>
               </th>
-              <th style="width: 30%">
+              <th style="width: 16rem">
                 <div class="th-content">Description</div>
               </th>
-              <th style="width: 15%">
+              <th style="width: 7rem">
                 <div class="th-content">Sections</div>
               </th>
-              <th style="width: 15%">
+              <th style="width: 7rem">
                 <div class="th-content">Status</div>
               </th>
-              <th style="width: 15%">
+              <th style="width: 10rem">
                 <div class="th-content">Created On</div>
               </th>
-              <th style="width: 5%">
+              <th style="width: 6rem">
                 <div class="th-content">Actions</div>
               </th>
             </tr>

@@ -79,6 +79,8 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
 
         if (this.roleData.isDefault === 1) {
           this.roleForm.get('name')?.disable();
+          this.roleForm.get('description')?.disable();
+          this.roleForm.get('status')?.disable();
         }
       }
 

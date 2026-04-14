@@ -63,6 +63,16 @@ $radius-sm: 8px;
           font-weight: 600;
           color: var(--text-color);
         }
+
+        .default-badge {
+          background: var(--primary-color);
+          color: #fff;
+          font-size: 0.75rem;
+          font-weight: 600;
+          padding: 2px 10px;
+          border-radius: 12px;
+          letter-spacing: 0.5px;
+        }
       }
 
       .header-actions {

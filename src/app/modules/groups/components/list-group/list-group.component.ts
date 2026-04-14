@@ -135,7 +135,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     return this.selectedGroups?.length || 0;
   }
 
-  isRowSelectable = (event: any) => true;
+  isRowSelectable = (event: any) => event?.data?.isDefault !== 1;
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;

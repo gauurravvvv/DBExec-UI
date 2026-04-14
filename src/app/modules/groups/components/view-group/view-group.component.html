@@ -7,12 +7,19 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Group Details</h2>
+        <span *ngIf="groupData?.isDefault === 1" class="default-badge">Default</span>
       </div>
       <div class="header-actions">
         <button class="btn-primary" (click)="onEdit()">
-          <i class="pi pi-pencil"></i> Edit
+          <i class="pi pi-pencil"></i>
+          {{ groupData?.isDefault === 1 ? 'Manage Users' : 'Edit' }}
         </button>
-        <button class="btn-danger" type="button" (click)="confirmDelete()">
+        <button
+          *ngIf="groupData?.isDefault !== 1"
+          class="btn-danger"
+          type="button"
+          (click)="confirmDelete()"
+        >
           <i class="pi pi-trash"></i> Delete
         </button>
       </div>
