@@ -419,7 +419,7 @@
       <!-- Result rows -->
       <div
         class="cmd-row"
-        *ngFor="let screen of queryBuilders; let i = index"
+        *ngFor="let screen of queryBuilders; let i = index; trackBy: trackById"
         [class.active]="i === qbActiveIndex"
         (click)="onQueryBuilderSelect(screen)"
         (mouseenter)="qbActiveIndex = i"

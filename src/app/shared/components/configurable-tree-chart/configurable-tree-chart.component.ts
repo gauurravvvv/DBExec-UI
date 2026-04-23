@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildTreeChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-tree-chart',
   templateUrl: './configurable-tree-chart.component.html',
   styleUrls: ['./configurable-tree-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableTreeChartComponent
   implements OnInit, OnChanges, DoCheck

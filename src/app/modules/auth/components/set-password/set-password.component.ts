@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -12,8 +14,11 @@ import { passwordStrengthValidator } from 'src/app/shared/validators/password-st
   selector: 'app-set-password',
   templateUrl: './set-password.component.html',
   styleUrls: ['./set-password.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SetPasswordComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   setPasswordForm: FormGroup;
   showPassword = false;
   features = SET_PASSWORD_PAGE_OPTIONS;
@@ -49,7 +54,7 @@ export class SetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.userId = params['id'];
       this.orgId = params['orgId'];
       this.token = params['token'];
@@ -107,6 +112,10 @@ export class SetPasswordComponent implements OnInit {
     }
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   getPasswordError(): string {
     const control = this.setPasswordForm.get('newPassword');
     if (control?.errors?.['required']) return 'Password is required';
@@ -132,5 +141,10 @@ export class SetPasswordComponent implements OnInit {
     this.showPassword = !this.showPassword;
     const input = document.getElementById(id) as HTMLInputElement;
     input.type = this.showPassword ? 'text' : 'password';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

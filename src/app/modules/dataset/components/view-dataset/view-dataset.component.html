@@ -118,19 +118,19 @@
           >
             <p-tabView [scrollable]="true" styleClass="qb-config-tabs">
               <p-tabPanel
-                *ngFor="let tab of datasetData.promptConfig.display"
+                *ngFor="let tab of datasetData.promptConfig.display; trackBy: trackByIndex"
                 [header]="tab.tabName"
               >
                 <p-accordion [multiple]="true">
                   <p-accordionTab
-                    *ngFor="let section of tab.sections"
+                    *ngFor="let section of tab.sections; trackBy: trackByIndex"
                     [header]="section.sectionName"
                     [selected]="true"
                   >
                     <div class="result-table">
                       <div
                         class="result-row"
-                        *ngFor="let prompt of section.prompts"
+                        *ngFor="let prompt of section.prompts; trackBy: trackByName"
                       >
                         <span class="result-name">{{ prompt.name }}</span>
                         <span class="result-value">{{
@@ -155,7 +155,7 @@
             <div class="result-table">
               <div
                 class="result-row"
-                *ngFor="let p of datasetData.promptConfig.prompts"
+                *ngFor="let p of datasetData.promptConfig.prompts; trackBy: trackByIndex"
               >
                 <span class="result-name">{{
                   p.name || 'Prompt #' + p.promptId
@@ -227,7 +227,8 @@
                   class="mapping-item"
                   *ngFor="
                     let entity of datasetData.datasetFields;
-                    let i = index
+                    let i = index;
+                    trackBy: trackById
                   "
                   [class.custom-field]="entity.type === 2"
                 >
@@ -295,7 +296,7 @@
           <div class="fields-list">
             <div
               class="field-item"
-              *ngFor="let analysis of datasetData.analyses"
+              *ngFor="let analysis of datasetData.analyses; trackBy: trackByName"
             >
               <i class="pi pi-chart-line"></i>
               {{ analysis.name || analysis }}

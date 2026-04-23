@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
@@ -11,8 +13,11 @@ import { REGEX } from 'src/app/constants/regex.constant';
   selector: 'app-add-organisation',
   templateUrl: './add-organisation.component.html',
   styleUrls: ['./add-organisation.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   orgForm!: FormGroup;
   currentStep = 0;
   isFormDirty = false;
@@ -36,7 +41,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.orgForm.valueChanges.subscribe(() => {
+    this.orgForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.isFormDirty = true;
     });
   }
@@ -125,14 +130,14 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Update email field validators when provider changes
-    this.orgForm.get('emailProvider')?.valueChanges.subscribe(provider => {
+    this.orgForm.get('emailProvider')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(provider => {
       this.updateEmailValidators(provider);
     });
 
     // Reset connection test when DB fields change
     ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
       field => {
-        this.orgForm.get(field)?.valueChanges.subscribe(() => {
+        this.orgForm.get(field)?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
           this.connectionTested = false;
           this.connectionTestResult = null;
         });
@@ -448,5 +453,10 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       if (control.errors['email']) return 'Please enter a valid email';
     }
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

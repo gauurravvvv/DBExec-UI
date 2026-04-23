@@ -182,7 +182,7 @@
           <label>Disabled Days of Week</label>
           <div class="day-toggle-group">
             <span
-              *ngFor="let day of weekDays"
+              *ngFor="let day of weekDays; trackBy: trackByIndex"
               class="day-chip"
               [class.active]="isDisabledDay(day.value)"
               (click)="toggleDisabledDay(day.value)"

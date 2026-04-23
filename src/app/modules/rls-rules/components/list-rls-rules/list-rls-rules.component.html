@@ -167,7 +167,7 @@
                     {{ rule.conditions.length }}
                     condition{{ rule.conditions.length !== 1 ? 's' : '' }}
                   </span>
-                  <ng-container *ngFor="let c of rule.conditions; let i = index">
+                  <ng-container *ngFor="let c of rule.conditions; let i = index; trackBy: trackByIndex">
                     <span class="condition-preview" *ngIf="i < 2">
                       <span class="cond-col">{{ c.columnName }}</span>
                       <span class="cond-op">{{ c.operator }}</span>

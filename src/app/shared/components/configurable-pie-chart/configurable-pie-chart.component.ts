@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildPieChartOption } from '../../helpers/echarts-option-builder';
 
 export interface PieChartData {
@@ -41,6 +39,7 @@ export interface PieChartConfig {
   selector: 'app-configurable-pie-chart',
   templateUrl: './configurable-pie-chart.component.html',
   styleUrls: ['./configurable-pie-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurablePieChartComponent
   implements OnInit, OnChanges, DoCheck

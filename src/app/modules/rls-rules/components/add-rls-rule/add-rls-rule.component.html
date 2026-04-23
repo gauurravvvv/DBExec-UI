@@ -131,7 +131,7 @@
           </div>
           <div
             class="condition-row"
-            *ngFor="let cond of conditions.controls; let i = index"
+            *ngFor="let cond of conditions.controls; let i = index; trackBy: trackByIndex"
             [formGroupName]="i"
           >
             <div class="condition-fields">

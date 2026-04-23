@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildAreaChartOption } from '../../helpers/echarts-option-builder';
 
 export interface AreaChartSeries {
@@ -55,6 +53,7 @@ export interface AreaChartConfig {
   selector: 'app-configurable-area-chart',
   templateUrl: './configurable-area-chart.component.html',
   styleUrls: ['./configurable-area-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableAreaChartComponent
   implements OnInit, OnChanges, DoCheck

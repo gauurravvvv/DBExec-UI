@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -12,6 +12,7 @@ import { HOME_ROUTES } from 'src/app/shared/components/layout/sidebar/sidebar.co
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
@@ -73,6 +74,10 @@ export class LoginComponent implements OnInit {
     this.showPassword = !this.showPassword;
     const input = document.getElementById('password') as HTMLInputElement;
     input.type = this.showPassword ? 'text' : 'password';
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   getErrorMessage(fieldName: string): string {

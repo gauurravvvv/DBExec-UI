@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject, Subscription } from 'rxjs';
@@ -15,6 +15,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-list-rls-rules',
   templateUrl: './list-rls-rules.component.html',
   styleUrls: ['./list-rls-rules.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListRlsRulesComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
@@ -248,6 +249,10 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
 
   onEdit(rule: any) {
     this.router.navigate([RLS_RULE.EDIT, this.selectedOrg, rule.id]);
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   confirmDelete(id: string) {

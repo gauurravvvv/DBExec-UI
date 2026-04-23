@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TAB } from 'src/app/constants/routes';
 import { TabService } from '../../services/tab.service';
@@ -8,6 +8,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
   selector: 'app-view-tab',
   templateUrl: './view-tab.component.html',
   styleUrls: ['./view-tab.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewTabComponent implements OnInit {
   tabId: string = '';
@@ -43,6 +44,10 @@ export class ViewTabComponent implements OnInit {
 
   goBack() {
     this.router.navigate([TAB.LIST]);
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
   }
 
   confirmDelete(): void {

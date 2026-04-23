@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ProfileService } from '../../services/profile.service';
@@ -10,8 +12,11 @@ import { AddAnalysesActions } from 'src/app/modules/analyses/store';
   selector: 'app-view-profile',
   templateUrl: './view-profile.component.html',
   styleUrls: ['./view-profile.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewProfileComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   profileData: any = null;
   loading = true;
   avatarBackground = '';
@@ -93,7 +98,7 @@ export class ViewProfileComponent implements OnInit {
   }
 
   private logoutAndRedirect() {
-    this.loginService.logout().subscribe({
+    this.loginService.logout().pipe(takeUntil(this.destroy$)).subscribe({
       next: () => this.clearSessionAndNavigate(),
       error: () => this.clearSessionAndNavigate(),
     });
@@ -124,5 +129,10 @@ export class ViewProfileComponent implements OnInit {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
     return colors[Math.abs(hash) % colors.length];
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

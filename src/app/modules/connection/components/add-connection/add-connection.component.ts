@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CONNECTION } from 'src/app/constants/routes';
@@ -15,8 +17,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-add-connection',
   templateUrl: './add-connection.component.html',
   styleUrls: ['./add-connection.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   connectionForm!: FormGroup;
   organisations: any[] = [];
   showPassword = false;
@@ -77,7 +82,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       dbPassword: ['', Validators.required],
     });
 
-    this.connectionForm.valueChanges.subscribe(() => {
+    this.connectionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.updateFormDirtyState();
     });
   }
@@ -160,5 +165,10 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

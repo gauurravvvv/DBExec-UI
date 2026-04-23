@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -14,8 +16,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-add-datasource',
   templateUrl: './add-datasource.component.html',
   styleUrls: ['./add-datasource.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   datasourceForm!: FormGroup;
   organisations: any[] = [];
   private _showOrganisationDropdown = false;
@@ -53,7 +58,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
 
     // Reset connection test when connection fields change
     ['host', 'port', 'database', 'username', 'password'].forEach(field => {
-      this.datasourceForm.get(field)?.valueChanges.subscribe(() => {
+      this.datasourceForm.get(field)?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
         this.connectionTested = false;
         this.connectionTestResult = null;
       });
@@ -263,5 +268,10 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
 
   get showOrganisationDropdown(): boolean {
     return this._showOrganisationDropdown;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

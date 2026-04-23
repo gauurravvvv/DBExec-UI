@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
 import { Router } from '@angular/router';
@@ -17,6 +17,7 @@ interface MenuItem {
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent implements OnInit {
   isExpanded = false;
@@ -165,6 +166,10 @@ export class SidebarComponent implements OnInit {
       // Then collapse the sidebar
       this.isExpanded = false;
     }
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   collapseAllAndToggle() {

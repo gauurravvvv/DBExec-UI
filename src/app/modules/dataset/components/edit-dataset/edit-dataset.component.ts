@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   OnDestroy,
@@ -24,8 +25,8 @@ import {
   ContextMenuItem,
   ContextMenuPosition,
 } from '../../models/query-tab.model';
-import { MonacoIntelliSenseService } from '../../services copy/monaco-intellisense.service';
-import { QueryService } from '../../services copy/query.service';
+import { MonacoIntelliSenseService } from '../../services/monaco-intellisense.service';
+import { QueryService } from '../../services/query.service';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
@@ -46,6 +47,7 @@ declare const window: any;
   selector: 'app-edit-dataset',
   templateUrl: './edit-dataset.component.html',
   styleUrls: ['./edit-dataset.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditDatasetComponent
   implements OnInit, OnDestroy, AfterViewInit, HasUnsavedChanges
@@ -170,6 +172,14 @@ export class EditDatasetComponent
       return schemaNameMatches || hasMatchingTable;
     });
   }
+  trackByName(index: number, item: any): any {
+    return item.name;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   constructor(
     private queryService: QueryService,
     private monacoIntelliSenseService: MonacoIntelliSenseService,

@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   Input,
@@ -29,8 +30,8 @@ import {
   ContextMenuItem,
   ContextMenuPosition,
 } from '../../models/query-tab.model';
-import { MonacoIntelliSenseService } from '../../services copy/monaco-intellisense.service';
-import { QueryService } from '../../services copy/query.service';
+import { MonacoIntelliSenseService } from '../../services/monaco-intellisense.service';
+import { QueryService } from '../../services/query.service';
 import { DatasetService } from '../../services/dataset.service';
 import { SqlFormatterService } from '../../services/sql-formatter.service';
 import { SqlValidatorService } from '../../services/sql-validator.service';
@@ -52,6 +53,7 @@ declare const window: any;
   selector: 'app-add-dataset',
   templateUrl: './add-dataset.component.html',
   styleUrls: ['./add-dataset.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddDatasetComponent
   implements OnInit, OnDestroy, AfterViewInit, OnChanges, HasUnsavedChanges
@@ -186,6 +188,14 @@ export class AddDatasetComponent
       );
       return schemaNameMatches || hasMatchingTable;
     });
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   constructor(

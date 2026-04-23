@@ -15,7 +15,7 @@
           class="form-control"
           (change)="onOrganizationChange($event)"
         >
-          <option *ngFor="let org of organizations" [value]="org.id">
+          <option *ngFor="let org of organizations; trackBy: trackById" [value]="org.id">
             {{ org.name }}
           </option>
         </select>
@@ -29,7 +29,7 @@
       <div class="overview-cards">
         <div
           class="overview-card"
-          *ngFor="let overview of overviews; let i = index"
+          *ngFor="let overview of overviews; let i = index; trackBy: trackByIndex"
           [@fadeInUp]
         >
           <div class="card-icon" [ngClass]="'bg-' + (i + 1)">
@@ -69,7 +69,7 @@
             </div>
           </div>
           <div class="stats-progress">
-            <div class="progress-item" *ngFor="let stat of stats">
+            <div class="progress-item" *ngFor="let stat of stats; trackBy: trackByIndex">
               <div class="progress-label">
                 <span>{{ stat.title }}</span>
                 <span class="value">{{ stat.value }}</span>

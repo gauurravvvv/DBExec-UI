@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   OnInit,
   OnDestroy,
@@ -26,6 +27,7 @@ import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analy
   selector: 'app-list-dataset',
   templateUrl: './list-dataset.component.html',
   styleUrls: ['./list-dataset.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDatasetComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
@@ -87,6 +89,10 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   }
 
   isRowSelectable = (event: any) => true;
+
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
 
   get isFilterActive(): boolean {
     return (

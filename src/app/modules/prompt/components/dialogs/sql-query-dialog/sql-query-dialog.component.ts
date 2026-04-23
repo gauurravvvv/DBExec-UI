@@ -1,5 +1,4 @@
-import {
-  AfterViewInit,
+import { ChangeDetectionStrategy, AfterViewInit,
   Component,
   EventEmitter,
   HostListener,
@@ -7,9 +6,8 @@ import {
   OnChanges,
   OnDestroy,
   Output,
-  SimpleChanges,
-} from '@angular/core';
-import { MonacoIntelliSenseService } from '../../../../dataset/services copy/monaco-intellisense.service';
+  SimpleChanges, } from '@angular/core';
+import { MonacoIntelliSenseService } from '../../../../dataset/services/monaco-intellisense.service';
 
 declare const monaco: any;
 declare const window: any;
@@ -96,6 +94,7 @@ const MONACO_EDITOR_OPTIONS = {
   selector: 'app-sql-query-dialog',
   templateUrl: './sql-query-dialog.component.html',
   styleUrls: ['./sql-query-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SqlQueryDialogComponent
   implements OnChanges, AfterViewInit, OnDestroy

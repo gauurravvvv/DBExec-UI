@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -8,6 +8,7 @@ import { UserService } from '../../services/user.service';
   selector: 'app-view-users',
   templateUrl: './view-users.component.html',
   styleUrls: ['./view-users.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewUsersComponent implements OnInit {
   userId: string = '';

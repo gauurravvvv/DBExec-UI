@@ -2,7 +2,7 @@
   <div class="chart-wrapper">
     <div class="card-grid" [style.gap.px]="config.innerPadding">
       <div
-        *ngFor="let item of data; let i = index"
+        *ngFor="let item of data; let i = index; trackBy: trackByName"
         class="card-item"
         [class.animated]="config.animations"
         [style.background-color]="getCardColor(i)"

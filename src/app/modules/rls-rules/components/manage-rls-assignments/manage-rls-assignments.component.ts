@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
@@ -9,6 +9,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-manage-rls-assignments',
   templateUrl: './manage-rls-assignments.component.html',
   styleUrls: ['./manage-rls-assignments.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ManageRlsAssignmentsComponent implements OnInit {
   @Input() rule: any;
@@ -123,6 +124,10 @@ export class ManageRlsAssignmentsComponent implements OnInit {
           this.loadAssignments();
         }
       });
+  }
+
+  trackById(index: number, item: any): any {
+    return item.id;
   }
 
   close(): void {

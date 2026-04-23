@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface RadioConfig {
   defaultValue: string | null;
@@ -19,6 +17,7 @@ export interface RadioConfig {
   selector: 'app-radio-config-dialog',
   templateUrl: './radio-config-dialog.component.html',
   styleUrls: ['./radio-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RadioConfigDialogComponent implements OnChanges {
   @Input() visible = false;

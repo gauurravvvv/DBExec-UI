@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildBar3DChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-bar3d-chart',
   templateUrl: './configurable-bar3d-chart.component.html',
   styleUrls: ['./configurable-bar3d-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableBar3dChartComponent
   implements OnInit, OnChanges, DoCheck

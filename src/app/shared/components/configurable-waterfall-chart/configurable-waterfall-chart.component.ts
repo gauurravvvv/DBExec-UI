@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildWaterfallChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-waterfall-chart',
   templateUrl: './configurable-waterfall-chart.component.html',
   styleUrls: ['./configurable-waterfall-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableWaterfallChartComponent
   implements OnInit, OnChanges, DoCheck

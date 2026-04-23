@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildCandlestickChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-candlestick-chart',
   templateUrl: './configurable-candlestick-chart.component.html',
   styleUrls: ['./configurable-candlestick-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableCandlestickChartComponent
   implements OnInit, OnChanges, DoCheck

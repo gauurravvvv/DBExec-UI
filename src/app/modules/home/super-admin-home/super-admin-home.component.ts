@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -12,7 +14,9 @@ import { HomeService } from '../services/home.service';
   animations: [
     trigger('fadeInUp', [
       transition(':enter', [
-        style({ transform: 'translateY(20px)', opacity: 0 }),
+        style({ transform: 'translateY(20px)', opacity: 0,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+}),
         animate(
           '0.4s ease-out',
           style({ transform: 'translateY(0)', opacity: 1 }),
@@ -22,6 +26,8 @@ import { HomeService } from '../services/home.service';
   ],
 })
 export class SuperAdminHomeComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   organizations: any[] = [];
 
   entitiesData = {
@@ -96,7 +102,7 @@ export class SuperAdminHomeComponent implements OnInit {
   //       pageNumber: 1,
   //       limit: 100,
   //     })
-  //     .subscribe((res: any) => {
+  //     .pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
   //       if (res) {
   //         this.organizations = [...res.data.orgs];
   //         this.loadOrganizationData(this.organizations[0].id);
@@ -106,7 +112,7 @@ export class SuperAdminHomeComponent implements OnInit {
 
   loadOrganizationData(orgId: string) {
     //fetch data from dashboardAPI
-    this.homeService.getSuperAdminDashboard(orgId).subscribe((res: any) => {
+    this.homeService.getSuperAdminDashboard(orgId).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res) {
         this.entitiesData.maxAdmins = res.data.maxAdmins;
         this.entitiesData.maxDatasources = res.data.maxDatasources;
@@ -163,6 +169,14 @@ export class SuperAdminHomeComponent implements OnInit {
     ];
   }
 
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   getOverviewIcon(title: string): string {
     const icons: { [key: string]: string } = {
       'Total Datasources': 'fas fa-database',
@@ -194,5 +208,10 @@ export class SuperAdminHomeComponent implements OnInit {
   getProgressPercentage(value: number): number {
     const maxValue = Math.max(...this.stats.map(stat => stat.value));
     return (value / maxValue) * 100;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

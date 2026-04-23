@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -16,6 +16,7 @@ import { RoleService } from '../../services/role.service';
   selector: 'app-edit-role',
   templateUrl: './edit-role.component.html',
   styleUrls: ['./edit-role.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   roleForm!: FormGroup;
@@ -179,6 +180,10 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
       }
     }
     return result;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   getNameError(): string {

@@ -1,17 +1,16 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   OnInit,
   Output,
   EventEmitter,
   Input,
-  HostListener,
-} from '@angular/core';
+  HostListener, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-change-password-dialog',
   templateUrl: './change-password-dialog.component.html',
   styleUrls: ['./change-password-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangePasswordDialogComponent implements OnInit {
   @Input() visible = false;

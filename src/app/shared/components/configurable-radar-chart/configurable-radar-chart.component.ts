@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildRadarChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-radar-chart',
   templateUrl: './configurable-radar-chart.component.html',
   styleUrls: ['./configurable-radar-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableRadarChartComponent
   implements OnInit, OnChanges, DoCheck

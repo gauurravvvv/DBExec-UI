@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildGraphGLChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-graphgl-chart',
   templateUrl: './configurable-graphgl-chart.component.html',
   styleUrls: ['./configurable-graphgl-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableGraphGlChartComponent
   implements OnInit, OnChanges, DoCheck

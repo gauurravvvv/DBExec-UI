@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   HostListener,
@@ -41,6 +42,7 @@ declare const window: any;
   selector: 'app-add-custom-field-dialog',
   templateUrl: './add-custom-field-dialog.component.html',
   styleUrls: ['./add-custom-field-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddCustomFieldDialogComponent
   implements OnChanges, AfterViewInit, OnDestroy
@@ -92,6 +94,14 @@ export class AddCustomFieldDialogComponent
   private currentTheme: string = 'vs-dark';
   private themeObserver: MutationObserver | null = null;
   private languageRegistered = false;
+
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
+  }
 
   constructor(
     private datasetService: DatasetService,

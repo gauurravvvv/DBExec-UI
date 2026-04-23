@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildLineChartOption } from '../../helpers/echarts-option-builder';
 
 export interface LineChartSeries {
@@ -58,6 +56,7 @@ export interface LineChartConfig {
   selector: 'app-configurable-line-chart',
   templateUrl: './configurable-line-chart.component.html',
   styleUrls: ['./configurable-line-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableLineChartComponent
   implements OnInit, OnChanges, DoCheck

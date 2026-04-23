@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -11,6 +11,7 @@ import { AUTH } from 'src/app/constants/routes';
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
   forgotPasswordForm: FormGroup;
@@ -42,6 +43,10 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearCountdown();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   getErrorMessage(fieldName: string): string {

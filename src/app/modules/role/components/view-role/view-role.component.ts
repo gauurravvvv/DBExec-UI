@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ROLE } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -8,6 +8,7 @@ import { RoleService } from '../../services/role.service';
   selector: 'app-view-role',
   templateUrl: './view-role.component.html',
   styleUrls: ['./view-role.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewRoleComponent implements OnInit {
   roleData: any = null;
@@ -39,6 +40,10 @@ export class ViewRoleComponent implements OnInit {
         }
       }
     });
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   onEdit() {

@@ -1,13 +1,11 @@
-import {
-  AfterViewInit,
+import { ChangeDetectionStrategy, AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
   OnDestroy,
   OnInit,
-  ViewChild,
-} from '@angular/core';
+  ViewChild, } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -63,6 +61,7 @@ import {
   selector: 'app-view-dashboard',
   templateUrl: './view-dashboard.component.html',
   styleUrls: ['./view-dashboard.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewDashboardComponent
   implements OnInit, AfterViewInit, OnDestroy

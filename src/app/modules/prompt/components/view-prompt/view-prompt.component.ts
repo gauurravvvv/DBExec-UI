@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PROMPT } from 'src/app/constants/routes';
 import { PromptService } from '../../services/prompt.service';
@@ -8,6 +8,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
   selector: 'app-view-prompt',
   templateUrl: './view-prompt.component.html',
   styleUrls: ['./view-prompt.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewPromptComponent implements OnInit {
   promptId: string = '';

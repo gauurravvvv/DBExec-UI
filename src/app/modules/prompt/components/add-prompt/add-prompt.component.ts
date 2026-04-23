@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -20,6 +20,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-add-prompt',
   templateUrl: './add-prompt.component.html',
   styleUrls: ['./add-prompt.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddPromptComponent
   implements OnInit, OnDestroy, HasUnsavedChanges
@@ -509,5 +510,9 @@ export class AddPromptComponent
     return this.sections.filter(
       section => !selectedSections.includes(section.id),
     );
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }

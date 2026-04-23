@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   ElementRef,
   HostListener,
   OnDestroy,
   OnInit,
-  ViewChild,
-} from '@angular/core';
+  ViewChild, } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -17,6 +15,7 @@ import { SIDEBAR_ITEMS_ROUTES } from '../layout/sidebar/sidebar.constant';
   selector: 'app-global-search',
   templateUrl: './global-search.component.html',
   styleUrls: ['./global-search.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalSearchComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef;
@@ -235,6 +234,14 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   getRouteUrl(entity: string): string {
     const routeItem = SIDEBAR_ITEMS_ROUTES.find(item => item.value === entity);
     return routeItem ? routeItem.route : '/';
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackById(index: number, item: any): any {
+    return item.id;
   }
 
   navigateToResult(result: any) {

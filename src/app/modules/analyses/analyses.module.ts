@@ -5,6 +5,7 @@ import { StoreModule } from '@ngrx/store';
 import { MenuModule } from 'primeng/menu';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
 import { AnalysesRoutingModule } from './analyses-routing.module';
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
@@ -24,6 +25,7 @@ import { ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer } from './store';
     AppPrimeNGModule,
     AnalysesRoutingModule,
     SharedModule,
+    SharedChartsModule,
     MenuModule,
     // NgRx Feature Store
     StoreModule.forFeature(ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer),

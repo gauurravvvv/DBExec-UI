@@ -1,20 +1,19 @@
 import * as echarts from 'echarts';
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildPolygons3DChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-polygons3d-chart',
   templateUrl: './configurable-polygons3d-chart.component.html',
   styleUrls: ['./configurable-polygons3d-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurablePolygons3dChartComponent
   implements OnInit, OnChanges, DoCheck

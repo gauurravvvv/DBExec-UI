@@ -201,7 +201,7 @@
   <div class="notification-list" *ngIf="hasNotifications; else noNotifications">
     <div
       class="notification-item"
-      *ngFor="let notification of notifications"
+      *ngFor="let notification of notifications; trackBy: trackById"
       [class.unread]="!notification.read"
       (click)="markAsRead(notification, $event)"
     >

@@ -1,4 +1,6 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { StorageType } from 'src/app/constants/storageType';
@@ -8,8 +10,11 @@ import { CLI_AUTH_PAGE_OPTIONS } from 'src/app/constants/global';
   selector: 'app-cli-auth',
   templateUrl: './cli-auth.component.html',
   styleUrls: ['./cli-auth.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CliAuthComponent implements OnInit, AfterViewInit {
+  private destroy$ = new Subject<void>();
+
   @ViewChild('codeInput') codeInputRef!: ElementRef<HTMLInputElement>;
 
   features = CLI_AUTH_PAGE_OPTIONS;
@@ -25,6 +30,10 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   codeError = '';
 
   constructor(private loginService: LoginService) {}
+
+  trackByIndex(index: number): number {
+    return index;
+  }
 
   ngOnInit(): void {
     if (!this.loginService.isLoggedIn()) {
@@ -75,7 +84,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
     this.codeError = '';
     this.pageState = 'authorizing';
 
-    this.loginService.cliAuthorize(trimmed, 'authorize').subscribe({
+    this.loginService.cliAuthorize(trimmed, 'authorize').pipe(takeUntil(this.destroy$)).subscribe({
       next: (response: any) => {
         if (response.status) {
           this.pageState = 'success';
@@ -109,7 +118,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
     this.actionInProgress = true;
     this.codeError = '';
 
-    this.loginService.cliAuthorize(trimmed, 'deny').subscribe({
+    this.loginService.cliAuthorize(trimmed, 'deny').pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.pageState = 'denied';
         this.message = 'CLI access has been denied. You can close this tab.';
@@ -121,5 +130,10 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
         this.actionInProgress = false;
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

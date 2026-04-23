@@ -66,7 +66,7 @@
       <div class="permissions-section" *ngIf="permissions.length > 0">
         <h4 class="section-title">Screen Permissions</h4>
         <div class="permission-columns">
-          <div class="column" *ngFor="let permission of permissions">
+          <div class="column" *ngFor="let permission of permissions; trackBy: trackByIndex">
             <div class="column-header">{{ permission.label }}</div>
             <div class="permission-items">
               <div class="permission-item" *ngIf="!permission.subPermissions">
@@ -76,7 +76,7 @@
               <ng-container *ngIf="permission.subPermissions">
                 <div
                   class="permission-item"
-                  *ngFor="let subPerm of permission.subPermissions"
+                  *ngFor="let subPerm of permission.subPermissions; trackBy: trackByIndex"
                 >
                   <span class="item-label">{{ subPerm.label }}</span>
                   <i class="pi pi-check-circle perm-enabled"></i>

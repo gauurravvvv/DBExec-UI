@@ -73,7 +73,7 @@
       <div class="tab-skeleton-container" *ngIf="loadingTabs">
         <div class="tab-skeleton-header">
           <p-skeleton
-            *ngFor="let i of skeletonTabs"
+            *ngFor="let i of skeletonTabs; trackBy: trackByIndex"
             width="120px"
             height="40px"
             styleClass="mr-2"
@@ -111,7 +111,7 @@
         styleClass="full-height-tabs"
       >
         <p-tabPanel
-          *ngFor="let tab of tabs; let tabIndex = index"
+          *ngFor="let tab of tabs; let tabIndex = index; trackBy: trackById"
           [header]="tab.name"
         >
           <div
@@ -125,7 +125,7 @@
             <!-- Section Loading Skeleton -->
             <div class="section-skeleton-container" *ngIf="tab.loading">
               <p-skeleton
-                *ngFor="let i of skeletonSections"
+                *ngFor="let i of skeletonSections; trackBy: trackByIndex"
                 width="100%"
                 height="60px"
                 styleClass="mb-3"
@@ -164,7 +164,7 @@
               [multiple]="true"
             >
               <p-accordionTab
-                *ngFor="let section of tab.sections"
+                *ngFor="let section of tab.sections; trackBy: trackById"
                 [header]="section.name"
                 [selected]="section.expanded"
                 (selectedChange)="onSectionToggle(section, $event)"
@@ -174,7 +174,7 @@
                 <div class="prompt-skeleton-container" *ngIf="section.loading">
                   <div
                     class="prompt-skeleton-row"
-                    *ngFor="let i of skeletonPrompts"
+                    *ngFor="let i of skeletonPrompts; trackBy: trackByIndex"
                   >
                     <p-skeleton
                       width="120px"
@@ -226,7 +226,7 @@
                 >
                   <div
                     class="prompt-field"
-                    *ngFor="let prompt of section.prompts"
+                    *ngFor="let prompt of section.prompts; trackBy: trackById"
                     [ngSwitch]="prompt.type"
                     [attr.id]="'prompt-' + prompt.id"
                     [ngClass]="{

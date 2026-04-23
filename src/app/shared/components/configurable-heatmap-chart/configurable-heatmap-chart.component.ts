@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildHeatMapChartOption } from '../../helpers/echarts-option-builder';
 
 export interface HeatMapSeries {
@@ -49,6 +47,7 @@ export interface HeatMapConfig {
   selector: 'app-configurable-heatmap-chart',
   templateUrl: './configurable-heatmap-chart.component.html',
   styleUrls: ['./configurable-heatmap-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableHeatmapChartComponent
   implements OnInit, OnChanges, DoCheck

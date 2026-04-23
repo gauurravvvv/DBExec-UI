@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildLine3DChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-line3d-chart',
   templateUrl: './configurable-line3d-chart.component.html',
   styleUrls: ['./configurable-line3d-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableLine3dChartComponent
   implements OnInit, OnChanges, DoCheck

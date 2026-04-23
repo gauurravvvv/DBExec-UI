@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   AbstractControl,
   FormBuilder,
@@ -23,8 +25,11 @@ import {
   selector: 'app-add-announcement',
   templateUrl: './add-announcement.component.html',
   styleUrls: ['./add-announcement.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   announcementForm!: FormGroup;
   organisations: any[] = [];
   groups: any[] = [];
@@ -89,7 +94,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       { validators: this.dateRangeValidator },
     );
 
-    this.announcementForm.get('organisation')?.valueChanges.subscribe(value => {
+    this.announcementForm.get('organisation')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
       this.announcementForm.patchValue(
         { targetGroupId: null },
         { emitEvent: false },
@@ -261,5 +266,10 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     if (c?.errors?.['maxlength'])
       return `Description must not exceed ${this.maxDescriptionLength} characters`;
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

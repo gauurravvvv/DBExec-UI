@@ -67,7 +67,7 @@
             <span class="count-badge">{{ ruleData.assignments?.length || 0 }}</span>
           </h3>
           <div class="assignments-list" *ngIf="ruleData.assignments?.length; else noAssignments">
-            <div class="assignment-item" *ngFor="let a of ruleData.assignments">
+            <div class="assignment-item" *ngFor="let a of ruleData.assignments; trackBy: trackById">
               <i class="pi" [ngClass]="a.scope === 'user' ? 'pi-user' : 'pi-users'"></i>
               <span class="assignment-name">{{ a.scopeName || a.scopeId }}</span>
               <span class="assignment-type-badge">{{ a.scope }}</span>
@@ -90,14 +90,14 @@
               <span>Operator</span>
               <span>Values</span>
             </div>
-            <div class="condition-table-row" *ngFor="let cond of ruleData.conditions; let i = index">
+            <div class="condition-table-row" *ngFor="let cond of ruleData.conditions; let i = index; trackBy: trackByIndex">
               <span class="cond-index">{{ i + 1 }}</span>
               <span class="cond-column">
                 <i class="pi pi-filter-fill"></i> {{ cond.columnName }}
               </span>
               <span class="operator-badge">{{ cond.operator }}</span>
               <div class="cond-values">
-                <span class="value-chip" *ngFor="let v of cond.values">{{ v }}</span>
+                <span class="value-chip" *ngFor="let v of cond.values; trackBy: trackByIndex">{{ v }}</span>
               </div>
             </div>
           </div>

@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildLinesGLChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-linesgl-chart',
   templateUrl: './configurable-linesgl-chart.component.html',
   styleUrls: ['./configurable-linesgl-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableLinesGlChartComponent
   implements OnInit, OnChanges, DoCheck

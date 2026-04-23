@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildGlobeChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-globe-chart',
   templateUrl: './configurable-globe-chart.component.html',
   styleUrls: ['./configurable-globe-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableGlobeChartComponent
   implements OnInit, OnChanges, DoCheck

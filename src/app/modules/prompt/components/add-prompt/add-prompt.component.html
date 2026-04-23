@@ -170,7 +170,8 @@
             <div
               *ngFor="
                 let sectionGroup of sectionGroups.controls;
-                let groupIndex = index
+                let groupIndex = index;
+                trackBy: trackByIndex
               "
               [formGroup]="$any(sectionGroup)"
               class="schema-group"
@@ -253,7 +254,8 @@
                 <div
                   *ngFor="
                     let prompt of getPrompts(groupIndex).controls;
-                    let promptIndex = index
+                    let promptIndex = index;
+                    trackBy: trackByIndex
                   "
                   [formGroupName]="promptIndex"
                   class="mapping-row"

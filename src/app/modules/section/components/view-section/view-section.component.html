@@ -86,7 +86,7 @@
             <span class="count-badge">{{ tabData.prompts.length }}</span>
           </h3>
           <div class="fields-list">
-            <div class="field-item" *ngFor="let prompt of tabData.prompts">
+            <div class="field-item" *ngFor="let prompt of tabData.prompts; trackBy: trackByName">
               <i class="pi pi-tag"></i>
               <span>{{ prompt.name }}</span>
             </div>

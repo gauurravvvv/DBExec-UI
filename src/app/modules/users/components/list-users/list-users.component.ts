@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject, Subscription } from 'rxjs';
@@ -15,6 +15,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-list-users',
   templateUrl: './list-users.component.html',
   styleUrls: ['./list-users.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListUsersComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;

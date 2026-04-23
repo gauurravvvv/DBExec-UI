@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import {
   DUMMY_MULTI_SERIES,
   DEFAULT_BAR_CHART_CONFIG,
@@ -27,6 +25,7 @@ export interface BarChartData {
   selector: 'app-configurable-bar-chart',
   templateUrl: './configurable-bar-chart.component.html',
   styleUrls: ['./configurable-bar-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableBarChartComponent
   implements OnInit, OnChanges, DoCheck

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   AbstractControl,
   FormBuilder,
@@ -18,8 +20,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-grant-access',
   templateUrl: './grant-access.component.html',
   styleUrls: ['./grant-access.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GrantAccessComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   accessForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
@@ -66,11 +71,11 @@ export class GrantAccessComponent implements OnInit {
     });
 
     // Trigger validation when groups or users change
-    this.accessForm.get('groups')?.valueChanges.subscribe(() => {
+    this.accessForm.get('groups')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.accessForm.updateValueAndValidity({ emitEvent: false });
     });
 
-    this.accessForm.get('users')?.valueChanges.subscribe(() => {
+    this.accessForm.get('users')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.accessForm.updateValueAndValidity({ emitEvent: false });
     });
   }
@@ -280,5 +285,10 @@ export class GrantAccessComponent implements OnInit {
           { emitEvent: false },
         );
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

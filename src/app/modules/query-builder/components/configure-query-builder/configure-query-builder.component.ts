@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QUERY_BUILDER } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -56,6 +56,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-configure-query-builder',
   templateUrl: './configure-query-builder.component.html',
   styleUrls: ['./configure-query-builder.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
   orgId: string = '';
@@ -1337,5 +1338,14 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
   // Helper method to find the section containing a prompt
   private findSectionContainingPrompt(prompt: Prompt): Section | null {
     return findSectionContainingPromptHelper(this.openTabs, prompt);
+  }
+
+  // trackBy functions for *ngFor performance
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }

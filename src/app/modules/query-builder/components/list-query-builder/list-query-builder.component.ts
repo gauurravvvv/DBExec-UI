@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem, LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -16,6 +16,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-list-query-builder',
   templateUrl: './list-query-builder.component.html',
   styleUrls: ['./list-query-builder.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListQueryBuilderComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;

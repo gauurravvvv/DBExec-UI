@@ -274,7 +274,7 @@
             <div class="default-chips">
               <span
                 class="default-chip"
-                *ngFor="let val of config.defaultValues"
+                *ngFor="let val of config.defaultValues; trackBy: trackByIndex"
                 >{{ val }}</span
               >
             </div>

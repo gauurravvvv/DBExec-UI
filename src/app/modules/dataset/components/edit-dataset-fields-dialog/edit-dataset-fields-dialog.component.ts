@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   HostListener,
@@ -28,6 +29,7 @@ export const ANALYTICAL_TYPES = [
   selector: 'app-edit-dataset-fields-dialog',
   templateUrl: './edit-dataset-fields-dialog.component.html',
   styleUrls: ['./edit-dataset-fields-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditDatasetFieldsDialogComponent implements OnChanges {
   @Input() visible = false;

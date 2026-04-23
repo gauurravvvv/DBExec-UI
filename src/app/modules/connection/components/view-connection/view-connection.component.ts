@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CONNECTION } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -7,6 +7,7 @@ import { ConnectionService } from '../../services/connection.service';
   selector: 'app-view-connection',
   templateUrl: './view-connection.component.html',
   styleUrls: ['./view-connection.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewConnectionComponent implements OnInit {
   connectionId: string = '';
@@ -44,6 +45,14 @@ export class ViewConnectionComponent implements OnInit {
 
   goBack() {
     this.router.navigate([CONNECTION.LIST]);
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   confirmDelete(): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GROUP } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -8,6 +8,7 @@ import { GroupService } from '../../services/group.service';
   selector: 'app-view-group',
   templateUrl: './view-group.component.html',
   styleUrls: ['./view-group.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewGroupComponent implements OnInit {
   groupId: string = '';
@@ -57,6 +58,10 @@ export class ViewGroupComponent implements OnInit {
   cancelDelete(): void {
     this.showDeleteConfirm = false;
     this.deleteJustification = '';
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   proceedDelete(): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LoadingService } from './core/services/loading.service';
@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit, OnDestroy {
   public loading = false;

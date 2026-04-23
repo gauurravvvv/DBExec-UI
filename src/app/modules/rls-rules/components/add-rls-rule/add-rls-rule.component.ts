@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   AbstractControl,
   FormArray,
@@ -31,8 +33,11 @@ function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
   selector: 'app-add-rls-rule',
   templateUrl: './add-rls-rule.component.html',
   styleUrls: ['./add-rls-rule.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   rlsForm!: FormGroup;
 
   organisations: any[] = [];
@@ -115,7 +120,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Org changes → reload datasources, clear downstream
-    this.rlsForm.get('organisation')?.valueChanges.subscribe(value => {
+    this.rlsForm.get('organisation')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
       if (value) {
         this.selectedDatasource = '';
         this.datasources = [];
@@ -133,7 +138,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Dataset changes → load columns, reset conditions
-    this.rlsForm.get('datasetId')?.valueChanges.subscribe(value => {
+    this.rlsForm.get('datasetId')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
       this.datasetColumns = [];
       this.columnValuesCache = {};
       this.isLoadingColumnValues = {};
@@ -314,6 +319,10 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.router.navigate([RLS_RULE.LIST]);
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   getNameError(): string {
     const control = this.rlsForm.get('name');
     if (control?.errors?.['required']) return 'Rule name is required';
@@ -324,5 +333,10 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

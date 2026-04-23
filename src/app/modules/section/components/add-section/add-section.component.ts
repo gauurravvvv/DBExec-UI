@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -16,8 +18,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-add-section',
   templateUrl: './add-section.component.html',
   styleUrls: ['./add-section.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddSectionComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   sectionForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
@@ -65,7 +70,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       this.loadDatasources();
     }
 
-    this.sectionForm.valueChanges.subscribe(() => {
+    this.sectionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.checkForDuplicates();
     });
   }
@@ -85,6 +90,10 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       datasource: [{ value: '', disabled: false }, Validators.required],
       tabGroups: this.fb.array([]),
     });
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   get tabGroups(): FormArray {
@@ -410,5 +419,10 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       }
       sections.push(this.createSection());
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

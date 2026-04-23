@@ -381,7 +381,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of getChangeRows()" [class.changed]="row.changed">
+          <tr *ngFor="let row of getChangeRows(); trackBy: trackByIndex" [class.changed]="row.changed">
             <td class="field-cell">{{ row.field }}</td>
             <td class="old-cell">{{ row.oldVal }}</td>
             <td class="new-cell">{{ row.newVal }}</td>
@@ -401,7 +401,7 @@
       </div>
       <table class="details-table">
         <tbody>
-          <tr *ngFor="let item of getEntityDetails()">
+          <tr *ngFor="let item of getEntityDetails(); trackBy: trackByIndex">
             <td class="dt-label">{{ item.key }}</td>
             <td class="dt-value">{{ item.value }}</td>
           </tr>

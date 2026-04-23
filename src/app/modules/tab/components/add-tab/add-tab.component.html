@@ -119,7 +119,7 @@
 
           <div class="fields-list" formArrayName="tabs">
             <div
-              *ngFor="let tabGroup of tabGroups.controls; let i = index"
+              *ngFor="let tabGroup of tabGroups.controls; let i = index; trackBy: trackByIndex"
               [formGroupName]="i"
               class="mapping-row"
               [class.highlight-animation]="

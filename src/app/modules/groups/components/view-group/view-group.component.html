@@ -85,7 +85,7 @@
             <span class="count-badge">{{ groupData.userGroups.length }}</span>
           </h3>
           <div class="fields-list">
-            <div class="field-item" *ngFor="let field of groupData.userGroups">
+            <div class="field-item" *ngFor="let field of groupData.userGroups; trackBy: trackByIndex">
               <i class="pi pi-user"></i>
               {{ field.user.username }}
             </div>
@@ -104,7 +104,7 @@
           <div class="fields-list">
             <div
               class="field-item"
-              *ngFor="let connection of groupData.connections"
+              *ngFor="let connection of groupData.connections; trackBy: trackByIndex"
             >
               <i class="pi pi-user"></i>
               {{ connection }}

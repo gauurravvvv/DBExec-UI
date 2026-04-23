@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatasourceService } from '../../services/datasource.service';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -16,6 +16,7 @@ interface StorageTable {
   selector: 'app-view-datasource',
   templateUrl: './view-datasource.component.html',
   styleUrls: ['./view-datasource.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewDatasourceComponent implements OnInit {
   dbId!: string;
@@ -353,6 +354,10 @@ export class ViewDatasourceComponent implements OnInit {
     return Array(count)
       .fill(0)
       .map((_, i) => colors[i % colors.length]);
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
   }
 
   goBack(): void {

@@ -33,7 +33,7 @@
       </button>
       <button
         class="filter-chip"
-        *ngFor="let type of uniqueEntityTypes"
+        *ngFor="let type of uniqueEntityTypes; trackBy: trackByIndex"
         [class.active]="activeFilter === type"
         (click)="setFilter(type)"
       >
@@ -46,7 +46,7 @@
     <div class="search-results" *ngIf="searchResults.length > 0">
       <div
         class="result-item"
-        *ngFor="let result of filteredSearchResults"
+        *ngFor="let result of filteredSearchResults; trackBy: trackById"
         (click)="navigateToResult(result)"
       >
         <div class="result-icon">

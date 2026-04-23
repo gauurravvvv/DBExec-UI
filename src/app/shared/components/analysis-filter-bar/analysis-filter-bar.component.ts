@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AnalysesService } from '../../../modules/analyses/service/analyses.service';
 
 @Component({
   selector: 'app-analysis-filter-bar',
   templateUrl: './analysis-filter-bar.component.html',
   styleUrls: ['./analysis-filter-bar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AnalysisFilterBarComponent implements OnInit {
   @Input() orgId!: string;
@@ -145,6 +146,10 @@ export class AnalysisFilterBarComponent implements OnInit {
       // Multi-select: use all valid matches
       this.appliedValues[filter.id] = validDefaults;
     }
+  }
+
+  trackById(index: number, item: any): any {
+    return item.id;
   }
 
   onFilterChange(filter: any, value: any): void {

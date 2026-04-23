@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildFlowGLChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-flowgl-chart',
   templateUrl: './configurable-flowgl-chart.component.html',
   styleUrls: ['./configurable-flowgl-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableFlowGlChartComponent
   implements OnInit, OnChanges, DoCheck
