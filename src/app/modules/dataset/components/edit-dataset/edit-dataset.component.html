@@ -181,7 +181,8 @@
               *ngFor="
                 let schema of getFilteredSchemas(
                   datasourceSchemas[selectedDatasourceObj.id]?.schemas || []
-                )
+                );
+                trackBy: trackByName
               "
               class="schema-item"
             >
@@ -215,7 +216,7 @@
                 "
               >
                 <div
-                  *ngFor="let table of getFilteredTables(schema.tables)"
+                  *ngFor="let table of getFilteredTables(schema.tables); trackBy: trackByName"
                   class="table-item"
                   [class.expanded]="
                     isTableExpanded(
@@ -267,7 +268,7 @@
                     "
                   >
                     <div
-                      *ngFor="let column of table.columns"
+                      *ngFor="let column of table.columns; trackBy: trackByName"
                       class="column-item"
                       (click)="
                         insertColumnName(
@@ -579,7 +580,7 @@
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 60px" pFrozenColumn>#</th>
-              <th *ngFor="let col of queryResult.columns">
+              <th *ngFor="let col of queryResult.columns; trackBy: trackByIndex">
                 <div class="th-content">
                   {{ col }}
                   <span
@@ -594,7 +595,7 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn></th>
-              <th *ngFor="let col of queryResult.columns">
+              <th *ngFor="let col of queryResult.columns; trackBy: trackByIndex">
                 <input
                   pInputText
                   type="text"
@@ -610,7 +611,7 @@
           <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
             <tr>
               <td pFrozenColumn class="row-number-cell">{{ rowIndex + 1 }}</td>
-              <td *ngFor="let col of queryResult.columns" [title]="row[col]">
+              <td *ngFor="let col of queryResult.columns; trackBy: trackByIndex" [title]="row[col]">
                 <span
                   [ngClass]="{
                     'null-value': row[col] === null || row[col] === undefined,

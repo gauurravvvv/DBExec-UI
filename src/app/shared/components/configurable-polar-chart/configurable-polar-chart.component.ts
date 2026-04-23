@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildPolarChartOption } from '../../helpers/echarts-option-builder';
 
 export interface PolarChartSeries {
@@ -52,6 +50,7 @@ export interface PolarChartConfig {
   selector: 'app-configurable-polar-chart',
   templateUrl: './configurable-polar-chart.component.html',
   styleUrls: ['./configurable-polar-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurablePolarChartComponent
   implements OnInit, OnChanges, DoCheck

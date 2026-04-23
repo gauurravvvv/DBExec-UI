@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -12,8 +14,11 @@ import { TabService } from '../../services/tab.service';
   selector: 'app-edit-tab',
   templateUrl: './edit-tab.component.html',
   styleUrls: ['./edit-tab.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditTabComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   tabForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -44,7 +49,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
       this.loadTabData();
     }
 
-    this.tabForm.valueChanges.subscribe(() => {
+    this.tabForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -156,5 +161,10 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
     } else {
       this.router.navigate([TAB.LIST]);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

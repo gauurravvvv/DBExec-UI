@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 
 export interface CardChartData {
@@ -33,6 +31,7 @@ export interface CardChartConfig {
   selector: 'app-configurable-card-chart',
   templateUrl: './configurable-card-chart.component.html',
   styleUrls: ['./configurable-card-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableCardChartComponent
   implements OnInit, OnChanges, DoCheck
@@ -124,6 +123,10 @@ export class ConfigurableCardChartComponent
     if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
     if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
     return String(value);
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
   }
 
   onCardSelect(item: CardChartData): void {

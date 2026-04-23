@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -11,6 +11,7 @@ import { SuperAdminService } from '../../services/superAdmin.service';
   selector: 'app-add-super-admin',
   templateUrl: './add-super-admin.component.html',
   styleUrls: ['./add-super-admin.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
   adminForm!: FormGroup;

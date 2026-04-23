@@ -64,7 +64,7 @@
       </div>
 
       <div class="assignment-list" *ngIf="!isLoadingAssignments && assignments.length > 0">
-        <div class="assignment-row" *ngFor="let a of assignments">
+        <div class="assignment-row" *ngFor="let a of assignments; trackBy: trackById">
           <i class="pi" [ngClass]="a.scope === 'user' ? 'pi-user' : 'pi-users'"></i>
           <div class="assignment-info">
             <span class="assignment-name">{{ a.scopeName || a.scopeId }}</span>

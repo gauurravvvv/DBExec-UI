@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -7,6 +7,7 @@ import { ROLES } from 'src/app/constants/user.constant';
   selector: 'app-org-home',
   templateUrl: './org-home.component.html',
   styleUrls: ['./org-home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrgHomeComponent implements OnInit {
   userName = '';

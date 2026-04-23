@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface MultiselectConfig {
   placeholder: string;
@@ -35,6 +33,7 @@ export interface MultiselectConfig {
   selector: 'app-multiselect-config-dialog',
   templateUrl: './multiselect-config-dialog.component.html',
   styleUrls: ['./multiselect-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultiselectConfigDialogComponent implements OnChanges {
   @Input() visible = false;
@@ -105,6 +104,10 @@ export class MultiselectConfigDialogComponent implements OnChanges {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
+
+  trackByIndex(index: number): number {
+    return index;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {

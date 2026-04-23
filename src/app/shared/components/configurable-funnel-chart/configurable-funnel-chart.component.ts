@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildFunnelChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-funnel-chart',
   templateUrl: './configurable-funnel-chart.component.html',
   styleUrls: ['./configurable-funnel-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableFunnelChartComponent
   implements OnInit, OnChanges, DoCheck

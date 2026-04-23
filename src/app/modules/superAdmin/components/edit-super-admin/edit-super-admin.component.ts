@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
@@ -11,8 +13,11 @@ import { REGEX } from 'src/app/constants/regex.constant';
   selector: 'app-edit-super-admin',
   templateUrl: './edit-super-admin.component.html',
   styleUrls: ['./edit-super-admin.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   adminForm!: FormGroup;
   adminId: string = '';
   adminData: any;
@@ -42,7 +47,7 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
     this.initForm();
 
     // Subscribe to form value changes
-    this.adminForm.valueChanges.subscribe(() => {
+    this.adminForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -83,7 +88,7 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
       status: [false],
     });
 
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.adminId = params['id'];
       if (this.adminId) {
         this.patchFormValues();
@@ -160,5 +165,10 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

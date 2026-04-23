@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildSurfaceChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-surface-chart',
   templateUrl: './configurable-surface-chart.component.html',
   styleUrls: ['./configurable-surface-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableSurfaceChartComponent
   implements OnInit, OnChanges, DoCheck

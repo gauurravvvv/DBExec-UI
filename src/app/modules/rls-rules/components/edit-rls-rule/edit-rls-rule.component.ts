@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   AbstractControl,
   FormArray,
@@ -27,8 +29,11 @@ function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
   selector: 'app-edit-rls-rule',
   templateUrl: './edit-rls-rule.component.html',
   styleUrls: ['./edit-rls-rule.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   rlsForm!: FormGroup;
   isFormDirty = false;
   showSaveConfirm = false;
@@ -92,7 +97,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       isEnabled: [true],
     });
 
-    this.rlsForm.valueChanges.subscribe(() => {
+    this.rlsForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.checkFormDirty();
     });
   }
@@ -271,6 +276,10 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   getNameError(): string {
     const control = this.rlsForm.get('name');
     if (control?.errors?.['required']) return 'Rule name is required';
@@ -283,4 +292,8 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     return '';
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

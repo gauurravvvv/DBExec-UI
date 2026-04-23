@@ -1,10 +1,8 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   ElementRef,
   OnDestroy,
   OnInit,
-  ViewChild,
-} from '@angular/core';
+  ViewChild, } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -32,6 +30,7 @@ import { PROMPT_TYPES } from '../../constants/prompt.constant';
   selector: 'app-config-prompt',
   templateUrl: './config-prompt.component.html',
   styleUrls: ['./config-prompt.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigPromptComponent implements OnInit, OnDestroy {
   // Subscription cleanup
@@ -1694,6 +1693,10 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       .catch(err => {
         console.error('Failed to copy SQL:', err);
       });
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
   }
 
   refreshPromptValues() {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -21,6 +21,7 @@ import {
   selector: 'app-edit-announcement',
   templateUrl: './edit-announcement.component.html',
   styleUrls: ['./edit-announcement.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   announcementForm!: FormGroup;

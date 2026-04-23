@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import {debounceTime, takeUntil} from 'rxjs/operators';
 import { DATASOURCE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -14,8 +14,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-list-datasource',
   templateUrl: './list-datasource.component.html',
   styleUrls: ['./list-datasource.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDatasourceComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   @ViewChild('dt') dt!: Table;
   dbs: any[] = [];
   filteredDBs: any[] = [];
@@ -48,7 +51,7 @@ export class ListDatasourceComponent implements OnInit {
 
   ngOnInit() {
     // Setup debounce for filter changes
-    this.searchSubject.pipe(debounceTime(500)).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.lastTableLazyLoadEvent) {
         this.loadDatasources(this.lastTableLazyLoadEvent);
       }
@@ -313,5 +316,10 @@ export class ListDatasourceComponent implements OnInit {
     if (this.lastTableLazyLoadEvent) {
       this.loadDatasources(this.lastTableLazyLoadEvent);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

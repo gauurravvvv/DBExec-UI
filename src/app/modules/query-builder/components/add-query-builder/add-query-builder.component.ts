@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -15,6 +15,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-add-query-builder',
   templateUrl: './add-query-builder.component.html',
   styleUrls: ['./add-query-builder.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddQueryBuilderComponent implements OnInit, HasUnsavedChanges {
   queryBuilderForm!: FormGroup;

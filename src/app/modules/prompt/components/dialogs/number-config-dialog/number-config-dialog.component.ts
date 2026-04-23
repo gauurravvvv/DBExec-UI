@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface NumberConfig {
   placeholder: string;
@@ -28,6 +26,7 @@ export interface NumberConfig {
   selector: 'app-number-config-dialog',
   templateUrl: './number-config-dialog.component.html',
   styleUrls: ['./number-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NumberConfigDialogComponent implements OnChanges {
   @Input() visible = false;

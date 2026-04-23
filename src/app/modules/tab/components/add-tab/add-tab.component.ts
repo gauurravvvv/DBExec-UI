@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -15,8 +17,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-add-tab',
   templateUrl: './add-tab.component.html',
   styleUrls: ['./add-tab.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddTabComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   tabForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
@@ -61,7 +66,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     }
 
     // Subscribe to form changes to check for duplicates
-    this.tabGroups.valueChanges.subscribe(() => {
+    this.tabGroups.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.checkForDuplicates();
     });
   }
@@ -107,6 +112,10 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Tab name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   get tabGroups(): FormArray {
@@ -261,5 +270,10 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
       this.tabGroups.removeAt(0);
     }
     this.addTabGroup();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

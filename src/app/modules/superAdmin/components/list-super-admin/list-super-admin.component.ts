@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
 import { Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
@@ -6,14 +6,17 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-list-super-admin',
   templateUrl: './list-super-admin.component.html',
   styleUrls: ['./list-super-admin.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListSuperAdminComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   Math = Math;
   loggedInUserId: any;
 
@@ -62,7 +65,7 @@ export class ListSuperAdminComponent implements OnInit {
     // Initial load will be triggered by p-table lazy load if [lazy]="true" is set
 
     // Setup debounce for filter changes
-    this.searchSubject.pipe(debounceTime(500)).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntil(this.destroy$)).subscribe(() => {
       // Trigger lazy load with current pagination but updated filters
       if (this.lastTableLazyLoadEvent) {
         this.loadSuperAdmins(this.lastTableLazyLoadEvent);
@@ -295,5 +298,10 @@ export class ListSuperAdminComponent implements OnInit {
       .catch(() => {
         // this.loading = false; // REMOVED
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

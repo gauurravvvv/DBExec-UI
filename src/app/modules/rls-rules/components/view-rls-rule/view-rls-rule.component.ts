@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RLS_RULE } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -8,6 +8,7 @@ import { RlsRulesService } from '../../services/rls-rules.service';
   selector: 'app-view-rls-rule',
   templateUrl: './view-rls-rule.component.html',
   styleUrls: ['./view-rls-rule.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewRlsRuleComponent implements OnInit {
   ruleId: string = '';
@@ -45,6 +46,14 @@ export class ViewRlsRuleComponent implements OnInit {
 
   goBack() {
     this.router.navigate([RLS_RULE.LIST]);
+  }
+
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   confirmDelete(): void {

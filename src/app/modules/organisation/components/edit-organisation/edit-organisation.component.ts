@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANISATION } from 'src/app/constants/routes';
@@ -11,8 +13,11 @@ import { REGEX } from 'src/app/constants/regex.constant';
   selector: 'app-edit-organisation',
   templateUrl: './edit-organisation.component.html',
   styleUrls: ['./edit-organisation.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   orgForm!: FormGroup;
   isFormDirty = false;
 
@@ -124,11 +129,11 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Update email field validators when provider changes
-    this.orgForm.get('emailProvider')?.valueChanges.subscribe(provider => {
+    this.orgForm.get('emailProvider')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(provider => {
       this.updateEmailValidators(provider);
     });
 
-    this.orgForm.valueChanges.subscribe(() => {
+    this.orgForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -168,7 +173,7 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     // Reset connection test when DB fields change
     ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
       field => {
-        this.orgForm.get(field)?.valueChanges.subscribe(() => {
+        this.orgForm.get(field)?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
           this.connectionTested = false;
           this.connectionTestResult = null;
         });
@@ -570,5 +575,10 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
         return 'Port cannot exceed 65535';
     }
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

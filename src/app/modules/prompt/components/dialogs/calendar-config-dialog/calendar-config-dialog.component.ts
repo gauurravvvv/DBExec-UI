@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface CalendarConfig {
   // Basic
@@ -52,6 +50,7 @@ export interface CalendarConfig {
   selector: 'app-calendar-config-dialog',
   templateUrl: './calendar-config-dialog.component.html',
   styleUrls: ['./calendar-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarConfigDialogComponent implements OnChanges {
   @Input() visible = false;
@@ -159,6 +158,10 @@ export class CalendarConfigDialogComponent implements OnChanges {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
+
+  trackByIndex(index: number): number {
+    return index;
+  }
 
   private toDate(val: any): Date | null {
     if (val == null) return null;

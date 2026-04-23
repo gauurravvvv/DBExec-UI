@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ANALYSES } from 'src/app/constants/routes';
 import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
@@ -11,8 +13,11 @@ import { DashboardService } from '../../../dashboard/services/dashboard.service'
   selector: 'app-view-analyses',
   templateUrl: './view-analyses.component.html',
   styleUrls: ['./view-analyses.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewAnalysesComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   analysisId: string = '';
   orgId: string = '';
   analysisDetails: any = null;
@@ -39,7 +44,7 @@ export class ViewAnalysesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.orgId = params['orgId'];
       this.analysisId = params['id'];
       if (this.analysisId) {
@@ -214,5 +219,14 @@ export class ViewAnalysesComponent implements OnInit {
     if (data?.field) {
       this.loadAnalysisFields();
     }
+  }
+
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

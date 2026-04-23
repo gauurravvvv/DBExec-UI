@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -58,8 +60,11 @@ interface OrganisationData {
   selector: 'app-view-organisation',
   templateUrl: './view-organisation.component.html',
   styleUrls: ['./view-organisation.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewOrganisationComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   organisationId!: string;
   organisationData!: OrganisationData;
   avatarBackground: string = '#2196F3';
@@ -76,7 +81,7 @@ export class ViewOrganisationComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.organisationId = params['id'];
       this.loadOrganisationData();
     });
@@ -142,4 +147,8 @@ export class ViewOrganisationComponent implements OnInit {
       });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

@@ -34,7 +34,7 @@
   <div class="sidebar-content">
     <nav class="sidebar-nav">
       <ul class="nav-list">
-        <li *ngFor="let item of menuItems" class="nav-item">
+        <li *ngFor="let item of menuItems; trackBy: trackByIndex" class="nav-item">
           <!-- Menu item with subPermissions -->
           <div
             *ngIf="item.subPermissions?.length"
@@ -80,7 +80,7 @@
             *ngIf="item.subPermissions"
           >
             <li
-              *ngFor="let subItem of item.subPermissions"
+              *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex"
               class="submenu-item"
               [class.visible]="item.isExpanded"
             >
@@ -140,7 +140,7 @@
     *ngIf="item.subPermissions"
   >
     <li
-      *ngFor="let nestedItem of item.subPermissions"
+      *ngFor="let nestedItem of item.subPermissions; trackBy: trackByIndex"
       class="nested-submenu-item"
       [class.visible]="item.isExpanded"
     >

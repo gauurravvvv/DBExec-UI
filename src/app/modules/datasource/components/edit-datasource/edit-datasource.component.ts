@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -58,8 +60,11 @@ import {
       transition('collapsed <=> expanded', [animate('300ms ease-in-out')]),
     ]),
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   datasourceForm!: FormGroup;
   isFormDirty = false;
 
@@ -103,7 +108,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     this.loadDatasourceData();
 
     // Monitor form changes
-    this.datasourceForm.valueChanges.subscribe(() => {
+    this.datasourceForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.initialFormValues) {
         this.isFormDirty = !this.isEqual(
           this.datasourceForm.getRawValue(),
@@ -114,7 +119,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
 
     // Reset connection test when connection fields change
     ['host', 'port', 'database', 'username', 'password'].forEach(field => {
-      this.datasourceForm.get(field)?.valueChanges.subscribe(() => {
+      this.datasourceForm.get(field)?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
         this.connectionTested = false;
         this.connectionTestResult = null;
       });
@@ -369,5 +374,10 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     }
 
     return JSON.stringify(form) === JSON.stringify(initial);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

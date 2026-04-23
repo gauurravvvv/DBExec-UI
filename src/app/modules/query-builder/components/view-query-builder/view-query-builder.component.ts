@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   OnInit,
   OnDestroy,
@@ -28,6 +29,7 @@ import { getPlaceholder } from '../execute-query-builder/helpers/prompt-renderer
   selector: 'app-view-query-builder',
   templateUrl: './view-query-builder.component.html',
   styleUrls: ['./view-query-builder.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   @ViewChild('treeDropdown') treeDropdownRef!: ElementRef;
@@ -519,5 +521,14 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
 
   onBack(): void {
     this.router.navigate([QUERY_BUILDER.LIST]);
+  }
+
+  // trackBy functions for *ngFor performance
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }

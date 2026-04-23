@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildSunburstChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-sunburst-chart',
   templateUrl: './configurable-sunburst-chart.component.html',
   styleUrls: ['./configurable-sunburst-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableSunburstChartComponent
   implements OnInit, OnChanges, DoCheck

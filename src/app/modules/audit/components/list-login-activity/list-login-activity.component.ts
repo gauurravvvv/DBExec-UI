@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
 import { AuditService } from '../../services/audit.service';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import {debounceTime, takeUntil} from 'rxjs/operators';
 import { ROLES } from 'src/app/constants/user.constant';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
 
@@ -12,8 +12,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
   selector: 'app-list-login-activity',
   templateUrl: './list-login-activity.component.html',
   styleUrls: ['./list-login-activity.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListLoginActivityComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   Math = Math;
 
   @ViewChild('dt') dt!: Table;
@@ -60,7 +63,7 @@ export class ListLoginActivityComponent implements OnInit {
       this.loadOrganisations();
     }
 
-    this.searchSubject.pipe(debounceTime(500)).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.lastTableLazyLoadEvent) {
         this.loadActivities(this.lastTableLazyLoadEvent);
       }
@@ -179,7 +182,7 @@ export class ListLoginActivityComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.auditService.exportLoginActivity(params).subscribe({
+    this.auditService.exportLoginActivity(params).pipe(takeUntil(this.destroy$)).subscribe({
       next: (blob: Blob) => {
         const orgLabel =
           this.organisationOptions.find(
@@ -227,5 +230,10 @@ export class ListLoginActivityComponent implements OnInit {
         }
       })
       .catch(() => {});
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

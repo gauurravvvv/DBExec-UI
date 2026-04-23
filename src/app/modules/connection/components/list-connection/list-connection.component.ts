@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import {debounceTime, takeUntil} from 'rxjs/operators';
 import { CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -15,8 +15,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-list-connection',
   templateUrl: './list-connection.component.html',
   styleUrls: ['./list-connection.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListConnectionComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   @ViewChild('dt') dt!: Table;
 
   // Pagination limit for connections
@@ -91,7 +94,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
     // Setup debounced filter
     this.filterSubscription = this.filter$
       .pipe(debounceTime(400))
-      .subscribe(() => {
+      .pipe(takeUntil(this.destroy$)).subscribe(() => {
         this.loadConnections();
       });
 

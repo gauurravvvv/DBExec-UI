@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -12,8 +14,11 @@ import { QueryBuilderService } from '../../services/query-builder.service';
   selector: 'app-edit-query-builder',
   templateUrl: './edit-query-builder.component.html',
   styleUrls: ['./edit-query-builder.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   queryBuilderForm!: FormGroup;
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
@@ -53,7 +58,7 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       this.loadQueryBuilderDetails();
     }
 
-    this.queryBuilderForm.valueChanges.subscribe(() => {
+    this.queryBuilderForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -166,5 +171,10 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
     } else {
       this.router.navigate([QUERY_BUILDER.LIST]);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

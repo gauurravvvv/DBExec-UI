@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildThemeRiverChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-theme-river-chart',
   templateUrl: './configurable-theme-river-chart.component.html',
   styleUrls: ['./configurable-theme-river-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableThemeRiverChartComponent
   implements OnInit, OnChanges, DoCheck

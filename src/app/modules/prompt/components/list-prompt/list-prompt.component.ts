@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -16,6 +16,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-list-prompt',
   templateUrl: './list-prompt.component.html',
   styleUrls: ['./list-prompt.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListPromptComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;

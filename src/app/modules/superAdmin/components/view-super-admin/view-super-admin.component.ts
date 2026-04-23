@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { MessageService } from 'primeng/api';
@@ -28,8 +30,11 @@ interface AdminData {
   selector: 'app-view-super-admin',
   templateUrl: './view-super-admin.component.html',
   styleUrls: ['./view-super-admin.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewSuperAdminComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   adminId: string = '';
   adminData: AdminData | null = null;
   adminInitials: string = '';
@@ -52,7 +57,7 @@ export class ViewSuperAdminComponent implements OnInit {
     // Get admin ID from route params
     this.loggedInUserId = this.globalService.getTokenDetails('userId');
 
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.adminId = params['id'];
       if (this.adminId) {
         this.loadAdminDetails();
@@ -158,5 +163,10 @@ export class ViewSuperAdminComponent implements OnInit {
     } else {
       this.showChangePasswordDialog = false;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

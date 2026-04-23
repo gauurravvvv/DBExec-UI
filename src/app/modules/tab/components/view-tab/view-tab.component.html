@@ -79,7 +79,7 @@
             <span class="count-badge">{{ tabData.sections.length }}</span>
           </h3>
           <div class="fields-list">
-            <div class="field-item" *ngFor="let section of tabData.sections">
+            <div class="field-item" *ngFor="let section of tabData.sections; trackBy: trackByName">
               <i class="pi pi-tag"></i>
               <span>{{ section.name }}</span>
             </div>

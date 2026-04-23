@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildTreeMapChartOption } from '../../helpers/echarts-option-builder';
 
 export interface TreeMapData {
@@ -29,6 +27,7 @@ export interface TreeMapConfig {
   selector: 'app-configurable-treemap-chart',
   templateUrl: './configurable-treemap-chart.component.html',
   styleUrls: ['./configurable-treemap-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableTreemapChartComponent
   implements OnInit, OnChanges, DoCheck

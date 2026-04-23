@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface CheckboxConfig {
   defaultValues: any[];
@@ -24,6 +22,7 @@ export interface CheckboxConfig {
   selector: 'app-checkbox-config-dialog',
   templateUrl: './checkbox-config-dialog.component.html',
   styleUrls: ['./checkbox-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckboxConfigDialogComponent implements OnChanges {
   @Input() visible = false;

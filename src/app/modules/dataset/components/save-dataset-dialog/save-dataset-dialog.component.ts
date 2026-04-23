@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   OnInit,
   OnChanges,
@@ -20,6 +21,7 @@ export interface DatasetFormData {
   selector: 'app-save-dataset-dialog',
   templateUrl: './save-dataset-dialog.component.html',
   styleUrls: ['./save-dataset-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   @Input() visible = false;

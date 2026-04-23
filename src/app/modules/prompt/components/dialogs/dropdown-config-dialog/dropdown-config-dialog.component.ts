@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface DropdownConfig {
   placeholder: string;
@@ -32,6 +30,7 @@ export interface DropdownConfig {
   selector: 'app-dropdown-config-dialog',
   templateUrl: './dropdown-config-dialog.component.html',
   styleUrls: ['./dropdown-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownConfigDialogComponent implements OnChanges {
   @Input() visible = false;

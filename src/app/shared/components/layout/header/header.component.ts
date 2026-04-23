@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   OnInit,
   OnDestroy,
   HostListener,
   ElementRef,
-  ViewChild,
-} from '@angular/core';
+  ViewChild, } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -30,6 +28,7 @@ interface Announcement {
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   organisationName: string = '';
@@ -442,6 +441,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
       (this.currentAnnouncementIndex + 1) % this.announcements.length;
     this.startTypewriter();
     this.scheduleRotation();
+  }
+
+  trackById(index: number, item: any): any {
+    return item.id;
   }
 
   prevAnnouncement() {

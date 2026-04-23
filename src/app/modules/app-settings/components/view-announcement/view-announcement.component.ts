@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ANNOUNCEMENT } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -8,6 +8,7 @@ import { AnnouncementService } from '../../services/announcement.service';
   selector: 'app-view-announcement',
   templateUrl: './view-announcement.component.html',
   styleUrls: ['./view-announcement.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewAnnouncementComponent implements OnInit {
   announcementId = '';

@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildParallelChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-parallel-chart',
   templateUrl: './configurable-parallel-chart.component.html',
   styleUrls: ['./configurable-parallel-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableParallelChartComponent
   implements OnInit, OnChanges, DoCheck

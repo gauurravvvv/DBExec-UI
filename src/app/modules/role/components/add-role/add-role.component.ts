@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -19,6 +19,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-add-role',
   templateUrl: './add-role.component.html',
   styleUrls: ['./add-role.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   roleForm!: FormGroup;
@@ -149,6 +150,10 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
       }
     }
     return result;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   getNameError(): string {

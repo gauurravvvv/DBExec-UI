@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildPictorialBarChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-pictorial-bar-chart',
   templateUrl: './configurable-pictorial-bar-chart.component.html',
   styleUrls: ['./configurable-pictorial-bar-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurablePictorialBarChartComponent
   implements OnInit, OnChanges, DoCheck

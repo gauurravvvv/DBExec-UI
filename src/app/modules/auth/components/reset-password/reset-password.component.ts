@@ -1,10 +1,11 @@
-import {
+import {ChangeDetectionStrategy,
   Component,
   OnInit,
   QueryList,
   ViewChildren,
-  ElementRef,
-} from '@angular/core';
+  ElementRef, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   FormGroup,
   UntypedFormBuilder,
@@ -22,8 +23,11 @@ import { passwordStrengthValidator } from 'src/app/shared/validators/password-st
   selector: 'app-reset-password',
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent implements OnInit {
+  private destroy$ = new Subject<void>();
+
   resetPasswordForm: FormGroup;
   showPassword = false;
   features = RESET_PASSWORD_PAGE_OPTIONS;
@@ -64,13 +68,17 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.userId = params['id'];
       this.orgId = params['orgId'];
       if (!this.userId || !this.orgId) {
         this.router.navigate([AUTH.LOGIN]);
       }
     });
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   get otpValue(): string {
@@ -190,5 +198,10 @@ export class ResetPasswordComponent implements OnInit {
     this.showPassword = !this.showPassword;
     const input = document.getElementById(id) as HTMLInputElement;
     input.type = this.showPassword ? 'text' : 'password';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

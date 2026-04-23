@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -12,6 +12,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       multi: true,
     },
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomRadioComponent implements ControlValueAccessor {
   @Input() label = '';
@@ -67,6 +68,10 @@ export class CustomRadioComponent implements ControlValueAccessor {
       default:
         return '1rem';
     }
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   get gridColumns(): string | null {

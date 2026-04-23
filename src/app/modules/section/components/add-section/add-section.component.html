@@ -144,7 +144,8 @@
             <div
               *ngFor="
                 let tabGroup of tabGroups.controls;
-                let groupIndex = index
+                let groupIndex = index;
+                trackBy: trackByIndex
               "
               [formGroup]="$any(tabGroup)"
               class="schema-group"
@@ -225,7 +226,8 @@
                 <div
                   *ngFor="
                     let section of getTabSections(groupIndex).controls;
-                    let sectionIndex = index
+                    let sectionIndex = index;
+                    trackBy: trackByIndex
                   "
                   [formGroupName]="sectionIndex"
                   class="mapping-row"

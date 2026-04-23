@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildGaugeChartOption } from '../../helpers/echarts-option-builder';
 
 export interface GaugeChartData {
@@ -43,6 +41,7 @@ export interface GaugeChartConfig {
   selector: 'app-configurable-gauge-chart',
   templateUrl: './configurable-gauge-chart.component.html',
   styleUrls: ['./configurable-gauge-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableGaugeChartComponent
   implements OnInit, OnChanges, DoCheck

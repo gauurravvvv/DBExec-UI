@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildPolarBarChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-polar-bar-chart',
   templateUrl: './configurable-polar-bar-chart.component.html',
   styleUrls: ['./configurable-polar-bar-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurablePolarBarChartComponent
   implements OnInit, OnChanges, DoCheck

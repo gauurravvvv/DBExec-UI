@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface DateRangeConfig {
   placeholder: string;
@@ -38,6 +36,7 @@ export interface DateRangeConfig {
   selector: 'app-daterange-config-dialog',
   templateUrl: './daterange-config-dialog.component.html',
   styleUrls: ['./daterange-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateRangeConfigDialogComponent implements OnChanges {
   @Input() visible = false;
@@ -118,6 +117,10 @@ export class DateRangeConfigDialogComponent implements OnChanges {
 
   _previewArr: number[] = [0];
   readonly trackPreview = (_i: number, v: number): number => v;
+
+  trackByIndex(index: number): number {
+    return index;
+  }
 
   private toDate(val: any): Date | null {
     if (val == null) return null;

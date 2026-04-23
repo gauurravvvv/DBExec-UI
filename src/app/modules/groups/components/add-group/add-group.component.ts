@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   AbstractControl,
   FormBuilder,
@@ -24,8 +26,11 @@ const MIN_USERS = 0;
   selector: 'app-add-group',
   templateUrl: './add-group.component.html',
   styleUrls: ['./add-group.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddGroupComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   userGroupForm!: FormGroup;
   organisations: any[] = [];
   roles: any[] = [];
@@ -86,7 +91,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Org change → reset role+users, reload roles and users
-    this.userGroupForm.get('organisation')?.valueChanges.subscribe(value => {
+    this.userGroupForm.get('organisation')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
       this.userGroupForm.patchValue(
         { roleId: '', users: [] },
         { emitEvent: false },
@@ -191,5 +196,10 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       return `At least ${MIN_USERS} user is required`;
     }
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -15,8 +17,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-edit-prompt',
   templateUrl: './edit-prompt.component.html',
   styleUrls: ['./edit-prompt.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditPromptComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   promptForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -51,7 +56,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       this.loadPromptData();
     }
 
-    this.promptForm.valueChanges.subscribe(() => {
+    this.promptForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -182,5 +187,10 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       this.isCancelClicked = true;
       this.promptForm.markAsPristine();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DATASET } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -8,6 +8,7 @@ import { DatasetService } from '../../services/dataset.service';
   selector: 'app-view-dataset',
   templateUrl: './view-dataset.component.html',
   styleUrls: ['./view-dataset.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewDatasetComponent implements OnInit {
   datasetData: any;
@@ -30,6 +31,18 @@ export class ViewDatasetComponent implements OnInit {
   ) {}
 
   isArray = Array.isArray;
+
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
 
   /**
    * Format prompt value for display.

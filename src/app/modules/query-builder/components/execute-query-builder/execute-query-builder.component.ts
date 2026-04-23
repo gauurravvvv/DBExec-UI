@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   OnInit,
   OnDestroy,
@@ -19,7 +20,7 @@ import { TreeNode } from 'primeng/api';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { QueryBuilderService } from '../../services/query-builder.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
-import { QueryService } from '../../../dataset/services copy/query.service';
+import { QueryService } from '../../../dataset/services/query.service';
 import { QueryResult } from '../../../dataset/helpers/dummy-data.helper';
 import {
   ExecuteTab,
@@ -68,6 +69,7 @@ interface FlatPromptValue {
   selector: 'app-execute-query-builder',
   templateUrl: './execute-query-builder.component.html',
   styleUrls: ['./execute-query-builder.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   @ViewChild('treeDropdown') treeDropdownRef!: ElementRef;
@@ -1253,5 +1255,18 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   onReset(): void {
     this.promptForm.reset();
     this.queryRanSuccessfully = false;
+  }
+
+  // trackBy functions for *ngFor performance
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
   }
 }

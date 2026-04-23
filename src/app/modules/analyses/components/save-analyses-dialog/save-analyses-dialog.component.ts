@@ -1,12 +1,10 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   OnInit,
   OnChanges,
   Output,
   EventEmitter,
   Input,
-  HostListener,
-} from '@angular/core';
+  HostListener, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { REGEX } from 'src/app/constants/regex.constant';
 
@@ -20,6 +18,7 @@ export interface AnalysisFormData {
   selector: 'app-save-analyses-dialog',
   templateUrl: './save-analyses-dialog.component.html',
   styleUrls: ['./save-analyses-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   @Input() visible = false;

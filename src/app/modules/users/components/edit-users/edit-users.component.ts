@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
@@ -14,6 +14,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-edit-users',
   templateUrl: './edit-users.component.html',
   styleUrls: ['./edit-users.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditUsersComponent implements OnInit, HasUnsavedChanges {
   userForm!: FormGroup;

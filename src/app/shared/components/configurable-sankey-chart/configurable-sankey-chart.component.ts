@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildSankeyChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-sankey-chart',
   templateUrl: './configurable-sankey-chart.component.html',
   styleUrls: ['./configurable-sankey-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableSankeyChartComponent
   implements OnInit, OnChanges, DoCheck

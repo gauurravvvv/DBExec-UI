@@ -24,7 +24,7 @@
     <h1 class="headline">Elevate Your Datasource<br />Management Experience</h1>
     <p class="subtitle">Powerful . Intuitive . Secure</p>
     <div class="features-grid">
-      <div class="feature-item" *ngFor="let feature of features">
+      <div class="feature-item" *ngFor="let feature of features; trackBy: trackByIndex">
         <div class="feature-icon">
           <i class="pi pi-{{ feature.icon }}"></i>
         </div>

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -15,8 +17,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-edit-section',
   templateUrl: './edit-section.component.html',
   styleUrls: ['./edit-section.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditSectionComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   sectionForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -50,7 +55,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       this.loadSectionData();
     }
 
-    this.sectionForm.valueChanges.subscribe(() => {
+    this.sectionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -179,5 +184,10 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       this.isCancelClicked = true;
       this.sectionForm.markAsPristine();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -73,7 +73,7 @@
           <div class="tab-cards-container" *ngIf="!isSidebarCollapsed">
             <div class="tab-cards">
               <div
-                *ngFor="let tab of tabsData"
+                *ngFor="let tab of tabsData; trackBy: trackById"
                 class="tab-card"
                 (click)="onTabClick(tab)"
                 [class.disabled]="isFreeze"
@@ -120,7 +120,7 @@
             *ngIf="openTabs.length"
           >
             <p-tabPanel
-              *ngFor="let tab of openTabs; let i = index"
+              *ngFor="let tab of openTabs; let i = index; trackBy: trackById"
               [header]="tab.name"
               [selected]="i === activeTabIndex"
             >
@@ -158,7 +158,8 @@
                   <p-accordionTab
                     *ngFor="
                       let section of tab.sections;
-                      let sectionIndex = index
+                      let sectionIndex = index;
+                      trackBy: trackById
                     "
                     [selected]="expandedSections[section.id]"
                     (selectedChange)="onTabAccordionChange(section.id, $event)"
@@ -198,7 +199,7 @@
                           >
                             <div
                               class="group-bullet"
-                              *ngFor="let groupId of Object.keys(groups)"
+                              *ngFor="let groupId of Object.keys(groups); trackBy: trackByIndex"
                               [ngStyle]="getGroupBulletStyle(+groupId, section)"
                               (click)="
                                 $event.stopPropagation();
@@ -252,7 +253,8 @@
                           class="prompt-card"
                           *ngFor="
                             let prompt of section.prompts;
-                            let promptIndex = index
+                            let promptIndex = index;
+                            trackBy: trackById
                           "
                           [ngClass]="{
                             dragging:

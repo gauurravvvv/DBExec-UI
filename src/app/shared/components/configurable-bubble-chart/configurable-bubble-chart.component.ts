@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildBubbleChartOption } from '../../helpers/echarts-option-builder';
 
 export interface BubbleChartConfig {
@@ -38,6 +36,7 @@ export interface BubbleChartConfig {
   selector: 'app-configurable-bubble-chart',
   templateUrl: './configurable-bubble-chart.component.html',
   styleUrls: ['./configurable-bubble-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableBubbleChartComponent
   implements OnInit, OnChanges, DoCheck

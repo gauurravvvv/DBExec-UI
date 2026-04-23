@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface RangeSliderConfig {
   // Range bounds
@@ -28,6 +26,7 @@ export interface RangeSliderConfig {
   selector: 'app-rangeslider-config-dialog',
   templateUrl: './rangeslider-config-dialog.component.html',
   styleUrls: ['./rangeslider-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RangeSliderConfigDialogComponent implements OnChanges {
   @Input() visible = false;

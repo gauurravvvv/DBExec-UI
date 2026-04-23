@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GROUP } from 'src/app/constants/routes';
@@ -13,8 +15,11 @@ import { REGEX } from 'src/app/constants/regex.constant';
   selector: 'app-edit-group',
   templateUrl: './edit-group.component.html',
   styleUrls: ['./edit-group.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditGroupComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   groupForm!: FormGroup;
   users: any[] = [];
   isFormDirty = false;
@@ -72,7 +77,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
       status: [1],
     });
 
-    this.groupForm.valueChanges.subscribe(() => this.checkFormDirty());
+    this.groupForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.checkFormDirty());
   }
 
   loadGroupData(): void {
@@ -190,4 +195,8 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     return '';
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

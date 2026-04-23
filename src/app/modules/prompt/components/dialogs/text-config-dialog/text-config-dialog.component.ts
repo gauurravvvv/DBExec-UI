@@ -1,11 +1,9 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 
 export interface TextConfig {
   placeholder: string;
@@ -30,6 +28,7 @@ export interface TextConfig {
   selector: 'app-text-config-dialog',
   templateUrl: './text-config-dialog.component.html',
   styleUrls: ['./text-config-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextConfigDialogComponent implements OnChanges {
   @Input() visible = false;

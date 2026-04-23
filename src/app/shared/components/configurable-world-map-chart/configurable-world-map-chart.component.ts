@@ -1,20 +1,19 @@
 import * as echarts from 'echarts';
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildWorldMapChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-world-map-chart',
   templateUrl: './configurable-world-map-chart.component.html',
   styleUrls: ['./configurable-world-map-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableWorldMapChartComponent
   implements OnInit, OnChanges, DoCheck

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject, Subscription } from 'rxjs';
@@ -15,6 +15,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-list-dashboard',
   templateUrl: './list-dashboard.component.html',
   styleUrls: ['./list-dashboard.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDashboardComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;

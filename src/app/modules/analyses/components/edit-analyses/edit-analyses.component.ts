@@ -1,13 +1,11 @@
-import {
-  AfterViewInit,
+import { ChangeDetectionStrategy, AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
   OnDestroy,
   OnInit,
-  ViewChild,
-} from '@angular/core';
+  ViewChild, } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
@@ -179,6 +177,7 @@ const DATE_FORMAT_OPTIONS = [
   selector: 'app-edit-analyses',
   templateUrl: './edit-analyses.component.html',
   styleUrls: ['./edit-analyses.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditAnalysesComponent
   implements OnInit, AfterViewInit, OnDestroy, HasUnsavedChanges
@@ -1802,6 +1801,18 @@ export class EditAnalysesComponent
 
   trackByVisualId(index: number, visual: Visual): string {
     return visual.id;
+  }
+
+  trackById(index: number, item: any): any {
+    return item.id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
   }
 
   getFocusedVisual(): Visual | null {

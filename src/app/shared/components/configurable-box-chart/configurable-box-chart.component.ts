@@ -1,13 +1,11 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildBoxPlotChartOption } from '../../helpers/echarts-option-builder';
 
 export interface BoxChartConfig {
@@ -38,6 +36,7 @@ export interface BoxChartConfig {
   selector: 'app-configurable-box-chart',
   templateUrl: './configurable-box-chart.component.html',
   styleUrls: ['./configurable-box-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableBoxChartComponent
   implements OnInit, OnChanges, DoCheck

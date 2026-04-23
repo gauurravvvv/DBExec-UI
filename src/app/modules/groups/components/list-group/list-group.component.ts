@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject, Subscription } from 'rxjs';
@@ -15,6 +15,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   selector: 'app-list-group',
   templateUrl: './list-group.component.html',
   styleUrls: ['./list-group.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListGroupComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;

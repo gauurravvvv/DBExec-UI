@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TAB, CONNECTION } from 'src/app/constants/routes';
@@ -13,8 +15,11 @@ import { REGEX } from 'src/app/constants/regex.constant';
   selector: 'app-edit-connection',
   templateUrl: './edit-connection.component.html',
   styleUrls: ['./edit-connection.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
+  private destroy$ = new Subject<void>();
+
   connectionForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -47,7 +52,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
       this.loadConnectionData();
     }
 
-    this.connectionForm.valueChanges.subscribe(() => {
+    this.connectionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -171,5 +176,10 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

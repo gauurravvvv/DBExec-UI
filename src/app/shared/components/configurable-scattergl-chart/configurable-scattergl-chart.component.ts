@@ -1,19 +1,18 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges,
-} from '@angular/core';
+  SimpleChanges, } from '@angular/core';
 import { buildScatterGLChartOption } from '../../helpers/echarts-option-builder';
 
 @Component({
   selector: 'app-configurable-scattergl-chart',
   templateUrl: './configurable-scattergl-chart.component.html',
   styleUrls: ['./configurable-scattergl-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfigurableScatterGlChartComponent
   implements OnInit, OnChanges, DoCheck

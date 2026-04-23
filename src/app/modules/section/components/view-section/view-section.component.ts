@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SECTION } from 'src/app/constants/routes';
 import { SectionService } from '../../services/section.service';
@@ -8,6 +8,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
   selector: 'app-view-section',
   templateUrl: './view-section.component.html',
   styleUrls: ['./view-section.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewSectionComponent implements OnInit {
   sectionId: string = '';
@@ -45,6 +46,10 @@ export class ViewSectionComponent implements OnInit {
 
   goBack() {
     this.router.navigate([SECTION.LIST]);
+  }
+
+  trackByName(index: number, item: any): any {
+    return item.name;
   }
 
   confirmDelete(): void {

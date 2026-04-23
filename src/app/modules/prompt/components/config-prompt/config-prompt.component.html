@@ -256,7 +256,8 @@
                           0,
                           maxSuggestions
                         );
-                        let i = index
+                        let i = index;
+                        trackBy: trackByName
                       "
                       [class.selected]="i === selectedJoinSuggestionIndex"
                       (mousedown)="selectJoinSuggestion(column)"
@@ -357,7 +358,8 @@
                       class="suggestion-item"
                       *ngFor="
                         let column of filteredColumns.slice(0, maxSuggestions);
-                        let i = index
+                        let i = index;
+                        trackBy: trackByName
                       "
                       [class.selected]="i === selectedSuggestionIndex"
                       (mousedown)="selectSuggestion(column)"
