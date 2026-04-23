@@ -22,7 +22,7 @@ export class CustomMultiselectComponent implements ControlValueAccessor {
   @Input() required = false;
   @Input() filter = true;
   @Input() filterBy = '';
-  @Input() filterMatchMode = 'contains';
+  @Input() filterMatchMode: 'contains' | 'startsWith' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' = 'contains';
   @Input() resetFilterOnHide = false;
   @Input() display: 'chip' | 'comma' = 'chip';
   @Input() showToggleAll = true;
