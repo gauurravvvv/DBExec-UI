@@ -95,6 +95,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'loginActivity', route: '/app/login-activity' },
   { value: 'dashboard', route: '/app/dashboard' },
   { value: 'rlsRules', route: '/app/rls-rules' },
+  { value: 'announcementManagement', route: '/app/app-settings/announcements' },
 ];
 
 export const HOME_ROUTES = {

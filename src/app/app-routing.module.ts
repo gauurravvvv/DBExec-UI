@@ -205,6 +205,18 @@ const routes: Routes = [
         canActivate: [RoleGuard],
         data: {  permission: PERMISSIONS.LOGIN_ACTIVITY, title: 'Login Activity' },
       },
+      {
+        path: 'app-settings',
+        loadChildren: () =>
+          import('./modules/app-settings/app-settings.module').then(
+            m => m.AppSettingsModule,
+          ),
+        canActivate: [RoleGuard],
+        data: {
+          permission: PERMISSIONS.ANNOUNCEMENT_MANAGEMENT,
+          title: 'App Settings',
+        },
+      },
       // All roles
       {
         path: 'profile',

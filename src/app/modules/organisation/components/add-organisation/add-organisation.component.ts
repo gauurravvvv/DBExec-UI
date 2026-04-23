@@ -22,9 +22,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   }
 
   showDbPassword = false;
-  confirmationChecked = false;
-  dbAcknowledgment = false;
-  schemaAcknowledgment = false;
   connectionTested = false;
   connectionTestLoading = false;
   connectionTestResult: 'success' | 'failed' | null = null;
@@ -121,6 +118,10 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       sesAccessKeyId: [''],
       sesSecretAccessKey: [''],
       sesFrom: [''],
+      // Acknowledgments
+      confirmationChecked: [false],
+      dbAcknowledgment: [false],
+      schemaAcknowledgment: [false],
     });
 
     // Update email field validators when provider changes
@@ -149,7 +150,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       descValid &&
       encValid &&
       pepperValid &&
-      this.confirmationChecked
+      this.orgForm.get('confirmationChecked')?.value
     );
   }
 
@@ -337,9 +338,6 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     this.orgForm.reset();
     this.currentStep = 0;
     this.isFormDirty = false;
-    this.confirmationChecked = false;
-    this.dbAcknowledgment = false;
-    this.schemaAcknowledgment = false;
     this.connectionTested = false;
     this.connectionTestResult = null;
     this.orgForm.markAsPristine();
@@ -354,6 +352,9 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       sessionInactivityTimeout: 30,
       emailProvider: null,
       smtpPort: 587,
+      confirmationChecked: false,
+      dbAcknowledgment: false,
+      schemaAcknowledgment: false,
     });
   }
 
@@ -374,9 +375,9 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   isFormValid(): boolean {
     return (
       this.orgForm.valid &&
-      this.confirmationChecked &&
-      this.dbAcknowledgment &&
-      this.schemaAcknowledgment &&
+      this.orgForm.get('confirmationChecked')?.value &&
+      this.orgForm.get('dbAcknowledgment')?.value &&
+      this.orgForm.get('schemaAcknowledgment')?.value &&
       this.connectionTested
     );
   }

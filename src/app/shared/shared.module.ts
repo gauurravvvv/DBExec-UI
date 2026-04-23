@@ -58,6 +58,7 @@ import { AddCustomFieldDialogComponent } from '../modules/dataset/components/add
 import { SaveAnalysesDialogComponent } from '../modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
 import { AnalysisFilterBarComponent } from './components/analysis-filter-bar/analysis-filter-bar.component';
 import { CustomAccordionComponent } from './components/custom-accordion/custom-accordion.component';
+import { CustomBinaryCheckboxComponent } from './components/custom-binary-checkbox/custom-binary-checkbox.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 
 @NgModule({
@@ -118,6 +119,7 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     SaveAnalysesDialogComponent,
     AnalysisFilterBarComponent,
     CustomAccordionComponent,
+    CustomBinaryCheckboxComponent,
   ],
   imports: [
     CommonModule,
@@ -189,6 +191,7 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     SaveAnalysesDialogComponent,
     AnalysisFilterBarComponent,
     CustomAccordionComponent,
+    CustomBinaryCheckboxComponent,
   ],
 })
 export class SharedModule {}

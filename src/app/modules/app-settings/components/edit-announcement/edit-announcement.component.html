@@ -1,0 +1,281 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/app-settings/announcements"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>Edit Announcement</h2>
+      </div>
+      <div class="action-buttons">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="!canSubmit()"
+        >
+          <i class="pi pi-save mr-2"></i>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="announcementForm" class="admin-form">
+      <div class="form-grid">
+        <!-- Organisation (read-only) -->
+        <div class="readonly-field" *ngIf="orgName">
+          <label>Organisation</label>
+          <div class="readonly-value">
+            <i class="pi pi-building"></i>
+            {{ orgName }}
+          </div>
+        </div>
+
+        <!-- Title -->
+        <app-custom-input
+          formControlName="name"
+          label="Title"
+          placeholder="Enter announcement title"
+          icon="pi-megaphone"
+          [required]="true"
+          [showError]="
+            !!(
+              announcementForm.get('name')?.invalid &&
+              announcementForm.get('name')?.touched
+            )
+          "
+          [errorMessage]="getNameError()"
+        ></app-custom-input>
+
+        <!-- Description -->
+        <div class="description-field">
+          <app-custom-textarea
+            formControlName="description"
+            label="Description"
+            placeholder="Enter announcement description"
+            [rows]="4"
+            [required]="true"
+            [showError]="
+              !!(
+                announcementForm.get('description')?.invalid &&
+                announcementForm.get('description')?.touched
+              )
+            "
+            [errorMessage]="getDescriptionError()"
+          ></app-custom-textarea>
+          <span
+            class="char-counter"
+            [class.limit-reached]="descriptionLength >= maxDescriptionLength"
+          >
+            {{ descriptionLength }}/{{ maxDescriptionLength }}
+          </span>
+        </div>
+
+        <!-- Target Group -->
+        <app-custom-dropdown
+          formControlName="targetGroupId"
+          label="Target Group"
+          placeholder="Select Group"
+          [options]="groups"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
+          [showError]="
+            !!(
+              announcementForm.get('targetGroupId')?.invalid &&
+              announcementForm.get('targetGroupId')?.touched
+            )
+          "
+          errorMessage="Target group is required"
+        ></app-custom-dropdown>
+
+        <!-- Colors + Status -->
+        <div class="color-status-row">
+          <div class="color-picker-field">
+            <label>Background</label>
+            <div class="color-picker-inline">
+              <p-colorPicker
+                formControlName="bgColor"
+                appendTo="body"
+              ></p-colorPicker>
+              <span class="color-value">{{
+                announcementForm.get('bgColor')?.value
+              }}</span>
+            </div>
+          </div>
+          <div class="color-picker-field">
+            <label>Text</label>
+            <div class="color-picker-inline">
+              <p-colorPicker
+                formControlName="textColor"
+                appendTo="body"
+              ></p-colorPicker>
+              <span class="color-value">{{
+                announcementForm.get('textColor')?.value
+              }}</span>
+            </div>
+          </div>
+          <app-custom-toggle
+            formControlName="status"
+            label="Status"
+            [trueValue]="1"
+            [falseValue]="0"
+            trueLabel="Active"
+            falseLabel="Inactive"
+            (onChange)="onStatusToggle()"
+          ></app-custom-toggle>
+        </div>
+
+        <!-- Preview Button -->
+        <button
+          type="button"
+          class="preview-trigger"
+          (click)="showPreview = true"
+        >
+          <i class="pi pi-eye"></i>
+          Preview how users will see this
+        </button>
+
+        <!-- Contrast Quality Meter -->
+        <div class="contrast-meter" [class]="'contrast-meter--' + contrastQuality.level">
+          <div class="contrast-meter__header">
+            <span class="contrast-meter__label">
+              <i class="pi" [ngClass]="{
+                'pi-times-circle': contrastQuality.level === 'poor',
+                'pi-exclamation-triangle': contrastQuality.level === 'needs-work',
+                'pi-check-circle': contrastQuality.level === 'good',
+                'pi-verified': contrastQuality.level === 'excellent'
+              }"></i>
+              {{ contrastQuality.label }}
+            </span>
+            <span class="contrast-meter__badge">{{ contrastRatio | number: '1.1-1' }}:1</span>
+          </div>
+          <div class="contrast-meter__bar">
+            <div class="contrast-meter__fill" [style.width.%]="contrastQuality.percent"></div>
+          </div>
+          <p class="contrast-meter__hint">{{ contrastQuality.hint }}</p>
+        </div>
+
+        <!-- Dates -->
+        <div class="date-row">
+          <app-custom-calendar
+            label="Start Date"
+            placeholder="Optional"
+            formControlName="startTime"
+            [minDate]="startTimeMinDate"
+            dateFormat="dd M yy"
+          ></app-custom-calendar>
+          <app-custom-calendar
+            label="End Date"
+            placeholder="Optional"
+            formControlName="endTime"
+            [minDate]="endTimeMinDate"
+            dateFormat="dd M yy"
+          ></app-custom-calendar>
+        </div>
+
+        <div
+          class="contrast-warning"
+          *ngIf="announcementForm.errors?.['dateRange']"
+        >
+          <i class="pi pi-exclamation-triangle"></i>
+          <span>End date must be after start date.</span>
+        </div>
+
+        <!-- Republish -->
+        <app-custom-binary-checkbox
+          formControlName="republish"
+          label="Re-publish"
+          description="Clear dismissals so users see this again. Auto-applied when flipping status Inactive → Active."
+        ></app-custom-binary-checkbox>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Live Preview Popup -->
+<div class="preview-overlay" *ngIf="showPreview" (click)="showPreview = false">
+  <div class="preview-container" (click)="$event.stopPropagation()">
+    <div class="preview-header">
+      <h3><i class="pi pi-eye"></i> Live Preview</h3>
+      <span class="preview-subtitle">This is exactly how users will see it</span>
+      <button class="preview-close" (click)="showPreview = false">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="preview-body">
+      <!-- Step 1: Banner preview -->
+      <div class="preview-step">
+        <span class="preview-step-label">
+          <span class="step-number">1</span>
+          Banner appears at the top of the app
+        </span>
+        <div
+          class="preview-banner"
+          [style.background]="announcementForm.get('bgColor')?.value"
+          [style.color]="announcementForm.get('textColor')?.value"
+        >
+          <div class="preview-banner__shimmer"></div>
+          <div class="preview-banner__content">
+            <span
+              class="preview-banner__label"
+              [style.color]="announcementForm.get('textColor')?.value"
+            >ANNOUNCEMENT</span>
+            <span class="preview-banner__divider">|</span>
+            <span class="preview-banner__message">{{
+              announcementForm.get('name')?.value || 'Your title here'
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Popup preview -->
+      <div class="preview-step">
+        <span class="preview-step-label">
+          <span class="step-number">2</span>
+          User clicks the banner and sees this
+        </span>
+        <div class="preview-popup-mock">
+          <div
+            class="preview-popup-mock__accent"
+            [style.background]="announcementForm.get('bgColor')?.value"
+          ></div>
+          <div class="preview-popup-mock__inner">
+            <span
+              class="preview-popup-mock__tag"
+              [style.color]="announcementForm.get('bgColor')?.value"
+            >ANNOUNCEMENT</span>
+            <h4 class="preview-popup-mock__title">{{
+              announcementForm.get('name')?.value || 'Your title here'
+            }}</h4>
+            <p class="preview-popup-mock__desc">{{
+              announcementForm.get('description')?.value || 'Your description will appear here...'
+            }}</p>
+            <div class="preview-popup-mock__footer">
+              <span class="preview-popup-mock__checkbox">
+                <i class="pi pi-stop"></i> Do not show again
+              </span>
+              <span class="preview-popup-mock__btn">Dismiss</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

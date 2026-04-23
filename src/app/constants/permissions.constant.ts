@@ -29,6 +29,10 @@ export const PERMISSIONS = {
   // Audit & Activity
   AUDIT_LOGS: 'auditLogs',
   LOGIN_ACTIVITY: 'loginActivity',
+
+  // App Settings
+  APP_SETTINGS: 'appSettings',
+  ANNOUNCEMENT_MANAGEMENT: 'announcementManagement',
 } as const;
 
 export type PermissionValue = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

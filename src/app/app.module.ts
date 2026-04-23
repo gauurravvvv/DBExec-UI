@@ -36,7 +36,6 @@ import { ResetPasswordComponent } from './modules/auth/components/reset-password
 import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
 import { CliAuthComponent } from './modules/auth/components/cli-auth/cli-auth.component';
 import { SharedModule } from './shared/shared.module';
-import { AnnouncementDialogModule } from './modules/organisation/components/announcement-dialog/announcement-dialog.module';
 
 @NgModule({
   declarations: [
@@ -67,7 +66,6 @@ import { AnnouncementDialogModule } from './modules/organisation/components/anno
     InputTextareaModule,
     AppPrimeNGModule,
     SharedModule,
-    AnnouncementDialogModule,
     // NgRx Store
     StoreModule.forRoot({}),
     EffectsModule.forRoot([]),

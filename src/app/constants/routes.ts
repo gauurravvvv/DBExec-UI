@@ -129,3 +129,10 @@ export const RLS_RULE = {
   EDIT: '/app/rls-rules/edit',
   VIEW: '/app/rls-rules/view',
 };
+
+export const ANNOUNCEMENT = {
+  ADD: '/app/app-settings/announcements/add',
+  LIST: '/app/app-settings/announcements',
+  EDIT: '/app/app-settings/announcements/edit',
+  VIEW: '/app/app-settings/announcements/view',
+};

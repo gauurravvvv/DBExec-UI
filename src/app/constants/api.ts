@@ -231,8 +231,11 @@ export const GLOBAL_SEARCH = {
 };
 
 export const ANNOUNCEMENT = {
-  CONFIGURE: '/announcement/configure',
-  GET: '/announcement/get/',
+  ADD: '/announcement/add',
+  UPDATE: '/announcement/update/',
+  DELETE: '/announcement/delete/',
+  LIST: '/announcement/list',
+  GET: '/announcement/get',
   DETAILS: '/announcement/details/',
   DISMISS: '/announcement/dismiss/',
 };

@@ -1,0 +1,20 @@
+<div class="form-field">
+  <div class="checkbox-row">
+    <p-checkbox
+      [binary]="true"
+      [ngModel]="checked"
+      [disabled]="disabled"
+      (onChange)="onCheckboxChange($event)"
+    ></p-checkbox>
+    <div class="checkbox-content" *ngIf="label || description">
+      <label *ngIf="label" class="checkbox-label">
+        {{ label }}
+        <span class="required" *ngIf="required">*</span>
+      </label>
+      <p class="checkbox-description" *ngIf="description">{{ description }}</p>
+    </div>
+  </div>
+  <small class="error-message" *ngIf="showError && errorMessage">
+    {{ errorMessage }}
+  </small>
+</div>
