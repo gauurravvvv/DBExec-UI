@@ -13,7 +13,6 @@ import { EditOrganisationComponent } from './components/edit-organisation/edit-o
 import { ListOrganisationComponent } from './components/list-organisation/list-organisation.component';
 import { ViewOrganisationComponent } from './components/view-organisation/view-organisation.component';
 import { OrganisationRoutingModule } from './organisation-routing.module';
-import { AnnouncementDialogModule } from './components/announcement-dialog/announcement-dialog.module';
 
 @NgModule({
   declarations: [
@@ -34,7 +33,6 @@ import { AnnouncementDialogModule } from './components/announcement-dialog/annou
     OrganisationRoutingModule,
     AppPrimeNGModule,
     SharedModule,
-    AnnouncementDialogModule,
   ],
 })
 export class OrganisationModule {}

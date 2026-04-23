@@ -9,6 +9,7 @@ export * from './components/custom-input/custom-input.component';
 export * from './components/custom-dropdown/custom-dropdown.component';
 export * from './components/custom-multiselect/custom-multiselect.component';
 export * from './components/custom-toggle/custom-toggle.component';
+export * from './components/custom-binary-checkbox/custom-binary-checkbox.component';
 export * from './modules/app-primeng.module';
 export * from './modules/app-root.module';
 export * from './modules/app-shared.module';

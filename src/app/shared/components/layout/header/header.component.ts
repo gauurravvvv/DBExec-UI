@@ -6,16 +6,25 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { Subscription } from 'rxjs';
+import { auditTime, filter } from 'rxjs/operators';
 import { Renderer2 } from '@angular/core';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { GlobalSearchService } from '../../../services/global-search.service';
 import { LoginService } from 'src/app/core/services/login.service';
-import { AnnouncementService } from 'src/app/modules/organisation/services/announcement.service';
+import { AnnouncementService } from 'src/app/modules/app-settings/services/announcement.service';
 import { ROLES } from 'src/app/constants/user.constant';
+
+interface Announcement {
+  id: string;
+  name: string;
+  description: string;
+  bgColor: string;
+  textColor: string;
+}
 
 @Component({
   selector: 'app-header',
@@ -28,27 +37,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userName: string = '';
   userRole: string = '';
   showProfileMenu: boolean = false;
-  isDarkMode = false; // Default to light mode
+  isDarkMode = false;
   isAnimating = false;
   isFullscreen = false;
   @ViewChild('notificationMenu') notificationMenu!: ElementRef;
 
-  announcementTitle: string | null = null;
-  announcementDescription: string | null = null;
-  announcementBgColor: string = '#0d47a1';
-  announcementTextColor: string = '#ffffff';
+  // Announcements (multiple, queued)
+  announcements: Announcement[] = [];
+  currentAnnouncementIndex = 0;
   typedMessage: string = '';
   isTyping: boolean = false;
   showAnnouncementOverlay: boolean = false;
   doNotShowAgain: boolean = false;
   private typewriterTimer: any;
-
-  // Announcement dialog for ORG_ADMIN
-  showAnnouncementDialog = false;
-  isOrgAdmin = false;
+  private rotateTimer: any;
+  private pollTimer: any;
+  private routerSub?: Subscription;
+  private readonly ROTATE_INTERVAL_MS = 8000;
+  private readonly POLL_INTERVAL_MS = 60_000;
 
   showNotificationMenu = false;
-  unreadNotifications = 2; // Example count
+  unreadNotifications = 2;
   notifications = [
     {
       id: '1',
@@ -60,7 +69,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     {
       id: '2',
       message: 'Datasource "Main DB" is now connected',
-      time: new Date(Date.now() - 3600000), // 1 hour ago
+      time: new Date(Date.now() - 3600000),
       read: true,
       icon: 'pi-database',
     },
@@ -68,21 +77,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
       id: '3',
       message:
         'User "John Doe" has been added to the Development team with admin privileges',
-      time: new Date(Date.now() - 7200000), // 2 hours ago
+      time: new Date(Date.now() - 7200000),
       read: false,
       icon: 'pi-user-plus',
     },
     {
       id: '4',
       message: 'Backup completed successfully for "Analytics DB"',
-      time: new Date(Date.now() - 86400000), // 1 day ago
+      time: new Date(Date.now() - 86400000),
       read: true,
       icon: 'pi-check-circle',
     },
     {
       id: '5',
       message: 'Security update: 2 new access policies have been implemented',
-      time: new Date(Date.now() - 172800000), // 2 days ago
+      time: new Date(Date.now() - 172800000),
       read: true,
       icon: 'pi-shield',
     },
@@ -90,7 +99,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       id: '6',
       message:
         'System maintenance scheduled for tomorrow at 02:00 AM UTCSystem maintenance scheduled for tomorrow at 02:00 AM UTCSystem maintenance scheduled for tomorrow at 02:00 AM UTC',
-      time: new Date(Date.now() - 259200000), // 3 days ago
+      time: new Date(Date.now() - 259200000),
       read: false,
       icon: 'pi-clock',
     },
@@ -105,63 +114,124 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private loginService: LoginService,
     private announcementService: AnnouncementService,
   ) {
-    // Always use light mode (theming disabled)
     this.isDarkMode = false;
     this.applyTheme();
   }
 
   ngOnInit() {
-    // Get organization name
     this.organisationName =
       this.globalService.getTokenDetails('organisationName');
 
-    // Get user details and create initials
     const userFullName = this.globalService.getTokenDetails('name');
     this.userName = userFullName;
     this.userInitials = this.globalService.chipNameProvider(userFullName);
     this.userRole = this.globalService.getTokenDetails('role');
 
-    this.isOrgAdmin = this.userRole === ROLES.ORG_ADMIN;
-
     this.updateUnreadCount();
 
-    // Fetch announcement only for custom org users (not super admin / default org)
-    // ORG_ADMIN sees type=1 (announcements from super admin)
-    // ORG_USER sees type=2 (announcements from org admin)
     if (this.userRole !== ROLES.SUPER_ADMIN) {
-      const announcementType = this.isOrgAdmin ? 1 : 2;
-      this.fetchAnnouncement(announcementType);
+      this.fetchAnnouncements();
+      // Refetch on route change (debounced) — picks up new/expired/dismissed banners
+      this.routerSub = this.router.events
+        .pipe(
+          filter(e => e instanceof NavigationEnd),
+          auditTime(500),
+        )
+        .subscribe(() => this.fetchAnnouncements());
+      // Background poll as a safety net for time-window expiry / new banners
+      this.pollTimer = setInterval(
+        () => this.fetchAnnouncements(),
+        this.POLL_INTERVAL_MS,
+      );
     }
   }
 
-  private fetchAnnouncement(type: number) {
-    const orgId = this.globalService.getTokenDetails('organisationId');
-    if (!orgId) return;
-
-    this.announcementService.getAnnouncement(orgId, type).then(res => {
-      if (res?.status && res?.data) {
-        this.announcementTitle = res.data.name;
-        this.announcementDescription = res.data.description;
-        this.announcementBgColor = res.data.bgColor || '#0d47a1';
-        this.announcementTextColor = res.data.textColor || '#ffffff';
-        this.startTypewriter();
-      }
+  private fetchAnnouncements() {
+    this.announcementService.getActive().then(res => {
+      if (!res?.status || !Array.isArray(res?.data)) return;
+      this.mergeAnnouncements(
+        res.data.map((a: any) => ({
+          id: a.id,
+          name: a.name,
+          description: a.description,
+          bgColor: a.bgColor || '#0d47a1',
+          textColor: a.textColor || '#ffffff',
+        })),
+      );
     });
   }
 
-  onAnnouncementSave(data: any) {
-    const orgId = this.globalService.getTokenDetails('organisationId');
-    this.announcementService
-      .addAnnouncement({ organisation: orgId, ...data })
-      .then(res => {
-        this.globalService.handleSuccessService(res);
-      });
+  /**
+   * Merge incoming list with current queue.
+   * - Preserves index on the same announcement when possible
+   * - Drops vanished announcements (expired/inactive/group removed)
+   * - Adds newly visible ones to the end
+   * - Tears everything down when list becomes empty
+   */
+  private mergeAnnouncements(incoming: Announcement[]): void {
+    const incomingIds = new Set(incoming.map(a => a.id));
+    const currentId = this.currentAnnouncement?.id;
+
+    if (incoming.length === 0) {
+      this.announcements = [];
+      this.currentAnnouncementIndex = 0;
+      this.typedMessage = '';
+      this.isTyping = false;
+      this.showAnnouncementOverlay = false;
+      if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
+      this.clearRotation();
+      return;
+    }
+
+    const existedBefore = this.announcements.length > 0;
+    this.announcements = incoming;
+
+    // Re-anchor index on the same announcement if still present
+    if (currentId && incomingIds.has(currentId)) {
+      this.currentAnnouncementIndex = incoming.findIndex(
+        a => a.id === currentId,
+      );
+    } else {
+      this.currentAnnouncementIndex = 0;
+      // Only restart typewriter when the visible message actually changed
+      this.startTypewriter();
+    }
+
+    // Start typewriter on first-ever fetch
+    if (!existedBefore) {
+      this.startTypewriter();
+    }
+
+    this.scheduleRotation();
+  }
+
+  get currentAnnouncement(): Announcement | null {
+    return this.announcements[this.currentAnnouncementIndex] || null;
+  }
+
+  private scheduleRotation() {
+    this.clearRotation();
+    if (this.announcements.length <= 1) return;
+    this.rotateTimer = setInterval(() => {
+      if (this.showAnnouncementOverlay) return;
+      this.currentAnnouncementIndex =
+        (this.currentAnnouncementIndex + 1) % this.announcements.length;
+      this.startTypewriter();
+    }, this.ROTATE_INTERVAL_MS);
+  }
+
+  private clearRotation() {
+    if (this.rotateTimer) {
+      clearInterval(this.rotateTimer);
+      this.rotateTimer = null;
+    }
   }
 
   ngOnDestroy() {
-    if (this.typewriterTimer) {
-      clearTimeout(this.typewriterTimer);
-    }
+    if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
+    if (this.pollTimer) clearInterval(this.pollTimer);
+    this.routerSub?.unsubscribe();
+    this.clearRotation();
   }
 
   logout() {
@@ -182,13 +252,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   handleClickOutside(event: Event) {
     const clickedElement = event.target as HTMLElement;
 
-    // Handle profile menu click outside
     const userProfile = document.querySelector('.user-profile');
     if (!userProfile?.contains(clickedElement)) {
       this.showProfileMenu = false;
     }
 
-    // Handle notification menu click outside
     if (
       !clickedElement.closest('.notification-btn') &&
       !clickedElement.closest('.notification-menu')
@@ -213,7 +281,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       icon.classList.add('animate');
       setTimeout(() => {
         icon.classList.remove('animate');
-      }, 700); // Match animation duration
+      }, 700);
     }
     this.isDarkMode = !this.isDarkMode;
     localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
@@ -238,18 +306,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   markAllAsRead() {
-    // Update read status for all notifications
     this.notifications.forEach(notification => {
       notification.read = true;
     });
-
-    // Update the unread count
     this.unreadNotifications = 0;
   }
 
   removeNotification(id: string) {
-    //call delete notification API
-    // this.notifications = this.notifications.filter(n => n.id !== id);
+    // call delete notification API
   }
 
   private updateUnreadCount() {
@@ -257,10 +321,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   markAsRead(notification: any, event: Event) {
-    // Prevent click event from bubbling up to parent elements
     event.stopPropagation();
-
-    // Only process if notification is unread
     if (!notification.read) {
       notification.read = true;
       this.updateUnreadCount();
@@ -273,7 +334,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       icon.classList.add('animate');
       setTimeout(() => {
         icon.classList.remove('animate');
-      }, 700); // Match animation duration
+      }, 700);
     }
 
     if (!document.fullscreenElement) {
@@ -297,12 +358,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   private startTypewriter() {
-    if (!this.announcementTitle) return;
+    const current = this.currentAnnouncement;
+    if (!current) return;
+
+    if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
 
     this.typedMessage = '';
     this.isTyping = true;
     let index = 0;
-    const message = this.announcementTitle;
+    const message = current.name;
 
     const typeNextChar = () => {
       if (index < message.length) {
@@ -314,26 +378,78 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.typewriterTimer = setTimeout(typeNextChar, 500);
+    this.typewriterTimer = setTimeout(typeNextChar, 300);
+  }
+
+  openAnnouncementPopup() {
+    if (!this.currentAnnouncement) return;
+    this.showAnnouncementOverlay = true;
   }
 
   closeAnnouncementPopup() {
     this.showAnnouncementOverlay = false;
     if (this.doNotShowAgain) {
-      this.dismissAnnouncement();
+      this.dismissCurrentAnnouncement();
+      this.doNotShowAgain = false;
     }
   }
 
-  dismissAnnouncement() {
-    const orgId = this.globalService.getTokenDetails('organisationId');
-    this.announcementService.dismissAnnouncement(orgId);
-    this.announcementTitle = null;
-    this.announcementDescription = null;
-    this.typedMessage = '';
-    this.isTyping = false;
-    this.showAnnouncementOverlay = false;
-    if (this.typewriterTimer) {
-      clearTimeout(this.typewriterTimer);
+  dismissCurrentAnnouncement() {
+    const current = this.currentAnnouncement;
+    if (!current) return;
+
+    // Snapshot for rollback if BE rejects
+    const snapshot = [...this.announcements];
+    const snapshotIndex = this.currentAnnouncementIndex;
+
+    this.announcements = this.announcements.filter(a => a.id !== current.id);
+    if (this.announcements.length === 0) {
+      this.currentAnnouncementIndex = 0;
+      this.typedMessage = '';
+      this.isTyping = false;
+      this.showAnnouncementOverlay = false;
+      if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
+      this.clearRotation();
+    } else {
+      this.currentAnnouncementIndex =
+        this.currentAnnouncementIndex % this.announcements.length;
+      this.startTypewriter();
+      this.scheduleRotation();
     }
+
+    this.announcementService
+      .dismiss(current.id)
+      .then(res => {
+        if (!res?.status) {
+          // Roll back so user isn't silently misled
+          this.announcements = snapshot;
+          this.currentAnnouncementIndex = snapshotIndex;
+          this.startTypewriter();
+          this.scheduleRotation();
+        }
+      })
+      .catch(() => {
+        this.announcements = snapshot;
+        this.currentAnnouncementIndex = snapshotIndex;
+        this.startTypewriter();
+        this.scheduleRotation();
+      });
+  }
+
+  nextAnnouncement() {
+    if (this.announcements.length <= 1) return;
+    this.currentAnnouncementIndex =
+      (this.currentAnnouncementIndex + 1) % this.announcements.length;
+    this.startTypewriter();
+    this.scheduleRotation();
+  }
+
+  prevAnnouncement() {
+    if (this.announcements.length <= 1) return;
+    this.currentAnnouncementIndex =
+      (this.currentAnnouncementIndex - 1 + this.announcements.length) %
+      this.announcements.length;
+    this.startTypewriter();
+    this.scheduleRotation();
   }
 }

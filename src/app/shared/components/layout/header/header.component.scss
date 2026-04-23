@@ -638,6 +638,11 @@
   .banner-content {
     position: relative;
     z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
 
     .banner-text-wrapper {
       display: flex;
@@ -658,6 +663,12 @@
         &:hover {
           background: rgba(255, 255, 255, 0.3);
         }
+
+        .banner-count {
+          margin-left: 4px;
+          font-weight: 600;
+          opacity: 0.85;
+        }
       }
 
       .banner-divider {
@@ -667,11 +678,40 @@
       .banner-message {
         line-height: 1.4;
         opacity: 0.95;
+        cursor: pointer;
 
         .typewriter-cursor {
           font-weight: 300;
           animation: blink 0.7s step-end infinite;
           margin-left: 1px;
+        }
+      }
+    }
+
+    .banner-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .banner-nav-btn {
+        background: rgba(255, 255, 255, 0.15);
+        border: none;
+        color: inherit;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+
+        i {
+          font-size: 10px;
         }
       }
     }

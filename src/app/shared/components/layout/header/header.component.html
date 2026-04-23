@@ -87,14 +87,6 @@
                 <span>My Profile</span>
               </a>
             </li>
-            <li class="menu-item" *ngIf="isOrgAdmin">
-              <a
-                (click)="showAnnouncementDialog = true; showProfileMenu = false"
-              >
-                <i class="pi pi-volume-up"></i>
-                <span>Announce</span>
-              </a>
-            </li>
             <li class="menu-item logout">
               <a (click)="logout()">
                 <i class="pi pi-sign-out"></i>
@@ -108,25 +100,49 @@
   </div>
 </header>
 
-<!-- Announcement Banner -->
+<!-- Announcement Banner (multi-queue) -->
 <div
   class="announcement-banner"
-  *ngIf="announcementTitle"
-  [ngStyle]="{ background: announcementBgColor, color: announcementTextColor }"
+  *ngIf="currentAnnouncement"
+  [ngStyle]="{
+    background: currentAnnouncement.bgColor,
+    color: currentAnnouncement.textColor,
+  }"
 >
   <div class="banner-shimmer"></div>
   <div class="banner-glow-left"></div>
   <div class="banner-glow-right"></div>
   <div class="banner-content">
     <div class="banner-text-wrapper">
-      <span class="banner-label" (click)="showAnnouncementOverlay = true"
-        >ANNOUNCEMENT</span
-      >
+      <span class="banner-label" (click)="openAnnouncementPopup()">
+        ANNOUNCEMENT
+        <span *ngIf="announcements.length > 1" class="banner-count">
+          ({{ currentAnnouncementIndex + 1 }}/{{ announcements.length }})
+        </span>
+      </span>
       <span class="banner-divider">|</span>
-      <span class="banner-message">
+      <span class="banner-message" (click)="openAnnouncementPopup()">
         {{ typedMessage
         }}<span class="typewriter-cursor" *ngIf="isTyping">|</span>
       </span>
+    </div>
+    <div class="banner-controls" *ngIf="announcements.length > 1">
+      <button
+        class="banner-nav-btn"
+        (click)="prevAnnouncement()"
+        pTooltip="Previous"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-chevron-left"></i>
+      </button>
+      <button
+        class="banner-nav-btn"
+        (click)="nextAnnouncement()"
+        pTooltip="Next"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-chevron-right"></i>
+      </button>
     </div>
   </div>
 </div>
@@ -134,22 +150,24 @@
 <!-- Announcement Popup -->
 <div
   class="announcement-popup-backdrop"
-  *ngIf="showAnnouncementOverlay"
+  *ngIf="showAnnouncementOverlay && currentAnnouncement"
   (click)="showAnnouncementOverlay = false"
 >
   <div class="announcement-popup" (click)="$event.stopPropagation()">
     <div
       class="popup-accent"
-      [ngStyle]="{ background: announcementBgColor }"
+      [ngStyle]="{ background: currentAnnouncement.bgColor }"
     ></div>
     <div class="popup-inner">
       <div class="popup-header-row">
-        <span class="popup-tag" [ngStyle]="{ color: announcementBgColor }"
+        <span
+          class="popup-tag"
+          [ngStyle]="{ color: currentAnnouncement.bgColor }"
           >Announcement</span
         >
       </div>
-      <h3 class="popup-title">{{ announcementTitle }}</h3>
-      <p class="popup-description">{{ announcementDescription }}</p>
+      <h3 class="popup-title">{{ currentAnnouncement.name }}</h3>
+      <p class="popup-description">{{ currentAnnouncement.description }}</p>
       <div class="popup-footer-row">
         <label class="do-not-show">
           <p-checkbox [(ngModel)]="doNotShowAgain" [binary]="true"></p-checkbox>
@@ -207,16 +225,6 @@
   </ng-template>
   <div class="notification-footer">Showing last 30 days</div>
 </div>
-
-<!-- Announcement Dialog (ORG_ADMIN creates type=2 announcements for users) -->
-<app-announcement-dialog
-  *ngIf="isOrgAdmin"
-  [(visible)]="showAnnouncementDialog"
-  [organisationId]="globalService.getTokenDetails('organisationId')"
-  [type]="2"
-  (save)="onAnnouncementSave($event)"
->
-</app-announcement-dialog>
 
 <!-- Global Search -->
 <app-global-search></app-global-search>

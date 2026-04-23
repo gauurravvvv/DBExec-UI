@@ -13,10 +13,6 @@
         <h2>Organisation Details</h2>
       </div>
       <div class="header-actions flex gap-2">
-        <button class="btn-primary" (click)="showAnnouncementDialog = true">
-          <i class="pi pi-volume-up"></i>
-          Announcement
-        </button>
         <button
           class="btn-primary"
           [routerLink]="['/app/organisation/edit', organisationId]"
@@ -521,11 +517,3 @@
   </div>
 </div>
 
-<!-- Announcement Dialog -->
-<app-announcement-dialog
-  [(visible)]="showAnnouncementDialog"
-  [organisationId]="organisationId"
-  [type]="1"
-  (save)="onAnnouncementSave($event)"
->
-</app-announcement-dialog>

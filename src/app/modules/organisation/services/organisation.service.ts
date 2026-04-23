@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ANNOUNCEMENT, DATASOURCE, ORGANISATION } from 'src/app/constants/api';
+import { DATASOURCE, ORGANISATION } from 'src/app/constants/api';
 
 @Injectable({
   providedIn: 'root',
@@ -185,34 +185,6 @@ export class OrganisationService {
   viewOrganisation(id: string) {
     return this.http
       .get(ORGANISATION.VIEW + `${id}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
-  }
-
-  getAnnouncement(orgId: string) {
-    return this.http
-      .get(ANNOUNCEMENT.GET + `${orgId}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
-  }
-
-  addAnnouncement(announcement: any) {
-    const { name, description, startTime, endTime, organisation } =
-      announcement;
-    return this.http
-      .post(ANNOUNCEMENT.CONFIGURE, {
-        name,
-        description,
-        startTime,
-        endTime,
-        organisation,
-      })
       .toPromise()
       .then((response: any) => {
         const result = JSON.parse(JSON.stringify(response));

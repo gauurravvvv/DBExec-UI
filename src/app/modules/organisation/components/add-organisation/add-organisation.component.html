@@ -190,36 +190,17 @@
               Security Configuration Acknowledgment
             </div>
             <div class="acknowledgment-card">
-              <div class="p-field-checkbox">
-                <p-checkbox
-                  [binary]="true"
-                  [(ngModel)]="confirmationChecked"
-                  [ngModelOptions]="{ standalone: true }"
-                  inputId="confirmation"
-                >
-                </p-checkbox>
-                <div class="acknowledgment-content">
-                  <label for="confirmation" class="acknowledgment-label">
-                    Encryption Configuration
-                  </label>
-                  <p class="acknowledgment-text">
-                    I understand that the encryption method and pepper key are
-                    critical security settings that cannot be modified after
-                    organisation creation. These settings will be used for all
-                    sensitive data encryption within the organisation.
-                  </p>
-                </div>
-              </div>
-              <small
-                class="error-message"
-                *ngIf="
-                  !confirmationChecked &&
+              <app-custom-binary-checkbox
+                formControlName="confirmationChecked"
+                label="Encryption Configuration"
+                description="I understand that the encryption method and pepper key are critical security settings that cannot be modified after organisation creation. These settings will be used for all sensitive data encryption within the organisation."
+                [showError]="
+                  !!(!orgForm.get('confirmationChecked')?.value &&
                   orgForm.get('encryptionAlgorithm')?.valid &&
-                  orgForm.get('pepperKey')?.valid
+                  orgForm.get('pepperKey')?.valid)
                 "
-              >
-                Please acknowledge the encryption configuration settings
-              </small>
+                errorMessage="Please acknowledge the encryption configuration settings"
+              ></app-custom-binary-checkbox>
             </div>
           </div>
         </div>
@@ -398,49 +379,19 @@
               Datasource Configuration Acknowledgments
             </div>
             <div class="acknowledgment-card">
-              <div class="p-field-checkbox">
-                <p-checkbox
-                  [binary]="true"
-                  [(ngModel)]="dbAcknowledgment"
-                  [ngModelOptions]="{ standalone: true }"
-                  inputId="dbAcknowledgment"
-                >
-                </p-checkbox>
-                <div class="acknowledgment-content">
-                  <label for="dbAcknowledgment" class="acknowledgment-label">
-                    Datasource Administrator Privileges
-                  </label>
-                  <p class="acknowledgment-text">
-                    I acknowledge that the username provided has admin
-                    privileges for this database.
-                  </p>
-                </div>
-              </div>
+              <app-custom-binary-checkbox
+                formControlName="dbAcknowledgment"
+                label="Datasource Administrator Privileges"
+                description="I acknowledge that the username provided has admin privileges for this database."
+              ></app-custom-binary-checkbox>
             </div>
 
             <div class="acknowledgment-card">
-              <div class="p-field-checkbox">
-                <p-checkbox
-                  [binary]="true"
-                  [(ngModel)]="schemaAcknowledgment"
-                  [ngModelOptions]="{ standalone: true }"
-                  inputId="schemaAcknowledgment"
-                >
-                </p-checkbox>
-                <div class="acknowledgment-content">
-                  <label
-                    for="schemaAcknowledgment"
-                    class="acknowledgment-label"
-                  >
-                    Schema Creation Authorization
-                  </label>
-                  <p class="acknowledgment-text">
-                    I hereby authorize DBExec to create and maintain a
-                    'dbexec_master' schema with all necessary database objects
-                    required for system operations.
-                  </p>
-                </div>
-              </div>
+              <app-custom-binary-checkbox
+                formControlName="schemaAcknowledgment"
+                label="Schema Creation Authorization"
+                description="I hereby authorize DBExec to create and maintain a 'dbexec_master' schema with all necessary database objects required for system operations."
+              ></app-custom-binary-checkbox>
             </div>
           </div>
         </div>
