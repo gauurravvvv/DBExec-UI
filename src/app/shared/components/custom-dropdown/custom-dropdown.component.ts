@@ -29,7 +29,7 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() filter = true;
   @Input() filterBy = '';
   @Input() filterPlaceholder = '';
-  @Input() filterMatchMode = 'contains';
+  @Input() filterMatchMode: 'contains' | 'startsWith' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' = 'contains';
   @Input() resetFilterOnHide = false;
   @Input() showClear = false;
   @Input() editable = false;

@@ -6,8 +6,6 @@ import {
 import { NgModule, isDevMode } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AngularEditorModule } from '@kolkov/angular-editor';
-import { IvyCarouselModule } from 'angular-responsive-carousel';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextareaModule } from 'primeng/inputtextarea';
@@ -53,14 +51,12 @@ import { SharedModule } from './shared/shared.module';
   imports: [
     AppRoutingModule,
     HttpClientModule,
-    AngularEditorModule,
     ToastModule,
     RippleModule,
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     ProgressSpinnerModule,
-    IvyCarouselModule,
     NgxSpinnerModule,
     DropdownModule,
     InputTextareaModule,
