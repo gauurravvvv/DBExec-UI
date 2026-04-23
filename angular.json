@@ -7,7 +7,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "UltraAnalyticsUI-R2": {
+    "DBExec": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -24,20 +24,15 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/UltraAnalyticsUI-R2",
+            "outputPath": "dist/DBExec",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              {
-                "glob": "**/*",
-                "input": "node_modules/monaco-editor",
-                "output": "assets/monaco-editor"
-              }
+              "src/assets"
             ],
             "styles": [
               "src/styles.scss",
@@ -47,21 +42,20 @@
               "node_modules/primeicons/primeicons.css",
               "node_modules/font-awesome/css/font-awesome.css"
             ],
-            "scripts": [],
-            "webWorkerTsConfig": "tsconfig.worker.json"
+            "scripts": []
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "8mb",
+                  "maximumWarning": "4mb",
                   "maximumError": "6mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "8mb",
-                  "maximumError": "6mb"
+                  "maximumWarning": "100kb",
+                  "maximumError": "200kb"
                 }
               ],
               "fileReplacements": [
@@ -101,13 +95,13 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "UltraAnalyticsUI-R2:build:production"
+              "buildTarget": "DBExec:build:production"
             },
             "development": {
-              "browserTarget": "UltraAnalyticsUI-R2:build:development"
+              "buildTarget": "DBExec:build:development"
             },
             "local": {
-              "browserTarget": "UltraAnalyticsUI-R2:build:local"
+              "buildTarget": "DBExec:build:local"
             }
           },
           "defaultConfiguration": "development"
@@ -115,7 +109,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "UltraAnalyticsUI-R2:build"
+            "buildTarget": "DBExec:build"
           }
         },
         "lint": {
