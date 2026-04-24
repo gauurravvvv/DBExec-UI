@@ -55,7 +55,7 @@
             pTooltip="Export PDF"
             tooltipPosition="top"
             (click)="exportLogs('pdf')"
-            [disabled]="totalItems === 0"
+            [disabled]="totalItems() === 0"
             class="p-button-outlined p-button-danger modern-button"
           ></button>
           <button
@@ -81,12 +81,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="logs"
+          [value]="logs()"
           [rows]="25"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadLogs($event)"
-          [totalRecords]="totalItems"
+          [totalRecords]="totalItems()"
           [rowHover]="true"
           dataKey="id"
           currentPageReportTemplate="{first} - {last} of {totalRecords}"

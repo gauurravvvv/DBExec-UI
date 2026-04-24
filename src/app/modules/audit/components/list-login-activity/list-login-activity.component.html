@@ -40,7 +40,7 @@
             pTooltip="Export PDF"
             tooltipPosition="top"
             (click)="exportActivity('pdf')"
-            [disabled]="totalItems === 0"
+            [disabled]="totalItems() === 0"
             class="p-button-outlined p-button-danger modern-button"
           ></button>
           <button
@@ -66,12 +66,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="activities"
+          [value]="activities()"
           [rows]="25"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadActivities($event)"
-          [totalRecords]="totalItems"
+          [totalRecords]="totalItems()"
           [rowHover]="true"
           dataKey="id"
           currentPageReportTemplate="{first} - {last} of {totalRecords}"
