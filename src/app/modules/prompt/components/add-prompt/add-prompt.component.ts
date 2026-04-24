@@ -48,6 +48,7 @@ export class AddPromptComponent
   lastAddedPromptIndex: number = -1;
   promptTypes = PROMPT_TYPES;
   expandedGroups: Set<number> = new Set();
+  saving = this.promptService.saving;
 
   constructor(
     private fb: FormBuilder,
@@ -306,7 +307,7 @@ export class AddPromptComponent
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
       }
-    });
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onSubmit() {
@@ -414,7 +415,7 @@ export class AddPromptComponent
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasources = response.data.datasources || [];
       }
-    });
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onDatasourceChange(event: any) {
@@ -459,7 +460,7 @@ export class AddPromptComponent
       if (this.globalService.handleSuccessService(response, false)) {
         this.tabs = [...response.data.tabs];
       }
-    });
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   loadSections() {
@@ -483,7 +484,7 @@ export class AddPromptComponent
           this.addSectionGroup();
         }
       }
-    });
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onSectionChange(event: any, groupIndex: number) {

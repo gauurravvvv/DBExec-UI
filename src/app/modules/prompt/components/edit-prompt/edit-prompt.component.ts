@@ -35,6 +35,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   isCancelClicked = false;
   showSaveConfirm = false;
   saveJustification = '';
+  saving = this.promptService.saving;
 
   constructor(
     private fb: FormBuilder,
@@ -132,7 +133,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.sections = response.data;
       }
-    });
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   getNameError(): string {

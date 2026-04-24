@@ -18,6 +18,7 @@ export class ViewPromptComponent implements OnInit {
   promptData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
+  saving = this.promptService.saving;
 
   constructor(
     private route: ActivatedRoute,
