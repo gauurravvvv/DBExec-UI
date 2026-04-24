@@ -54,7 +54,10 @@ export class TabService {
   }
 
   async delete(orgId: string, tabId: string, justification?: string): Promise<any> {
-    return lastValueFrom(this.http.apiDelete(TAB.DELETE + `${orgId}/${tabId}`, { body: { justification } }));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiDelete(TAB.DELETE + `${orgId}/${tabId}`, { body: { justification } }));
+    } finally { this._saving.set(false); }
   }
 
   resetCurrent(): void { this._current.set(null); }

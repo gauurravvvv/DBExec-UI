@@ -156,6 +156,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
 
   onCancel(): void {
     if (this.isFormDirty) {
+      if (!this.tabData) return;  // guard: data not loaded yet
       // Restore basic form values
       this.tabForm.patchValue({
         id: this.tabData.id,

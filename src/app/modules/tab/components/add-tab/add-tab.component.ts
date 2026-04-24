@@ -191,10 +191,9 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
   }
 
   onCancel() {
+    this.tabGroups.clear();
     this.tabForm.reset();
-    Object.keys(this.tabForm.controls).forEach(key => {
-      this.tabForm.get(key)?.setValue('');
-    });
+    this.cdr.markForCheck();
   }
 
   onOrganisationChange(event: any) {
