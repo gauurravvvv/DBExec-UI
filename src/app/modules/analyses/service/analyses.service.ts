@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import {
@@ -15,6 +15,12 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
   providedIn: 'root',
 })
 export class AnalysesService {
+  private _saving  = signal(false);
+  private _running = signal(false);
+
+  readonly saving  = this._saving.asReadonly();
+  readonly running = this._running.asReadonly();
+
   constructor(private http: HttpClientService) {}
 
   listDatasets(params: any) {
@@ -27,26 +33,41 @@ export class AnalysesService {
     return lastValueFrom(this.http.apiDelete(DATASET.DELETE + `${orgId}/${datasetId}`));
   }
 
-  addAnalyses(payload: any) {
+  async addAnalyses(payload: any) {
     const { name, description, datasetId, organisation, datasource } = payload;
-    return lastValueFrom(this.http.apiPost(ANALYSES.ADD, {
-      name, description, datasetId, organisation, datasource,
-    }));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(ANALYSES.ADD, {
+        name, description, datasetId, organisation, datasource,
+      }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   listAnalyses(params: any) {
     return lastValueFrom(this.http.apiGet(ANALYSES.LIST, { params }));
   }
 
-  deleteAnalyses(orgId: string, analysisId: string, justification?: string) {
-    return lastValueFrom(this.http.apiDelete(
-      ANALYSES.DELETE + `${orgId}/${analysisId}`,
-      { body: { justification } },
-    ));
+  async deleteAnalyses(orgId: string, analysisId: string, justification?: string) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiDelete(
+        ANALYSES.DELETE + `${orgId}/${analysisId}`,
+        { body: { justification } },
+      ));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  bulkDeleteAnalyses(ids: string[], justification: string | undefined, orgId: string) {
-    return lastValueFrom(this.http.apiDelete(ANALYSES.BULK_DELETE + orgId, { body: { ids, justification } }));
+  async bulkDeleteAnalyses(ids: string[], justification: string | undefined, orgId: string) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiDelete(ANALYSES.BULK_DELETE + orgId, { body: { ids, justification } }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   viewAnalyses(orgId: string, analysisId: string) {
@@ -73,11 +94,16 @@ export class AnalysesService {
     return lastValueFrom(this.http.apiGet(ANALYSES_VISUAL.VIEW + `${orgId}/${analysisId}/${visualId}`));
   }
 
-  updateAnalyses(payload: any, justification?: string) {
+  async updateAnalyses(payload: any, justification?: string) {
     const { id, name, description, datasetId, organisation, datasource, visuals } = payload;
-    return lastValueFrom(this.http.apiPut(ANALYSES.UPDATE, {
-      id, name, description, datasetId, organisation, datasource, visuals, justification,
-    }));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPut(ANALYSES.UPDATE, {
+        id, name, description, datasetId, organisation, datasource, visuals, justification,
+      }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   viewSuperAdmin(id: string) {
@@ -151,16 +177,31 @@ export class AnalysesService {
     }));
   }
 
-  addFilters(payload: any) {
-    return lastValueFrom(this.http.apiPost(ANALYSIS_FILTER.ADD, payload));
+  async addFilters(payload: any) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(ANALYSIS_FILTER.ADD, payload));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  updateFilter(payload: any) {
-    return lastValueFrom(this.http.apiPut(ANALYSIS_FILTER.UPDATE, payload));
+  async updateFilter(payload: any) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPut(ANALYSIS_FILTER.UPDATE, payload));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  deleteFilter(orgId: string, filterId: string) {
-    return lastValueFrom(this.http.apiDelete(ANALYSIS_FILTER.DELETE + `${orgId}/${filterId}`));
+  async deleteFilter(orgId: string, filterId: string) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiDelete(ANALYSIS_FILTER.DELETE + `${orgId}/${filterId}`));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   listFilters(orgId: string, analysisId: string) {
@@ -176,7 +217,7 @@ export class AnalysesService {
    * Returns data enriched with both dataset-level and analysis-level custom fields.
    * POST /analyses/run
    */
-  runAnalysisQuery(payload: {
+  async runAnalysisQuery(payload: {
     datasetId: string;
     analysisId: string;
     organisation: string;
@@ -191,6 +232,11 @@ export class AnalysesService {
     if (limit !== undefined) {
       body.limit = limit;
     }
-    return lastValueFrom(this.http.apiPost(ANALYSES.RUN_QUERY, body));
+    this._running.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(ANALYSES.RUN_QUERY, body));
+    } finally {
+      this._running.set(false);
+    }
   }
 }

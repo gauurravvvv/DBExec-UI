@@ -22,7 +22,7 @@
         class="p-button-text btn-primary"
         title="Refresh Data"
         (click)="refreshData()"
-        [disabled]="(datasetStatus$ | async) === 'loading'"
+        [disabled]="(datasetStatus$ | async) === 'loading' || running()"
       >
         <i
           class="pi pi-refresh"
@@ -34,7 +34,7 @@
         class="p-button-text btn-primary"
         title="Save Analysis"
         (click)="saveAnalysis()"
-        [disabled]="!canSave"
+        [disabled]="!canSave || saving()"
       >
         <i class="pi pi-save"></i>
       </button>

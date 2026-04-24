@@ -351,7 +351,7 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="!deleteJustification.trim() || saving()"
       >
         <i class="pi pi-trash"></i>
         Delete

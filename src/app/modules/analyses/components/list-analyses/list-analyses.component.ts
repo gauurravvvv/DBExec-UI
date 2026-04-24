@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { ANALYSES } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -17,7 +18,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-analyses.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListAnalysesComponent implements OnInit, OnDestroy {
+export class ListAnalysesComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
   limit = 10;
@@ -58,7 +59,8 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   get selectedCount(): number {
     return this.selectedAnalyses?.length || 0;
@@ -85,15 +87,17 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {}
 
+  get saving() { return this.analysesService.saving; }
+
   ngOnInit() {
     // Setup debounced filter
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadAnalyses();
       });
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['orgId'] || params['datasourceId'] || params['name']) {
         this.handleDeepLinking(params);
       } else {
@@ -142,12 +146,6 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
-    }
-  }
-
   loadOrganisations(preSelectedOrgId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
@@ -180,6 +178,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
             this.totalRecords = 0;
           }
         }
+        this.cdr.markForCheck();
         resolve();
       });
     });
@@ -261,6 +260,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
             this.filteredAnalyses = [];
             this.totalRecords = 0;
           }
+          this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
@@ -270,6 +270,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
           this.analyses = [];
           this.filteredAnalyses = [];
           this.totalRecords = 0;
+          this.cdr.markForCheck();
           resolve();
         });
     });
@@ -348,11 +349,13 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
           this.filteredAnalyses = [];
           this.totalRecords = 0;
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.analyses = [];
         this.filteredAnalyses = [];
         this.totalRecords = 0;
+        this.cdr.markForCheck();
       });
   }
 
@@ -401,6 +404,10 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
             this.selectedAnalyses = [];
             this.loadAnalyses();
           }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
         })
         .finally(() => this.closeDeletePopup());
       return;
@@ -420,6 +427,10 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
             );
             this.loadAnalyses();
           }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
         });
     }
     this.closeDeletePopup();

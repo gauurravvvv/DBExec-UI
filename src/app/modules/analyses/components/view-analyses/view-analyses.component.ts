@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ANALYSES } from 'src/app/constants/routes';
 import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
@@ -16,7 +15,8 @@ import { DashboardService } from '../../../dashboard/services/dashboard.service'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewAnalysesComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   analysisId: string = '';
   orgId: string = '';
@@ -43,8 +43,10 @@ export class ViewAnalysesComponent implements OnInit {
     private dashboardService: DashboardService,
   ) {}
 
+  get saving() { return this.analysesService.saving; }
+
   ngOnInit(): void {
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.orgId = params['orgId'];
       this.analysisId = params['id'];
       if (this.analysisId) {
@@ -65,6 +67,10 @@ export class ViewAnalysesComponent implements OnInit {
           this.loadAnalysisFields();
           this.loadVisuals();
         }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
       });
   }
 
@@ -73,6 +79,9 @@ export class ViewAnalysesComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasetDetails = response.data;
       }
+      this.cdr.markForCheck();
+    }).catch(() => {
+      this.cdr.markForCheck();
     });
   }
 
@@ -83,6 +92,10 @@ export class ViewAnalysesComponent implements OnInit {
         if (this.globalService.handleSuccessService(response, false)) {
           this.analysisFields = response.data?.analysisFields || [];
         }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
       });
   }
 
@@ -93,6 +106,10 @@ export class ViewAnalysesComponent implements OnInit {
         if (this.globalService.handleSuccessService(response, false)) {
           this.visuals = response.data.visuals || [];
         }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
       });
   }
 
@@ -172,6 +189,10 @@ export class ViewAnalysesComponent implements OnInit {
             this.deleteJustification = '';
             this.router.navigate([ANALYSES.LIST]);
           }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
         });
     }
   }
@@ -207,6 +228,9 @@ export class ViewAnalysesComponent implements OnInit {
         this.publishForm = { name: '', description: '' };
         this.router.navigate([DB_ROUTES.VIEW, this.orgId, response.data.id]);
       }
+      this.cdr.markForCheck();
+    }).catch(() => {
+      this.cdr.markForCheck();
     });
   }
 
@@ -223,10 +247,5 @@ export class ViewAnalysesComponent implements OnInit {
 
   trackById(index: number, item: any): any {
     return item.id;
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
