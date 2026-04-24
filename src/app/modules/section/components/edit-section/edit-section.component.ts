@@ -130,7 +130,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
     };
     this.tabService.listTab(param).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = [...response.data];
+        this.tabs = [...(response.data.tabs ?? response.data ?? [])];
       }
       this.cdr.markForCheck();
     }).catch(() => { this.cdr.markForCheck(); });
@@ -178,7 +178,11 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => { this.cdr.markForCheck(); })
+        .finally(() => {
+          this.saveJustification = '';
+          this.cdr.markForCheck();
+        });
     }
   }
 
