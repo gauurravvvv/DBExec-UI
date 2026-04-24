@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
-import { MessageService } from 'primeng/api';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 
@@ -48,8 +47,8 @@ export class ViewSuperAdminComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private superAdminService: SuperAdminService,
-    private messageService: MessageService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -71,6 +70,7 @@ export class ViewSuperAdminComponent implements OnInit {
       this.adminData = data;
       this.setAdminInitials();
       this.generateAvatarColor();
+      this.cdr.markForCheck();
     }
   }
 
