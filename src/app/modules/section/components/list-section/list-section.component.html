@@ -81,12 +81,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="sections"
+          [value]="sections()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadSections($event)"
-          [totalRecords]="totalRecords"
+          [totalRecords]="total()"
           [globalFilterFields]="['name', 'description', 'tab.name']"
           [rowHover]="true"
           dataKey="id"

@@ -26,10 +26,7 @@ export class ListSectionComponent implements OnInit {
 
   // Pagination limit for sections
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
-
-  filteredSections: any[] = [];
 
   selectedSections: any[] = [];
   searchTerm: string = '';
@@ -40,7 +37,9 @@ export class ListSectionComponent implements OnInit {
   Math = Math;
   organisations: any[] = [];
   datasources: any[] = [];
-  sections: any[] = [];
+  sections = this.sectionService.sections;
+  total    = this.sectionService.total;
+  loading  = this.sectionService.loading;
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
@@ -99,19 +98,21 @@ export class ListSectionComponent implements OnInit {
         this.loadSections();
       });
 
-    this.route.queryParams.subscribe(params => {
-      if (params['orgId'] || params['datasourceId'] || params['name']) {
-        this.handleDeepLinking(params);
-      } else {
-        if (this.showOrganisationDropdown) {
-          this.loadOrganisations();
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        if (params['orgId'] || params['datasourceId'] || params['name']) {
+          this.handleDeepLinking(params);
         } else {
-          this.selectedOrg =
-            this.globalService.getTokenDetails('organisationId');
-          this.loadDatasources();
+          if (this.showOrganisationDropdown) {
+            this.loadOrganisations();
+          } else {
+            this.selectedOrg =
+              this.globalService.getTokenDetails('organisationId');
+            this.loadDatasources();
+          }
         }
-      }
-    });
+      });
   }
 
   handleDeepLinking(params: any) {
@@ -174,14 +175,11 @@ export class ListSectionComponent implements OnInit {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.sections = [];
-            this.filteredSections = [];
-            this.totalRecords = 0;
           }
         }
         this.cdr.markForCheck();
         resolve();
-      });
+      }).catch(() => { this.cdr.markForCheck(); });
     });
   }
 
@@ -249,17 +247,11 @@ export class ListSectionComponent implements OnInit {
               this.loadSections();
             } else {
               this.selectedDatasource = null;
-              this.sections = [];
-              this.filteredSections = [];
-              this.totalRecords = 0;
             }
           } else {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.sections = [];
-            this.filteredSections = [];
-            this.totalRecords = 0;
           }
           this.cdr.markForCheck();
           resolve();
@@ -268,9 +260,6 @@ export class ListSectionComponent implements OnInit {
           this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
-          this.sections = [];
-          this.filteredSections = [];
-          this.totalRecords = 0;
           this.cdr.markForCheck();
           resolve();
         });
@@ -337,26 +326,7 @@ export class ListSectionComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.sectionService
-      .listSection(params)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.sections = response.data?.sections || [];
-          this.filteredSections = [...this.sections];
-          this.totalRecords = response.data?.count || this.sections.length;
-        } else {
-          this.sections = [];
-          this.filteredSections = [];
-          this.totalRecords = 0;
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.sections = [];
-        this.filteredSections = [];
-        this.totalRecords = 0;
-        this.cdr.markForCheck();
-      });
+    this.sectionService.load(params);
   }
 
   onAddNewSection() {
@@ -412,7 +382,7 @@ export class ListSectionComponent implements OnInit {
 
     if (this.sectionToDelete) {
       this.sectionService
-        .deleteSection(this.selectedOrg, this.sectionToDelete, reason)
+        .delete(this.selectedOrg, this.sectionToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedSections = this.selectedSections.filter(
