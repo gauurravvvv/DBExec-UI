@@ -109,7 +109,7 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
           this.groups = res.data.groups || [];
         }
         this.cdr.markForCheck();
-      });
+      }).catch(() => { this.cdr.markForCheck(); });
   }
 
   loadAnnouncement(): void {
