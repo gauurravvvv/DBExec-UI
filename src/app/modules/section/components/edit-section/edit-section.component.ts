@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -20,7 +19,10 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditSectionComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
+
+  saving = this.sectionService.saving;
 
   sectionForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
@@ -55,7 +57,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       this.loadSectionData();
     }
 
-    this.sectionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.sectionForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -91,30 +93,31 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadSectionData(): void {
-    this.sectionService
-      .viewSection(this.orgId, this.sectionId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.sectionData = response.data;
+    this.sectionService.resetCurrent();
+    this.sectionService.loadOne(this.orgId, this.sectionId).then(() => {
+      const data = this.sectionService.current();
+      if (data) {
+        this.sectionData = data;
 
-          this.sectionForm.patchValue({
-            id: this.sectionData.id,
-            name: this.sectionData.name,
-            description: this.sectionData.description,
-            organisation: this.sectionData.organisationId,
-            datasource: this.sectionData.datasourceId,
-            tab: this.sectionData.tabId,
-            status: this.sectionData.status,
-          });
+        this.sectionForm.patchValue({
+          id: this.sectionData.id,
+          name: this.sectionData.name,
+          description: this.sectionData.description,
+          organisation: this.sectionData.organisationId,
+          datasource: this.sectionData.datasourceId,
+          tab: this.sectionData.tabId,
+          status: this.sectionData.status,
+        });
 
-          this.selectedOrgName = this.sectionData.organisationName || '';
-          this.selectedDatasourceName = this.sectionData.datasource?.name || '';
+        this.selectedOrgName = this.sectionData.organisationName || '';
+        this.selectedDatasourceName = this.sectionData.datasource?.name || '';
 
-          this.loadTabData();
+        this.loadTabData();
 
-          this.sectionForm.markAsPristine();
-        }
-      });
+        this.sectionForm.markAsPristine();
+      }
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   loadTabData() {
@@ -128,7 +131,8 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.tabs = [...response.data];
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   getNameError(): string {
@@ -156,8 +160,14 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
 
   proceedSave(): void {
     if (this.saveJustification.trim()) {
+      const { id, name, description, organisation, datasource, tab, status } = this.sectionForm.value;
+      const payload = {
+        id, name, description, organisation, datasource, tab,
+        status: status ? 1 : 0,
+        justification: this.saveJustification.trim(),
+      };
       this.sectionService
-        .updateSection(this.sectionForm, this.saveJustification.trim())
+        .update(payload)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.showSaveConfirm = false;
@@ -165,11 +175,14 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
             this.sectionForm.markAsPristine();
             this.router.navigate([SECTION.LIST]);
           }
-        });
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.cdr.markForCheck(); });
     }
   }
 
   onCancel(): void {
+    if (!this.sectionData) return;
     if (this.isFormDirty) {
       this.sectionForm.patchValue({
         id: this.sectionData.id,
@@ -184,10 +197,5 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       this.isCancelClicked = true;
       this.sectionForm.markAsPristine();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
