@@ -380,6 +380,7 @@ export class ListTabComponent implements OnInit {
             this.refreshList();
           }
         })
+        .catch(() => { /* global interceptor shows error toast */ })
         .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
       return;
     }
@@ -395,6 +396,7 @@ export class ListTabComponent implements OnInit {
             this.refreshList();
           }
         })
+        .catch(() => { /* global interceptor shows error toast */ })
         .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
     }
   }
