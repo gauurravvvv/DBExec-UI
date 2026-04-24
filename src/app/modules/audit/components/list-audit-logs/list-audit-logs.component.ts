@@ -1,10 +1,11 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuditService } from '../../services/audit.service';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
-import {debounceTime, takeUntil} from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { ROLES } from 'src/app/constants/user.constant';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
 
@@ -15,15 +16,18 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListAuditLogsComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private searchSubject = new Subject<void>();
 
   Math = Math;
 
   @ViewChild('dt') dt!: Table;
-  private searchSubject = new Subject<void>();
 
-  logs: any[] = [];
-  totalItems = 0;
+  // Expose service signals as component refs
+  logs = this.auditService.logs;
+  totalItems = this.auditService.logsTotal;
+  loading = this.auditService.loading;
+
   lastTableLazyLoadEvent: any;
 
   showDetailDialog = false;
@@ -80,7 +84,7 @@ export class ListAuditLogsComponent implements OnInit {
       this.loadOrganisations();
     }
 
-    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.lastTableLazyLoadEvent) {
         this.loadLogs(this.lastTableLazyLoadEvent);
       }
@@ -345,7 +349,7 @@ export class ListAuditLogsComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.auditService.exportAuditLogs(params).pipe(takeUntil(this.destroy$)).subscribe({
+    this.auditService.exportAuditLogs(params).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (blob: Blob) => {
         const orgLabel =
           this.organisationOptions.find(
@@ -373,30 +377,13 @@ export class ListAuditLogsComponent implements OnInit {
 
   loadLogs(event: any) {
     this.lastTableLazyLoadEvent = event;
-
     const page = event.first / event.rows + 1;
     const limit = event.rows;
-
     const params: any = { page, limit };
     const filter = this.getFilterParams();
-
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
     }
-
-    this.auditService
-      .listAuditLogs(params)
-      .then((res: any) => {
-        if (this.globalService.handleSuccessService(res, false)) {
-          this.logs = res.data.logs;
-          this.totalItems = res.data.count;
-        }
-      })
-      .catch(() => {});
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.auditService.loadAuditLogs(params);
   }
 }
