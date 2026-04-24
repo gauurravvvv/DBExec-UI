@@ -355,10 +355,11 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   onCancel() {
+    this.tabGroups.clear();
+    this.expandedGroups.clear();
     this.sectionForm.reset();
-    Object.keys(this.sectionForm.controls).forEach(key => {
-      this.sectionForm.get(key)?.setValue('');
-    });
+    this.addTabGroup();
+    this.cdr.markForCheck();
   }
 
   onOrganisationChange(event: any) {

@@ -121,6 +121,7 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadTabData() {
+    if (!this.sectionData) return;
     const param = {
       orgId: this.sectionData.organisationId,
       datasourceId: this.sectionData.datasourceId,
@@ -188,14 +189,16 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
         id: this.sectionData.id,
         name: this.sectionData.name,
         description: this.sectionData.description,
-        organisation: this.sectionData.organisation,
-        datasource: this.sectionData.datasource,
+        organisation: this.sectionData.organisationId,
+        datasource: this.sectionData.datasourceId,
+        tab: this.sectionData.tabId,
         status: this.sectionData.status,
       });
 
       this.selectedOrgName = this.sectionData.organisationName;
       this.isCancelClicked = true;
       this.sectionForm.markAsPristine();
+      this.cdr.markForCheck();
     }
   }
 }
