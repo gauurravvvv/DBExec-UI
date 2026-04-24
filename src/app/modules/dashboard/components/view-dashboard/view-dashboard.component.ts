@@ -1,11 +1,14 @@
 import { ChangeDetectionStrategy, AfterViewInit,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
+  inject,
   OnDestroy,
   OnInit,
   ViewChild, } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -66,6 +69,13 @@ import {
 export class ViewDashboardComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
+  private destroyRef = inject(DestroyRef);
+  private _dashboardService = inject(DashboardService);
+
+  // Signal refs from service
+  rendered = this._dashboardService.rendered;
+  loading  = this._dashboardService.loading;
+
   orgId = '';
   dashboardId = '';
   dashboard: any = null;
@@ -146,13 +156,16 @@ export class ViewDashboardComponent
   ) {}
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.orgId = params['orgId'];
-      this.dashboardId = params['id'];
-      if (this.dashboardId) {
-        this.loadDashboard();
-      }
-    });
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.orgId = params['orgId'];
+        this.dashboardId = params['id'];
+        if (this.dashboardId) {
+          this._dashboardService.resetCurrent();
+          this.loadDashboard();
+        }
+      });
   }
 
   ngAfterViewInit(): void {
@@ -220,20 +233,23 @@ export class ViewDashboardComponent
 
   loadDashboard(): void {
     this.isLoading = true;
-    this.dashboardService
-      .renderDashboard(this.orgId, this.dashboardId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.dashboard = response.data;
-          this.filters = response.data.filters || [];
-          this.mapVisualsFromResponse(response.data.visuals || []);
+    this._dashboardService
+      .render(this.orgId, this.dashboardId)
+      .then(() => {
+        const data = this._dashboardService.rendered();
+        if (data) {
+          this.dashboard = data;
+          this.filters = data.filters || [];
+          this.mapVisualsFromResponse(data.visuals || []);
           this.executeQuery();
         } else {
           this.isLoading = false;
+          this.cdr.markForCheck();
         }
       })
       .catch(() => {
         this.isLoading = false;
+        this.cdr.markForCheck();
       });
   }
 

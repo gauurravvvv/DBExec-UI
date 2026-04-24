@@ -72,12 +72,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="dashboards"
+          [value]="dashboards()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadDashboards($event)"
-          [totalRecords]="totalRecords"
+          [totalRecords]="totalRecords()"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedDashboards"
