@@ -75,10 +75,14 @@ export class DatasourceService {
   resetCurrent() { this._current.set(null); }
 
   async loadSchemas(orgId: string, datasourceId: string) {
-    const res: any = await lastValueFrom(this.http.apiGet(
-      DATASOURCE.LIST_SCHEMAS + `${orgId}/${datasourceId}`,
-    ));
-    if (res?.status) this._schemas.set(res.data ?? []);
+    try {
+      const res: any = await lastValueFrom(this.http.apiGet(
+        DATASOURCE.LIST_SCHEMAS + `${orgId}/${datasourceId}`,
+      ));
+      if (res?.status) this._schemas.set(res.data ?? []);
+    } catch {
+      this._schemas.set([]);
+    }
   }
 
   // These methods are used by other modules and view — keep as-is
