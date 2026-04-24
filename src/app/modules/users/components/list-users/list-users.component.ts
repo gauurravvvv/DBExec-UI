@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -17,12 +18,15 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-users.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListUsersComponent implements OnInit, OnDestroy {
+export class ListUsersComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
-  users: any[] = [];
+  // Signal refs from service
+  users   = this.userService.users;
+  total   = this.userService.total;
+  loading = this.userService.loading;
+
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
 
   filteredUsers: any[] = [];
@@ -61,7 +65,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
+  private destroyRef = inject(DestroyRef);
 
   get isFilterActive(): boolean {
     return (
@@ -82,12 +86,13 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     private groupService: GroupService,
     private router: Router,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
     // Setup debounced filter
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadUsers();
       });
@@ -97,12 +102,6 @@ export class ListUsersComponent implements OnInit, OnDestroy {
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadGroupOptions();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
     }
   }
 
@@ -122,11 +121,10 @@ export class ListUsersComponent implements OnInit, OnDestroy {
           this.loadUsers();
         } else {
           this.selectedOrg = null;
-          this.users = [];
           this.filteredUsers = [];
-          this.totalRecords = 0;
         }
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -141,6 +139,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
             (g: any) => g.status === 1,
           );
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -274,24 +273,13 @@ export class ListUsersComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.userService
-      .listUser(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.users = response.data.users || [];
-          this.filteredUsers = [...this.users];
-          this.totalRecords = response.data.totalItems || this.users.length;
-        } else {
-          this.users = [];
-          this.filteredUsers = [];
-          this.totalRecords = 0;
-        }
-      })
-      .catch(() => {
-        this.users = [];
-        this.filteredUsers = [];
-        this.totalRecords = 0;
-      });
+    this.userService.load(params).then(() => {
+      this.filteredUsers = [...this.userService.users()];
+      this.cdr.markForCheck();
+    }).catch(() => {
+      this.filteredUsers = [];
+      this.cdr.markForCheck();
+    });
   }
 
   onAddNewAdmin() {
@@ -299,7 +287,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
   }
 
   onUnlock(id: string) {
-    this.userService.unlockUser(this.selectedOrg, id).then((res: any) => {
+    this.userService.unlock(this.selectedOrg, id).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         if (this.lastTableLazyLoadEvent) {
           this.loadUsers(this.lastTableLazyLoadEvent);
@@ -343,7 +331,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
         return;
       }
       this.userService
-        .bulkDeleteUser(ids, reason, this.selectedOrg)
+        .bulkDelete(ids, reason, this.selectedOrg)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedUsers = [];
@@ -356,7 +344,7 @@ export class ListUsersComponent implements OnInit, OnDestroy {
 
     if (this.userToDelete) {
       this.userService
-        .deleteUser(
+        .delete(
           this.userToDelete,
           this.selectedOrg,
           reason,

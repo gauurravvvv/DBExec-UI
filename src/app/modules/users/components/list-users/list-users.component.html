@@ -66,12 +66,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="users"
+          [value]="users()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadUsers($event)"
-          [totalRecords]="totalRecords"
+          [totalRecords]="total()"
           [globalFilterFields]="['firstName', 'lastName', 'email', 'status']"
           [rowHover]="true"
           dataKey="id"
