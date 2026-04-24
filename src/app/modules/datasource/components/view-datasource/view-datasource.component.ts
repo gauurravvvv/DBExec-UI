@@ -70,6 +70,7 @@ export class ViewDatasourceComponent implements OnInit {
 
   // Changed from private to public
   async loadDatasourceData(): Promise<void> {
+    this.datasourceService.resetCurrent();
     await this.datasourceService.loadOne(this.orgId, this.dbId);
     const data = this.datasourceService.current();
     if (data) {
