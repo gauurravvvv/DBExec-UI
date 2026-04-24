@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem, LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { QUERY_BUILDER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -18,7 +19,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-query-builder.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListQueryBuilderComponent implements OnInit, OnDestroy {
+export class ListQueryBuilderComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
   // Pagination limit for query builders
@@ -61,7 +62,7 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
 
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
+  private destroyRef = inject(DestroyRef);
 
   get selectedCount(): number {
     return this.selectedQueryBuilders?.length || 0;
@@ -89,13 +90,13 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Setup debounced filter
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadQueryBuilders();
       });
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['orgId'] || params['datasourceId'] || params['name']) {
         this.handleDeepLinking(params);
       } else {
@@ -141,12 +142,6 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
       } else {
         this.loadDatasources();
       }
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
     }
   }
 

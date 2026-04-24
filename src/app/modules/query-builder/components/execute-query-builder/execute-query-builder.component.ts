@@ -1,11 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
+  inject,
   OnInit,
   OnDestroy,
   ElementRef,
   ViewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   FormBuilder,
@@ -93,7 +96,8 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   promptForm!: FormGroup;
 
   // Submission
-  isSubmitting = false;
+  private destroyRef = inject(DestroyRef);
+  executing = inject(QueryBuilderService).executing;
   submitError: string | null = null;
 
   // Save dialog
@@ -138,7 +142,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   highlightedElementId: string | null = null;
 
   // Cleanup
-  private destroy$ = new Subject<void>();
   private clickOutsideHandler = (e: MouseEvent) => this.onClickOutside(e);
 
   // Skeleton arrays (cached to avoid recreating in template)
@@ -177,7 +180,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     // after ALL tabs/sections/prompts finish loading (see checkAndLoadDatasetForEdit)
 
     // Debounce server-side result filters
-    this.resultFilterSubject.pipe(debounceTime(500)).subscribe(() => {
+    this.resultFilterSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (!this.lastExecutedQuery) return;
       this.resultPage = 1;
       const filter: { [key: string]: string } = {};
@@ -196,8 +199,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
     this.resultFilterSubject.complete();
     document.removeEventListener('click', this.clickOutsideHandler);
   }
@@ -394,7 +395,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   onExecuteConfirm(): void {
     if (!this.executePayload) return;
 
-    this.isSubmitting = true;
     this.executeError = null;
 
     // Build prompt lookup for ID → string value resolution
@@ -406,7 +406,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     });
 
     this.queryBuilderService
-      .executeQueryBuilder({
+      .execute({
         queryBuilderId: this.queryBuilderId,
         organisation: this.orgId,
         prompts: this.executePayload.prompts.map(p => {
@@ -424,7 +424,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
         }),
       })
       .then((response: any) => {
-        this.isSubmitting = false;
         if (response.status) {
           this.generatedSql = response.data?.sql || '';
           this.sqlComponents = response.data?.components || null;
@@ -436,7 +435,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
         }
       })
       .catch(() => {
-        this.isSubmitting = false;
         this.executeError = 'Failed to generate SQL';
       });
   }

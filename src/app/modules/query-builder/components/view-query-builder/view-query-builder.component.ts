@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
-import { Subject } from 'rxjs';
 import { TreeNode } from 'primeng/api';
 
 import { QUERY_BUILDER } from 'src/app/constants/routes';
@@ -63,7 +62,6 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   highlightedElementId: string | null = null;
 
   // Cleanup
-  private destroy$ = new Subject<void>();
   private clickOutsideHandler = (e: MouseEvent) => this.onClickOutside(e);
 
   // Skeleton arrays
@@ -90,8 +88,6 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
     document.removeEventListener('click', this.clickOutsideHandler);
   }
 
@@ -504,17 +500,16 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   proceedDelete(): void {
     if (this.deleteJustification.trim()) {
       this.queryBuilderService
-        .deleteQueryBuilder(
-          this.orgId,
-          this.queryBuilderId,
-          this.deleteJustification.trim(),
-        )
+        .delete(this.orgId, this.queryBuilderId, this.deleteJustification.trim())
         .then((response: any) => {
-          this.showDeleteConfirm = false;
-          this.deleteJustification = '';
           if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([QUERY_BUILDER.LIST]);
           }
+        })
+        .catch(() => {})
+        .finally(() => {
+          this.showDeleteConfirm = false;
+          this.deleteJustification = '';
         });
     }
   }
