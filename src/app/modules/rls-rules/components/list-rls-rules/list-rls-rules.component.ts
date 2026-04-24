@@ -261,6 +261,9 @@ export class ListRlsRulesComponent implements OnInit {
           }
         })
         .catch(() => {
+          this.showDeleteConfirm = false;
+          this.ruleToDelete = null;
+          this.deleteJustification = '';
           this.cdr.markForCheck();
         });
     }
