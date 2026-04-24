@@ -5,17 +5,21 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({ providedIn: 'root' })
 export class DatasourceService {
-  private _datasources = signal<any[]>([]);
-  private _total       = signal(0);
-  private _current     = signal<any>(null);
-  private _loading     = signal(false);
-  private _saving      = signal(false);
+  private _datasources  = signal<any[]>([]);
+  private _total        = signal(0);
+  private _current      = signal<any>(null);
+  private _loading      = signal(false);
+  private _saving       = signal(false);
+  private _schemas      = signal<any[]>([]);
+  private _queryLoading = signal(false);
 
-  readonly datasources = this._datasources.asReadonly();
-  readonly total       = this._total.asReadonly();
-  readonly current     = this._current.asReadonly();
-  readonly loading     = this._loading.asReadonly();
-  readonly saving      = this._saving.asReadonly();
+  readonly datasources  = this._datasources.asReadonly();
+  readonly total        = this._total.asReadonly();
+  readonly current      = this._current.asReadonly();
+  readonly loading      = this._loading.asReadonly();
+  readonly saving       = this._saving.asReadonly();
+  readonly schemas      = this._schemas.asReadonly();
+  readonly queryLoading = this._queryLoading.asReadonly();
 
   constructor(private http: HttpClientService) {}
 
@@ -70,6 +74,13 @@ export class DatasourceService {
 
   resetCurrent() { this._current.set(null); }
 
+  async loadSchemas(orgId: string, datasourceId: string) {
+    const res: any = await lastValueFrom(this.http.apiGet(
+      DATASOURCE.LIST_SCHEMAS + `${orgId}/${datasourceId}`,
+    ));
+    if (res?.status) this._schemas.set(res.data ?? []);
+  }
+
   // These methods are used by other modules and view — keep as-is
   listDatasourceSchemas(params: any) {
     return lastValueFrom(this.http.apiGet(
@@ -89,12 +100,15 @@ export class DatasourceService {
     ));
   }
 
-  runQuery(params: any) {
-    return lastValueFrom(this.http.apiPost(DATASOURCE.RUN_QUERY, {
-      orgId: params.orgId,
-      datasourceId: params.datasourceId,
-      query: params.query,
-    }));
+  async runQuery(params: any): Promise<any> {
+    this._queryLoading.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(DATASOURCE.RUN_QUERY, {
+        orgId: params.orgId,
+        datasourceId: params.datasourceId,
+        query: params.query,
+      }));
+    } finally { this._queryLoading.set(false); }
   }
 
   // Legacy methods for external callers
