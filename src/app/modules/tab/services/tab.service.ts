@@ -1,100 +1,46 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { TAB } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TabService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   listTab(params: any) {
-    return this.http
-      .get(TAB.LIST, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(TAB.LIST, { params }));
   }
 
   listAllTabData(params: any) {
-    return this.http
-      .get(TAB.GET_ALL, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(TAB.GET_ALL, { params }));
   }
 
   deleteTab(orgId: string, id: string, justification?: string) {
-    return this.http
-      .request('DELETE', TAB.DELETE + `${orgId}/${id}`, {
-        body: { justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(TAB.DELETE + `${orgId}/${id}`, { body: { justification } }));
   }
 
   bulkDeleteTab(ids: string[], justification: string | undefined, orgId: string) {
-    return this.http
-      .request('DELETE', TAB.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(TAB.BULK_DELETE + orgId, { body: { ids, justification } }));
   }
 
   addTab(tabForm: FormGroup) {
     const { organisation, datasource, tabs } = tabForm.value;
-    return this.http
-      .post(TAB.ADD, {
-        organisation,
-        datasource,
-        tabs,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(TAB.ADD, { organisation, datasource, tabs }));
   }
 
   viewTab(orgId: string, id: string) {
-    return this.http
-      .get(TAB.VIEW + `${orgId}/${id}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(TAB.VIEW + `${orgId}/${id}`));
   }
 
   updateTab(tabForm: FormGroup, justification?: string) {
-    const { id, name, description, organisation, datasource, status } =
-      tabForm.getRawValue();
-    return this.http
-      .put(TAB.UPDATE, {
-        id,
-        name,
-        description,
-        organisation,
-        datasource,
-        status: status ? 1 : 0,
-        justification,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    const { id, name, description, organisation, datasource, status } = tabForm.getRawValue();
+    return lastValueFrom(this.http.apiPut(TAB.UPDATE, {
+      id, name, description, organisation, datasource,
+      status: status ? 1 : 0,
+      justification,
+    }));
   }
 }

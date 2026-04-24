@@ -21,6 +21,7 @@ import { AppPrimeNGModule } from './shared/modules/app-primeng.module';
 import { LoginComponent } from './modules/auth/components/login/login.component';
 import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
 import { HttpRequestInterceptor } from './core/interceptor/HttpRequestInterceptor';
+import { HttpErrorInterceptor } from './core/interceptor/HttpErrorInterceptor';
 import { FooterComponent } from './shared/components/layout/footer/footer.component';
 import { HeaderComponent } from './shared/components/layout/header/header.component';
 import { HomeComponent } from './shared/components/layout/home/home.component';
@@ -67,6 +68,13 @@ import { SharedModule } from './shared/shared.module';
   ],
 
   providers: [
+    // Outermost: catches errors that bubble up from inner interceptors
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
+      multi: true,
+    },
+    // Innermost: handles auth headers, session refresh (440), loader
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpRequestInterceptor,

@@ -1,152 +1,76 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { DATASOURCE, DATASET, SUPER_ADMIN } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatasetService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   listDatasets(params: any) {
-    return this.http
-      .get(DATASET.LIST, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(DATASET.LIST, { params }));
   }
 
   deleteDataset(orgId: string, datasetId: string, justification?: string) {
-    const url = DATASET.DELETE + `${orgId}` + `/${datasetId}`;
-    return this.http
-      .request('DELETE', url, { body: { justification } })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(
+      DATASET.DELETE + `${orgId}/${datasetId}`,
+      { body: { justification } },
+    ));
   }
 
   bulkDeleteDataset(ids: string[], justification: string | undefined, orgId: string) {
-    return this.http
-      .request('DELETE', DATASET.BULK_DELETE + `${orgId}`, {
-        body: { ids, justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(
+      DATASET.BULK_DELETE + `${orgId}`,
+      { body: { ids, justification } },
+    ));
   }
 
   addDataset(payload: any) {
     const { name, description, organisation, datasource, sql } = payload;
-
-    return this.http
-      .post(DATASET.ADD, {
-        name,
-        description,
-        organisation,
-        datasource,
-        sql,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(DATASET.ADD, {
+      name, description, organisation, datasource, sql,
+    }));
   }
 
   addDatasetViaBuilder(payload: any) {
-    return this.http
-      .post(DATASET.ADD_VIA_BUILDER, payload)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(DATASET.ADD_VIA_BUILDER, payload));
   }
 
   updateDatasetViaBuilder(payload: any) {
-    return this.http
-      .put(DATASET.UPDATE_VIA_BUILDER, payload)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPut(DATASET.UPDATE_VIA_BUILDER, payload));
   }
 
   viewSuperAdmin(id: string) {
-    return this.http
-      .get(SUPER_ADMIN.VIEW + `${id}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(SUPER_ADMIN.VIEW + `${id}`));
   }
 
   updateSuperAdmin(superAdminForm: FormGroup) {
-    const { id, firstName, lastName, username, email, mobile, status } =
-      superAdminForm.value;
-    return this.http
-      .put(SUPER_ADMIN.UPDATE, {
-        id,
-        firstName,
-        lastName,
-        username,
-        email,
-        mobile,
-        status: status ? 1 : 0,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    const { id, firstName, lastName, username, email, mobile, status } = superAdminForm.value;
+    return lastValueFrom(this.http.apiPut(SUPER_ADMIN.UPDATE, {
+      id, firstName, lastName, username, email, mobile,
+      status: status ? 1 : 0,
+    }));
   }
 
   viewDataset(orgId: string, id: string) {
-    return this.http
-      .get(DATASET.VIEW + `${orgId}` + `/${id}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(DATASET.VIEW + `${orgId}/${id}`));
   }
 
   viewDatasetField(orgId: string, datasetId: string, fieldId: string) {
-    return this.http
-      .get(DATASET.VIEW_FIELD + `${orgId}` + `/${datasetId}` + `/${fieldId}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(DATASET.VIEW_FIELD + `${orgId}/${datasetId}/${fieldId}`));
   }
 
   updateDatasetMapping(payload: any) {
     const {
-      fieldId,
-      datasetId,
-      organisation,
-      columnNameToView,
-      customLogic,
-      used_field_ids,
-      dataType,
+      fieldId, datasetId, organisation, columnNameToView,
+      customLogic, used_field_ids, dataType,
     } = payload;
 
     const requestBody: any = {
-      fieldId,
-      datasetId,
-      organisation,
-      columnNameToView,
-      used_field_ids,
+      fieldId, datasetId, organisation, columnNameToView, used_field_ids,
     };
 
     // Include customLogic only if provided (for custom fields)
@@ -159,156 +83,62 @@ export class DatasetService {
       requestBody.dataType = dataType;
     }
 
-    return this.http
-      .put(DATASET.UPDATE_FIELD, requestBody)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPut(DATASET.UPDATE_FIELD, requestBody));
   }
 
   updateDatasource(payload: any) {
     const {
-      id,
-      name,
-      description,
-      type,
-      host,
-      port,
-      datasource,
-      username,
-      password,
-      organisation,
-      isMasterDB,
-      status,
+      id, name, description, type, host, port, datasource,
+      username, password, organisation, isMasterDB, status,
     } = payload;
-    return this.http
-      .put(DATASOURCE.UPDATE, {
-        id,
-        name,
-        description,
-        type,
-        host,
-        port,
-        datasource,
-        username,
-        password,
-        organisation,
-        isMasterDB,
-        status,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPut(DATASOURCE.UPDATE, {
+      id, name, description, type, host, port, datasource,
+      username, password, organisation, isMasterDB, status,
+    }));
   }
 
   listDatasourceSchemas(params: any) {
-    return this.http
-      .get(
-        DATASOURCE.LIST_SCHEMAS + `${params.orgId}` + `/${params.datasourceId}`,
-      )
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(
+      DATASOURCE.LIST_SCHEMAS + `${params.orgId}/${params.datasourceId}`,
+    ));
   }
 
   listSchemaTables(params: any) {
-    return this.http
-      .get(
-        DATASOURCE.LIST_SCHEMA_TABLES +
-          `${params.orgId}` +
-          `/${params.datasourceId}` +
-          `/${params.schemaName}`,
-      )
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(
+      DATASOURCE.LIST_SCHEMA_TABLES + `${params.orgId}/${params.datasourceId}/${params.schemaName}`,
+    ));
   }
 
   listTableColumns(params: any) {
-    return this.http
-      .get(
-        DATASOURCE.LIST_TABLE_COLUMNS +
-          `${params.orgId}` +
-          `/${params.datasourceId}` +
-          `/${params.schemaName}` +
-          `/${params.tableName}`,
-      )
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(
+      DATASOURCE.LIST_TABLE_COLUMNS + `${params.orgId}/${params.datasourceId}/${params.schemaName}/${params.tableName}`,
+    ));
   }
 
   getDataset(orgId: string, datasetId: string) {
-    return this.http
-      .get(DATASET.VIEW + `${orgId}/${datasetId}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(DATASET.VIEW + `${orgId}/${datasetId}`));
   }
 
   updateDataset(payload: any, justification?: string) {
     const { id, name, description, organisation, datasource, sql } = payload;
-
-    return this.http
-      .put(DATASET.UPDATE, {
-        id,
-        name,
-        description,
-        organisation,
-        datasource,
-        sql,
-        justification,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPut(DATASET.UPDATE, {
+      id, name, description, organisation, datasource, sql, justification,
+    }));
   }
 
   validateCustomField(payload: any) {
     const { datasetId, organisation, customLogic } = payload;
-    return this.http
-      .post(DATASET.VALIDATE_FIELD, {
-        organisation,
-        datasetId,
-        customLogic,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(DATASET.VALIDATE_FIELD, {
+      organisation, datasetId, customLogic,
+    }));
   }
 
   addCustomField(payload: any) {
     const {
-      organisation,
-      datasetId,
-      name,
-      customLogic,
-      used_field_ids,
-      dataType,
-      analysisId,
+      organisation, datasetId, name, customLogic, used_field_ids, dataType, analysisId,
     } = payload;
     const requestBody: any = {
-      organisation,
-      datasetId,
-      name,
-      customLogic,
-      used_field_ids,
+      organisation, datasetId, name, customLogic, used_field_ids,
     };
 
     // Include dataType if provided
@@ -321,28 +151,11 @@ export class DatasetService {
       requestBody.analysisId = analysisId;
     }
 
-    return this.http
-      .post(DATASET.ADD_FIELD, requestBody)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(DATASET.ADD_FIELD, requestBody));
   }
 
-  duplicateDataset(
-    orgId: string,
-    datasetId: string,
-    name: string,
-    description: string,
-  ) {
-    return this.http
-      .post(DATASET.DUPLICATE + `${orgId}/${datasetId}`, { name, description })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+  duplicateDataset(orgId: string, datasetId: string, name: string, description: string) {
+    return lastValueFrom(this.http.apiPost(DATASET.DUPLICATE + `${orgId}/${datasetId}`, { name, description }));
   }
 
   runDatasetQuery(payload: any) {
@@ -351,32 +164,14 @@ export class DatasetService {
     if (filters && filters.length > 0) {
       body.filters = filters;
     }
-    return this.http
-      .post(DATASET.RUN_QUERY, body)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(DATASET.RUN_QUERY, body));
   }
 
   getDistinctColumnValues(orgId: string, datasetId: string, columnName: string) {
-    return this.http
-      .post(DATASET.DISTINCT_VALUES + `${orgId}/${datasetId}`, { columnName })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(DATASET.DISTINCT_VALUES + `${orgId}/${datasetId}`, { columnName }));
   }
 
   deleteDatasetField(orgId: string, datasetId: string, fieldId: string) {
-    return this.http
-      .delete(DATASET.DELETE_FIELD + `${orgId}/${datasetId}/${fieldId}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(DATASET.DELETE_FIELD + `${orgId}/${datasetId}/${fieldId}`));
   }
 }

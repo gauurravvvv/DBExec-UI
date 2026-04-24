@@ -1,92 +1,42 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
 import { SECTION } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SectionService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   listSection(params: any) {
-    return this.http
-      .get(SECTION.LIST, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(SECTION.LIST, { params }));
   }
 
   deleteSection(orgId: string, id: string, justification?: string) {
-    return this.http
-      .request('DELETE', SECTION.DELETE + `${orgId}/${id}`, {
-        body: { justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(SECTION.DELETE + `${orgId}/${id}`, { body: { justification } }));
   }
 
   bulkDeleteSection(ids: string[], justification: string | undefined, orgId: string) {
-    return this.http
-      .request('DELETE', SECTION.BULK_DELETE + orgId, {
-        body: { ids, justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(SECTION.BULK_DELETE + orgId, { body: { ids, justification } }));
   }
 
   addSection(formData: any) {
     const { organisation, datasource, sections } = formData;
-    return this.http
-      .post(SECTION.ADD, {
-        organisation,
-        datasource,
-        sections,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(SECTION.ADD, { organisation, datasource, sections }));
   }
 
   viewSection(orgId: string, id: string) {
-    return this.http
-      .get(SECTION.VIEW + `${orgId}/${id}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(SECTION.VIEW + `${orgId}/${id}`));
   }
 
   updateSection(sectionForm: FormGroup, justification?: string) {
-    const { id, name, description, organisation, datasource, tab, status } =
-      sectionForm.value;
-    return this.http
-      .put(SECTION.UPDATE, {
-        id,
-        name,
-        description,
-        organisation,
-        datasource,
-        tab,
-        status: status ? 1 : 0,
-        justification,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    const { id, name, description, organisation, datasource, tab, status } = sectionForm.value;
+    return lastValueFrom(this.http.apiPut(SECTION.UPDATE, {
+      id, name, description, organisation, datasource, tab,
+      status: status ? 1 : 0,
+      justification,
+    }));
   }
 }

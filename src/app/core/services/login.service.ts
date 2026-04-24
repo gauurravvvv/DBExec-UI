@@ -1,11 +1,12 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { UntypedFormGroup } from '@angular/forms';
+import { Observable } from 'rxjs';
 import { AUTH } from 'src/app/constants/api';
 import { StorageType } from 'src/app/constants/storageType';
 import { ROLES } from 'src/app/constants/user.constant';
 import { StorageService } from 'src/app/core/services/storage.service';
-import { Observable } from 'rxjs';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,129 +15,71 @@ export class LoginService implements OnDestroy {
   isForgetPasswordForm = false;
   private refreshTimer: any = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
-  login(loginForm: UntypedFormGroup) {
+  async login(loginForm: UntypedFormGroup): Promise<any> {
     const { organisation, username, password } = loginForm.value;
-    return this.http
-      .post(AUTH.LOGIN, {
-        organisation,
-        username,
-        password,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        if (result.status) {
-          // Store access token and refresh token
-          this.setAccessToken(result.data.accessToken);
-          this.setRefreshToken(result.data.refreshToken);
+    const result: any = await lastValueFrom(
+      this.http.apiPost(AUTH.LOGIN, { organisation, username, password }),
+    );
+    if (result.status) {
+      // Store access token and refresh token
+      this.setAccessToken(result.data.accessToken);
+      this.setRefreshToken(result.data.refreshToken);
 
-          // Store other details
-          StorageService.set(StorageType.ROLE, result.data.user.role);
+      // Store other details
+      StorageService.set(StorageType.ROLE, result.data.user.role);
+      StorageService.set(StorageType.ORGANISATION_ID, result.data.user.organisationId);
+      StorageService.set(StorageType.ORGANISATION, result.data.user.organisationName);
 
-          StorageService.set(
-            StorageType.ORGANISATION_ID,
-            result.data.user.organisationId,
-          );
-
-          StorageService.set(
-            StorageType.ORGANISATION,
-            result.data.user.organisationName,
-          );
-
-          if (result.data.sessionInactivityTimeout) {
-            StorageService.set(
-              StorageType.SESSION_INACTIVITY_TIMEOUT,
-              result.data.sessionInactivityTimeout.toString(),
-            );
-          }
-        }
-        return result;
-      });
+      if (result.data.sessionInactivityTimeout) {
+        StorageService.set(
+          StorageType.SESSION_INACTIVITY_TIMEOUT,
+          result.data.sessionInactivityTimeout.toString(),
+        );
+      }
+    }
+    return result;
   }
 
   generateOTP(forgotPasswordForm: UntypedFormGroup) {
     const { organisation, username, email } = forgotPasswordForm.value;
-    return this.http
-      .post(AUTH.GENERATE_OTP, {
-        organisation: organisation,
-        username: username,
-        email: email,
-      })
-      .toPromise()
-      .then(response => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(AUTH.GENERATE_OTP, {
+      organisation, username, email,
+    }));
   }
 
-  resetPassword(
-    loginForm: UntypedFormGroup,
-    id: string,
-    orgId: string,
-    otp?: string,
-  ) {
+  resetPassword(loginForm: UntypedFormGroup, id: string, orgId: string, otp?: string) {
     const { otp: formOtp, newPassword } = loginForm.value;
-    return this.http
-      .post(AUTH.RESET_PASSWORD, {
-        id: id,
-        orgId: orgId,
-        otp: otp || formOtp,
-        password: newPassword,
-      })
-      .toPromise()
-      .then(response => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(AUTH.RESET_PASSWORD, {
+      id, orgId, otp: otp || formOtp, password: newPassword,
+    }));
   }
 
   setPassword(password: string, id: string, orgId: string, token: string) {
-    return this.http
-      .post(AUTH.SET_PASSWORD, { id, orgId, token, password })
-      .toPromise()
-      .then(response => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(AUTH.SET_PASSWORD, { id, orgId, token, password }));
   }
 
   verifySetupToken(id: string, orgId: string, token: string) {
-    return this.http
-      .post(AUTH.VERIFY_SETUP_TOKEN, { id, orgId, token })
-      .toPromise()
-      .then(response => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(AUTH.VERIFY_SETUP_TOKEN, { id, orgId, token }));
   }
 
   resendSetupLink(id: string, orgId: string) {
-    return this.http
-      .post(AUTH.RESEND_SETUP_LINK, { id, orgId })
-      .toPromise()
-      .then(response => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(AUTH.RESEND_SETUP_LINK, { id, orgId }));
   }
 
   cliAuthorize(code: string, action: 'authorize' | 'deny'): Observable<any> {
-    return this.http.post(AUTH.CLI_AUTHORIZE, { code, action });
+    return this.http.apiPost(AUTH.CLI_AUTHORIZE, { code, action });
   }
 
   logout(): Observable<any> {
-    return this.http.post(AUTH.LOGOUT, {});
+    return this.http.apiPost(AUTH.LOGOUT, {});
   }
 
   refreshAccessToken(): Observable<any> {
     const refreshToken = StorageService.get(StorageType.REFRESH_TOKEN);
     const organisation = StorageService.get(StorageType.ORGANISATION);
-    return this.http.post(AUTH.REFRESH_TOKEN, {
-      refreshToken,
-      organisation,
-    });
+    return this.http.apiPost(AUTH.REFRESH_TOKEN, { refreshToken, organisation });
   }
 
   public setAccessToken(accessToken: string) {
