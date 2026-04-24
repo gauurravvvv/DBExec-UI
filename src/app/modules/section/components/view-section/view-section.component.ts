@@ -77,7 +77,7 @@ export class ViewSectionComponent implements OnInit {
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';
-            this.router.navigate(['/app/section']);
+            this.router.navigate([SECTION.LIST]);
           }
           this.cdr.markForCheck();
         })
