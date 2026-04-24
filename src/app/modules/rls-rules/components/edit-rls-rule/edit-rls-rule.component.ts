@@ -271,6 +271,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
         })
         .catch(() => {
           this.showSaveConfirm = false;
+          this.saveJustification = '';
           this.cdr.markForCheck();
         });
     }
