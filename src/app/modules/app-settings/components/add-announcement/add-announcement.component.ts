@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -28,7 +27,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   announcementForm!: FormGroup;
   organisations: any[] = [];
@@ -37,9 +36,10 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   maxDescriptionLength = 1000;
   minDate = new Date();
-  loading = false;
   showPreview = false;
   readonly minContrastRatio = 4.5;
+
+  saving = this.announcementService.saving;
 
   constructor(
     private fb: FormBuilder,
@@ -48,6 +48,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     private announcementService: AnnouncementService,
     private organisationService: OrganisationService,
     private groupService: GroupService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -94,14 +95,16 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       { validators: this.dateRangeValidator },
     );
 
-    this.announcementForm.get('organisation')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      this.announcementForm.patchValue(
-        { targetGroupId: null },
-        { emitEvent: false },
-      );
-      this.groups = [];
-      if (value) this.loadGroups();
-    });
+    this.announcementForm.get('organisation')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        this.announcementForm.patchValue(
+          { targetGroupId: null },
+          { emitEvent: false },
+        );
+        this.groups = [];
+        if (value) this.loadGroups();
+      });
   }
 
   dateRangeValidator(group: AbstractControl): ValidationErrors | null {
@@ -119,6 +122,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs || [];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -131,6 +135,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
         if (this.globalService.handleSuccessService(res, false)) {
           this.groups = res.data.groups || [];
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -217,13 +222,12 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   canSubmit(): boolean {
     return (
-      this.announcementForm.valid && !this.hasLowContrast && !this.loading
+      this.announcementForm.valid && !this.hasLowContrast && !this.saving()
     );
   }
 
   onSubmit(): void {
     if (!this.canSubmit()) return;
-    this.loading = true;
     const value = this.announcementForm.value;
     const payload: AnnouncementPayload = {
       name: value.name,
@@ -245,7 +249,8 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
           this.router.navigate([ANNOUNCEMENT.LIST]);
         }
       })
-      .finally(() => (this.loading = false));
+      .catch(() => {})
+      .finally(() => this.cdr.markForCheck());
   }
 
   onCancel(): void {
@@ -266,10 +271,5 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     if (c?.errors?.['maxlength'])
       return `Description must not exceed ${this.maxDescriptionLength} characters`;
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
