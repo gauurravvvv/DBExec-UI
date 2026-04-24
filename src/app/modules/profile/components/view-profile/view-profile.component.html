@@ -1,4 +1,4 @@
-<div class="profile-page-wrapper" *ngIf="!loading">
+<div class="profile-page-wrapper" *ngIf="!loading()">
   <div class="profile-content-container">
     <!-- Header Section -->
     <div class="page-header-section">
@@ -20,24 +20,24 @@
         <div class="avatar-section">
           <div
             class="avatar-circle"
-            [style.background-color]="avatarBackground"
+            [style.background-color]="avatarBackground()"
           >
             {{ initials }}
           </div>
           <h3 class="profile-name">{{ fullName }}</h3>
-          <p class="profile-username">&#64;{{ profileData?.username }}</p>
+          <p class="profile-username">&#64;{{ profile()?.username }}</p>
           <div class="status-wrapper">
             <span
               class="status-badge"
               [class.active]="
-                !profileData?.isLocked && profileData?.status === 1
+                !profile()?.isLocked && profile()?.status === 1
               "
-              [class.locked]="profileData?.isLocked"
+              [class.locked]="profile()?.isLocked"
             >
               {{
-                profileData?.isLocked
+                profile()?.isLocked
                   ? 'Locked'
-                  : profileData?.status === 1
+                  : profile()?.status === 1
                     ? 'Active'
                     : 'Inactive'
               }}
@@ -53,7 +53,7 @@
           <div class="meta-item">
             <span class="label">Member Since</span>
             <span class="value">{{
-              profileData?.createdOn | date: 'mediumDate'
+              profile()?.createdOn | date: 'mediumDate'
             }}</span>
           </div>
         </div>
@@ -71,12 +71,12 @@
             <h4>Personal Details</h4>
             <div class="detail-row">
               <span class="label"><i class="pi pi-user"></i> First Name</span>
-              <span class="value">{{ profileData?.firstName }}</span>
+              <span class="value">{{ profile()?.firstName }}</span>
             </div>
             <div class="detail-row">
               <span class="label"><i class="pi pi-user"></i> Last Name</span>
               <span class="value">{{
-                profileData?.lastName || 'Not provided'
+                profile()?.lastName || 'Not provided'
               }}</span>
             </div>
           </div>
@@ -86,11 +86,11 @@
             <h4>Contact Details</h4>
             <div class="detail-row">
               <span class="label"><i class="pi pi-envelope"></i> Email</span>
-              <span class="value">{{ profileData?.email }}</span>
+              <span class="value">{{ profile()?.email }}</span>
             </div>
             <div class="detail-row">
               <span class="label"><i class="pi pi-at"></i> Username</span>
-              <span class="value">{{ profileData?.username }}</span>
+              <span class="value">{{ profile()?.username }}</span>
             </div>
           </div>
 
@@ -100,18 +100,18 @@
             <div class="detail-row">
               <span class="label"><i class="pi pi-building"></i> Name</span>
               <span class="value">{{
-                profileData?.organisationName || 'N/A'
+                profile()?.organisationName || 'N/A'
               }}</span>
             </div>
             <div
               class="detail-row"
-              *ngIf="profileData?.organisation?.description"
+              *ngIf="profile()?.organisation?.description"
             >
               <span class="label"
                 ><i class="pi pi-info-circle"></i> Description</span
               >
               <span class="value">{{
-                profileData.organisation.description
+                profile()?.organisation?.description
               }}</span>
             </div>
           </div>
@@ -122,8 +122,8 @@
             <div class="detail-row">
               <span class="label"><i class="pi pi-clock"></i> Last Login</span>
               <span class="value">{{
-                profileData?.lastLogin
-                  ? (profileData.lastLogin | date: 'medium')
+                profile()?.lastLogin
+                  ? (profile()?.lastLogin | date: 'medium')
                   : 'Never'
               }}</span>
             </div>
@@ -139,7 +139,7 @@
 </div>
 
 <!-- Loading State -->
-<div class="profile-page-wrapper loading-state" *ngIf="loading">
+<div class="profile-page-wrapper loading-state" *ngIf="loading()">
   <div class="profile-content-container">
     <div class="loading-spinner">
       <i class="pi pi-spin pi-spinner"></i>
