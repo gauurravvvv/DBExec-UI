@@ -178,7 +178,7 @@ export class ListQueryBuilderComponent implements OnInit {
           }
         }
         resolve();
-      });
+      }).catch(() => resolve());
     });
   }
 
@@ -395,6 +395,7 @@ export class ListQueryBuilderComponent implements OnInit {
             this.refreshList();
           }
         })
+        .catch(() => {})
         .finally(() => this.closeDeletePopup());
       return;
     }
@@ -410,6 +411,7 @@ export class ListQueryBuilderComponent implements OnInit {
             this.refreshList();
           }
         })
+        .catch(() => {})
         .finally(() => this.closeDeletePopup());
     }
   }
