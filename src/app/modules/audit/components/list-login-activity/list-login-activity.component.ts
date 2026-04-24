@@ -26,7 +26,7 @@ export class ListLoginActivityComponent implements OnInit {
   // Expose service signals as component refs
   activities = this.auditService.activity;
   totalItems = this.auditService.activityTotal;
-  loading = this.auditService.loading;
+  loading = this.auditService.activityLoading;
 
   lastTableLazyLoadEvent: any;
 

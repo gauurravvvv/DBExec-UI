@@ -9,18 +9,20 @@ export class AuditService {
   private _activity      = signal<any[]>([]);
   private _logsTotal     = signal(0);
   private _activityTotal = signal(0);
-  private _loading       = signal(false);
+  private _logsLoading     = signal(false);
+  private _activityLoading = signal(false);
 
-  readonly logs          = this._logs.asReadonly();
-  readonly activity      = this._activity.asReadonly();
-  readonly logsTotal     = this._logsTotal.asReadonly();
-  readonly activityTotal = this._activityTotal.asReadonly();
-  readonly loading       = this._loading.asReadonly();
+  readonly logs            = this._logs.asReadonly();
+  readonly activity        = this._activity.asReadonly();
+  readonly logsTotal       = this._logsTotal.asReadonly();
+  readonly activityTotal   = this._activityTotal.asReadonly();
+  readonly logsLoading     = this._logsLoading.asReadonly();
+  readonly activityLoading = this._activityLoading.asReadonly();
 
   constructor(private http: HttpClientService) {}
 
   async loadAuditLogs(params: any) {
-    this._loading.set(true);
+    this._logsLoading.set(true);
     try {
       const res: any = await lastValueFrom(this.http.apiGet(AUDIT.LIST, { params }));
       if (res?.status) {
@@ -28,12 +30,12 @@ export class AuditService {
         this._logsTotal.set(res.data.count ?? 0);
       }
     } finally {
-      this._loading.set(false);
+      this._logsLoading.set(false);
     }
   }
 
   async loadLoginActivity(params: any) {
-    this._loading.set(true);
+    this._activityLoading.set(true);
     try {
       const res: any = await lastValueFrom(this.http.apiGet(AUDIT.LOGIN_ACTIVITY, { params }));
       if (res?.status) {
@@ -41,7 +43,7 @@ export class AuditService {
         this._activityTotal.set(res.data.count ?? 0);
       }
     } finally {
-      this._loading.set(false);
+      this._activityLoading.set(false);
     }
   }
 
