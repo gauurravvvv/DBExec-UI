@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
-  AbstractControl,
   FormBuilder,
   FormGroup,
-  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,8 +16,6 @@ import { RoleService } from 'src/app/modules/role/services/role.service';
 import { GroupService } from '../../services/group.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
-
-const MIN_USERS = 0;
 
 @Component({
   selector: 'app-add-group',
@@ -167,16 +163,6 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     this.router.navigate([GROUP.LIST]);
   }
 
-  minUsersValidator(min: number) {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const users = control.value as any[];
-      if (!users || users.length < min) {
-        return { minUsers: { min, actual: users?.length || 0 } };
-      }
-      return null;
-    };
-  }
-
   canSubmit(): boolean {
     return this.userGroupForm.valid;
   }
@@ -193,11 +179,4 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     return '';
   }
 
-  getUsersError(): string {
-    const control = this.userGroupForm.get('users');
-    if (control?.errors?.['required'] || control?.errors?.['minUsers']) {
-      return `At least ${MIN_USERS} user is required`;
-    }
-    return '';
-  }
 }

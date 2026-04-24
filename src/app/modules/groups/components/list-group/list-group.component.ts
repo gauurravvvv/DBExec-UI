@@ -292,10 +292,11 @@ export class ListGroupComponent implements OnInit {
               g => g.id !== this.groupToDelete,
             );
             this.refreshList();
+            this.closeDeletePopup();
           }
-        });
+        })
+        .catch(() => {});
     }
-    this.closeDeletePopup();
   }
 
   private closeDeletePopup() {
