@@ -8,96 +8,46 @@ import { Observable } from 'rxjs';
 export class HttpClientService {
   constructor(private http: HttpClient) {}
 
-  // API Server methods
   apiGet<T = any>(url: string, options?: any): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers),
-    };
-    return this.http.get<T>(url, requestOptions) as Observable<T>;
+    return this.http.get<T>(url, this.buildOptions(options)) as Observable<T>;
   }
 
   apiPost<T = any>(url: string, body: any, options?: any): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers),
-    };
-    return this.http.post<T>(url, body, requestOptions) as Observable<T>;
+    return this.http.post<T>(url, body, this.buildOptions(options)) as Observable<T>;
   }
 
   apiPut<T = any>(url: string, body: any, options?: any): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers),
-    };
-    return this.http.put<T>(url, body, requestOptions) as Observable<T>;
+    return this.http.put<T>(url, body, this.buildOptions(options)) as Observable<T>;
   }
 
   apiDelete<T = any>(url: string, options?: any): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers),
-    };
-    return this.http.delete<T>(url, requestOptions) as Observable<T>;
+    return this.http.delete<T>(url, this.buildOptions(options)) as Observable<T>;
   }
 
-  // Query methods — now routed to the same API server (query server merged)
+  // Query methods — same server as API (query server merged into main server)
   queryGet<T = any>(url: string, options?: any): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers),
-    };
-    return this.http.get<T>(url, requestOptions) as Observable<T>;
+    return this.http.get<T>(url, this.buildOptions(options)) as Observable<T>;
   }
 
   queryPost<T = any>(url: string, body: any, options?: any): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers),
-    };
-    return this.http.post<T>(url, body, requestOptions) as Observable<T>;
+    return this.http.post<T>(url, body, this.buildOptions(options)) as Observable<T>;
   }
 
-  queryPostNoLoader<T = any>(
-    url: string,
-    body: any,
-    options?: any,
-  ): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers, true),
-    };
-    return this.http.post<T>(url, body, requestOptions) as Observable<T>;
+  queryPostNoLoader<T = any>(url: string, body: any, options?: any): Observable<T> {
+    return this.http.post<T>(url, body, this.buildOptions(options, true)) as Observable<T>;
   }
 
   queryPut<T = any>(url: string, body: any, options?: any): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers),
-    };
-    return this.http.put<T>(url, body, requestOptions) as Observable<T>;
+    return this.http.put<T>(url, body, this.buildOptions(options)) as Observable<T>;
   }
 
   queryDelete<T = any>(url: string, options?: any): Observable<T> {
-    const requestOptions = {
-      ...options,
-      headers: this.addServerTypeHeader('api', options?.headers),
-    };
-    return this.http.delete<T>(url, requestOptions) as Observable<T>;
+    return this.http.delete<T>(url, this.buildOptions(options)) as Observable<T>;
   }
 
-  private addServerTypeHeader(
-    serverType: 'api',
-    existingHeaders?: HttpHeaders,
-    skipLoader?: boolean,
-  ): HttpHeaders {
-    let headers = existingHeaders || new HttpHeaders();
-    headers = headers.set('X-Server-Type', serverType);
-
-    if (skipLoader) {
-      headers = headers.set('X-Skip-Loader', 'true');
-    }
-
-    return headers;
+  private buildOptions(options?: any, skipLoader?: boolean): any {
+    if (!skipLoader) return options;
+    const headers = (options?.headers || new HttpHeaders()).set('X-Skip-Loader', 'true');
+    return { ...options, headers };
   }
 }

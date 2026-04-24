@@ -1,7 +1,6 @@
 import {
   HTTP_INTERCEPTORS,
   HttpClientModule,
-  HttpClient,
 } from '@angular/common/http';
 import { NgModule, isDevMode } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -22,10 +21,6 @@ import { AppPrimeNGModule } from './shared/modules/app-primeng.module';
 import { LoginComponent } from './modules/auth/components/login/login.component';
 import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
 import { HttpRequestInterceptor } from './core/interceptor/HttpRequestInterceptor';
-import {
-  API_HTTP_CLIENT,
-  QUERY_HTTP_CLIENT,
-} from './core/tokens/http-client.tokens';
 import { FooterComponent } from './shared/components/layout/footer/footer.component';
 import { HeaderComponent } from './shared/components/layout/header/header.component';
 import { HomeComponent } from './shared/components/layout/home/home.component';
@@ -72,19 +67,6 @@ import { SharedModule } from './shared/shared.module';
   ],
 
   providers: [
-    // Provide injection tokens for different HttpClients
-    {
-      provide: API_HTTP_CLIENT,
-      useFactory: (httpClient: HttpClient) => httpClient,
-      deps: [HttpClient],
-    },
-    {
-      provide: QUERY_HTTP_CLIENT,
-      useFactory: (httpClient: HttpClient) => httpClient,
-      deps: [HttpClient],
-    },
-
-    // Default interceptor - will be used for determining routing
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpRequestInterceptor,
