@@ -7,6 +7,7 @@ import {
   OnDestroy,
   ElementRef,
   ViewChild,
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -103,7 +104,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   // Save dialog
   showSaveDialog = false;
   saveForm!: FormGroup;
-  isSaving = false;
+  isSaving = signal(false);
 
   // Edit mode (for editing existing type=2 datasets)
   editDatasetId: string | null = null;
@@ -673,7 +674,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
       },
     };
 
-    this.isSaving = true;
+    this.isSaving.set(true);
 
     if (this.isEditMode && this.editDatasetId) {
       // Update existing dataset
@@ -681,7 +682,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
       this.datasetService
         .updateDatasetViaBuilder(payload)
         .then((response: any) => {
-          this.isSaving = false;
+          this.isSaving.set(false);
           if (this.globalService.handleSuccessService(response, true)) {
             this.saveForm.reset();
             this.showSaveDialog = false;
@@ -689,14 +690,14 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           }
         })
         .catch(() => {
-          this.isSaving = false;
+          this.isSaving.set(false);
         });
     } else {
       // Create new dataset
       this.datasetService
         .addDatasetViaBuilder(payload)
         .then((response: any) => {
-          this.isSaving = false;
+          this.isSaving.set(false);
           if (this.globalService.handleSuccessService(response, true)) {
             this.saveForm.reset();
             this.showSaveDialog = false;
@@ -704,7 +705,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           }
         })
         .catch(() => {
-          this.isSaving = false;
+          this.isSaving.set(false);
         });
     }
   }
