@@ -46,7 +46,7 @@ export class RoleService {
 
   async loadPermissions() {
     const res: any = await lastValueFrom(this.http.apiGet(ROLE.LIST_PERMISSIONS));
-    if (res?.status) this._permissions.set(res.data ?? []);
+    if (res?.status) this._permissions.set(res.data?.permissions ?? []);
   }
 
   async add(data: any): Promise<any> {
@@ -62,11 +62,11 @@ export class RoleService {
   }
 
   async delete(orgId: string, id: string, justification?: string): Promise<any> {
-    return lastValueFrom(this.http.apiDelete(ROLE.DELETE + `${orgId}/${id}`, { body: { justification } }));
+    return await lastValueFrom(this.http.apiDelete(ROLE.DELETE + `${orgId}/${id}`, { body: { justification } }));
   }
 
   async bulkDelete(ids: string[], justification: string | undefined, orgId: string): Promise<any> {
-    return lastValueFrom(this.http.apiDelete(ROLE.BULK_DELETE + orgId, { body: { ids, justification } }));
+    return await lastValueFrom(this.http.apiDelete(ROLE.BULK_DELETE + orgId, { body: { ids, justification } }));
   }
 
   resetCurrent() { this._current.set(null); }

@@ -30,18 +30,18 @@ export class ViewRoleComponent implements OnInit {
     this.loadRole();
   }
 
-  loadRole() {
-    this.roleService.viewRole(this.orgId, this.roleId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.roleData = response.data;
-        try {
-          this.permissions = JSON.parse(this.roleData.permissions || '[]');
-        } catch {
-          this.permissions = [];
-        }
-        this.cdr.markForCheck();
+  async loadRole() {
+    await this.roleService.loadOne(this.orgId, this.roleId);
+    const data = this.roleService.current();
+    if (data) {
+      this.roleData = data;
+      try {
+        this.permissions = JSON.parse(this.roleData.permissions || '[]');
+      } catch {
+        this.permissions = [];
       }
-    });
+      this.cdr.markForCheck();
+    }
   }
 
   trackByIndex(index: number): number {
