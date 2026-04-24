@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -17,7 +18,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-announcements.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListAnnouncementsComponent implements OnInit, OnDestroy {
+export class ListAnnouncementsComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
   limit = 10;
@@ -52,8 +53,8 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
     createdDateRange: null,
   };
 
+  private destroyRef = inject(DestroyRef);
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
 
   get isFilterActive(): boolean {
     return (
@@ -75,8 +76,8 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadAnnouncements());
 
     if (this.showOrganisationDropdown) {
@@ -86,10 +87,6 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
       this.loadGroups();
       this.loadAnnouncements();
     }
-  }
-
-  ngOnDestroy(): void {
-    if (this.filterSubscription) this.filterSubscription.unsubscribe();
   }
 
   loadOrganisations(): void {
@@ -106,7 +103,7 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
         }
       }
       this.cdr.markForCheck();
-    });
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   loadGroups(): void {
@@ -122,7 +119,7 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
           this.groups = res.data.groups || [];
         }
         this.cdr.markForCheck();
-      });
+      }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onOrgChange(orgId: any): void {

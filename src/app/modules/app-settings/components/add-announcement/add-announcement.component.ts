@@ -123,7 +123,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
         this.organisations = response.data.orgs || [];
       }
       this.cdr.markForCheck();
-    });
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   loadGroups(): void {
@@ -136,7 +136,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
           this.groups = res.data.groups || [];
         }
         this.cdr.markForCheck();
-      });
+      }).catch(() => { this.cdr.markForCheck(); });
   }
 
   // sRGB relative luminance per WCAG
