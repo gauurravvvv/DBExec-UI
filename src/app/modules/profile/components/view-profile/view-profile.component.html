@@ -127,10 +127,6 @@
                   : 'Never'
               }}</span>
             </div>
-            <div class="detail-row">
-              <span class="label"><i class="pi pi-shield"></i> Role</span>
-              <span class="value">{{ roleLabel }}</span>
-            </div>
           </div>
         </div>
       </div>
@@ -149,7 +145,7 @@
 </div>
 
 <app-change-password-dialog
-  [visible]="showChangePasswordDialog"
+  [visible]="showChangePasswordDialog()"
   (close)="onPasswordDialogClose($event)"
 >
 </app-change-password-dialog>
