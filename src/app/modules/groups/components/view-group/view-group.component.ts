@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GROUP } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -22,6 +22,7 @@ export class ViewGroupComponent implements OnInit {
     private router: Router,
     private groupService: GroupService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -30,12 +31,10 @@ export class ViewGroupComponent implements OnInit {
     this.loadGroupDetails();
   }
 
-  loadGroupDetails() {
-    this.groupService.viewGroup(this.orgId, this.groupId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.groupData = response.data;
-      }
-    });
+  async loadGroupDetails() {
+    await this.groupService.loadOne(this.orgId, this.groupId);
+    this.groupData = this.groupService.current();
+    this.cdr.markForCheck();
   }
 
   onEdit() {
@@ -64,21 +63,18 @@ export class ViewGroupComponent implements OnInit {
     return index;
   }
 
-  proceedDelete(): void {
+  async proceedDelete(): Promise<void> {
     if (this.groupData && this.deleteJustification.trim()) {
-      this.groupService
-        .deleteGroup(
-          this.orgId,
-          this.groupData.id,
-          this.deleteJustification.trim(),
-        )
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showDeleteConfirm = false;
-            this.deleteJustification = '';
-            this.router.navigate([GROUP.LIST]);
-          }
-        });
+      const response = await this.groupService.delete(
+        this.orgId,
+        this.groupData.id,
+        this.deleteJustification.trim(),
+      );
+      if (this.globalService.handleSuccessService(response)) {
+        this.showDeleteConfirm = false;
+        this.deleteJustification = '';
+        this.router.navigate([GROUP.LIST]);
+      }
     }
   }
 }
