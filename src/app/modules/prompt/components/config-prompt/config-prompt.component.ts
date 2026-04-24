@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component,
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component,
+  DestroyRef,
   ElementRef,
-  OnDestroy,
+  inject,
   OnInit,
   ViewChild, } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
   FormControl,
@@ -11,8 +13,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { first, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -32,9 +33,9 @@ import { PROMPT_TYPES } from '../../constants/prompt.constant';
   styleUrls: ['./config-prompt.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConfigPromptComponent implements OnInit, OnDestroy {
-  // Subscription cleanup
-  private destroy$ = new Subject<void>();
+export class ConfigPromptComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   promptForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
@@ -145,17 +146,12 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }
 
     this.promptForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.isCancelClicked) {
           this.isCancelClicked = false;
         }
       });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   get isFormDirty(): boolean {
@@ -182,7 +178,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
     this.promptForm
       .get('schema')
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(schema => {
         if (schema) {
           // Cascading reset: clear all dependent fields when schema changes
@@ -210,7 +206,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     // Fix #8: Also sync selectedPromptType when type changes
     this.promptForm
       .get('type')
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(type => {
         this.selectedPromptType = type;
         const promptValuesControl = this.promptForm.get('promptValues');
@@ -225,7 +221,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
     this.promptForm
       .get('tables')
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(tables => {
         // Clear where condition when tables change
         this.promptForm.get('promptWhere')?.setValue('');
@@ -285,9 +281,11 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   }
 
   loadPromptData(): void {
-    this.promptService.viewPrompt(this.orgId, this.promptId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.sectionData = response.data;
+    this.promptService.resetCurrent();
+    this.promptService.loadOne(this.orgId, this.promptId).then(() => {
+      const data = this.promptService.current();
+      if (data) {
+        this.sectionData = data;
 
         // Set basic prompt data
         this.promptForm.patchValue({
@@ -327,7 +325,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         // First load schema data
         this.loadSchemaData();
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   loadSchemaData() {
@@ -381,6 +380,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }));
 
     this.isLoadingSchema = false;
+    this.cdr.markForCheck();
 
     // After schema data is loaded, load config data
     this.loadConfigData();
@@ -422,6 +422,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           );
 
           this.isLoadingSchema = false;
+          this.cdr.markForCheck();
 
           // After schema data is loaded, load config data
           this.loadConfigData();
@@ -435,6 +436,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
             }),
           );
           this.isLoadingSchema = false;
+          this.cdr.markForCheck();
         }
       })
       .catch((error: any) => {
@@ -447,10 +449,12 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           }),
         );
         this.isLoadingSchema = false;
+        this.cdr.markForCheck();
       });
   }
 
   loadConfigData() {
+    this.promptService.resetConfig();
     this.promptService.getConfig(this.orgId, this.promptId).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         const config = response.data.configuration;
@@ -544,6 +548,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           this.promptForm.markAsPristine();
         }
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -572,11 +577,14 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         promptSql: this.generateSqlPreview(),
       };
 
-      this.promptService.configPrompt(submitData).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.router.navigate([PROMPT.LIST]);
-        }
-      });
+      this.promptService.configPrompt(submitData)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.router.navigate([PROMPT.LIST]);
+          }
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.cdr.markForCheck(); });
     }
   }
 
@@ -1430,7 +1438,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
    */
   openConfigDialog(): void {
     this.promptService
-      .getAppearence(this.orgId, this.promptId)
+      .getAppearance(this.orgId, this.promptId)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
           const appearance = response.data?.appearance;
@@ -1552,7 +1560,9 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       })
       .then((response: any) => {
         this.globalService.handleSuccessService(response, true);
-      });
+        this.cdr.markForCheck();
+      })
+      .catch(() => { this.cdr.markForCheck(); });
   }
 
   /**
@@ -1608,7 +1618,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           }
         }
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   // ===== Live SQL Preview Methods =====
@@ -1738,7 +1749,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
             });
           }
         }
+        this.cdr.markForCheck();
       })
-      .catch(() => {});
+      .catch(() => { this.cdr.markForCheck(); });
   }
 }

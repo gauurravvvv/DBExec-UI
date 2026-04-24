@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -23,10 +22,10 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddPromptComponent
-  implements OnInit, OnDestroy, HasUnsavedChanges
+  implements OnInit, HasUnsavedChanges
 {
-  // Subscription cleanup
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   sectionForm!: FormGroup;
   showPassword = false;
@@ -82,15 +81,10 @@ export class AddPromptComponent
     }
 
     this.sectionForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.checkForDuplicates();
       });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   initForm() {
@@ -331,12 +325,15 @@ export class AddPromptComponent
         prompts: this.transformPrompts(),
       };
 
-      this.promptService.addPrompt(transformedData).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.sectionForm.markAsPristine();
-          this.router.navigate([PROMPT.LIST]);
-        }
-      });
+      this.promptService.add(transformedData)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.sectionForm.markAsPristine();
+            this.router.navigate([PROMPT.LIST]);
+          }
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.cdr.markForCheck(); });
     }
   }
 

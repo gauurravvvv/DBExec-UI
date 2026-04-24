@@ -84,12 +84,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="prompts"
+          [value]="prompts()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadPrompts($event)"
-          [totalRecords]="totalRecords"
+          [totalRecords]="total()"
           [globalFilterFields]="[
             'name',
             'description',

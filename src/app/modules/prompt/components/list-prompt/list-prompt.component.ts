@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -18,15 +18,21 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-prompt.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListPromptComponent implements OnInit, OnDestroy {
+export class ListPromptComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
+
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
+
+  // Signal refs from service
+  prompts   = this.promptService.prompts;
+  total     = this.promptService.total;
+  loading   = this.promptService.loading;
+  saving    = this.promptService.saving;
 
   // Pagination limit for prompts
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
-
-  filteredPrompts: any[] = [];
 
   selectedPrompts: any[] = [];
   searchTerm: string = '';
@@ -37,7 +43,6 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   Math = Math;
   organisations: any[] = [];
   datasources: any[] = [];
-  prompts: any[] = [];
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
@@ -64,7 +69,6 @@ export class ListPromptComponent implements OnInit, OnDestroy {
 
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
 
   get selectedCount(): number {
     return this.selectedPrompts?.length || 0;
@@ -95,13 +99,15 @@ export class ListPromptComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Setup debounced filter
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadPrompts();
       });
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
       if (params['orgId'] || params['datasourceId'] || params['name']) {
         this.handleDeepLinking(params);
       } else {
@@ -150,12 +156,6 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
-    }
-  }
-
   loadOrganisations(preSelectedOrgId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
@@ -182,9 +182,6 @@ export class ListPromptComponent implements OnInit, OnDestroy {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.prompts = [];
-            this.filteredPrompts = [];
-            this.totalRecords = 0;
           }
         }
         resolve();
@@ -258,17 +255,11 @@ export class ListPromptComponent implements OnInit, OnDestroy {
               this.loadPrompts();
             } else {
               this.selectedDatasource = null;
-              this.prompts = [];
-              this.filteredPrompts = [];
-              this.totalRecords = 0;
             }
           } else {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.prompts = [];
-            this.filteredPrompts = [];
-            this.totalRecords = 0;
           }
           resolve();
         })
@@ -276,9 +267,6 @@ export class ListPromptComponent implements OnInit, OnDestroy {
           this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
-          this.prompts = [];
-          this.filteredPrompts = [];
-          this.totalRecords = 0;
           resolve();
         });
     });
@@ -351,24 +339,9 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.promptService
-      .listPrompt(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.prompts = response.data?.prompts || [];
-          this.filteredPrompts = [...this.prompts];
-          this.totalRecords = response.data?.count;
-        } else {
-          this.prompts = [];
-          this.filteredPrompts = [];
-          this.totalRecords = 0;
-        }
-      })
-      .catch(() => {
-        this.prompts = [];
-        this.filteredPrompts = [];
-        this.totalRecords = 0;
-      });
+    this.promptService.load(params)
+      .then(() => { this.cdr.markForCheck(); })
+      .catch(() => { this.cdr.markForCheck(); });
   }
 
   onAddNewPrompt() {
@@ -414,20 +387,21 @@ export class ListPromptComponent implements OnInit, OnDestroy {
         return;
       }
       this.promptService
-        .bulkDeletePrompt(ids, reason, this.selectedOrg)
+        .bulkDelete(ids, reason, this.selectedOrg)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedPrompts = [];
             this.refreshList();
           }
         })
-        .finally(() => this.closeDeletePopup());
+        .catch(() => {})
+        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
       return;
     }
 
     if (this.promptToDelete) {
       this.promptService
-        .deletePrompt(this.selectedOrg, this.promptToDelete, reason)
+        .delete(this.selectedOrg, this.promptToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedPrompts = this.selectedPrompts.filter(
@@ -436,7 +410,8 @@ export class ListPromptComponent implements OnInit, OnDestroy {
             this.refreshList();
           }
         })
-        .finally(() => this.closeDeletePopup());
+        .catch(() => {})
+        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
     }
   }
 

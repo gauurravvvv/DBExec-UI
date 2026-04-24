@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -20,7 +19,8 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditPromptComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   promptForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
@@ -56,7 +56,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       this.loadPromptData();
     }
 
-    this.promptForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.promptForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -93,9 +93,11 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadPromptData(): void {
-    this.promptService.viewPrompt(this.orgId, this.promptId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.sectionData = response.data;
+    this.promptService.resetCurrent();
+    this.promptService.loadOne(this.orgId, this.promptId).then(() => {
+      const data = this.promptService.current();
+      if (data) {
+        this.sectionData = data;
 
         this.promptForm.patchValue({
           id: this.sectionData.id,
@@ -115,7 +117,8 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
         this.promptForm.markAsPristine();
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   loadSectionData() {
@@ -158,7 +161,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   proceedSave(): void {
     if (this.saveJustification.trim()) {
       this.promptService
-        .updatePrompt(this.promptForm, this.saveJustification.trim())
+        .update(this.promptForm, this.saveJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.showSaveConfirm = false;
@@ -166,7 +169,9 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
             this.promptForm.markAsPristine();
             this.router.navigate([PROMPT.LIST]);
           }
-        });
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.cdr.markForCheck(); });
     }
   }
 
@@ -189,8 +194,4 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }

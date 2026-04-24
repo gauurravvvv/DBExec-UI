@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PROMPT } from 'src/app/constants/routes';
 import { PromptService } from '../../services/prompt.service';
@@ -11,6 +11,8 @@ import { GlobalService } from 'src/app/core/services/global.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewPromptComponent implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
   promptId: string = '';
   orgId: string = '';
   promptData: any = null;
@@ -31,11 +33,14 @@ export class ViewPromptComponent implements OnInit {
   }
 
   loadPromptData() {
-    this.promptService.viewPrompt(this.orgId, this.promptId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.promptData = response.data;
+    this.promptService.resetCurrent();
+    this.promptService.loadOne(this.orgId, this.promptId).then(() => {
+      const data = this.promptService.current();
+      if (data) {
+        this.promptData = data;
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onEdit() {
@@ -58,7 +63,7 @@ export class ViewPromptComponent implements OnInit {
   proceedDelete(): void {
     if (this.promptData && this.deleteJustification.trim()) {
       this.promptService
-        .deletePrompt(
+        .delete(
           this.orgId,
           this.promptId,
           this.deleteJustification.trim(),
@@ -69,6 +74,12 @@ export class ViewPromptComponent implements OnInit {
           if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([PROMPT.LIST]);
           }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.showDeleteConfirm = false;
+          this.deleteJustification = '';
+          this.cdr.markForCheck();
         });
     }
   }
