@@ -65,12 +65,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="roles"
+          [value]="roles()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadRoles($event)"
-          [totalRecords]="totalRecords"
+          [totalRecords]="total()"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedRoles"

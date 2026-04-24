@@ -30,6 +30,8 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   selectedOrg: any = null;
   permissionControls: { [key: string]: FormControl } = {};
 
+  saving = this.roleService.saving;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -77,11 +79,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadOrganisations() {
-    const params = {
-         page: DEFAULT_PAGE,
-         limit: MAX_LIMIT,
-       };
-
+    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
@@ -100,9 +98,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
 
   onSubmit() {
     if (this.roleForm.valid) {
-      const selectedPermissions = this.buildSelectedPermissions(
-        this.permissions,
-      );
+      const selectedPermissions = this.buildSelectedPermissions(this.permissions);
 
       if (selectedPermissions.length === 0) {
         return;
@@ -110,7 +106,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
 
       const formValues = this.roleForm.value;
       this.roleService
-        .addRole({
+        .add({
           name: formValues.name,
           description: formValues.description || undefined,
           organisation: formValues.organisation,
@@ -216,9 +212,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   private updateChildPermissions(permissions: any[], checked: boolean) {
     permissions.forEach(perm => {
       if (this.permissionControls[perm.value]) {
-        this.permissionControls[perm.value].setValue(checked, {
-          emitEvent: false,
-        });
+        this.permissionControls[perm.value].setValue(checked, { emitEvent: false });
       }
       if (perm.subPermissions) {
         this.updateChildPermissions(perm.subPermissions, checked);
@@ -227,14 +221,9 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   private updateParentPermission(permission: any) {
-    const parent = this.findPermissionById(
-      this.permissions,
-      permission.parentId,
-    );
+    const parent = this.findPermissionById(this.permissions, permission.parentId);
     if (parent && this.permissionControls[parent.value]) {
-      this.permissionControls[parent.value].setValue(true, {
-        emitEvent: false,
-      });
+      this.permissionControls[parent.value].setValue(true, { emitEvent: false });
       if (parent.parentId !== '0') {
         this.updateParentPermission(parent);
       }

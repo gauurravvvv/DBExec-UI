@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ROLE } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -21,6 +21,7 @@ export class ViewRoleComponent implements OnInit {
     private router: Router,
     private roleService: RoleService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -38,6 +39,7 @@ export class ViewRoleComponent implements OnInit {
         } catch {
           this.permissions = [];
         }
+        this.cdr.markForCheck();
       }
     });
   }
