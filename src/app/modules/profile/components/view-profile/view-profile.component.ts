@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -19,8 +19,8 @@ export class ViewProfileComponent implements OnInit {
   profile = this.profileService.profile;
   loading = this.profileService.loading;
 
-  avatarBackground = signal('');
-  showChangePasswordDialog = false;
+  avatarBackground = computed(() => this.generateAvatarColor(this.profile()?.firstName ?? ''));
+  showChangePasswordDialog = signal(false);
 
   constructor(
     private profileService: ProfileService,
@@ -31,10 +31,7 @@ export class ViewProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.profileService.loadProfile().then(() => {
-      const p = this.profile();
-      if (p) this.avatarBackground.set(this.generateAvatarColor(p.firstName));
-    });
+    this.profileService.loadProfile();
   }
 
   get initials(): string {
@@ -61,24 +58,20 @@ export class ViewProfileComponent implements OnInit {
     }
   }
 
-  get isSuperAdmin(): boolean {
-    return this.profile()?.role === 'SUPER-ADMIN';
-  }
-
   openChangePasswordDialog() {
-    this.showChangePasswordDialog = true;
+    this.showChangePasswordDialog.set(true);
   }
 
   onPasswordDialogClose(newPassword: string | null) {
     if (newPassword) {
       this.profileService.changePassword(newPassword).then((response: any) => {
         if (this.globalService.handleSuccessService(response)) {
-          this.showChangePasswordDialog = false;
+          this.showChangePasswordDialog.set(false);
           this.logoutAndRedirect();
         }
       });
     } else {
-      this.showChangePasswordDialog = false;
+      this.showChangePasswordDialog.set(false);
     }
   }
 
