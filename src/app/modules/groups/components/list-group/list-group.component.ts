@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GROUP } from 'src/app/constants/routes';
@@ -17,15 +18,18 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-group.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListGroupComponent implements OnInit, OnDestroy {
+export class ListGroupComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
+  private destroyRef = inject(DestroyRef);
+
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
 
-  groups: any[] = [];
-  filteredGroups: any[] = [];
+  // Signal refs from service
+  groups  = this.groupService.groups;
+  total   = this.groupService.total;
+  loading = this.groupService.loading;
 
   selectedGroups: any[] = [];
 
@@ -46,7 +50,6 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     { label: 'Inactive', value: 0 },
   ];
 
-  // Filter values for column filtering
   filterValues: any = {
     name: '',
     description: '',
@@ -54,9 +57,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     createdDateRange: null,
   };
 
-  // Debouncing for filter changes
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
 
   get isFilterActive(): boolean {
     return (
@@ -74,12 +75,12 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     private roleService: RoleService,
     private router: Router,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
-    // Setup debounced filter
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadGroups();
       });
@@ -90,12 +91,6 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadRoles();
       this.loadGroups();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
     }
   }
 
@@ -111,15 +106,12 @@ export class ListGroupComponent implements OnInit, OnDestroy {
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
           this.loadRoles();
-          // Trigger load after org is selected
           this.loadGroups();
         } else {
           this.selectedOrg = null;
-          this.groups = [];
-          this.filteredGroups = [];
-          this.totalRecords = 0;
         }
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -129,6 +121,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       if (this.globalService.handleSuccessService(response, false)) {
         this.roles = response.data.roles || [];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -154,7 +147,6 @@ export class ListGroupComponent implements OnInit, OnDestroy {
 
   onFilterChange() {
     this.selectedGroups = [];
-    // Trigger debounced API call
     this.filter$.next();
   }
 
@@ -166,7 +158,6 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       createdDateRange: null,
     };
     this.selectedRole = null;
-    // Immediately reload without filters
     this.loadGroups();
   }
 
@@ -177,10 +168,9 @@ export class ListGroupComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadGroups(event?: any) {
+  async loadGroups(event?: any) {
     if (!this.selectedOrg) return;
 
-    // Store the event for future reloads
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
       if (
@@ -208,7 +198,6 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       params.roleId = this.selectedRole;
     }
 
-    // Build filter object
     const filter: any = {};
     if (this.filterValues.name) {
       filter.name = this.filterValues.name;
@@ -232,29 +221,12 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       filter.createdDateTo = dateTo.toISOString();
     }
 
-    // Add JSON stringified filter if any filter is set
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
     }
 
-    this.groupService
-      .listGroups(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.groups = response.data.groups || [];
-          this.filteredGroups = [...this.groups];
-          this.totalRecords = response.data.count || this.groups.length;
-        } else {
-          this.groups = [];
-          this.filteredGroups = [];
-          this.totalRecords = 0;
-        }
-      })
-      .catch(() => {
-        this.groups = [];
-        this.filteredGroups = [];
-        this.totalRecords = 0;
-      });
+    await this.groupService.load(params);
+    this.cdr.markForCheck();
   }
 
   onAddNewCategory() {
@@ -296,7 +268,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
         return;
       }
       this.groupService
-        .bulkDeleteGroup(ids, reason, this.selectedOrg)
+        .bulkDelete(ids, reason, this.selectedOrg)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedGroups = [];
@@ -309,7 +281,7 @@ export class ListGroupComponent implements OnInit, OnDestroy {
 
     if (this.groupToDelete) {
       this.groupService
-        .deleteGroup(
+        .delete(
           this.selectedOrg,
           this.groupToDelete,
           reason,

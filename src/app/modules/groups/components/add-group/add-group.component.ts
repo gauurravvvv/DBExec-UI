@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -29,7 +28,7 @@ const MIN_USERS = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddGroupComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   userGroupForm!: FormGroup;
   organisations: any[] = [];
@@ -37,6 +36,8 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   users: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+
+  saving = this.groupService.saving;
 
   constructor(
     private fb: FormBuilder,
@@ -46,6 +47,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     private groupService: GroupService,
     private userService: UserService,
     private roleService: RoleService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -62,7 +64,6 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
-      // Non-super-admin: org pre-set, load roles and users for it
       this.loadRoles();
       this.loadUsers();
     }
@@ -90,19 +91,20 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       users: [[]],
     });
 
-    // Org change → reset role+users, reload roles and users
-    this.userGroupForm.get('organisation')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      this.userGroupForm.patchValue(
-        { roleId: '', users: [] },
-        { emitEvent: false },
-      );
-      this.roles = [];
-      this.users = [];
-      if (value) {
-        this.loadRoles();
-        this.loadUsers();
-      }
-    });
+    this.userGroupForm.get('organisation')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        this.userGroupForm.patchValue(
+          { roleId: '', users: [] },
+          { emitEvent: false },
+        );
+        this.roles = [];
+        this.users = [];
+        if (value) {
+          this.loadRoles();
+          this.loadUsers();
+        }
+      });
   }
 
   loadOrganisations() {
@@ -111,6 +113,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs || [];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -122,11 +125,11 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       .listRoles(orgId, { page: DEFAULT_PAGE, limit: MAX_LIMIT })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          // Only active roles
           this.roles = (response.data.roles || []).filter(
             (r: any) => r.status === 1,
           );
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -146,17 +149,17 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
           (u: any) => u.status === 1,
         );
       }
+      this.cdr.markForCheck();
     });
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.canSubmit()) {
-      this.groupService.addGroup(this.userGroupForm).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.userGroupForm.markAsPristine();
-          this.router.navigate([GROUP.LIST]);
-        }
-      });
+      const response = await this.groupService.add(this.userGroupForm);
+      if (this.globalService.handleSuccessService(response)) {
+        this.userGroupForm.markAsPristine();
+        this.router.navigate([GROUP.LIST]);
+      }
     }
   }
 
@@ -196,10 +199,5 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       return `At least ${MIN_USERS} user is required`;
     }
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

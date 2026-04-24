@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GROUP } from 'src/app/constants/routes';
@@ -18,7 +17,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditGroupComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   groupForm!: FormGroup;
   users: any[] = [];
@@ -33,6 +32,8 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
   originalFormValue: any;
   isDefaultGroup = false;
 
+  saving = this.groupService.saving;
+
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
   }
@@ -44,6 +45,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     private groupService: GroupService,
     private userService: UserService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -70,59 +72,58 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       description: [''],
-      // Org + role immutable once group created
       organisation: [{ value: '', disabled: true }, Validators.required],
       roleId: [{ value: '', disabled: true }, Validators.required],
       users: [[]],
       status: [1],
     });
 
-    this.groupForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.checkFormDirty());
+    this.groupForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.checkFormDirty());
   }
 
-  loadGroupData(): void {
-    this.groupService.viewGroup(this.orgId, this.categoryId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        const groupData = response.data;
+  async loadGroupData(): Promise<void> {
+    await this.groupService.loadOne(this.orgId, this.categoryId);
+    const groupData = this.groupService.current();
 
-        this.selectedOrgName = groupData.organisationName || '';
-        this.selectedRoleName = groupData.roleName || '';
+    if (!groupData) return;
 
-        // Load all active users for this org
-        this.loadUsers({
-          orgId: groupData.organisationId,
-          page: DEFAULT_PAGE,
-          limit: MAX_LIMIT,
-        });
+    this.selectedOrgName = groupData.organisationName || '';
+    this.selectedRoleName = groupData.roleName || '';
 
-        const userIds = (groupData.userGroups || []).map(
-          (mapping: any) => mapping.userId,
-        );
-
-        this.isDefaultGroup = groupData.isDefault === 1;
-
-        this.groupForm.patchValue({
-          id: groupData.id,
-          name: groupData.name,
-          description: groupData.description,
-          organisation: groupData.organisationId,
-          roleId: groupData.roleId,
-          users: userIds,
-          status: groupData.status,
-        });
-
-        // Lock name, description, status for default groups
-        if (this.isDefaultGroup) {
-          this.groupForm.get('name')?.disable();
-          this.groupForm.get('description')?.disable();
-          this.groupForm.get('status')?.disable();
-        }
-
-        this.originalFormValue = this.groupForm.getRawValue();
-        this.isFormDirty = false;
-        this.groupForm.markAsPristine();
-      }
+    this.loadUsers({
+      orgId: groupData.organisationId,
+      page: DEFAULT_PAGE,
+      limit: MAX_LIMIT,
     });
+
+    const userIds = (groupData.userGroups || []).map(
+      (mapping: any) => mapping.userId,
+    );
+
+    this.isDefaultGroup = groupData.isDefault === 1;
+
+    this.groupForm.patchValue({
+      id: groupData.id,
+      name: groupData.name,
+      description: groupData.description,
+      organisation: groupData.organisationId,
+      roleId: groupData.roleId,
+      users: userIds,
+      status: groupData.status,
+    });
+
+    if (this.isDefaultGroup) {
+      this.groupForm.get('name')?.disable();
+      this.groupForm.get('description')?.disable();
+      this.groupForm.get('status')?.disable();
+    }
+
+    this.originalFormValue = this.groupForm.getRawValue();
+    this.isFormDirty = false;
+    this.groupForm.markAsPristine();
+    this.cdr.markForCheck();
   }
 
   loadUsers(params: any): void {
@@ -132,6 +133,7 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
           (u: any) => u.status === 1,
         );
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -150,19 +152,16 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     this.saveJustification = '';
   }
 
-  proceedSave(): void {
+  async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      this.groupService
-        .editGroup(this.groupForm, this.saveJustification.trim())
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showSaveConfirm = false;
-            this.saveJustification = '';
-            this.isFormDirty = false;
-            this.groupForm.markAsPristine();
-            this.router.navigate([GROUP.LIST]);
-          }
-        });
+      const response = await this.groupService.edit(this.groupForm, this.saveJustification.trim());
+      if (this.globalService.handleSuccessService(response)) {
+        this.showSaveConfirm = false;
+        this.saveJustification = '';
+        this.isFormDirty = false;
+        this.groupForm.markAsPristine();
+        this.router.navigate([GROUP.LIST]);
+      }
     }
   }
 
@@ -193,10 +192,5 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Group name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

@@ -41,8 +41,8 @@
 
       <!-- Table -->
       <div class="table-wrapper">
-        <p-table #dt [value]="filteredGroups" [rows]="10" [paginator]="true" [lazy]="true"
-          (onLazyLoad)="loadGroups($event)" [totalRecords]="totalRecords"
+        <p-table #dt [value]="groups()" [rows]="10" [paginator]="true" [lazy]="true"
+          (onLazyLoad)="loadGroups($event)" [totalRecords]="total()"
           [globalFilterFields]="['name', 'description', 'status']" [rowHover]="true" dataKey="id"
           [(selection)]="selectedGroups" [rowSelectable]="isRowSelectable"
           currentPageReportTemplate="{first} - {last} of {totalRecords}" [showCurrentPageReport]="true"
