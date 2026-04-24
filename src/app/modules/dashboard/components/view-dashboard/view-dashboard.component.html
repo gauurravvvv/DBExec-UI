@@ -51,13 +51,13 @@
     </div>
 
     <!-- Loading State -->
-    <div class="loading-section" *ngIf="isLoading">
+    <div class="loading-section" *ngIf="loading()">
       <i class="pi pi-spin pi-spinner"></i>
       <p>Loading dashboard...</p>
     </div>
 
     <!-- Content Section -->
-    <div class="content-section" *ngIf="!isLoading && dashboard">
+    <div class="content-section" *ngIf="!loading() && dashboard">
       <!-- Filter Sidebar -->
       <div
         class="filter-sidebar"

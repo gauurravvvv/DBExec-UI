@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, AfterViewInit,
   Component,
   DestroyRef,
   ElementRef,
-  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -84,7 +83,6 @@ export class ViewDashboardComponent
   rawData: any[] = [];
   appliedFilters: any[] = [];
 
-  isLoading = true;
   isDataLoading = false;
   dataLoadStatus: 'idle' | 'loading' | 'loaded' | 'error' = 'idle';
 
@@ -150,7 +148,6 @@ export class ViewDashboardComponent
     private router: Router,
     private cdr: ChangeDetectorRef,
     private globalService: GlobalService,
-    private dashboardService: DashboardService,
     private analysesService: AnalysesService,
     private chartDataTransformer: ChartDataTransformerService,
   ) {}
@@ -178,9 +175,6 @@ export class ViewDashboardComponent
     }
     clearTimeout(this.resizeDebounceTimer);
   }
-
-  @HostListener('window:resize')
-  onWindowResize(): void {}
 
   private trySetupCanvas(): void {
     if (this.canvasContainer?.nativeElement) {
@@ -232,7 +226,6 @@ export class ViewDashboardComponent
   // ── Data Loading ──
 
   loadDashboard(): void {
-    this.isLoading = true;
     this._dashboardService
       .render(this.orgId, this.dashboardId)
       .then(() => {
@@ -243,12 +236,10 @@ export class ViewDashboardComponent
           this.mapVisualsFromResponse(data.visuals || []);
           this.executeQuery();
         } else {
-          this.isLoading = false;
           this.cdr.markForCheck();
         }
       })
       .catch(() => {
-        this.isLoading = false;
         this.cdr.markForCheck();
       });
   }
@@ -325,7 +316,6 @@ export class ViewDashboardComponent
     this.analysesService
       .runAnalysisQuery(payload)
       .then(response => {
-        this.isLoading = false;
         this.isDataLoading = false;
 
         if (this.globalService.handleSuccessService(response, false)) {
@@ -344,7 +334,6 @@ export class ViewDashboardComponent
         setTimeout(() => this.trySetupCanvas(), 0);
       })
       .catch(() => {
-        this.isLoading = false;
         this.isDataLoading = false;
         this.dataLoadStatus = 'error';
         this.visuals.forEach(v => {
@@ -377,7 +366,7 @@ export class ViewDashboardComponent
         visual.loaded = true;
       }
     });
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   // ── Filter Handlers ──
@@ -427,7 +416,7 @@ export class ViewDashboardComponent
     this.visuals.forEach(visual => {
       this.computeVisualDimensions(visual);
     });
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   private computeVisualDimensions(visual: Visual): void {
