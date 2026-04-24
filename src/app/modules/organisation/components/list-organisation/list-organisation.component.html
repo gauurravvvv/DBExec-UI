@@ -53,12 +53,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="organisations"
+          [value]="orgs()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadOrganisations($event)"
-          [totalRecords]="totalItems"
+          [totalRecords]="total()"
           [globalFilterFields]="['name', 'description', 'status']"
           [rowHover]="true"
           dataKey="id"
