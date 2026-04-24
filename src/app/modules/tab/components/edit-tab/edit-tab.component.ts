@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -17,7 +16,8 @@ import { TabService } from '../../services/tab.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditTabComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   tabForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
@@ -49,7 +49,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
       this.loadTabData();
     }
 
-    this.tabForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.tabForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -102,6 +102,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
 
         this.tabForm.markAsPristine();
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -127,6 +128,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
             this.tabForm.markAsPristine();
             this.router.navigate([TAB.LIST]);
           }
+          this.cdr.markForCheck();
         });
     }
   }
@@ -163,8 +165,4 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }

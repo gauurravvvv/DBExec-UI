@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TAB } from 'src/app/constants/routes';
 import { TabService } from '../../services/tab.service';
@@ -11,6 +11,8 @@ import { GlobalService } from 'src/app/core/services/global.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewTabComponent implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
   tabId: string = '';
   orgId: string = '';
   tabData: any = null;
@@ -35,6 +37,7 @@ export class ViewTabComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.tabData = response.data;
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -68,6 +71,7 @@ export class ViewTabComponent implements OnInit {
             this.deleteJustification = '';
             this.router.navigate([TAB.LIST]);
           }
+          this.cdr.markForCheck();
         });
     }
   }
