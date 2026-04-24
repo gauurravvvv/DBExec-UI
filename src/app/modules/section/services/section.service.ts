@@ -38,6 +38,8 @@ export class SectionService {
     try {
       const res: any = await lastValueFrom(this.http.apiGet(SECTION.VIEW + `${orgId}/${id}`));
       if (res?.status) this._current.set(res.data);
+    } catch {
+      this._current.set(null);
     } finally { this._loading.set(false); }
   }
 

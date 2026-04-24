@@ -81,7 +81,13 @@ export class ViewSectionComponent implements OnInit {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => {
+          this.cdr.markForCheck();
+        })
+        .finally(() => {
+          this.showDeleteConfirm = false;
+          this.cdr.markForCheck();
+        });
     }
   }
 }
