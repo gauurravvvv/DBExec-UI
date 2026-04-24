@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -19,7 +18,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   datasourceForm!: FormGroup;
   organisations: any[] = [];
@@ -31,12 +30,15 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   connectionTestLoading = false;
   connectionTestResult: 'success' | 'failed' | null = null;
 
+  saving = this.datasourceService.saving;
+
   constructor(
     private fb: FormBuilder,
     private datasourceService: DatasourceService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   get isFormDirty(): boolean {
@@ -58,7 +60,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
 
     // Reset connection test when connection fields change
     ['host', 'port', 'database', 'username', 'password'].forEach(field => {
-      this.datasourceForm.get(field)?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.datasourceForm.get(field)?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.connectionTested = false;
         this.connectionTestResult = null;
       });
@@ -117,12 +119,13 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       this.organisationService.listOrganisation(params).then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           this.organisations = [...response.data.orgs];
+          this.cdr.markForCheck();
         }
       });
     }
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.datasourceForm.valid && this.connectionTested) {
       const formValue = this.datasourceForm.getRawValue();
 
@@ -138,12 +141,11 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         organisation: formValue.organisation,
       };
 
-      this.datasourceService.addDatasource(payload).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.datasourceForm.markAsPristine();
-          this.router.navigate([DATASOURCE.LIST]);
-        }
-      });
+      const response = await this.datasourceService.add(payload);
+      if (this.globalService.handleSuccessService(response)) {
+        this.datasourceForm.markAsPristine();
+        this.router.navigate([DATASOURCE.LIST]);
+      }
     }
   }
 
@@ -225,11 +227,13 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
           this.connectionTested = false;
           this.connectionTestResult = 'failed';
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.connectionTestLoading = false;
         this.connectionTested = false;
         this.connectionTestResult = 'failed';
+        this.cdr.markForCheck();
       });
   }
 
@@ -268,10 +272,5 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
 
   get showOrganisationDropdown(): boolean {
     return this._showOrganisationDropdown;
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

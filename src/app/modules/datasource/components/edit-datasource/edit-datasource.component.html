@@ -25,7 +25,7 @@
           icon="pi pi-save"
           iconPos="left"
           (click)="onSubmit()"
-          [disabled]="!isFormValid()"
+          [disabled]="!isFormValid() || saving()"
         ></button>
       </div>
     </div>
@@ -298,7 +298,7 @@
       <button
         class="btn-confirm"
         (click)="proceedSave()"
-        [disabled]="!saveJustification.trim()"
+        [disabled]="!saveJustification.trim() || saving()"
       >
         <i class="pi pi-check"></i>
         Update

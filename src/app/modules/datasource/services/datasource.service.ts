@@ -1,40 +1,76 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { DATASOURCE } from 'src/app/constants/api';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class DatasourceService {
+  private _datasources = signal<any[]>([]);
+  private _total       = signal(0);
+  private _current     = signal<any>(null);
+  private _loading     = signal(false);
+  private _saving      = signal(false);
+
+  readonly datasources = this._datasources.asReadonly();
+  readonly total       = this._total.asReadonly();
+  readonly current     = this._current.asReadonly();
+  readonly loading     = this._loading.asReadonly();
+  readonly saving      = this._saving.asReadonly();
+
   constructor(private http: HttpClientService) {}
 
-  listDatasource(params: any) {
-    return lastValueFrom(this.http.apiGet(DATASOURCE.LIST, { params }));
+  async load(params: any) {
+    this._loading.set(true);
+    try {
+      const res: any = await lastValueFrom(this.http.apiGet(DATASOURCE.LIST, { params }));
+      if (res?.status) {
+        this._datasources.set(res.data.datasources ?? []);
+        this._total.set(res.data.count ?? 0);
+      }
+    } finally { this._loading.set(false); }
   }
 
-  deleteDatasource(orgId: string, id: string, justification?: string) {
-    return lastValueFrom(this.http.apiPost(DATASOURCE.DELETE + `${orgId}/${id}`, { justification }));
+  async loadOne(orgId: string, id: string) {
+    this._loading.set(true);
+    try {
+      const res: any = await lastValueFrom(this.http.apiGet(DATASOURCE.VIEW + `${orgId}/${id}`));
+      if (res?.status) this._current.set(res.data);
+    } finally { this._loading.set(false); }
   }
 
-  addDatasource(payload: any) {
-    const { name, description, type, host, port, database, username, password, organisation } = payload;
-    return lastValueFrom(this.http.apiPost(DATASOURCE.ADD, {
-      name, description, type, host, port, database, username, password, organisation,
-    }));
+  async add(payload: any): Promise<any> {
+    this._saving.set(true);
+    try {
+      const { name, description, type, host, port, database, username, password, organisation } = payload;
+      return await lastValueFrom(this.http.apiPost(DATASOURCE.ADD, {
+        name, description, type, host, port, database, username, password, organisation,
+      }));
+    } finally { this._saving.set(false); }
   }
 
-  viewDatasource(orgId: string, id: string) {
-    return lastValueFrom(this.http.apiGet(DATASOURCE.VIEW + `${orgId}/${id}`));
+  async update(payload: any, justification?: string): Promise<any> {
+    this._saving.set(true);
+    try {
+      const { id, name, description, type, host, port, database, username, password, organisation, status } = payload;
+      return await lastValueFrom(this.http.apiPut(DATASOURCE.UPDATE, {
+        id, name, description, type, host, port, database, username, password, organisation, status, justification,
+      }));
+    } finally { this._saving.set(false); }
   }
 
-  updateDatasource(payload: any, justification?: string) {
-    const { id, name, description, type, host, port, database, username, password, organisation, status } = payload;
-    return lastValueFrom(this.http.apiPut(DATASOURCE.UPDATE, {
-      id, name, description, type, host, port, database, username, password, organisation, status, justification,
-    }));
+  async delete(orgId: string, id: string, justification?: string): Promise<any> {
+    // NOTE: API uses POST for delete (intentional)
+    return await lastValueFrom(this.http.apiPost(DATASOURCE.DELETE + `${orgId}/${id}`, { justification }));
   }
 
+  async bulkDelete(ids: string[], justification: string | undefined, orgId: string): Promise<any> {
+    // NOTE: API uses POST for bulk delete (intentional)
+    return await lastValueFrom(this.http.apiPost(DATASOURCE.BULK_DELETE + `${orgId}`, { ids, justification }));
+  }
+
+  resetCurrent() { this._current.set(null); }
+
+  // These methods are used by other modules and view — keep as-is
   listDatasourceSchemas(params: any) {
     return lastValueFrom(this.http.apiGet(
       DATASOURCE.LIST_SCHEMAS + `${params.orgId}/${params.datasourceId}`,
@@ -53,15 +89,20 @@ export class DatasourceService {
     ));
   }
 
-  bulkDeleteDatasource(ids: string[], justification: string | undefined, orgId: string) {
-    return lastValueFrom(this.http.apiPost(DATASOURCE.BULK_DELETE + `${orgId}`, { ids, justification }));
-  }
-
   runQuery(params: any) {
     return lastValueFrom(this.http.apiPost(DATASOURCE.RUN_QUERY, {
       orgId: params.orgId,
       datasourceId: params.datasourceId,
       query: params.query,
     }));
+  }
+
+  // Legacy methods for external callers
+  listDatasource(params: any) {
+    return lastValueFrom(this.http.apiGet(DATASOURCE.LIST, { params }));
+  }
+
+  viewDatasource(orgId: string, id: string) {
+    return lastValueFrom(this.http.apiGet(DATASOURCE.VIEW + `${orgId}/${id}`));
   }
 }

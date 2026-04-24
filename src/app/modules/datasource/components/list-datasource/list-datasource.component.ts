@@ -1,8 +1,9 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
-import {debounceTime, takeUntil} from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { DATASOURCE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -17,16 +18,19 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDatasourceComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('dt') dt!: Table;
-  dbs: any[] = [];
-  filteredDBs: any[] = [];
+
+  // Bound directly to service signals — no local copies
+  datasources = this.datasourceService.datasources;
+  total       = this.datasourceService.total;
+  loading     = this.datasourceService.loading;
+
   listParams: any = {
     limit: 10,
     page: 1,
   };
-  totalItems = 0;
 
   private searchSubject = new Subject<void>();
   lastTableLazyLoadEvent: any;
@@ -47,21 +51,20 @@ export class ListDatasourceComponent implements OnInit {
     private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
     // Setup debounce for filter changes
-    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.lastTableLazyLoadEvent) {
         this.loadDatasources(this.lastTableLazyLoadEvent);
       }
     });
 
     if (this.showOrganisationDropdown) {
-      // Super Admin: Load organisations first, then trigger table load
       this.loadOrganisations();
     } else {
-      // Non-Super Admin: Set org from token, lazy load will trigger automatically
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
     }
   }
@@ -77,26 +80,21 @@ export class ListDatasourceComponent implements OnInit {
         this.organisations = [...response.data.orgs];
         if (this.organisations.length > 0) {
           this.selectedOrg = this.organisations[0].id;
-          // Trigger lazy load by resetting table, or call API directly if table not ready
           if (this.dt) {
             this.dt.reset();
           } else {
-            // Table not ready yet, call API directly with default params
             this.listDatasourceAPI(this.selectedOrg);
           }
         } else {
-          // No organisations found, clear everything
           this.selectedOrg = null;
-          this.dbs = [];
-          this.totalItems = 0;
         }
+        this.cdr.markForCheck();
       }
     });
   }
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
-    // Reset table which triggers onLazyLoad -> loadDatasources
     if (this.dt) {
       this.dt.reset();
     }
@@ -176,7 +174,6 @@ export class ListDatasourceComponent implements OnInit {
   }
 
   listDatasourceAPI(overrideOrgId?: any) {
-    // Handle both object with .id property and primitive ID values
     let orgId = overrideOrgId || this.selectedOrg;
     if (typeof orgId === 'object' && orgId !== null) {
       orgId = orgId.id;
@@ -213,23 +210,7 @@ export class ListDatasourceComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.datasourceService
-      .listDatasource(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.dbs = response.data.datasources || [];
-          this.totalItems = response.data.count || 0;
-        } else {
-          // If response not successful, clear the list
-          this.dbs = [];
-          this.totalItems = 0;
-        }
-      })
-      .catch(() => {
-        // If API fails, clear the list
-        this.dbs = [];
-        this.totalItems = 0;
-      });
+    this.datasourceService.load(params);
   }
 
   onAddNewDatasource() {
@@ -260,7 +241,7 @@ export class ListDatasourceComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  proceedDelete() {
+  async proceedDelete() {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
@@ -274,34 +255,34 @@ export class ListDatasourceComponent implements OnInit {
       if (typeof orgId === 'object' && orgId !== null) {
         orgId = orgId.id;
       }
-      this.datasourceService
-        .bulkDeleteDatasource(ids, reason, orgId)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedDatasources = [];
-            this.refreshList();
-          }
-        })
-        .finally(() => this.closeDeletePopup());
+      try {
+        const res: any = await this.datasourceService.bulkDelete(ids, reason, orgId);
+        if (this.globalService.handleSuccessService(res)) {
+          this.selectedDatasources = [];
+          this.refreshList();
+        }
+      } finally {
+        this.closeDeletePopup();
+      }
       return;
     }
 
     if (this.selectedDatasource) {
-      this.datasourceService
-        .deleteDatasource(
+      try {
+        const response: any = await this.datasourceService.delete(
           this.selectedDatasource.organisationId,
           this.selectedDatasource.id,
           reason,
-        )
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.selectedDatasources = this.selectedDatasources.filter(
-              (d: any) => d.id !== this.selectedDatasource.id,
-            );
-            this.refreshList();
-          }
-        })
-        .finally(() => this.closeDeletePopup());
+        );
+        if (this.globalService.handleSuccessService(response)) {
+          this.selectedDatasources = this.selectedDatasources.filter(
+            (d: any) => d.id !== this.selectedDatasource.id,
+          );
+          this.refreshList();
+        }
+      } finally {
+        this.closeDeletePopup();
+      }
     }
   }
 
@@ -316,10 +297,5 @@ export class ListDatasourceComponent implements OnInit {
     if (this.lastTableLazyLoadEvent) {
       this.loadDatasources(this.lastTableLazyLoadEvent);
     }
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

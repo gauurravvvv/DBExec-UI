@@ -65,12 +65,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="dbs"
+          [value]="datasources()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadDatasources($event)"
-          [totalRecords]="totalItems"
+          [totalRecords]="total()"
           [globalFilterFields]="[
             'name',
             'description',
