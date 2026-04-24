@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { DATASOURCE, DATASET, SUPER_ADMIN } from 'src/app/constants/api';
@@ -8,51 +8,84 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
   providedIn: 'root',
 })
 export class DatasetService {
+  private _saving = signal(false);
+  readonly saving = this._saving.asReadonly();
+
   constructor(private http: HttpClientService) {}
 
   listDatasets(params: any) {
     return lastValueFrom(this.http.apiGet(DATASET.LIST, { params }));
   }
 
-  deleteDataset(orgId: string, datasetId: string, justification?: string) {
-    return lastValueFrom(this.http.apiDelete(
-      DATASET.DELETE + `${orgId}/${datasetId}`,
-      { body: { justification } },
-    ));
+  async deleteDataset(orgId: string, datasetId: string, justification?: string) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiDelete(
+        DATASET.DELETE + `${orgId}/${datasetId}`,
+        { body: { justification } },
+      ));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  bulkDeleteDataset(ids: string[], justification: string | undefined, orgId: string) {
-    return lastValueFrom(this.http.apiDelete(
-      DATASET.BULK_DELETE + `${orgId}`,
-      { body: { ids, justification } },
-    ));
+  async bulkDeleteDataset(ids: string[], justification: string | undefined, orgId: string) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiDelete(
+        DATASET.BULK_DELETE + `${orgId}`,
+        { body: { ids, justification } },
+      ));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  addDataset(payload: any) {
+  async addDataset(payload: any) {
     const { name, description, organisation, datasource, sql } = payload;
-    return lastValueFrom(this.http.apiPost(DATASET.ADD, {
-      name, description, organisation, datasource, sql,
-    }));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(DATASET.ADD, {
+        name, description, organisation, datasource, sql,
+      }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  addDatasetViaBuilder(payload: any) {
-    return lastValueFrom(this.http.apiPost(DATASET.ADD_VIA_BUILDER, payload));
+  async addDatasetViaBuilder(payload: any) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(DATASET.ADD_VIA_BUILDER, payload));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  updateDatasetViaBuilder(payload: any) {
-    return lastValueFrom(this.http.apiPut(DATASET.UPDATE_VIA_BUILDER, payload));
+  async updateDatasetViaBuilder(payload: any) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPut(DATASET.UPDATE_VIA_BUILDER, payload));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   viewSuperAdmin(id: string) {
     return lastValueFrom(this.http.apiGet(SUPER_ADMIN.VIEW + `${id}`));
   }
 
-  updateSuperAdmin(superAdminForm: FormGroup) {
+  async updateSuperAdmin(superAdminForm: FormGroup) {
     const { id, firstName, lastName, username, email, mobile, status } = superAdminForm.value;
-    return lastValueFrom(this.http.apiPut(SUPER_ADMIN.UPDATE, {
-      id, firstName, lastName, username, email, mobile,
-      status: status ? 1 : 0,
-    }));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPut(SUPER_ADMIN.UPDATE, {
+        id, firstName, lastName, username, email, mobile,
+        status: status ? 1 : 0,
+      }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   viewDataset(orgId: string, id: string) {
@@ -63,7 +96,7 @@ export class DatasetService {
     return lastValueFrom(this.http.apiGet(DATASET.VIEW_FIELD + `${orgId}/${datasetId}/${fieldId}`));
   }
 
-  updateDatasetMapping(payload: any) {
+  async updateDatasetMapping(payload: any) {
     const {
       fieldId, datasetId, organisation, columnNameToView,
       customLogic, used_field_ids, dataType,
@@ -83,18 +116,28 @@ export class DatasetService {
       requestBody.dataType = dataType;
     }
 
-    return lastValueFrom(this.http.apiPut(DATASET.UPDATE_FIELD, requestBody));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPut(DATASET.UPDATE_FIELD, requestBody));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  updateDatasource(payload: any) {
+  async updateDatasource(payload: any) {
     const {
       id, name, description, type, host, port, datasource,
       username, password, organisation, isMasterDB, status,
     } = payload;
-    return lastValueFrom(this.http.apiPut(DATASOURCE.UPDATE, {
-      id, name, description, type, host, port, datasource,
-      username, password, organisation, isMasterDB, status,
-    }));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPut(DATASOURCE.UPDATE, {
+        id, name, description, type, host, port, datasource,
+        username, password, organisation, isMasterDB, status,
+      }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   listDatasourceSchemas(params: any) {
@@ -119,21 +162,31 @@ export class DatasetService {
     return lastValueFrom(this.http.apiGet(DATASET.VIEW + `${orgId}/${datasetId}`));
   }
 
-  updateDataset(payload: any, justification?: string) {
+  async updateDataset(payload: any, justification?: string) {
     const { id, name, description, organisation, datasource, sql } = payload;
-    return lastValueFrom(this.http.apiPut(DATASET.UPDATE, {
-      id, name, description, organisation, datasource, sql, justification,
-    }));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPut(DATASET.UPDATE, {
+        id, name, description, organisation, datasource, sql, justification,
+      }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  validateCustomField(payload: any) {
+  async validateCustomField(payload: any) {
     const { datasetId, organisation, customLogic } = payload;
-    return lastValueFrom(this.http.apiPost(DATASET.VALIDATE_FIELD, {
-      organisation, datasetId, customLogic,
-    }));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(DATASET.VALIDATE_FIELD, {
+        organisation, datasetId, customLogic,
+      }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  addCustomField(payload: any) {
+  async addCustomField(payload: any) {
     const {
       organisation, datasetId, name, customLogic, used_field_ids, dataType, analysisId,
     } = payload;
@@ -151,11 +204,21 @@ export class DatasetService {
       requestBody.analysisId = analysisId;
     }
 
-    return lastValueFrom(this.http.apiPost(DATASET.ADD_FIELD, requestBody));
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(DATASET.ADD_FIELD, requestBody));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
-  duplicateDataset(orgId: string, datasetId: string, name: string, description: string) {
-    return lastValueFrom(this.http.apiPost(DATASET.DUPLICATE + `${orgId}/${datasetId}`, { name, description }));
+  async duplicateDataset(orgId: string, datasetId: string, name: string, description: string) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiPost(DATASET.DUPLICATE + `${orgId}/${datasetId}`, { name, description }));
+    } finally {
+      this._saving.set(false);
+    }
   }
 
   runDatasetQuery(payload: any) {
@@ -171,7 +234,12 @@ export class DatasetService {
     return lastValueFrom(this.http.apiPost(DATASET.DISTINCT_VALUES + `${orgId}/${datasetId}`, { columnName }));
   }
 
-  deleteDatasetField(orgId: string, datasetId: string, fieldId: string) {
-    return lastValueFrom(this.http.apiDelete(DATASET.DELETE_FIELD + `${orgId}/${datasetId}/${fieldId}`));
+  async deleteDatasetField(orgId: string, datasetId: string, fieldId: string) {
+    this._saving.set(true);
+    try {
+      return await lastValueFrom(this.http.apiDelete(DATASET.DELETE_FIELD + `${orgId}/${datasetId}/${fieldId}`));
+    } finally {
+      this._saving.set(false);
+    }
   }
 }

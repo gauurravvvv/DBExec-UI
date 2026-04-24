@@ -1,15 +1,18 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  DestroyRef,
   OnInit,
-  OnDestroy,
   ViewChild,
   ElementRef,
+  inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { ANALYSES, DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -29,7 +32,7 @@ import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analy
   styleUrls: ['./list-dataset.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListDatasetComponent implements OnInit, OnDestroy {
+export class ListDatasetComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
   @ViewChild('qbSearchInput') qbSearchInput!: ElementRef;
 
@@ -78,11 +81,12 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
 
   // Debouncing for QB search
   private qbFilter$ = new Subject<void>();
-  private qbFilterSubscription!: Subscription;
+
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   get selectedCount(): number {
     return this.selectedDatasets?.length || 0;
@@ -128,15 +132,15 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Setup debounced filter
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadDatasets();
       });
 
     // Setup debounced QB search
-    this.qbFilterSubscription = this.qbFilter$
-      .pipe(debounceTime(400))
+    this.qbFilter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadQueryBuilders();
       });
@@ -190,15 +194,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
-    }
-    if (this.qbFilterSubscription) {
-      this.qbFilterSubscription.unsubscribe();
-    }
-  }
-
   loadOrganisations(preSelectedOrgId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
@@ -231,8 +226,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
             this.totalRecords = 0;
           }
         }
+        this.cdr.markForCheck();
         resolve();
-      });
+      }).catch(() => { resolve(); });
     });
   }
 
@@ -311,6 +307,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
             this.filteredDatasets = [];
             this.totalRecords = 0;
           }
+          this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
@@ -320,6 +317,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           this.datasets = [];
           this.filteredDatasets = [];
           this.totalRecords = 0;
+          this.cdr.markForCheck();
           resolve();
         });
     });
@@ -394,11 +392,13 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           this.filteredDatasets = [];
           this.totalRecords = 0;
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.datasets = [];
         this.filteredDatasets = [];
         this.totalRecords = 0;
+        this.cdr.markForCheck();
       });
   }
 
@@ -482,11 +482,13 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           this.qbTotalRecords = 0;
         }
         this.loadingQueryBuilders = false;
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.queryBuilders = [];
         this.qbTotalRecords = 0;
         this.loadingQueryBuilders = false;
+        this.cdr.markForCheck();
       });
   }
 
@@ -523,7 +525,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           if (this.globalService.handleSuccessService(response, true)) {
             this.router.navigate([ANALYSES.LIST]);
           }
-        });
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.cdr.markForCheck(); });
     }
     this.showCreateAnalysisDialog = false;
     this.analysisDatasetId = '';
@@ -547,7 +551,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
           if (this.globalService.handleSuccessService(response)) {
             this.loadDatasets();
           }
-        });
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.cdr.markForCheck(); });
     }
     this.showDuplicateDialog = false;
     this.datasetToDuplicate = null;
@@ -590,7 +596,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
             this.selectedDatasets = [];
             this.refreshList();
           }
+          this.cdr.markForCheck();
         })
+        .catch(() => { this.cdr.markForCheck(); })
         .finally(() => this.closeDeletePopup());
       return;
     }
@@ -609,7 +617,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
             );
             this.refreshList();
           }
+          this.cdr.markForCheck();
         })
+        .catch(() => { this.cdr.markForCheck(); })
         .finally(() => this.closeDeletePopup());
     }
   }

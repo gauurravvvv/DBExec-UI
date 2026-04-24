@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   HostListener,
@@ -48,9 +49,12 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
   readonly MIN_NAME_LENGTH = 1;
   readonly MAX_NAME_LENGTH = 128;
 
+  saving = this.datasetService.saving;
+
   constructor(
     private datasetService: DatasetService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -159,7 +163,13 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
       if (this.globalService.handleSuccessService(response, true)) {
         this.isSubmitting = false;
         this.close.emit({ field: this.editableField });
+      } else {
+        this.isSubmitting = false;
       }
+      this.cdr.markForCheck();
+    }).catch(() => {
+      this.isSubmitting = false;
+      this.cdr.markForCheck();
     });
   }
 

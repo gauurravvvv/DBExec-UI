@@ -1,12 +1,16 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   OnDestroy,
   OnInit,
   ViewChild,
+  inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
@@ -180,6 +184,9 @@ export class EditDatasetComponent
     return index;
   }
 
+  private destroyRef = inject(DestroyRef);
+  saving = this.datasetService.saving;
+
   constructor(
     private queryService: QueryService,
     private monacoIntelliSenseService: MonacoIntelliSenseService,
@@ -189,6 +196,7 @@ export class EditDatasetComponent
     private route: ActivatedRoute,
     private messageService: MessageService,
     private store: Store,
+    private cdr: ChangeDetectorRef,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -196,7 +204,7 @@ export class EditDatasetComponent
 
   ngOnInit(): void {
     // Setup debounce for result filter changes
-    this.resultFilterSubject.pipe(debounceTime(500)).subscribe(() => {
+    this.resultFilterSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (!this.lastExecutedQuery) return;
 
       // Reset to first page on filter change
@@ -219,7 +227,7 @@ export class EditDatasetComponent
     });
 
     // Fetch orgId and datasetId from route params
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.datasetId = params['id'] ? params['id'] : undefined;
       this.orgId = params['orgId']
         ? params['orgId']
@@ -1100,7 +1108,9 @@ export class EditDatasetComponent
             this.originalQuery = this.editor?.getValue() || this.currentQuery;
             this.router.navigate([DATASET.LIST]);
           }
-        });
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.cdr.markForCheck(); });
     }
   }
 
@@ -1244,6 +1254,7 @@ export class EditDatasetComponent
       .getDataset(this.orgId, this.datasetId)
       .then(response => {
         this.isLoadingDataset = false;
+        this.cdr.markForCheck();
 
         if (this.globalService.handleSuccessService(response, false)) {
           const dataset = response.data;
@@ -1307,8 +1318,9 @@ export class EditDatasetComponent
           });
         }
       })
-      .catch(error => {
+      .catch(() => {
         this.isLoadingDataset = false;
+        this.cdr.markForCheck();
       });
   }
 }
