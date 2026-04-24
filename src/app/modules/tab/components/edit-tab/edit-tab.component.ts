@@ -122,23 +122,29 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      const { id, name, description, organisation, datasource, status } = this.tabForm.getRawValue();
-      const response = await this.tabService.update({
-        id,
-        name,
-        description,
-        organisation,
-        datasource,
-        status: status ? 1 : 0,
-        justification: this.saveJustification.trim(),
-      });
-      if (this.globalService.handleSuccessService(response)) {
-        this.showSaveConfirm = false;
-        this.saveJustification = '';
-        this.tabForm.markAsPristine();
-        this.router.navigate([TAB.LIST]);
+      try {
+        const { id, name, description, organisation, datasource, status } = this.tabForm.getRawValue();
+        const response = await this.tabService.update({
+          id,
+          name,
+          description,
+          organisation,
+          datasource,
+          status: status ? 1 : 0,
+          justification: this.saveJustification.trim(),
+        });
+        if (this.globalService.handleSuccessService(response)) {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.tabForm.markAsPristine();
+          this.router.navigate([TAB.LIST]);
+        }
+      } catch {
+        // global interceptor shows toast; ensure view re-checks
+        this.cdr.markForCheck();
+      } finally {
+        this.cdr.markForCheck();
       }
-      this.cdr.markForCheck();
     }
   }
 

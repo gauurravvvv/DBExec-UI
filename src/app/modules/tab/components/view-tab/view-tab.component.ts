@@ -69,6 +69,7 @@ export class ViewTabComponent implements OnInit {
         .deleteTab(this.orgId, this.tabData.id, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
+            this.showDeleteConfirm = false;
             this.deleteJustification = '';
             this.router.navigate([TAB.LIST]);
           }
