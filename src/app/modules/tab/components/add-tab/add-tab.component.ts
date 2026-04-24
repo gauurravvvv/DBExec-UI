@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -20,7 +19,8 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddTabComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   tabForm!: FormGroup;
   showPassword = false;
@@ -66,7 +66,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     }
 
     // Subscribe to form changes to check for duplicates
-    this.tabGroups.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.tabGroups.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.checkForDuplicates();
     });
   }
@@ -167,6 +167,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -181,6 +182,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
           this.tabForm.markAsPristine();
           this.router.navigate([TAB.LIST]);
         }
+        this.cdr.markForCheck();
       });
     }
   }
@@ -227,6 +229,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasources = [...(response.data.datasources || [])];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -272,8 +275,4 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     this.addTabGroup();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }
