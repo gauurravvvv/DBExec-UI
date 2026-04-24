@@ -39,11 +39,11 @@
         <button
           class="btn-secondary"
           (click)="onRefresh()"
-          [disabled]="isDataLoading"
+          [disabled]="isDataLoading()"
         >
           <i
             class="pi"
-            [ngClass]="isDataLoading ? 'pi-spin pi-spinner' : 'pi-refresh'"
+            [ngClass]="isDataLoading() ? 'pi-spin pi-spinner' : 'pi-refresh'"
           ></i>
           Refresh
         </button>

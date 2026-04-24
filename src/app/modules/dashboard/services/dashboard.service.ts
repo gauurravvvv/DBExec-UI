@@ -112,11 +112,11 @@ export class DashboardService {
     return lastValueFrom(this.http.apiGet(DASHBOARD.RENDER + `${orgId}/${id}`));
   }
 
-  deleteDashboard(orgId: string, id: string, justification: string): Promise<any> {
-    return lastValueFrom(this.http.apiDelete(DASHBOARD.DELETE + `${orgId}/${id}`, { body: { justification } }));
+  async deleteDashboard(orgId: string, id: string, justification: string): Promise<any> {
+    return this.delete(orgId, id, justification);
   }
 
-  bulkDeleteDashboard(ids: string[], justification: string | undefined, orgId: string): Promise<any> {
-    return lastValueFrom(this.http.apiDelete(DASHBOARD.BULK_DELETE + orgId, { body: { ids, justification } }));
+  async bulkDeleteDashboard(ids: string[], justification: string | undefined, orgId: string): Promise<any> {
+    return this.bulkDelete(ids, justification, orgId);
   }
 }

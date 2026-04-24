@@ -6,6 +6,7 @@ import { ChangeDetectionStrategy, AfterViewInit,
   inject,
   OnDestroy,
   OnInit,
+  signal,
   ViewChild, } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -83,8 +84,7 @@ export class ViewDashboardComponent
   rawData: any[] = [];
   appliedFilters: any[] = [];
 
-  isDataLoading = false;
-  dataLoadStatus: 'idle' | 'loading' | 'loaded' | 'error' = 'idle';
+  isDataLoading = signal(false);
 
   // Filter sidebar
   isFilterSidebarOpen = false;
@@ -290,8 +290,7 @@ export class ViewDashboardComponent
   executeQuery(filters?: any[]): void {
     if (!this.dashboard) return;
 
-    this.isDataLoading = true;
-    this.dataLoadStatus = 'loading';
+    this.isDataLoading.set(true);
 
     this.visuals.forEach(v => {
       v.loading = true;
@@ -316,14 +315,12 @@ export class ViewDashboardComponent
     this.analysesService
       .runAnalysisQuery(payload)
       .then(response => {
-        this.isDataLoading = false;
+        this.isDataLoading.set(false);
 
         if (this.globalService.handleSuccessService(response, false)) {
           this.rawData = response.data || [];
-          this.dataLoadStatus = 'loaded';
           this.transformAllVisuals();
         } else {
-          this.dataLoadStatus = 'error';
           this.visuals.forEach(v => {
             v.loading = false;
             v.error = true;
@@ -334,8 +331,7 @@ export class ViewDashboardComponent
         setTimeout(() => this.trySetupCanvas(), 0);
       })
       .catch(() => {
-        this.isDataLoading = false;
-        this.dataLoadStatus = 'error';
+        this.isDataLoading.set(false);
         this.visuals.forEach(v => {
           v.loading = false;
           v.error = true;
