@@ -58,6 +58,7 @@ export class ConfigPromptComponent implements OnInit {
   editingChipIndex: number = -1;
   editingChipValue: string | null = null;
   @ViewChild('chipInput') chipInput!: ElementRef;
+  saving = this.promptService.saving;
   configData: any = null;
   columnNameControl = new FormControl('');
   showSuggestions = false;
@@ -260,7 +261,9 @@ export class ConfigPromptComponent implements OnInit {
 
   private setupColumnNameSync() {
     // Sync column name with where condition
-    this.columnNameControl.valueChanges.subscribe(columnName => {
+    this.columnNameControl.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(columnName => {
       if (columnName) {
         const tableAlias = this.getSelectedTableAlias();
         const value =
@@ -453,103 +456,104 @@ export class ConfigPromptComponent implements OnInit {
       });
   }
 
-  loadConfigData() {
+  async loadConfigData() {
     this.promptService.resetConfig();
-    this.promptService.getConfig(this.orgId, this.promptId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        const config = response.data.configuration;
-        if (!config) {
+    await this.promptService.loadConfig(this.orgId, this.promptId);
+    const response = this.promptService.config();
+    if (response) {
+      const config = response.configuration;
+      if (!config) {
+        this.cdr.markForCheck();
+        return;
+      }
+
+      const values = response.values || [];
+      this.configData = config;
+
+      // First set the schema
+      const schemaControl = this.promptForm.get('schema');
+      schemaControl?.patchValue({ name: config.prompt_schema });
+
+      // Parse and set tables - handles multiple tables like "departments(dep_d22),employee_projects(emp_178)"
+      const tableStrings = config.prompt_table.split(',');
+      const parsedTables: { tableName: string; alias: string }[] = [];
+
+      tableStrings.forEach((tableStr: string) => {
+        const tableMatch = tableStr.trim().match(/(.+?)\((.+?)\)/);
+        if (tableMatch) {
+          parsedTables.push({
+            tableName: tableMatch[1],
+            alias: tableMatch[2],
+          });
+        }
+      });
+
+      if (parsedTables.length > 0) {
+        // Fix #9: Use synchronous reactive approach instead of timeout
+        // Ensure schema data is loaded before proceeding
+        if (!this.staticSchemaData || this.staticSchemaData.length === 0) {
+          console.error(
+            'Schema data not loaded. Cannot populate table columns.',
+          );
           return;
         }
 
-        const values = response.data.values || [];
-        this.configData = config;
+        // Manually populate tableColumns and availableColumns before patching form
+        this.updateTableColumns(parsedTables);
+        this.updateAvailableColumns(parsedTables);
 
-        // First set the schema
-        const schemaControl = this.promptForm.get('schema');
-        schemaControl?.patchValue({ name: config.prompt_schema });
+        // Now patch all form values synchronously
+        this.promptForm.patchValue(
+          {
+            tables: parsedTables,
+            promptJoin: config.prompt_join,
+            promptWhere: config.prompt_where,
+            promptValues: values.map((v: any) => ({
+              id: v.id,
+              value: v.value,
+            })),
+          },
+          { emitEvent: false },
+        );
 
-        // Parse and set tables - handles multiple tables like "departments(dep_d22),employee_projects(emp_178)"
-        const tableStrings = config.prompt_table.split(',');
-        const parsedTables: { tableName: string; alias: string }[] = [];
-
-        tableStrings.forEach((tableStr: string) => {
-          const tableMatch = tableStr.trim().match(/(.+?)\((.+?)\)/);
-          if (tableMatch) {
-            parsedTables.push({
-              tableName: tableMatch[1],
-              alias: tableMatch[2],
-            });
-          }
-        });
-
-        if (parsedTables.length > 0) {
-          // Fix #9: Use synchronous reactive approach instead of timeout
-          // Ensure schema data is loaded before proceeding
-          if (!this.staticSchemaData || this.staticSchemaData.length === 0) {
-            console.error(
-              'Schema data not loaded. Cannot populate table columns.',
-            );
-            return;
-          }
-
-          // Manually populate tableColumns and availableColumns before patching form
-          this.updateTableColumns(parsedTables);
-          this.updateAvailableColumns(parsedTables);
-
-          // Now patch all form values synchronously
-          this.promptForm.patchValue(
-            {
-              tables: parsedTables,
-              promptJoin: config.prompt_join,
-              promptWhere: config.prompt_where,
-              promptValues: values.map((v: any) => ({
-                id: v.id,
-                value: v.value,
-              })),
-            },
-            { emitEvent: false },
+        // Set selected columns now that availableColumns is populated
+        if (config.prompt_column) {
+          const columnStrings = config.prompt_column
+            .split(',')
+            .map((c: string) => c.trim());
+          const matchedColumns = this.availableColumns.filter((col: any) =>
+            columnStrings.includes(col.fullName),
           );
 
-          // Set selected columns now that availableColumns is populated
-          if (config.prompt_column) {
-            const columnStrings = config.prompt_column
-              .split(',')
-              .map((c: string) => c.trim());
-            const matchedColumns = this.availableColumns.filter((col: any) =>
-              columnStrings.includes(col.fullName),
+          // If we found matches, use them; otherwise create column objects
+          if (matchedColumns.length > 0) {
+            this.promptForm.patchValue(
+              { columns: matchedColumns },
+              { emitEvent: false },
             );
-
-            // If we found matches, use them; otherwise create column objects
-            if (matchedColumns.length > 0) {
-              this.promptForm.patchValue(
-                { columns: matchedColumns },
-                { emitEvent: false },
-              );
-            } else {
-              // Fallback: create column objects manually
-              const columnArray = columnStrings.map((col: string) => {
-                const [alias, columnName] = col.split('.');
-                return {
-                  alias,
-                  columnName,
-                  fullName: col,
-                  displayName: `${alias}.${columnName}`,
-                };
-              });
-              this.promptForm.patchValue(
-                { columns: columnArray },
-                { emitEvent: false },
-              );
-            }
+          } else {
+            // Fallback: create column objects manually
+            const columnArray = columnStrings.map((col: string) => {
+              const [alias, columnName] = col.split('.');
+              return {
+                alias,
+                columnName,
+                fullName: col,
+                displayName: `${alias}.${columnName}`,
+              };
+            });
+            this.promptForm.patchValue(
+              { columns: columnArray },
+              { emitEvent: false },
+            );
           }
-
-          // Mark form as pristine since we just loaded saved data
-          this.promptForm.markAsPristine();
         }
+
+        // Mark form as pristine since we just loaded saved data
+        this.promptForm.markAsPristine();
       }
-      this.cdr.markForCheck();
-    });
+    }
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {

@@ -27,7 +27,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="promptForm.invalid || !isFormDirty"
+          [disabled]="promptForm.invalid || !isFormDirty || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
