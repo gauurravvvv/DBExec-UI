@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -17,14 +18,20 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListDashboardComponent implements OnInit, OnDestroy {
+export class ListDashboardComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
+
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
 
-  dashboards: any[] = [];
+  // Signal refs from service
+  dashboards   = this.dashboardService.dashboards;
+  totalRecords = this.dashboardService.total;
+  loading      = this.dashboardService.loading;
+  saving       = this.dashboardService.saving;
 
   selectedDashboards: any[] = [];
 
@@ -56,7 +63,6 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   };
 
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
 
   get selectedCount(): number {
     return this.selectedDashboards?.length || 0;
@@ -84,9 +90,10 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {}
 
+
   ngOnInit() {
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadDashboards();
       });
@@ -96,12 +103,6 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatasources();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
     }
   }
 
@@ -122,10 +123,9 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.dashboards = [];
-            this.totalRecords = 0;
           }
         }
+        this.cdr.markForCheck();
         resolve();
       });
     });
@@ -187,24 +187,20 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
               this.loadDashboards();
             } else {
               this.selectedDatasource = null;
-              this.dashboards = [];
-              this.totalRecords = 0;
             }
           } else {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.dashboards = [];
-            this.totalRecords = 0;
           }
+          this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
           this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
-          this.dashboards = [];
-          this.totalRecords = 0;
+          this.cdr.markForCheck();
           resolve();
         });
     });
@@ -271,21 +267,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.dashboardService
-      .listDashboards(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.dashboards = response.data.dashboards || [];
-          this.totalRecords = response.data.count || this.dashboards.length;
-        } else {
-          this.dashboards = [];
-          this.totalRecords = 0;
-        }
-      })
-      .catch(() => {
-        this.dashboards = [];
-        this.totalRecords = 0;
-      });
+    this.dashboardService.load(params).catch(() => {});
   }
 
   onView(id: string) {
@@ -323,20 +305,22 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
         return;
       }
       this.dashboardService
-        .bulkDeleteDashboard(ids, reason, this.selectedOrg)
+        .bulkDelete(ids, reason, this.selectedOrg)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedDashboards = [];
+            this.cdr.markForCheck();
             this.loadDashboards();
           }
         })
-        .finally(() => this.closeDeletePopup());
+        .catch(() => {})
+        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
       return;
     }
 
     if (this.dashboardToDelete) {
       this.dashboardService
-        .deleteDashboard(
+        .delete(
           this.selectedOrg,
           this.dashboardToDelete,
           reason,
@@ -346,9 +330,13 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
             this.selectedDashboards = this.selectedDashboards.filter(
               d => d.id !== this.dashboardToDelete,
             );
+            this.cdr.markForCheck();
             this.loadDashboards();
           }
-        });
+        })
+        .catch(() => {})
+        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
+      return;
     }
     this.closeDeletePopup();
   }
