@@ -48,7 +48,7 @@ export class ConfigPromptComponent implements OnInit {
   selectedDatasourceName: string = '';
   selectedTabName: string = '';
   selectedSectionName: string = '';
-  sectionData: any;
+  sectionData: any = null;
   sections: any[] = [];
   isCancelClicked = false;
   schemas: any[] = [];
@@ -604,6 +604,7 @@ export class ConfigPromptComponent implements OnInit {
 
   onCancel(): void {
     if (this.isFormDirty) {
+      if (!this.sectionData) return;
       // Fix #6: Reset schema to null instead of empty string
       this.promptForm.patchValue({
         id: this.sectionData.id,
