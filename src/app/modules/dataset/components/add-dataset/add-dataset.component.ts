@@ -282,7 +282,8 @@ export class AddDatasetComponent
           this.initializeComponent();
         }
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onDatasourceChange(event: any): void {
@@ -350,9 +351,11 @@ export class AddDatasetComponent
             this.proceedWithDatasourceChange(this.selectedDatasourceObj);
           }
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.isLoadingDatasources = false;
+        this.cdr.markForCheck();
       });
   }
 

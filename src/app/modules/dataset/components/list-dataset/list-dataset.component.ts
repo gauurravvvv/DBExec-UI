@@ -63,6 +63,7 @@ export class ListDatasetComponent implements OnInit {
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  saving = this.datasetService.saving;
 
   today = new Date();
 
@@ -145,7 +146,7 @@ export class ListDatasetComponent implements OnInit {
         this.loadQueryBuilders();
       });
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['orgId'] || params['datasourceId'] || params['name']) {
         this.handleDeepLinking(params);
       } else {
