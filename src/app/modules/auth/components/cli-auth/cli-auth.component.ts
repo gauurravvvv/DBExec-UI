@@ -1,6 +1,5 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, OnDestroy, signal} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild, signal} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { StorageType } from 'src/app/constants/storageType';
@@ -13,7 +12,7 @@ import { CLI_AUTH_PAGE_OPTIONS } from 'src/app/constants/global';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CliAuthComponent implements OnInit, AfterViewInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('codeInput') codeInputRef!: ElementRef<HTMLInputElement>;
 
@@ -84,7 +83,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
     this.codeError = '';
     this.pageState = 'authorizing';
 
-    this.loginService.cliAuthorize(trimmed, 'authorize').pipe(takeUntil(this.destroy$)).subscribe({
+    this.loginService.cliAuthorize(trimmed, 'authorize').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any) => {
         if (response.status) {
           this.pageState = 'success';
@@ -118,7 +117,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
     this.loading.set(true);
     this.codeError = '';
 
-    this.loginService.cliAuthorize(trimmed, 'deny').pipe(takeUntil(this.destroy$)).subscribe({
+    this.loginService.cliAuthorize(trimmed, 'deny').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.pageState = 'denied';
         this.message = 'CLI access has been denied. You can close this tab.';
@@ -132,8 +131,4 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }

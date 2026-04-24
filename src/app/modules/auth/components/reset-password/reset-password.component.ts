@@ -1,13 +1,13 @@
 import {ChangeDetectionStrategy,
   Component,
+  DestroyRef,
+  inject,
   OnInit,
   QueryList,
   ViewChildren,
   ElementRef,
-  OnDestroy,
   signal} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormGroup,
   UntypedFormBuilder,
@@ -28,7 +28,7 @@ import { passwordStrengthValidator } from 'src/app/shared/validators/password-st
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   resetPasswordForm: FormGroup;
   showPassword = false;
@@ -72,7 +72,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.userId = params['id'];
       this.orgId = params['orgId'];
       if (!this.userId || !this.orgId) {
@@ -212,8 +212,4 @@ export class ResetPasswordComponent implements OnInit {
     input.type = this.showPassword ? 'text' : 'password';
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }
