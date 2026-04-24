@@ -1,7 +1,9 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   Input,
   OnChanges,
@@ -9,7 +11,9 @@ import {
   OnInit,
   SimpleChanges,
   ViewChild,
+  inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { MessageService } from 'primeng/api';
@@ -198,6 +202,9 @@ export class AddDatasetComponent
     return index;
   }
 
+  private destroyRef = inject(DestroyRef);
+  saving = this.datasetService.saving;
+
   constructor(
     private queryService: QueryService,
     private datasourceService: DatasourceService,
@@ -210,6 +217,7 @@ export class AddDatasetComponent
     private router: Router,
     private messageService: MessageService,
     private store: Store,
+    private cdr: ChangeDetectorRef,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -217,7 +225,7 @@ export class AddDatasetComponent
 
   ngOnInit(): void {
     // Setup debounce for result filter changes
-    this.resultFilterSubject.pipe(debounceTime(500)).subscribe(() => {
+    this.resultFilterSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (!this.lastExecutedQuery) return;
 
       // Reset to first page on filter change
@@ -1310,7 +1318,8 @@ export class AddDatasetComponent
             this.pendingOrgChange = null;
           }
         }
-      });
+        this.cdr.markForCheck();
+      }).catch(() => { this.cdr.markForCheck(); });
     }
   }
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DATASET } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -23,11 +23,14 @@ export class ViewDatasetComponent implements OnInit {
   fieldToDelete: any = null;
   isLoadingField = false;
 
+  saving = this.datasetService.saving;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private datasetService: DatasetService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   isArray = Array.isArray;
@@ -169,7 +172,8 @@ export class ViewDatasetComponent implements OnInit {
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasetData = response.data;
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   goBack() {
@@ -225,7 +229,9 @@ export class ViewDatasetComponent implements OnInit {
             this.deleteJustification = '';
             this.router.navigate([DATASET.LIST]);
           }
-        });
+          this.cdr.markForCheck();
+        })
+        .catch(() => { this.cdr.markForCheck(); });
     }
   }
 
@@ -307,9 +313,11 @@ export class ViewDatasetComponent implements OnInit {
             this.showEditFieldsDialog = true;
           }
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.isLoadingField = false;
+        this.cdr.markForCheck();
       });
   }
 

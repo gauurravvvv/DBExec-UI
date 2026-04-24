@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   HostListener,
@@ -103,9 +104,12 @@ export class AddCustomFieldDialogComponent
     return item.name;
   }
 
+  saving = this.datasetService.saving;
+
   constructor(
     private datasetService: DatasetService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -473,9 +477,11 @@ export class AddCustomFieldDialogComponent
           if (this.globalService.handleSuccessService(response, true)) {
             this.close.emit({ field: response.data });
           }
+          this.cdr.markForCheck();
         })
         .catch(() => {
           this.isSubmitting = false;
+          this.cdr.markForCheck();
         });
     } else {
       // Add mode - call add API
@@ -500,9 +506,11 @@ export class AddCustomFieldDialogComponent
           if (this.globalService.handleSuccessService(response, true)) {
             this.close.emit({ field: response.data });
           }
+          this.cdr.markForCheck();
         })
         .catch(() => {
           this.isSubmitting = false;
+          this.cdr.markForCheck();
         });
     }
   }
@@ -584,6 +592,7 @@ export class AddCustomFieldDialogComponent
             message: response.message || 'Validation failed',
           };
         }
+        this.cdr.markForCheck();
       })
       .catch((error: any) => {
         this.isValidating = false;
@@ -593,6 +602,7 @@ export class AddCustomFieldDialogComponent
           message:
             error?.error?.message || 'Validation failed. Please try again.',
         };
+        this.cdr.markForCheck();
       });
   }
 
