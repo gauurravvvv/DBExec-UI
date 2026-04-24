@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -37,6 +38,8 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   saving = this.announcementService.saving;
   loading = this.announcementService.loading;
+
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,
