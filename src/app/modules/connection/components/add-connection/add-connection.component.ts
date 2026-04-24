@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CONNECTION } from 'src/app/constants/routes';
@@ -20,13 +19,15 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   connectionForm!: FormGroup;
   organisations: any[] = [];
   showPassword = false;
   datasources: any[] = [];
   isFormDirty: boolean = false;
+
+  saving = this.connectionService.saving;
 
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
@@ -44,6 +45,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     private globalService: GlobalService,
     private datasourceService: DatasourceService,
     private connectionService: ConnectionService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -82,7 +84,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       dbPassword: ['', Validators.required],
     });
 
-    this.connectionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.connectionForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.updateFormDirtyState();
     });
   }
@@ -97,6 +99,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -113,6 +116,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasources = [...(response.data.datasources || [])];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -123,16 +127,13 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     this.updateFormDirtyState();
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.connectionForm.valid) {
-      this.connectionService
-        .addConnection(this.connectionForm)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.isFormDirty = false;
-            this.router.navigate([CONNECTION.LIST]);
-          }
-        });
+      const response = await this.connectionService.add(this.connectionForm);
+      if (this.globalService.handleSuccessService(response)) {
+        this.isFormDirty = false;
+        this.router.navigate([CONNECTION.LIST]);
+      }
     }
   }
 
@@ -165,10 +166,5 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

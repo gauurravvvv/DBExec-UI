@@ -83,12 +83,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="filteredConnections"
+          [value]="connections()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadConnections($event)"
-          [totalRecords]="totalRecords"
+          [totalRecords]="totalRecords()"
           [globalFilterFields]="['name', 'description', 'dbUsername', 'status']"
           [rowHover]="true"
           dataKey="id"
