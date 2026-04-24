@@ -57,15 +57,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    // Build the full URL
-    const serverType = req.headers.get('X-Server-Type');
-    let serverUrl: string;
-
-    if (serverType === 'query') {
-      serverUrl = environment.queryServer || 'http://localhost:3001/api/v1';
-    } else {
-      serverUrl = environment.apiServer || 'http://localhost:3000/api/v1';
-    }
+    // Build the full URL — all requests go to the single API server
+    const serverUrl = environment.apiServer || 'http://localhost:3000/api/v1';
 
     const URL = serverUrl + req.url;
 
