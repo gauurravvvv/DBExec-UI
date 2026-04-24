@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy, signal} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -17,7 +16,7 @@ import { passwordStrengthValidator } from 'src/app/shared/validators/password-st
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SetPasswordComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   setPasswordForm: FormGroup;
   showPassword = false;
@@ -56,7 +55,7 @@ export class SetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.userId = params['id'];
       this.orgId = params['orgId'];
       this.token = params['token'];
@@ -81,7 +80,8 @@ export class SetPasswordComponent implements OnInit {
         } else {
           this.pageState = 'invalid';
         }
-      });
+      })
+      .catch(() => {});
   }
 
   resendLink() {
@@ -91,7 +91,7 @@ export class SetPasswordComponent implements OnInit {
       if (this.globalService.handleSuccessService(res)) {
         this.pageState = 'resent';
       }
-    });
+    }).catch(() => {});
   }
 
   passwordMatchValidator(g: FormGroup) {
@@ -154,8 +154,4 @@ export class SetPasswordComponent implements OnInit {
     input.type = this.showPassword ? 'text' : 'password';
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }
