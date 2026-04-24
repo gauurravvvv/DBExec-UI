@@ -185,7 +185,7 @@ export class ListPromptComponent implements OnInit {
           }
         }
         resolve();
-      });
+      }).catch(() => { resolve(); this.cdr.markForCheck(); });
     });
   }
 

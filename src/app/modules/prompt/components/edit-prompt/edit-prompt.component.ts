@@ -30,7 +30,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   selectedOrgName: string = '';
   selectedDatasourceName: string = '';
   selectedTabName: string = '';
-  sectionData: any;
+  sectionData: any = null;
   sections: any[] = [];
   isCancelClicked = false;
   showSaveConfirm = false;
@@ -131,7 +131,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
     };
     this.sectionService.listSection(param).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.sections = response.data;
+        this.sections = response.data.sections ?? response.data ?? [];
       }
     }).catch(() => { this.cdr.markForCheck(); });
   }
@@ -172,12 +172,13 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => { this.showSaveConfirm = false; this.saveJustification = ''; this.cdr.markForCheck(); });
     }
   }
 
   onCancel(): void {
     if (this.isFormDirty) {
+      if (!this.sectionData) return;
       // Restore basic form values
       this.promptForm.patchValue({
         id: this.sectionData.id,
