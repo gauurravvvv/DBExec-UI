@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ProfileService } from '../../services/profile.service';
@@ -15,11 +14,12 @@ import { AddAnalysesActions } from 'src/app/modules/analyses/store';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewProfileComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
-  profileData: any = null;
-  loading = true;
-  avatarBackground = '';
+  profile = this.profileService.profile;
+  loading = this.profileService.loading;
+
+  avatarBackground = signal('');
   showChangePasswordDialog = false;
 
   constructor(
@@ -31,53 +31,38 @@ export class ViewProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadProfile();
-  }
-
-  async loadProfile() {
-    try {
-      this.loading = true;
-      const response = await this.profileService.getProfile();
-      if (response?.status) {
-        this.profileData = response.data;
-        this.avatarBackground = this.generateAvatarColor(
-          this.profileData.firstName,
-        );
-      }
-    } catch (error) {
-      console.error('Failed to load profile', error);
-    } finally {
-      this.loading = false;
-    }
+    this.profileService.loadProfile().then(() => {
+      const p = this.profile();
+      if (p) this.avatarBackground.set(this.generateAvatarColor(p.firstName));
+    });
   }
 
   get initials(): string {
-    if (!this.profileData) return '';
-    const first = this.profileData.firstName?.[0] || '';
-    const last = this.profileData.lastName?.[0] || '';
+    const p = this.profile();
+    if (!p) return '';
+    const first = p.firstName?.[0] || '';
+    const last = p.lastName?.[0] || '';
     return (first + last).toUpperCase();
   }
 
   get fullName(): string {
-    if (!this.profileData) return '';
-    return `${this.profileData.firstName || ''} ${this.profileData.lastName || ''}`.trim();
+    const p = this.profile();
+    if (!p) return '';
+    return `${p.firstName || ''} ${p.lastName || ''}`.trim();
   }
 
   get roleLabel(): string {
-    switch (this.profileData?.role) {
-      case 'SUPER-ADMIN':
-        return 'Super Admin';
-      case 'ORG-ADMIN':
-        return 'Organisation Admin';
-      case 'ORG-USER':
-        return 'User';
-      default:
-        return this.profileData?.role || '';
+    const p = this.profile();
+    switch (p?.role) {
+      case 'SUPER-ADMIN': return 'Super Admin';
+      case 'ORG-ADMIN': return 'Organisation Admin';
+      case 'ORG-USER': return 'User';
+      default: return p?.role || '';
     }
   }
 
   get isSuperAdmin(): boolean {
-    return this.profileData?.role === 'SUPER-ADMIN';
+    return this.profile()?.role === 'SUPER-ADMIN';
   }
 
   openChangePasswordDialog() {
@@ -98,7 +83,7 @@ export class ViewProfileComponent implements OnInit {
   }
 
   private logoutAndRedirect() {
-    this.loginService.logout().pipe(takeUntil(this.destroy$)).subscribe({
+    this.loginService.logout().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.clearSessionAndNavigate(),
       error: () => this.clearSessionAndNavigate(),
     });
@@ -112,27 +97,11 @@ export class ViewProfileComponent implements OnInit {
   }
 
   private generateAvatarColor(name: string): string {
-    const colors = [
-      '#2196F3',
-      '#4CAF50',
-      '#FF9800',
-      '#9C27B0',
-      '#00BCD4',
-      '#E91E63',
-      '#3F51B5',
-      '#009688',
-      '#FF5722',
-      '#607D8B',
-    ];
+    const colors = ['#2196F3','#4CAF50','#FF9800','#9C27B0','#00BCD4','#E91E63','#3F51B5','#009688','#FF5722','#607D8B'];
     let hash = 0;
     for (let i = 0; i < (name || '').length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
     return colors[Math.abs(hash) % colors.length];
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
