@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -23,7 +22,10 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GrantAccessComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+
+  saving = this.acessService.saving;
+  loading = this.acessService.loading;
 
   accessForm!: FormGroup;
   showPassword = false;
@@ -71,11 +73,11 @@ export class GrantAccessComponent implements OnInit {
     });
 
     // Trigger validation when groups or users change
-    this.accessForm.get('groups')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.accessForm.get('groups')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.accessForm.updateValueAndValidity({ emitEvent: false });
     });
 
-    this.accessForm.get('users')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.accessForm.get('users')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.accessForm.updateValueAndValidity({ emitEvent: false });
     });
   }
@@ -149,18 +151,16 @@ export class GrantAccessComponent implements OnInit {
       });
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.accessForm.valid) {
-      this.acessService
-        .grantAccess(this.accessForm.value)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.onCancel();
-          }
-        })
-        .catch(error => {
-          console.error('Error granting access:', error);
-        });
+      try {
+        const response = await this.acessService.grantAccess(this.accessForm.value);
+        if (this.globalService.handleSuccessService(response)) {
+          this.onCancel();
+        }
+      } catch (error) {
+        console.error('Error granting access:', error);
+      }
     }
   }
 
@@ -220,75 +220,28 @@ export class GrantAccessComponent implements OnInit {
     this.accessForm.markAsUntouched();
   }
 
-  onConnectionChange() {
+  async onConnectionChange() {
     const orgId = this.accessForm.get('organisation')?.value;
     const connectionId = this.accessForm.get('connection')?.value;
-
     if (!orgId || !connectionId) return;
 
-    const params = {
-      orgId,
-      connectionId,
-    };
-
-    this.acessService
-      .listAccessDetails(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          // Set available options for dropdowns
-          this.users = [...(response.data.users || [])];
-          this.groups = [...(response.data.groups || [])];
-
-          // Extract existing access details
-          const accessDetails = [...(response.data.existingConfig || [])];
-
-          // Extract existing user IDs (where userId exists and groupId is null)
-          const existingUserIds = accessDetails
-            .filter((item: any) => item.userId && item.groupId === null)
-            .map((item: any) => item.userId);
-
-          // Extract existing group IDs (where groupId exists and userId is null)
-          const existingGroupIds = accessDetails
-            .filter((item: any) => item.groupId && item.userId === null)
-            .map((item: any) => item.groupId);
-
-          // Patch the form with existing values
-          this.accessForm.patchValue(
-            {
-              users: existingUserIds,
-              groups: existingGroupIds,
-            },
-            { emitEvent: false },
-          );
-        } else {
-          // Clear data on unsuccessful response
-          this.users = [];
-          this.groups = [];
-          this.accessForm.patchValue(
-            {
-              users: [],
-              groups: [],
-            },
-            { emitEvent: false },
-          );
-        }
-      })
-      .catch(error => {
-        // Clear all data on error
-        this.users = [];
-        this.groups = [];
-        this.accessForm.patchValue(
-          {
-            users: [],
-            groups: [],
-          },
-          { emitEvent: false },
-        );
-      });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    const response = await this.acessService.loadAccessDetails(orgId, connectionId);
+    if (this.globalService.handleSuccessService(response, false)) {
+      const data = response.data;
+      this.users = [...(data.users || [])];
+      this.groups = [...(data.groups || [])];
+      const accessDetails = [...(data.existingConfig || [])];
+      const existingUserIds = accessDetails
+        .filter((item: any) => item.userId && item.groupId === null)
+        .map((item: any) => item.userId);
+      const existingGroupIds = accessDetails
+        .filter((item: any) => item.groupId && item.userId === null)
+        .map((item: any) => item.groupId);
+      this.accessForm.patchValue({ users: existingUserIds, groups: existingGroupIds }, { emitEvent: false });
+    } else {
+      this.users = [];
+      this.groups = [];
+      this.accessForm.patchValue({ users: [], groups: [] }, { emitEvent: false });
+    }
   }
 }
