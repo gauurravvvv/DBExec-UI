@@ -1,14 +1,17 @@
 import { ChangeDetectionStrategy, AfterViewInit,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
+  inject,
   OnDestroy,
   OnInit,
   ViewChild, } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { ANALYSES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -182,6 +185,7 @@ const DATE_FORMAT_OPTIONS = [
 export class EditAnalysesComponent
   implements OnInit, AfterViewInit, OnDestroy, HasUnsavedChanges
 {
+  private destroyRef = inject(DestroyRef);
   analysisId: string = '';
   orgId: string = '';
   datasourceId: string = '';
@@ -465,7 +469,6 @@ export class EditAnalysesComponent
   private resizeDebounceTimer: any = null;
   private lastStableWidth: number = 0;
   private lastStableHeight: number = 0;
-  private subscriptions: Subscription[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -478,16 +481,19 @@ export class EditAnalysesComponent
     private chartDataTransformer: ChartDataTransformerService,
   ) {}
 
+  get saving() { return this.analysesService.saving; }
+  get running() { return this.analysesService.running; }
+
   ngOnInit(): void {
-    this.subscriptions.push(
-      this.route.params.subscribe(params => {
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
         this.orgId = params['orgId'];
         this.analysisId = params['id'];
         if (this.analysisId) {
           this.loadAnalysis();
         }
-      }),
-    );
+      });
   }
 
   ngAfterViewInit(): void {
@@ -502,8 +508,6 @@ export class EditAnalysesComponent
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.subscriptions = [];
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
@@ -818,16 +822,16 @@ export class EditAnalysesComponent
     );
 
     // Subscribe to graphData$ to populate rawGraphData and transform charts
-    this.subscriptions.push(
-      this.graphData$.subscribe(data => {
+    this.graphData$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => {
         if (data && data.length > 0) {
           this.rawGraphData = data;
           // Transform chart data for all loaded visuals
           this.transformAllVisualsChartData();
           this.cdr.detectChanges();
         }
-      }),
-    );
+      });
   }
 
   /**
@@ -2622,6 +2626,10 @@ export class EditAnalysesComponent
             this._isDirty = false;
             this.router.navigate([ANALYSES.LIST]);
           }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
         });
     }
   }
