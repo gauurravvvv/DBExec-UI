@@ -69,7 +69,7 @@ export class ViewUsersComponent implements OnInit {
     this.avatarBackground = colors[randomIndex];
   }
 
-  confirmDelete(id: string) {
+  confirmDelete() {
     this.showDeleteConfirm = true;
   }
 

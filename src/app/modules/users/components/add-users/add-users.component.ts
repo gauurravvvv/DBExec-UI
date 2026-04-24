@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
@@ -25,8 +25,6 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
 
   saving = this.userService.saving;
-
-  private destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,

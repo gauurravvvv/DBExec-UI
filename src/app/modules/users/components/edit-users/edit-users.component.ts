@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
@@ -32,8 +32,6 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
   saveJustification = '';
 
   saving = this.userService.saving;
-
-  private destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,
@@ -163,6 +161,7 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
   }
 
   onCancel() {
+    if (!this.userData) return;
     this.userForm.patchValue({
       id: this.userData.id,
       firstName: this.userData.firstName,

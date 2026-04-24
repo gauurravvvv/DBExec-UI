@@ -29,8 +29,6 @@ export class ListUsersComponent implements OnInit {
   limit = 10;
   lastTableLazyLoadEvent: any;
 
-  filteredUsers: any[] = [];
-
   selectedUsers: any[] = [];
 
   showDeleteConfirm = false;
@@ -121,7 +119,6 @@ export class ListUsersComponent implements OnInit {
           this.loadUsers();
         } else {
           this.selectedOrg = null;
-          this.filteredUsers = [];
         }
       }
       this.cdr.markForCheck();
@@ -274,10 +271,8 @@ export class ListUsersComponent implements OnInit {
     }
 
     this.userService.load(params).then(() => {
-      this.filteredUsers = [...this.userService.users()];
       this.cdr.markForCheck();
     }).catch(() => {
-      this.filteredUsers = [];
       this.cdr.markForCheck();
     });
   }
