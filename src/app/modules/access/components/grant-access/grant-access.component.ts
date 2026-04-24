@@ -195,7 +195,7 @@ export class GrantAccessComponent implements OnInit {
       this.users = [];
       // Keep organisations array intact (don't clear it)
     } else if (isOrgAdmin) {
-      // For ORG_ADMIN: Set organisation from token, keep datasources list, clear rest
+      // For ORG_ADMIN: Set organisation from token, clear datasources and connections
       this.accessForm.patchValue(
         {
           organisation: organisationId,
@@ -207,12 +207,11 @@ export class GrantAccessComponent implements OnInit {
         { emitEvent: false },
       );
 
-      // Clear only groups and users arrays
+      // Clear datasources, connections, groups, and users arrays
       this.datasources = [];
       this.connections = [];
       this.groups = [];
       this.users = [];
-      // Keep datasources array intact (don't clear it)
     }
 
     // Mark form as pristine and untouched
@@ -225,20 +224,26 @@ export class GrantAccessComponent implements OnInit {
     const connectionId = this.accessForm.get('connection')?.value;
     if (!orgId || !connectionId) return;
 
-    const response = await this.acessService.loadAccessDetails(orgId, connectionId);
-    if (this.globalService.handleSuccessService(response, false)) {
-      const data = response.data;
-      this.users = [...(data.users || [])];
-      this.groups = [...(data.groups || [])];
-      const accessDetails = [...(data.existingConfig || [])];
-      const existingUserIds = accessDetails
-        .filter((item: any) => item.userId && item.groupId === null)
-        .map((item: any) => item.userId);
-      const existingGroupIds = accessDetails
-        .filter((item: any) => item.groupId && item.userId === null)
-        .map((item: any) => item.groupId);
-      this.accessForm.patchValue({ users: existingUserIds, groups: existingGroupIds }, { emitEvent: false });
-    } else {
+    try {
+      const response = await this.acessService.loadAccessDetails(orgId, connectionId);
+      if (this.globalService.handleSuccessService(response, false)) {
+        const data = response.data;
+        this.users = [...(data.users || [])];
+        this.groups = [...(data.groups || [])];
+        const accessDetails = [...(data.existingConfig || [])];
+        const existingUserIds = accessDetails
+          .filter((item: any) => item.userId && item.groupId === null)
+          .map((item: any) => item.userId);
+        const existingGroupIds = accessDetails
+          .filter((item: any) => item.groupId && item.userId === null)
+          .map((item: any) => item.groupId);
+        this.accessForm.patchValue({ users: existingUserIds, groups: existingGroupIds }, { emitEvent: false });
+      } else {
+        this.users = [];
+        this.groups = [];
+        this.accessForm.patchValue({ users: [], groups: [] }, { emitEvent: false });
+      }
+    } catch (error) {
       this.users = [];
       this.groups = [];
       this.accessForm.patchValue({ users: [], groups: [] }, { emitEvent: false });
