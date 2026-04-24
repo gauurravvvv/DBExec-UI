@@ -134,7 +134,7 @@ export class ListAnalysesComponent implements OnInit {
             this.loadDatasources();
           }
         }
-      });
+      }).catch(() => {});
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
 
@@ -180,6 +180,9 @@ export class ListAnalysesComponent implements OnInit {
         }
         this.cdr.markForCheck();
         resolve();
+      }).catch(() => {
+        resolve();
+        this.cdr.markForCheck();
       });
     });
   }
