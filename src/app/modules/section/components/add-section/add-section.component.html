@@ -36,7 +36,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="sectionForm.invalid || hasDuplicates || hasEmptySections"
+          [disabled]="sectionForm.invalid || hasDuplicates || hasEmptySections || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>

@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -21,7 +20,10 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddSectionComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
+
+  saving = this.sectionService.saving;
 
   sectionForm!: FormGroup;
   showPassword = false;
@@ -70,7 +72,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       this.loadDatasources();
     }
 
-    this.sectionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.sectionForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.checkForDuplicates();
     });
   }
@@ -305,7 +307,8 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onSubmit() {
@@ -323,12 +326,13 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
         sections: this.transformSections(formValue.tabGroups),
       };
 
-      this.sectionService.addSection(transformedData).then(response => {
+      this.sectionService.add(transformedData).then(response => {
         if (this.globalService.handleSuccessService(response)) {
           this.sectionForm.markAsPristine();
           this.router.navigate([SECTION.LIST]);
         }
-      });
+        this.cdr.markForCheck();
+      }).catch(() => { this.cdr.markForCheck(); });
     }
   }
 
@@ -381,7 +385,8 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasources = [...(response.data.datasources || [])];
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onDatasourceChange(event: any) {
@@ -408,7 +413,8 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.tabs = [...response.data.tabs];
       }
-    });
+      this.cdr.markForCheck();
+    }).catch(() => { this.cdr.markForCheck(); });
   }
 
   onTabChange(event: any, groupIndex: number) {
@@ -421,8 +427,4 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }

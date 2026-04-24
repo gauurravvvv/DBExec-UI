@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -18,8 +18,11 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-section.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListSectionComponent implements OnInit, OnDestroy {
+export class ListSectionComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
+
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   // Pagination limit for sections
   limit = 10;
@@ -62,7 +65,6 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
 
   get selectedCount(): number {
     return this.selectedSections?.length || 0;
@@ -91,8 +93,8 @@ export class ListSectionComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Setup debounced filter
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadSections();
       });
@@ -146,12 +148,6 @@ export class ListSectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
-    }
-  }
-
   loadOrganisations(preSelectedOrgId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
@@ -183,6 +179,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
             this.totalRecords = 0;
           }
         }
+        this.cdr.markForCheck();
         resolve();
       });
     });
@@ -264,6 +261,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
             this.filteredSections = [];
             this.totalRecords = 0;
           }
+          this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
@@ -273,6 +271,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
           this.sections = [];
           this.filteredSections = [];
           this.totalRecords = 0;
+          this.cdr.markForCheck();
           resolve();
         });
     });
@@ -350,11 +349,13 @@ export class ListSectionComponent implements OnInit, OnDestroy {
           this.filteredSections = [];
           this.totalRecords = 0;
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.sections = [];
         this.filteredSections = [];
         this.totalRecords = 0;
+        this.cdr.markForCheck();
       });
   }
 
@@ -404,6 +405,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
             this.refreshList();
           }
         })
+        .catch(() => { this.cdr.markForCheck(); })
         .finally(() => this.closeDeletePopup());
       return;
     }
@@ -419,6 +421,7 @@ export class ListSectionComponent implements OnInit, OnDestroy {
             this.refreshList();
           }
         })
+        .catch(() => { this.cdr.markForCheck(); })
         .finally(() => this.closeDeletePopup());
     }
   }
