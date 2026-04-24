@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TAB, CONNECTION } from 'src/app/constants/routes';
@@ -18,7 +17,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   connectionForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
@@ -33,6 +32,8 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
   showSaveConfirm = false;
   saveJustification = '';
 
+  saving = this.connectionService.saving;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -40,6 +41,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
     private globalService: GlobalService,
     private tabService: TabService,
     private connectionService: ConnectionService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -52,7 +54,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
       this.loadConnectionData();
     }
 
-    this.connectionForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.connectionForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -88,30 +90,28 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  loadConnectionData(): void {
-    this.connectionService
-      .viewConnection(this.orgId, this.connectionId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.connectionData = response.data;
+  async loadConnectionData(): Promise<void> {
+    await this.connectionService.loadOne(this.orgId, this.connectionId);
+    const data = this.connectionService.current();
+    if (data) {
+      this.connectionData = data;
 
-          this.connectionForm.patchValue({
-            id: this.connectionData.id,
-            name: this.connectionData.name,
-            description: this.connectionData.description,
-            organisation: this.connectionData.organisationId,
-            datasource: this.connectionData.datasourceId,
-            status: this.connectionData.status,
-            dbUsername: this.connectionData.dbUsername,
-          });
-
-          this.selectedOrgName = this.connectionData.organisationName || '';
-          this.selectedDatasourceName =
-            this.connectionData.datasource?.name || '';
-
-          this.connectionForm.markAsPristine();
-        }
+      this.connectionForm.patchValue({
+        id: this.connectionData.id,
+        name: this.connectionData.name,
+        description: this.connectionData.description,
+        organisation: this.connectionData.organisationId,
+        datasource: this.connectionData.datasourceId,
+        status: this.connectionData.status,
+        dbUsername: this.connectionData.dbUsername,
       });
+
+      this.selectedOrgName = this.connectionData.organisationName || '';
+      this.selectedDatasourceName = this.connectionData.datasource?.name || '';
+
+      this.connectionForm.markAsPristine();
+    }
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
@@ -125,18 +125,16 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
     this.saveJustification = '';
   }
 
-  proceedSave(): void {
+  async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      this.connectionService
-        .updateConnection(this.connectionForm, this.saveJustification.trim())
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showSaveConfirm = false;
-            this.saveJustification = '';
-            this.connectionForm.markAsPristine();
-            this.router.navigate([CONNECTION.LIST]);
-          }
-        });
+      const response = await this.connectionService.update(this.connectionForm, this.saveJustification.trim());
+      if (this.globalService.handleSuccessService(response)) {
+        this.showSaveConfirm = false;
+        this.saveJustification = '';
+        this.connectionForm.markAsPristine();
+        this.router.navigate([CONNECTION.LIST]);
+      }
+      this.cdr.markForCheck();
     }
   }
 
@@ -176,10 +174,5 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

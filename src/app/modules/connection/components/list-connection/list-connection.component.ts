@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
-import {debounceTime, takeUntil} from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -17,18 +18,16 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-connection.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListConnectionComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+export class ListConnectionComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('dt') dt!: Table;
 
   // Pagination limit for connections
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
 
   users: any[] = [];
-  filteredConnections: any[] = [];
 
   searchTerm: string = '';
   selectedConnections: any[] = [];
@@ -39,7 +38,6 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
   Math = Math;
   organisations: any[] = [];
   datasources: any[] = [];
-  connections: any[] = [];
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
@@ -64,7 +62,11 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
 
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
+
+  // Signal refs from service
+  connections = this.connectionService.connections;
+  totalRecords = this.connectionService.total;
+  loading = this.connectionService.loading;
 
   get selectedCount(): number {
     return this.selectedConnections?.length || 0;
@@ -88,13 +90,15 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
     private connectionService: ConnectionService,
     private router: Router,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
     // Setup debounced filter
-    this.filterSubscription = this.filter$
+    this.filter$
       .pipe(debounceTime(400))
-      .pipe(takeUntil(this.destroy$)).subscribe(() => {
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         this.loadConnections();
       });
 
@@ -103,12 +107,6 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatasources();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
     }
   }
 
@@ -127,11 +125,9 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
           this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
-          this.connections = [];
-          this.filteredConnections = [];
-          this.totalRecords = 0;
         }
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -187,29 +183,22 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
             this.loadConnections();
           } else {
             this.selectedDatasource = null;
-            this.connections = [];
-            this.filteredConnections = [];
-            this.totalRecords = 0;
           }
         } else {
           this.selectedDatasource = null;
           this.datasources = [];
-          this.connections = [];
-          this.filteredConnections = [];
-          this.totalRecords = 0;
         }
+        this.cdr.markForCheck();
       },
-      error => {
+      () => {
         this.selectedDatasource = null;
         this.datasources = [];
-        this.connections = [];
-        this.filteredConnections = [];
-        this.totalRecords = 0;
+        this.cdr.markForCheck();
       },
     );
   }
 
-  loadConnections(event?: any) {
+  async loadConnections(event?: any) {
     if (!this.selectedDatasource) return;
 
     // Clear selection when page/sort changes
@@ -269,25 +258,8 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
       params.filter = JSON.stringify(filter);
     }
 
-    this.connectionService.listConnection(params).then(
-      (response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.connections = [...response.data.connections];
-          this.filteredConnections = [...this.connections];
-          this.totalRecords =
-            response.data.totalItems || this.connections.length;
-        } else {
-          this.connections = [];
-          this.filteredConnections = [];
-          this.totalRecords = 0;
-        }
-      },
-      error => {
-        this.connections = [];
-        this.filteredConnections = [];
-        this.totalRecords = 0;
-      },
-    );
+    await this.connectionService.load(params);
+    this.cdr.markForCheck();
   }
 
   onAddNewConnection() {
@@ -318,7 +290,7 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
     this.deleteJustification = '';
   }
 
-  proceedDelete() {
+  async proceedDelete() {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
@@ -328,34 +300,32 @@ export class ListConnectionComponent implements OnInit, OnDestroy {
         this.cancelDelete();
         return;
       }
-      this.connectionService
-        .bulkDeleteConnection(ids, reason, this.selectedOrg)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedConnections = [];
-            this.refreshList();
-          }
-        })
-        .finally(() => this.closeDeletePopup());
+      try {
+        const res: any = await this.connectionService.bulkDelete(ids, reason, this.selectedOrg);
+        if (this.globalService.handleSuccessService(res)) {
+          this.selectedConnections = [];
+          this.refreshList();
+        }
+      } finally {
+        this.closeDeletePopup();
+        this.cdr.markForCheck();
+      }
       return;
     }
 
     if (this.tabToDelete) {
-      this.connectionService
-        .deleteConnection(
-          this.selectedOrg,
-          this.tabToDelete,
-          reason,
-        )
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.selectedConnections = this.selectedConnections.filter(
-              (c: any) => c.id !== this.tabToDelete,
-            );
-            this.refreshList();
-          }
-        })
-        .finally(() => this.closeDeletePopup());
+      try {
+        const response: any = await this.connectionService.delete(this.selectedOrg, this.tabToDelete, reason);
+        if (this.globalService.handleSuccessService(response)) {
+          this.selectedConnections = this.selectedConnections.filter(
+            (c: any) => c.id !== this.tabToDelete,
+          );
+          this.refreshList();
+        }
+      } finally {
+        this.closeDeletePopup();
+        this.cdr.markForCheck();
+      }
     }
   }
 
