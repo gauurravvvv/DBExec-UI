@@ -27,7 +27,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="queryBuilderForm.invalid"
+          [disabled]="queryBuilderForm.invalid || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>

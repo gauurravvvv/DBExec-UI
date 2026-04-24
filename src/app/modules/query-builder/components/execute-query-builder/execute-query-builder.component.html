@@ -56,7 +56,7 @@
           class="btn-secondary"
           type="button"
           (click)="onReset()"
-          [disabled]="isSubmitting || !hasAnyValue"
+          [disabled]="executing() || !hasAnyValue"
         >
           <i class="pi pi-refresh"></i>
           Reset
@@ -65,7 +65,7 @@
           class="btn-cancel"
           type="button"
           (click)="onExecute()"
-          [disabled]="isSubmitting || !hasAnyValue"
+          [disabled]="executing() || !hasAnyValue"
         >
           <i class="pi pi-play"></i>
           Run
@@ -74,7 +74,7 @@
           class="btn-primary"
           type="button"
           (click)="onSave()"
-          [disabled]="isSubmitting || !hasAnyValue || !queryRanSuccessfully"
+          [disabled]="executing() || !hasAnyValue || !queryRanSuccessfully"
         >
           <i class="pi pi-save"></i>
           {{ isEditMode ? 'Update' : 'Save' }}
@@ -844,11 +844,11 @@
         class="btn-primary"
         type="button"
         (click)="onExecuteConfirm()"
-        [disabled]="isSubmitting"
+        [disabled]="executing()"
       >
-        <i class="pi pi-spin pi-spinner" *ngIf="isSubmitting"></i>
-        <i class="pi pi-cog" *ngIf="!isSubmitting"></i>
-        {{ isSubmitting ? 'Generating...' : 'Generate' }}
+        <i class="pi pi-spin pi-spinner" *ngIf="executing()"></i>
+        <i class="pi pi-cog" *ngIf="!executing()"></i>
+        {{ executing() ? 'Generating...' : 'Generate' }}
       </button>
     </div>
   </div>

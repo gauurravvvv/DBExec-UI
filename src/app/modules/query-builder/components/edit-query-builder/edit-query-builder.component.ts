@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -17,7 +16,8 @@ import { QueryBuilderService } from '../../services/query-builder.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  saving = inject(QueryBuilderService).saving;
 
   queryBuilderForm!: FormGroup;
   showOrganisationDropdown =
@@ -58,7 +58,7 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       this.loadQueryBuilderDetails();
     }
 
-    this.queryBuilderForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.queryBuilderForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -138,10 +138,7 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
   proceedSave(): void {
     if (this.saveJustification.trim()) {
       this.queryBuilderService
-        .updateQueryBuilder(
-          this.queryBuilderForm,
-          this.saveJustification.trim(),
-        )
+        .update(this.queryBuilderForm, this.saveJustification.trim())
         .then(res => {
           if (this.globalService.handleSuccessService(res, true, true)) {
             this.showSaveConfirm = false;
@@ -149,6 +146,10 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
             this.queryBuilderForm.markAsPristine();
             this.router.navigate([QUERY_BUILDER.LIST]);
           }
+        })
+        .catch(() => {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
         });
     }
   }
@@ -173,8 +174,4 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 }
