@@ -2,11 +2,10 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inje
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TAB, CONNECTION } from 'src/app/constants/routes';
+import { CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { ConnectionService } from '../../services/connection.service';
 import { REGEX } from 'src/app/constants/regex.constant';
 
@@ -39,7 +38,6 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private route: ActivatedRoute,
     private globalService: GlobalService,
-    private tabService: TabService,
     private connectionService: ConnectionService,
     private cdr: ChangeDetectorRef,
   ) {
