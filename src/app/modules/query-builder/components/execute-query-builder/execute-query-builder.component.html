@@ -779,11 +779,11 @@
           type="submit"
           [label]="isEditMode ? 'Update' : 'Save'"
           class="p-button-outlined"
-          [disabled]="saveForm.invalid || isSaving"
+          [disabled]="saveForm.invalid || isSaving()"
           (click)="onSaveConfirm()"
         >
-          <i class="pi pi-spin pi-spinner mr-2" *ngIf="isSaving"></i>
-          <i class="pi pi-save mr-2" *ngIf="!isSaving"></i>
+          <i class="pi pi-spin pi-spinner mr-2" *ngIf="isSaving()"></i>
+          <i class="pi pi-save mr-2" *ngIf="!isSaving()"></i>
         </button>
       </div>
     </form>

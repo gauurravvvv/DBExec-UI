@@ -170,6 +170,6 @@ export class QueryBuilderService {
   }
 
   executeQueryBuilder(payload: ExecuteQueryBuilderRequest): Promise<any> {
-    return lastValueFrom(this.http.apiPost(QUERY_BUILDER.EXECUTE, payload));
+    return this.execute(payload);
   }
 }
