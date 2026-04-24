@@ -22,6 +22,8 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
+  saving = this.tabService.saving;
+
   tabForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
@@ -177,7 +179,8 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
       return; // Prevent submission if duplicates exist
     }
     if (this.tabForm.valid) {
-      this.tabService.addTab(this.tabForm).then(response => {
+      const { organisation, datasource, tabs } = this.tabForm.value;
+      this.tabService.add({ organisation, datasource, tabs }).then(response => {
         if (this.globalService.handleSuccessService(response)) {
           this.tabForm.markAsPristine();
           this.router.navigate([TAB.LIST]);

@@ -19,6 +19,8 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
+  saving = this.tabService.saving;
+
   tabForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -83,27 +85,28 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  loadTabData(): void {
-    this.tabService.viewTab(this.orgId, this.tabId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.tabData = response.data;
+  async loadTabData(): Promise<void> {
+    this.tabService.resetCurrent();
+    await this.tabService.loadOne(this.orgId, this.tabId);
+    const data = this.tabService.current();
+    if (data) {
+      this.tabData = data;
 
-        this.tabForm.patchValue({
-          id: this.tabData.id,
-          name: this.tabData.name,
-          description: this.tabData.description,
-          organisation: this.tabData.organisationId,
-          datasource: this.tabData.datasourceId,
-          status: this.tabData.status,
-        });
+      this.tabForm.patchValue({
+        id: this.tabData.id,
+        name: this.tabData.name,
+        description: this.tabData.description,
+        organisation: this.tabData.organisationId,
+        datasource: this.tabData.datasourceId,
+        status: this.tabData.status,
+      });
 
-        this.selectedOrgName = this.tabData.organisationName || '';
-        this.selectedDatasourceName = this.tabData.datasource?.name || '';
+      this.selectedOrgName = this.tabData.organisationName || '';
+      this.selectedDatasourceName = this.tabData.datasource?.name || '';
 
-        this.tabForm.markAsPristine();
-      }
-      this.cdr.markForCheck();
-    });
+      this.tabForm.markAsPristine();
+    }
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
@@ -117,19 +120,25 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
     this.saveJustification = '';
   }
 
-  proceedSave(): void {
+  async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      this.tabService
-        .updateTab(this.tabForm, this.saveJustification.trim())
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showSaveConfirm = false;
-            this.saveJustification = '';
-            this.tabForm.markAsPristine();
-            this.router.navigate([TAB.LIST]);
-          }
-          this.cdr.markForCheck();
-        });
+      const { id, name, description, organisation, datasource, status } = this.tabForm.getRawValue();
+      const response = await this.tabService.update({
+        id,
+        name,
+        description,
+        organisation,
+        datasource,
+        status: status ? 1 : 0,
+        justification: this.saveJustification.trim(),
+      });
+      if (this.globalService.handleSuccessService(response)) {
+        this.showSaveConfirm = false;
+        this.saveJustification = '';
+        this.tabForm.markAsPristine();
+        this.router.navigate([TAB.LIST]);
+      }
+      this.cdr.markForCheck();
     }
   }
 
