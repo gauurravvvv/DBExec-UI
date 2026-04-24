@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -18,7 +18,8 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   showPassword = false;
   features = LOGIN_PAGE_OPTIONS;
-  loginError = '';
+  loading = signal(false);
+  loginError = signal('');
 
   private returnUrl: string | null = null;
 
@@ -31,15 +32,15 @@ export class LoginComponent implements OnInit {
   ) {
     this.loginForm = this.fb.group({
       organisation: [
-        'DBExec',
+        '',
         [Validators.required, Validators.pattern(REGEX.orgName)],
       ],
       username: [
-        'dbexec_vanshika',
+        '',
         [Validators.required, Validators.pattern(REGEX.username)],
       ],
       password: [
-        'Gaurav@1234',
+        '',
         [Validators.required, Validators.pattern(REGEX.password)],
       ],
     });
@@ -49,10 +50,12 @@ export class LoginComponent implements OnInit {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.loginForm.valid) {
-      this.loginError = '';
-      this.loginService.login(this.loginForm).then((res: any) => {
+      this.loginError.set('');
+      this.loading.set(true);
+      try {
+        const res: any = await this.loginService.login(this.loginForm);
         if (this.globalService.handleSuccessService(res, true, false)) {
           const role = this.globalService.getTokenDetails('role');
           const homeRoute = role === ROLES.SUPER_ADMIN
@@ -63,9 +66,13 @@ export class LoginComponent implements OnInit {
             replaceUrl: true,
           });
         } else {
-          this.loginError = res.message;
+          this.loginError.set(res.message);
         }
-      });
+      } catch (err: any) {
+        this.loginError.set(err?.message || 'Login failed. Please try again.');
+      } finally {
+        this.loading.set(false);
+      }
     }
   }
 
