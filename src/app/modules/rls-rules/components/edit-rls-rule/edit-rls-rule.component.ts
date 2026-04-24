@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormArray,
@@ -32,7 +31,11 @@ function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
+
+  // Signal refs
+  saving = this.rlsRulesService.saving;
 
   rlsForm!: FormGroup;
   isFormDirty = false;
@@ -74,6 +77,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.ruleId = this.route.snapshot.params['id'];
     this.orgId = this.route.snapshot.params['orgId'];
     if (this.ruleId) {
+      this.rlsRulesService.resetCurrent();
       this.loadRuleData();
     }
   }
@@ -97,9 +101,11 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       isEnabled: [true],
     });
 
-    this.rlsForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.checkFormDirty();
-    });
+    this.rlsForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.checkFormDirty();
+      });
   }
 
   createCondition(c?: any): FormGroup {
@@ -124,46 +130,39 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadRuleData(): void {
-    this.rlsRulesService
-      .viewRule(this.orgId, this.ruleId)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const rule = response.data;
+    this.rlsRulesService.loadOne(this.orgId, this.ruleId).then(() => {
+      const rule = this.rlsRulesService.current();
+      if (!rule) return;
 
-          // Load dataset columns first so dropdowns have options
-          this.loadDatasetColumns(rule.organisationId, rule.datasetId, () => {
-            // Rebuild conditions FormArray from saved data
-            this.conditions.clear();
-            const savedConditions = rule.conditions?.length
-              ? rule.conditions
-              : [{ columnName: '', operator: 'IN', values: [] }];
-            savedConditions.forEach((c: any) => {
-              this.conditions.push(this.createCondition(c));
-              // Load distinct values for each existing condition column
-              if (c.columnName) {
-                this.loadDistinctValuesForColumn(
-                  c.columnName,
-                  rule.organisationId,
-                  rule.datasetId,
-                );
-              }
-            });
+      this.loadDatasetColumns(rule.organisationId, rule.datasetId, () => {
+        this.conditions.clear();
+        const savedConditions = rule.conditions?.length
+          ? rule.conditions
+          : [{ columnName: '', operator: 'IN', values: [] }];
+        savedConditions.forEach((c: any) => {
+          this.conditions.push(this.createCondition(c));
+          if (c.columnName) {
+            this.loadDistinctValuesForColumn(c.columnName, rule.organisationId, rule.datasetId);
+          }
+        });
 
-            this.rlsForm.patchValue({
-              id: rule.id,
-              name: rule.name,
-              description: rule.description || '',
-              organisation: rule.organisationId,
-              datasetId: rule.datasetId,
-              isEnabled: rule.isEnabled,
-            });
+        this.rlsForm.patchValue({
+          id: rule.id,
+          name: rule.name,
+          description: rule.description || '',
+          organisation: rule.organisationId,
+          datasetId: rule.datasetId,
+          isEnabled: rule.isEnabled,
+        });
 
-            this.originalFormValue = this.rlsForm.value;
-            this.isFormDirty = false;
-            this.rlsForm.markAsPristine();
-          });
-        }
+        this.originalFormValue = this.rlsForm.value;
+        this.isFormDirty = false;
+        this.rlsForm.markAsPristine();
+        this.cdr.markForCheck();
       });
+    }).catch(() => {
+      this.cdr.markForCheck();
+    });
   }
 
   loadDatasetColumns(orgId?: string, datasetId?: string, callback?: () => void): void {
@@ -183,6 +182,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
           columnToView: f.columnToView || f.columnToUse,
         }));
       }
+      this.cdr.markForCheck();
       if (callback) callback();
     });
   }
@@ -207,6 +207,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       console.error('Failed to load distinct values for column', columnName, err);
     } finally {
       this.isLoadingColumnValues[columnName] = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -254,19 +255,26 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
         justification: this.saveJustification.trim(),
       };
 
-      this.rlsRulesService.updateRule(payload).then((response: any) => {
-        if (this.globalService.handleSuccessService(response)) {
+      this.rlsRulesService.update(payload)
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.showSaveConfirm = false;
+            this.saveJustification = '';
+            this.isFormDirty = false;
+            this.rlsForm.markAsPristine();
+            this.router.navigate([RLS_RULE.LIST]);
+          }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
           this.showSaveConfirm = false;
-          this.saveJustification = '';
-          this.isFormDirty = false;
-          this.rlsForm.markAsPristine();
-          this.router.navigate([RLS_RULE.LIST]);
-        }
-      });
+          this.cdr.markForCheck();
+        });
     }
   }
 
   onCancel(): void {
+    if (!this.rlsForm) return;
     if (this.isFormDirty) {
       this.rlsForm.patchValue(this.originalFormValue);
       this.isFormDirty = false;
@@ -290,10 +298,5 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

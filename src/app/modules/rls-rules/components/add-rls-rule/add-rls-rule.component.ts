@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormArray,
@@ -36,7 +35,11 @@ function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
+
+  // Signal ref
+  saving = this.rlsRulesService.saving;
 
   rlsForm!: FormGroup;
 
@@ -120,33 +123,34 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Org changes → reload datasources, clear downstream
-    this.rlsForm.get('organisation')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      if (value) {
-        this.selectedDatasource = '';
-        this.datasources = [];
-        this.datasets = [];
+    this.rlsForm.get('organisation')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        if (value) {
+          this.selectedDatasource = '';
+          this.datasources = [];
+          this.datasets = [];
+          this.datasetColumns = [];
+          this.columnValuesCache = {};
+          this.isLoadingColumnValues = {};
+          this.resetConditions();
+          this.rlsForm.patchValue({ datasetId: '' }, { emitEvent: false });
+          this.loadDatasources();
+        }
+      });
+
+    // Dataset changes → load columns, reset conditions
+    this.rlsForm.get('datasetId')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
         this.datasetColumns = [];
         this.columnValuesCache = {};
         this.isLoadingColumnValues = {};
         this.resetConditions();
-        this.rlsForm.patchValue(
-          { datasetId: '' },
-          { emitEvent: false },
-        );
-        this.loadDatasources();
-      }
-    });
-
-    // Dataset changes → load columns, reset conditions
-    this.rlsForm.get('datasetId')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(value => {
-      this.datasetColumns = [];
-      this.columnValuesCache = {};
-      this.isLoadingColumnValues = {};
-      this.resetConditions();
-      if (value) {
-        this.loadDatasetColumns();
-      }
-    });
+        if (value) {
+          this.loadDatasetColumns();
+        }
+      });
   }
 
   createCondition(): FormGroup {
@@ -179,6 +183,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs || [];
+        this.cdr.markForCheck();
       }
     });
   }
@@ -193,13 +198,11 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         this.datasources = response.data.datasources || [];
         this.selectedDatasource = '';
         this.datasets = [];
-        this.rlsForm.patchValue(
-          { datasetId: '' },
-          { emitEvent: false },
-        );
+        this.rlsForm.patchValue({ datasetId: '' }, { emitEvent: false });
       } else {
         this.datasources = [];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -210,10 +213,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.columnValuesCache = {};
     this.isLoadingColumnValues = {};
     this.resetConditions();
-    this.rlsForm.patchValue(
-      { datasetId: '' },
-      { emitEvent: false },
-    );
+    this.rlsForm.patchValue({ datasetId: '' }, { emitEvent: false });
     if (datasourceId) {
       this.loadDatasets();
     }
@@ -236,6 +236,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       } else {
         this.datasets = [];
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -250,14 +251,13 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
           ...f,
           columnToView: f.columnToView || f.columnToUse,
         }));
+        this.cdr.markForCheck();
       }
     });
   }
 
   async loadDistinctValuesForColumn(columnName: string): Promise<void> {
     if (!columnName) return;
-
-    // Return from cache if available
     if (this.columnValuesCache[columnName]) return;
 
     const orgId = this.rlsForm.get('organisation')?.value;
@@ -278,6 +278,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       console.error('Failed to load distinct values for column', columnName, err);
     } finally {
       this.isLoadingColumnValues[columnName] = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -306,12 +307,17 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         })),
       };
 
-      this.rlsRulesService.addRule(payload).then((response: any) => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.rlsForm.markAsPristine();
-          this.router.navigate([RLS_RULE.LIST]);
-        }
-      });
+      this.rlsRulesService.add(payload)
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.rlsForm.markAsPristine();
+            this.router.navigate([RLS_RULE.LIST]);
+          }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
   }
 
@@ -333,10 +339,5 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

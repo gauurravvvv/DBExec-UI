@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
@@ -16,14 +16,18 @@ export class ManageRlsAssignmentsComponent implements OnInit {
   @Input() orgId: string = '';
   @Output() closed = new EventEmitter<void>();
 
-  assignments: any[] = [];
+  private cdr = inject(ChangeDetectorRef);
+
+  // Signal refs
+  assignments  = this.rlsRulesService.assignments;
+  saving       = this.rlsRulesService.saving;
+
   scopeTargets: { label: string; value: string }[] = [];
 
   newScope: string = '';
   newScopeId: string = '';
 
   isLoadingAssignments = false;
-  isAddingAssignment = false;
   scopeTargetsLoading = false;
 
   scopeOptions = [
@@ -39,24 +43,24 @@ export class ManageRlsAssignmentsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (!this.rule?.id) return;
+    this.rlsRulesService.resetAssignments();
     this.loadAssignments();
   }
 
   loadAssignments(): void {
+    if (!this.rule?.id) return;
     this.isLoadingAssignments = true;
+    this.cdr.markForCheck();
     this.rlsRulesService
-      .listAssignments(this.orgId, this.rule.id)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.assignments = response.data.assignments || [];
-        } else {
-          this.assignments = [];
-        }
+      .loadAssignments(this.orgId, this.rule.id)
+      .then(() => {
         this.isLoadingAssignments = false;
+        this.cdr.markForCheck();
       })
       .catch(() => {
-        this.assignments = [];
         this.isLoadingAssignments = false;
+        this.cdr.markForCheck();
       });
   }
 
@@ -80,6 +84,7 @@ export class ManageRlsAssignmentsComponent implements OnInit {
           }));
         }
         this.scopeTargetsLoading = false;
+        this.cdr.markForCheck();
       });
     } else if (scope === 'group') {
       this.groupService.listGroups(params).then((response: any) => {
@@ -90,14 +95,14 @@ export class ManageRlsAssignmentsComponent implements OnInit {
           }));
         }
         this.scopeTargetsLoading = false;
+        this.cdr.markForCheck();
       });
     }
   }
 
   addAssignment(): void {
-    if (!this.newScope || !this.newScopeId || this.isAddingAssignment) return;
+    if (!this.newScope || !this.newScopeId || this.saving()) return;
 
-    this.isAddingAssignment = true;
     const payload = {
       ruleId: this.rule.id,
       organisation: this.orgId,
@@ -105,15 +110,19 @@ export class ManageRlsAssignmentsComponent implements OnInit {
       scopeId: this.newScopeId,
     };
 
-    this.rlsRulesService.addAssignment(payload).then((response: any) => {
-      if (this.globalService.handleSuccessService(response)) {
-        this.newScope = '';
-        this.newScopeId = '';
-        this.scopeTargets = [];
-        this.loadAssignments();
-      }
-      this.isAddingAssignment = false;
-    });
+    this.rlsRulesService.addAssignment(payload)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.newScope = '';
+          this.newScopeId = '';
+          this.scopeTargets = [];
+          this.loadAssignments();
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   removeAssignment(assignment: any): void {
@@ -123,6 +132,10 @@ export class ManageRlsAssignmentsComponent implements OnInit {
         if (this.globalService.handleSuccessService(response)) {
           this.loadAssignments();
         }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
       });
   }
 

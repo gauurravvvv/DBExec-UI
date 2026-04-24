@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RLS_RULE } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -11,9 +11,15 @@ import { RlsRulesService } from '../../services/rls-rules.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewRlsRuleComponent implements OnInit {
+  private cdr = inject(ChangeDetectorRef);
+
+  // Signal refs
+  current  = this.rlsRulesService.current;
+  loading  = this.rlsRulesService.loading;
+  saving   = this.rlsRulesService.saving;
+
   ruleId: string = '';
   orgId: string = '';
-  ruleData: any = null;
   showDeleteConfirm = false;
   deleteJustification = '';
 
@@ -27,16 +33,17 @@ export class ViewRlsRuleComponent implements OnInit {
   ngOnInit() {
     this.ruleId = this.route.snapshot.params['id'];
     this.orgId = this.route.snapshot.params['orgId'];
+    this.rlsRulesService.resetCurrent();
     this.loadRuleDetails();
   }
 
   loadRuleDetails() {
-    this.rlsRulesService
-      .viewRule(this.orgId, this.ruleId)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.ruleData = response.data;
-        }
+    this.rlsRulesService.loadOne(this.orgId, this.ruleId)
+      .then(() => {
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
       });
   }
 
@@ -57,6 +64,7 @@ export class ViewRlsRuleComponent implements OnInit {
   }
 
   confirmDelete(): void {
+    if (!this.current()) return;
     this.showDeleteConfirm = true;
   }
 
@@ -66,20 +74,22 @@ export class ViewRlsRuleComponent implements OnInit {
   }
 
   proceedDelete(): void {
-    if (this.ruleData && this.deleteJustification.trim()) {
-      this.rlsRulesService
-        .deleteRule(
-          this.orgId,
-          this.ruleData.id,
-          this.deleteJustification.trim(),
-        )
-        .then((response: any) => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showDeleteConfirm = false;
-            this.deleteJustification = '';
-            this.router.navigate([RLS_RULE.LIST]);
-          }
-        });
-    }
+    const ruleData = this.current();
+    if (!ruleData || !this.deleteJustification.trim()) return;
+
+    this.rlsRulesService
+      .delete(this.orgId, ruleData.id, this.deleteJustification.trim())
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.showDeleteConfirm = false;
+          this.deleteJustification = '';
+          this.router.navigate([RLS_RULE.LIST]);
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.showDeleteConfirm = false;
+        this.cdr.markForCheck();
+      });
   }
 }
