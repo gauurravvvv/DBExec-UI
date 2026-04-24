@@ -117,6 +117,9 @@ export class EditDatasetComponent
   private hoverProviderDisposable: any = null;
   private signatureHelpDisposable: any = null;
 
+  // Stable bound reference for context menu listener
+  private boundCloseContextMenu = this.closeContextMenu.bind(this);
+
   // Organisation Management
   selectedOrg: any = {};
   selectedOrgName: string = '';
@@ -245,7 +248,7 @@ export class EditDatasetComponent
     this.setupThemeObserver();
 
     // Close context menus on click outside
-    document.addEventListener('click', this.closeContextMenu.bind(this));
+    document.addEventListener('click', this.boundCloseContextMenu);
   }
 
   refreshSingleDatasource(dbId: string): void {
@@ -369,7 +372,7 @@ export class EditDatasetComponent
     }
 
     // Remove context menu listener
-    document.removeEventListener('click', this.closeContextMenu.bind(this));
+    document.removeEventListener('click', this.boundCloseContextMenu);
   }
 
   private loadMonacoEditor(): void {
@@ -1254,7 +1257,6 @@ export class EditDatasetComponent
       .getDataset(this.orgId, this.datasetId)
       .then(response => {
         this.isLoadingDataset = false;
-        this.cdr.markForCheck();
 
         if (this.globalService.handleSuccessService(response, false)) {
           const dataset = response.data;
@@ -1317,6 +1319,7 @@ export class EditDatasetComponent
             this.initializeComponent();
           });
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.isLoadingDataset = false;
