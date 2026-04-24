@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component,
   DestroyRef,
   ElementRef,
   inject,
+  OnDestroy,
   OnInit,
   ViewChild, } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -33,7 +34,7 @@ import { PROMPT_TYPES } from '../../constants/prompt.constant';
   styleUrls: ['./config-prompt.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConfigPromptComponent implements OnInit {
+export class ConfigPromptComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -1757,5 +1758,10 @@ export class ConfigPromptComponent implements OnInit {
         this.cdr.markForCheck();
       })
       .catch(() => { this.cdr.markForCheck(); });
+  }
+
+  ngOnDestroy(): void {
+    if (this.hideDelay) clearTimeout(this.hideDelay);
+    if (this.hideJoinDelay) clearTimeout(this.hideJoinDelay);
   }
 }
