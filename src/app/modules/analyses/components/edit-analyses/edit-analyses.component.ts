@@ -733,9 +733,11 @@ export class EditAnalysesComponent
             this.checkCachedDataAndLoad();
           }
         }
+        this.cdr.markForCheck();
       })
       .catch(error => {
         console.error('Error loading analysis:', error);
+        this.cdr.markForCheck();
       });
   }
 
@@ -750,9 +752,11 @@ export class EditAnalysesComponent
           this.datasetDetails = response.data;
           this.rebuildAllFields();
         }
+        this.cdr.markForCheck();
       })
       .catch(error => {
         console.error('Error loading dataset info:', error);
+        this.cdr.markForCheck();
       });
   }
 
@@ -767,9 +771,11 @@ export class EditAnalysesComponent
           this.analysisFields = response.data?.analysisFields || [];
           this.rebuildAllFields();
         }
+        this.cdr.markForCheck();
       })
       .catch(error => {
         console.error('Error loading analysis fields:', error);
+        this.cdr.markForCheck();
       });
   }
 
@@ -1142,6 +1148,10 @@ export class EditAnalysesComponent
             this.datasetDetails = response.data;
             this.rebuildAllFields();
           }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
         });
       // Re-run dataset query so the new field's computed values are available
       this.loadDatasetData();
