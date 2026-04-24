@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { MessageService } from 'primeng/api';
@@ -33,7 +32,7 @@ interface AdminData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewSuperAdminComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   adminId: string = '';
   adminData: AdminData | null = null;
@@ -57,7 +56,7 @@ export class ViewSuperAdminComponent implements OnInit {
     // Get admin ID from route params
     this.loggedInUserId = this.globalService.getTokenDetails('userId');
 
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.adminId = params['id'];
       if (this.adminId) {
         this.loadAdminDetails();
@@ -65,16 +64,14 @@ export class ViewSuperAdminComponent implements OnInit {
     });
   }
 
-  private loadAdminDetails(): void {
-    this.superAdminService
-      .viewSuperAdmin(this.adminId)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.adminData = response.data;
-          this.setAdminInitials();
-          this.generateAvatarColor();
-        }
-      });
+  private async loadAdminDetails(): Promise<void> {
+    await this.superAdminService.loadOne(this.adminId);
+    const data = this.superAdminService.current();
+    if (data) {
+      this.adminData = data;
+      this.setAdminInitials();
+      this.generateAvatarColor();
+    }
   }
 
   private setAdminInitials(): void {
@@ -131,7 +128,7 @@ export class ViewSuperAdminComponent implements OnInit {
 
   onDelete(adminId: string) {
     this.superAdminService
-      .deleteSuperAdmin(adminId, this.deleteJustification.trim())
+      .delete(adminId, this.deleteJustification.trim())
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
           this.router.navigate([SUPER_ADMIN.LIST]);
@@ -140,7 +137,7 @@ export class ViewSuperAdminComponent implements OnInit {
   }
 
   onUnlock() {
-    this.superAdminService.unlockSuperAdmin(this.adminId).then((res: any) => {
+    this.superAdminService.unlock(this.adminId).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         this.loadAdminDetails();
       }
@@ -154,7 +151,7 @@ export class ViewSuperAdminComponent implements OnInit {
   onPasswordDialogClose(newPassword: string | null) {
     if (newPassword) {
       this.superAdminService
-        .updateSuperAdminPassword(this.adminId, newPassword)
+        .updatePassword(this.adminId, newPassword)
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             this.showChangePasswordDialog = false;
@@ -163,10 +160,5 @@ export class ViewSuperAdminComponent implements OnInit {
     } else {
       this.showChangePasswordDialog = false;
     }
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

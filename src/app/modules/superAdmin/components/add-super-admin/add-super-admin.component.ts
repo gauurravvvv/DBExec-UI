@@ -15,6 +15,7 @@ import { SuperAdminService } from '../../services/superAdmin.service';
 })
 export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
   adminForm!: FormGroup;
+  saving = this.superAdminService.saving;
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
@@ -69,16 +70,13 @@ export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.adminForm.valid) {
-      this.superAdminService
-        .addSuperAdmin(this.adminForm)
-        .then((response: any) => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.adminForm.markAsPristine();
-            this.router.navigate([SUPER_ADMIN.LIST]);
-          }
-        });
+      const response: any = await this.superAdminService.add(this.adminForm);
+      if (this.globalService.handleSuccessService(response)) {
+        this.adminForm.markAsPristine();
+        this.router.navigate([SUPER_ADMIN.LIST]);
+      }
     } else {
       // Mark all fields as touched to trigger validation messages
       Object.keys(this.adminForm.controls).forEach(key => {
