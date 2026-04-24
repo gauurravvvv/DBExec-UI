@@ -27,7 +27,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="adminForm.invalid || !isFormDirty"
+          [disabled]="adminForm.invalid || !isFormDirty || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>

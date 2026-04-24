@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
@@ -16,7 +15,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   adminForm!: FormGroup;
   adminId: string = '';
@@ -25,6 +24,7 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
   isLocked: boolean = false;
   showSaveConfirm = false;
   saveJustification = '';
+  saving = this.superAdminService.saving;
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
@@ -47,7 +47,7 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
     this.initForm();
 
     // Subscribe to form value changes
-    this.adminForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.adminForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -88,7 +88,7 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
       status: [false],
     });
 
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.adminId = params['id'];
       if (this.adminId) {
         this.patchFormValues();
@@ -96,19 +96,17 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  patchFormValues(): void {
-    this.superAdminService
-      .viewSuperAdmin(this.adminId)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.adminData = response.data;
-          this.isLocked = !!this.adminData.isLocked;
-          this.adminForm.patchValue(this.adminData);
-          if (this.isLocked) {
-            this.adminForm.get('status')?.disable();
-          }
-        }
-      });
+  async patchFormValues(): Promise<void> {
+    await this.superAdminService.loadOne(this.adminId);
+    const data = this.superAdminService.current();
+    if (data) {
+      this.adminData = data;
+      this.isLocked = !!this.adminData.isLocked;
+      this.adminForm.patchValue(this.adminData);
+      if (this.isLocked) {
+        this.adminForm.get('status')?.disable();
+      }
+    }
   }
 
   onSubmit(): void {
@@ -122,18 +120,15 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
     this.saveJustification = '';
   }
 
-  proceedSave(): void {
+  async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      this.superAdminService
-        .updateSuperAdmin(this.adminForm, this.saveJustification.trim())
-        .then((response: any) => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showSaveConfirm = false;
-            this.saveJustification = '';
-            this.adminForm.markAsPristine();
-            this.router.navigate([SUPER_ADMIN.LIST]);
-          }
-        });
+      const response: any = await this.superAdminService.update(this.adminForm, this.saveJustification.trim());
+      if (this.globalService.handleSuccessService(response)) {
+        this.showSaveConfirm = false;
+        this.saveJustification = '';
+        this.adminForm.markAsPristine();
+        this.router.navigate([SUPER_ADMIN.LIST]);
+      }
     }
   }
 
@@ -165,10 +160,5 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
     if (control?.errors?.['pattern'])
       return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

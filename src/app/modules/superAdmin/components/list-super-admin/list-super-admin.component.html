@@ -54,13 +54,13 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="superAdmins"
+          [value]="admins()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           [filterDelay]="1000"
           (onLazyLoad)="loadSuperAdmins($event)"
-          [totalRecords]="totalItems"
+          [totalRecords]="total()"
           [rowHover]="true"
           dataKey="id"
           [(selection)]="selectedAdmins"

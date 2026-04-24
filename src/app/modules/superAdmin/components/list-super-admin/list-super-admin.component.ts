@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
@@ -6,7 +6,8 @@ import { IParams } from 'src/app/core/interfaces/global.interface';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
-import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-list-super-admin',
@@ -15,7 +16,7 @@ import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListSuperAdminComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   Math = Math;
   loggedInUserId: any;
@@ -23,8 +24,9 @@ export class ListSuperAdminComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
   private searchSubject = new Subject<void>();
 
-  superAdmins: any[] = [];
-  totalItems = 0;
+  admins  = this.superAdminService.admins;
+  total   = this.superAdminService.total;
+  loading = this.superAdminService.loading;
 
   selectedAdmins: any[] = [];
 
@@ -57,7 +59,6 @@ export class ListSuperAdminComponent implements OnInit {
     private globalService: GlobalService,
   ) {}
 
-  loading = false; // REMOVED (Global loader used)
   lastTableLazyLoadEvent: any;
 
   ngOnInit(): void {
@@ -65,7 +66,7 @@ export class ListSuperAdminComponent implements OnInit {
     // Initial load will be triggered by p-table lazy load if [lazy]="true" is set
 
     // Setup debounce for filter changes
-    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       // Trigger lazy load with current pagination but updated filters
       if (this.lastTableLazyLoadEvent) {
         this.loadSuperAdmins(this.lastTableLazyLoadEvent);
@@ -83,7 +84,7 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   get deletableAdmins(): any[] {
-    return this.superAdmins.filter(a => a.canDelete);
+    return this.admins().filter(a => a.canDelete);
   }
 
   isRowSelectable = (event: any) => !!event?.data?.canDelete;
@@ -162,7 +163,7 @@ export class ListSuperAdminComponent implements OnInit {
         return;
       }
       this.superAdminService
-        .bulkDeleteSuperAdmin(ids, reason)
+        .bulkDelete(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedAdmins = [];
@@ -194,7 +195,7 @@ export class ListSuperAdminComponent implements OnInit {
 
   onDelete(adminId: string) {
     this.superAdminService
-      .deleteSuperAdmin(adminId, this.deleteJustification.trim())
+      .delete(adminId, this.deleteJustification.trim())
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
           this.selectedAdmins = this.selectedAdmins.filter(
@@ -206,7 +207,7 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   onUnlock(adminId: string) {
-    this.superAdminService.unlockSuperAdmin(adminId).then((res: any) => {
+    this.superAdminService.unlock(adminId).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         if (this.lastTableLazyLoadEvent) {
           this.loadSuperAdmins(this.lastTableLazyLoadEvent);
@@ -220,7 +221,6 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   loadSuperAdmins(event: any) {
-    // this.loading = true; // REMOVED
     // Clear selection when page/sort changes (not on same-page re-fetch after delete)
     const prev = this.lastTableLazyLoadEvent;
     if (
@@ -286,22 +286,6 @@ export class ListSuperAdminComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.superAdminService
-      .listSuperAdmin(params)
-      .then((res: any) => {
-        // this.loading = false; // REMOVED
-        if (this.globalService.handleSuccessService(res, false)) {
-          this.superAdmins = res.data.superAdmins;
-          this.totalItems = res.data.count;
-        }
-      })
-      .catch(() => {
-        // this.loading = false; // REMOVED
-      });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.superAdminService.load(params);
   }
 }
