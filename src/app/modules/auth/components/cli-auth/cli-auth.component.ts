@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, OnDestroy} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, OnDestroy, signal} from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LoginService } from 'src/app/core/services/login.service';
@@ -24,7 +24,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   userName = '';
   userRole = '';
   userOrg = '';
-  actionInProgress = false;
+  loading = signal(false);
 
   code = '';
   codeError = '';
@@ -72,7 +72,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   }
 
   authorize(): void {
-    if (this.actionInProgress) return;
+    if (this.loading()) return;
 
     const trimmed = this.code.trim();
     if (trimmed.length !== 8) {
@@ -80,7 +80,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.actionInProgress = true;
+    this.loading.set(true);
     this.codeError = '';
     this.pageState = 'authorizing';
 
@@ -96,18 +96,18 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
           this.pageState = 'error';
           this.message = response.message || 'Authorization failed.';
         }
-        this.actionInProgress = false;
+        this.loading.set(false);
       },
       error: (err: any) => {
         this.pageState = 'error';
         this.message = err?.error?.message || 'Authorization failed. The code may be invalid or expired.';
-        this.actionInProgress = false;
+        this.loading.set(false);
       },
     });
   }
 
   deny(): void {
-    if (this.actionInProgress) return;
+    if (this.loading()) return;
 
     const trimmed = this.code.trim();
     if (trimmed.length !== 8) {
@@ -115,19 +115,19 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.actionInProgress = true;
+    this.loading.set(true);
     this.codeError = '';
 
     this.loginService.cliAuthorize(trimmed, 'deny').pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.pageState = 'denied';
         this.message = 'CLI access has been denied. You can close this tab.';
-        this.actionInProgress = false;
+        this.loading.set(false);
       },
       error: () => {
         this.pageState = 'denied';
         this.message = 'CLI access has been denied. You can close this tab.';
-        this.actionInProgress = false;
+        this.loading.set(false);
       },
     });
   }

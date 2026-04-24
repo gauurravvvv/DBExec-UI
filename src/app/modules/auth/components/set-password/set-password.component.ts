@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy, signal} from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
@@ -22,6 +22,8 @@ export class SetPasswordComponent implements OnInit {
   setPasswordForm: FormGroup;
   showPassword = false;
   features = SET_PASSWORD_PAGE_OPTIONS;
+  loading = signal(false);
+  error = signal('');
   userId!: string;
   orgId!: string;
   token!: string;
@@ -98,17 +100,26 @@ export class SetPasswordComponent implements OnInit {
       : { mismatch: true };
   }
 
-  onSubmit() {
+  async onSubmit(): Promise<void> {
     if (this.setPasswordForm.valid) {
-      const { newPassword } = this.setPasswordForm.value;
-      this.loginService
-        .setPassword(newPassword, this.userId, this.orgId, this.token)
-        .then(res => {
-          if (this.globalService.handleSuccessService(res)) {
-            StorageService.clear();
-            this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
-          }
-        });
+      this.error.set('');
+      this.loading.set(true);
+      try {
+        const { newPassword } = this.setPasswordForm.value;
+        const res: any = await this.loginService.setPassword(
+          newPassword, this.userId, this.orgId, this.token
+        );
+        if (this.globalService.handleSuccessService(res)) {
+          StorageService.clear();
+          this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
+        } else {
+          this.error.set(res.message || 'Failed to set password.');
+        }
+      } catch (err: any) {
+        this.error.set(err?.message || 'Failed to set password. Please try again.');
+      } finally {
+        this.loading.set(false);
+      }
     }
   }
 

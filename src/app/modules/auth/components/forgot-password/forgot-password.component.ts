@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -17,6 +17,8 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   forgotPasswordForm: FormGroup;
   showPassword = false;
   features = FORGOT_PASSWORD_PAGE_OPTIONS;
+  loading = signal(false);
+  error = signal('');
 
   otpSent = false;
   countdownDisplay = '';
@@ -78,16 +80,23 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.forgotPasswordForm.valid) {
-      this.loginService
-        .generateOTP(this.forgotPasswordForm)
-        .then((res: any) => {
-          this.globalService.handleSuccessService(res);
-          if (res.data?.otpExpiresAt) {
-            this.startCountdown(new Date(res.data.otpExpiresAt));
-          }
-        });
+      this.error.set('');
+      this.loading.set(true);
+      try {
+        const res: any = await this.loginService.generateOTP(this.forgotPasswordForm);
+        this.globalService.handleSuccessService(res);
+        if (res.data?.otpExpiresAt) {
+          this.startCountdown(new Date(res.data.otpExpiresAt));
+        } else if (!res.status) {
+          this.error.set(res.message || 'Failed to send OTP.');
+        }
+      } catch (err: any) {
+        this.error.set(err?.message || 'Failed to send OTP. Please try again.');
+      } finally {
+        this.loading.set(false);
+      }
     }
   }
 

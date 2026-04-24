@@ -3,7 +3,9 @@ import {ChangeDetectionStrategy,
   OnInit,
   QueryList,
   ViewChildren,
-  ElementRef, OnDestroy} from '@angular/core';
+  ElementRef,
+  OnDestroy,
+  signal} from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
@@ -31,6 +33,8 @@ export class ResetPasswordComponent implements OnInit {
   resetPasswordForm: FormGroup;
   showPassword = false;
   features = RESET_PASSWORD_PAGE_OPTIONS;
+  loading = signal(false);
+  error = signal('');
   userId!: string;
   orgId!: string;
 
@@ -153,7 +157,7 @@ export class ResetPasswordComponent implements OnInit {
     this.otpInvalid = false;
   }
 
-  onSubmit() {
+  async onSubmit(): Promise<void> {
     if (!this.isOtpComplete) {
       this.otpInvalid = true;
       this.otpControls.forEach(c => c.markAsTouched());
@@ -161,15 +165,23 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     if (this.isFormValid) {
-      const { newPassword } = this.resetPasswordForm.value;
-      const otp = this.otpValue;
-      this.loginService
-        .resetPassword(this.resetPasswordForm, this.userId, this.orgId, otp)
-        .then(res => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
-          }
-        });
+      this.error.set('');
+      this.loading.set(true);
+      try {
+        const otp = this.otpValue;
+        const res: any = await this.loginService.resetPassword(
+          this.resetPasswordForm, this.userId, this.orgId, otp
+        );
+        if (this.globalService.handleSuccessService(res)) {
+          this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
+        } else {
+          this.error.set(res.message || 'Password reset failed.');
+        }
+      } catch (err: any) {
+        this.error.set(err?.message || 'Password reset failed. Please try again.');
+      } finally {
+        this.loading.set(false);
+      }
     }
   }
 

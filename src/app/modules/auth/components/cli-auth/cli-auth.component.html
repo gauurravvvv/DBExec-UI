@@ -77,7 +77,7 @@
             icon="pi pi-check"
             class="p-button-lg authorize-btn"
             (click)="authorize()"
-            [disabled]="actionInProgress || code.length !== 8"
+            [disabled]="loading() || code.length !== 8"
           ></button>
           <button
             pButton
@@ -86,7 +86,7 @@
             icon="pi pi-times"
             class="p-button-lg p-button-outlined deny-btn"
             (click)="deny()"
-            [disabled]="actionInProgress || code.length !== 8"
+            [disabled]="loading() || code.length !== 8"
           ></button>
         </div>
       </ng-container>
