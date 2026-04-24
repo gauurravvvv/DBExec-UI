@@ -127,6 +127,9 @@ export class ListDashboardComponent implements OnInit {
         }
         this.cdr.markForCheck();
         resolve();
+      }).catch(() => {
+        this.cdr.markForCheck();
+        resolve();
       });
     });
   }
