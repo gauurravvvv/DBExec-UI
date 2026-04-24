@@ -89,6 +89,7 @@ export class ViewRlsRuleComponent implements OnInit {
       })
       .catch(() => {
         this.showDeleteConfirm = false;
+        this.deleteJustification = '';
         this.cdr.markForCheck();
       });
   }
