@@ -120,8 +120,8 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  onOrganisationChange(orgId: any) {
-    this.connectionForm.get('datasource')?.reset();
+  onOrganisationChange() {
+    this.connectionForm.patchValue({ datasource: null }, { emitEvent: false });
     this.datasources = [];
     this.loadDatasources();
     this.updateFormDirtyState();

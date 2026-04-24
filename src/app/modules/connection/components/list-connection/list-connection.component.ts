@@ -342,13 +342,4 @@ export class ListConnectionComponent implements OnInit {
     }
   }
 
-  onEditTab(tab: any) {
-    this.router.navigate([
-      CONNECTION.EDIT,
-      this.selectedOrg.id,
-      ,
-      this.selectedDatasource.id,
-      tab.id,
-    ]);
-  }
 }
