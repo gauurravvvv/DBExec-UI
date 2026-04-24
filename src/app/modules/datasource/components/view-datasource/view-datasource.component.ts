@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatasourceService } from '../../services/datasource.service';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -54,6 +54,7 @@ export class ViewDatasourceComponent implements OnInit {
     private router: Router,
     private datasourceService: DatasourceService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {
     // Initialize chart options with default values
     this.initChartOptions();
@@ -68,18 +69,17 @@ export class ViewDatasourceComponent implements OnInit {
   }
 
   // Changed from private to public
-  loadDatasourceData(): void {
-    this.datasourceService
-      .viewDatasource(this.orgId, this.dbId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.dbData = response.data;
-          this.prepareChartData();
-          this.updateChartOptions(); // Update options after data is loaded
-          this.filteredSchemas = this.dbData.statistics.schemaStats;
-          this.prepareTopStorageTables();
-        }
-      });
+  async loadDatasourceData(): Promise<void> {
+    await this.datasourceService.loadOne(this.orgId, this.dbId);
+    const data = this.datasourceService.current();
+    if (data) {
+      this.dbData = data;
+      this.prepareChartData();
+      this.updateChartOptions();
+      this.filteredSchemas = this.dbData.statistics.schemaStats;
+      this.prepareTopStorageTables();
+      this.cdr.markForCheck();
+    }
   }
 
   onSchemaSearch(event: any): void {
@@ -377,20 +377,17 @@ export class ViewDatasourceComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  proceedDelete(): void {
+  async proceedDelete(): Promise<void> {
     if (this.dbData && this.deleteJustification.trim()) {
-      this.datasourceService
-        .deleteDatasource(
-          this.orgId,
-          this.dbId,
-          this.deleteJustification.trim(),
-        )
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.deleteJustification = '';
-            this.router.navigate([DATASOURCE.LIST]);
-          }
-        });
+      const response = await this.datasourceService.delete(
+        this.orgId,
+        this.dbId,
+        this.deleteJustification.trim(),
+      );
+      if (this.globalService.handleSuccessService(response)) {
+        this.deleteJustification = '';
+        this.router.navigate([DATASOURCE.LIST]);
+      }
     }
   }
 }

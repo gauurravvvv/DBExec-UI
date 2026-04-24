@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -63,7 +62,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   datasourceForm!: FormGroup;
   isFormDirty = false;
@@ -88,6 +87,8 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
   connectionTestLoading = false;
   connectionTestResult: 'success' | 'failed' | null = null;
 
+  saving = this.datasourceService.saving;
+
   constructor(
     private fb: FormBuilder,
     private datasourceService: DatasourceService,
@@ -95,6 +96,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     private globalService: GlobalService,
     private router: Router,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -108,7 +110,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     this.loadDatasourceData();
 
     // Monitor form changes
-    this.datasourceForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.datasourceForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.initialFormValues) {
         this.isFormDirty = !this.isEqual(
           this.datasourceForm.getRawValue(),
@@ -119,7 +121,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
 
     // Reset connection test when connection fields change
     ['host', 'port', 'database', 'username', 'password'].forEach(field => {
-      this.datasourceForm.get(field)?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.datasourceForm.get(field)?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.connectionTested = false;
         this.connectionTestResult = null;
       });
@@ -160,36 +162,34 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  loadDatasourceData(): void {
-    this.datasourceService
-      .viewDatasource(this.orgId, this.datasourceId)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const data = response.data;
-          this.organisationName = data.organisationId;
+  async loadDatasourceData(): Promise<void> {
+    await this.datasourceService.loadOne(this.orgId, this.datasourceId);
+    const data = this.datasourceService.current();
+    if (data) {
+      this.organisationName = data.organisationId;
 
-          const formData = {
-            name: data.name,
-            description: data.description || '',
-            type: data.config?.dbType || 'postgres',
-            host: data.config?.hostname || '',
-            port: data.config?.port || '',
-            database: data.config?.dbName || '',
-            username: data.config?.username || '',
-            password: '',
-            organisation: data.organisationId,
-            status: data.status === 1,
-          };
+      const formData = {
+        name: data.name,
+        description: data.description || '',
+        type: data.config?.dbType || 'postgres',
+        host: data.config?.hostname || '',
+        port: data.config?.port || '',
+        database: data.config?.dbName || '',
+        username: data.config?.username || '',
+        password: '',
+        organisation: data.organisationId,
+        status: data.status === 1,
+      };
 
-          this.initialFormValues = { ...formData };
-          this.datasourceForm.patchValue(formData);
-          this.isFormDirty = false;
+      this.initialFormValues = { ...formData };
+      this.datasourceForm.patchValue(formData);
+      this.isFormDirty = false;
 
-          // Connection is already valid since the DB was fetched successfully
-          this.connectionTested = true;
-          this.connectionTestResult = 'success';
-        }
-      });
+      // Connection is already valid since the DB was fetched successfully
+      this.connectionTested = true;
+      this.connectionTestResult = 'success';
+      this.cdr.markForCheck();
+    }
   }
 
   isConnectionFieldsValid(): boolean {
@@ -233,11 +233,13 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
           this.connectionTested = false;
           this.connectionTestResult = 'failed';
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.connectionTestLoading = false;
         this.connectionTested = false;
         this.connectionTestResult = 'failed';
+        this.cdr.markForCheck();
       });
   }
 
@@ -252,7 +254,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     this.saveJustification = '';
   }
 
-  proceedSave(): void {
+  async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
       const formValue = this.datasourceForm.getRawValue();
 
@@ -270,17 +272,14 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         status: formValue.status ? 1 : 0,
       };
 
-      this.datasourceService
-        .updateDatasource(payload, this.saveJustification.trim())
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showSaveConfirm = false;
-            this.saveJustification = '';
-            this.isFormDirty = false;
-            this.datasourceForm.markAsPristine();
-            this.router.navigate([DATASOURCE.LIST]);
-          }
-        });
+      const response = await this.datasourceService.update(payload, this.saveJustification.trim());
+      if (this.globalService.handleSuccessService(response)) {
+        this.showSaveConfirm = false;
+        this.saveJustification = '';
+        this.isFormDirty = false;
+        this.datasourceForm.markAsPristine();
+        this.router.navigate([DATASOURCE.LIST]);
+      }
     }
   }
 
@@ -374,10 +373,5 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     }
 
     return JSON.stringify(form) === JSON.stringify(initial);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
