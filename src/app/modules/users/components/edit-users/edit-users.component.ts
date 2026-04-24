@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
@@ -31,6 +31,10 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
   showSaveConfirm = false;
   saveJustification = '';
 
+  saving = this.userService.saving;
+
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -38,6 +42,7 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
     private userService: UserService,
     private groupService: GroupService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -60,6 +65,7 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
             (g: any) => g.status === 1,
           );
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -108,27 +114,28 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  loadAdminData() {
-    this.userService.viewOrgUser(this.orgId, this.userId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.userData = response.data;
-        this.isLocked = !!this.userData.isLocked;
-        if (this.isLocked) {
-          this.userForm.get('status')?.disable();
-        }
-        this.userForm.patchValue({
-          id: this.userData.id,
-          firstName: this.userData.firstName,
-          lastName: this.userData.lastName,
-          username: this.userData.username,
-          email: this.userData.email,
-          organisation: this.userData.organisationId,
-          status: this.userData.status,
-          groupIds: this.userData.groupIds || [],
-        });
-        this.selectedOrgName = this.userData.organisationName;
+  async loadAdminData() {
+    await this.userService.loadOne(this.orgId, this.userId);
+    const data = this.userService.current();
+    if (data) {
+      this.userData = data;
+      this.isLocked = !!this.userData.isLocked;
+      if (this.isLocked) {
+        this.userForm.get('status')?.disable();
       }
-    });
+      this.userForm.patchValue({
+        id: this.userData.id,
+        firstName: this.userData.firstName,
+        lastName: this.userData.lastName,
+        username: this.userData.username,
+        email: this.userData.email,
+        organisation: this.userData.organisationId,
+        status: this.userData.status,
+        groupIds: this.userData.groupIds || [],
+      });
+      this.selectedOrgName = this.userData.organisationName;
+    }
+    this.cdr.markForCheck();
   }
 
   onSubmit() {
@@ -142,18 +149,16 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
     this.saveJustification = '';
   }
 
-  proceedSave() {
+  async proceedSave() {
     if (this.saveJustification.trim()) {
-      this.userService
-        .updateUser(this.userForm, this.saveJustification.trim())
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showSaveConfirm = false;
-            this.saveJustification = '';
-            this.userForm.markAsPristine();
-            this.router.navigate([USER.LIST]);
-          }
-        });
+      const response = await this.userService.update(this.userForm, this.saveJustification.trim());
+      if (this.globalService.handleSuccessService(response)) {
+        this.showSaveConfirm = false;
+        this.saveJustification = '';
+        this.userForm.markAsPristine();
+        this.router.navigate([USER.LIST]);
+      }
+      this.cdr.markForCheck();
     }
   }
 

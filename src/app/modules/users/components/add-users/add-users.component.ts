@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
@@ -24,6 +24,10 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
 
+  saving = this.userService.saving;
+
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -31,6 +35,7 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
     private organisationService: OrganisationService,
     private groupService: GroupService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -101,6 +106,7 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -114,6 +120,7 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
             (g: any) => g.status === 1,
           );
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -125,14 +132,14 @@ export class AddUsersComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.userForm.valid) {
-      this.userService.addUser(this.userForm).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.userForm.markAsPristine();
-          this.router.navigate([USER.LIST]);
-        }
-      });
+      const response = await this.userService.add(this.userForm);
+      if (this.globalService.handleSuccessService(response)) {
+        this.userForm.markAsPristine();
+        this.router.navigate([USER.LIST]);
+      }
+      this.cdr.markForCheck();
     } else {
       Object.keys(this.userForm.controls).forEach(key => {
         const control = this.userForm.get(key);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -26,6 +26,7 @@ export class ViewUsersComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -34,14 +35,15 @@ export class ViewUsersComponent implements OnInit {
     this.loadAdminData();
   }
 
-  loadAdminData() {
-    this.userService.viewOrgUser(this.orgId, this.userId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.userData = response.data;
-        this.setAdminInitials();
-        this.generateAvatarBackground();
-      }
-    });
+  async loadAdminData() {
+    await this.userService.loadOne(this.orgId, this.userId);
+    const data = this.userService.current();
+    if (data) {
+      this.userData = data;
+      this.setAdminInitials();
+      this.generateAvatarBackground();
+    }
+    this.cdr.markForCheck();
   }
 
   setAdminInitials() {
@@ -76,40 +78,35 @@ export class ViewUsersComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  proceedDelete() {
+  async proceedDelete() {
     if (this.deleteJustification.trim()) {
-      this.userService
-        .deleteUser(this.userId, this.orgId, this.deleteJustification.trim())
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.deleteJustification = '';
-            this.router.navigate([USER.LIST]);
-          }
-        });
+      const response = await this.userService.delete(this.userId, this.orgId, this.deleteJustification.trim());
+      if (this.globalService.handleSuccessService(response)) {
+        this.deleteJustification = '';
+        this.router.navigate([USER.LIST]);
+      }
+      this.cdr.markForCheck();
     }
   }
 
-  onUnlock() {
-    this.userService.unlockUser(this.orgId, this.userId).then((res: any) => {
-      if (this.globalService.handleSuccessService(res)) {
-        this.loadAdminData();
-      }
-    });
+  async onUnlock() {
+    const res: any = await this.userService.unlock(this.orgId, this.userId);
+    if (this.globalService.handleSuccessService(res)) {
+      this.loadAdminData();
+    }
   }
 
   openChangePasswordDialog() {
     this.showChangePasswordDialog = true;
   }
 
-  onPasswordDialogClose(newPassword: string | null) {
+  async onPasswordDialogClose(newPassword: string | null) {
     if (newPassword) {
-      this.userService
-        .updateUserPassword(this.userId, newPassword)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.showChangePasswordDialog = false;
-          }
-        });
+      const response = await this.userService.updatePassword(this.userId, newPassword);
+      if (this.globalService.handleSuccessService(response)) {
+        this.showChangePasswordDialog = false;
+      }
+      this.cdr.markForCheck();
     } else {
       this.showChangePasswordDialog = false;
     }

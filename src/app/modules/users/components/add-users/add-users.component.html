@@ -12,7 +12,7 @@
         <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" [disabled]="!isFormDirty"
           (click)="onCancel()"></button>
         <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-          [disabled]="userForm.invalid">
+          [disabled]="userForm.invalid || saving()">
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
