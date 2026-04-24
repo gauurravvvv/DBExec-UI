@@ -100,7 +100,7 @@ export class AddQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
       }
-    });
+    }).catch(() => {});
   }
 
   getNameError(): string {
@@ -161,6 +161,6 @@ export class AddQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       if (this.globalService.handleSuccessService(response, false)) {
         this.datasources = [...(response.data.datasources || [])];
       }
-    });
+    }).catch(() => {});
   }
 }

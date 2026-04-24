@@ -199,7 +199,6 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.resultFilterSubject.complete();
     document.removeEventListener('click', this.clickOutsideHandler);
   }
 
@@ -754,7 +753,8 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             this.patchSavedPromptValues(savedPrompts);
           }
         }
-      });
+      })
+      .catch(() => {});
   }
 
   /**

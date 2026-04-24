@@ -472,7 +472,8 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
           this.datasourceId = String(response.data.datasourceId || '');
           this.queryBuilderName = response.data.name || '';
         }
-      });
+      })
+      .catch(() => {});
   }
 
   onEdit(): void {

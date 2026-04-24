@@ -109,7 +109,8 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
 
           this.queryBuilderForm.markAsPristine();
         }
-      });
+      })
+      .catch(() => {});
   }
 
   getNameError(): string {
