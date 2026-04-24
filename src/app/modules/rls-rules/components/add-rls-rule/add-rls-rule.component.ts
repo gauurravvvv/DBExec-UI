@@ -185,6 +185,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         this.organisations = response.data.orgs || [];
         this.cdr.markForCheck();
       }
+    }).catch(() => {
+      this.cdr.markForCheck();
     });
   }
 
@@ -202,6 +204,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       } else {
         this.datasources = [];
       }
+      this.cdr.markForCheck();
+    }).catch(() => {
       this.cdr.markForCheck();
     });
   }
@@ -237,6 +241,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         this.datasets = [];
       }
       this.cdr.markForCheck();
+    }).catch(() => {
+      this.cdr.markForCheck();
     });
   }
 
@@ -253,6 +259,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         }));
         this.cdr.markForCheck();
       }
+    }).catch(() => {
+      this.cdr.markForCheck();
     });
   }
 

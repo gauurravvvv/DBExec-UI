@@ -109,6 +109,9 @@ export class ListRlsRulesComponent implements OnInit {
         }
         this.cdr.markForCheck();
         resolve();
+      }).catch(() => {
+        this.cdr.markForCheck();
+        resolve();
       });
     });
   }
