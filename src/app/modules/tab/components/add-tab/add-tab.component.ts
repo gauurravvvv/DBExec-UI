@@ -186,12 +186,16 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
           this.router.navigate([TAB.LIST]);
         }
         this.cdr.markForCheck();
+      }).catch(() => {
+        // global interceptor shows error toast; ensure UI recovers
+        this.cdr.markForCheck();
       });
     }
   }
 
   onCancel() {
     this.tabGroups.clear();
+    this.addTabGroup();          // restore at least one empty row
     this.tabForm.reset();
     this.cdr.markForCheck();
   }
