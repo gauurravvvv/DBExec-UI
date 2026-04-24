@@ -73,6 +73,10 @@ export class ViewTabComponent implements OnInit {
             this.router.navigate([TAB.LIST]);
           }
           this.cdr.markForCheck();
+        })
+        .catch(() => {
+          // global interceptor already shows error toast; ensure UI recovers
+          this.cdr.markForCheck();
         });
     }
   }
