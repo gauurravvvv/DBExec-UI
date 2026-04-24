@@ -27,10 +27,7 @@ export class ListTabComponent implements OnInit {
 
   // Pagination limit for tabs
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
-
-  filteredTabs: any[] = [];
 
   selectedTabs: any[] = [];
   showDeleteConfirm = false;
@@ -40,7 +37,6 @@ export class ListTabComponent implements OnInit {
   Math = Math;
   organisations: any[] = [];
   datasources: any[] = [];
-  tabs: any[] = [];
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
@@ -64,6 +60,10 @@ export class ListTabComponent implements OnInit {
 
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
+
+  tabs    = this.tabService.tabs;
+  total   = this.tabService.total;
+  loading = this.tabService.loading;
 
   get selectedCount(): number {
     return this.selectedTabs?.length || 0;
@@ -97,19 +97,21 @@ export class ListTabComponent implements OnInit {
         this.loadTabs();
       });
 
-    this.route.queryParams.subscribe(params => {
-      if (params['orgId'] || params['datasourceId'] || params['name']) {
-        this.handleDeepLinking(params);
-      } else {
-        if (this.showOrganisationDropdown) {
-          this.loadOrganisations();
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        if (params['orgId'] || params['datasourceId'] || params['name']) {
+          this.handleDeepLinking(params);
         } else {
-          this.selectedOrg =
-            this.globalService.getTokenDetails('organisationId');
-          this.loadDatasources();
+          if (this.showOrganisationDropdown) {
+            this.loadOrganisations();
+          } else {
+            this.selectedOrg =
+              this.globalService.getTokenDetails('organisationId');
+            this.loadDatasources();
+          }
         }
-      }
-    });
+      });
   }
 
   onOrgChange(orgId: any) {
@@ -212,9 +214,6 @@ export class ListTabComponent implements OnInit {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.tabs = [];
-            this.filteredTabs = [];
-            this.totalRecords = 0;
           }
         }
         this.cdr.markForCheck();
@@ -252,17 +251,11 @@ export class ListTabComponent implements OnInit {
               this.loadTabs();
             } else {
               this.selectedDatasource = null;
-              this.tabs = [];
-              this.filteredTabs = [];
-              this.totalRecords = 0;
             }
           } else {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.tabs = [];
-            this.filteredTabs = [];
-            this.totalRecords = 0;
           }
           this.cdr.markForCheck();
           resolve();
@@ -271,9 +264,6 @@ export class ListTabComponent implements OnInit {
           this.selectedOrg = null;
           this.datasources = [];
           this.selectedDatasource = null;
-          this.tabs = [];
-          this.filteredTabs = [];
-          this.totalRecords = 0;
           this.cdr.markForCheck();
           resolve();
         });
@@ -337,26 +327,11 @@ export class ListTabComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.tabService
-      .listTab(params)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.tabs = response.data?.tabs || [];
-          this.filteredTabs = [...this.tabs];
-          this.totalRecords = response.data?.count || this.tabs.length;
-        } else {
-          this.tabs = [];
-          this.filteredTabs = [];
-          this.totalRecords = 0;
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.tabs = [];
-        this.filteredTabs = [];
-        this.totalRecords = 0;
-        this.cdr.markForCheck();
-      });
+    this.tabService.load(params).then(() => {
+      this.cdr.markForCheck();
+    }).catch(() => {
+      this.cdr.markForCheck();
+    });
   }
 
   onAddNewTab() {

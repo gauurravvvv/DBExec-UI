@@ -32,13 +32,14 @@ export class ViewTabComponent implements OnInit {
     this.loadTabDetails();
   }
 
-  loadTabDetails() {
-    this.tabService.viewTab(this.orgId, this.tabId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.tabData = response.data;
-      }
-      this.cdr.markForCheck();
-    });
+  async loadTabDetails(): Promise<void> {
+    this.tabService.resetCurrent();
+    await this.tabService.loadOne(this.orgId, this.tabId);
+    const data = this.tabService.current();
+    if (data) {
+      this.tabData = data;
+    }
+    this.cdr.markForCheck();
   }
 
   onEdit() {
