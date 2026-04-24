@@ -24,7 +24,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="roleForm.invalid || !isFormDirty"
+          [disabled]="roleForm.invalid || !isFormDirty || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -149,7 +149,7 @@
       <button
         class="btn-confirm"
         (click)="proceedSave()"
-        [disabled]="!saveJustification.trim()"
+        [disabled]="!saveJustification.trim() || saving()"
       >
         <i class="pi pi-check"></i>
         Update

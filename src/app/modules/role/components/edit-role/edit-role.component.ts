@@ -28,6 +28,8 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   showSaveConfirm = false;
   saveJustification = '';
 
+  saving = this.roleService.saving;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -135,12 +137,10 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
 
   proceedSave() {
     if (this.saveJustification.trim()) {
-      const selectedPermissions = this.buildSelectedPermissions(
-        this.permissions,
-      );
+      const selectedPermissions = this.buildSelectedPermissions(this.permissions);
       const raw = this.roleForm.getRawValue();
       this.roleService
-        .editRole(
+        .edit(
           {
             id: raw.id,
             name: raw.name,
@@ -213,9 +213,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   private updateChildPermissions(permissions: any[], checked: boolean) {
     permissions.forEach(perm => {
       if (this.permissionControls[perm.value]) {
-        this.permissionControls[perm.value].setValue(checked, {
-          emitEvent: false,
-        });
+        this.permissionControls[perm.value].setValue(checked, { emitEvent: false });
       }
       if (perm.subPermissions) {
         this.updateChildPermissions(perm.subPermissions, checked);
@@ -224,10 +222,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   private updateParentPermission(permission: any) {
-    const parent = this.findPermissionById(
-      this.permissions,
-      permission.parentId,
-    );
+    const parent = this.findPermissionById(this.permissions, permission.parentId);
     if (parent && this.permissionControls[parent.value]) {
       this.permissionControls[parent.value].setValue(true, { emitEvent: false });
       if (parent.parentId !== '0') {

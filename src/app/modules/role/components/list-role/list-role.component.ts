@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { ROLE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -16,12 +17,15 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-role.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListRoleComponent implements OnInit, OnDestroy {
+export class ListRoleComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
-  roles: any[] = [];
+  // Signal refs from service
+  roles    = this.roleService.roles;
+  total    = this.roleService.total;
+  loading  = this.roleService.loading;
+
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
 
   selectedRoles: any[] = [];
@@ -50,7 +54,7 @@ export class ListRoleComponent implements OnInit, OnDestroy {
   };
 
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
+  private destroyRef = inject(DestroyRef);
 
   get isFilterActive(): boolean {
     return (
@@ -69,11 +73,9 @@ export class ListRoleComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
-      .subscribe(() => {
-        this.loadRoles();
-      });
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadRoles());
 
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
@@ -83,18 +85,8 @@ export class ListRoleComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
-    }
-  }
-
   loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
-
+    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = response.data.orgs;
@@ -103,8 +95,6 @@ export class ListRoleComponent implements OnInit, OnDestroy {
           this.loadRoles();
         } else {
           this.selectedOrgId = null;
-          this.roles = [];
-          this.totalRecords = 0;
         }
       }
     });
@@ -163,7 +153,7 @@ export class ListRoleComponent implements OnInit, OnDestroy {
       this.lastTableLazyLoadEvent = event;
     }
 
-    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const page  = event ? Math.floor(event.first / event.rows) + 1 : 1;
     const limit = event ? event.rows : this.limit;
 
     const filter: any = {};
@@ -181,21 +171,9 @@ export class ListRoleComponent implements OnInit, OnDestroy {
       filter.createdDateTo = to.toISOString();
     }
 
-    this.roleService
-      .listRoles(this.selectedOrgId, {
-        page,
-        limit,
-        filter: Object.keys(filter).length > 0 ? filter : undefined,
-      })
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.roles = response.data.roles || [];
-          this.totalRecords = response.data.count || 0;
-        } else {
-          this.roles = [];
-          this.totalRecords = 0;
-        }
-      });
+    const params: any = { orgId: this.selectedOrgId, page, limit };
+    if (Object.keys(filter).length > 0) params.filter = JSON.stringify(filter);
+    this.roleService.load(params);
   }
 
   onAddNewRole() {
@@ -237,7 +215,7 @@ export class ListRoleComponent implements OnInit, OnDestroy {
         return;
       }
       this.roleService
-        .bulkDeleteRole(ids, reason, this.selectedOrgId)
+        .bulkDelete(ids, reason, this.selectedOrgId)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
             this.selectedRoles = [];
@@ -250,16 +228,10 @@ export class ListRoleComponent implements OnInit, OnDestroy {
 
     if (this.roleToDelete) {
       this.roleService
-        .deleteRole(
-          this.selectedOrgId,
-          this.roleToDelete,
-          reason,
-        )
+        .delete(this.selectedOrgId, this.roleToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.selectedRoles = this.selectedRoles.filter(
-              r => r.id !== this.roleToDelete,
-            );
+            this.selectedRoles = this.selectedRoles.filter(r => r.id !== this.roleToDelete);
             this.refreshList();
           }
         });

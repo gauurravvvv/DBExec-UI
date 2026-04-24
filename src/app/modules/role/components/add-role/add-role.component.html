@@ -23,7 +23,7 @@
           type="submit"
           label="Save"
           (click)="onSubmit()"
-          [disabled]="roleForm.invalid"
+          [disabled]="roleForm.invalid || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
