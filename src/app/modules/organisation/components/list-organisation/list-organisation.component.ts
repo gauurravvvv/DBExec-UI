@@ -1,8 +1,9 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import {debounceTime, takeUntil} from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -15,7 +16,7 @@ import { OrganisationService } from '../../services/organisation.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListOrganisationComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild('dt') dt!: Table;
   Math = Math;
@@ -47,7 +48,7 @@ export class ListOrganisationComponent implements OnInit {
 
   ngOnInit(): void {
     // Setup debounce for filter changes
-    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.listParams.pageNumber = 1;
       this.loadOrganisations(this.lastTableLazyLoadEvent);
     });
@@ -239,10 +240,5 @@ export class ListOrganisationComponent implements OnInit {
           this.refreshList();
         }
       });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

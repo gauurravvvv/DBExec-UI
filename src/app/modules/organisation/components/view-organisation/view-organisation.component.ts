@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -63,7 +62,8 @@ interface OrganisationData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewOrganisationComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   organisationId!: string;
   organisationData!: OrganisationData;
@@ -81,7 +81,7 @@ export class ViewOrganisationComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.organisationId = params['id'];
       this.loadOrganisationData();
     });
@@ -94,6 +94,7 @@ export class ViewOrganisationComponent implements OnInit {
         if (this.globalService.handleSuccessService(response, false)) {
           this.organisationData = response.data;
           this.setOrganisationInitials();
+          this.cdr.markForCheck();
         }
       });
   }
@@ -141,14 +142,11 @@ export class ViewOrganisationComponent implements OnInit {
       .then(response => {
         this.globalService.handleSuccessService(response);
         this.isRefreshingMasterDb = false;
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.isRefreshingMasterDb = false;
+        this.cdr.markForCheck();
       });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

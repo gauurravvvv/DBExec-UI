@@ -1,6 +1,5 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ORGANISATION } from 'src/app/constants/routes';
@@ -16,7 +15,9 @@ import { REGEX } from 'src/app/constants/regex.constant';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+
+  saving = this.organisationService.saving;
 
   orgForm!: FormGroup;
   isFormDirty = false;
@@ -129,11 +130,11 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Update email field validators when provider changes
-    this.orgForm.get('emailProvider')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(provider => {
+    this.orgForm.get('emailProvider')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(provider => {
       this.updateEmailValidators(provider);
     });
 
-    this.orgForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.orgForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       if (this.isCancelClicked) {
         this.isCancelClicked = false;
       }
@@ -173,7 +174,7 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     // Reset connection test when DB fields change
     ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
       field => {
-        this.orgForm.get(field)?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+        this.orgForm.get(field)?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
           this.connectionTested = false;
           this.connectionTestResult = null;
         });
@@ -470,7 +471,7 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
   proceedSave(): void {
     if (this.saveJustification.trim()) {
       this.organisationService
-        .editOrganisation(this.orgForm, this.saveJustification.trim())
+        .edit(this.orgForm, this.saveJustification.trim())
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             this.showSaveConfirm = false;
@@ -575,10 +576,5 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
         return 'Port cannot exceed 65535';
     }
     return '';
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
