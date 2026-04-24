@@ -184,6 +184,9 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       }
       this.cdr.markForCheck();
       if (callback) callback();
+    }).catch(() => {
+      this.cdr.markForCheck();
+      if (callback) callback();
     });
   }
 

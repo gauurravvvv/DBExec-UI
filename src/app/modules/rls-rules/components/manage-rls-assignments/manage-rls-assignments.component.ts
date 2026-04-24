@@ -83,6 +83,9 @@ export class ManageRlsAssignmentsComponent implements OnInit {
             value: u.id,
           }));
         }
+      }).catch(() => {
+        this.cdr.markForCheck();
+      }).finally(() => {
         this.scopeTargetsLoading = false;
         this.cdr.markForCheck();
       });
@@ -94,6 +97,9 @@ export class ManageRlsAssignmentsComponent implements OnInit {
             value: g.id,
           }));
         }
+      }).catch(() => {
+        this.cdr.markForCheck();
+      }).finally(() => {
         this.scopeTargetsLoading = false;
         this.cdr.markForCheck();
       });
