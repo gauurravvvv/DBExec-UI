@@ -20,7 +20,7 @@
           type="submit"
           label="Grant Access"
           (click)="onSubmit()"
-          [disabled]="accessForm.invalid"
+          [disabled]="accessForm.invalid || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
