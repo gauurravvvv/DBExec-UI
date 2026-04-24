@@ -1,111 +1,52 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { SUPER_ADMIN } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SuperAdminService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   listSuperAdmin(params: any) {
-    return this.http
-      .get(SUPER_ADMIN.LIST, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(SUPER_ADMIN.LIST, { params }));
   }
 
   deleteSuperAdmin(id: string, justification?: string) {
-    return this.http
-      .request('DELETE', SUPER_ADMIN.DELETE + `${id}`, {
-        body: { justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(SUPER_ADMIN.DELETE + `${id}`, { body: { justification } }));
   }
 
   bulkDeleteSuperAdmin(ids: string[], justification?: string) {
-    return this.http
-      .request('DELETE', SUPER_ADMIN.BULK_DELETE, {
-        body: { ids, justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(SUPER_ADMIN.BULK_DELETE, { body: { ids, justification } }));
   }
 
   addSuperAdmin(superAdminForm: FormGroup) {
     const { firstName, lastName, username, email } = superAdminForm.value;
-    return this.http
-      .post(SUPER_ADMIN.ADD, {
-        firstName,
-        lastName,
-        username,
-        email,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(SUPER_ADMIN.ADD, {
+      firstName, lastName, username, email,
+    }));
   }
 
   viewSuperAdmin(id: string) {
-    return this.http
-      .get(SUPER_ADMIN.VIEW + `${id}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(SUPER_ADMIN.VIEW + `${id}`));
   }
 
   updateSuperAdmin(superAdminForm: FormGroup, justification?: string) {
-    const { id, firstName, lastName, username, email, status } =
-      superAdminForm.getRawValue();
-    return this.http
-      .put(SUPER_ADMIN.UPDATE, {
-        id,
-        firstName,
-        lastName,
-        username,
-        email,
-        status: status ? 1 : 0,
-        justification,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    const { id, firstName, lastName, username, email, status } = superAdminForm.getRawValue();
+    return lastValueFrom(this.http.apiPut(SUPER_ADMIN.UPDATE, {
+      id, firstName, lastName, username, email,
+      status: status ? 1 : 0,
+      justification,
+    }));
   }
 
   unlockSuperAdmin(id: string) {
-    return this.http
-      .put(SUPER_ADMIN.UNLOCK + `${id}`, {})
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPut(SUPER_ADMIN.UNLOCK + `${id}`, {}));
   }
 
   updateSuperAdminPassword(id: string, password: string) {
-    return this.http
-      .put(SUPER_ADMIN.UPDATE_PASSWORD, { id, newPassword: password })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPut(SUPER_ADMIN.UPDATE_PASSWORD, { id, newPassword: password }));
   }
 }

@@ -1,68 +1,34 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { DATASOURCE, ORGANISATION } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrganisationService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   listOrganisation(params: any) {
-    return this.http
-      .get(ORGANISATION.LIST, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(ORGANISATION.LIST, { params }));
   }
 
   addOrganisation(orgForm: FormGroup) {
     const {
-      name,
-      description,
-      encryptionAlgorithm,
-      pepperKey,
-      dbHost,
-      dbPort,
-      dbName,
-      dbUsername,
-      dbPassword,
-      adminEmail,
-      maxLoginAttempts,
-      accountLockDurationHours,
-      passwordHistoryLimit,
-      sessionInactivityTimeout,
-      emailProvider,
-      smtpHost,
-      smtpPort,
-      smtpUser,
-      smtpPassword,
-      smtpFrom,
-      sesRegion,
-      sesAccessKeyId,
-      sesSecretAccessKey,
-      sesFrom,
+      name, description, encryptionAlgorithm, pepperKey,
+      dbHost, dbPort, dbName, dbUsername, dbPassword, adminEmail,
+      maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
+      sessionInactivityTimeout, emailProvider,
+      smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom,
+      sesRegion, sesAccessKeyId, sesSecretAccessKey, sesFrom,
     } = orgForm.value;
 
     const payload: any = {
-      name,
-      description,
-      encryptionAlgorithm,
-      pepperKey,
-      dbHost,
-      dbPort,
-      dbName,
-      dbUsername,
-      dbPassword,
-      adminEmail,
-      maxLoginAttempts,
-      accountLockDurationHours,
-      passwordHistoryLimit,
-      sessionInactivityTimeout,
-      emailProvider,
+      name, description, encryptionAlgorithm, pepperKey,
+      dbHost, dbPort, dbName, dbUsername, dbPassword, adminEmail,
+      maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
+      sessionInactivityTimeout, emailProvider,
     };
 
     if (emailProvider === 'SMTP') {
@@ -78,39 +44,17 @@ export class OrganisationService {
       payload.sesFrom = sesFrom;
     }
 
-    return this.http
-      .post(ORGANISATION.ADD, payload)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(ORGANISATION.ADD, payload));
   }
 
   editOrganisation(orgForm: FormGroup, justification?: string) {
     const {
-      id,
-      status,
-      description,
-      dbHost,
-      dbPort,
-      dbName,
-      dbUsername,
-      dbPassword,
-      maxLoginAttempts,
-      accountLockDurationHours,
-      passwordHistoryLimit,
-      sessionInactivityTimeout,
-      emailProvider,
-      smtpHost,
-      smtpPort,
-      smtpUser,
-      smtpPassword,
-      smtpFrom,
-      sesRegion,
-      sesAccessKeyId,
-      sesSecretAccessKey,
-      sesFrom,
+      id, status, description,
+      dbHost, dbPort, dbName, dbUsername, dbPassword,
+      maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
+      sessionInactivityTimeout, emailProvider,
+      smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom,
+      sesRegion, sesAccessKeyId, sesSecretAccessKey, sesFrom,
     } = orgForm.getRawValue();
 
     const payload: any = {
@@ -149,57 +93,23 @@ export class OrganisationService {
       payload.sesFrom = sesFrom;
     }
 
-    return this.http
-      .put(ORGANISATION.EDIT, payload)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPut(ORGANISATION.EDIT, payload));
   }
 
   bulkDeleteOrganisation(ids: string[], justification?: string) {
-    return this.http
-      .request('DELETE', ORGANISATION.BULK_DELETE, {
-        body: { ids, justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(ORGANISATION.BULK_DELETE, { body: { ids, justification } }));
   }
 
   deleteOrganisation(orgId: string, justification?: string) {
-    return this.http
-      .request('DELETE', ORGANISATION.DELETE + `${orgId}`, {
-        body: { justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(ORGANISATION.DELETE + `${orgId}`, { body: { justification } }));
   }
 
   viewOrganisation(id: string) {
-    return this.http
-      .get(ORGANISATION.VIEW + `${id}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(ORGANISATION.VIEW + `${id}`));
   }
 
   refreshMasterDb(orgId: string) {
-    return this.http
-      .post(ORGANISATION.REFRESH_MASTER_DB + `${orgId}`, {})
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(ORGANISATION.REFRESH_MASTER_DB + `${orgId}`, {}));
   }
 
   validateDatasource(payload: {
@@ -210,12 +120,6 @@ export class OrganisationService {
     username: string;
     password: string;
   }) {
-    return this.http
-      .post(DATASOURCE.VALIDATE, payload)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(DATASOURCE.VALIDATE, payload));
   }
 }

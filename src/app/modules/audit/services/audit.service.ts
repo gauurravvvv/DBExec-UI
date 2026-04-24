@@ -1,42 +1,27 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { AUDIT } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuditService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   listAuditLogs(params: any) {
-    return this.http
-      .get(AUDIT.LIST, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(AUDIT.LIST, { params }));
   }
 
   listLoginActivity(params: any) {
-    return this.http
-      .get(AUDIT.LOGIN_ACTIVITY, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(AUDIT.LOGIN_ACTIVITY, { params }));
   }
 
   exportAuditLogs(params: any): Observable<Blob> {
-    return this.http.get(AUDIT.EXPORT_LOGS, { params, responseType: 'blob' });
+    return this.http.apiGet<Blob>(AUDIT.EXPORT_LOGS, { params, responseType: 'blob' });
   }
 
   exportLoginActivity(params: any): Observable<Blob> {
-    return this.http.get(AUDIT.EXPORT_LOGIN_ACTIVITY, {
-      params,
-      responseType: 'blob',
-    });
+    return this.http.apiGet<Blob>(AUDIT.EXPORT_LOGIN_ACTIVITY, { params, responseType: 'blob' });
   }
 }

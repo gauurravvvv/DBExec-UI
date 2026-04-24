@@ -1,38 +1,22 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { ACCESS } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AccessService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   listAccessDetails(params: any) {
-    return this.http
-      .get(ACCESS.GET + `/${params.orgId}/${params.connectionId}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(ACCESS.GET + `/${params.orgId}/${params.connectionId}`));
   }
 
   grantAccess(payload: any) {
     const { organisation, datasource, users, groups, connection } = payload;
-    const requestBody: any = {
-      organisation,
-      datasource,
-      users,
-      groups,
-      connection,
-    };
-    return this.http
-      .post(ACCESS.GRANT, requestBody)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPost(ACCESS.GRANT, {
+      organisation, datasource, users, groups, connection,
+    }));
   }
 }

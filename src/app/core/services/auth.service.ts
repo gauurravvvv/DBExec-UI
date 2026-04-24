@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../../types/auth.types';
 import { UserRole } from '../../constants/auth.constants';
 import { LoginCredentials } from '../../types/auth.types';
-import { HttpClient } from '@angular/common/http';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { AUTH } from '../../constants/api';
 
 @Injectable({
@@ -13,7 +13,7 @@ export class AuthService {
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClientService) {
     this.currentUserSubject = new BehaviorSubject<User | null>(
       this.getUserFromStorage(),
     );
@@ -83,6 +83,6 @@ export class AuthService {
     email: string;
     role: string;
   }) {
-    return this.http.post(AUTH.GENERATE_OTP, payload);
+    return this.http.apiPost(AUTH.GENERATE_OTP, payload);
   }
 }

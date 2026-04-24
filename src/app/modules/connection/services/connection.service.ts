@@ -1,110 +1,44 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { CONNECTIONS } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConnectionService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   listConnection(params: any) {
-    return this.http
-      .get(CONNECTIONS.LIST, { params })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(CONNECTIONS.LIST, { params }));
   }
 
   deleteConnection(orgId: string, id: string, justification?: string) {
-    return this.http
-      .request('DELETE', CONNECTIONS.DELETE + `${orgId}/${id}`, {
-        body: { justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(CONNECTIONS.DELETE + `${orgId}/${id}`, { body: { justification } }));
   }
 
   bulkDeleteConnection(ids: string[], justification: string | undefined, orgId: string) {
-    return this.http
-      .request('DELETE', CONNECTIONS.BULK_DELETE + `${orgId}`, {
-        body: { ids, justification },
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiDelete(CONNECTIONS.BULK_DELETE + `${orgId}`, { body: { ids, justification } }));
   }
 
   addConnection(connectionForm: FormGroup) {
-    const {
-      organisation,
-      datasource,
-      name,
-      description,
-      dbUsername,
-      dbPassword,
-    } = connectionForm.value;
-    return this.http
-      .post(CONNECTIONS.ADD, {
-        organisation,
-        datasource,
-        name,
-        description,
-        dbUsername,
-        dbPassword,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    const { organisation, datasource, name, description, dbUsername, dbPassword } = connectionForm.value;
+    return lastValueFrom(this.http.apiPost(CONNECTIONS.ADD, {
+      organisation, datasource, name, description, dbUsername, dbPassword,
+    }));
   }
 
   viewConnection(orgId: string, id: string) {
-    return this.http
-      .get(CONNECTIONS.VIEW + `${orgId}/${id}`)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(CONNECTIONS.VIEW + `${orgId}/${id}`));
   }
 
   updateConnection(connectionForm: FormGroup, justification?: string) {
-    const {
-      id,
-      name,
-      description,
-      organisation,
-      datasource,
-      status,
-      dbUsername,
-      dbPassword,
-    } = connectionForm.getRawValue();
-    return this.http
-      .put(CONNECTIONS.UPDATE, {
-        id,
-        name,
-        description,
-        organisation,
-        datasource,
-        status: status ? 1 : 0,
-        dbUsername,
-        dbPassword,
-        justification,
-      })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    const { id, name, description, organisation, datasource, status, dbUsername, dbPassword } = connectionForm.getRawValue();
+    return lastValueFrom(this.http.apiPut(CONNECTIONS.UPDATE, {
+      id, name, description, organisation, datasource,
+      status: status ? 1 : 0,
+      dbUsername, dbPassword, justification,
+    }));
   }
 }

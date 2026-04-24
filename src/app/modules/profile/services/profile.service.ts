@@ -1,30 +1,19 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 import { PROFILE } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProfileService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   getProfile() {
-    return this.http
-      .get(PROFILE.GET)
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiGet(PROFILE.GET));
   }
 
   changePassword(newPassword: string) {
-    return this.http
-      .put(PROFILE.CHANGE_PASSWORD, { newPassword })
-      .toPromise()
-      .then((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      });
+    return lastValueFrom(this.http.apiPut(PROFILE.CHANGE_PASSWORD, { newPassword }));
   }
 }

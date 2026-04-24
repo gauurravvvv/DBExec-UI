@@ -1,20 +1,14 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs';
 import { HOME } from 'src/app/constants/api';
+import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HomeService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClientService) {}
 
   getSuperAdminDashboard(orgId: string) {
-    return this.http.get(HOME.SUPER_ADMIN + `${orgId}`).pipe(
-      map((response: any) => {
-        const result = JSON.parse(JSON.stringify(response));
-        return result;
-      }),
-    );
+    return this.http.apiGet(HOME.SUPER_ADMIN + `${orgId}`);
   }
 }
