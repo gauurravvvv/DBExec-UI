@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChil
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
-import {debounceTime, takeUntil} from 'rxjs/operators';
+import {debounceTime} from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
@@ -30,8 +30,9 @@ export class ListOrganisationComponent implements OnInit {
   private searchSubject = new Subject<void>();
   lastTableLazyLoadEvent: any;
 
-  organisations: any[] = [];
-  totalItems = 0;
+  orgs = this.organisationService.orgs;
+  total = this.organisationService.total;
+  loading = this.organisationService.loading;
 
   selectedOrgs: any[] = [];
 
@@ -84,7 +85,6 @@ export class ListOrganisationComponent implements OnInit {
       status: null,
       createdDateRange: null,
     };
-    this.onFilterChange();
     this.onFilterChange();
   }
 
@@ -154,12 +154,7 @@ export class ListOrganisationComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.organisationService.listOrganisation(params).then((res: any) => {
-      if (this.globalService.handleSuccessService(res, false)) {
-        this.organisations = [...res.data.orgs];
-        this.totalItems = res.data.count; // Ensure backend returns totalCount for pagination
-      }
-    });
+    this.organisationService.load(params);
   }
 
   onAddNewOrganisation() {
