@@ -70,9 +70,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     let headers = req.headers
       .set('x-auth-token', accessToken)
       .set('x-organization-id', organisationId);
-    if (headers.has('X-Server-Type')) {
-      headers = headers.delete('X-Server-Type');
-    }
     if (headers.has('X-Skip-Loader')) {
       headers = headers.delete('X-Skip-Loader');
     }
