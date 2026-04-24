@@ -259,6 +259,7 @@ export class ListDatasourceComponent implements OnInit {
         const res: any = await this.datasourceService.bulkDelete(ids, reason, orgId);
         if (this.globalService.handleSuccessService(res)) {
           this.selectedDatasources = [];
+          this.cdr.markForCheck();
           this.refreshList();
         }
       } finally {
@@ -278,6 +279,7 @@ export class ListDatasourceComponent implements OnInit {
           this.selectedDatasources = this.selectedDatasources.filter(
             (d: any) => d.id !== this.selectedDatasource.id,
           );
+          this.cdr.markForCheck();
           this.refreshList();
         }
       } finally {
@@ -291,6 +293,7 @@ export class ListDatasourceComponent implements OnInit {
     this.selectedDatasource = null;
     this.bulkDelete = false;
     this.deleteJustification = '';
+    this.cdr.markForCheck();
   }
 
   private refreshList() {
