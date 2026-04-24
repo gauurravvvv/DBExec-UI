@@ -279,10 +279,16 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   onCancel(): void {
     if (!this.rlsForm) return;
-    if (this.isFormDirty) {
+    if (this.isFormDirty && this.originalFormValue) {
+      const conditionsArray = this.rlsForm.get('conditions') as FormArray;
+      conditionsArray.clear();
+      (this.originalFormValue.conditions ?? []).forEach((cond: any) => {
+        conditionsArray.push(this.createCondition(cond));
+      });
       this.rlsForm.patchValue(this.originalFormValue);
       this.isFormDirty = false;
       this.rlsForm.markAsPristine();
+      this.cdr.markForCheck();
     } else {
       this.router.navigate([RLS_RULE.LIST]);
     }
