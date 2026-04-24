@@ -7,7 +7,7 @@
         </button>
         <h2>Announcement Details</h2>
         <span
-          *ngIf="data"
+          *ngIf="current()"
           class="status-badge"
           [class.active]="isActive()"
         >
@@ -23,13 +23,13 @@
           <i class="pi pi-pencil"></i>
           Edit
         </button>
-        <button class="btn-danger" type="button" (click)="confirmDelete()">
+        <button class="btn-danger" type="button" (click)="confirmDelete()" [disabled]="saving()">
           <i class="pi pi-trash"></i> Delete
         </button>
       </div>
     </div>
 
-    <div class="content-section" *ngIf="data">
+    <div class="content-section" *ngIf="current() as data">
       <div class="details-grid">
         <!-- Banner Preview -->
         <div class="info-section">
@@ -181,7 +181,7 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()">
+      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="saving()">
         <i class="pi pi-trash"></i>
         Delete
       </button>

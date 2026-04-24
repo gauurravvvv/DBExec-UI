@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ANNOUNCEMENT } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -13,14 +13,17 @@ import { AnnouncementService } from '../../services/announcement.service';
 export class ViewAnnouncementComponent implements OnInit {
   announcementId = '';
   orgId = '';
-  data: any = null;
   showDeleteConfirm = false;
+
+  current = this.announcementService.current;
+  saving = this.announcementService.saving;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private announcementService: AnnouncementService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -30,21 +33,19 @@ export class ViewAnnouncementComponent implements OnInit {
   }
 
   load(): void {
+    this.announcementService.resetCurrent();
     this.announcementService
-      .details(this.announcementId, this.orgId)
-      .then(res => {
-        if (this.globalService.handleSuccessService(res, false)) {
-          this.data = res.data;
-        }
-      });
+      .loadOne(this.announcementId, this.orgId)
+      .catch(() => {})
+      .finally(() => this.cdr.markForCheck());
   }
 
   isActive(): boolean {
-    if (!this.data || this.data.status !== 1) return false;
+    const data = this.current();
+    if (!data || data.status !== 1) return false;
     const now = new Date();
-    if (this.data.startTime && new Date(this.data.startTime) > now)
-      return false;
-    if (this.data.endTime && new Date(this.data.endTime) < now) return false;
+    if (data.startTime && new Date(data.startTime) > now) return false;
+    if (data.endTime && new Date(data.endTime) < now) return false;
     return true;
   }
 
@@ -72,6 +73,10 @@ export class ViewAnnouncementComponent implements OnInit {
           this.router.navigate([ANNOUNCEMENT.LIST]);
         }
       })
-      .finally(() => (this.showDeleteConfirm = false));
+      .catch(() => {})
+      .finally(() => {
+        this.showDeleteConfirm = false;
+        this.cdr.markForCheck();
+      });
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -31,10 +31,12 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   orgName = '';
   maxDescriptionLength = 1000;
   minDate = new Date();
-  loading = false;
   showPreview = false;
   initialStatus = 1;
   readonly minContrastRatio = 4.5;
+
+  saving = this.announcementService.saving;
+  loading = this.announcementService.loading;
 
   constructor(
     private fb: FormBuilder,
@@ -43,6 +45,7 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
     private globalService: GlobalService,
     private announcementService: AnnouncementService,
     private groupService: GroupService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -105,16 +108,17 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
         if (this.globalService.handleSuccessService(res, false)) {
           this.groups = res.data.groups || [];
         }
+        this.cdr.markForCheck();
       });
   }
 
   loadAnnouncement(): void {
-    this.loading = true;
+    this.announcementService.resetCurrent();
     this.announcementService
-      .details(this.announcementId, this.orgId)
-      .then(res => {
-        if (this.globalService.handleSuccessService(res, false)) {
-          const data = res.data;
+      .loadOne(this.announcementId, this.orgId)
+      .then(() => {
+        const data = this.announcementService.current();
+        if (data) {
           this.orgName = data.organisationName || '';
           this.initialStatus = data.status;
           this.announcementForm.patchValue({
@@ -129,8 +133,9 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
           });
           this.announcementForm.markAsPristine();
         }
+        this.cdr.markForCheck();
       })
-      .finally(() => (this.loading = false));
+      .catch(() => this.cdr.markForCheck());
   }
 
   private luminance(hex: string): number {
@@ -217,7 +222,7 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
     return (
       this.announcementForm.valid &&
       !this.hasLowContrast &&
-      !this.loading &&
+      !this.saving() &&
       this.isFormDirty
     );
   }
@@ -231,7 +236,6 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   onSubmit(): void {
     if (!this.canSubmit()) return;
-    this.loading = true;
     const value = this.announcementForm.value;
     const payload: UpdateAnnouncementPayload = {
       name: value.name,
@@ -254,7 +258,8 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
           this.router.navigate([ANNOUNCEMENT.LIST]);
         }
       })
-      .finally(() => (this.loading = false));
+      .catch(() => {})
+      .finally(() => this.cdr.markForCheck());
   }
 
   onCancel(): void {

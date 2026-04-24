@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject, Subscription } from 'rxjs';
@@ -21,11 +21,12 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
 
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
 
-  announcements: any[] = [];
-  filteredAnnouncements: any[] = [];
+  announcements = this.announcementService.announcements;
+  totalRecordsSignal = this.announcementService.total;
+  loading = this.announcementService.loading;
+  saving = this.announcementService.saving;
 
   organisations: any[] = [];
   groups: any[] = [];
@@ -70,6 +71,7 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
     private groupService: GroupService,
     private globalService: GlobalService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -101,11 +103,9 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
           this.loadAnnouncements();
         } else {
           this.selectedOrg = null;
-          this.announcements = [];
-          this.filteredAnnouncements = [];
-          this.totalRecords = 0;
         }
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -121,6 +121,7 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
         if (this.globalService.handleSuccessService(res, false)) {
           this.groups = res.data.groups || [];
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -191,23 +192,9 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
     if (Object.keys(filter).length > 0) params.filter = JSON.stringify(filter);
 
     this.announcementService
-      .list(params)
-      .then(res => {
-        if (this.globalService.handleSuccessService(res, false)) {
-          this.announcements = res.data.announcements || [];
-          this.filteredAnnouncements = [...this.announcements];
-          this.totalRecords = res.data.count || 0;
-        } else {
-          this.announcements = [];
-          this.filteredAnnouncements = [];
-          this.totalRecords = 0;
-        }
-      })
-      .catch(() => {
-        this.announcements = [];
-        this.filteredAnnouncements = [];
-        this.totalRecords = 0;
-      });
+      .load(params)
+      .catch(() => {})
+      .finally(() => this.cdr.markForCheck());
   }
 
   isActive(a: any): boolean {
@@ -250,7 +237,11 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
           this.refreshList();
         }
       })
-      .finally(() => this.cancelDelete());
+      .catch(() => {})
+      .finally(() => {
+        this.cancelDelete();
+        this.cdr.markForCheck();
+      });
   }
 
   private refreshList(): void {
