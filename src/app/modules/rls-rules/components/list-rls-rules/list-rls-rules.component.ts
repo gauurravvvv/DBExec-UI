@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -17,14 +18,20 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./list-rls-rules.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListRlsRulesComponent implements OnInit, OnDestroy {
+export class ListRlsRulesComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
+
   limit = 10;
-  totalRecords = 0;
   lastTableLazyLoadEvent: any;
 
-  rules: any[] = [];
+  // Signal refs — template binds directly to these
+  rules   = this.rlsRulesService.rules;
+  total   = this.rlsRulesService.total;
+  loading = this.rlsRulesService.loading;
+  saving  = this.rlsRulesService.saving;
 
   datasources: any[] = [];
   selectedDatasource: any = null;
@@ -53,7 +60,6 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
   showAssignmentsPanel = false;
 
   private filter$ = new Subject<void>();
-  private filterSubscription!: Subscription;
 
   get isFilterActive(): boolean {
     return (
@@ -72,8 +78,8 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.filterSubscription = this.filter$
-      .pipe(debounceTime(400))
+    this.filter$
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadRules();
       });
@@ -83,12 +89,6 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
       this.loadDatasources();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.filterSubscription) {
-      this.filterSubscription.unsubscribe();
     }
   }
 
@@ -105,10 +105,9 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
             this.selectedOrg = null;
             this.datasources = [];
             this.selectedDatasource = null;
-            this.rules = [];
-            this.totalRecords = 0;
           }
         }
+        this.cdr.markForCheck();
         resolve();
       });
     });
@@ -117,8 +116,6 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
     this.selectedDatasource = null;
-    this.rules = [];
-    this.totalRecords = 0;
     this.loadDatasources();
   }
 
@@ -143,22 +140,18 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
               this.loadRules();
             } else {
               this.selectedDatasource = null;
-              this.rules = [];
-              this.totalRecords = 0;
             }
           } else {
             this.datasources = [];
             this.selectedDatasource = null;
-            this.rules = [];
-            this.totalRecords = 0;
           }
+          this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
           this.datasources = [];
           this.selectedDatasource = null;
-          this.rules = [];
-          this.totalRecords = 0;
+          this.cdr.markForCheck();
           resolve();
         });
     });
@@ -166,8 +159,6 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
 
   onDatasourceChange(datasourceId: any) {
     this.selectedDatasource = datasourceId;
-    this.rules = [];
-    this.totalRecords = 0;
     if (this.selectedDatasource) {
       this.loadRules();
     }
@@ -196,40 +187,23 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
     const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
     const limit = event ? event.rows : this.limit;
 
-    const params: any = {
-      page,
-      limit,
-    };
+    const params: any = { page, limit };
 
     const filter: any = {};
-    if (this.filterValues.datasetName) {
-      filter.datasetName = this.filterValues.datasetName;
-    }
-    if (this.filterValues.name) {
-      filter.name = this.filterValues.name;
-    }
+    if (this.filterValues.datasetName) filter.datasetName = this.filterValues.datasetName;
+    if (this.filterValues.name) filter.name = this.filterValues.name;
     if (this.filterValues.status !== null && this.filterValues.status !== undefined) {
       filter.status = this.filterValues.status;
     }
-
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
-    }
+    if (Object.keys(filter).length > 0) params.filter = JSON.stringify(filter);
 
     this.rlsRulesService
-      .listRules(this.selectedOrg, this.selectedDatasource, params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.rules = response.data.rules || [];
-          this.totalRecords = response.data.count || this.rules.length;
-        } else {
-          this.rules = [];
-          this.totalRecords = 0;
-        }
+      .load(this.selectedOrg, this.selectedDatasource, params)
+      .then(() => {
+        this.cdr.markForCheck();
       })
       .catch(() => {
-        this.rules = [];
-        this.totalRecords = 0;
+        this.cdr.markForCheck();
       });
   }
 
@@ -269,12 +243,8 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
   proceedDelete() {
     if (this.ruleToDelete && this.deleteJustification.trim()) {
       this.rlsRulesService
-        .deleteRule(
-          this.selectedOrg,
-          this.ruleToDelete,
-          this.deleteJustification.trim(),
-        )
-        .then(response => {
+        .delete(this.selectedOrg, this.ruleToDelete, this.deleteJustification.trim())
+        .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
               this.loadRules(this.lastTableLazyLoadEvent);
@@ -284,7 +254,11 @@ export class ListRlsRulesComponent implements OnInit, OnDestroy {
             this.showDeleteConfirm = false;
             this.ruleToDelete = null;
             this.deleteJustification = '';
+            this.cdr.markForCheck();
           }
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
         });
     }
   }

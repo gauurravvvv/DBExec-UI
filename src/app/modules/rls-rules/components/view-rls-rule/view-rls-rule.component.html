@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <div class="content-section" *ngIf="ruleData">
+    <div class="content-section" *ngIf="current()">
       <div class="details-grid">
         <!-- Basic Information -->
         <div class="info-section">
@@ -25,36 +25,32 @@
           <div class="info-grid">
             <div class="info-item">
               <label>Rule Name</label>
-              <p>{{ ruleData.name }}</p>
+              <p>{{ current()!.name }}</p>
             </div>
             <div class="info-item">
               <label>Description</label>
-              <p>{{ ruleData.description || 'No description available' }}</p>
+              <p>{{ current()!.description || 'No description available' }}</p>
             </div>
             <div class="info-item">
               <label>Dataset</label>
               <p class="with-icon">
-                <i class="pi pi-table mr-2"></i
-                >{{ ruleData.datasetName || 'N/A' }}
+                <i class="pi pi-table mr-2"></i>{{ current()!.datasetName || 'N/A' }}
               </p>
             </div>
             <div class="info-item">
               <label>Status</label>
-              <span class="status-badge" [class.active]="ruleData.isEnabled">
+              <span class="status-badge" [class.active]="current()!.isEnabled">
                 <i
                   class="pi"
-                  [ngClass]="
-                    ruleData.isEnabled ? 'pi-check-circle' : 'pi-times-circle'
-                  "
+                  [ngClass]="current()!.isEnabled ? 'pi-check-circle' : 'pi-times-circle'"
                 ></i>
-                {{ ruleData.isEnabled ? 'Enabled' : 'Disabled' }}
+                {{ current()!.isEnabled ? 'Enabled' : 'Disabled' }}
               </span>
             </div>
             <div class="info-item">
               <label>Created On</label>
               <p class="with-icon">
-                <i class="pi pi-calendar mr-2"></i
-                >{{ ruleData.createdOn | date: 'medium' }}
+                <i class="pi pi-calendar mr-2"></i>{{ current()!.createdOn | date: 'medium' }}
               </p>
             </div>
           </div>
@@ -64,10 +60,10 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-users mr-2"></i> Assignments
-            <span class="count-badge">{{ ruleData.assignments?.length || 0 }}</span>
+            <span class="count-badge">{{ current()!.assignments?.length || 0 }}</span>
           </h3>
-          <div class="assignments-list" *ngIf="ruleData.assignments?.length; else noAssignments">
-            <div class="assignment-item" *ngFor="let a of ruleData.assignments; trackBy: trackById">
+          <div class="assignments-list" *ngIf="current()!.assignments?.length; else noAssignments">
+            <div class="assignment-item" *ngFor="let a of current()!.assignments; trackBy: trackById">
               <i class="pi" [ngClass]="a.scope === 'user' ? 'pi-user' : 'pi-users'"></i>
               <span class="assignment-name">{{ a.scopeName || a.scopeId }}</span>
               <span class="assignment-type-badge">{{ a.scope }}</span>
@@ -82,15 +78,15 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-filter mr-2"></i> Filter Conditions
-            <span class="count-badge">{{ ruleData.conditions?.length || 0 }}</span>
+            <span class="count-badge">{{ current()!.conditions?.length || 0 }}</span>
           </h3>
-          <div class="conditions-table" *ngIf="ruleData.conditions?.length; else noConditions">
+          <div class="conditions-table" *ngIf="current()!.conditions?.length; else noConditions">
             <div class="conditions-table-header">
               <span>Column</span>
               <span>Operator</span>
               <span>Values</span>
             </div>
-            <div class="condition-table-row" *ngFor="let cond of ruleData.conditions; let i = index; trackBy: trackByIndex">
+            <div class="condition-table-row" *ngFor="let cond of current()!.conditions; let i = index; trackBy: trackByIndex">
               <span class="cond-index">{{ i + 1 }}</span>
               <span class="cond-column">
                 <i class="pi pi-filter-fill"></i> {{ cond.columnName }}
@@ -104,7 +100,7 @@
           <ng-template #noConditions>
             <div class="no-data">No conditions defined</div>
           </ng-template>
-          <p class="and-note" *ngIf="ruleData.conditions?.length > 1">
+          <p class="and-note" *ngIf="current()!.conditions?.length > 1">
             <i class="pi pi-info-circle"></i> All conditions are AND-ed together
           </p>
         </div>
@@ -124,16 +120,13 @@
       <p class="delete-intro">Are you sure you want to delete this RLS rule?</p>
       <ul class="delete-info-list">
         <li>
-          <i class="pi pi-info-circle"></i
-          ><span>This will permanently remove the rule</span>
+          <i class="pi pi-info-circle"></i><span>This will permanently remove the rule</span>
         </li>
         <li>
-          <i class="pi pi-info-circle"></i
-          ><span>Users/groups will no longer be restricted by this rule</span>
+          <i class="pi pi-info-circle"></i><span>Users/groups will no longer be restricted by this rule</span>
         </li>
         <li>
-          <i class="pi pi-info-circle"></i
-          ><span>This action cannot be undone</span>
+          <i class="pi pi-info-circle"></i><span>This action cannot be undone</span>
         </li>
       </ul>
       <div class="justification-section">
@@ -157,7 +150,7 @@
       <button
         class="btn-confirm"
         (click)="proceedDelete()"
-        [disabled]="!deleteJustification.trim()"
+        [disabled]="!deleteJustification.trim() || saving()"
       >
         <i class="pi pi-trash"></i> Delete
       </button>

@@ -75,12 +75,12 @@
       <div class="table-wrapper">
         <p-table
           #dt
-          [value]="rules"
+          [value]="rules()"
           [rows]="10"
           [paginator]="true"
           [lazy]="true"
           (onLazyLoad)="loadRules($event)"
-          [totalRecords]="totalRecords"
+          [totalRecords]="total()"
           [rowHover]="true"
           dataKey="id"
           currentPageReportTemplate="{first} - {last} of {totalRecords}"
