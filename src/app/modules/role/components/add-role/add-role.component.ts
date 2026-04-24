@@ -84,6 +84,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
         this.organisations = [...response.data.orgs];
+        this.cdr.markForCheck();
       }
     });
   }
