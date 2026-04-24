@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -36,6 +36,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
     private route: ActivatedRoute,
     private roleService: RoleService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -64,35 +65,39 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  loadRoleData() {
-    Promise.all([
-      this.roleService.viewRole(this.orgId, this.roleId),
-      this.roleService.listPermissions(),
-    ]).then(([roleResponse, permResponse]) => {
-      if (this.globalService.handleSuccessService(roleResponse, false)) {
-        this.roleData = roleResponse.data;
+  async loadRoleData() {
+    await Promise.all([
+      this.roleService.loadOne(this.orgId, this.roleId),
+      this.roleService.loadPermissions(),
+    ]);
 
-        this.roleForm.patchValue({
-          id: this.roleData.id,
-          organisation: this.roleData.organisationId,
-          name: this.roleData.name,
-          description: this.roleData.description || '',
-          status: this.roleData.status,
-        });
+    const roleData = this.roleService.current();
+    if (roleData) {
+      this.roleData = roleData;
 
-        if (this.roleData.isDefault === 1) {
-          this.roleForm.get('name')?.disable();
-          this.roleForm.get('description')?.disable();
-          this.roleForm.get('status')?.disable();
-        }
+      this.roleForm.patchValue({
+        id: this.roleData.id,
+        organisation: this.roleData.organisationId,
+        name: this.roleData.name,
+        description: this.roleData.description || '',
+        status: this.roleData.status,
+      });
+
+      if (this.roleData.isDefault === 1) {
+        this.roleForm.get('name')?.disable();
+        this.roleForm.get('description')?.disable();
+        this.roleForm.get('status')?.disable();
       }
+    }
 
-      if (this.globalService.handleSuccessService(permResponse, false)) {
-        this.permissions = [...(permResponse.data.permissions || [])];
-        this.initializePermissionControls(this.permissions);
-        this.applyExistingPermissions();
-      }
-    });
+    const perms = this.roleService.permissions();
+    if (perms.length > 0) {
+      this.permissions = [...perms];
+      this.initializePermissionControls(this.permissions);
+      this.applyExistingPermissions();
+    }
+
+    this.cdr.markForCheck();
   }
 
   private applyExistingPermissions() {

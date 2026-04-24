@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -38,6 +38,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     private roleService: RoleService,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -87,13 +88,14 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  loadPermissions() {
-    this.roleService.listPermissions().then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.permissions = [...(response.data.permissions || [])];
-        this.initializePermissionControls(this.permissions);
-      }
-    });
+  async loadPermissions() {
+    await this.roleService.loadPermissions();
+    const perms = this.roleService.permissions();
+    if (perms.length > 0) {
+      this.permissions = [...perms];
+      this.initializePermissionControls(this.permissions);
+      this.cdr.markForCheck();
+    }
   }
 
   onSubmit() {
