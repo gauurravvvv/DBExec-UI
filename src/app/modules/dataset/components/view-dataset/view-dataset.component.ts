@@ -262,10 +262,12 @@ export class ViewDatasetComponent implements OnInit {
           // Reload dataset data from API
           this.loadDatasetData();
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.showDeleteFieldConfirm = false;
         this.fieldToDelete = null;
+        this.cdr.markForCheck();
       });
   }
 
