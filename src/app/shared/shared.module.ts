@@ -21,6 +21,9 @@ import { AnalysisFilterBarComponent } from './components/analysis-filter-bar/ana
 import { CustomAccordionComponent } from './components/custom-accordion/custom-accordion.component';
 import { CustomBinaryCheckboxComponent } from './components/custom-binary-checkbox/custom-binary-checkbox.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
+import { FileSizePipe } from './pipes/file-size.pipe';
+import { FilterSchemasPipe, FilterTablesPipe } from './pipes/filter-schemas.pipe';
+import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
 
 @NgModule({
   declarations: [
@@ -43,6 +46,10 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     AnalysisFilterBarComponent,
     CustomAccordionComponent,
     CustomBinaryCheckboxComponent,
+    FileSizePipe,
+    FilterSchemasPipe,
+    FilterTablesPipe,
+    ReplaceUnderscoresPipe,
   ],
   imports: [
     CommonModule,
@@ -70,6 +77,10 @@ import { AppPrimeNGModule } from './modules/app-primeng.module';
     AnalysisFilterBarComponent,
     CustomAccordionComponent,
     CustomBinaryCheckboxComponent,
+    FileSizePipe,
+    FilterSchemasPipe,
+    FilterTablesPipe,
+    ReplaceUnderscoresPipe,
   ],
 })
 export class SharedModule {}

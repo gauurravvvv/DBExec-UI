@@ -166,7 +166,7 @@
                   class="event-badge"
                   [ngClass]="getEventClass(activity.eventType)"
                 >
-                  {{ formatEventType(activity.eventType) }}
+                  {{ activity.eventType | replaceUnderscores }}
                 </span>
               </td>
               <td>
@@ -180,7 +180,7 @@
                   *ngIf="activity.failureReason"
                   [title]="activity.failureReason"
                 >
-                  {{ activity.failureReason?.replace('_', ' ') }}
+                  {{ activity.failureReason | replaceUnderscores }}
                 </span>
                 <span class="description-text" *ngIf="!activity.failureReason"
                   >-</span
