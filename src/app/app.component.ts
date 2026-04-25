@@ -7,6 +7,7 @@ import { SessionExpiredService } from './core/services/session-expired.service';
 import { IdleTimeoutService } from './core/services/idle-timeout.service';
 import { LoginService } from './core/services/login.service';
 import { StorageService } from './core/services/storage.service';
+import { StorageType } from './constants/storageType';
 import { PrimeNGConfig } from 'primeng/api';
 import { delay, filter } from 'rxjs/operators';
 
@@ -34,9 +35,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private titleService: Title,
   ) {
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = StorageService.get(StorageType.THEME);
     if (!savedTheme) {
-      localStorage.setItem('theme', 'dark');
+      StorageService.set(StorageType.THEME, 'dark');
       document.body.classList.remove('light-theme');
     } else {
       if (savedTheme === 'light') {

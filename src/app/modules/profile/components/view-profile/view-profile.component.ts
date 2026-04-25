@@ -6,6 +6,7 @@ import { ProfileService } from '../../services/profile.service';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
+import { StorageService } from 'src/app/core/services/storage.service';
 
 @Component({
   selector: 'app-view-profile',
@@ -84,8 +85,7 @@ export class ViewProfileComponent implements OnInit {
 
   private clearSessionAndNavigate() {
     this.store.dispatch(AddAnalysesActions.clearAllDatasets());
-    localStorage.clear();
-    sessionStorage.clear();
+    StorageService.clear();
     this.router.navigate(['/login']);
   }
 
