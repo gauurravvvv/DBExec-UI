@@ -133,6 +133,7 @@ export class ViewSuperAdminComponent implements OnInit {
         if (this.globalService.handleSuccessService(res)) {
           this.router.navigate([SUPER_ADMIN.LIST]);
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -141,6 +142,7 @@ export class ViewSuperAdminComponent implements OnInit {
       if (this.globalService.handleSuccessService(res)) {
         this.loadAdminDetails();
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -156,6 +158,7 @@ export class ViewSuperAdminComponent implements OnInit {
           if (this.globalService.handleSuccessService(response)) {
             this.showChangePasswordDialog = false;
           }
+          this.cdr.markForCheck();
         });
     } else {
       this.showChangePasswordDialog = false;

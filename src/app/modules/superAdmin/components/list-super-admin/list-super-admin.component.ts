@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
@@ -57,6 +57,7 @@ export class ListSuperAdminComponent implements OnInit {
     private superAdminService: SuperAdminService,
     private router: Router,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   lastTableLazyLoadEvent: any;
@@ -169,6 +170,7 @@ export class ListSuperAdminComponent implements OnInit {
             this.selectedAdmins = [];
             this.refreshList();
           }
+          this.cdr.markForCheck();
         })
         .finally(() => this.closeDeletePopup());
       return;
@@ -203,6 +205,7 @@ export class ListSuperAdminComponent implements OnInit {
           );
           this.refreshList();
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -213,6 +216,7 @@ export class ListSuperAdminComponent implements OnInit {
           this.loadSuperAdmins(this.lastTableLazyLoadEvent);
         }
       }
+      this.cdr.markForCheck();
     });
   }
 

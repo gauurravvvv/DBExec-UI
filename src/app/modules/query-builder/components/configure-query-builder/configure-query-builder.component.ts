@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QUERY_BUILDER } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -96,6 +96,7 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private tabService: TabService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -395,6 +396,7 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
           this.tabsData = tabsWithPrompts;
           this.refactoredTabData = JSON.parse(JSON.stringify(tabsWithPrompts));
         }
+        this.cdr.markForCheck();
       })
       .then(() => {
         this.queryBuilderService
@@ -405,6 +407,7 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
                 this.patchQueryBuilderConfiguration(response.data);
               }
             }
+            this.cdr.markForCheck();
           });
       });
   }
@@ -879,6 +882,7 @@ export class ConfigureQueryBuilderComponent implements OnInit, OnDestroy {
         if (this.globalService.handleSuccessService(response, true)) {
           this.router.navigate([QUERY_BUILDER.LIST]);
         }
+        this.cdr.markForCheck();
       });
   }
 
