@@ -2,7 +2,7 @@ import { IEnvironment } from 'src/app/types/environment.types';
 
 export const environment: IEnvironment = {
   production: true,
-  apiServer: 'http://localhost:3000/api/v1',
-  appURL: 'http://localhost:4200',
+  apiServer: '__API_SERVER__',  // Replace at deploy time (e.g., https://api.dbexec.com/api/v1)
+  appURL: '__APP_URL__',        // Replace at deploy time (e.g., https://app.dbexec.com)
   appVersion: 'v26.1',
 };
