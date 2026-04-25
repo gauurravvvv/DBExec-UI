@@ -1,22 +1,19 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy} from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { GlobalService } from 'src/app/core/services/global.service';
-// import { OrganisationService } from '../../organisation/organisation.service';
 import { HomeService } from '../services/home.service';
 
 @Component({
   selector: 'app-super-admin-home',
   templateUrl: './super-admin-home.component.html',
   styleUrls: ['./super-admin-home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('fadeInUp', [
       transition(':enter', [
-        style({ transform: 'translateY(20px)', opacity: 0,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-}),
+        style({ transform: 'translateY(20px)', opacity: 0 }),
         animate(
           '0.4s ease-out',
           style({ transform: 'translateY(0)', opacity: 1 }),
@@ -26,7 +23,8 @@ import { HomeService } from '../services/home.service';
   ],
 })
 export class SuperAdminHomeComponent implements OnInit {
-  private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
+  private cdr        = inject(ChangeDetectorRef);
 
   organizations: any[] = [];
 
@@ -81,50 +79,37 @@ export class SuperAdminHomeComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private globalService: GlobalService,
-    // private orgService: OrganisationService,
     private homeService: HomeService,
   ) {}
 
   ngOnInit(): void {
-    // Fetch initial data for the first organization
-    // this.listOrganisationAPI();
-
-    this.updateStats(); // Update stats on init
+    this.updateStats();
   }
 
   onOrganizationChange(event: any) {
     this.loadOrganizationData(event?.target.value);
   }
 
-  // listOrganisationAPI() {
-  //   this.orgService
-  //     .listOrganisation({
-  //       pageNumber: 1,
-  //       limit: 100,
-  //     })
-  //     .pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
-  //       if (res) {
-  //         this.organizations = [...res.data.orgs];
-  //         this.loadOrganizationData(this.organizations[0].id);
-  //       }
-  //     });
-  // }
-
   loadOrganizationData(orgId: string) {
-    //fetch data from dashboardAPI
-    this.homeService.getSuperAdminDashboard(orgId).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
-      if (res) {
-        this.entitiesData.maxAdmins = res.data.maxAdmins;
-        this.entitiesData.maxDatasources = res.data.maxDatasources;
-        this.entitiesData.maxEnvironment = res.data.maxEnvironment;
-        this.entitiesData.maxUsers = res.data.maxUsers;
-        this.entitiesData.totalAdmins = res.data.adminsCount;
-        this.entitiesData.totalDatasources = res.data.datasourcesCount;
-        this.entitiesData.totalEnvironment = res.data.environmentCount;
-        this.entitiesData.totalUsers = res.data.usersCount;
-        this.updateStats();
-      }
-    });
+    this.homeService.getSuperAdminDashboard(orgId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          if (res) {
+            this.entitiesData.maxAdmins = res.data.maxAdmins;
+            this.entitiesData.maxDatasources = res.data.maxDatasources;
+            this.entitiesData.maxEnvironment = res.data.maxEnvironment;
+            this.entitiesData.maxUsers = res.data.maxUsers;
+            this.entitiesData.totalAdmins = res.data.adminsCount;
+            this.entitiesData.totalDatasources = res.data.datasourcesCount;
+            this.entitiesData.totalEnvironment = res.data.environmentCount;
+            this.entitiesData.totalUsers = res.data.usersCount;
+            this.updateStats();
+            this.cdr.markForCheck();
+          }
+        },
+        error: () => { /* handled by interceptor */ },
+      });
     // Simulate fetching data based on organization ID
     // Replace this with actual service calls
     this.activeUsers24hrs = Math.floor(Math.random() * 100);
@@ -133,7 +118,7 @@ export class SuperAdminHomeComponent implements OnInit {
     this.activeUsers15days = Math.floor(Math.random() * 700);
     this.activeUsers30days = Math.floor(Math.random() * 1000);
 
-    this.updateStats(); // Update stats after loading data
+    this.updateStats();
   }
 
   updateStats() {
@@ -188,8 +173,7 @@ export class SuperAdminHomeComponent implements OnInit {
   }
 
   getProgressValue(obj: any) {
-    // Calculate percentage based on some maximum value
-    const maxValue = obj.maxValue; // Adjust this based on your needs
+    const maxValue = obj.maxValue;
     return (obj.value / maxValue) * 100;
   }
 
@@ -208,10 +192,5 @@ export class SuperAdminHomeComponent implements OnInit {
   getProgressPercentage(value: number): number {
     const maxValue = Math.max(...this.stats.map(stat => stat.value));
     return (value / maxValue) * 100;
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
