@@ -179,9 +179,7 @@
           >
             <div
               *ngFor="
-                let schema of getFilteredSchemas(
-                  datasourceSchemas[selectedDatasourceObj.id]?.schemas || []
-                );
+                let schema of (datasourceSchemas[selectedDatasourceObj.id]?.schemas || []) | filterSchemas: schemaSearchText;
                 trackBy: trackByName
               "
               class="schema-item"
@@ -216,7 +214,7 @@
                 "
               >
                 <div
-                  *ngFor="let table of getFilteredTables(schema.tables); trackBy: trackByName"
+                  *ngFor="let table of schema.tables | filterTables: schemaSearchText; trackBy: trackByName"
                   class="table-item"
                   [class.expanded]="
                     isTableExpanded(
