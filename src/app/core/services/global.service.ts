@@ -91,12 +91,20 @@ export class GlobalService {
     }
   }
 
+  /**
+   * UI-only JWT decode — no signature verification.
+   * All security decisions are enforced server-side; this is only for display/routing.
+   */
   getDecodeToken() {
     const accessToken = StorageService.get(StorageType.ACCESS_TOKEN);
     if (accessToken) return JSON.parse(atob(accessToken.split('.')[1]));
     else this.router.navigateByUrl('');
   }
 
+  /**
+   * UI-only JWT claim extraction — no signature verification.
+   * Used for display/routing only; server enforces all access control.
+   */
   getTokenDetails(value: string) {
     const accessToken = StorageService.get(StorageType.ACCESS_TOKEN);
     if (!accessToken) {

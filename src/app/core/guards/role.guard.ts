@@ -15,6 +15,11 @@ import { ROLES } from 'src/app/constants/user.constant';
 @Injectable({
   providedIn: 'root',
 })
+/**
+ * UI-only route guard based on client-decoded JWT role.
+ * This prevents navigation to unauthorized pages but is NOT a security boundary —
+ * the server enforces role-based access on every API call.
+ */
 export class RoleGuard implements CanActivate {
   constructor(
     private globalService: GlobalService,
