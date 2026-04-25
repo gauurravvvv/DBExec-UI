@@ -158,406 +158,26 @@
                   hasRequiredChartFields(visual)
                 "
               >
-                <!-- Bar Chart Types -->
-                <app-configurable-bar-chart
-                  *ngIf="isBarChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [chartType]="visual.chartType"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-bar-chart>
-
-                <!-- Line Chart -->
-                <app-configurable-line-chart
-                  *ngIf="isLineChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-line-chart>
-
-                <!-- Area Chart Types -->
-                <app-configurable-area-chart
-                  *ngIf="isAreaChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [chartType]="visual.chartType"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-area-chart>
-
-                <!-- Polar Chart -->
-                <app-configurable-polar-chart
-                  *ngIf="isPolarChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-polar-chart>
-
-                <!-- Pie Chart Types -->
-                <app-configurable-pie-chart
-                  *ngIf="isPieChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [chartType]="visual.chartType"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-pie-chart>
-
-                <!-- Gauge Chart Types -->
-                <app-configurable-gauge-chart
-                  *ngIf="isGaugeChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [chartType]="visual.chartType"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-gauge-chart>
-
-                <!-- Number Card Chart -->
+                <!-- Card chart (non-ECharts) -->
                 <app-configurable-card-chart
-                  *ngIf="isCardChartType(visual.chartType)"
+                  *ngIf="isCardChartType(visual.chartType); else dashEchartBlock"
                   [showConfigPanel]="false"
                   [chartWidth]="visual.width"
                   [chartHeight]="visual.height - 35"
                   [chartConfig]="visual.config"
                   [data]="visual.chartData"
-                >
-                </app-configurable-card-chart>
+                ></app-configurable-card-chart>
 
-                <!-- Heat Map Chart -->
-                <app-configurable-heatmap-chart
-                  *ngIf="isHeatMapChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-heatmap-chart>
+                <ng-template #dashEchartBlock>
+                  <app-echart-visual
+                    [chartType]="visual.chartType!"
+                    [chartConfig]="visual.config"
+                    [chartWidth]="visual.width"
+                    [chartHeight]="visual.height - 35"
+                    [data]="getDisplayData(visual)"
+                  ></app-echart-visual>
+                </ng-template>
 
-                <!-- Tree Map Chart -->
-                <app-configurable-treemap-chart
-                  *ngIf="isTreeMapChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-treemap-chart>
-
-                <!-- Bubble Chart -->
-                <app-configurable-bubble-chart
-                  *ngIf="isBubbleChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-bubble-chart>
-
-                <!-- Box Chart -->
-                <app-configurable-box-chart
-                  *ngIf="isBoxChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-box-chart>
-
-                <!-- Scatter Chart Types -->
-                <app-configurable-scatter-chart
-                  *ngIf="isScatterChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [chartType]="visual.chartType || 'scatter'"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-scatter-chart>
-
-                <!-- Funnel Chart -->
-                <app-configurable-funnel-chart
-                  *ngIf="isFunnelChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-funnel-chart>
-
-                <!-- Sunburst Chart -->
-                <app-configurable-sunburst-chart
-                  *ngIf="isSunburstChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-sunburst-chart>
-
-                <!-- Sankey Chart -->
-                <app-configurable-sankey-chart
-                  *ngIf="isSankeyChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-sankey-chart>
-
-                <!-- Waterfall Chart -->
-                <app-configurable-waterfall-chart
-                  *ngIf="isWaterfallChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-waterfall-chart>
-
-                <!-- Graph Chart -->
-                <app-configurable-graph-chart
-                  *ngIf="isGraphChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-graph-chart>
-
-                <!-- Tree Chart -->
-                <app-configurable-tree-chart
-                  *ngIf="isTreeChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-tree-chart>
-
-                <!-- Theme River Chart -->
-                <app-configurable-theme-river-chart
-                  *ngIf="isThemeRiverChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-theme-river-chart>
-
-                <!-- Pictorial Bar Chart -->
-                <app-configurable-pictorial-bar-chart
-                  *ngIf="isPictorialBarChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-pictorial-bar-chart>
-
-                <!-- Polar Bar Chart -->
-                <app-configurable-polar-bar-chart
-                  *ngIf="isPolarBarChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-polar-bar-chart>
-
-                <!-- Radar Chart -->
-                <app-configurable-radar-chart
-                  *ngIf="isRadarChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-radar-chart>
-
-                <!-- Candlestick Chart -->
-                <app-configurable-candlestick-chart
-                  *ngIf="isCandlestickChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-candlestick-chart>
-
-                <!-- Parallel Chart -->
-                <app-configurable-parallel-chart
-                  *ngIf="isParallelChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-parallel-chart>
-
-                <!-- Bar 3D Chart -->
-                <app-configurable-bar3d-chart
-                  *ngIf="isBar3dChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-bar3d-chart>
-
-                <!-- Line 3D Chart -->
-                <app-configurable-line3d-chart
-                  *ngIf="isLine3dChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-line3d-chart>
-
-                <!-- Scatter 3D Chart -->
-                <app-configurable-scatter3d-chart
-                  *ngIf="isScatter3dChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-scatter3d-chart>
-
-                <!-- Surface Chart -->
-                <app-configurable-surface-chart
-                  *ngIf="isSurfaceChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-surface-chart>
-
-                <!-- Globe Chart -->
-                <app-configurable-globe-chart
-                  *ngIf="isGlobeChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-globe-chart>
-
-                <!-- Graph GL Chart -->
-                <app-configurable-graphgl-chart
-                  *ngIf="isGraphGlChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-graphgl-chart>
-
-                <!-- Scatter GL Chart -->
-                <app-configurable-scattergl-chart
-                  *ngIf="isScatterGlChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-scattergl-chart>
-
-                <!-- Lines GL Chart -->
-                <app-configurable-linesgl-chart
-                  *ngIf="isLinesGlChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-linesgl-chart>
-
-                <!-- Map 3D Chart -->
-                <app-configurable-map3d-chart
-                  *ngIf="isMap3dChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-map3d-chart>
-
-                <!-- Flow GL Chart -->
-                <app-configurable-flowgl-chart
-                  *ngIf="isFlowGlChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-flowgl-chart>
-
-                <!-- World Map Chart -->
-                <app-configurable-world-map-chart
-                  *ngIf="isWorldMapChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-world-map-chart>
-
-                <!-- Flow Lines Chart -->
-                <app-configurable-flow-lines-chart
-                  *ngIf="isFlowLinesChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                >
-                </app-configurable-flow-lines-chart>
               </ng-container>
 
               <!-- Globe Charts (show with dummy data when no mapping) -->
@@ -565,28 +185,18 @@
                 *ngIf="
                   !visual.loading &&
                   !visual.error &&
-                  (isLines3dChartType(visual.chartType) ||
-                    isPolygons3dChartType(visual.chartType))
+                  !hasRequiredChartFields(visual) &&
+                  visual.chartType &&
+                  isGlobeSpecialType(visual.chartType)
                 "
               >
-                <app-configurable-lines3d-chart
-                  *ngIf="isLines3dChartType(visual.chartType)"
-                  [showConfigPanel]="false"
+                <app-echart-visual
+                  [chartType]="visual.chartType!"
+                  [chartConfig]="visual.config"
                   [chartWidth]="visual.width"
                   [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
                   [data]="getDisplayData(visual)"
-                >
-                </app-configurable-lines3d-chart>
-                <app-configurable-polygons3d-chart
-                  *ngIf="isPolygons3dChartType(visual.chartType)"
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="getDisplayData(visual)"
-                >
-                </app-configurable-polygons3d-chart>
+                ></app-echart-visual>
               </ng-container>
             </div>
           </div>

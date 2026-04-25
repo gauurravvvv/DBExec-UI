@@ -17,42 +17,10 @@ import { AnalysesService } from '../../../analyses/service/analyses.service';
 import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
 import { Visual } from '../../../analyses/models/visual.model';
 import {
-  isBarChartType,
-  isLineChartType,
-  isAreaChartType,
-  isPieChartType,
-  isGaugeChartType,
   isCardChartType,
   isHeatMapChartType,
-  isTreeMapChartType,
-  isPolarChartType,
-  isBubbleChartType,
-  isBoxChartType,
-  isScatterChartType,
-  isFunnelChartType,
   isSankeyChartType,
-  isSunburstChartType,
-  isWaterfallChartType,
   isGraphChartType,
-  isTreeChartType,
-  isThemeRiverChartType,
-  isPictorialBarChartType,
-  isPolarBarChartType,
-  isRadarChartType,
-  isCandlestickChartType,
-  isParallelChartType,
-  isBar3dChartType,
-  isLine3dChartType,
-  isScatter3dChartType,
-  isSurfaceChartType,
-  isGlobeChartType,
-  isGraphGlChartType,
-  isScatterGlChartType,
-  isLinesGlChartType,
-  isMap3dChartType,
-  isFlowGlChartType,
-  isWorldMapChartType,
-  isFlowLinesChartType,
   isLines3dChartType,
   isPolygons3dChartType,
   is3DCoordinateChartType,
@@ -103,45 +71,7 @@ export class ViewDashboardComponent
   private lastStableWidth = 0;
   private lastStableHeight = 0;
 
-  // Chart type checkers as class properties
-  isBarChartType = isBarChartType;
-  isLineChartType = isLineChartType;
-  isAreaChartType = isAreaChartType;
-  isPieChartType = isPieChartType;
-  isGaugeChartType = isGaugeChartType;
   isCardChartType = isCardChartType;
-  isHeatMapChartType = isHeatMapChartType;
-  isTreeMapChartType = isTreeMapChartType;
-  isPolarChartType = isPolarChartType;
-  isBubbleChartType = isBubbleChartType;
-  isBoxChartType = isBoxChartType;
-  isScatterChartType = isScatterChartType;
-  isFunnelChartType = isFunnelChartType;
-  isSankeyChartType = isSankeyChartType;
-  isSunburstChartType = isSunburstChartType;
-  isWaterfallChartType = isWaterfallChartType;
-  isGraphChartType = isGraphChartType;
-  isTreeChartType = isTreeChartType;
-  isThemeRiverChartType = isThemeRiverChartType;
-  isPictorialBarChartType = isPictorialBarChartType;
-  isPolarBarChartType = isPolarBarChartType;
-  isRadarChartType = isRadarChartType;
-  isCandlestickChartType = isCandlestickChartType;
-  isParallelChartType = isParallelChartType;
-  isBar3dChartType = isBar3dChartType;
-  isLine3dChartType = isLine3dChartType;
-  isScatter3dChartType = isScatter3dChartType;
-  isSurfaceChartType = isSurfaceChartType;
-  isGlobeChartType = isGlobeChartType;
-  isGraphGlChartType = isGraphGlChartType;
-  isScatterGlChartType = isScatterGlChartType;
-  isLinesGlChartType = isLinesGlChartType;
-  isMap3dChartType = isMap3dChartType;
-  isFlowGlChartType = isFlowGlChartType;
-  isWorldMapChartType = isWorldMapChartType;
-  isFlowLinesChartType = isFlowLinesChartType;
-  isLines3dChartType = isLines3dChartType;
-  isPolygons3dChartType = isPolygons3dChartType;
 
   constructor(
     private route: ActivatedRoute,
@@ -487,6 +417,10 @@ export class ViewDashboardComponent
   }
 
   // ── Chart Helpers ──
+
+  isGlobeSpecialType(chartType: string): boolean {
+    return isLines3dChartType(chartType) || isPolygons3dChartType(chartType);
+  }
 
   hasRequiredChartFields(visual: Visual): boolean {
     if (!visual.chartType) return false;
