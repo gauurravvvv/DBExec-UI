@@ -10,6 +10,8 @@ import {
   OnDestroy,
   Output,
   SimpleChanges,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import {
   FUNCTION_CATEGORIES,
@@ -50,6 +52,7 @@ export class AddCustomFieldDialogComponent
   implements OnChanges, AfterViewInit, OnDestroy
 {
   @Input() visible = false;
+  @ViewChild('formulaEditorContainer') formulaEditorContainer!: ElementRef<HTMLDivElement>;
   @Input() datasetId: string = '';
   @Input() organisationId: string = '';
   @Input() datasetFields: any[] = [];
@@ -235,7 +238,7 @@ export class AddCustomFieldDialogComponent
   }
 
   private createEditor(): void {
-    const container = document.getElementById('formula-editor-container');
+    const container = this.formulaEditorContainer?.nativeElement;
     if (!container) {
       this.isLoadingEditor = false;
       return;

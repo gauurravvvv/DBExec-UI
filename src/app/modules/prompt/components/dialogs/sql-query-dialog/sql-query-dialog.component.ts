@@ -6,7 +6,9 @@ import { ChangeDetectionStrategy, AfterViewInit,
   OnChanges,
   OnDestroy,
   Output,
-  SimpleChanges, } from '@angular/core';
+  SimpleChanges,
+  ViewChild,
+  ElementRef, } from '@angular/core';
 import { MonacoIntelliSenseService } from '../../../../dataset/services/monaco-intellisense.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 
@@ -100,6 +102,7 @@ const MONACO_EDITOR_OPTIONS = {
 export class SqlQueryDialogComponent
   implements OnChanges, AfterViewInit, OnDestroy
 {
+  @ViewChild('sqlQueryEditorContainer') sqlQueryEditorContainer!: ElementRef<HTMLDivElement>;
   @Input() visible = false;
   @Input() schemaData: any[] = []; // Schema structure with tables and columns
   @Input() currentSchema: string = '';
@@ -241,7 +244,7 @@ export class SqlQueryDialogComponent
   private initMonaco(): void {
     // Wait for the DOM to be ready
     setTimeout(() => {
-      const container = document.getElementById('sql-query-editor-container');
+      const container = this.sqlQueryEditorContainer?.nativeElement;
       if (!container) {
         this.isLoadingEditor = false;
         return;
