@@ -1,0 +1,291 @@
+<p-dialog
+  header="{{ editingFilter ? 'Edit Filter' : 'Add Filter' }}"
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '520px' }"
+  styleClass="filter-config-dialog"
+  [closable]="true"
+  (onHide)="onDialogHide()"
+>
+  <div class="filter-dialog-form">
+    <!-- Column Selection -->
+    <div class="filter-dialog-field">
+      <app-custom-dropdown
+        [options]="datasetFields"
+        [(ngModel)]="filterDialogColumn"
+        label="Column"
+        optionLabel="columnToView"
+        placeholder="Select a dataset column"
+        [filter]="true"
+        filterBy="columnToView"
+        [required]="true"
+        [autoDisplayFirst]="false"
+        appendTo="body"
+        (onChangeEvent)="onFilterColumnChange()"
+      ></app-custom-dropdown>
+    </div>
+
+    <!-- Filter Name -->
+    <div class="filter-dialog-field">
+      <app-custom-input
+        [(ngModel)]="filterDialogName"
+        label="Display Name"
+        icon="pi-tag"
+        placeholder="Filter label (defaults to column name)"
+      ></app-custom-input>
+    </div>
+
+    <!-- Type Selection Row -->
+    <div class="filter-dialog-row">
+      <div class="filter-dialog-field">
+        <app-custom-dropdown
+          [options]="filterTypeOptions"
+          [(ngModel)]="filterDialogType"
+          label="Filter Type"
+          optionValue="value"
+          placeholder="Select type"
+          [required]="true"
+          [autoDisplayFirst]="false"
+          appendTo="body"
+          (onChangeEvent)="onFilterTypeChange()"
+        ></app-custom-dropdown>
+      </div>
+      <div class="filter-dialog-field">
+        <app-custom-dropdown
+          [options]="controlTypeOptions"
+          [(ngModel)]="filterDialogControl"
+          label="Control Type"
+          optionValue="value"
+          placeholder="Select control"
+          [required]="true"
+          [autoDisplayFirst]="false"
+          appendTo="body"
+        ></app-custom-dropdown>
+      </div>
+    </div>
+
+    <!-- Operator & Null Handling Row -->
+    <div class="filter-dialog-row" *ngIf="filterDialogType">
+      <div class="filter-dialog-field">
+        <app-custom-dropdown
+          [options]="operatorOptions"
+          [(ngModel)]="filterDialogOperator"
+          label="Match Operator"
+          optionValue="value"
+          placeholder="Select operator"
+          [autoDisplayFirst]="false"
+          appendTo="body"
+        ></app-custom-dropdown>
+      </div>
+      <div class="filter-dialog-field">
+        <app-custom-dropdown
+          [options]="nullOptions"
+          [(ngModel)]="filterDialogNullOption"
+          label="Null Handling"
+          optionValue="value"
+          [autoDisplayFirst]="false"
+          appendTo="body"
+        ></app-custom-dropdown>
+      </div>
+    </div>
+
+    <!-- Default Value Section — Category -->
+    <div
+      class="filter-dialog-field"
+      *ngIf="filterDialogType === 'category'"
+    >
+      <app-custom-multiselect
+        [options]="filterDialogCategoryValues"
+        [(ngModel)]="filterDialogDefaultValue"
+        label="Default Values"
+        optionValue="value"
+        placeholder="{{
+          isLoadingFilterValues
+            ? 'Loading values...'
+            : 'Select default values...'
+        }}"
+        [filter]="true"
+        display="chip"
+        appendTo="body"
+      ></app-custom-multiselect>
+      <small
+        class="field-hint"
+        *ngIf="
+          filterDialogCategoryValues.length === 0 && !isLoadingFilterValues
+        "
+      >
+        <i class="pi pi-info-circle"></i> Load data to see available values
+      </small>
+    </div>
+
+    <!-- Default Value Section — Numeric Equality -->
+    <div
+      class="filter-dialog-field"
+      *ngIf="filterDialogType === 'numeric_equality'"
+    >
+      <app-custom-number
+        [(ngModel)]="filterDialogDefaultValue"
+        label="Default Value"
+        placeholder="Enter default number..."
+      ></app-custom-number>
+    </div>
+
+    <!-- Default Value Section — Numeric Range -->
+    <div
+      class="filter-dialog-row"
+      *ngIf="filterDialogType === 'numeric_range'"
+    >
+      <div class="filter-dialog-field">
+        <app-custom-number
+          [(ngModel)]="filterDialogDefaultValue.min"
+          label="Range Min"
+          placeholder="Min"
+        ></app-custom-number>
+      </div>
+      <div class="filter-dialog-field">
+        <app-custom-number
+          [(ngModel)]="filterDialogDefaultValue.max"
+          label="Range Max"
+          placeholder="Max"
+        ></app-custom-number>
+      </div>
+    </div>
+
+    <!-- Date Format & Time Options — for time-based filters -->
+    <div
+      class="filter-dialog-row"
+      *ngIf="
+        filterDialogType === 'time_equality' ||
+        filterDialogType === 'time_range'
+      "
+    >
+      <div class="filter-dialog-field">
+        <app-custom-dropdown
+          [(ngModel)]="filterDialogDateFormat"
+          [options]="dateFormatOptions"
+          optionLabel="label"
+          optionValue="value"
+          label="Date Format"
+          appendTo="body"
+          (onChangeEvent)="onDateFormatChange()"
+        ></app-custom-dropdown>
+      </div>
+      <div class="filter-dialog-field">
+        <app-custom-toggle
+          [ngModel]="filterDialogIncludeTime"
+          (ngModelChange)="
+            filterDialogIncludeTime = $event; onIncludeTimeChange()
+          "
+          label="Include Time"
+          trueLabel="Date & Time"
+          falseLabel="Date Only"
+        ></app-custom-toggle>
+      </div>
+    </div>
+
+    <!-- Default Value Section — Time Equality -->
+    <div
+      class="filter-dialog-field"
+      *ngIf="filterDialogType === 'time_equality'"
+    >
+      <app-custom-calendar
+        [(ngModel)]="filterDialogDefaultValue"
+        label="Default Date"
+        [placeholder]="
+          filterDialogIncludeTime
+            ? 'Select date & time...'
+            : 'Select date...'
+        "
+        [showTime]="filterDialogIncludeTime"
+        [showIcon]="true"
+        [dateFormat]="filterDialogDateFormat"
+        appendTo="body"
+      ></app-custom-calendar>
+    </div>
+
+    <!-- Default Value Section — Time Range -->
+    <div
+      class="filter-dialog-field"
+      *ngIf="filterDialogType === 'time_range'"
+    >
+      <app-custom-daterange
+        [(ngModel)]="filterDialogDefaultValue"
+        label="Date Range"
+        [placeholder]="
+          filterDialogIncludeTime
+            ? 'Select date & time range...'
+            : 'Select date range...'
+        "
+        [showTime]="filterDialogIncludeTime"
+        [showIcon]="true"
+        [dateFormat]="filterDialogDateFormat"
+        [numberOfMonths]="2"
+        appendTo="body"
+      ></app-custom-daterange>
+    </div>
+
+    <!-- Placeholder Text -->
+    <div class="filter-dialog-field" *ngIf="filterDialogType">
+      <app-custom-input
+        [(ngModel)]="filterDialogPlaceholder"
+        label="Placeholder Text"
+        icon="pi-pencil"
+        placeholder="Text shown when no value selected"
+      ></app-custom-input>
+    </div>
+
+    <!-- Options Row -->
+    <div class="filter-dialog-options">
+      <app-custom-toggle
+        [(ngModel)]="filterDialogEnabled"
+        label="Status"
+        trueLabel="Enabled"
+        falseLabel="Disabled"
+      ></app-custom-toggle>
+      <app-custom-toggle
+        [(ngModel)]="filterDialogMandatory"
+        label="Required"
+        trueLabel="Required"
+        falseLabel="Optional"
+      ></app-custom-toggle>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button
+        class="btn-cancel"
+        type="button"
+        (click)="cancel()"
+      >
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button
+        class="btn-primary"
+        type="button"
+        (click)="save()"
+        [disabled]="
+          !filterDialogColumn ||
+          !filterDialogType ||
+          !filterDialogControl ||
+          isSavingFilter
+        "
+      >
+        <i
+          class="pi"
+          [ngClass]="isSavingFilter ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
+        {{
+          isSavingFilter
+            ? 'Saving...'
+            : editingFilter
+              ? 'Update Filter'
+              : 'Add Filter'
+        }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

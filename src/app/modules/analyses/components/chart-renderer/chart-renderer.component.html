@@ -1,0 +1,365 @@
+<!-- Standard charts: render when required fields are mapped -->
+<ng-container
+  *ngIf="
+    visual.chartType &&
+    hasRequiredChartFields(visual) &&
+    !isLines3dChartType(visual.chartType) &&
+    !isPolygons3dChartType(visual.chartType)
+  "
+>
+  <app-configurable-bar-chart
+    *ngIf="isBarChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [chartType]="visual.chartType"
+    [data]="visual.chartData"
+  ></app-configurable-bar-chart>
+
+  <app-configurable-line-chart
+    *ngIf="isLineChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-line-chart>
+
+  <app-configurable-area-chart
+    *ngIf="isAreaChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [chartType]="visual.chartType"
+    [data]="visual.chartData"
+  ></app-configurable-area-chart>
+
+  <app-configurable-polar-chart
+    *ngIf="isPolarChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-polar-chart>
+
+  <app-configurable-pie-chart
+    *ngIf="isPieChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [chartType]="visual.chartType"
+    [data]="visual.chartData"
+  ></app-configurable-pie-chart>
+
+  <app-configurable-gauge-chart
+    *ngIf="isGaugeChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [chartType]="visual.chartType"
+    [data]="visual.chartData"
+  ></app-configurable-gauge-chart>
+
+  <app-configurable-card-chart
+    *ngIf="isCardChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-card-chart>
+
+  <app-configurable-heatmap-chart
+    *ngIf="isHeatMapChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-heatmap-chart>
+
+  <app-configurable-treemap-chart
+    *ngIf="isTreeMapChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-treemap-chart>
+
+  <app-configurable-bubble-chart
+    *ngIf="isBubbleChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-bubble-chart>
+
+  <app-configurable-box-chart
+    *ngIf="isBoxChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-box-chart>
+
+  <app-configurable-scatter-chart
+    *ngIf="isScatterChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [chartType]="visual.chartType || 'scatter'"
+    [data]="visual.chartData"
+  ></app-configurable-scatter-chart>
+
+  <app-configurable-funnel-chart
+    *ngIf="isFunnelChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-funnel-chart>
+
+  <app-configurable-sunburst-chart
+    *ngIf="isSunburstChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-sunburst-chart>
+
+  <app-configurable-sankey-chart
+    *ngIf="isSankeyChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-sankey-chart>
+
+  <app-configurable-waterfall-chart
+    *ngIf="isWaterfallChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-waterfall-chart>
+
+  <app-configurable-graph-chart
+    *ngIf="isGraphChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-graph-chart>
+
+  <app-configurable-tree-chart
+    *ngIf="isTreeChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-tree-chart>
+
+  <app-configurable-theme-river-chart
+    *ngIf="isThemeRiverChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-theme-river-chart>
+
+  <app-configurable-pictorial-bar-chart
+    *ngIf="isPictorialBarChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-pictorial-bar-chart>
+
+  <app-configurable-polar-bar-chart
+    *ngIf="isPolarBarChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-polar-bar-chart>
+
+  <app-configurable-radar-chart
+    *ngIf="isRadarChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-radar-chart>
+
+  <app-configurable-candlestick-chart
+    *ngIf="isCandlestickChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-candlestick-chart>
+
+  <app-configurable-parallel-chart
+    *ngIf="isParallelChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-parallel-chart>
+
+  <app-configurable-bar3d-chart
+    *ngIf="isBar3dChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-bar3d-chart>
+
+  <app-configurable-line3d-chart
+    *ngIf="isLine3dChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-line3d-chart>
+
+  <app-configurable-scatter3d-chart
+    *ngIf="isScatter3dChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-scatter3d-chart>
+
+  <app-configurable-surface-chart
+    *ngIf="isSurfaceChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-surface-chart>
+
+  <app-configurable-globe-chart
+    *ngIf="isGlobeChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-globe-chart>
+
+  <app-configurable-graphgl-chart
+    *ngIf="isGraphGlChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-graphgl-chart>
+
+  <app-configurable-scattergl-chart
+    *ngIf="isScatterGlChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-scattergl-chart>
+
+  <app-configurable-linesgl-chart
+    *ngIf="isLinesGlChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-linesgl-chart>
+
+  <app-configurable-map3d-chart
+    *ngIf="isMap3dChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-map3d-chart>
+
+  <app-configurable-flowgl-chart
+    *ngIf="isFlowGlChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-flowgl-chart>
+
+  <app-configurable-world-map-chart
+    *ngIf="isWorldMapChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-world-map-chart>
+
+  <app-configurable-flow-lines-chart
+    *ngIf="isFlowLinesChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="visual.chartData"
+  ></app-configurable-flow-lines-chart>
+</ng-container>
+
+<!-- Globe charts: show immediately with dummy data (no field mapping required) -->
+<ng-container
+  *ngIf="
+    visual.chartType &&
+    (isLines3dChartType(visual.chartType) ||
+      isPolygons3dChartType(visual.chartType))
+  "
+>
+  <app-configurable-lines3d-chart
+    *ngIf="isLines3dChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="getDisplayData(visual)"
+  ></app-configurable-lines3d-chart>
+
+  <app-configurable-polygons3d-chart
+    *ngIf="isPolygons3dChartType(visual.chartType)"
+    [showConfigPanel]="false"
+    [chartWidth]="chartWidth"
+    [chartHeight]="chartHeight"
+    [chartConfig]="visual.config"
+    [data]="getDisplayData(visual)"
+  ></app-configurable-polygons3d-chart>
+</ng-container>
