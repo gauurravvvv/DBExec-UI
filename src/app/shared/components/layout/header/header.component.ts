@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component,
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component,
+  DestroyRef,
   OnInit,
-  OnDestroy,
   HostListener,
   ElementRef,
-  ViewChild, } from '@angular/core';
+  ViewChild,
+  inject, } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { Subscription } from 'rxjs';
 import { auditTime, filter } from 'rxjs/operators';
 import { Renderer2 } from '@angular/core';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
@@ -30,7 +31,9 @@ interface Announcement {
   styleUrls: ['./header.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
   organisationName: string = '';
   userInitials: string = '';
   userName: string = '';
@@ -48,10 +51,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isTyping: boolean = false;
   showAnnouncementOverlay: boolean = false;
   doNotShowAgain: boolean = false;
-  private typewriterTimer: any;
-  private rotateTimer: any;
-  private pollTimer: any;
-  private routerSub?: Subscription;
+  private typewriterTimer: ReturnType<typeof setTimeout> | null = null;
+  private rotateTimer: ReturnType<typeof setInterval> | null = null;
   private readonly ROTATE_INTERVAL_MS = 8000;
   private readonly POLL_INTERVAL_MS = 60_000;
 
@@ -115,6 +116,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {
     this.isDarkMode = false;
     this.applyTheme();
+
+    this.destroyRef.onDestroy(() => {
+      if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
+      this.clearRotation();
+    });
   }
 
   ngOnInit() {
@@ -131,17 +137,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.userRole !== ROLES.SUPER_ADMIN) {
       this.fetchAnnouncements();
       // Refetch on route change (debounced) — picks up new/expired/dismissed banners
-      this.routerSub = this.router.events
+      this.router.events
         .pipe(
           filter(e => e instanceof NavigationEnd),
           auditTime(500),
+          takeUntilDestroyed(this.destroyRef),
         )
         .subscribe(() => this.fetchAnnouncements());
       // Background poll as a safety net for time-window expiry / new banners
-      this.pollTimer = setInterval(
+      const pollTimer = setInterval(
         () => this.fetchAnnouncements(),
         this.POLL_INTERVAL_MS,
       );
+      this.destroyRef.onDestroy(() => clearInterval(pollTimer));
     }
   }
 
@@ -157,7 +165,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
           textColor: a.textColor || '#ffffff',
         })),
       );
-    });
+      this.cdr.markForCheck();
+    }).catch(() => {});
   }
 
   /**
@@ -216,6 +225,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.currentAnnouncementIndex =
         (this.currentAnnouncementIndex + 1) % this.announcements.length;
       this.startTypewriter();
+      this.cdr.markForCheck();
     }, this.ROTATE_INTERVAL_MS);
   }
 
@@ -226,15 +236,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
-    if (this.pollTimer) clearInterval(this.pollTimer);
-    this.routerSub?.unsubscribe();
-    this.clearRotation();
-  }
-
   logout() {
-    this.loginService.logout().subscribe({
+    this.loginService.logout().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: () => this.clearSessionAndNavigate(),
       error: () => this.clearSessionAndNavigate(),
     });
@@ -354,6 +359,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @HostListener('document:fullscreenchange', ['$event'])
   onFullscreenChange() {
     this.isFullscreen = !!document.fullscreenElement;
+    this.cdr.markForCheck();
   }
 
   private startTypewriter() {
@@ -375,6 +381,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       } else {
         this.isTyping = false;
       }
+      this.cdr.markForCheck();
     };
 
     this.typewriterTimer = setTimeout(typeNextChar, 300);
@@ -426,12 +433,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.startTypewriter();
           this.scheduleRotation();
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.announcements = snapshot;
         this.currentAnnouncementIndex = snapshotIndex;
         this.startTypewriter();
         this.scheduleRotation();
+        this.cdr.markForCheck();
       });
   }
 
