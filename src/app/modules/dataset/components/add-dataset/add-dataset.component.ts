@@ -65,6 +65,7 @@ export class AddDatasetComponent
 {
   // ViewChild for file input
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('sqlEditorContainer') sqlEditorContainer!: ElementRef<HTMLDivElement>;
 
   // Removed ViewChild as we now use dynamic containers per tab
   @Input() datasourceId?: string;
@@ -585,7 +586,7 @@ export class AddDatasetComponent
 
     // Wait for the DOM to be ready
     setTimeout(() => {
-      const container = document.getElementById('sql-editor-container');
+      const container = this.sqlEditorContainer?.nativeElement;
       if (!container) {
         this.isLoadingEditor = false;
         return;
