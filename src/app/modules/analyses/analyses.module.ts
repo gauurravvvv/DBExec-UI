@@ -7,6 +7,9 @@ import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
 import { AnalysesRoutingModule } from './analyses-routing.module';
+import { ChartRendererComponent } from './components/chart-renderer/chart-renderer.component';
+import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
+import { VisualConfigSidebarComponent } from './components/visual-config-sidebar/visual-config-sidebar.component';
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
@@ -14,6 +17,9 @@ import { ADD_ANALYSES_FEATURE_KEY, addAnalysesReducer } from './store';
 
 @NgModule({
   declarations: [
+    ChartRendererComponent,
+    FilterDialogComponent,
+    VisualConfigSidebarComponent,
     EditAnalysesComponent,
     ViewAnalysesComponent,
     ListAnalysesComponent,
