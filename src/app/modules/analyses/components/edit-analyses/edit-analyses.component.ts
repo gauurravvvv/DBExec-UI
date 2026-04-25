@@ -21,44 +21,13 @@ import {
   getDefaultChartConfig,
   hasAxisLabels,
   is3DCoordinateChartType,
-  isAreaChartType,
-  isBarChartType,
-  isBubbleChartType,
-  isBoxChartType,
-  isCardChartType,
-  isGaugeChartType,
   isHeatMapChartType,
-  isLineChartType,
-  isPieChartType,
-  isPolarChartType,
-  isTreeMapChartType,
-  isScatterChartType,
-  isFunnelChartType,
   isSankeyChartType,
-  isSunburstChartType,
-  isWaterfallChartType,
   isGraphChartType,
-  isTreeChartType,
-  isThemeRiverChartType,
-  isPictorialBarChartType,
-  isPolarBarChartType,
-  isRadarChartType,
-  isCandlestickChartType,
-  isParallelChartType,
-  isBar3dChartType,
-  isLine3dChartType,
-  isScatter3dChartType,
-  isSurfaceChartType,
-  isGlobeChartType,
-  isGraphGlChartType,
-  isScatterGlChartType,
-  isLinesGlChartType,
-  isMap3dChartType,
-  isFlowGlChartType,
-  isWorldMapChartType,
-  isFlowLinesChartType,
   isLines3dChartType,
   isPolygons3dChartType,
+  isFlowLinesChartType,
+  isWorldMapChartType,
 } from '../../constants/charts.constants';
 import { Visual, createVisual } from '../../models';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
@@ -268,9 +237,6 @@ export class EditAnalysesComponent
   // Maximized visual
   maximizedVisual: any = null;
 
-  // Available chart types
-  chartTypes = CHART_TYPES;
-
   // Dragging
   draggingVisual: any = null;
 
@@ -279,14 +245,6 @@ export class EditAnalysesComponent
 
   // Axis selection mode
   activeAxisSelection: 'x' | 'y' | 'z' | null = null;
-
-  // Search for chart types
-  chartSearchQuery: string = '';
-
-  // Cached chart category/type results to avoid recalculation per CD cycle
-  private _cachedChartCategories: string[] = [];
-  private _cachedChartsByCategory: Map<string, any[]> = new Map();
-  private _lastChartSearchQuery: string | null = null;
 
   // Canvas container reference and dimensions for responsive sizing
   @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
@@ -1295,49 +1253,6 @@ export class EditAnalysesComponent
     return this.visuals.some(v => v.chartType !== null);
   }
 
-  /** Rebuild cached chart categories when search query changes */
-  private rebuildChartCategoryCache(): void {
-    const filtered = this.getFilteredChartTypes();
-    this._cachedChartCategories = [...new Set(filtered.map(c => c.category))];
-    this._cachedChartsByCategory = new Map();
-    for (const category of this._cachedChartCategories) {
-      this._cachedChartsByCategory.set(
-        category,
-        filtered.filter(c => c.category === category),
-      );
-    }
-    this._lastChartSearchQuery = this.chartSearchQuery;
-  }
-
-  private ensureChartCacheValid(): void {
-    if (this._lastChartSearchQuery !== this.chartSearchQuery) {
-      this.rebuildChartCategoryCache();
-    }
-  }
-
-  getChartCategories(): string[] {
-    this.ensureChartCacheValid();
-    return this._cachedChartCategories;
-  }
-
-  getChartsByCategory(category: string): any[] {
-    this.ensureChartCacheValid();
-    return this._cachedChartsByCategory.get(category) || [];
-  }
-
-  getFilteredChartTypes(): any[] {
-    if (!this.chartSearchQuery || this.chartSearchQuery.trim() === '') {
-      return this.chartTypes;
-    }
-    const query = this.chartSearchQuery.toLowerCase().trim();
-    return this.chartTypes.filter(
-      chart =>
-        chart.name.toLowerCase().includes(query) ||
-        chart.description.toLowerCase().includes(query) ||
-        chart.category.toLowerCase().includes(query),
-    );
-  }
-
   getVisualChartIcon(chartType: string | null | undefined): string {
     if (!chartType) return 'pi pi-chart-bar';
     return CHART_TYPES.find(c => c.id === chartType)?.icon ?? 'pi pi-chart-bar';
@@ -1348,141 +1263,16 @@ export class EditAnalysesComponent
     return CHART_TYPES.find(c => c.id === chartType)?.name ?? chartType;
   }
 
-  // Wrapper methods for chart type checking
-  isBarChartType(chartType: string | null | undefined): boolean {
-    return isBarChartType(chartType ?? null);
-  }
-
-  isAreaChartType(chartType: string | null | undefined): boolean {
-    return isAreaChartType(chartType ?? null);
-  }
-
-  isPieChartType(chartType: string | null | undefined): boolean {
-    return isPieChartType(chartType ?? null);
-  }
-
-  isGaugeChartType(chartType: string | null | undefined): boolean {
-    return isGaugeChartType(chartType ?? null);
-  }
-
-  isCardChartType(chartType: string | null | undefined): boolean {
-    return isCardChartType(chartType ?? null);
-  }
-
   isHeatMapChartType(chartType: string | null | undefined): boolean {
     return isHeatMapChartType(chartType ?? null);
-  }
-
-  isTreeMapChartType(chartType: string | null | undefined): boolean {
-    return isTreeMapChartType(chartType ?? null);
-  }
-
-  isBubbleChartType(chartType: string | null | undefined): boolean {
-    return isBubbleChartType(chartType ?? null);
-  }
-
-  isBoxChartType(chartType: string | null | undefined): boolean {
-    return isBoxChartType(chartType ?? null);
-  }
-
-  isPolarChartType(chartType: string | null | undefined): boolean {
-    return isPolarChartType(chartType ?? null);
-  }
-
-  isLineChartType(chartType: string | null | undefined): boolean {
-    return isLineChartType(chartType ?? null);
-  }
-
-  isScatterChartType(chartType: string | null | undefined): boolean {
-    return isScatterChartType(chartType ?? null);
-  }
-
-  isFunnelChartType(chartType: string | null | undefined): boolean {
-    return isFunnelChartType(chartType ?? null);
   }
 
   isSankeyChartType(chartType: string | null | undefined): boolean {
     return isSankeyChartType(chartType ?? null);
   }
 
-  isSunburstChartType(chartType: string | null | undefined): boolean {
-    return isSunburstChartType(chartType ?? null);
-  }
-
-  isWaterfallChartType(chartType: string | null | undefined): boolean {
-    return isWaterfallChartType(chartType ?? null);
-  }
-
   isGraphChartType(chartType: string | null | undefined): boolean {
     return isGraphChartType(chartType ?? null);
-  }
-
-  isTreeChartType(chartType: string | null | undefined): boolean {
-    return isTreeChartType(chartType ?? null);
-  }
-
-  isThemeRiverChartType(chartType: string | null | undefined): boolean {
-    return isThemeRiverChartType(chartType ?? null);
-  }
-
-  isPictorialBarChartType(chartType: string | null | undefined): boolean {
-    return isPictorialBarChartType(chartType ?? null);
-  }
-
-  isPolarBarChartType(chartType: string | null | undefined): boolean {
-    return isPolarBarChartType(chartType ?? null);
-  }
-
-  isRadarChartType(chartType: string | null | undefined): boolean {
-    return isRadarChartType(chartType ?? null);
-  }
-
-  isCandlestickChartType(chartType: string | null | undefined): boolean {
-    return isCandlestickChartType(chartType ?? null);
-  }
-
-  isParallelChartType(chartType: string | null | undefined): boolean {
-    return isParallelChartType(chartType ?? null);
-  }
-
-  isBar3dChartType(chartType: string | null | undefined): boolean {
-    return isBar3dChartType(chartType ?? null);
-  }
-
-  isLine3dChartType(chartType: string | null | undefined): boolean {
-    return isLine3dChartType(chartType ?? null);
-  }
-
-  isScatter3dChartType(chartType: string | null | undefined): boolean {
-    return isScatter3dChartType(chartType ?? null);
-  }
-
-  isSurfaceChartType(chartType: string | null | undefined): boolean {
-    return isSurfaceChartType(chartType ?? null);
-  }
-
-  isGlobeChartType(chartType: string | null | undefined): boolean {
-    return isGlobeChartType(chartType ?? null);
-  }
-
-  isGraphGlChartType(chartType: string | null | undefined): boolean {
-    return isGraphGlChartType(chartType ?? null);
-  }
-
-  isScatterGlChartType(chartType: string | null | undefined): boolean {
-    return isScatterGlChartType(chartType ?? null);
-  }
-
-  isLinesGlChartType(chartType: string | null | undefined): boolean {
-    return isLinesGlChartType(chartType ?? null);
-  }
-
-  isMap3dChartType(chartType: string | null | undefined): boolean {
-    return isMap3dChartType(chartType ?? null);
-  }
-
-  isFlowGlChartType(chartType: string | null | undefined): boolean {
-    return isFlowGlChartType(chartType ?? null);
   }
 
   isWorldMapChartType(chartType: string | null | undefined): boolean {
@@ -1499,14 +1289,6 @@ export class EditAnalysesComponent
 
   isPolygons3dChartType(chartType: string | null | undefined): boolean {
     return isPolygons3dChartType(chartType ?? null);
-  }
-
-  hasAxisLabels(chartType: string | null | undefined): boolean {
-    return hasAxisLabels(chartType ?? null);
-  }
-
-  is3DCoordinateChartType(chartType: string | null | undefined): boolean {
-    return is3DCoordinateChartType(chartType ?? null);
   }
 
   hasRequiredChartFields(visual: any): boolean {
@@ -1532,16 +1314,6 @@ export class EditAnalysesComponent
       return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
     }
     return !!(visual.xAxisColumn && visual.yAxisColumn);
-  }
-
-  setVisualChartType(chartType: any): void {
-    this.markDirty();
-    const visual = this.getFocusedVisual();
-    if (visual) {
-      visual.chartType = chartType.id;
-      visual.title = chartType.name;
-      this.updateVisualChartData(visual);
-    }
   }
 
   removeVisual(id: string): void {
@@ -1606,13 +1378,17 @@ export class EditAnalysesComponent
     this.isConfigSidebarOpen = false;
   }
 
-  // Axis selection methods
-  startAxisSelection(axis: 'x' | 'y' | 'z'): void {
-    this.activeAxisSelection = this.activeAxisSelection === axis ? null : axis;
+  onChartTypeSelected(): void {
+    this.markDirty();
+    const visual = this.getFocusedVisual();
+    if (visual) {
+      this.updateVisualChartData(visual);
+    }
+  }
 
-    // Ensure dataset fields sidebar is open for field selection
-    if (this.activeAxisSelection && !this.isFieldsPanelOpen) {
-      // Close visual list if open (mutual exclusivity)
+  onAxisSelectionStarted(axis: 'x' | 'y' | 'z' | null): void {
+    this.activeAxisSelection = axis;
+    if (axis && !this.isFieldsPanelOpen) {
       if (this.isVisualListPanelOpen) {
         this.isVisualListPanelOpen = false;
       }
@@ -1620,8 +1396,13 @@ export class EditAnalysesComponent
     }
   }
 
-  cancelAxisSelection(): void {
-    this.activeAxisSelection = null;
+  onAxisFieldCleared(): void {
+    this.markDirty();
+    const visual = this.getFocusedVisual();
+    if (visual) {
+      this.updateVisualChartData(visual);
+    }
+    this.cdr.markForCheck();
   }
 
   onFieldClick(field: any): void {
@@ -1650,37 +1431,6 @@ export class EditAnalysesComponent
         this.cdr.markForCheck();
       }
     }
-  }
-
-  clearAxisField(axis: 'x' | 'y' | 'z', event: Event): void {
-    event.stopPropagation();
-    this.markDirty();
-    const visual = this.getFocusedVisual();
-    if (!visual) return;
-
-    if (axis === 'x') {
-      visual.xAxisColumn = null;
-    } else if (axis === 'y') {
-      visual.yAxisColumn = null;
-    } else if (axis === 'z') {
-      visual.zAxisColumn = null;
-    }
-
-    this.updateVisualChartData(visual);
-    this.cdr.markForCheck();
-  }
-
-  getFieldDisplayName(columnToUse: string | null): string {
-    if (!columnToUse) return '';
-    // Search both dataset-level and analysis-level fields
-    const allFields = this._cachedAllFields?.length
-      ? this._cachedAllFields
-      : this.datasetDetails?.datasetFields || [];
-    const field = allFields.find(
-      (f: any) =>
-        f.columnToUse === columnToUse || f.columnToView === columnToUse,
-    );
-    return field?.columnToView || columnToUse;
   }
 
   // Maximize visual
@@ -1968,15 +1718,6 @@ export class EditAnalysesComponent
       class: 'status-complete',
       icon: 'pi-check-circle',
     };
-  }
-
-  /**
-   * Get chart type display name
-   */
-  getChartTypeName(chartTypeId: string | null): string {
-    if (!chartTypeId) return 'Not selected';
-    const chartType = this.chartTypes.find(c => c.id === chartTypeId);
-    return chartType?.name || chartTypeId;
   }
 
   saveAnalysis(): void {

@@ -2848,3 +2848,108 @@ export function buildPolygons3DChartOption(data: any[], config: any): any {
     ],
   };
 }
+
+// ========= Unified Dispatcher =========
+
+type NodeLinkBuilder = (nodes: any[], links: any[], config: any) => any;
+type DataConfigBuilder = (data: any[], config: any) => any;
+type DataConfigTypeBuilder = (data: any[], config: any, chartType: string) => any;
+
+const NODE_LINK_BUILDERS: Record<string, NodeLinkBuilder> = {
+  sankey: buildSankeyChartOption,
+  graph: buildGraphChartOption,
+  graphgl: buildGraphGLChartOption,
+  'flow-lines': buildFlowLinesChartOption,
+};
+
+const CHART_TYPE_BUILDERS: Record<string, DataConfigTypeBuilder> = {
+  'bar-vertical': buildBarChartOption,
+  'bar-horizontal': buildBarChartOption,
+  'bar-vertical-2d': buildBarChartOption,
+  'bar-horizontal-2d': buildBarChartOption,
+  'bar-vertical-stacked': buildBarChartOption,
+  'bar-horizontal-stacked': buildBarChartOption,
+  'bar-vertical-normalized': buildBarChartOption,
+  'bar-horizontal-normalized': buildBarChartOption,
+  line: buildLineChartOption,
+  'line-stacked': buildLineChartOption,
+  'line-step': buildLineChartOption,
+  area: buildAreaChartOption,
+  'area-stacked': buildAreaChartOption,
+  'area-normalized': buildAreaChartOption,
+  pie: buildPieChartOption,
+  'pie-advanced': buildPieChartOption,
+  'pie-grid': buildPieChartOption,
+  donut: buildPieChartOption,
+  'half-donut': buildPieChartOption,
+  'nested-pie': buildPieChartOption,
+  rose: buildPieChartOption,
+  scatter: buildScatterChartOption,
+  'effect-scatter': buildScatterChartOption,
+  gauge: (d, c, _t) => buildGaugeChartOption(d, c),
+  'linear-gauge': (d, c, _t) => buildGaugeChartOption(d, c),
+};
+
+const SIMPLE_BUILDERS: Record<string, DataConfigBuilder> = {
+  polar: buildPolarChartOption,
+  'heat-map': buildHeatMapChartOption,
+  'tree-map': buildTreeMapChartOption,
+  bubble: buildBubbleChartOption,
+  'box-chart': buildBoxPlotChartOption,
+  funnel: buildFunnelChartOption,
+  sunburst: buildSunburstChartOption,
+  waterfall: buildWaterfallChartOption,
+  tree: buildTreeChartOption,
+  'theme-river': buildThemeRiverChartOption,
+  'pictorial-bar': buildPictorialBarChartOption,
+  'bar-polar': buildPolarBarChartOption,
+  radar: buildRadarChartOption,
+  candlestick: buildCandlestickChartOption,
+  parallel: buildParallelChartOption,
+  bar3d: buildBar3DChartOption,
+  line3d: buildLine3DChartOption,
+  scatter3d: buildScatter3DChartOption,
+  surface: buildSurfaceChartOption,
+  globe: buildGlobeChartOption,
+  scattergl: buildScatterGLChartOption,
+  linesgl: buildLinesGLChartOption,
+  map3d: buildMap3DChartOption,
+  'world-map': buildWorldMapChartOption,
+  flowgl: buildFlowGLChartOption,
+  lines3d: buildLines3DChartOption,
+  polygons3d: buildPolygons3DChartOption,
+};
+
+/**
+ * Unified dispatcher — routes chartType to the correct build function.
+ * Handles node+link charts (sankey, graph, etc.), typed charts (bar, line, etc.),
+ * and simple (data, config) charts.
+ */
+export function buildChartOption(
+  data: any,
+  config: any,
+  chartType: string,
+): any {
+  if (!chartType) return {};
+
+  // Node+link charts: data is { nodes: [], links: [] }
+  const nodeLinkBuilder = NODE_LINK_BUILDERS[chartType];
+  if (nodeLinkBuilder) {
+    const d = data || { nodes: [], links: [] };
+    return nodeLinkBuilder(d.nodes || [], d.links || [], config);
+  }
+
+  // Charts that need chartType variant
+  const typedBuilder = CHART_TYPE_BUILDERS[chartType];
+  if (typedBuilder) {
+    return typedBuilder(data, config, chartType);
+  }
+
+  // Simple (data, config) charts
+  const simpleBuilder = SIMPLE_BUILDERS[chartType];
+  if (simpleBuilder) {
+    return simpleBuilder(data, config);
+  }
+
+  return {};
+}

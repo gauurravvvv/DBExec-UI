@@ -1,0 +1,541 @@
+<div class="sidebar-content">
+  <div class="sidebar-header-info">
+    <div class="dataset-label">
+      {{
+        focusedVisualId && !focusedVisual.chartType
+          ? 'Chart Type'
+          : focusedVisualId && focusedVisual.chartType
+            ? 'Field Mapping'
+            : 'Charts'
+      }}
+    </div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-content-inner">
+    <!-- Add Visual Button (always visible) -->
+    <div class="add-visual-section">
+      <button
+        pButton
+        label="Add Visual"
+        icon="pi pi-plus"
+        class="p-button-outlined p-button-sm add-visual-button"
+        (click)="addVisualClicked.emit()"
+        [disabled]="!isDataLoaded"
+        pTooltip="Load data first to add visuals"
+        [tooltipDisabled]="isDataLoaded"
+        tooltipPosition="top"
+      ></button>
+    </div>
+
+    <!-- Chart Type Grid (when visual is focused but no chart type selected) -->
+    <div
+      class="chart-type-section"
+      *ngIf="focusedVisualId && !focusedVisual?.chartType"
+    >
+      <div class="chart-type-hint">
+        <i class="pi pi-info-circle"></i>
+        <span>Select a chart type for this visual</span>
+      </div>
+      <!-- Search Input for Charts -->
+      <div class="chart-search-wrapper">
+        <app-custom-input
+          [(ngModel)]="chartSearchQuery"
+          placeholder="Search charts..."
+          icon="pi-search"
+        ></app-custom-input>
+      </div>
+      <div class="chart-categories">
+        <div
+          class="chart-category-section"
+          *ngFor="let category of getChartCategories(); trackBy: trackByIndex"
+        >
+          <div class="category-label">{{ category }}</div>
+          <div class="chart-type-grid">
+            <div
+              class="chart-type-card"
+              *ngFor="let chartType of getChartsByCategory(category); trackBy: trackById"
+              [class.selected]="focusedVisual.chartType === chartType.id"
+              (click)="setVisualChartType(chartType)"
+              [pTooltip]="chartType.description"
+              tooltipPosition="bottom"
+            >
+              <div class="chart-icon" [class.rotate]="chartType.rotate">
+                <i [class]="chartType.icon"></i>
+              </div>
+              <div class="chart-name">{{ chartType.name }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Mapping Section (when chart type is already selected) -->
+    <div
+      class="chart-type-section"
+      *ngIf="focusedVisualId && focusedVisual?.chartType"
+    >
+      <div class="section-divider"></div>
+      <div class="axis-selection-title">Data Mapping</div>
+      <div class="axis-hint" *ngIf="activeAxisSelection">
+        <i class="pi pi-arrow-left"></i>
+        <span>Click a field from the left panel</span>
+      </div>
+
+      <!-- Heat Map / Sankey / Graph: 3 fields -->
+      <ng-container
+        *ngIf="
+          isHeatMapChartType(focusedVisual.chartType) ||
+          isSankeyChartType(focusedVisual.chartType) ||
+          isGraphChartType(focusedVisual.chartType)
+        "
+      >
+        <!-- First Field Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'x'"
+          [class.has-value]="focusedVisual.xAxisColumn"
+          (click)="startAxisSelection('x')"
+        >
+          <div class="axis-label">
+            {{
+              isSankeyChartType(focusedVisual.chartType) ||
+              isGraphChartType(focusedVisual.chartType)
+                ? 'Source'
+                : 'Row'
+            }}
+          </div>
+          <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.xAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('x', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.xAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Second Field Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'y'"
+          [class.has-value]="focusedVisual.yAxisColumn"
+          (click)="startAxisSelection('y')"
+        >
+          <div class="axis-label">
+            {{
+              isSankeyChartType(focusedVisual.chartType) ||
+              isGraphChartType(focusedVisual.chartType)
+                ? 'Target'
+                : 'Column'
+            }}
+          </div>
+          <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.yAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('y', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.yAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Value Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'z'"
+          [class.has-value]="focusedVisual.zAxisColumn"
+          (click)="startAxisSelection('z')"
+        >
+          <div class="axis-label">Value</div>
+          <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.zAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('z', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.zAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Bubble Chart: X-Axis, Y-Axis, Size (3 fields) -->
+      <ng-container *ngIf="isBubbleChartType(focusedVisual.chartType)">
+        <!-- X-Axis Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'x'"
+          [class.has-value]="focusedVisual.xAxisColumn"
+          (click)="startAxisSelection('x')"
+        >
+          <div class="axis-label">X-Axis</div>
+          <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.xAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('x', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.xAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Y-Axis Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'y'"
+          [class.has-value]="focusedVisual.yAxisColumn"
+          (click)="startAxisSelection('y')"
+        >
+          <div class="axis-label">Y-Axis</div>
+          <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.yAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('y', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.yAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Size Slot (optional for bubble) -->
+        <div
+          class="axis-slot optional"
+          [class.active]="activeAxisSelection === 'z'"
+          [class.has-value]="focusedVisual.zAxisColumn"
+          (click)="startAxisSelection('z')"
+        >
+          <div class="axis-label">Size (optional)</div>
+          <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.zAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('z', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.zAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- 3D Coordinate Charts: X-Axis, Y-Axis, Z-Axis (bar3d, line3d, scatter3d, polygons3d) -->
+      <ng-container
+        *ngIf="is3DCoordinateChartType(focusedVisual.chartType)"
+      >
+        <!-- X-Axis Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'x'"
+          [class.has-value]="focusedVisual.xAxisColumn"
+          (click)="startAxisSelection('x')"
+        >
+          <div class="axis-label">
+            {{
+              isPolygons3dChartType(focusedVisual.chartType)
+                ? 'Name'
+                : 'X-Axis'
+            }}
+          </div>
+          <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.xAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('x', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.xAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Y-Axis Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'y'"
+          [class.has-value]="focusedVisual.yAxisColumn"
+          (click)="startAxisSelection('y')"
+        >
+          <div class="axis-label">
+            {{
+              isPolygons3dChartType(focusedVisual.chartType)
+                ? 'Longitude'
+                : 'Y-Axis'
+            }}
+          </div>
+          <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.yAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('y', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.yAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Z-Axis Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'z'"
+          [class.has-value]="focusedVisual.zAxisColumn"
+          (click)="startAxisSelection('z')"
+        >
+          <div class="axis-label">
+            {{
+              isPolygons3dChartType(focusedVisual.chartType)
+                ? 'Latitude'
+                : 'Z-Axis'
+            }}
+          </div>
+          <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.zAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('z', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.zAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Axis charts: X-Axis, Y-Axis (bar, line, area, scatter, waterfall, pictorial-bar) -->
+      <ng-container
+        *ngIf="
+          hasAxisLabels(focusedVisual.chartType) &&
+          !isHeatMapChartType(focusedVisual.chartType) &&
+          !isBubbleChartType(focusedVisual.chartType) &&
+          !isSankeyChartType(focusedVisual.chartType) &&
+          !isGraphChartType(focusedVisual.chartType)
+        "
+      >
+        <!-- X-Axis Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'x'"
+          [class.has-value]="focusedVisual.xAxisColumn"
+          (click)="startAxisSelection('x')"
+        >
+          <div class="axis-label">X-Axis</div>
+          <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.xAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('x', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.xAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Y-Axis Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'y'"
+          [class.has-value]="focusedVisual.yAxisColumn"
+          (click)="startAxisSelection('y')"
+        >
+          <div class="axis-label">Y-Axis</div>
+          <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.yAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('y', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.yAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Non-axis charts: Category, Value (pie, gauge, card, tree-map, funnel, sunburst, tree, theme-river, bar-polar) -->
+      <ng-container
+        *ngIf="
+          !hasAxisLabels(focusedVisual.chartType) &&
+          !isBubbleChartType(focusedVisual.chartType) &&
+          !isSankeyChartType(focusedVisual.chartType) &&
+          !isGraphChartType(focusedVisual.chartType) &&
+          !is3DCoordinateChartType(focusedVisual.chartType) &&
+          !isLines3dChartType(focusedVisual.chartType)
+        "
+      >
+        <!-- Category Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'x'"
+          [class.has-value]="focusedVisual.xAxisColumn"
+          (click)="startAxisSelection('x')"
+        >
+          <div class="axis-label">Category</div>
+          <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.xAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('x', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.xAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Value Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'y'"
+          [class.has-value]="focusedVisual.yAxisColumn"
+          (click)="startAxisSelection('y')"
+        >
+          <div class="axis-label">Value</div>
+          <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.yAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('y', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.yAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Lines 3D: Longitude, Latitude (geographic arc chart on globe) -->
+      <ng-container *ngIf="isLines3dChartType(focusedVisual.chartType)">
+        <!-- Longitude Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'x'"
+          [class.has-value]="focusedVisual.xAxisColumn"
+          (click)="startAxisSelection('x')"
+        >
+          <div class="axis-label">Longitude</div>
+          <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.xAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('x', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.xAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+        <!-- Latitude Slot -->
+        <div
+          class="axis-slot"
+          [class.active]="activeAxisSelection === 'y'"
+          [class.has-value]="focusedVisual.yAxisColumn"
+          (click)="startAxisSelection('y')"
+        >
+          <div class="axis-label">Latitude</div>
+          <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
+            <span>{{
+              getFieldDisplayName(focusedVisual.yAxisColumn)
+            }}</span>
+            <i
+              class="pi pi-times clear-btn"
+              (click)="clearAxisField('y', $event)"
+            ></i>
+          </div>
+          <div
+            class="axis-placeholder"
+            *ngIf="!focusedVisual.yAxisColumn"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Click to select field</span>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

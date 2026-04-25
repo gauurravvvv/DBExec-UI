@@ -3,44 +3,12 @@ import {
   getDummyData,
   hasAxisLabels,
   is3DCoordinateChartType,
-  isAreaChartType,
-  isBar3dChartType,
-  isBarChartType,
-  isBoxChartType,
-  isBubbleChartType,
-  isCandlestickChartType,
   isCardChartType,
-  isFlowGlChartType,
-  isFlowLinesChartType,
-  isFunnelChartType,
-  isGaugeChartType,
-  isGlobeChartType,
   isGraphChartType,
-  isGraphGlChartType,
   isHeatMapChartType,
-  isLine3dChartType,
-  isLineChartType,
   isLines3dChartType,
-  isLinesGlChartType,
-  isMap3dChartType,
-  isParallelChartType,
-  isPictorialBarChartType,
-  isPieChartType,
-  isPolarBarChartType,
-  isPolarChartType,
   isPolygons3dChartType,
-  isRadarChartType,
   isSankeyChartType,
-  isScatter3dChartType,
-  isScatterChartType,
-  isScatterGlChartType,
-  isSunburstChartType,
-  isSurfaceChartType,
-  isThemeRiverChartType,
-  isTreeChartType,
-  isTreeMapChartType,
-  isWaterfallChartType,
-  isWorldMapChartType,
 } from '../../constants/charts.constants';
 import { Visual } from '../../models';
 
@@ -54,47 +22,11 @@ export class ChartRendererComponent {
   @Input() chartWidth!: number;
   @Input() chartHeight!: number;
 
-  // Expose chart type checkers to template
-  isBarChartType = isBarChartType;
-  isLineChartType = isLineChartType;
-  isAreaChartType = isAreaChartType;
-  isPolarChartType = isPolarChartType;
-  isPieChartType = isPieChartType;
-  isGaugeChartType = isGaugeChartType;
   isCardChartType = isCardChartType;
-  isHeatMapChartType = isHeatMapChartType;
-  isTreeMapChartType = isTreeMapChartType;
-  isBubbleChartType = isBubbleChartType;
-  isBoxChartType = isBoxChartType;
-  isScatterChartType = isScatterChartType;
-  isFunnelChartType = isFunnelChartType;
-  isSunburstChartType = isSunburstChartType;
-  isSankeyChartType = isSankeyChartType;
-  isWaterfallChartType = isWaterfallChartType;
-  isGraphChartType = isGraphChartType;
-  isTreeChartType = isTreeChartType;
-  isThemeRiverChartType = isThemeRiverChartType;
-  isPictorialBarChartType = isPictorialBarChartType;
-  isPolarBarChartType = isPolarBarChartType;
-  isRadarChartType = isRadarChartType;
-  isCandlestickChartType = isCandlestickChartType;
-  isParallelChartType = isParallelChartType;
-  isBar3dChartType = isBar3dChartType;
-  isLine3dChartType = isLine3dChartType;
-  isScatter3dChartType = isScatter3dChartType;
-  isSurfaceChartType = isSurfaceChartType;
-  isGlobeChartType = isGlobeChartType;
-  isGraphGlChartType = isGraphGlChartType;
-  isScatterGlChartType = isScatterGlChartType;
-  isLinesGlChartType = isLinesGlChartType;
-  isMap3dChartType = isMap3dChartType;
-  isFlowGlChartType = isFlowGlChartType;
-  isWorldMapChartType = isWorldMapChartType;
-  isFlowLinesChartType = isFlowLinesChartType;
-  isLines3dChartType = isLines3dChartType;
-  isPolygons3dChartType = isPolygons3dChartType;
-  hasAxisLabels = hasAxisLabels;
-  is3DCoordinateChartType = is3DCoordinateChartType;
+
+  isGlobeSpecialType(chartType: string): boolean {
+    return isLines3dChartType(chartType) || isPolygons3dChartType(chartType);
+  }
 
   hasRequiredChartFields(visual: Visual): boolean {
     if (!visual.chartType) return false;

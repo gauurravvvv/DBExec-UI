@@ -1,0 +1,12 @@
+<div class="echart-visual-container">
+  <div
+    echarts
+    [options]="chartOption"
+    [autoResize]="true"
+    class="echart-canvas"
+    [style.width.px]="chartWidth ? chartWidth - 10 : null"
+    [style.height.px]="chartHeight ? chartHeight - 10 : null"
+    (chartInit)="onChartInit($event)"
+    (chartClick)="onChartClick($event)"
+  ></div>
+</div>
