@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component,
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component,
+  DestroyRef,
   ElementRef,
   HostListener,
-  OnDestroy,
   OnInit,
-  ViewChild, } from '@angular/core';
+  ViewChild,
+  inject, } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Subscription, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { GlobalSearchService } from '../../services/global-search.service';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -17,7 +19,7 @@ import { SIDEBAR_ITEMS_ROUTES } from '../layout/sidebar/sidebar.constant';
   styleUrls: ['./global-search.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GlobalSearchComponent implements OnInit, OnDestroy {
+export class GlobalSearchComponent implements OnInit {
   @ViewChild('searchInput') searchInput!: ElementRef;
 
   showSearchModal = false;
@@ -25,8 +27,10 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   searchResults: any[] = [];
   uniqueEntityTypes: string[] = [];
   activeFilter: string = 'ALL';
-  openSearchSubscription?: Subscription;
   searchSubject = new Subject<string>();
+
+  readonly loading = this.globalSearchService.loading;
+  readonly results = this.globalSearchService.results;
 
   GLOBAL_SEARCH_RESULT_ICON = {
     TAB: 'ci ci-ribbon',
@@ -38,6 +42,8 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   };
 
   private userRole: string = '';
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   constructor(
     private globalSearchService: GlobalSearchService,
@@ -47,23 +53,23 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
     this.userRole = this.globalService.getTokenDetails('role');
     // Debounce search input
     this.searchSubject
-      .pipe(debounceTime(300), distinctUntilChanged())
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe(term => {
         this.performSearch(term);
       });
   }
 
   ngOnInit(): void {
-    this.openSearchSubscription =
-      this.globalSearchService.openSearch$.subscribe(() => {
+    this.globalSearchService.openSearch$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         this.openSearchModal();
+        this.cdr.markForCheck();
       });
-  }
-
-  ngOnDestroy(): void {
-    if (this.openSearchSubscription) {
-      this.openSearchSubscription.unsubscribe();
-    }
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -95,6 +101,7 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
     this.showSearchModal = false;
     this.searchTerm = '';
     this.searchResults = [];
+    this.globalSearchService.clearResults();
   }
 
   onSearch() {
@@ -106,6 +113,8 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
       this.searchResults = [];
       this.uniqueEntityTypes = [];
       this.activeFilter = 'ALL';
+      this.globalSearchService.clearResults();
+      this.cdr.markForCheck();
       return;
     }
 
@@ -125,16 +134,21 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
               ...item,
             };
           });
+          this.globalSearchService.setResults(this.searchResults);
           this.extractEntityTypes();
         } else {
           this.searchResults = [];
           this.uniqueEntityTypes = [];
+          this.globalSearchService.clearResults();
         }
+        this.cdr.markForCheck();
       })
       .catch(error => {
         console.error('Search failed', error);
         this.searchResults = [];
         this.uniqueEntityTypes = [];
+        this.globalSearchService.clearResults();
+        this.cdr.markForCheck();
       });
   }
 
