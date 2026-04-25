@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
 import { Router } from '@angular/router';
@@ -24,6 +24,9 @@ export class SidebarComponent implements OnInit {
   isMobile = false;
   menuItems: MenuItem[] = [];
 
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
+
   constructor(
     private globalService: GlobalService,
     public router: Router,
@@ -34,7 +37,9 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     this.checkScreenSize();
-    window.addEventListener('resize', () => this.checkScreenSize());
+    const resizeHandler = () => this.checkScreenSize();
+    window.addEventListener('resize', resizeHandler);
+    this.destroyRef.onDestroy(() => window.removeEventListener('resize', resizeHandler));
   }
 
   processMenuItems(items: MenuItem[], level: number = 0): MenuItem[] {
@@ -166,6 +171,8 @@ export class SidebarComponent implements OnInit {
       // Then collapse the sidebar
       this.isExpanded = false;
     }
+
+    this.cdr.markForCheck();
   }
 
   trackByIndex(index: number): number {
