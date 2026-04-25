@@ -50,7 +50,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       this.loadingService.showLoader();
     }
 
-    if (req.url.includes('assets')) {
+    // Skip auth for asset requests and absolute URLs (external/CDN)
+    const isExternal = req.url.startsWith('http://') || req.url.startsWith('https://');
+    if (req.url.includes('assets') || isExternal) {
       if (!skipLoader) {
         this.loadingService.hideLoader();
       }
@@ -62,7 +64,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     const URL = serverUrl + req.url;
 
-    // Attach auth headers
+    // Attach auth headers only to API requests
     const accessToken = StorageService.get(StorageType.ACCESS_TOKEN) || '';
     const organisationId =
       StorageService.get(StorageType.ORGANISATION_ID) || '';
@@ -139,8 +141,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
         throw new HttpErrorResponse({ status: 440, url: req.url });
       }
       if (evt.body?.code === 501 || evt.body?.code === 503) {
-        window.location.href = '';
-        StorageService.remove(StorageType.ACCESS_TOKEN);
+        StorageService.clear();
+        this.router.navigateByUrl('/login');
         return evt;
       }
     }
