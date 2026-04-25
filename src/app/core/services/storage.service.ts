@@ -1,5 +1,15 @@
 import { StorageType, SessionStorageType } from 'src/app/constants/storageType';
 
+/**
+ * Centralized storage access layer.
+ *
+ * TODO [Security]: Migrate ACCESS_TOKEN and REFRESH_TOKEN from localStorage
+ * to httpOnly secure cookies. localStorage is vulnerable to XSS — any injected
+ * script can read tokens. This requires backend changes:
+ *   1. Server sets httpOnly, Secure, SameSite=Strict cookies on login/refresh
+ *   2. Remove client-side token storage/attachment (interceptor sends cookies automatically)
+ *   3. CSRF protection (double-submit cookie or custom header)
+ */
 export class StorageService {
   static localStorage = window.localStorage;
   static sessionStorage = window.sessionStorage;
