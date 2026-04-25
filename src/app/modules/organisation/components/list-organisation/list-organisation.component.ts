@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
@@ -45,6 +45,7 @@ export class ListOrganisationComponent implements OnInit {
     private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -202,6 +203,7 @@ export class ListOrganisationComponent implements OnInit {
             this.selectedOrgs = [];
             this.refreshList();
           }
+          this.cdr.markForCheck();
         })
         .finally(() => this.closeDeletePopup());
       return;
@@ -234,6 +236,7 @@ export class ListOrganisationComponent implements OnInit {
           this.selectedOrgs = this.selectedOrgs.filter(o => o.id !== orgId);
           this.refreshList();
         }
+        this.cdr.markForCheck();
       });
   }
 }

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, OnDestroy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LoadingService } from './core/services/loading.service';
@@ -7,8 +8,7 @@ import { IdleTimeoutService } from './core/services/idle-timeout.service';
 import { LoginService } from './core/services/login.service';
 import { StorageService } from './core/services/storage.service';
 import { PrimeNGConfig } from 'primeng/api';
-import { delay, filter, map } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { delay, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -17,15 +17,12 @@ import { Subscription } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private destroyRef = inject(DestroyRef);
+
   public loading = false;
   showSessionExpiredDialog = false;
   showIdleWarningDialog = false;
   idleCountdown = 0;
-
-  private sessionSub!: Subscription;
-  private idleWarningSub!: Subscription;
-  private idleLogoutSub!: Subscription;
-  private routerSub!: Subscription;
 
   constructor(
     private loadingService: LoadingService,
@@ -55,34 +52,37 @@ export class AppComponent implements OnInit, OnDestroy {
     this.listenToLoading();
 
     // Session expired (refresh token invalidated)
-    this.sessionSub = this.sessionExpiredService.onSessionExpired.subscribe(
-      () => {
+    this.sessionExpiredService.onSessionExpired
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         this.idleTimeoutService.stop();
         this.showIdleWarningDialog = false;
         this.showSessionExpiredDialog = true;
-      },
-    );
+      });
 
     // Idle timeout warning (countdown tick)
-    this.idleWarningSub = this.idleTimeoutService.onIdleWarning.subscribe(
-      seconds => {
+    this.idleTimeoutService.onIdleWarning
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(seconds => {
         this.idleCountdown = seconds;
         this.showIdleWarningDialog = true;
-      },
-    );
+      });
 
     // Idle timeout expired — auto logout
-    this.idleLogoutSub = this.idleTimeoutService.onIdleLogout.subscribe(() => {
-      this.showIdleWarningDialog = false;
-      this.performLogout();
-    });
+    this.idleTimeoutService.onIdleLogout
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.showIdleWarningDialog = false;
+        this.performLogout();
+      });
 
     // Start/stop idle tracking based on route
-    this.routerSub = this.router.events
+    this.router.events
       .pipe(
         filter(
           (event): event is NavigationEnd => event instanceof NavigationEnd,
         ),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(event => {
         // Update browser tab title
@@ -118,10 +118,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.sessionSub?.unsubscribe();
-    this.idleWarningSub?.unsubscribe();
-    this.idleLogoutSub?.unsubscribe();
-    this.routerSub?.unsubscribe();
     this.idleTimeoutService.stop();
   }
 
@@ -155,7 +151,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   listenToLoading() {
     this.loadingService.isLoadingSubject
-      .pipe(delay(0))
+      .pipe(delay(0), takeUntilDestroyed(this.destroyRef))
       .subscribe((loading: any) => {
         if (this.loading !== loading) this.loading = loading;
       });

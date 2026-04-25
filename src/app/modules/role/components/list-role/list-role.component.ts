@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -70,6 +70,7 @@ export class ListRoleComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private roleService: RoleService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -97,6 +98,7 @@ export class ListRoleComponent implements OnInit {
           this.selectedOrgId = null;
         }
       }
+      this.cdr.markForCheck();
     });
   }
 
@@ -221,6 +223,7 @@ export class ListRoleComponent implements OnInit {
             this.selectedRoles = [];
             this.refreshList();
           }
+          this.cdr.markForCheck();
         })
         .finally(() => this.closeDeletePopup());
       return;
@@ -234,6 +237,7 @@ export class ListRoleComponent implements OnInit {
             this.selectedRoles = this.selectedRoles.filter(r => r.id !== this.roleToDelete);
             this.refreshList();
           }
+          this.cdr.markForCheck();
         });
     }
     this.closeDeletePopup();

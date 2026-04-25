@@ -163,6 +163,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
             this.roleForm.markAsPristine();
             this.router.navigate([ROLE.LIST]);
           }
+          this.cdr.markForCheck();
         });
     }
   }
