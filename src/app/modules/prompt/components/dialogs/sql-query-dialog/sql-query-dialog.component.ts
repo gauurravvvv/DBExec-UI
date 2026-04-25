@@ -8,6 +8,7 @@ import { ChangeDetectionStrategy, AfterViewInit,
   Output,
   SimpleChanges, } from '@angular/core';
 import { MonacoIntelliSenseService } from '../../../../dataset/services/monaco-intellisense.service';
+import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 
 declare const monaco: any;
 declare const window: any;
@@ -119,7 +120,10 @@ export class SqlQueryDialogComponent
   private currentTheme: string = 'vs-dark';
   private themeObserver: MutationObserver | null = null;
 
-  constructor(private monacoIntelliSenseService: MonacoIntelliSenseService) {}
+  constructor(
+    private monacoIntelliSenseService: MonacoIntelliSenseService,
+    private monacoLoader: MonacoLoaderService,
+  ) {}
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscapeKey(event: KeyboardEvent) {
@@ -220,55 +224,12 @@ export class SqlQueryDialogComponent
   }
 
   private loadMonacoEditor(): void {
-    // Check if Monaco is already loaded
-    if (typeof monaco !== 'undefined') {
-      setTimeout(() => this.initMonaco(), 0);
-      return;
-    }
-
-    // Check if loading failed during script load
-    if (window.monacoLoading === false && typeof monaco === 'undefined') {
+    this.monacoLoader.load().then(() => {
+      this.initMonaco();
+    }).catch(() => {
       this.isLoadingEditor = false;
       this.monacoLoadFailed = true;
-      return;
-    }
-
-    let attempts = 0;
-    const maxAttempts = EDITOR_LOADING_CONFIG.MAX_ATTEMPTS;
-    const checkInterval = EDITOR_LOADING_CONFIG.CHECK_INTERVAL_MS;
-
-    const checkMonaco = setInterval(() => {
-      attempts++;
-
-      if (typeof monaco !== 'undefined') {
-        clearInterval(checkMonaco);
-        this.initMonaco();
-        return;
-      }
-
-      // Check if loading explicitly failed
-      if (window.monacoLoading === false) {
-        clearInterval(checkMonaco);
-        this.isLoadingEditor = false;
-        this.monacoLoadFailed = true;
-        return;
-      }
-
-      if (attempts >= maxAttempts) {
-        clearInterval(checkMonaco);
-        this.isLoadingEditor = false;
-        this.monacoLoadFailed = true;
-      }
-    }, checkInterval);
-
-    // Extended timeout fallback - 20 seconds
-    setTimeout(() => {
-      clearInterval(checkMonaco);
-      if (typeof monaco === 'undefined') {
-        this.isLoadingEditor = false;
-        this.monacoLoadFailed = true;
-      }
-    }, EDITOR_LOADING_CONFIG.TIMEOUT_MS);
+    });
   }
 
   retryLoadMonaco(): void {
