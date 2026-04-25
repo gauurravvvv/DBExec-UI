@@ -326,7 +326,7 @@ export class ViewDashboardComponent
             v.error = true;
           });
         }
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
         // Canvas container is behind *ngIf, set up observer after DOM renders
         setTimeout(() => this.trySetupCanvas(), 0);
       })
@@ -336,7 +336,7 @@ export class ViewDashboardComponent
           v.loading = false;
           v.error = true;
         });
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
         setTimeout(() => this.trySetupCanvas(), 0);
       });
   }

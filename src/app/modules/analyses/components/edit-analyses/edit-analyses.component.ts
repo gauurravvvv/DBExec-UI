@@ -604,7 +604,7 @@ export class EditAnalysesComponent
     this.visuals.forEach(visual => {
       this.computeVisualDimensions(visual);
     });
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   /**
@@ -835,7 +835,7 @@ export class EditAnalysesComponent
           this.rawGraphData = data;
           // Transform chart data for all loaded visuals
           this.transformAllVisualsChartData();
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         }
       });
   }
@@ -995,7 +995,7 @@ export class EditAnalysesComponent
             );
           }
 
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
 
           // Step 5: Fetch each visual independently and plot in real-time
           this.fetchVisualsIndependently();
@@ -1051,7 +1051,7 @@ export class EditAnalysesComponent
                 this.transformSingleVisualChartData(this.visuals[visualIndex]);
               }
 
-              this.cdr.detectChanges();
+              this.cdr.markForCheck();
             }
           }
         })
@@ -1062,7 +1062,7 @@ export class EditAnalysesComponent
           if (visualIndex !== -1) {
             this.visuals[visualIndex].loading = false;
             this.visuals[visualIndex].error = true;
-            this.cdr.detectChanges();
+            this.cdr.markForCheck();
           }
         });
     });
@@ -2253,7 +2253,7 @@ export class EditAnalysesComponent
         this.activeAxisSelection = null;
         // Trigger change detection to update the UI
         this.cdr.markForCheck();
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     }
   }
@@ -2273,7 +2273,7 @@ export class EditAnalysesComponent
     }
 
     this.updateVisualChartData(visual);
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   getFieldDisplayName(columnToUse: string | null): string {
