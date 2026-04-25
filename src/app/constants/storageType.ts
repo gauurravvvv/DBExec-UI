@@ -7,6 +7,7 @@ export enum StorageType {
   ROLE = 'role',
   SAVED_CREDS = 'savedCredentials',
   SESSION_INACTIVITY_TIMEOUT = 'sessionInactivityTimeout',
+  THEME = 'theme',
 }
 
 export enum SessionStorageType {

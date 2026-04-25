@@ -16,6 +16,8 @@ import { GlobalSearchService } from '../../../services/global-search.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { AnnouncementService } from 'src/app/modules/app-settings/services/announcement.service';
 import { ROLES } from 'src/app/constants/user.constant';
+import { StorageService } from 'src/app/core/services/storage.service';
+import { StorageType } from 'src/app/constants/storageType';
 
 interface Announcement {
   id: string;
@@ -247,8 +249,7 @@ export class HeaderComponent implements OnInit {
 
   private clearSessionAndNavigate() {
     this.store.dispatch(AddAnalysesActions.clearAllDatasets());
-    localStorage.clear();
-    sessionStorage.clear();
+    StorageService.clear();
     this.router.navigate(['/login']);
   }
 
@@ -288,7 +289,7 @@ export class HeaderComponent implements OnInit {
       }, 700);
     }
     this.isDarkMode = !this.isDarkMode;
-    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
+    StorageService.set(StorageType.THEME, this.isDarkMode ? 'dark' : 'light');
     this.applyTheme();
   }
 
