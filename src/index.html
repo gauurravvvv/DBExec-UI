@@ -31,45 +31,6 @@
   <body>
     <app-root></app-root>
 
-    <!-- Monaco Editor from CDN -->
-    <script>
-      // Set loading flag before script loads
-      window.monacoLoading = true;
-      window.monacoLoaded = false;
-    </script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"
-      integrity="sha384-UcP5/iVWyRzIhnVjcB2o9W1eoYKL5fAhHTRzvFZg8ctOsoAoDeBQyQuyIk+BJ/nh"
-      crossorigin="anonymous"
-      onerror="
-        console.error('Failed to load Monaco loader script');
-        window.monacoLoading = false;
-      "
-    ></script>
-    <script>
-      // Wait for loader to be available
-      (function checkLoader() {
-        if (
-          typeof require !== 'undefined' &&
-          typeof require.config === 'function'
-        ) {
-          require.config({
-            paths: {
-              vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs',
-            },
-          });
-          require(['vs/editor/editor.main'], function () {
-            window.monacoLoaded = true;
-            window.monacoLoading = false;
-          }, function (err) {
-            console.error('Failed to load Monaco editor.main:', err);
-            window.monacoLoading = false;
-          });
-        } else if (window.monacoLoading) {
-          // Retry if still loading
-          setTimeout(checkLoader, 100);
-        }
-      })();
-    </script>
+    <!-- Monaco Editor loaded on-demand by MonacoLoaderService -->
   </body>
 </html>

@@ -17,6 +17,7 @@ import {
   FunctionDefinition,
   getAllFunctions,
 } from '../../constants/functions-reference';
+import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import {
   FORMULA_EDITOR_OPTIONS,
   FORMULA_EDITOR_LOADING_CONFIG,
@@ -110,6 +111,7 @@ export class AddCustomFieldDialogComponent
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
+    private monacoLoader: MonacoLoaderService,
   ) {}
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -204,47 +206,14 @@ export class AddCustomFieldDialogComponent
   }
 
   private initializeMonacoEditor(): void {
-    if (typeof monaco !== 'undefined') {
-      setTimeout(() => this.createEditor(), 0);
-      return;
-    }
-
     this.isLoadingEditor = true;
-
-    let attempts = 0;
-    const maxAttempts = FORMULA_EDITOR_LOADING_CONFIG.MAX_ATTEMPTS;
-    const checkInterval = FORMULA_EDITOR_LOADING_CONFIG.CHECK_INTERVAL_MS;
-
-    const checkMonaco = setInterval(() => {
-      attempts++;
-
-      if (typeof monaco !== 'undefined') {
-        clearInterval(checkMonaco);
-        this.createEditor();
-        return;
-      }
-
-      if (window.monacoLoading === false) {
-        clearInterval(checkMonaco);
-        this.isLoadingEditor = false;
-        this.monacoLoadFailed = true;
-        return;
-      }
-
-      if (attempts >= maxAttempts) {
-        clearInterval(checkMonaco);
-        this.isLoadingEditor = false;
-        this.monacoLoadFailed = true;
-      }
-    }, checkInterval);
-
-    setTimeout(() => {
-      clearInterval(checkMonaco);
-      if (typeof monaco === 'undefined') {
-        this.isLoadingEditor = false;
-        this.monacoLoadFailed = true;
-      }
-    }, FORMULA_EDITOR_LOADING_CONFIG.TIMEOUT_MS);
+    this.monacoLoader.load().then(() => {
+      this.createEditor();
+    }).catch(() => {
+      this.isLoadingEditor = false;
+      this.monacoLoadFailed = true;
+      this.cdr.markForCheck();
+    });
   }
 
   private registerFormulaLanguage(): void {
