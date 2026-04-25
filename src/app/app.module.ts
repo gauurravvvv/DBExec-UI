@@ -61,7 +61,10 @@ import { SharedModule } from './shared/shared.module';
     // NgRx Store
     StoreModule.forRoot({}),
     EffectsModule.forRoot([]),
-    ...(isDevMode() ? [StoreDevtoolsModule.instrument({ maxAge: 25 })] : []),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+    }),
   ],
 
   providers: [

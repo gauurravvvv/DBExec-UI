@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 
-declare const require: any;
-
 const MONACO_VERSION = '0.45.0';
 const MONACO_CDN = `https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/${MONACO_VERSION}/min/vs`;
 const LOADER_URL = `${MONACO_CDN}/loader.min.js`;
@@ -25,8 +23,10 @@ export class MonacoLoaderService {
       script.integrity = LOADER_SRI;
       script.crossOrigin = 'anonymous';
       script.onload = () => {
-        require.config({ paths: { vs: MONACO_CDN } });
-        require(['vs/editor/editor.main'], () => resolve(), (err: any) => reject(err));
+        // Use (window as any).require to avoid webpack static analysis
+        const amdRequire = (window as any).require;
+        amdRequire.config({ paths: { vs: MONACO_CDN } });
+        amdRequire(['vs/editor/editor.main'], () => resolve(), (err: any) => reject(err));
       };
       script.onerror = () => reject(new Error('Failed to load Monaco loader'));
       document.head.appendChild(script);
