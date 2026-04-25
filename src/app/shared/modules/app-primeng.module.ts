@@ -63,6 +63,12 @@ import { SplitterModule } from 'primeng/splitter';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { ColorPickerModule } from 'primeng/colorpicker';
 
+/**
+ * TODO [Performance]: Split into per-feature PrimeNG imports when migrating to
+ * standalone components. Currently all 62 modules are re-exported here; Angular
+ * tree-shakes unused ones in production builds, but lazy chunk sizes would
+ * benefit from importing only what each feature module actually uses.
+ */
 @NgModule({
   imports: [
     BreadcrumbModule,
