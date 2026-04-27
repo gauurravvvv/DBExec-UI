@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SECTION } from 'src/app/constants/routes';
-import { SectionService } from '../../services/section.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { SectionService } from '../../services/section.service';
 
 @Component({
   selector: 'app-view-section',

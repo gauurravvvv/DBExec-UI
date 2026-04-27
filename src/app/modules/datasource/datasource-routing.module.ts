@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
-import { ListDatasourceComponent } from './components/list-datasource/list-datasource.component';
 import { AddDatasourceComponent } from './components/add-datasource/add-datasource.component';
-import { ViewDatasourceComponent } from './components/view-datasource/view-datasource.component';
 import { EditDatasourceComponent } from './components/edit-datasource/edit-datasource.component';
+import { ListDatasourceComponent } from './components/list-datasource/list-datasource.component';
+import { ViewDatasourceComponent } from './components/view-datasource/view-datasource.component';
 
 const routes: Routes = [
   {

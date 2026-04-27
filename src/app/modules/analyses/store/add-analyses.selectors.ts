@@ -6,10 +6,10 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import {
   AddAnalysesState,
   ADD_ANALYSES_FEATURE_KEY,
+  CACHE_CONFIG,
   DatasetEntry,
   getDatasetKey,
   isDatasetStale,
-  CACHE_CONFIG,
 } from './add-analyses.state';
 
 // Feature selector

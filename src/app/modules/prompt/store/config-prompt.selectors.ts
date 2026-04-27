@@ -4,12 +4,12 @@
  */
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import {
+  CACHE_CONFIG,
   ConfigPromptState,
   CONFIG_PROMPT_FEATURE_KEY,
-  SchemaEntry,
   getSchemaKey,
   isSchemaStale,
-  CACHE_CONFIG,
+  SchemaEntry,
 } from './config-prompt.state';
 
 // Feature selector

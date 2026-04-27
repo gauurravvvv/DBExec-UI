@@ -3,25 +3,25 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  OnInit,
-  HostListener,
   ElementRef,
-  ViewChild,
+  HostListener,
   inject,
+  OnInit,
+  Renderer2,
+  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { GlobalService } from 'src/app/core/services/global.service';
 import { auditTime, filter } from 'rxjs/operators';
-import { Renderer2 } from '@angular/core';
-import { AddAnalysesActions } from 'src/app/modules/analyses/store';
-import { GlobalSearchService } from '../../../services/global-search.service';
-import { LoginService } from 'src/app/core/services/login.service';
-import { AnnouncementService } from 'src/app/modules/app-settings/services/announcement.service';
-import { ROLES } from 'src/app/constants/user.constant';
-import { StorageService } from 'src/app/core/services/storage.service';
 import { StorageType } from 'src/app/constants/storageType';
+import { ROLES } from 'src/app/constants/user.constant';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { LoginService } from 'src/app/core/services/login.service';
+import { StorageService } from 'src/app/core/services/storage.service';
+import { AddAnalysesActions } from 'src/app/modules/analyses/store';
+import { AnnouncementService } from 'src/app/modules/app-settings/services/announcement.service';
+import { GlobalSearchService } from '../../../services/global-search.service';
 
 interface Announcement {
   id: string;

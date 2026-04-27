@@ -1,7 +1,8 @@
 import {
-  ChangeDetectionStrategy,
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
+  ElementRef,
   EventEmitter,
   HostListener,
   Input,
@@ -10,10 +11,9 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
-  ElementRef,
 } from '@angular/core';
-import { MonacoIntelliSenseService } from '../../../../dataset/services/monaco-intellisense.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
+import { MonacoIntelliSenseService } from '../../../../dataset/services/monaco-intellisense.service';
 
 declare const monaco: any;
 declare const window: any;

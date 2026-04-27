@@ -5,13 +5,13 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   SimpleChanges,
   ViewChild,
-  inject,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -19,25 +19,24 @@ import { Store } from '@ngrx/store';
 import { MessageService } from 'primeng/api';
 import { Observable, Subject } from 'rxjs';
 import { debounceTime, first } from 'rxjs/operators';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import {
-  EDITOR_LOADING_CONFIG,
-  MONACO_EDITOR_OPTIONS,
-} from '../../config/sql-editor.config';
+import { MONACO_EDITOR_OPTIONS } from '../../config/sql-editor.config';
 import { DatasourceSchema, QueryResult } from '../../helpers/dummy-data.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
   ContextMenuPosition,
 } from '../../models/query-tab.model';
+import { DatasetService } from '../../services/dataset.service';
 import { MonacoIntelliSenseService } from '../../services/monaco-intellisense.service';
 import { QueryService } from '../../services/query.service';
-import { DatasetService } from '../../services/dataset.service';
-import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import { SqlFormatterService } from '../../services/sql-formatter.service';
 import { SqlValidatorService } from '../../services/sql-validator.service';
 import {
@@ -47,8 +46,6 @@ import {
   selectSchemaByKey,
 } from '../../store';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
-import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;

@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddRoleComponent } from './components/add-role/add-role.component';
-import { ViewRoleComponent } from './components/view-role/view-role.component';
 import { EditRoleComponent } from './components/edit-role/edit-role.component';
 import { ListRoleComponent } from './components/list-role/list-role.component';
+import { ViewRoleComponent } from './components/view-role/view-role.component';
 
 const routes: Routes = [
   {

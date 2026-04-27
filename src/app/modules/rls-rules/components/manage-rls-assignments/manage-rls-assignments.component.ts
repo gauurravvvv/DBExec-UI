@@ -8,11 +8,11 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { GlobalService } from 'src/app/core/services/global.service';
-import { UserService } from 'src/app/modules/users/services/user.service';
-import { GroupService } from 'src/app/modules/groups/services/group.service';
-import { RlsRulesService } from '../../services/rls-rules.service';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { GroupService } from 'src/app/modules/groups/services/group.service';
+import { UserService } from 'src/app/modules/users/services/user.service';
+import { RlsRulesService } from '../../services/rls-rules.service';
 
 @Component({
   selector: 'app-manage-rls-assignments',

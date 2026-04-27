@@ -7,18 +7,18 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { GROUP } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { GROUP } from 'src/app/constants/routes';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RoleService } from 'src/app/modules/role/services/role.service';
 import { GroupService } from '../../services/group.service';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-list-group',

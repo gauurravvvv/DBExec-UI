@@ -4,14 +4,14 @@
  * Implements LRU cache with max size and access tracking.
  */
 import { createReducer, on } from '@ngrx/store';
+import * as AddAnalysesActions from './add-analyses.actions';
 import {
-  initialAddAnalysesState,
   AddAnalysesState,
-  getDatasetKey,
   CACHE_CONFIG,
   DatasetEntry,
+  getDatasetKey,
+  initialAddAnalysesState,
 } from './add-analyses.state';
-import * as AddAnalysesActions from './add-analyses.actions';
 
 /**
  * Helper: Update access order for LRU tracking

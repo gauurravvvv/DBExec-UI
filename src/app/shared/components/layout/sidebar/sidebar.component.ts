@@ -6,9 +6,9 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
-import { Router } from '@angular/router';
 
 interface MenuItem {
   label: string;

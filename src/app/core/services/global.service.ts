@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { AbstractControl, UntypedFormControl } from '@angular/forms';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { BehaviorSubject } from 'rxjs';
 import { StorageType } from '../../constants/storageType';
-import { StorageService } from './storage.service';
-import { MessageService } from 'primeng/api';
 import { ROLES } from '../../constants/user.constant';
+import { StorageService } from './storage.service';
 
 interface IAPIResponse {
   code: number;

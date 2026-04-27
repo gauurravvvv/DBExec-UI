@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subject, Subscription, merge, fromEvent } from 'rxjs';
+import { fromEvent, merge, Subject, Subscription } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
-import { StorageService } from 'src/app/core/services/storage.service';
 import { StorageType } from 'src/app/constants/storageType';
+import { StorageService } from 'src/app/core/services/storage.service';
 
 @Injectable({
   providedIn: 'root',

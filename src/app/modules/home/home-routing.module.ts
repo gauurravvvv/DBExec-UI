@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { EmptyRootComponent } from './empty-root/empty-root.component';
-import { SuperAdminHomeComponent } from './super-admin-home/super-admin-home.component';
-import { OrgHomeComponent } from './org-home/org-home.component';
 import { RoleGuard } from 'src/app/core/guards/role.guard';
+import { EmptyRootComponent } from './empty-root/empty-root.component';
+import { OrgHomeComponent } from './org-home/org-home.component';
+import { SuperAdminHomeComponent } from './super-admin-home/super-admin-home.component';
 
 const routes: Routes = [
   {

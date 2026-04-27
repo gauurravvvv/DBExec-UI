@@ -8,12 +8,11 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ANALYSES } from 'src/app/constants/routes';
-import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
+import { ANALYSES, DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../service/analyses.service';
-import { DashboardService } from '../../../dashboard/services/dashboard.service';
 
 @Component({
   selector: 'app-view-analyses',

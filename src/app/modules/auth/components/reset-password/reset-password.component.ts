@@ -2,12 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   inject,
   OnInit,
   QueryList,
-  ViewChildren,
-  ElementRef,
   signal,
+  ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -18,9 +18,9 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RESET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
+import { AUTH } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
-import { AUTH } from 'src/app/constants/routes';
 import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
 
 @Component({

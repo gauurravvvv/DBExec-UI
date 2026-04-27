@@ -8,8 +8,8 @@ import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { GrantAccessComponent } from './components/grant-access/grant-access.component';
 import { AccessRoutingModule } from './access-routing.module';
+import { GrantAccessComponent } from './components/grant-access/grant-access.component';
 
 @NgModule({
   declarations: [GrantAccessComponent],

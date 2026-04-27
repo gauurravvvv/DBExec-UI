@@ -6,10 +6,10 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import {
   AddDatasetState,
   ADD_DATASET_FEATURE_KEY,
-  SchemaEntry,
+  CACHE_CONFIG,
   getSchemaKey,
   isSchemaStale,
-  CACHE_CONFIG,
+  SchemaEntry,
 } from './add-dataset.state';
 
 // Feature selector

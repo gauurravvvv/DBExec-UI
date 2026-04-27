@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PROMPT } from 'src/app/constants/routes';
-import { PromptService } from '../../services/prompt.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { PromptService } from '../../services/prompt.service';
 
 @Component({
   selector: 'app-view-prompt',

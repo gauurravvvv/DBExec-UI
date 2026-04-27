@@ -4,15 +4,14 @@
  */
 
 import {
-  FormControl,
-  Validators,
   AbstractControl,
+  FormControl,
   ValidationErrors,
+  Validators,
 } from '@angular/forms';
 import {
   ExecutePrompt,
   PromptType,
-  isRangeType,
 } from '../models/execute-query-builder.models';
 
 /**

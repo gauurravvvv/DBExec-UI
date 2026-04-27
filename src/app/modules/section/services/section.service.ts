@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
+import { lastValueFrom } from 'rxjs';
 import { SECTION } from 'src/app/constants/api';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 

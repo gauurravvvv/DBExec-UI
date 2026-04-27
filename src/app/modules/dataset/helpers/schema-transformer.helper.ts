@@ -1,8 +1,8 @@
 import {
   DatasourceSchema,
   SchemaGroup,
-  TableSchema,
   TableColumn,
+  TableSchema,
 } from './dummy-data.helper';
 
 /**

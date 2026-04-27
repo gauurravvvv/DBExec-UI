@@ -4,10 +4,10 @@
  */
 
 import {
+  GROUP_COLORS,
   Prompt,
   Section,
   TabData,
-  GROUP_COLORS,
 } from '../models/configure-query-builder.models';
 
 /**

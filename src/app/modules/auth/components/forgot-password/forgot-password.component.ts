@@ -1,17 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   OnDestroy,
+  OnInit,
   signal,
 } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
-import { REGEX } from 'src/app/constants/regex.constant';
-import { AUTH } from 'src/app/constants/routes';
 
 @Component({
   selector: 'app-forgot-password',
@@ -128,7 +127,9 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     }
     const minutes = Math.floor(remainingMs / 60000);
     const seconds = Math.floor((remainingMs % 60000) / 1000);
-    this.countdownDisplay.set(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+    this.countdownDisplay.set(
+      `${minutes}:${seconds.toString().padStart(2, '0')}`,
+    );
   }
 
   private clearCountdown(): void {

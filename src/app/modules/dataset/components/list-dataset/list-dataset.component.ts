@@ -3,28 +3,28 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  OnInit,
-  ViewChild,
   ElementRef,
   inject,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { ANALYSES, DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { DatasetService } from '../../services/dataset.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';
-import { AnalysesService } from 'src/app/modules/analyses/service/analyses.service';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
-import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
+import { AnalysesService } from 'src/app/modules/analyses/service/analyses.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';
+import { DatasetService } from '../../services/dataset.service';
+import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
 @Component({
   selector: 'app-list-dataset',

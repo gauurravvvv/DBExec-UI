@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
-import { ListSectionComponent } from './components/list-section/list-section.component';
 import { AddSectionComponent } from './components/add-section/add-section.component';
-import { ViewSectionComponent } from './components/view-section/view-section.component';
 import { EditSectionComponent } from './components/edit-section/edit-section.component';
+import { ListSectionComponent } from './components/list-section/list-section.component';
+import { ViewSectionComponent } from './components/view-section/view-section.component';
 
 const routes: Routes = [
   {

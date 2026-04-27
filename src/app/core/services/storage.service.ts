@@ -1,4 +1,4 @@
-import { StorageType, SessionStorageType } from 'src/app/constants/storageType';
+import { SessionStorageType, StorageType } from 'src/app/constants/storageType';
 
 /**
  * Centralized storage access layer.

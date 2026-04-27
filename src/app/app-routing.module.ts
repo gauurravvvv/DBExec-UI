@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './modules/auth/components/login/login.component';
-import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
+import { PERMISSIONS } from './constants/permissions.constant';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
-import { HomeComponent } from './shared/components/layout/home/home.component';
+import { CliAuthComponent } from './modules/auth/components/cli-auth/cli-auth.component';
+import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
+import { LoginComponent } from './modules/auth/components/login/login.component';
 import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
 import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
-import { CliAuthComponent } from './modules/auth/components/cli-auth/cli-auth.component';
-import { PERMISSIONS } from './constants/permissions.constant';
+import { HomeComponent } from './shared/components/layout/home/home.component';
 
 const routes: Routes = [
   {

@@ -1,12 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnInit,
-  OnChanges,
   DoCheck,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import { COLOR_PALETTES } from '../../helpers/chart-config.helper';

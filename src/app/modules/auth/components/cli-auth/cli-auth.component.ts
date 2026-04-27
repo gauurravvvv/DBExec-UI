@@ -6,14 +6,14 @@ import {
   ElementRef,
   inject,
   OnInit,
-  ViewChild,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CLI_AUTH_PAGE_OPTIONS } from 'src/app/constants/global';
+import { StorageType } from 'src/app/constants/storageType';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
-import { StorageType } from 'src/app/constants/storageType';
-import { CLI_AUTH_PAGE_OPTIONS } from 'src/app/constants/global';
 
 @Component({
   selector: 'app-cli-auth',
@@ -28,7 +28,9 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
 
   features = CLI_AUTH_PAGE_OPTIONS;
 
-  pageState = signal<'prompt' | 'authorizing' | 'success' | 'denied' | 'not-logged-in' | 'error'>('prompt');
+  pageState = signal<
+    'prompt' | 'authorizing' | 'success' | 'denied' | 'not-logged-in' | 'error'
+  >('prompt');
   message = signal('');
   userName = '';
   userRole = '';
@@ -47,7 +49,9 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     if (!this.loginService.isLoggedIn()) {
       this.pageState.set('not-logged-in');
-      this.message.set('You need to be logged in to DBExec to authorize CLI access.');
+      this.message.set(
+        'You need to be logged in to DBExec to authorize CLI access.',
+      );
       return;
     }
 
@@ -105,9 +109,11 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
           if (response.status) {
             this.pageState.set('success');
             const d = response.data;
-            this.message.set(d
-              ? `Signed in as ${d.name} (${d.role}) in ${d.organisation}`
-              : 'CLI access authorized successfully.');
+            this.message.set(
+              d
+                ? `Signed in as ${d.name} (${d.role}) in ${d.organisation}`
+                : 'CLI access authorized successfully.',
+            );
           } else {
             this.pageState.set('error');
             this.message.set(response.message || 'Authorization failed.');
@@ -118,7 +124,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
           this.pageState.set('error');
           this.message.set(
             err?.error?.message ||
-            'Authorization failed. The code may be invalid or expired.',
+              'Authorization failed. The code may be invalid or expired.',
           );
           this.loading.set(false);
         },
@@ -143,12 +149,16 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: () => {
           this.pageState.set('denied');
-          this.message.set('CLI access has been denied. You can close this tab.');
+          this.message.set(
+            'CLI access has been denied. You can close this tab.',
+          );
           this.loading.set(false);
         },
         error: () => {
           this.pageState.set('denied');
-          this.message.set('CLI access has been denied. You can close this tab.');
+          this.message.set(
+            'CLI access has been denied. You can close this tab.',
+          );
           this.loading.set(false);
         },
       });

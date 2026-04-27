@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GlobalService } from 'src/app/core/services/global.service';
 import { ROLES } from 'src/app/constants/user.constant';
+import { GlobalService } from 'src/app/core/services/global.service';
 
 @Component({
   selector: 'app-org-home',

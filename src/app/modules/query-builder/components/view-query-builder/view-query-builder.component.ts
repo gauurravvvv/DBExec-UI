@@ -1,28 +1,28 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
-  OnDestroy,
   ElementRef,
+  OnDestroy,
+  OnInit,
   ViewChild,
 } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { TreeNode } from 'primeng/api';
 
 import { QUERY_BUILDER } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { QueryBuilderService } from '../../services/query-builder.service';
-import {
-  ExecuteTab,
-  ExecuteSection,
-  ExecutePrompt,
-  transformTabResponse,
-  transformSectionResponse,
-  transformPromptResponse,
-} from '../execute-query-builder/models/execute-query-builder.models';
 import { createPromptFormControl } from '../execute-query-builder/helpers/form.helper';
 import { getPlaceholder } from '../execute-query-builder/helpers/prompt-renderer.helper';
+import {
+  ExecutePrompt,
+  ExecuteSection,
+  ExecuteTab,
+  transformPromptResponse,
+  transformSectionResponse,
+  transformTabResponse,
+} from '../execute-query-builder/models/execute-query-builder.models';
 
 @Component({
   selector: 'app-view-query-builder',
