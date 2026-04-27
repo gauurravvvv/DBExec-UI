@@ -10,9 +10,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SET_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
+import { AUTH } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
-import { AUTH } from 'src/app/constants/routes';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
 
@@ -34,7 +34,9 @@ export class SetPasswordComponent implements OnInit {
   orgId!: string;
   token!: string;
 
-  pageState = signal<'loading' | 'valid' | 'expired' | 'already_set' | 'invalid' | 'resent'>('loading');
+  pageState = signal<
+    'loading' | 'valid' | 'expired' | 'already_set' | 'invalid' | 'resent'
+  >('loading');
   resending = signal(false);
 
   constructor(

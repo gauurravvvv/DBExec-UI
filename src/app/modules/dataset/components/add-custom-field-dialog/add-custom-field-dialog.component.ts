@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   HostListener,
   Input,
@@ -11,31 +12,26 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
-  ElementRef,
 } from '@angular/core';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
+import { FORMULA_EDITOR_OPTIONS } from '../../config/formula-editor.config';
 import {
-  FUNCTION_CATEGORIES,
   FunctionCategory,
   FunctionDefinition,
+  FUNCTION_CATEGORIES,
   getAllFunctions,
 } from '../../constants/functions-reference';
-import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
-import {
-  FORMULA_EDITOR_OPTIONS,
-  FORMULA_EDITOR_LOADING_CONFIG,
-} from '../../config/formula-editor.config';
 import { DatasetService } from '../../services/dataset.service';
-import { GlobalService } from 'src/app/core/services/global.service';
 import { ANALYTICAL_TYPES } from '../edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
 import {
+  createFieldCompletionItem,
+  createFunctionCompletionItem,
+  createThemeObserver,
   CustomFieldData,
-  DEFAULT_CUSTOM_FIELD,
   FORMULA_LANGUAGE_CONFIG,
   FORMULA_TOKENIZER,
   getCurrentMonacoTheme,
-  createThemeObserver,
-  createFunctionCompletionItem,
-  createFieldCompletionItem,
 } from './add-custom-field-dialog.helper';
 
 // Declare Monaco for TypeScript

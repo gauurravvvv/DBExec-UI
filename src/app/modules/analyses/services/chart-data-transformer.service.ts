@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
-  ChartDataPoint,
-  ChartSeriesData,
-  ChartDataMapping,
   ChartData,
-  Visual,
-  SingleSeriesData,
+  ChartDataMapping,
   MultiSeriesData,
+  SingleSeriesData,
 } from '../models';
 
 /**

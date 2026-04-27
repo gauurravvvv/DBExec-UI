@@ -6,7 +6,6 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -15,11 +14,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { ANNOUNCEMENT } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import {
   AnnouncementService,
   UpdateAnnouncementPayload,

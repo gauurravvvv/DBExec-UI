@@ -7,11 +7,11 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 import { GlobalService } from 'src/app/core/services/global.service';

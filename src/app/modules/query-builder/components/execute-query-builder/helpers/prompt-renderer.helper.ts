@@ -7,10 +7,10 @@ import { formatDate } from '@angular/common';
 import { SelectItem } from 'primeng/api';
 import {
   ExecutePrompt,
+  isRangeType,
+  PromptSubmission,
   PromptType,
   PromptValue,
-  PromptSubmission,
-  isRangeType,
 } from '../models/execute-query-builder.models';
 
 /**

@@ -8,11 +8,11 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { OrganisationService } from '../../services/organisation.service';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { REGEX } from 'src/app/constants/regex.constant';
+import { OrganisationService } from '../../services/organisation.service';
 
 @Component({
   selector: 'app-add-organisation',

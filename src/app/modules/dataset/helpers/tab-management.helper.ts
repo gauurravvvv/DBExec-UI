@@ -3,7 +3,7 @@
  * Contains utility methods for tab operations
  */
 
-import { QueryTab, ContextMenuItem } from '../models/query-tab.model';
+import { ContextMenuItem, QueryTab } from '../models/query-tab.model';
 
 export class TabManagementHelper {
   /**

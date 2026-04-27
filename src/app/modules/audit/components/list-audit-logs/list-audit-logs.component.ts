@@ -7,14 +7,14 @@ import {
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AuditService } from '../../services/audit.service';
-import { GlobalService } from 'src/app/core/services/global.service';
-import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { ROLES } from 'src/app/constants/user.constant';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
+import { ROLES } from 'src/app/constants/user.constant';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { AuditService } from '../../services/audit.service';
 
 @Component({
   selector: 'app-list-audit-logs',

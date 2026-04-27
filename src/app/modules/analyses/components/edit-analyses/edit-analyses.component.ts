@@ -1,6 +1,6 @@
 import {
-  ChangeDetectionStrategy,
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   DestroyRef,
@@ -17,6 +17,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { ANALYSES } from 'src/app/constants/routes';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import {
@@ -24,16 +25,15 @@ import {
   getDefaultChartConfig,
   hasAxisLabels,
   is3DCoordinateChartType,
-  isHeatMapChartType,
-  isSankeyChartType,
+  isFlowLinesChartType,
   isGraphChartType,
+  isHeatMapChartType,
   isLines3dChartType,
   isPolygons3dChartType,
-  isFlowLinesChartType,
+  isSankeyChartType,
   isWorldMapChartType,
 } from '../../constants/charts.constants';
-import { Visual, createVisual } from '../../models';
-import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { createVisual, Visual } from '../../models';
 import { AnalysesService } from '../../service/analyses.service';
 import { ChartDataTransformerService } from '../../services';
 import {

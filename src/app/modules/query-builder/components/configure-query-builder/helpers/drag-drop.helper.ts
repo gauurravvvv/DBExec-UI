@@ -4,10 +4,10 @@
  */
 
 import {
-  TabData,
-  Section,
-  Prompt,
   DragState,
+  Prompt,
+  Section,
+  TabData,
 } from '../models/configure-query-builder.models';
 
 /**

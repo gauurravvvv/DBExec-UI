@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
-import { Subject } from 'rxjs';
+import { lastValueFrom, Subject } from 'rxjs';
 import { GLOBAL_SEARCH } from 'src/app/constants';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';

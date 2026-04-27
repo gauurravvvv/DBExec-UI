@@ -10,14 +10,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
+import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { PromptService } from '../../services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
-import { PROMPT } from 'src/app/constants/routes';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { PromptService } from '../../services/prompt.service';
 
 @Component({
   selector: 'app-edit-prompt',

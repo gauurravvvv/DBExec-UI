@@ -23,41 +23,38 @@ import {
 
 // Import drag-drop helpers
 import {
-  reorderTabs,
-  reorderSections,
   reorderPrompts,
+  reorderSections,
+  reorderTabs,
 } from './helpers/drag-drop.helper';
 
 // Import group helpers
 import {
+  assignColorToGroup as assignColorToGroupHelper,
   canGroupPrompts as canGroupPromptsHelper,
-  isPromptSelected as isPromptSelectedHelper,
-  isGroupActiveInSection as isGroupActiveInSectionHelper,
-  hasSectionGroups as hasSectionGroupsHelper,
-  hasAnyGroups as hasAnyGroupsHelper,
-  validateAndCleanupGroup as validateAndCleanupGroupHelper,
   clearAllGroupsFromTabs,
   clearSectionGroups as clearSectionGroupsHelper,
-  getNextAvailableColorIndex as getNextAvailableColorIndexHelper,
-  getColorIndexForGroup as getColorIndexForGroupHelper,
-  isColorInUse as isColorInUseHelper,
-  toggleMandatoryInGroup,
   findSectionContainingPrompt as findSectionContainingPromptHelper,
+  getColorIndexForGroup as getColorIndexForGroupHelper,
+  getNextAvailableColorIndex as getNextAvailableColorIndexHelper,
   groupPrompts as groupPromptsHelper,
-  addPromptToGroup as addPromptToGroupHelper,
-  assignColorToGroup as assignColorToGroupHelper,
+  hasAnyGroups as hasAnyGroupsHelper,
+  hasSectionGroups as hasSectionGroupsHelper,
+  isColorInUse as isColorInUseHelper,
+  isGroupActiveInSection as isGroupActiveInSectionHelper,
+  isPromptSelected as isPromptSelectedHelper,
+  validateAndCleanupGroup as validateAndCleanupGroupHelper,
 } from './helpers/group.helper';
 
 // Import style helpers
-import {
-  getPromptMandatoryStyle as getPromptMandatoryStyleHelper,
-  getGroupBulletStyle as getGroupBulletStyleHelper,
-  getPromptGroupStyle as getPromptGroupStyleHelper,
-  getPromptGroupDotStyle as getPromptGroupDotStyleHelper,
-  getSectionGroupColor as getSectionGroupColorHelper,
-  getGroupedPromptsCount as getGroupedPromptsCountHelper,
-} from './helpers/style.helper';
 import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import {
+  getGroupBulletStyle as getGroupBulletStyleHelper,
+  getGroupedPromptsCount as getGroupedPromptsCountHelper,
+  getPromptGroupDotStyle as getPromptGroupDotStyleHelper,
+  getPromptGroupStyle as getPromptGroupStyleHelper,
+  getPromptMandatoryStyle as getPromptMandatoryStyleHelper,
+} from './helpers/style.helper';
 
 @Component({
   selector: 'app-configure-query-builder',

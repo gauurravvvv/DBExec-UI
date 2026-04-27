@@ -1,12 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
 import { UntypedFormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { AUTH } from 'src/app/constants/api';
 import { StorageType } from 'src/app/constants/storageType';
-import { ROLES } from 'src/app/constants/user.constant';
-import { StorageService } from 'src/app/core/services/storage.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
+import { StorageService } from 'src/app/core/services/storage.service';
 
 @Injectable({
   providedIn: 'root',

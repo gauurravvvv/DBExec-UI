@@ -1,30 +1,23 @@
-import { Injectable } from '@angular/core';
 import {
-  HttpEvent,
-  HttpInterceptor,
-  HttpHandler,
-  HttpRequest,
   HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-import { Observable, throwError, BehaviorSubject, of, from } from 'rxjs';
-import {
-  catchError,
-  filter,
-  take,
-  switchMap,
-  map,
-  finalize,
-} from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { BehaviorSubject, from, Observable, of, throwError } from 'rxjs';
+import { catchError, filter, finalize, switchMap, take } from 'rxjs/operators';
+import { AUTH } from 'src/app/constants/api';
+import { StorageType } from 'src/app/constants/storageType';
 import { environment } from 'src/environments/environment';
 import { LoadingService } from '../services/loading.service';
-import { Router } from '@angular/router';
-import { StorageType } from 'src/app/constants/storageType';
-import { StorageService } from '../services/storage.service';
 import { LoginService } from '../services/login.service';
-import { AUTH } from 'src/app/constants/api';
 import { SessionExpiredService } from '../services/session-expired.service';
+import { StorageService } from '../services/storage.service';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {

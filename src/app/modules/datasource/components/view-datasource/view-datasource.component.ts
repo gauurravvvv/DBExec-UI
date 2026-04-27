@@ -5,9 +5,9 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DatasourceService } from '../../services/datasource.service';
-import { GlobalService } from 'src/app/core/services/global.service';
 import { DATASOURCE } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasourceService } from '../../services/datasource.service';
 
 interface StorageTable {
   name: string;

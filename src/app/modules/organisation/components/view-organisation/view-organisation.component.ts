@@ -8,9 +8,9 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrganisationService } from '../../services/organisation.service';
-import { GlobalService } from 'src/app/core/services/global.service';
 import { ORGANISATION } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { OrganisationService } from '../../services/organisation.service';
 
 interface OrganisationConfig {
   maxDatasources: number;

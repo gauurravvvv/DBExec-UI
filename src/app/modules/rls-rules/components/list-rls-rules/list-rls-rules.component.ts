@@ -12,13 +12,13 @@ import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { RLS_RULE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { RLS_RULE } from 'src/app/constants/routes';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RlsRulesService } from '../../services/rls-rules.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-list-rls-rules',

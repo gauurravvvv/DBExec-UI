@@ -2,44 +2,44 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  inject,
-  OnInit,
-  OnDestroy,
   ElementRef,
-  ViewChild,
+  inject,
+  OnDestroy,
+  OnInit,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
 import {
   FormBuilder,
-  FormGroup,
   FormControl,
+  FormGroup,
   Validators,
 } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TreeNode } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { TreeNode } from 'primeng/api';
 
 import { GlobalService } from 'src/app/core/services/global.service';
-import { QueryBuilderService } from '../../services/query-builder.service';
+import { QueryResult } from '../../../dataset/helpers/dummy-data.helper';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { QueryService } from '../../../dataset/services/query.service';
-import { QueryResult } from '../../../dataset/helpers/dummy-data.helper';
-import {
-  ExecuteTab,
-  ExecuteSection,
-  ExecutePrompt,
-  SubmissionPayload,
-  transformTabResponse,
-  transformSectionResponse,
-  transformPromptResponse,
-} from './models/execute-query-builder.models';
+import { QueryBuilderService } from '../../services/query-builder.service';
 import { createPromptFormControl } from './helpers/form.helper';
 import {
   createPromptSubmission,
   getPlaceholder,
 } from './helpers/prompt-renderer.helper';
+import {
+  ExecutePrompt,
+  ExecuteSection,
+  ExecuteTab,
+  SubmissionPayload,
+  transformPromptResponse,
+  transformSectionResponse,
+  transformTabResponse,
+} from './models/execute-query-builder.models';
 
 interface GroupedPrompt {
   promptId: string;

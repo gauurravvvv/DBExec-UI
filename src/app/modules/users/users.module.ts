@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { ListUsersComponent } from './components/list-users/list-users.component';
 import { AddUsersComponent } from './components/add-users/add-users.component';
 import { EditUsersComponent } from './components/edit-users/edit-users.component';
+import { ListUsersComponent } from './components/list-users/list-users.component';
 import { ViewUsersComponent } from './components/view-users/view-users.component';
 import { UsersRoutingModule } from './users-routing.module';
 

@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -17,7 +18,6 @@ import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { SectionService } from '../../services/section.service';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-edit-section',

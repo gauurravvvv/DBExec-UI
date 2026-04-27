@@ -1,4 +1,11 @@
 import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -11,18 +18,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { DATASOURCE } from 'src/app/constants/routes';
-import { DatasourceService } from '../../services/datasource.service';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import {
-  trigger,
-  transition,
-  style,
-  animate,
-  state,
-} from '@angular/animations';
+import { DatasourceService } from '../../services/datasource.service';
 
 @Component({
   selector: 'app-edit-datasource',

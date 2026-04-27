@@ -16,12 +16,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { RLS_RULE } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { RlsRulesService } from '../../services/rls-rules.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
-import { REGEX } from 'src/app/constants/regex.constant';
+import { RlsRulesService } from '../../services/rls-rules.service';
 
 function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
   const value = control.value;

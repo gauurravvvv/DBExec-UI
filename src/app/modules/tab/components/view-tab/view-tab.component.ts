@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TAB } from 'src/app/constants/routes';
-import { TabService } from '../../services/tab.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { TabService } from '../../services/tab.service';
 
 @Component({
   selector: 'app-view-tab',

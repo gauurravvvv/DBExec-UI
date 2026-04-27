@@ -9,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -20,7 +21,6 @@ import { PromptService } from 'src/app/modules/prompt/services/prompt.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { PROMPT_TYPES } from '../../constants/prompt.constant';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-prompt',

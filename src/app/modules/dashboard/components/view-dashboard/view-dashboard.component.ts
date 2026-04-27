@@ -1,6 +1,6 @@
 import {
-  ChangeDetectionStrategy,
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   DestroyRef,
@@ -15,21 +15,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DashboardService } from '../../services/dashboard.service';
-import { AnalysesService } from '../../../analyses/service/analyses.service';
-import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
-import { Visual } from '../../../analyses/models/visual.model';
 import {
+  getDummyData,
+  hasAxisLabels,
+  is3DCoordinateChartType,
   isCardChartType,
-  isHeatMapChartType,
-  isSankeyChartType,
   isGraphChartType,
+  isHeatMapChartType,
   isLines3dChartType,
   isPolygons3dChartType,
-  is3DCoordinateChartType,
-  hasAxisLabels,
-  getDummyData,
+  isSankeyChartType,
 } from '../../../analyses/constants/charts.constants';
+import { Visual } from '../../../analyses/models/visual.model';
+import { AnalysesService } from '../../../analyses/service/analyses.service';
+import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-view-dashboard',

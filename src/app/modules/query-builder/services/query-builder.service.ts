@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
 import { FormGroup } from '@angular/forms';
-import { QUERY_BUILDER, TAB, SECTION } from 'src/app/constants/api';
+import { lastValueFrom } from 'rxjs';
+import { QUERY_BUILDER, SECTION, TAB } from 'src/app/constants/api';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 export interface ExecuteQueryBuilderRequest {

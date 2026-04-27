@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
-import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
 import { AddAnnouncementComponent } from './components/add-announcement/add-announcement.component';
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
+import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
 
 const routes: Routes = [

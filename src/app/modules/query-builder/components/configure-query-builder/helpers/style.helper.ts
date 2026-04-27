@@ -4,9 +4,9 @@
  */
 
 import {
+  GROUP_COLORS,
   Prompt,
   Section,
-  GROUP_COLORS,
 } from '../models/configure-query-builder.models';
 
 /** Mandatory color constant */

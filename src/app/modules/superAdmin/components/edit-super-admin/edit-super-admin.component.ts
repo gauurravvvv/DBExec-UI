@@ -8,11 +8,11 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { REGEX } from 'src/app/constants/regex.constant';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SuperAdminService } from '../../services/superAdmin.service';
-import { REGEX } from 'src/app/constants/regex.constant';
 
 @Component({
   selector: 'app-edit-super-admin',

@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
 import {
-  HttpEvent,
-  HttpInterceptor,
-  HttpHandler,
-  HttpRequest,
   HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
 } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { MessageService } from 'primeng/api';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MessageService } from 'primeng/api';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {

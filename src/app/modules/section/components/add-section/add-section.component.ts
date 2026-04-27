@@ -7,8 +7,9 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -18,7 +19,6 @@ import { DatasourceService } from 'src/app/modules/datasource/services/datasourc
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { SectionService } from '../../services/section.service';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-add-section',

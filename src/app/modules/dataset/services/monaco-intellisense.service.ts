@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import {
-  TableSchema,
-  TableColumn,
-  DatasourceSchema,
-} from '../helpers/dummy-data.helper';
-import {
-  SQL_KEYWORDS,
   SQL_FUNCTIONS,
+  SQL_KEYWORDS,
   SQL_SNIPPETS,
 } from '../config/sql-editor.config';
+import {
+  DatasourceSchema,
+  TableColumn,
+  TableSchema,
+} from '../helpers/dummy-data.helper';
 
 declare const monaco: any;
 

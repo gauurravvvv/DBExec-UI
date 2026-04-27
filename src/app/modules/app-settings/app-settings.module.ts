@@ -4,9 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AppSettingsRoutingModule } from './app-settings-routing.module';
-import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
 import { AddAnnouncementComponent } from './components/add-announcement/add-announcement.component';
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
+import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
 
 @NgModule({

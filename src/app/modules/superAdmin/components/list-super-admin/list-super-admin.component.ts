@@ -7,15 +7,14 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { SuperAdminService } from '../../services/superAdmin.service';
-import { SUPER_ADMIN } from 'src/app/constants/routes';
-import { IParams } from 'src/app/core/interfaces/global.interface';
-import { GlobalService } from 'src/app/core/services/global.service';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SUPER_ADMIN } from 'src/app/constants/routes';
+import { GlobalService } from 'src/app/core/services/global.service';
+import { SuperAdminService } from '../../services/superAdmin.service';
 
 @Component({
   selector: 'app-list-super-admin',

@@ -3,20 +3,20 @@ import {
   Component,
   DestroyRef,
   inject,
-  OnInit,
   OnDestroy,
+  OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { LoadingService } from './core/services/loading.service';
-import { SessionExpiredService } from './core/services/session-expired.service';
-import { IdleTimeoutService } from './core/services/idle-timeout.service';
-import { LoginService } from './core/services/login.service';
-import { StorageService } from './core/services/storage.service';
-import { StorageType } from './constants/storageType';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { filter } from 'rxjs/operators';
+import { StorageType } from './constants/storageType';
+import { IdleTimeoutService } from './core/services/idle-timeout.service';
+import { LoadingService } from './core/services/loading.service';
+import { LoginService } from './core/services/login.service';
+import { SessionExpiredService } from './core/services/session-expired.service';
+import { StorageService } from './core/services/storage.service';
 
 @Component({
   selector: 'app-root',

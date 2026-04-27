@@ -7,10 +7,10 @@ import {
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
+import { REGEX } from 'src/app/constants/regex.constant';
+import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
-import { ROLES } from 'src/app/constants/user.constant';
-import { REGEX } from 'src/app/constants/regex.constant';
 import { HOME_ROUTES } from 'src/app/shared/components/layout/sidebar/sidebar.constant';
 
 @Component({

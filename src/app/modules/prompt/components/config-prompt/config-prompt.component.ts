@@ -23,14 +23,14 @@ import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { PROMPT_TYPES } from '../../constants/prompt.constant';
 import { PromptService } from '../../services/prompt.service';
 import {
   ConfigPromptActions,
-  selectSchemaByKey,
   selectIsSchemaStale,
+  selectSchemaByKey,
 } from '../../store';
 import { SqlQueryDialogComponent } from '../dialogs/sql-query-dialog/sql-query-dialog.component';
-import { PROMPT_TYPES } from '../../constants/prompt.constant';
 
 @Component({
   selector: 'app-config-prompt',

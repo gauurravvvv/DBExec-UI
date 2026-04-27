@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
-import { ListDatasetComponent } from './components/list-dataset/list-dataset.component';
 import { AddDatasetComponent } from './components/add-dataset/add-dataset.component';
-import { ViewDatasetComponent } from './components/view-dataset/view-dataset.component';
 import { EditDatasetComponent } from './components/edit-dataset/edit-dataset.component';
+import { ListDatasetComponent } from './components/list-dataset/list-dataset.component';
+import { ViewDatasetComponent } from './components/view-dataset/view-dataset.component';
 
 const routes: Routes = [
   {

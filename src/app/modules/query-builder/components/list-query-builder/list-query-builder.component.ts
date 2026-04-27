@@ -7,18 +7,17 @@ import {
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, ActivatedRoute } from '@angular/router';
-import { MenuItem, LazyLoadEvent } from 'primeng/api';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { QUERY_BUILDER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { QueryBuilderService } from '../../services/query-builder.service';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 
 @Component({
   selector: 'app-list-query-builder',

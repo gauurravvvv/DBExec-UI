@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
 import { OrganisationService } from '../../organisation/services/organisation.service';
 import { QueryService } from './query.service';
 

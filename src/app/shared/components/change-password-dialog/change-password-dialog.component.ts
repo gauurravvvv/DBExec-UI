@@ -1,11 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
+  HostListener,
+  Input,
   OnInit,
   Output,
-  EventEmitter,
-  Input,
-  HostListener,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 

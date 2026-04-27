@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import {
-  CanActivate,
   ActivatedRouteSnapshot,
-  RouterStateSnapshot,
+  CanActivate,
   Router,
+  RouterStateSnapshot,
 } from '@angular/router';
-import { GlobalService } from '../services/global.service';
-import {
-  HOME_ROUTES,
-  AUTH_ROUTES,
-} from 'src/app/shared/components/layout/sidebar/sidebar.constant';
 import { ROLES } from 'src/app/constants/user.constant';
+import {
+  AUTH_ROUTES,
+  HOME_ROUTES,
+} from 'src/app/shared/components/layout/sidebar/sidebar.constant';
+import { GlobalService } from '../services/global.service';
 
 @Injectable({
   providedIn: 'root',
