@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RLS_RULE } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -14,9 +20,9 @@ export class ViewRlsRuleComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   // Signal refs
-  current  = this.rlsRulesService.current;
-  loading  = this.rlsRulesService.loading;
-  saving   = this.rlsRulesService.saving;
+  current = this.rlsRulesService.current;
+  loading = this.rlsRulesService.loading;
+  saving = this.rlsRulesService.saving;
 
   ruleId: string = '';
   orgId: string = '';
@@ -38,7 +44,8 @@ export class ViewRlsRuleComponent implements OnInit {
   }
 
   loadRuleDetails() {
-    this.rlsRulesService.loadOne(this.orgId, this.ruleId)
+    this.rlsRulesService
+      .loadOne(this.orgId, this.ruleId)
       .then(() => {
         this.cdr.markForCheck();
       })

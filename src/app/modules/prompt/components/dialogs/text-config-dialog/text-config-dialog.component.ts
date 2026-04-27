@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component,
+import {
+  ChangeDetectionStrategy,
+  Component,
   EventEmitter,
   Input,
   OnChanges,
   Output,
-  SimpleChanges, } from '@angular/core';
+  SimpleChanges,
+} from '@angular/core';
 
 export interface TextConfig {
   placeholder: string;

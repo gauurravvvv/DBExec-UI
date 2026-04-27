@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
@@ -24,8 +32,8 @@ export class ListSuperAdminComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
   private searchSubject = new Subject<void>();
 
-  admins  = this.superAdminService.admins;
-  total   = this.superAdminService.total;
+  admins = this.superAdminService.admins;
+  total = this.superAdminService.total;
   loading = this.superAdminService.loading;
 
   selectedAdmins: any[] = [];
@@ -67,12 +75,14 @@ export class ListSuperAdminComponent implements OnInit {
     // Initial load will be triggered by p-table lazy load if [lazy]="true" is set
 
     // Setup debounce for filter changes
-    this.searchSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      // Trigger lazy load with current pagination but updated filters
-      if (this.lastTableLazyLoadEvent) {
-        this.loadSuperAdmins(this.lastTableLazyLoadEvent);
-      }
-    });
+    this.searchSubject
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        // Trigger lazy load with current pagination but updated filters
+        if (this.lastTableLazyLoadEvent) {
+          this.loadSuperAdmins(this.lastTableLazyLoadEvent);
+        }
+      });
   }
 
   onFilterChange() {

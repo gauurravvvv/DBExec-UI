@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -22,8 +30,8 @@ export class ListUsersComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
   // Signal refs from service
-  users   = this.userService.users;
-  total   = this.userService.total;
+  users = this.userService.users;
+  total = this.userService.total;
   loading = this.userService.loading;
 
   limit = 10;
@@ -126,7 +134,8 @@ export class ListUsersComponent implements OnInit {
   }
 
   loadGroupOptions() {
-    const orgId = this.selectedOrg || this.globalService.getTokenDetails('organisationId');
+    const orgId =
+      this.selectedOrg || this.globalService.getTokenDetails('organisationId');
     if (!orgId) return;
     this.groupService
       .listGroups({ orgId, page: DEFAULT_PAGE, limit: MAX_LIMIT })
@@ -270,11 +279,14 @@ export class ListUsersComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.userService.load(params).then(() => {
-      this.cdr.markForCheck();
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
+    this.userService
+      .load(params)
+      .then(() => {
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onAddNewAdmin() {
@@ -339,11 +351,7 @@ export class ListUsersComponent implements OnInit {
 
     if (this.userToDelete) {
       this.userService
-        .delete(
-          this.userToDelete,
-          this.selectedOrg,
-          reason,
-        )
+        .delete(this.userToDelete, this.selectedOrg, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedUsers = this.selectedUsers.filter(

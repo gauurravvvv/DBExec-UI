@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -58,11 +64,13 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       this.loadQueryBuilderDetails();
     }
 
-    this.queryBuilderForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.isCancelClicked) {
-        this.isCancelClicked = false;
-      }
-    });
+    this.queryBuilderForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
   }
 
   initForm() {
@@ -174,5 +182,4 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       this.router.navigate([QUERY_BUILDER.LIST]);
     }
   }
-
 }

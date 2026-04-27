@@ -160,7 +160,10 @@
               >
                 <!-- Card chart (non-ECharts) -->
                 <app-configurable-card-chart
-                  *ngIf="isCardChartType(visual.chartType); else dashEchartBlock"
+                  *ngIf="
+                    isCardChartType(visual.chartType);
+                    else dashEchartBlock
+                  "
                   [showConfigPanel]="false"
                   [chartWidth]="visual.width"
                   [chartHeight]="visual.height - 35"
@@ -177,7 +180,6 @@
                     [data]="getDisplayData(visual)"
                   ></app-echart-visual>
                 </ng-template>
-
               </ng-container>
 
               <!-- Globe Charts (show with dummy data when no mapping) -->

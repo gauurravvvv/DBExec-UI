@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SECTION } from 'src/app/constants/routes';
 import { SectionService } from '../../services/section.service';
@@ -36,13 +42,18 @@ export class ViewSectionComponent implements OnInit {
 
   loadSectionDetails() {
     this.sectionService.resetCurrent();
-    this.sectionService.loadOne(this.orgId, this.sectionId).then(() => {
-      const data = this.sectionService.current();
-      if (data) {
-        this.tabData = data;
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.sectionService
+      .loadOne(this.orgId, this.sectionId)
+      .then(() => {
+        const data = this.sectionService.current();
+        if (data) {
+          this.tabData = data;
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onEdit() {
@@ -69,11 +80,7 @@ export class ViewSectionComponent implements OnInit {
   proceedDelete(): void {
     if (this.tabData && this.deleteJustification.trim()) {
       this.sectionService
-        .delete(
-          this.orgId,
-          this.tabData.id,
-          this.deleteJustification.trim(),
-        )
+        .delete(this.orgId, this.tabData.id, this.deleteJustification.trim())
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.deleteJustification = '';

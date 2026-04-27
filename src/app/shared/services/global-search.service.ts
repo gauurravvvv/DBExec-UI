@@ -32,10 +32,12 @@ export class GlobalSearchService {
     const organisationId = this.globalService.getTokenDetails('organisationId');
     this._loading.set(true);
     try {
-      const response = await lastValueFrom(this.http.apiPost(GLOBAL_SEARCH.SEARCH, {
-        organisation: organisationId,
-        key,
-      }));
+      const response = await lastValueFrom(
+        this.http.apiPost(GLOBAL_SEARCH.SEARCH, {
+          organisation: organisationId,
+          key,
+        }),
+      );
       return response;
     } finally {
       this._loading.set(false);

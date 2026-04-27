@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -87,7 +95,9 @@ export class ListAnalysesComponent implements OnInit {
     private route: ActivatedRoute,
   ) {}
 
-  get saving() { return this.analysesService.saving; }
+  get saving() {
+    return this.analysesService.saving;
+  }
 
   ngOnInit() {
     // Setup debounced filter
@@ -97,19 +107,21 @@ export class ListAnalysesComponent implements OnInit {
         this.loadAnalyses();
       });
 
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      if (params['orgId'] || params['datasourceId'] || params['name']) {
-        this.handleDeepLinking(params);
-      } else {
-        if (this.showOrganisationDropdown) {
-          this.loadOrganisations();
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        if (params['orgId'] || params['datasourceId'] || params['name']) {
+          this.handleDeepLinking(params);
         } else {
-          this.selectedOrg =
-            this.globalService.getTokenDetails('organisationId');
-          this.loadDatasources();
+          if (this.showOrganisationDropdown) {
+            this.loadOrganisations();
+          } else {
+            this.selectedOrg =
+              this.globalService.getTokenDetails('organisationId');
+            this.loadDatasources();
+          }
         }
-      }
-    });
+      });
   }
 
   handleDeepLinking(params: any) {
@@ -126,15 +138,17 @@ export class ListAnalysesComponent implements OnInit {
         ? this.loadOrganisations(orgId)
         : this.loadOrganisations();
 
-      orgPromise.then(() => {
-        if (orgId) {
-          if (datasourceId) {
-            this.loadDatasources(datasourceId);
-          } else {
-            this.loadDatasources();
+      orgPromise
+        .then(() => {
+          if (orgId) {
+            if (datasourceId) {
+              this.loadDatasources(datasourceId);
+            } else {
+              this.loadDatasources();
+            }
           }
-        }
-      }).catch(() => {});
+        })
+        .catch(() => {});
     } else {
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
 
@@ -153,37 +167,40 @@ export class ListAnalysesComponent implements OnInit {
         limit: MAX_LIMIT,
       };
 
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = response.data.orgs || [];
-          if (this.organisations.length > 0) {
-            if (
-              preSelectedOrgId &&
-              this.organisations.find(o => o.id === preSelectedOrgId)
-            ) {
-              this.selectedOrg = preSelectedOrgId;
-            } else {
-              this.selectedOrg = this.organisations[0].id;
-            }
+      this.organisationService
+        .listOrganisation(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.organisations = response.data.orgs || [];
+            if (this.organisations.length > 0) {
+              if (
+                preSelectedOrgId &&
+                this.organisations.find(o => o.id === preSelectedOrgId)
+              ) {
+                this.selectedOrg = preSelectedOrgId;
+              } else {
+                this.selectedOrg = this.organisations[0].id;
+              }
 
-            if (!preSelectedOrgId) {
-              this.loadDatasources();
+              if (!preSelectedOrgId) {
+                this.loadDatasources();
+              }
+            } else {
+              this.selectedOrg = null;
+              this.datasources = [];
+              this.selectedDatasource = null;
+              this.analyses = [];
+              this.filteredAnalyses = [];
+              this.totalRecords = 0;
             }
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
-            this.analyses = [];
-            this.filteredAnalyses = [];
-            this.totalRecords = 0;
           }
-        }
-        this.cdr.markForCheck();
-        resolve();
-      }).catch(() => {
-        resolve();
-        this.cdr.markForCheck();
-      });
+          this.cdr.markForCheck();
+          resolve();
+        })
+        .catch(() => {
+          resolve();
+          this.cdr.markForCheck();
+        });
     });
   }
 
@@ -418,11 +435,7 @@ export class ListAnalysesComponent implements OnInit {
 
     if (this.analysisToDelete) {
       this.analysesService
-        .deleteAnalyses(
-          this.selectedOrg,
-          this.analysisToDelete,
-          reason,
-        )
+        .deleteAnalyses(this.selectedOrg, this.analysisToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedAnalyses = this.selectedAnalyses.filter(

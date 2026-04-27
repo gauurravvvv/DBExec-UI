@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
@@ -301,7 +309,11 @@ export class ListConnectionComponent implements OnInit {
         return;
       }
       try {
-        const res: any = await this.connectionService.bulkDelete(ids, reason, this.selectedOrg);
+        const res: any = await this.connectionService.bulkDelete(
+          ids,
+          reason,
+          this.selectedOrg,
+        );
         if (this.globalService.handleSuccessService(res)) {
           this.selectedConnections = [];
           this.refreshList();
@@ -315,7 +327,11 @@ export class ListConnectionComponent implements OnInit {
 
     if (this.tabToDelete) {
       try {
-        const response: any = await this.connectionService.delete(this.selectedOrg, this.tabToDelete, reason);
+        const response: any = await this.connectionService.delete(
+          this.selectedOrg,
+          this.tabToDelete,
+          reason,
+        );
         if (this.globalService.handleSuccessService(response)) {
           this.selectedConnections = this.selectedConnections.filter(
             (c: any) => c.id !== this.tabToDelete,
@@ -341,5 +357,4 @@ export class ListConnectionComponent implements OnInit {
       this.loadConnections(this.lastTableLazyLoadEvent);
     }
   }
-
 }

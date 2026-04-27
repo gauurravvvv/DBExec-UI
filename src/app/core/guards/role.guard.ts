@@ -52,7 +52,10 @@ export class RoleGuard implements CanActivate {
     }
 
     // Check module-level permission if specified
-    if (requiredPermission && !this.globalService.hasPermission(requiredPermission)) {
+    if (
+      requiredPermission &&
+      !this.globalService.hasPermission(requiredPermission)
+    ) {
       this.router.navigate([this.getHomeByRole(userRole)]);
       return false;
     }

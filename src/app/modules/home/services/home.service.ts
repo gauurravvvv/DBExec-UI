@@ -6,17 +6,19 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 @Injectable({ providedIn: 'root' })
 export class HomeService {
   private _dashboard = signal<any>(null);
-  private _loading   = signal(false);
+  private _loading = signal(false);
 
   readonly dashboard = this._dashboard.asReadonly();
-  readonly loading   = this._loading.asReadonly();
+  readonly loading = this._loading.asReadonly();
 
   constructor(private http: HttpClientService) {}
 
   async loadSuperAdminDashboard(orgId: string) {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(this.http.apiGet(HOME.SUPER_ADMIN + `${orgId}`));
+      const res: any = await lastValueFrom(
+        this.http.apiGet(HOME.SUPER_ADMIN + `${orgId}`),
+      );
       if (res?.status) this._dashboard.set(res.data);
       return res;
     } finally {
@@ -24,7 +26,9 @@ export class HomeService {
     }
   }
 
-  resetDashboard() { this._dashboard.set(null); }
+  resetDashboard() {
+    this._dashboard.set(null);
+  }
 
   // Legacy — kept for external compatibility
   getSuperAdminDashboard(orgId: string) {

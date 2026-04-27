@@ -806,7 +806,10 @@
 
     <div class="execute-result-body" *ngIf="groupedValues.length > 0">
       <p-tabView [scrollable]="true" styleClass="full-height-tabs">
-        <p-tabPanel *ngFor="let tab of groupedValues; trackBy: trackByIndex" [header]="tab.tabName">
+        <p-tabPanel
+          *ngFor="let tab of groupedValues; trackBy: trackByIndex"
+          [header]="tab.tabName"
+        >
           <p-accordion [multiple]="true">
             <p-accordionTab
               *ngFor="let section of tab.sections; trackBy: trackByIndex"
@@ -814,7 +817,10 @@
               [selected]="true"
             >
               <div class="result-table">
-                <div class="result-row" *ngFor="let prompt of section.prompts; trackBy: trackByIndex">
+                <div
+                  class="result-row"
+                  *ngFor="let prompt of section.prompts; trackBy: trackByIndex"
+                >
                   <span class="result-name">{{ prompt.name }}</span>
                   <span class="result-value">{{ prompt.displayValue }}</span>
                 </div>
@@ -892,7 +898,10 @@
         <div class="sql-component-row" *ngIf="sqlComponents.tables?.length > 0">
           <span class="component-label">Tables</span>
           <span class="component-value">
-            <span class="component-tag" *ngFor="let t of sqlComponents.tables; trackBy: trackByName">
+            <span
+              class="component-tag"
+              *ngFor="let t of sqlComponents.tables; trackBy: trackByName"
+            >
               {{ t.name }} ({{ t.alias }})
             </span>
           </span>
@@ -909,9 +918,11 @@
         <div class="sql-component-row" *ngIf="sqlComponents.joins?.length > 0">
           <span class="component-label">Joins</span>
           <span class="component-value">
-            <span class="component-tag" *ngFor="let j of sqlComponents.joins; trackBy: trackByIndex">{{
-              j
-            }}</span>
+            <span
+              class="component-tag"
+              *ngFor="let j of sqlComponents.joins; trackBy: trackByIndex"
+              >{{ j }}</span
+            >
           </span>
         </div>
         <div
@@ -922,7 +933,10 @@
           <span class="component-value">
             <span
               class="component-tag"
-              *ngFor="let w of sqlComponents.whereConditions; trackBy: trackByIndex"
+              *ngFor="
+                let w of sqlComponents.whereConditions;
+                trackBy: trackByIndex
+              "
               >{{ w }}</span
             >
           </span>
@@ -1071,14 +1085,18 @@
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 60px" pFrozenColumn>#</th>
-              <th *ngFor="let col of queryResult.columns; trackBy: trackByIndex">
+              <th
+                *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+              >
                 <div class="th-content">{{ col }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn></th>
-              <th *ngFor="let col of queryResult.columns; trackBy: trackByIndex">
+              <th
+                *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+              >
                 <input
                   pInputText
                   type="text"
@@ -1094,7 +1112,10 @@
           <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
             <tr>
               <td pFrozenColumn class="row-number-cell">{{ rowIndex + 1 }}</td>
-              <td *ngFor="let col of queryResult.columns; trackBy: trackByIndex" [title]="row[col]">
+              <td
+                *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+                [title]="row[col]"
+              >
                 <span
                   [ngClass]="{
                     'null-value': row[col] === null || row[col] === undefined,

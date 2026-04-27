@@ -90,7 +90,7 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/groups/group.module').then(m => m.GroupModule),
         canActivate: [RoleGuard],
-        data: {  permission: PERMISSIONS.USER_GROUP, title: 'Groups' },
+        data: { permission: PERMISSIONS.USER_GROUP, title: 'Groups' },
       },
       {
         path: 'rls-rules',
@@ -99,7 +99,7 @@ const routes: Routes = [
             m => m.RlsRulesModule,
           ),
         canActivate: [RoleGuard],
-        data: {  permission: PERMISSIONS.RLS_RULES, title: 'RLS Rules' },
+        data: { permission: PERMISSIONS.RLS_RULES, title: 'RLS Rules' },
       },
       {
         path: 'access',
@@ -132,7 +132,7 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/role/role.module').then(m => m.RoleModule),
         canActivate: [RoleGuard],
-        data: {  permission: PERMISSIONS.ROLE_MANAGEMENT, title: 'Roles' },
+        data: { permission: PERMISSIONS.ROLE_MANAGEMENT, title: 'Roles' },
       },
       {
         path: 'dataset',
@@ -194,7 +194,7 @@ const routes: Routes = [
         loadChildren: () =>
           import('./modules/audit/audit.module').then(m => m.AuditModule),
         canActivate: [RoleGuard],
-        data: {  permission: PERMISSIONS.AUDIT_LOGS, title: 'Audit Logs' },
+        data: { permission: PERMISSIONS.AUDIT_LOGS, title: 'Audit Logs' },
       },
       {
         path: 'login-activity',
@@ -203,7 +203,10 @@ const routes: Routes = [
             m => m.LoginActivityModule,
           ),
         canActivate: [RoleGuard],
-        data: {  permission: PERMISSIONS.LOGIN_ACTIVITY, title: 'Login Activity' },
+        data: {
+          permission: PERMISSIONS.LOGIN_ACTIVITY,
+          title: 'Login Activity',
+        },
       },
       {
         path: 'app-settings',

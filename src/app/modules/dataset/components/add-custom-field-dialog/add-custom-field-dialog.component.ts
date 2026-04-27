@@ -52,7 +52,8 @@ export class AddCustomFieldDialogComponent
   implements OnChanges, AfterViewInit, OnDestroy
 {
   @Input() visible = false;
-  @ViewChild('formulaEditorContainer') formulaEditorContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('formulaEditorContainer')
+  formulaEditorContainer!: ElementRef<HTMLDivElement>;
   @Input() datasetId: string = '';
   @Input() organisationId: string = '';
   @Input() datasetFields: any[] = [];
@@ -210,13 +211,16 @@ export class AddCustomFieldDialogComponent
 
   private initializeMonacoEditor(): void {
     this.isLoadingEditor = true;
-    this.monacoLoader.load().then(() => {
-      this.createEditor();
-    }).catch(() => {
-      this.isLoadingEditor = false;
-      this.monacoLoadFailed = true;
-      this.cdr.markForCheck();
-    });
+    this.monacoLoader
+      .load()
+      .then(() => {
+        this.createEditor();
+      })
+      .catch(() => {
+        this.isLoadingEditor = false;
+        this.monacoLoadFailed = true;
+        this.cdr.markForCheck();
+      });
   }
 
   private registerFormulaLanguage(): void {

@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -101,7 +106,9 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
 
   onSubmit() {
     if (this.roleForm.valid) {
-      const selectedPermissions = this.buildSelectedPermissions(this.permissions);
+      const selectedPermissions = this.buildSelectedPermissions(
+        this.permissions,
+      );
 
       if (selectedPermissions.length === 0) {
         return;
@@ -215,7 +222,9 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   private updateChildPermissions(permissions: any[], checked: boolean) {
     permissions.forEach(perm => {
       if (this.permissionControls[perm.value]) {
-        this.permissionControls[perm.value].setValue(checked, { emitEvent: false });
+        this.permissionControls[perm.value].setValue(checked, {
+          emitEvent: false,
+        });
       }
       if (perm.subPermissions) {
         this.updateChildPermissions(perm.subPermissions, checked);
@@ -224,9 +233,14 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   private updateParentPermission(permission: any) {
-    const parent = this.findPermissionById(this.permissions, permission.parentId);
+    const parent = this.findPermissionById(
+      this.permissions,
+      permission.parentId,
+    );
     if (parent && this.permissionControls[parent.value]) {
-      this.permissionControls[parent.value].setValue(true, { emitEvent: false });
+      this.permissionControls[parent.value].setValue(true, {
+        emitEvent: false,
+      });
       if (parent.parentId !== '0') {
         this.updateParentPermission(parent);
       }
@@ -253,7 +267,9 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
 
   private addPermissionControls(permissions: any[]) {
     permissions.forEach(perm => {
-      this.permissionControls[perm.value] = new FormControl(perm.value === 'home' ? true : false);
+      this.permissionControls[perm.value] = new FormControl(
+        perm.value === 'home' ? true : false,
+      );
       if (perm.subPermissions) {
         this.addPermissionControls(perm.subPermissions);
       }

@@ -81,7 +81,10 @@
 
         <div class="permissions-grid">
           <div class="permission-columns">
-            <div class="column" *ngFor="let permission of permissions; trackBy: trackByIndex">
+            <div
+              class="column"
+              *ngFor="let permission of permissions; trackBy: trackByIndex"
+            >
               <div class="column-header">{{ permission.label }}</div>
               <div class="permission-items">
                 <div class="permission-item" *ngIf="!permission.subPermissions">
@@ -97,7 +100,10 @@
                 <ng-container *ngIf="permission.subPermissions">
                   <div
                     class="permission-item"
-                    *ngFor="let subPerm of permission.subPermissions; trackBy: trackByIndex"
+                    *ngFor="
+                      let subPerm of permission.subPermissions;
+                      trackBy: trackByIndex
+                    "
                   >
                     <span class="item-label">{{ subPerm.label }}</span>
                     <app-custom-toggle

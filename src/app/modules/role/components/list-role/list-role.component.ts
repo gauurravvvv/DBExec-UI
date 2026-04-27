@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -21,9 +29,9 @@ export class ListRoleComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
   // Signal refs from service
-  roles    = this.roleService.roles;
-  total    = this.roleService.total;
-  loading  = this.roleService.loading;
+  roles = this.roleService.roles;
+  total = this.roleService.total;
+  loading = this.roleService.loading;
 
   limit = 10;
   lastTableLazyLoadEvent: any;
@@ -155,17 +163,22 @@ export class ListRoleComponent implements OnInit {
       this.lastTableLazyLoadEvent = event;
     }
 
-    const page  = event ? Math.floor(event.first / event.rows) + 1 : 1;
+    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
     const limit = event ? event.rows : this.limit;
 
     const filter: any = {};
     if (this.filterValues.name) filter.name = this.filterValues.name;
-    if (this.filterValues.description) filter.description = this.filterValues.description;
-    if (this.filterValues.status !== null && this.filterValues.status !== undefined) {
+    if (this.filterValues.description)
+      filter.description = this.filterValues.description;
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
       filter.status = this.filterValues.status;
     }
     if (this.filterValues.createdDateRange?.[0]) {
-      filter.createdDateFrom = this.filterValues.createdDateRange[0].toISOString();
+      filter.createdDateFrom =
+        this.filterValues.createdDateRange[0].toISOString();
     }
     if (this.filterValues.createdDateRange?.[1]) {
       const to = new Date(this.filterValues.createdDateRange[1]);
@@ -234,7 +247,9 @@ export class ListRoleComponent implements OnInit {
         .delete(this.selectedOrgId, this.roleToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.selectedRoles = this.selectedRoles.filter(r => r.id !== this.roleToDelete);
+            this.selectedRoles = this.selectedRoles.filter(
+              r => r.id !== this.roleToDelete,
+            );
             this.refreshList();
           }
           this.cdr.markForCheck();

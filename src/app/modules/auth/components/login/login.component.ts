@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LOGIN_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -35,14 +40,8 @@ export class LoginComponent implements OnInit {
         '',
         [Validators.required, Validators.pattern(REGEX.orgName)],
       ],
-      username: [
-        '',
-        [Validators.required, Validators.pattern(REGEX.username)],
-      ],
-      password: [
-        '',
-        [Validators.required, Validators.pattern(REGEX.password)],
-      ],
+      username: ['', [Validators.required, Validators.pattern(REGEX.username)]],
+      password: ['', [Validators.required, Validators.pattern(REGEX.password)]],
     });
   }
 
@@ -58,9 +57,10 @@ export class LoginComponent implements OnInit {
         const res: any = await this.loginService.login(this.loginForm);
         if (this.globalService.handleSuccessService(res, true, false)) {
           const role = this.globalService.getTokenDetails('role');
-          const homeRoute = role === ROLES.SUPER_ADMIN
-            ? HOME_ROUTES.SUPER_ADMIN
-            : HOME_ROUTES.ORG_ADMIN;
+          const homeRoute =
+            role === ROLES.SUPER_ADMIN
+              ? HOME_ROUTES.SUPER_ADMIN
+              : HOME_ROUTES.ORG_ADMIN;
           const target = this.returnUrl || homeRoute;
           this.router.navigateByUrl(target, {
             replaceUrl: true,

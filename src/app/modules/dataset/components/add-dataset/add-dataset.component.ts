@@ -65,7 +65,8 @@ export class AddDatasetComponent
 {
   // ViewChild for file input
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('sqlEditorContainer') sqlEditorContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('sqlEditorContainer')
+  sqlEditorContainer!: ElementRef<HTMLDivElement>;
 
   // Removed ViewChild as we now use dynamic containers per tab
   @Input() datasourceId?: string;
@@ -228,27 +229,29 @@ export class AddDatasetComponent
 
   ngOnInit(): void {
     // Setup debounce for result filter changes
-    this.resultFilterSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (!this.lastExecutedQuery) return;
+    this.resultFilterSubject
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.lastExecutedQuery) return;
 
-      // Reset to first page on filter change
-      this.resultPage = 1;
+        // Reset to first page on filter change
+        this.resultPage = 1;
 
-      // Build filter object from non-empty filter values
-      const filter: { [key: string]: string } = {};
-      for (const col of Object.keys(this.resultFilterValues)) {
-        if (this.resultFilterValues[col]) {
-          filter[col] = this.resultFilterValues[col];
+        // Build filter object from non-empty filter values
+        const filter: { [key: string]: string } = {};
+        for (const col of Object.keys(this.resultFilterValues)) {
+          if (this.resultFilterValues[col]) {
+            filter[col] = this.resultFilterValues[col];
+          }
         }
-      }
 
-      this.executeQueryForDatasource(
-        this.lastExecutedQuery,
-        1,
-        this.resultRows,
-        filter,
-      );
-    });
+        this.executeQueryForDatasource(
+          this.lastExecutedQuery,
+          1,
+          this.resultRows,
+          filter,
+        );
+      });
 
     // Load organisations if super admin
     if (this.showOrganisationDropdown) {
@@ -276,17 +279,22 @@ export class AddDatasetComponent
       limit: MAX_LIMIT,
     };
 
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs];
-        if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0];
-          this.loadDatasources();
-          this.initializeComponent();
+    this.organisationService
+      .listOrganisation(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = [...response.data.orgs];
+          if (this.organisations.length > 0) {
+            this.selectedOrg = this.organisations[0];
+            this.loadDatasources();
+            this.initializeComponent();
+          }
         }
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onDatasourceChange(event: any): void {
@@ -560,14 +568,17 @@ export class AddDatasetComponent
   }
 
   private loadMonacoEditor(): void {
-    this.monacoLoader.load().then(() => {
-      this.initMonaco();
-    }).catch(() => {
-      this.isLoadingEditor = false;
-      this.monacoLoadFailed = true;
-      this.showMonacoLoadError();
-      this.cdr.markForCheck();
-    });
+    this.monacoLoader
+      .load()
+      .then(() => {
+        this.initMonaco();
+      })
+      .catch(() => {
+        this.isLoadingEditor = false;
+        this.monacoLoadFailed = true;
+        this.showMonacoLoadError();
+        this.cdr.markForCheck();
+      });
   }
 
   private showMonacoLoadError(): void {}
@@ -1263,24 +1274,29 @@ export class AddDatasetComponent
         sql,
       };
 
-      this.datasetService.addDataset(payload).then(response => {
-        if (this.globalService.handleSuccessService(response, true)) {
-          // Navigate to dataset list
-          this._saved = true;
-          this.router.navigate([DATASET.LIST]);
-          // Dataset saved successfully
-          // Now proceed with pending change if any
-          if (this.pendingDatasourceChange) {
-            this.proceedWithDatasourceChange(this.pendingDatasourceChange);
-            this.pendingDatasourceChange = null;
+      this.datasetService
+        .addDataset(payload)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, true)) {
+            // Navigate to dataset list
+            this._saved = true;
+            this.router.navigate([DATASET.LIST]);
+            // Dataset saved successfully
+            // Now proceed with pending change if any
+            if (this.pendingDatasourceChange) {
+              this.proceedWithDatasourceChange(this.pendingDatasourceChange);
+              this.pendingDatasourceChange = null;
+            }
+            if (this.pendingOrgChange) {
+              this.proceedWithOrgChange(this.pendingOrgChange);
+              this.pendingOrgChange = null;
+            }
           }
-          if (this.pendingOrgChange) {
-            this.proceedWithOrgChange(this.pendingOrgChange);
-            this.pendingOrgChange = null;
-          }
-        }
-        this.cdr.markForCheck();
-      }).catch(() => { this.cdr.markForCheck(); });
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
   }
 

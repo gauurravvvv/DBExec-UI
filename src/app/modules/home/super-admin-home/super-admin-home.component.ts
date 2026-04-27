@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -24,7 +31,7 @@ import { HomeService } from '../services/home.service';
 })
 export class SuperAdminHomeComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
-  private cdr        = inject(ChangeDetectorRef);
+  private cdr = inject(ChangeDetectorRef);
 
   organizations: any[] = [];
 
@@ -91,7 +98,8 @@ export class SuperAdminHomeComponent implements OnInit {
   }
 
   loadOrganizationData(orgId: string) {
-    this.homeService.getSuperAdminDashboard(orgId)
+    this.homeService
+      .getSuperAdminDashboard(orgId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: any) => {
@@ -108,7 +116,9 @@ export class SuperAdminHomeComponent implements OnInit {
             this.cdr.markForCheck();
           }
         },
-        error: () => { /* handled by interceptor */ },
+        error: () => {
+          /* handled by interceptor */
+        },
       });
     // Simulate fetching data based on organization ID
     // Replace this with actual service calls

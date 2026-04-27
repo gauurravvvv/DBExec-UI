@@ -152,21 +152,33 @@
         </button>
 
         <!-- Contrast Quality Meter -->
-        <div class="contrast-meter" [class]="'contrast-meter--' + contrastQuality.level">
+        <div
+          class="contrast-meter"
+          [class]="'contrast-meter--' + contrastQuality.level"
+        >
           <div class="contrast-meter__header">
             <span class="contrast-meter__label">
-              <i class="pi" [ngClass]="{
-                'pi-times-circle': contrastQuality.level === 'poor',
-                'pi-exclamation-triangle': contrastQuality.level === 'needs-work',
-                'pi-check-circle': contrastQuality.level === 'good',
-                'pi-verified': contrastQuality.level === 'excellent'
-              }"></i>
+              <i
+                class="pi"
+                [ngClass]="{
+                  'pi-times-circle': contrastQuality.level === 'poor',
+                  'pi-exclamation-triangle':
+                    contrastQuality.level === 'needs-work',
+                  'pi-check-circle': contrastQuality.level === 'good',
+                  'pi-verified': contrastQuality.level === 'excellent',
+                }"
+              ></i>
               {{ contrastQuality.label }}
             </span>
-            <span class="contrast-meter__badge">{{ contrastRatio | number: '1.1-1' }}:1</span>
+            <span class="contrast-meter__badge"
+              >{{ contrastRatio | number: '1.1-1' }}:1</span
+            >
           </div>
           <div class="contrast-meter__bar">
-            <div class="contrast-meter__fill" [style.width.%]="contrastQuality.percent"></div>
+            <div
+              class="contrast-meter__fill"
+              [style.width.%]="contrastQuality.percent"
+            ></div>
           </div>
           <p class="contrast-meter__hint">{{ contrastQuality.hint }}</p>
         </div>
@@ -213,7 +225,9 @@
   <div class="preview-container" (click)="$event.stopPropagation()">
     <div class="preview-header">
       <h3><i class="pi pi-eye"></i> Live Preview</h3>
-      <span class="preview-subtitle">This is exactly how users will see it</span>
+      <span class="preview-subtitle"
+        >This is exactly how users will see it</span
+      >
       <button class="preview-close" (click)="showPreview = false">
         <i class="pi pi-times"></i>
       </button>
@@ -236,7 +250,8 @@
             <span
               class="preview-banner__label"
               [style.color]="announcementForm.get('textColor')?.value"
-            >ANNOUNCEMENT</span>
+              >ANNOUNCEMENT</span
+            >
             <span class="preview-banner__divider">|</span>
             <span class="preview-banner__message">{{
               announcementForm.get('name')?.value || 'Your title here'
@@ -260,13 +275,17 @@
             <span
               class="preview-popup-mock__tag"
               [style.color]="announcementForm.get('bgColor')?.value"
-            >ANNOUNCEMENT</span>
-            <h4 class="preview-popup-mock__title">{{
-              announcementForm.get('name')?.value || 'Your title here'
-            }}</h4>
-            <p class="preview-popup-mock__desc">{{
-              announcementForm.get('description')?.value || 'Your description will appear here...'
-            }}</p>
+              >ANNOUNCEMENT</span
+            >
+            <h4 class="preview-popup-mock__title">
+              {{ announcementForm.get('name')?.value || 'Your title here' }}
+            </h4>
+            <p class="preview-popup-mock__desc">
+              {{
+                announcementForm.get('description')?.value ||
+                  'Your description will appear here...'
+              }}
+            </p>
             <div class="preview-popup-mock__footer">
               <span class="preview-popup-mock__checkbox">
                 <i class="pi pi-stop"></i> Do not show again

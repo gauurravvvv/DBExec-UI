@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
@@ -61,8 +69,8 @@ export class ListTabComponent implements OnInit {
   // Debouncing for filter changes
   private filter$ = new Subject<void>();
 
-  tabs    = this.tabService.tabs;
-  total   = this.tabService.total;
+  tabs = this.tabService.tabs;
+  total = this.tabService.total;
   loading = this.tabService.loading;
 
   get selectedCount(): number {
@@ -327,11 +335,14 @@ export class ListTabComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.tabService.load(params).then(() => {
-      this.cdr.markForCheck();
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
+    this.tabService
+      .load(params)
+      .then(() => {
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onAddNewTab() {
@@ -380,8 +391,13 @@ export class ListTabComponent implements OnInit {
             this.refreshList();
           }
         })
-        .catch(() => { /* global interceptor shows error toast */ })
-        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
+        .catch(() => {
+          /* global interceptor shows error toast */
+        })
+        .finally(() => {
+          this.closeDeletePopup();
+          this.cdr.markForCheck();
+        });
       return;
     }
 
@@ -396,8 +412,13 @@ export class ListTabComponent implements OnInit {
             this.refreshList();
           }
         })
-        .catch(() => { /* global interceptor shows error toast */ })
-        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
+        .catch(() => {
+          /* global interceptor shows error toast */
+        })
+        .finally(() => {
+          this.closeDeletePopup();
+          this.cdr.markForCheck();
+        });
     }
   }
 

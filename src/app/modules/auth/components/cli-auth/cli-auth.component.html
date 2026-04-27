@@ -8,7 +8,10 @@
     <h1 class="headline">Authorize Your<br />CLI Access</h1>
     <p class="subtitle">Powerful . Intuitive . Secure</p>
     <div class="features-grid">
-      <div class="feature-item" *ngFor="let feature of features; trackBy: trackByIndex">
+      <div
+        class="feature-item"
+        *ngFor="let feature of features; trackBy: trackByIndex"
+      >
         <div class="feature-icon">
           <i class="pi pi-{{ feature.icon }}"></i>
         </div>
@@ -28,11 +31,12 @@
   <!-- Right Section - Auth Content -->
   <div class="login-section">
     <div class="login-box">
-
       <!-- Prompt State — Code Entry -->
       <ng-container *ngIf="pageState === 'prompt'">
         <h2>Authorize CLI</h2>
-        <p class="text-500 mb-4">Enter the code from your terminal to grant access</p>
+        <p class="text-500 mb-4">
+          Enter the code from your terminal to grant access
+        </p>
 
         <div class="code-input-wrapper">
           <input
@@ -103,7 +107,9 @@
         <i class="pi pi-check-circle status-icon status-icon-success"></i>
         <h2>Authorized</h2>
         <p class="text-500">{{ message }}</p>
-        <p class="hint-text">You can close this tab and return to your terminal.</p>
+        <p class="hint-text">
+          You can close this tab and return to your terminal.
+        </p>
       </div>
 
       <!-- Denied State -->
@@ -137,7 +143,6 @@
           Back to Login
         </a>
       </div>
-
     </div>
   </div>
 </div>

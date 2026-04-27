@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -154,7 +161,10 @@ export class EditGroupComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      const response = await this.groupService.edit(this.groupForm, this.saveJustification.trim());
+      const response = await this.groupService.edit(
+        this.groupForm,
+        this.saveJustification.trim(),
+      );
       if (this.globalService.handleSuccessService(response)) {
         this.showSaveConfirm = false;
         this.saveJustification = '';

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -57,11 +64,13 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       this.loadSectionData();
     }
 
-    this.sectionForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.isCancelClicked) {
-        this.isCancelClicked = false;
-      }
-    });
+    this.sectionForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
   }
 
   get isFormDirty(): boolean {
@@ -94,30 +103,35 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
 
   loadSectionData(): void {
     this.sectionService.resetCurrent();
-    this.sectionService.loadOne(this.orgId, this.sectionId).then(() => {
-      const data = this.sectionService.current();
-      if (data) {
-        this.sectionData = data;
+    this.sectionService
+      .loadOne(this.orgId, this.sectionId)
+      .then(() => {
+        const data = this.sectionService.current();
+        if (data) {
+          this.sectionData = data;
 
-        this.sectionForm.patchValue({
-          id: this.sectionData.id,
-          name: this.sectionData.name,
-          description: this.sectionData.description,
-          organisation: this.sectionData.organisationId,
-          datasource: this.sectionData.datasourceId,
-          tab: this.sectionData.tabId,
-          status: this.sectionData.status,
-        });
+          this.sectionForm.patchValue({
+            id: this.sectionData.id,
+            name: this.sectionData.name,
+            description: this.sectionData.description,
+            organisation: this.sectionData.organisationId,
+            datasource: this.sectionData.datasourceId,
+            tab: this.sectionData.tabId,
+            status: this.sectionData.status,
+          });
 
-        this.selectedOrgName = this.sectionData.organisationName || '';
-        this.selectedDatasourceName = this.sectionData.datasource?.name || '';
+          this.selectedOrgName = this.sectionData.organisationName || '';
+          this.selectedDatasourceName = this.sectionData.datasource?.name || '';
 
-        this.loadTabData();
+          this.loadTabData();
 
-        this.sectionForm.markAsPristine();
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+          this.sectionForm.markAsPristine();
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadTabData() {
@@ -128,12 +142,17 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
-    this.tabService.listTab(param).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = [...(response.data.tabs ?? response.data ?? [])];
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.tabService
+      .listTab(param)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.tabs = [...(response.data.tabs ?? response.data ?? [])];
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   getNameError(): string {
@@ -161,9 +180,15 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
 
   proceedSave(): void {
     if (this.saveJustification.trim()) {
-      const { id, name, description, organisation, datasource, tab, status } = this.sectionForm.value;
+      const { id, name, description, organisation, datasource, tab, status } =
+        this.sectionForm.value;
       const payload = {
-        id, name, description, organisation, datasource, tab,
+        id,
+        name,
+        description,
+        organisation,
+        datasource,
+        tab,
         status: status ? 1 : 0,
         justification: this.saveJustification.trim(),
       };
@@ -178,7 +203,9 @@ export class EditSectionComponent implements OnInit, HasUnsavedChanges {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); })
+        .catch(() => {
+          this.cdr.markForCheck();
+        })
         .finally(() => {
           this.saveJustification = '';
           this.cdr.markForCheck();

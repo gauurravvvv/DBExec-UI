@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component,
+import {
+  ChangeDetectionStrategy,
+  Component,
   EventEmitter,
   forwardRef,
   Input,
   Output,
-  ViewEncapsulation, } from '@angular/core';
+  ViewEncapsulation,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({

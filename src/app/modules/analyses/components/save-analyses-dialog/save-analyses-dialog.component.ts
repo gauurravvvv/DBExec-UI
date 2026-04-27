@@ -1,10 +1,13 @@
-import { ChangeDetectionStrategy, Component,
+import {
+  ChangeDetectionStrategy,
+  Component,
   OnInit,
   OnChanges,
   Output,
   EventEmitter,
   Input,
-  HostListener, } from '@angular/core';
+  HostListener,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { REGEX } from 'src/app/constants/regex.constant';
 

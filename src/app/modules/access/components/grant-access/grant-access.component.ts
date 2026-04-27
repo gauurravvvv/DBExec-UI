@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -73,13 +79,19 @@ export class GrantAccessComponent implements OnInit {
     });
 
     // Trigger validation when groups or users change
-    this.accessForm.get('groups')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.accessForm.updateValueAndValidity({ emitEvent: false });
-    });
+    this.accessForm
+      .get('groups')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.accessForm.updateValueAndValidity({ emitEvent: false });
+      });
 
-    this.accessForm.get('users')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.accessForm.updateValueAndValidity({ emitEvent: false });
-    });
+    this.accessForm
+      .get('users')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.accessForm.updateValueAndValidity({ emitEvent: false });
+      });
   }
 
   loadOrganisations() {
@@ -154,7 +166,9 @@ export class GrantAccessComponent implements OnInit {
   async onSubmit() {
     if (this.accessForm.valid) {
       try {
-        const response = await this.acessService.grantAccess(this.accessForm.value);
+        const response = await this.acessService.grantAccess(
+          this.accessForm.value,
+        );
         if (this.globalService.handleSuccessService(response)) {
           this.onCancel();
         }
@@ -225,7 +239,10 @@ export class GrantAccessComponent implements OnInit {
     if (!orgId || !connectionId) return;
 
     try {
-      const response = await this.acessService.loadAccessDetails(orgId, connectionId);
+      const response = await this.acessService.loadAccessDetails(
+        orgId,
+        connectionId,
+      );
       if (this.globalService.handleSuccessService(response, false)) {
         const data = response.data;
         this.users = [...(data.users || [])];
@@ -237,16 +254,25 @@ export class GrantAccessComponent implements OnInit {
         const existingGroupIds = accessDetails
           .filter((item: any) => item.groupId && item.userId === null)
           .map((item: any) => item.groupId);
-        this.accessForm.patchValue({ users: existingUserIds, groups: existingGroupIds }, { emitEvent: false });
+        this.accessForm.patchValue(
+          { users: existingUserIds, groups: existingGroupIds },
+          { emitEvent: false },
+        );
       } else {
         this.users = [];
         this.groups = [];
-        this.accessForm.patchValue({ users: [], groups: [] }, { emitEvent: false });
+        this.accessForm.patchValue(
+          { users: [], groups: [] },
+          { emitEvent: false },
+        );
       }
     } catch (error) {
       this.users = [];
       this.groups = [];
-      this.accessForm.patchValue({ users: [], groups: [] }, { emitEvent: false });
+      this.accessForm.patchValue(
+        { users: [], groups: [] },
+        { emitEvent: false },
+      );
     }
   }
 }

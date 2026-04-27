@@ -141,7 +141,11 @@
           <div class="visual-list-items" *ngIf="visuals.length > 0">
             <div
               class="visual-list-item"
-              *ngFor="let visual of filteredVisuals; let i = index; trackBy: trackById"
+              *ngFor="
+                let visual of filteredVisuals;
+                let i = index;
+                trackBy: trackById
+              "
               [class.focused]="focusedVisualId === visual.id"
               [class.unconfigured]="!visual.chartType"
               (click)="scrollToVisual(visual, $event)"
@@ -218,7 +222,9 @@
               class="fields-list"
               [class.selection-mode]="activeAxisSelection"
             >
-              <ng-container *ngFor="let field of filteredDatasetFields; trackBy: trackById">
+              <ng-container
+                *ngFor="let field of filteredDatasetFields; trackBy: trackById"
+              >
                 <div
                   *ngIf="field._scope === 'dataset'"
                   class="field-card"
@@ -247,7 +253,9 @@
               class="fields-list"
               [class.selection-mode]="activeAxisSelection"
             >
-              <ng-container *ngFor="let field of filteredDatasetFields; trackBy: trackById">
+              <ng-container
+                *ngFor="let field of filteredDatasetFields; trackBy: trackById"
+              >
                 <div
                   *ngIf="field._scope === 'analysis'"
                   class="field-card analysis-field"
@@ -362,7 +370,11 @@
           <div class="filter-cards" *ngIf="configuredFilters.length > 0">
             <div
               class="filter-card"
-              *ngFor="let filter of configuredFilters; let i = index; trackBy: trackByName"
+              *ngFor="
+                let filter of configuredFilters;
+                let i = index;
+                trackBy: trackByName
+              "
               [class.disabled]="!filter.isEnabled"
             >
               <div class="filter-card-header">

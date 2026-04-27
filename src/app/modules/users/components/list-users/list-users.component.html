@@ -27,7 +27,6 @@
             >
             </app-custom-dropdown>
           </div>
-
         </div>
 
         <div class="toolbar-right">
@@ -83,7 +82,7 @@
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
           scrollHeight="calc(100vh - 440px)"
-          [tableStyle]="{'min-width': '88rem'}"
+          [tableStyle]="{ 'min-width': '88rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
@@ -330,7 +329,9 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro" *ngIf="!bulkDelete">Are you sure you want to delete this user?</p>
+      <p class="delete-intro" *ngIf="!bulkDelete">
+        Are you sure you want to delete this user?
+      </p>
       <p class="delete-intro" *ngIf="bulkDelete">
         Are you sure you want to delete
         <strong>{{ selectedCount }}</strong> selected user(s)?

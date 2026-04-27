@@ -109,8 +109,7 @@ export const CLI_AUTH_PAGE_OPTIONS = [
   {
     icon: 'clock',
     title: 'Short-Lived Codes',
-    description:
-      'Authorization codes expire in 5 minutes for maximum security',
+    description: 'Authorization codes expire in 5 minutes for maximum security',
   },
   {
     icon: 'lock',

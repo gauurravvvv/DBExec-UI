@@ -122,7 +122,10 @@
             <span class="count-badge">{{ connectionData.users.length }}</span>
           </h3>
           <div class="fields-list">
-            <div class="field-item" *ngFor="let user of connectionData?.users; trackBy: trackByIndex">
+            <div
+              class="field-item"
+              *ngFor="let user of connectionData?.users; trackBy: trackByIndex"
+            >
               <i class="pi pi-user"></i>
               <span>{{ user?.username }}</span>
             </div>

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -47,7 +54,9 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   datasources: any[] = [];
   datasets: any[] = [];
   datasetColumns: any[] = [];
-  columnValuesCache: { [columnName: string]: { label: string; value: string }[] } = {};
+  columnValuesCache: {
+    [columnName: string]: { label: string; value: string }[];
+  } = {};
   isLoadingColumnValues: { [columnName: string]: boolean } = {};
 
   selectedDatasource: string = '';
@@ -123,8 +132,9 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Org changes → reload datasources, clear downstream
-    this.rlsForm.get('organisation')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.rlsForm
+      .get('organisation')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(value => {
         if (value) {
           this.selectedDatasource = '';
@@ -140,8 +150,9 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       });
 
     // Dataset changes → load columns, reset conditions
-    this.rlsForm.get('datasetId')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.rlsForm
+      .get('datasetId')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(value => {
         this.datasetColumns = [];
         this.columnValuesCache = {};
@@ -180,14 +191,17 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   loadOrganisations() {
     const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs || [];
+    this.organisationService
+      .listOrganisation(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = response.data.orgs || [];
+          this.cdr.markForCheck();
+        }
+      })
+      .catch(() => {
         this.cdr.markForCheck();
-      }
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
+      });
   }
 
   loadDatasources() {
@@ -195,19 +209,22 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     if (!orgId) return;
 
     const params = { orgId, pageNumber: DEFAULT_PAGE, limit: MAX_LIMIT };
-    this.datasourceService.listDatasource(params).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasources = response.data.datasources || [];
-        this.selectedDatasource = '';
-        this.datasets = [];
-        this.rlsForm.patchValue({ datasetId: '' }, { emitEvent: false });
-      } else {
-        this.datasources = [];
-      }
-      this.cdr.markForCheck();
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
+    this.datasourceService
+      .listDatasource(params)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasources = response.data.datasources || [];
+          this.selectedDatasource = '';
+          this.datasets = [];
+          this.rlsForm.patchValue({ datasetId: '' }, { emitEvent: false });
+        } else {
+          this.datasources = [];
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onDatasourceChange(datasourceId: string) {
@@ -234,16 +251,19 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       limit: MAX_LIMIT,
     };
 
-    this.datasetService.listDatasets(params).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasets = response.data.datasets || [];
-      } else {
-        this.datasets = [];
-      }
-      this.cdr.markForCheck();
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
+    this.datasetService
+      .listDatasets(params)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasets = response.data.datasets || [];
+        } else {
+          this.datasets = [];
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadDatasetColumns(): void {
@@ -251,17 +271,22 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     const datasetId = this.rlsForm.get('datasetId')?.value;
     if (!orgId || !datasetId) return;
 
-    this.datasetService.getDataset(orgId, datasetId).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasetColumns = (response.data.datasetFields || []).map((f: any) => ({
-          ...f,
-          columnToView: f.columnToView || f.columnToUse,
-        }));
+    this.datasetService
+      .getDataset(orgId, datasetId)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasetColumns = (response.data.datasetFields || []).map(
+            (f: any) => ({
+              ...f,
+              columnToView: f.columnToView || f.columnToUse,
+            }),
+          );
+          this.cdr.markForCheck();
+        }
+      })
+      .catch(() => {
         this.cdr.markForCheck();
-      }
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
+      });
   }
 
   async loadDistinctValuesForColumn(columnName: string): Promise<void> {
@@ -275,7 +300,11 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.isLoadingColumnValues[columnName] = true;
 
     try {
-      const res: any = await this.datasetService.getDistinctColumnValues(orgId, datasetId, columnName);
+      const res: any = await this.datasetService.getDistinctColumnValues(
+        orgId,
+        datasetId,
+        columnName,
+      );
       if (res?.status && res.data) {
         this.columnValuesCache[columnName] = (res.data || []).map((v: any) => ({
           label: String(v),
@@ -283,7 +312,11 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         }));
       }
     } catch (err) {
-      console.error('Failed to load distinct values for column', columnName, err);
+      console.error(
+        'Failed to load distinct values for column',
+        columnName,
+        err,
+      );
     } finally {
       this.isLoadingColumnValues[columnName] = false;
       this.cdr.markForCheck();
@@ -315,7 +348,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         })),
       };
 
-      this.rlsRulesService.add(payload)
+      this.rlsRulesService
+        .add(payload)
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             this.rlsForm.markAsPristine();

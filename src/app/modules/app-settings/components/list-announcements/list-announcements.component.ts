@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -91,19 +99,24 @@ export class ListAnnouncementsComponent implements OnInit {
 
   loadOrganisations(): void {
     const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs];
-        if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0].id;
-          this.loadGroups();
-          this.loadAnnouncements();
-        } else {
-          this.selectedOrg = null;
+    this.organisationService
+      .listOrganisation(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = [...response.data.orgs];
+          if (this.organisations.length > 0) {
+            this.selectedOrg = this.organisations[0].id;
+            this.loadGroups();
+            this.loadAnnouncements();
+          } else {
+            this.selectedOrg = null;
+          }
         }
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadGroups(): void {
@@ -119,7 +132,10 @@ export class ListAnnouncementsComponent implements OnInit {
           this.groups = res.data.groups || [];
         }
         this.cdr.markForCheck();
-      }).catch(() => { this.cdr.markForCheck(); });
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onOrgChange(orgId: any): void {

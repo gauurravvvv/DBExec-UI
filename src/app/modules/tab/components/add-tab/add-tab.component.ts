@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -68,9 +75,11 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     }
 
     // Subscribe to form changes to check for duplicates
-    this.tabGroups.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.checkForDuplicates();
-    });
+    this.tabGroups.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.checkForDuplicates();
+      });
   }
 
   initForm() {
@@ -180,22 +189,25 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     }
     if (this.tabForm.valid) {
       const { organisation, datasource, tabs } = this.tabForm.value;
-      this.tabService.add({ organisation, datasource, tabs }).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.tabForm.markAsPristine();
-          this.router.navigate([TAB.LIST]);
-        }
-        this.cdr.markForCheck();
-      }).catch(() => {
-        // global interceptor shows error toast; ensure UI recovers
-        this.cdr.markForCheck();
-      });
+      this.tabService
+        .add({ organisation, datasource, tabs })
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.tabForm.markAsPristine();
+            this.router.navigate([TAB.LIST]);
+          }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          // global interceptor shows error toast; ensure UI recovers
+          this.cdr.markForCheck();
+        });
     }
   }
 
   onCancel() {
     this.tabGroups.clear();
-    this.addTabGroup();          // restore at least one empty row
+    this.addTabGroup(); // restore at least one empty row
     this.tabForm.reset();
     this.cdr.markForCheck();
   }
@@ -280,5 +292,4 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     }
     this.addTabGroup();
   }
-
 }

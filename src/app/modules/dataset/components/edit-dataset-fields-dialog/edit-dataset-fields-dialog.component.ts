@@ -159,18 +159,21 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
       payload.dataType = this.editableField.dataType;
     }
 
-    this.datasetService.updateDatasetMapping(payload).then(response => {
-      if (this.globalService.handleSuccessService(response, true)) {
+    this.datasetService
+      .updateDatasetMapping(payload)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, true)) {
+          this.isSubmitting = false;
+          this.close.emit({ field: this.editableField });
+        } else {
+          this.isSubmitting = false;
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
         this.isSubmitting = false;
-        this.close.emit({ field: this.editableField });
-      } else {
-        this.isSubmitting = false;
-      }
-      this.cdr.markForCheck();
-    }).catch(() => {
-      this.isSubmitting = false;
-      this.cdr.markForCheck();
-    });
+        this.cdr.markForCheck();
+      });
   }
 
   onCancel() {

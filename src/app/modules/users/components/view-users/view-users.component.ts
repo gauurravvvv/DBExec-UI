@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -80,7 +85,11 @@ export class ViewUsersComponent implements OnInit {
 
   async proceedDelete() {
     if (this.deleteJustification.trim()) {
-      const response = await this.userService.delete(this.userId, this.orgId, this.deleteJustification.trim());
+      const response = await this.userService.delete(
+        this.userId,
+        this.orgId,
+        this.deleteJustification.trim(),
+      );
       if (this.globalService.handleSuccessService(response)) {
         this.deleteJustification = '';
         this.router.navigate([USER.LIST]);
@@ -102,7 +111,10 @@ export class ViewUsersComponent implements OnInit {
 
   async onPasswordDialogClose(newPassword: string | null) {
     if (newPassword) {
-      const response = await this.userService.updatePassword(this.userId, newPassword);
+      const response = await this.userService.updatePassword(
+        this.userId,
+        newPassword,
+      );
       if (this.globalService.handleSuccessService(response)) {
         this.showChangePasswordDialog = false;
       }

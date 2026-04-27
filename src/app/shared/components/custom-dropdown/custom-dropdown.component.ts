@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component,
+import {
+  ChangeDetectionStrategy,
+  Component,
   EventEmitter,
   forwardRef,
   Input,
-  Output, } from '@angular/core';
+  Output,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -28,7 +31,17 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() filter = true;
   @Input() filterBy = '';
   @Input() filterPlaceholder = '';
-  @Input() filterMatchMode: 'contains' | 'startsWith' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' = 'contains';
+  @Input() filterMatchMode:
+    | 'contains'
+    | 'startsWith'
+    | 'endsWith'
+    | 'equals'
+    | 'notEquals'
+    | 'in'
+    | 'lt'
+    | 'lte'
+    | 'gt'
+    | 'gte' = 'contains';
   @Input() resetFilterOnHide = false;
   @Input() showClear = false;
   @Input() editable = false;

@@ -1,8 +1,16 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
-import {debounceTime} from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
@@ -50,10 +58,13 @@ export class ListOrganisationComponent implements OnInit {
 
   ngOnInit(): void {
     // Setup debounce for filter changes
-    this.searchSubject.pipe(debounceTime(500)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.listParams.pageNumber = 1;
-      this.loadOrganisations(this.lastTableLazyLoadEvent);
-    });
+    this.searchSubject
+      .pipe(debounceTime(500))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.listParams.pageNumber = 1;
+        this.loadOrganisations(this.lastTableLazyLoadEvent);
+      });
   }
 
   today = new Date();

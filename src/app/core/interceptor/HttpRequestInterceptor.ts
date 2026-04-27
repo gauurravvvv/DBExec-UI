@@ -51,7 +51,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     }
 
     // Skip auth for asset requests and absolute URLs (external/CDN)
-    const isExternal = req.url.startsWith('http://') || req.url.startsWith('https://');
+    const isExternal =
+      req.url.startsWith('http://') || req.url.startsWith('https://');
     if (req.url.includes('assets') || isExternal) {
       if (!skipLoader) {
         this.loadingService.hideLoader();

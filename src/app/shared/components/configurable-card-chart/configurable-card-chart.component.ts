@@ -1,11 +1,14 @@
-import { ChangeDetectionStrategy, Component,
+import {
+  ChangeDetectionStrategy,
+  Component,
   Input,
   Output,
   EventEmitter,
   OnInit,
   OnChanges,
   DoCheck,
-  SimpleChanges, } from '@angular/core';
+  SimpleChanges,
+} from '@angular/core';
 import { COLOR_PALETTES } from '../../helpers/chart-config.helper';
 
 export interface CardChartData {

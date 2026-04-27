@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FORGOT_PASSWORD_PAGE_OPTIONS } from 'src/app/constants/global';
@@ -85,7 +91,9 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       this.error.set('');
       this.loading.set(true);
       try {
-        const res: any = await this.loginService.generateOTP(this.forgotPasswordForm);
+        const res: any = await this.loginService.generateOTP(
+          this.forgotPasswordForm,
+        );
         this.globalService.handleSuccessService(res);
         if (res.data?.otpExpiresAt) {
           this.startCountdown(new Date(res.data.otpExpiresAt));

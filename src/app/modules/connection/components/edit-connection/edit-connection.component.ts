@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -52,11 +59,13 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
       this.loadConnectionData();
     }
 
-    this.connectionForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.isCancelClicked) {
-        this.isCancelClicked = false;
-      }
-    });
+    this.connectionForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
   }
 
   get isFormDirty(): boolean {
@@ -125,7 +134,10 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      const response = await this.connectionService.update(this.connectionForm, this.saveJustification.trim());
+      const response = await this.connectionService.update(
+        this.connectionForm,
+        this.saveJustification.trim(),
+      );
       if (this.globalService.handleSuccessService(response)) {
         this.showSaveConfirm = false;
         this.saveJustification = '';

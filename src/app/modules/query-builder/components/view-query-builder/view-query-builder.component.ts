@@ -501,7 +501,11 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   proceedDelete(): void {
     if (this.deleteJustification.trim()) {
       this.queryBuilderService
-        .delete(this.orgId, this.queryBuilderId, this.deleteJustification.trim())
+        .delete(
+          this.orgId,
+          this.queryBuilderId,
+          this.deleteJustification.trim(),
+        )
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([QUERY_BUILDER.LIST]);

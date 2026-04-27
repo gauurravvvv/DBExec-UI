@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
 import { Router } from '@angular/router';
@@ -39,7 +46,9 @@ export class SidebarComponent implements OnInit {
     this.checkScreenSize();
     const resizeHandler = () => this.checkScreenSize();
     window.addEventListener('resize', resizeHandler);
-    this.destroyRef.onDestroy(() => window.removeEventListener('resize', resizeHandler));
+    this.destroyRef.onDestroy(() =>
+      window.removeEventListener('resize', resizeHandler),
+    );
   }
 
   processMenuItems(items: MenuItem[], level: number = 0): MenuItem[] {

@@ -23,7 +23,12 @@
           <i class="pi pi-pencil"></i>
           Edit
         </button>
-        <button class="btn-danger" type="button" (click)="confirmDelete()" [disabled]="saving()">
+        <button
+          class="btn-danger"
+          type="button"
+          (click)="confirmDelete()"
+          [disabled]="saving()"
+        >
           <i class="pi pi-trash"></i> Delete
         </button>
       </div>
@@ -181,7 +186,11 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="saving()">
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="saving()"
+      >
         <i class="pi pi-trash"></i>
         Delete
       </button>

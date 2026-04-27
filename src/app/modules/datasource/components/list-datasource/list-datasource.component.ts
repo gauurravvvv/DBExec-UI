@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -24,8 +32,8 @@ export class ListDatasourceComponent implements OnInit {
 
   // Bound directly to service signals — no local copies
   datasources = this.datasourceService.datasources;
-  total       = this.datasourceService.total;
-  loading     = this.datasourceService.loading;
+  total = this.datasourceService.total;
+  loading = this.datasourceService.loading;
 
   listParams: any = {
     limit: 10,
@@ -56,11 +64,13 @@ export class ListDatasourceComponent implements OnInit {
 
   ngOnInit() {
     // Setup debounce for filter changes
-    this.searchSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.lastTableLazyLoadEvent) {
-        this.loadDatasources(this.lastTableLazyLoadEvent);
-      }
-    });
+    this.searchSubject
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.lastTableLazyLoadEvent) {
+          this.loadDatasources(this.lastTableLazyLoadEvent);
+        }
+      });
 
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
@@ -256,7 +266,11 @@ export class ListDatasourceComponent implements OnInit {
         orgId = orgId.id;
       }
       try {
-        const res: any = await this.datasourceService.bulkDelete(ids, reason, orgId);
+        const res: any = await this.datasourceService.bulkDelete(
+          ids,
+          reason,
+          orgId,
+        );
         if (this.globalService.handleSuccessService(res)) {
           this.selectedDatasources = [];
           this.cdr.markForCheck();

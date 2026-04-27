@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
@@ -27,8 +35,8 @@ export class ListGroupComponent implements OnInit {
   lastTableLazyLoadEvent: any;
 
   // Signal refs from service
-  groups  = this.groupService.groups;
-  total   = this.groupService.total;
+  groups = this.groupService.groups;
+  total = this.groupService.total;
   loading = this.groupService.loading;
 
   selectedGroups: any[] = [];
@@ -281,11 +289,7 @@ export class ListGroupComponent implements OnInit {
 
     if (this.groupToDelete) {
       this.groupService
-        .delete(
-          this.selectedOrg,
-          this.groupToDelete,
-          reason,
-        )
+        .delete(this.selectedOrg, this.groupToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedGroups = this.selectedGroups.filter(

@@ -22,7 +22,10 @@ import { CustomAccordionComponent } from './components/custom-accordion/custom-a
 import { CustomBinaryCheckboxComponent } from './components/custom-binary-checkbox/custom-binary-checkbox.component';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 import { FileSizePipe } from './pipes/file-size.pipe';
-import { FilterSchemasPipe, FilterTablesPipe } from './pipes/filter-schemas.pipe';
+import {
+  FilterSchemasPipe,
+  FilterTablesPipe,
+} from './pipes/filter-schemas.pipe';
 import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
 
 @NgModule({
@@ -51,12 +54,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     FilterTablesPipe,
     ReplaceUnderscoresPipe,
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppPrimeNGModule,
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AppPrimeNGModule],
   exports: [
     ChangePasswordDialogComponent,
     ConfirmLeaveDialogComponent,

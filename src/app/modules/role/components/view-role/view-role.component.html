@@ -3,21 +3,13 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button
-          pButton
-          class="p-button-text back-button"
-          (click)="goBack()"
-        >
+        <button pButton class="p-button-text back-button" (click)="goBack()">
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Role Details</h2>
       </div>
       <div class="header-actions" *ngIf="roleData?.isDefault !== 1">
-        <button
-          class="btn-primary"
-          type="button"
-          (click)="onEdit()"
-        >
+        <button class="btn-primary" type="button" (click)="onEdit()">
           <i class="pi pi-pencil"></i> Edit
         </button>
       </div>
@@ -34,7 +26,9 @@
               <i class="pi pi-shield"></i>
             </div>
             <h3 class="role-name">{{ roleData.name }}</h3>
-            <span *ngIf="roleData.isDefault === 1" class="default-badge">Default</span>
+            <span *ngIf="roleData.isDefault === 1" class="default-badge"
+              >Default</span
+            >
           </div>
 
           <!-- Role Information -->
@@ -53,7 +47,10 @@
                 Status
               </span>
               <span class="value">
-                <span class="status-badge" [class.active]="roleData.status === 1">
+                <span
+                  class="status-badge"
+                  [class.active]="roleData.status === 1"
+                >
                   {{ roleData.status === 1 ? 'Active' : 'Inactive' }}
                 </span>
               </span>
@@ -66,7 +63,10 @@
       <div class="permissions-section" *ngIf="permissions.length > 0">
         <h4 class="section-title">Screen Permissions</h4>
         <div class="permission-columns">
-          <div class="column" *ngFor="let permission of permissions; trackBy: trackByIndex">
+          <div
+            class="column"
+            *ngFor="let permission of permissions; trackBy: trackByIndex"
+          >
             <div class="column-header">{{ permission.label }}</div>
             <div class="permission-items">
               <div class="permission-item" *ngIf="!permission.subPermissions">
@@ -76,7 +76,10 @@
               <ng-container *ngIf="permission.subPermissions">
                 <div
                   class="permission-item"
-                  *ngFor="let subPerm of permission.subPermissions; trackBy: trackByIndex"
+                  *ngFor="
+                    let subPerm of permission.subPermissions;
+                    trackBy: trackByIndex
+                  "
                 >
                   <span class="item-label">{{ subPerm.label }}</span>
                   <i class="pi pi-check-circle perm-enabled"></i>

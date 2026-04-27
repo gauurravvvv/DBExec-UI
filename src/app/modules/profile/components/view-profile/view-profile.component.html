@@ -29,9 +29,7 @@
           <div class="status-wrapper">
             <span
               class="status-badge"
-              [class.active]="
-                !profile()?.isLocked && profile()?.status === 1
-              "
+              [class.active]="!profile()?.isLocked && profile()?.status === 1"
               [class.locked]="profile()?.isLocked"
             >
               {{
