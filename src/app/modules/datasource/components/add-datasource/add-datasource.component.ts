@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -60,10 +67,13 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
 
     // Reset connection test when connection fields change
     ['host', 'port', 'database', 'username', 'password'].forEach(field => {
-      this.datasourceForm.get(field)?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-        this.connectionTested = false;
-        this.connectionTestResult = null;
-      });
+      this.datasourceForm
+        .get(field)
+        ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.connectionTested = false;
+          this.connectionTestResult = null;
+        });
     });
   }
 

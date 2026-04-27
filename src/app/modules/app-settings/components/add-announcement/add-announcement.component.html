@@ -2,16 +2,32 @@
   <div class="add-admin-container">
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" routerLink="/app/app-settings/announcements">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/app-settings/announcements"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Add Announcement</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel" [disabled]="!isFormDirty"
-          (click)="onCancel()"></button>
-        <button pButton class="p-button-primary btn-save" type="submit" label="Save" (click)="onSubmit()"
-          [disabled]="!canSubmit()">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          (click)="onSubmit()"
+          [disabled]="!canSubmit()"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -20,62 +36,109 @@
     <form [formGroup]="announcementForm" class="admin-form">
       <div class="form-grid">
         <!-- Title -->
-        <app-custom-input formControlName="name" label="Title" placeholder="Enter announcement title" [required]="true"
+        <app-custom-input
+          formControlName="name"
+          label="Title"
+          placeholder="Enter announcement title"
+          [required]="true"
           [showError]="
             !!(
               announcementForm.get('name')?.invalid &&
               announcementForm.get('name')?.touched
             )
-          " [errorMessage]="getNameError()"></app-custom-input>
+          "
+          [errorMessage]="getNameError()"
+        ></app-custom-input>
 
         <!-- Description -->
         <div class="description-field">
-          <app-custom-textarea formControlName="description" label="Description"
-            placeholder="Enter announcement description" [rows]="4" [required]="true" [showError]="
+          <app-custom-textarea
+            formControlName="description"
+            label="Description"
+            placeholder="Enter announcement description"
+            [rows]="4"
+            [required]="true"
+            [showError]="
               !!(
                 announcementForm.get('description')?.invalid &&
                 announcementForm.get('description')?.touched
               )
-            " [errorMessage]="getDescriptionError()"></app-custom-textarea>
-          <span class="char-counter" [class.limit-reached]="descriptionLength >= maxDescriptionLength">
+            "
+            [errorMessage]="getDescriptionError()"
+          ></app-custom-textarea>
+          <span
+            class="char-counter"
+            [class.limit-reached]="descriptionLength >= maxDescriptionLength"
+          >
             {{ descriptionLength }}/{{ maxDescriptionLength }}
           </span>
         </div>
 
         <!-- Organisation (SA only) -->
-        <app-custom-dropdown *ngIf="showOrganisationDropdown" formControlName="organisation" label="Organisation"
-          placeholder="Select Organisation" [options]="organisations" optionLabel="name" optionValue="id"
-          [filter]="true" filterBy="name" [required]="true" [showError]="
+        <app-custom-dropdown
+          *ngIf="showOrganisationDropdown"
+          formControlName="organisation"
+          label="Organisation"
+          placeholder="Select Organisation"
+          [options]="organisations"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
+          [showError]="
             !!(
               announcementForm.get('organisation')?.invalid &&
               announcementForm.get('organisation')?.touched
             )
-          " errorMessage="Organisation is required"></app-custom-dropdown>
+          "
+          errorMessage="Organisation is required"
+        ></app-custom-dropdown>
 
         <!-- Target Group -->
-        <app-custom-dropdown formControlName="targetGroupId" label="Target Group" placeholder="Select Group"
-          [options]="groups" optionLabel="name" optionValue="id" [filter]="true" filterBy="name" [required]="true"
+        <app-custom-dropdown
+          formControlName="targetGroupId"
+          label="Target Group"
+          placeholder="Select Group"
+          [options]="groups"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [required]="true"
           [showError]="
             !!(
               announcementForm.get('targetGroupId')?.invalid &&
               announcementForm.get('targetGroupId')?.touched
             )
-          " errorMessage="Target group is required"></app-custom-dropdown>
+          "
+          errorMessage="Target group is required"
+        ></app-custom-dropdown>
 
         <!-- Colors -->
         <div class="color-row">
           <div class="color-picker-field">
             <label>Background</label>
             <div class="color-picker-inline">
-              <p-colorPicker formControlName="bgColor" appendTo="body"></p-colorPicker>
-              <span class="color-value">{{ announcementForm.get('bgColor')?.value }}</span>
+              <p-colorPicker
+                formControlName="bgColor"
+                appendTo="body"
+              ></p-colorPicker>
+              <span class="color-value">{{
+                announcementForm.get('bgColor')?.value
+              }}</span>
             </div>
           </div>
           <div class="color-picker-field">
             <label>Text</label>
             <div class="color-picker-inline">
-              <p-colorPicker formControlName="textColor" appendTo="body"></p-colorPicker>
-              <span class="color-value">{{ announcementForm.get('textColor')?.value }}</span>
+              <p-colorPicker
+                formControlName="textColor"
+                appendTo="body"
+              ></p-colorPicker>
+              <span class="color-value">{{
+                announcementForm.get('textColor')?.value
+              }}</span>
             </div>
           </div>
         </div>
@@ -91,34 +154,59 @@
         </button>
 
         <!-- Contrast Quality Meter -->
-        <div class="contrast-meter" [class]="'contrast-meter--' + contrastQuality.level">
+        <div
+          class="contrast-meter"
+          [class]="'contrast-meter--' + contrastQuality.level"
+        >
           <div class="contrast-meter__header">
             <span class="contrast-meter__label">
-              <i class="pi" [ngClass]="{
-                'pi-times-circle': contrastQuality.level === 'poor',
-                'pi-exclamation-triangle': contrastQuality.level === 'needs-work',
-                'pi-check-circle': contrastQuality.level === 'good',
-                'pi-verified': contrastQuality.level === 'excellent'
-              }"></i>
+              <i
+                class="pi"
+                [ngClass]="{
+                  'pi-times-circle': contrastQuality.level === 'poor',
+                  'pi-exclamation-triangle':
+                    contrastQuality.level === 'needs-work',
+                  'pi-check-circle': contrastQuality.level === 'good',
+                  'pi-verified': contrastQuality.level === 'excellent',
+                }"
+              ></i>
               {{ contrastQuality.label }}
             </span>
-            <span class="contrast-meter__badge">{{ contrastRatio | number: '1.1-1' }}:1</span>
+            <span class="contrast-meter__badge"
+              >{{ contrastRatio | number: '1.1-1' }}:1</span
+            >
           </div>
           <div class="contrast-meter__bar">
-            <div class="contrast-meter__fill" [style.width.%]="contrastQuality.percent"></div>
+            <div
+              class="contrast-meter__fill"
+              [style.width.%]="contrastQuality.percent"
+            ></div>
           </div>
           <p class="contrast-meter__hint">{{ contrastQuality.hint }}</p>
         </div>
 
         <!-- Dates -->
         <div class="date-row">
-          <app-custom-calendar label="Start Date" placeholder="Select start date" formControlName="startTime"
-            [minDate]="startTimeMinDate" dateFormat="dd M yy"></app-custom-calendar>
-          <app-custom-calendar label="End Date" placeholder="Select end date" formControlName="endTime"
-            [minDate]="endTimeMinDate" dateFormat="dd M yy"></app-custom-calendar>
+          <app-custom-calendar
+            label="Start Date"
+            placeholder="Select start date"
+            formControlName="startTime"
+            [minDate]="startTimeMinDate"
+            dateFormat="dd M yy"
+          ></app-custom-calendar>
+          <app-custom-calendar
+            label="End Date"
+            placeholder="Select end date"
+            formControlName="endTime"
+            [minDate]="endTimeMinDate"
+            dateFormat="dd M yy"
+          ></app-custom-calendar>
         </div>
 
-        <div class="contrast-warning" *ngIf="announcementForm.errors?.['dateRange']">
+        <div
+          class="contrast-warning"
+          *ngIf="announcementForm.errors?.['dateRange']"
+        >
           <i class="pi pi-exclamation-triangle"></i>
           <span>End date must be after start date.</span>
         </div>
@@ -132,7 +220,9 @@
   <div class="preview-container" (click)="$event.stopPropagation()">
     <div class="preview-header">
       <h3><i class="pi pi-eye"></i> Live Preview</h3>
-      <span class="preview-subtitle">This is exactly how users will see it</span>
+      <span class="preview-subtitle"
+        >This is exactly how users will see it</span
+      >
       <button class="preview-close" (click)="showPreview = false">
         <i class="pi pi-times"></i>
       </button>
@@ -155,7 +245,8 @@
             <span
               class="preview-banner__label"
               [style.color]="announcementForm.get('textColor')?.value"
-            >ANNOUNCEMENT</span>
+              >ANNOUNCEMENT</span
+            >
             <span class="preview-banner__divider">|</span>
             <span class="preview-banner__message">{{
               announcementForm.get('name')?.value || 'Your title here'
@@ -179,13 +270,17 @@
             <span
               class="preview-popup-mock__tag"
               [style.color]="announcementForm.get('bgColor')?.value"
-            >ANNOUNCEMENT</span>
-            <h4 class="preview-popup-mock__title">{{
-              announcementForm.get('name')?.value || 'Your title here'
-            }}</h4>
-            <p class="preview-popup-mock__desc">{{
-              announcementForm.get('description')?.value || 'Your description will appear here...'
-            }}</p>
+              >ANNOUNCEMENT</span
+            >
+            <h4 class="preview-popup-mock__title">
+              {{ announcementForm.get('name')?.value || 'Your title here' }}
+            </h4>
+            <p class="preview-popup-mock__desc">
+              {{
+                announcementForm.get('description')?.value ||
+                  'Your description will appear here...'
+              }}
+            </p>
             <div class="preview-popup-mock__footer">
               <span class="preview-popup-mock__checkbox">
                 <i class="pi pi-stop"></i> Do not show again

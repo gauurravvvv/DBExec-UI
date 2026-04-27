@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SuperAdminService } from '../../services/superAdmin.service';
@@ -55,12 +62,14 @@ export class ViewSuperAdminComponent implements OnInit {
     // Get admin ID from route params
     this.loggedInUserId = this.globalService.getTokenDetails('userId');
 
-    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      this.adminId = params['id'];
-      if (this.adminId) {
-        this.loadAdminDetails();
-      }
-    });
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.adminId = params['id'];
+        if (this.adminId) {
+          this.loadAdminDetails();
+        }
+      });
   }
 
   private async loadAdminDetails(): Promise<void> {

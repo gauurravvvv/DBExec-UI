@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PROMPT } from 'src/app/constants/routes';
 import { PromptService } from '../../services/prompt.service';
@@ -35,13 +41,18 @@ export class ViewPromptComponent implements OnInit {
 
   loadPromptData() {
     this.promptService.resetCurrent();
-    this.promptService.loadOne(this.orgId, this.promptId).then(() => {
-      const data = this.promptService.current();
-      if (data) {
-        this.promptData = data;
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.promptService
+      .loadOne(this.orgId, this.promptId)
+      .then(() => {
+        const data = this.promptService.current();
+        if (data) {
+          this.promptData = data;
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onEdit() {
@@ -64,11 +75,7 @@ export class ViewPromptComponent implements OnInit {
   proceedDelete(): void {
     if (this.promptData && this.deleteJustification.trim()) {
       this.promptService
-        .delete(
-          this.orgId,
-          this.promptId,
-          this.deleteJustification.trim(),
-        )
+        .delete(this.orgId, this.promptId, this.deleteJustification.trim())
         .then(response => {
           this.showDeleteConfirm = false;
           this.deleteJustification = '';

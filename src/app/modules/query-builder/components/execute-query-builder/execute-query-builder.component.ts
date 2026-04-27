@@ -181,22 +181,24 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     // after ALL tabs/sections/prompts finish loading (see checkAndLoadDatasetForEdit)
 
     // Debounce server-side result filters
-    this.resultFilterSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (!this.lastExecutedQuery) return;
-      this.resultPage = 1;
-      const filter: { [key: string]: string } = {};
-      for (const col of Object.keys(this.resultFilterValues)) {
-        if (this.resultFilterValues[col]) {
-          filter[col] = this.resultFilterValues[col];
+    this.resultFilterSubject
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.lastExecutedQuery) return;
+        this.resultPage = 1;
+        const filter: { [key: string]: string } = {};
+        for (const col of Object.keys(this.resultFilterValues)) {
+          if (this.resultFilterValues[col]) {
+            filter[col] = this.resultFilterValues[col];
+          }
         }
-      }
-      this.executeQueryForResults(
-        this.lastExecutedQuery,
-        1,
-        this.resultRows,
-        filter,
-      );
-    });
+        this.executeQueryForResults(
+          this.lastExecutedQuery,
+          1,
+          this.resultRows,
+          filter,
+        );
+      });
   }
 
   ngOnDestroy(): void {

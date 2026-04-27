@@ -24,6 +24,8 @@ export class ProfileService {
   }
 
   changePassword(newPassword: string) {
-    return lastValueFrom(this.http.apiPut(PROFILE.CHANGE_PASSWORD, { newPassword }));
+    return lastValueFrom(
+      this.http.apiPut(PROFILE.CHANGE_PASSWORD, { newPassword }),
+    );
   }
 }

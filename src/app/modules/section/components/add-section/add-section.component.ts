@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -72,9 +79,11 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       this.loadDatasources();
     }
 
-    this.sectionForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.checkForDuplicates();
-    });
+    this.sectionForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.checkForDuplicates();
+      });
   }
 
   initForm() {
@@ -303,12 +312,17 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       limit: MAX_LIMIT,
     };
 
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs];
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.organisationService
+      .listOrganisation(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = [...response.data.orgs];
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onSubmit() {
@@ -326,13 +340,18 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
         sections: this.transformSections(formValue.tabGroups),
       };
 
-      this.sectionService.add(transformedData).then(response => {
-        if (this.globalService.handleSuccessService(response)) {
-          this.sectionForm.markAsPristine();
-          this.router.navigate([SECTION.LIST]);
-        }
-        this.cdr.markForCheck();
-      }).catch(() => { this.cdr.markForCheck(); });
+      this.sectionService
+        .add(transformedData)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.sectionForm.markAsPristine();
+            this.router.navigate([SECTION.LIST]);
+          }
+          this.cdr.markForCheck();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
   }
 
@@ -382,12 +401,17 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       limit: MAX_LIMIT,
     };
 
-    this.datasourceService.listDatasource(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasources = [...(response.data.datasources || [])];
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.datasourceService
+      .listDatasource(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasources = [...(response.data.datasources || [])];
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onDatasourceChange(event: any) {
@@ -410,12 +434,17 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
-    this.tabService.listTab(param).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = [...response.data.tabs];
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.tabService
+      .listTab(param)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.tabs = [...response.data.tabs];
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onTabChange(event: any, groupIndex: number) {
@@ -427,5 +456,4 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       sections.push(this.createSection());
     }
   }
-
 }

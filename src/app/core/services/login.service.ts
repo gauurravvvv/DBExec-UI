@@ -29,8 +29,14 @@ export class LoginService implements OnDestroy {
 
       // Store other details
       StorageService.set(StorageType.ROLE, result.data.user.role);
-      StorageService.set(StorageType.ORGANISATION_ID, result.data.user.organisationId);
-      StorageService.set(StorageType.ORGANISATION, result.data.user.organisationName);
+      StorageService.set(
+        StorageType.ORGANISATION_ID,
+        result.data.user.organisationId,
+      );
+      StorageService.set(
+        StorageType.ORGANISATION,
+        result.data.user.organisationName,
+      );
 
       if (result.data.sessionInactivityTimeout) {
         StorageService.set(
@@ -44,28 +50,48 @@ export class LoginService implements OnDestroy {
 
   generateOTP(forgotPasswordForm: UntypedFormGroup) {
     const { organisation, username, email } = forgotPasswordForm.value;
-    return lastValueFrom(this.http.apiPost(AUTH.GENERATE_OTP, {
-      organisation, username, email,
-    }));
+    return lastValueFrom(
+      this.http.apiPost(AUTH.GENERATE_OTP, {
+        organisation,
+        username,
+        email,
+      }),
+    );
   }
 
-  resetPassword(loginForm: UntypedFormGroup, id: string, orgId: string, otp?: string) {
+  resetPassword(
+    loginForm: UntypedFormGroup,
+    id: string,
+    orgId: string,
+    otp?: string,
+  ) {
     const { otp: formOtp, newPassword } = loginForm.value;
-    return lastValueFrom(this.http.apiPost(AUTH.RESET_PASSWORD, {
-      id, orgId, otp: otp || formOtp, password: newPassword,
-    }));
+    return lastValueFrom(
+      this.http.apiPost(AUTH.RESET_PASSWORD, {
+        id,
+        orgId,
+        otp: otp || formOtp,
+        password: newPassword,
+      }),
+    );
   }
 
   setPassword(password: string, id: string, orgId: string, token: string) {
-    return lastValueFrom(this.http.apiPost(AUTH.SET_PASSWORD, { id, orgId, token, password }));
+    return lastValueFrom(
+      this.http.apiPost(AUTH.SET_PASSWORD, { id, orgId, token, password }),
+    );
   }
 
   verifySetupToken(id: string, orgId: string, token: string) {
-    return lastValueFrom(this.http.apiPost(AUTH.VERIFY_SETUP_TOKEN, { id, orgId, token }));
+    return lastValueFrom(
+      this.http.apiPost(AUTH.VERIFY_SETUP_TOKEN, { id, orgId, token }),
+    );
   }
 
   resendSetupLink(id: string, orgId: string) {
-    return lastValueFrom(this.http.apiPost(AUTH.RESEND_SETUP_LINK, { id, orgId }));
+    return lastValueFrom(
+      this.http.apiPost(AUTH.RESEND_SETUP_LINK, { id, orgId }),
+    );
   }
 
   cliAuthorize(code: string, action: 'authorize' | 'deny'): Observable<any> {
@@ -79,7 +105,10 @@ export class LoginService implements OnDestroy {
   refreshAccessToken(): Observable<any> {
     const refreshToken = StorageService.get(StorageType.REFRESH_TOKEN);
     const organisation = StorageService.get(StorageType.ORGANISATION);
-    return this.http.apiPost(AUTH.REFRESH_TOKEN, { refreshToken, organisation });
+    return this.http.apiPost(AUTH.REFRESH_TOKEN, {
+      refreshToken,
+      organisation,
+    });
   }
 
   public setAccessToken(accessToken: string) {

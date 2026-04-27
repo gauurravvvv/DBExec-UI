@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -28,10 +36,10 @@ export class ListDashboardComponent implements OnInit {
   lastTableLazyLoadEvent: any;
 
   // Signal refs from service
-  dashboards   = this.dashboardService.dashboards;
+  dashboards = this.dashboardService.dashboards;
   totalRecords = this.dashboardService.total;
-  loading      = this.dashboardService.loading;
-  saving       = this.dashboardService.saving;
+  loading = this.dashboardService.loading;
+  saving = this.dashboardService.saving;
 
   selectedDashboards: any[] = [];
 
@@ -90,7 +98,6 @@ export class ListDashboardComponent implements OnInit {
     private route: ActivatedRoute,
   ) {}
 
-
   ngOnInit() {
     this.filter$
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
@@ -113,24 +120,27 @@ export class ListDashboardComponent implements OnInit {
         limit: MAX_LIMIT,
       };
 
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = response.data.orgs || [];
-          if (this.organisations.length > 0) {
-            this.selectedOrg = this.organisations[0].id;
-            this.loadDatasources();
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
+      this.organisationService
+        .listOrganisation(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.organisations = response.data.orgs || [];
+            if (this.organisations.length > 0) {
+              this.selectedOrg = this.organisations[0].id;
+              this.loadDatasources();
+            } else {
+              this.selectedOrg = null;
+              this.datasources = [];
+              this.selectedDatasource = null;
+            }
           }
-        }
-        this.cdr.markForCheck();
-        resolve();
-      }).catch(() => {
-        this.cdr.markForCheck();
-        resolve();
-      });
+          this.cdr.markForCheck();
+          resolve();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
+          resolve();
+        });
     });
   }
 
@@ -317,17 +327,16 @@ export class ListDashboardComponent implements OnInit {
           }
         })
         .catch(() => {})
-        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
+        .finally(() => {
+          this.closeDeletePopup();
+          this.cdr.markForCheck();
+        });
       return;
     }
 
     if (this.dashboardToDelete) {
       this.dashboardService
-        .delete(
-          this.selectedOrg,
-          this.dashboardToDelete,
-          reason,
-        )
+        .delete(this.selectedOrg, this.dashboardToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedDashboards = this.selectedDashboards.filter(
@@ -338,7 +347,10 @@ export class ListDashboardComponent implements OnInit {
           }
         })
         .catch(() => {})
-        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
+        .finally(() => {
+          this.closeDeletePopup();
+          this.cdr.markForCheck();
+        });
       return;
     }
     this.closeDeletePopup();

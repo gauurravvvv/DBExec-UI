@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  forwardRef,
+  Input,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -23,7 +28,17 @@ export class CustomMultiselectComponent implements ControlValueAccessor {
   @Input() required = false;
   @Input() filter = true;
   @Input() filterBy = '';
-  @Input() filterMatchMode: 'contains' | 'startsWith' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' = 'contains';
+  @Input() filterMatchMode:
+    | 'contains'
+    | 'startsWith'
+    | 'endsWith'
+    | 'equals'
+    | 'notEquals'
+    | 'in'
+    | 'lt'
+    | 'lte'
+    | 'gt'
+    | 'gte' = 'contains';
   @Input() resetFilterOnHide = false;
   @Input() display: 'chip' | 'comma' = 'chip';
   @Input() showToggleAll = true;

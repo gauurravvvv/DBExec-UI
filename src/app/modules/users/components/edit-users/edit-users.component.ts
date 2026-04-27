@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { USER } from 'src/app/constants/routes';
@@ -149,7 +154,10 @@ export class EditUsersComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave() {
     if (this.saveJustification.trim()) {
-      const response = await this.userService.update(this.userForm, this.saveJustification.trim());
+      const response = await this.userService.update(
+        this.userForm,
+        this.saveJustification.trim(),
+      );
       if (this.globalService.handleSuccessService(response)) {
         this.showSaveConfirm = false;
         this.saveJustification = '';

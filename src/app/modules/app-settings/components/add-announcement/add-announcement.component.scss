@@ -293,7 +293,9 @@
         &__fill {
           height: 100%;
           border-radius: 3px;
-          transition: width 0.4s ease, background 0.4s ease;
+          transition:
+            width 0.4s ease,
+            background 0.4s ease;
         }
 
         &__hint {
@@ -486,7 +488,12 @@
       left: -100%;
       width: 60%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08) 50%, transparent);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.08) 50%,
+        transparent
+      );
       animation: shimmerSweep 4s ease-in-out infinite;
       pointer-events: none;
     }
@@ -594,19 +601,35 @@
 }
 
 @keyframes previewFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes previewEnter {
-  from { opacity: 0; transform: translateY(12px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes shimmerSweep {
-  0% { left: -100%; }
-  50% { left: 150%; }
-  100% { left: 150%; }
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 150%;
+  }
+  100% {
+    left: 150%;
+  }
 }
 
 @media (max-width: 576px) {
@@ -681,7 +704,9 @@
       border: 2px solid var(--border-color) !important;
       cursor: pointer;
       display: inline-block !important;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
 
       &:hover {
         transform: scale(1.05);

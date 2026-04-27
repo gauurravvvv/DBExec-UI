@@ -81,7 +81,7 @@
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
           scrollHeight="calc(100vh - 440px)"
-          [tableStyle]="{'min-width': '56rem'}"
+          [tableStyle]="{ 'min-width': '56rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
@@ -193,9 +193,7 @@
                     class="icon-btn edit-btn"
                     (click)="onEdit(role.id)"
                     [pTooltip]="
-                      role.isDefault === 1
-                        ? 'Cannot edit default role'
-                        : 'Edit'
+                      role.isDefault === 1 ? 'Cannot edit default role' : 'Edit'
                     "
                     tooltipPosition="bottom"
                     [disabled]="role.isDefault === 1"
@@ -244,7 +242,9 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro" *ngIf="!bulkDelete">Are you sure you want to delete this role?</p>
+      <p class="delete-intro" *ngIf="!bulkDelete">
+        Are you sure you want to delete this role?
+      </p>
       <p class="delete-intro" *ngIf="bulkDelete">
         Are you sure you want to delete
         <strong>{{ selectedCount }}</strong> selected role(s)?

@@ -146,19 +146,21 @@ export class ListDatasetComponent implements OnInit {
         this.loadQueryBuilders();
       });
 
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      if (params['orgId'] || params['datasourceId'] || params['name']) {
-        this.handleDeepLinking(params);
-      } else {
-        if (this.showOrganisationDropdown) {
-          this.loadOrganisations();
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        if (params['orgId'] || params['datasourceId'] || params['name']) {
+          this.handleDeepLinking(params);
         } else {
-          this.selectedOrg =
-            this.globalService.getTokenDetails('organisationId');
-          this.loadDatasources();
+          if (this.showOrganisationDropdown) {
+            this.loadOrganisations();
+          } else {
+            this.selectedOrg =
+              this.globalService.getTokenDetails('organisationId');
+            this.loadDatasources();
+          }
         }
-      }
-    });
+      });
   }
 
   handleDeepLinking(params: any) {
@@ -202,34 +204,39 @@ export class ListDatasetComponent implements OnInit {
         limit: MAX_LIMIT,
       };
 
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = response.data.orgs || [];
-          if (this.organisations.length > 0) {
-            if (
-              preSelectedOrgId &&
-              this.organisations.find(o => o.id === preSelectedOrgId)
-            ) {
-              this.selectedOrg = preSelectedOrgId;
-            } else {
-              this.selectedOrg = this.organisations[0].id;
-            }
+      this.organisationService
+        .listOrganisation(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.organisations = response.data.orgs || [];
+            if (this.organisations.length > 0) {
+              if (
+                preSelectedOrgId &&
+                this.organisations.find(o => o.id === preSelectedOrgId)
+              ) {
+                this.selectedOrg = preSelectedOrgId;
+              } else {
+                this.selectedOrg = this.organisations[0].id;
+              }
 
-            if (!preSelectedOrgId) {
-              this.loadDatasources();
+              if (!preSelectedOrgId) {
+                this.loadDatasources();
+              }
+            } else {
+              this.selectedOrg = null;
+              this.datasources = [];
+              this.selectedDatasource = null;
+              this.datasets = [];
+              this.filteredDatasets = [];
+              this.totalRecords = 0;
             }
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
-            this.datasets = [];
-            this.filteredDatasets = [];
-            this.totalRecords = 0;
           }
-        }
-        this.cdr.markForCheck();
-        resolve();
-      }).catch(() => { resolve(); });
+          this.cdr.markForCheck();
+          resolve();
+        })
+        .catch(() => {
+          resolve();
+        });
     });
   }
 
@@ -528,7 +535,9 @@ export class ListDatasetComponent implements OnInit {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
     this.showCreateAnalysisDialog = false;
     this.analysisDatasetId = '';
@@ -554,7 +563,9 @@ export class ListDatasetComponent implements OnInit {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
     this.showDuplicateDialog = false;
     this.datasetToDuplicate = null;
@@ -599,18 +610,16 @@ export class ListDatasetComponent implements OnInit {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); })
+        .catch(() => {
+          this.cdr.markForCheck();
+        })
         .finally(() => this.closeDeletePopup());
       return;
     }
 
     if (this.datasetToDelete) {
       this.datasetService
-        .deleteDataset(
-          this.selectedOrg,
-          this.datasetToDelete,
-          reason,
-        )
+        .deleteDataset(this.selectedOrg, this.datasetToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.selectedDatasets = this.selectedDatasets.filter(
@@ -620,7 +629,9 @@ export class ListDatasetComponent implements OnInit {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); })
+        .catch(() => {
+          this.cdr.markForCheck();
+        })
         .finally(() => this.closeDeletePopup());
     }
   }

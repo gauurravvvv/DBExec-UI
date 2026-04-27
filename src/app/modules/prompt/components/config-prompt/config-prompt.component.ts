@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component,
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
   DestroyRef,
   ElementRef,
   inject,
   OnDestroy,
   OnInit,
-  ViewChild, } from '@angular/core';
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
@@ -265,18 +269,18 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     this.columnNameControl.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(columnName => {
-      if (columnName) {
-        const tableAlias = this.getSelectedTableAlias();
-        const value =
-          this.selectedPromptType === 'dropdown'
-            ? `${tableAlias}.${columnName} = '{value}'`
-            : `${tableAlias}.${columnName} in ('{value}')`;
-        this.promptForm.patchValue(
-          { promptWhere: value },
-          { emitEvent: false },
-        );
-      }
-    });
+        if (columnName) {
+          const tableAlias = this.getSelectedTableAlias();
+          const value =
+            this.selectedPromptType === 'dropdown'
+              ? `${tableAlias}.${columnName} = '{value}'`
+              : `${tableAlias}.${columnName} in ('{value}')`;
+          this.promptForm.patchValue(
+            { promptWhere: value },
+            { emitEvent: false },
+          );
+        }
+      });
   }
 
   getSelectedTableAlias(): string {
@@ -286,51 +290,57 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
   loadPromptData(): void {
     this.promptService.resetCurrent();
-    this.promptService.loadOne(this.orgId, this.promptId).then(() => {
-      const data = this.promptService.current();
-      if (data) {
-        this.sectionData = data;
+    this.promptService
+      .loadOne(this.orgId, this.promptId)
+      .then(() => {
+        const data = this.promptService.current();
+        if (data) {
+          this.sectionData = data;
 
-        // Set basic prompt data
-        this.promptForm.patchValue({
-          id: this.sectionData.id,
-          name: this.sectionData.name,
-          organisation: this.sectionData.organisationId,
-          datasource: this.sectionData.datasourceId,
-          tab: this.sectionData.section.tab.id,
-          section: this.sectionData.section.id,
-          type: PROMPT_TYPES.find(type => type.value === this.sectionData.type)
-            ?.label,
-        });
+          // Set basic prompt data
+          this.promptForm.patchValue({
+            id: this.sectionData.id,
+            name: this.sectionData.name,
+            organisation: this.sectionData.organisationId,
+            datasource: this.sectionData.datasourceId,
+            tab: this.sectionData.section.tab.id,
+            section: this.sectionData.section.id,
+            type: PROMPT_TYPES.find(
+              type => type.value === this.sectionData.type,
+            )?.label,
+          });
 
-        // Set display names
-        this.selectedOrgName = this.sectionData.organisationName || '';
-        this.selectedDatasourceName = this.sectionData.datasource?.name || '';
-        this.selectedTabName = this.sectionData.section.tab.name || '';
-        this.selectedSectionName = this.sectionData.section.name || '';
-        this.selectedPromptType = this.sectionData.type || '';
+          // Set display names
+          this.selectedOrgName = this.sectionData.organisationName || '';
+          this.selectedDatasourceName = this.sectionData.datasource?.name || '';
+          this.selectedTabName = this.sectionData.section.tab.name || '';
+          this.selectedSectionName = this.sectionData.section.name || '';
+          this.selectedPromptType = this.sectionData.type || '';
 
-        // Set prompt type validations
-        this.showAddPromptValues =
-          this.selectedPromptType === 'dropdown' ||
-          this.selectedPromptType === 'multiselect' ||
-          this.selectedPromptType === 'checkbox' ||
-          this.selectedPromptType === 'radio';
+          // Set prompt type validations
+          this.showAddPromptValues =
+            this.selectedPromptType === 'dropdown' ||
+            this.selectedPromptType === 'multiselect' ||
+            this.selectedPromptType === 'checkbox' ||
+            this.selectedPromptType === 'radio';
 
-        if (this.showAddPromptValues) {
-          this.promptForm
-            .get('promptValues')
-            ?.setValidators([Validators.required]);
-        } else {
-          this.promptForm.get('promptValues')?.clearValidators();
+          if (this.showAddPromptValues) {
+            this.promptForm
+              .get('promptValues')
+              ?.setValidators([Validators.required]);
+          } else {
+            this.promptForm.get('promptValues')?.clearValidators();
+          }
+          this.promptForm.get('promptValues')?.updateValueAndValidity();
+
+          // First load schema data
+          this.loadSchemaData();
         }
-        this.promptForm.get('promptValues')?.updateValueAndValidity();
-
-        // First load schema data
-        this.loadSchemaData();
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadSchemaData() {
@@ -582,14 +592,17 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         promptSql: this.generateSqlPreview(),
       };
 
-      this.promptService.configPrompt(submitData)
+      this.promptService
+        .configPrompt(submitData)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.router.navigate([PROMPT.LIST]);
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
   }
 
@@ -1568,7 +1581,9 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         this.globalService.handleSuccessService(response, true);
         this.cdr.markForCheck();
       })
-      .catch(() => { this.cdr.markForCheck(); });
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   /**
@@ -1589,43 +1604,48 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       query: query.trim(),
     };
 
-    this.promptService.getPromptValuesBySQL(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        const results = response.data.columnValues;
+    this.promptService
+      .getPromptValuesBySQL(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const results = response.data.columnValues;
 
-        // API returns array of strings directly
-        const newValues: string[] = [];
-        if (results && Array.isArray(results) && results.length > 0) {
-          results.forEach((value: any) => {
-            // Handle both string values and potential objects
-            if (typeof value === 'string' || typeof value === 'number') {
-              newValues.push(String(value));
-            } else if (typeof value === 'object' && value !== null) {
-              // Fallback: if it's an object, get first column value
-              const firstKey = Object.keys(value)[0];
-              if (firstKey && value[firstKey] != null) {
-                newValues.push(String(value[firstKey]));
+          // API returns array of strings directly
+          const newValues: string[] = [];
+          if (results && Array.isArray(results) && results.length > 0) {
+            results.forEach((value: any) => {
+              // Handle both string values and potential objects
+              if (typeof value === 'string' || typeof value === 'number') {
+                newValues.push(String(value));
+              } else if (typeof value === 'object' && value !== null) {
+                // Fallback: if it's an object, get first column value
+                const firstKey = Object.keys(value)[0];
+                if (firstKey && value[firstKey] != null) {
+                  newValues.push(String(value[firstKey]));
+                }
               }
+            });
+          }
+
+          if (newValues.length > 0) {
+            // Replace previous values with new values from query (as {id: null, value} objects)
+            this.promptForm.patchValue({
+              promptValues: newValues.map(v => ({ id: null, value: v })),
+              promptValueSQL: response.data.query,
+            });
+
+            this.closeSqlDialog();
+          } else {
+            if (this.sqlDialogComponent) {
+              this.sqlDialogComponent.setError('Query returned no results');
             }
-          });
-        }
-
-        if (newValues.length > 0) {
-          // Replace previous values with new values from query (as {id: null, value} objects)
-          this.promptForm.patchValue({
-            promptValues: newValues.map(v => ({ id: null, value: v })),
-            promptValueSQL: response.data.query,
-          });
-
-          this.closeSqlDialog();
-        } else {
-          if (this.sqlDialogComponent) {
-            this.sqlDialogComponent.setError('Query returned no results');
           }
         }
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   // ===== Live SQL Preview Methods =====
@@ -1757,7 +1777,9 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         }
         this.cdr.markForCheck();
       })
-      .catch(() => { this.cdr.markForCheck(); });
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy(): void {

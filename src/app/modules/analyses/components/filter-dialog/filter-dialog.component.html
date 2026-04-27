@@ -92,10 +92,7 @@
     </div>
 
     <!-- Default Value Section — Category -->
-    <div
-      class="filter-dialog-field"
-      *ngIf="filterDialogType === 'category'"
-    >
+    <div class="filter-dialog-field" *ngIf="filterDialogType === 'category'">
       <app-custom-multiselect
         [options]="filterDialogCategoryValues"
         [(ngModel)]="filterDialogDefaultValue"
@@ -133,10 +130,7 @@
     </div>
 
     <!-- Default Value Section — Numeric Range -->
-    <div
-      class="filter-dialog-row"
-      *ngIf="filterDialogType === 'numeric_range'"
-    >
+    <div class="filter-dialog-row" *ngIf="filterDialogType === 'numeric_range'">
       <div class="filter-dialog-field">
         <app-custom-number
           [(ngModel)]="filterDialogDefaultValue.min"
@@ -194,9 +188,7 @@
         [(ngModel)]="filterDialogDefaultValue"
         label="Default Date"
         [placeholder]="
-          filterDialogIncludeTime
-            ? 'Select date & time...'
-            : 'Select date...'
+          filterDialogIncludeTime ? 'Select date & time...' : 'Select date...'
         "
         [showTime]="filterDialogIncludeTime"
         [showIcon]="true"
@@ -206,10 +198,7 @@
     </div>
 
     <!-- Default Value Section — Time Range -->
-    <div
-      class="filter-dialog-field"
-      *ngIf="filterDialogType === 'time_range'"
-    >
+    <div class="filter-dialog-field" *ngIf="filterDialogType === 'time_range'">
       <app-custom-daterange
         [(ngModel)]="filterDialogDefaultValue"
         label="Date Range"
@@ -255,11 +244,7 @@
 
   <ng-template pTemplate="footer">
     <div class="dialog-footer">
-      <button
-        class="btn-cancel"
-        type="button"
-        (click)="cancel()"
-      >
+      <button class="btn-cancel" type="button" (click)="cancel()">
         <i class="pi pi-times"></i>
         Cancel
       </button>

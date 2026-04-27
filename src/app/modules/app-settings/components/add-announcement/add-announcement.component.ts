@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -74,11 +81,18 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       {
         name: [
           '',
-          [Validators.required, Validators.minLength(1), Validators.maxLength(255)],
+          [
+            Validators.required,
+            Validators.minLength(1),
+            Validators.maxLength(255),
+          ],
         ],
         description: [
           '',
-          [Validators.required, Validators.maxLength(this.maxDescriptionLength)],
+          [
+            Validators.required,
+            Validators.maxLength(this.maxDescriptionLength),
+          ],
         ],
         organisation: [
           this.showOrganisationDropdown
@@ -95,8 +109,9 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       { validators: this.dateRangeValidator },
     );
 
-    this.announcementForm.get('organisation')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.announcementForm
+      .get('organisation')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(value => {
         this.announcementForm.patchValue(
           { targetGroupId: null },
@@ -118,12 +133,17 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   loadOrganisations(): void {
     const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs || [];
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.organisationService
+      .listOrganisation(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = response.data.orgs || [];
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadGroups(): void {
@@ -136,13 +156,22 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
           this.groups = res.data.groups || [];
         }
         this.cdr.markForCheck();
-      }).catch(() => { this.cdr.markForCheck(); });
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   // sRGB relative luminance per WCAG
   private luminance(hex: string): number {
     const h = hex.replace('#', '');
-    const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+    const full =
+      h.length === 3
+        ? h
+            .split('')
+            .map(c => c + c)
+            .join('')
+        : h;
     const r = parseInt(full.substring(0, 2), 16) / 255;
     const g = parseInt(full.substring(2, 4), 16) / 255;
     const b = parseInt(full.substring(4, 6), 16) / 255;
@@ -260,8 +289,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
   getNameError(): string {
     const c = this.announcementForm.get('name');
     if (c?.errors?.['required']) return 'Title is required';
-    if (c?.errors?.['maxlength'])
-      return 'Title must not exceed 255 characters';
+    if (c?.errors?.['maxlength']) return 'Title must not exceed 255 characters';
     return '';
   }
 

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuditService } from '../../services/audit.service';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -84,11 +91,13 @@ export class ListAuditLogsComponent implements OnInit {
       this.loadOrganisations();
     }
 
-    this.searchSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.lastTableLazyLoadEvent) {
-        this.loadLogs(this.lastTableLazyLoadEvent);
-      }
-    });
+    this.searchSubject
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.lastTableLazyLoadEvent) {
+          this.loadLogs(this.lastTableLazyLoadEvent);
+        }
+      });
   }
 
   loadOrganisations() {
@@ -349,30 +358,33 @@ export class ListAuditLogsComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.auditService.exportAuditLogs(params).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (blob: Blob) => {
-        const orgLabel =
-          this.organisationOptions.find(
-            (o: any) => o.value === this.filterValues.organisationId,
-          )?.label || 'Organisation';
-        const dateStr = new Date().toISOString().slice(0, 10);
-        const fileName = `Audit_Logs_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.pdf`;
+    this.auditService
+      .exportAuditLogs(params)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (blob: Blob) => {
+          const orgLabel =
+            this.organisationOptions.find(
+              (o: any) => o.value === this.filterValues.organisationId,
+            )?.label || 'Organisation';
+          const dateStr = new Date().toISOString().slice(0, 10);
+          const fileName = `Audit_Logs_${orgLabel.replace(/\s+/g, '_')}_${dateStr}.pdf`;
 
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        link.click();
-        window.URL.revokeObjectURL(url);
-      },
-      error: () => {
-        this.globalService.handleSuccessService({
-          status: false,
-          code: 500,
-          message: 'Failed to export audit logs',
-        });
-      },
-    });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = fileName;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: () => {
+          this.globalService.handleSuccessService({
+            status: false,
+            code: 500,
+            message: 'Failed to export audit logs',
+          });
+        },
+      });
   }
 
   loadLogs(event: any) {

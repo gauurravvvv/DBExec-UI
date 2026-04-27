@@ -4,9 +4,7 @@
     <div class="page-header-section">
       <div class="header-content">
         <h2>Announcements</h2>
-        <p class="subtitle">
-          Create banners targeted to specific user groups
-        </p>
+        <p class="subtitle">Create banners targeted to specific user groups</p>
       </div>
     </div>
 
@@ -161,15 +159,17 @@
                 <span
                   class="color-swatch"
                   [style.background]="a.bgColor"
-                  [pTooltip]="
-                    'BG ' + a.bgColor + ' / Text ' + a.textColor
-                  "
+                  [pTooltip]="'BG ' + a.bgColor + ' / Text ' + a.textColor"
                 ></span>
               </td>
               <td pFrozenColumn>
                 <a
                   class="dataset-name-link"
-                  [routerLink]="['/app/app-settings/announcements/view', selectedOrg, a.id]"
+                  [routerLink]="[
+                    '/app/app-settings/announcements/view',
+                    selectedOrg,
+                    a.id,
+                  ]"
                 >
                   {{ a.name }}
                 </a>

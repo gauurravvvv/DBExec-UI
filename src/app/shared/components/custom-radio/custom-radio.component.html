@@ -15,7 +15,10 @@
       gap: gapValue,
     }"
   >
-    <div class="radio-option" *ngFor="let opt of options; trackBy: trackByIndex">
+    <div
+      class="radio-option"
+      *ngFor="let opt of options; trackBy: trackByIndex"
+    >
       <p-radioButton
         [name]="name"
         [value]="opt[optionValue]"

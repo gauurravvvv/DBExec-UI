@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component,
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
   DestroyRef,
   ElementRef,
   HostListener,
   OnInit,
   ViewChild,
-  inject, } from '@angular/core';
+  inject,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';

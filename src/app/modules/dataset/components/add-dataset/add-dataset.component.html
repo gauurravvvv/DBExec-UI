@@ -170,7 +170,8 @@
           >
             <div
               *ngFor="
-                let schema of (datasourceSchemas[selectedDatasourceObj.id]?.schemas || []) | filterSchemas: schemaSearchText;
+                let schema of datasourceSchemas[selectedDatasourceObj.id]
+                  ?.schemas || [] | filterSchemas: schemaSearchText;
                 trackBy: trackByName
               "
               class="schema-item"
@@ -205,7 +206,10 @@
                 "
               >
                 <div
-                  *ngFor="let table of schema.tables | filterTables: schemaSearchText; trackBy: trackByName"
+                  *ngFor="
+                    let table of schema.tables | filterTables: schemaSearchText;
+                    trackBy: trackByName
+                  "
                   class="table-item"
                   [class.expanded]="
                     isTableExpanded(
@@ -329,7 +333,11 @@
           class="editor-container"
           [hidden]="isLoadingEditor || monacoLoadFailed"
         >
-          <div #sqlEditorContainer id="sql-editor-container" class="single-editor-container"></div>
+          <div
+            #sqlEditorContainer
+            id="sql-editor-container"
+            class="single-editor-container"
+          ></div>
         </div>
 
         <!-- No Datasource Selected State -->
@@ -622,7 +630,9 @@
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 60px" pFrozenColumn>#</th>
-              <th *ngFor="let col of queryResult.columns; trackBy: trackByIndex">
+              <th
+                *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+              >
                 <div class="th-content">
                   {{ col }}
                   <span
@@ -637,7 +647,9 @@
             <!-- Filter Row -->
             <tr>
               <th pFrozenColumn></th>
-              <th *ngFor="let col of queryResult.columns; trackBy: trackByIndex">
+              <th
+                *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+              >
                 <input
                   pInputText
                   type="text"
@@ -653,7 +665,10 @@
           <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
             <tr>
               <td pFrozenColumn class="row-number-cell">{{ rowIndex + 1 }}</td>
-              <td *ngFor="let col of queryResult.columns; trackBy: trackByIndex" [title]="row[col]">
+              <td
+                *ngFor="let col of queryResult.columns; trackBy: trackByIndex"
+                [title]="row[col]"
+              >
                 <span
                   [ngClass]="{
                     'null-value': row[col] === null || row[col] === undefined,

@@ -131,7 +131,11 @@
           </div>
           <div
             class="condition-row"
-            *ngFor="let cond of conditions.controls; let i = index; trackBy: trackByIndex"
+            *ngFor="
+              let cond of conditions.controls;
+              let i = index;
+              trackBy: trackByIndex
+            "
             [formGroupName]="i"
           >
             <div class="condition-fields">
@@ -146,7 +150,12 @@
                   filterBy="columnToView"
                   [autoDisplayFirst]="false"
                   [required]="true"
-                  [showError]="!!(conditions.at(i).get('columnName')?.invalid && conditions.at(i).get('columnName')?.touched)"
+                  [showError]="
+                    !!(
+                      conditions.at(i).get('columnName')?.invalid &&
+                      conditions.at(i).get('columnName')?.touched
+                    )
+                  "
                   errorMessage="Column is required"
                   (onChangeEvent)="onColumnChange(i, $event)"
                 ></app-custom-dropdown>
@@ -183,7 +192,12 @@
                   [maxSelectedLabels]="5"
                   selectedItemsLabel="{0} values selected"
                   [required]="true"
-                  [showError]="!!(conditions.at(i).get('values')?.invalid && conditions.at(i).get('values')?.touched)"
+                  [showError]="
+                    !!(
+                      conditions.at(i).get('values')?.invalid &&
+                      conditions.at(i).get('values')?.touched
+                    )
+                  "
                   errorMessage="At least one value is required"
                 ></app-custom-multiselect>
               </div>

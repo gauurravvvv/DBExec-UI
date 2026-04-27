@@ -1,4 +1,10 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -130,54 +136,62 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Update email field validators when provider changes
-    this.orgForm.get('emailProvider')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(provider => {
-      this.updateEmailValidators(provider);
-    });
+    this.orgForm
+      .get('emailProvider')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(provider => {
+        this.updateEmailValidators(provider);
+      });
 
-    this.orgForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.isCancelClicked) {
-        this.isCancelClicked = false;
-      }
-      const currentValue = this.orgForm.getRawValue();
-      const config = this.orgData?.orgConfig;
-      const originalValue: any = {
-        id: this.orgData?.id,
-        name: this.orgData?.name,
-        description: this.orgData?.description,
-        status: this.orgData?.status,
-        dbHost: this.orgData?.masterDbConfig?.hostname || '',
-        dbPort: this.orgData?.masterDbConfig?.port || '',
-        dbName: this.orgData?.masterDbConfig?.dbName || '',
-        dbUsername: this.orgData?.masterDbConfig?.username || '',
-        dbPassword: '',
-        maxLoginAttempts: config?.maxLoginAttempts ?? 5,
-        accountLockDurationHours: config?.accountLockDurationHours ?? 1,
-        passwordHistoryLimit: config?.passwordHistoryLimit ?? 5,
-        sessionInactivityTimeout: config?.sessionInactivityTimeout ?? 30,
-        emailProvider: config?.emailProvider || null,
-        smtpHost: config?.smtpHost || '',
-        smtpPort: config?.smtpPort || 587,
-        smtpUser: config?.smtpUser || '',
-        smtpPassword: '',
-        smtpFrom: config?.smtpFrom || '',
-        sesRegion: config?.sesRegion || '',
-        sesAccessKeyId: config?.sesAccessKeyId || '',
-        sesSecretAccessKey: '',
-        sesFrom: config?.sesFrom || '',
-      };
+    this.orgForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+        const currentValue = this.orgForm.getRawValue();
+        const config = this.orgData?.orgConfig;
+        const originalValue: any = {
+          id: this.orgData?.id,
+          name: this.orgData?.name,
+          description: this.orgData?.description,
+          status: this.orgData?.status,
+          dbHost: this.orgData?.masterDbConfig?.hostname || '',
+          dbPort: this.orgData?.masterDbConfig?.port || '',
+          dbName: this.orgData?.masterDbConfig?.dbName || '',
+          dbUsername: this.orgData?.masterDbConfig?.username || '',
+          dbPassword: '',
+          maxLoginAttempts: config?.maxLoginAttempts ?? 5,
+          accountLockDurationHours: config?.accountLockDurationHours ?? 1,
+          passwordHistoryLimit: config?.passwordHistoryLimit ?? 5,
+          sessionInactivityTimeout: config?.sessionInactivityTimeout ?? 30,
+          emailProvider: config?.emailProvider || null,
+          smtpHost: config?.smtpHost || '',
+          smtpPort: config?.smtpPort || 587,
+          smtpUser: config?.smtpUser || '',
+          smtpPassword: '',
+          smtpFrom: config?.smtpFrom || '',
+          sesRegion: config?.sesRegion || '',
+          sesAccessKeyId: config?.sesAccessKeyId || '',
+          sesSecretAccessKey: '',
+          sesFrom: config?.sesFrom || '',
+        };
 
-      this.isFormDirty = Object.keys(currentValue).some(
-        key => currentValue[key] !== originalValue[key],
-      );
-    });
+        this.isFormDirty = Object.keys(currentValue).some(
+          key => currentValue[key] !== originalValue[key],
+        );
+      });
 
     // Reset connection test when DB fields change
     ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
       field => {
-        this.orgForm.get(field)?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-          this.connectionTested = false;
-          this.connectionTestResult = null;
-        });
+        this.orgForm
+          .get(field)
+          ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            this.connectionTested = false;
+            this.connectionTestResult = null;
+          });
       },
     );
   }

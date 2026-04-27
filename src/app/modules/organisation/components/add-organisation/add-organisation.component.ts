@@ -1,4 +1,10 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -42,9 +48,11 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.orgForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.isFormDirty = true;
-    });
+    this.orgForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.isFormDirty = true;
+      });
   }
 
   private initForm() {
@@ -131,17 +139,23 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     });
 
     // Update email field validators when provider changes
-    this.orgForm.get('emailProvider')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(provider => {
-      this.updateEmailValidators(provider);
-    });
+    this.orgForm
+      .get('emailProvider')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(provider => {
+        this.updateEmailValidators(provider);
+      });
 
     // Reset connection test when DB fields change
     ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
       field => {
-        this.orgForm.get(field)?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-          this.connectionTested = false;
-          this.connectionTestResult = null;
-        });
+        this.orgForm
+          .get(field)
+          ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            this.connectionTested = false;
+            this.connectionTestResult = null;
+          });
       },
     );
   }

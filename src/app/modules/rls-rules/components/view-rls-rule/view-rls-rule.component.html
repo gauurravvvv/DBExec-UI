@@ -34,7 +34,8 @@
             <div class="info-item">
               <label>Dataset</label>
               <p class="with-icon">
-                <i class="pi pi-table mr-2"></i>{{ current()!.datasetName || 'N/A' }}
+                <i class="pi pi-table mr-2"></i
+                >{{ current()!.datasetName || 'N/A' }}
               </p>
             </div>
             <div class="info-item">
@@ -42,7 +43,9 @@
               <span class="status-badge" [class.active]="current()!.isEnabled">
                 <i
                   class="pi"
-                  [ngClass]="current()!.isEnabled ? 'pi-check-circle' : 'pi-times-circle'"
+                  [ngClass]="
+                    current()!.isEnabled ? 'pi-check-circle' : 'pi-times-circle'
+                  "
                 ></i>
                 {{ current()!.isEnabled ? 'Enabled' : 'Disabled' }}
               </span>
@@ -50,7 +53,8 @@
             <div class="info-item">
               <label>Created On</label>
               <p class="with-icon">
-                <i class="pi pi-calendar mr-2"></i>{{ current()!.createdOn | date: 'medium' }}
+                <i class="pi pi-calendar mr-2"></i
+                >{{ current()!.createdOn | date: 'medium' }}
               </p>
             </div>
           </div>
@@ -60,12 +64,25 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-users mr-2"></i> Assignments
-            <span class="count-badge">{{ current()!.assignments?.length || 0 }}</span>
+            <span class="count-badge">{{
+              current()!.assignments?.length || 0
+            }}</span>
           </h3>
-          <div class="assignments-list" *ngIf="current()!.assignments?.length; else noAssignments">
-            <div class="assignment-item" *ngFor="let a of current()!.assignments; trackBy: trackById">
-              <i class="pi" [ngClass]="a.scope === 'user' ? 'pi-user' : 'pi-users'"></i>
-              <span class="assignment-name">{{ a.scopeName || a.scopeId }}</span>
+          <div
+            class="assignments-list"
+            *ngIf="current()!.assignments?.length; else noAssignments"
+          >
+            <div
+              class="assignment-item"
+              *ngFor="let a of current()!.assignments; trackBy: trackById"
+            >
+              <i
+                class="pi"
+                [ngClass]="a.scope === 'user' ? 'pi-user' : 'pi-users'"
+              ></i>
+              <span class="assignment-name">{{
+                a.scopeName || a.scopeId
+              }}</span>
               <span class="assignment-type-badge">{{ a.scope }}</span>
             </div>
           </div>
@@ -78,22 +95,38 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-filter mr-2"></i> Filter Conditions
-            <span class="count-badge">{{ current()!.conditions?.length || 0 }}</span>
+            <span class="count-badge">{{
+              current()!.conditions?.length || 0
+            }}</span>
           </h3>
-          <div class="conditions-table" *ngIf="current()!.conditions?.length; else noConditions">
+          <div
+            class="conditions-table"
+            *ngIf="current()!.conditions?.length; else noConditions"
+          >
             <div class="conditions-table-header">
               <span>Column</span>
               <span>Operator</span>
               <span>Values</span>
             </div>
-            <div class="condition-table-row" *ngFor="let cond of current()!.conditions; let i = index; trackBy: trackByIndex">
+            <div
+              class="condition-table-row"
+              *ngFor="
+                let cond of current()!.conditions;
+                let i = index;
+                trackBy: trackByIndex
+              "
+            >
               <span class="cond-index">{{ i + 1 }}</span>
               <span class="cond-column">
                 <i class="pi pi-filter-fill"></i> {{ cond.columnName }}
               </span>
               <span class="operator-badge">{{ cond.operator }}</span>
               <div class="cond-values">
-                <span class="value-chip" *ngFor="let v of cond.values; trackBy: trackByIndex">{{ v }}</span>
+                <span
+                  class="value-chip"
+                  *ngFor="let v of cond.values; trackBy: trackByIndex"
+                  >{{ v }}</span
+                >
               </div>
             </div>
           </div>
@@ -120,13 +153,16 @@
       <p class="delete-intro">Are you sure you want to delete this RLS rule?</p>
       <ul class="delete-info-list">
         <li>
-          <i class="pi pi-info-circle"></i><span>This will permanently remove the rule</span>
+          <i class="pi pi-info-circle"></i
+          ><span>This will permanently remove the rule</span>
         </li>
         <li>
-          <i class="pi pi-info-circle"></i><span>Users/groups will no longer be restricted by this rule</span>
+          <i class="pi pi-info-circle"></i
+          ><span>Users/groups will no longer be restricted by this rule</span>
         </li>
         <li>
-          <i class="pi pi-info-circle"></i><span>This action cannot be undone</span>
+          <i class="pi pi-info-circle"></i
+          ><span>This action cannot be undone</span>
         </li>
       </ul>
       <div class="justification-section">

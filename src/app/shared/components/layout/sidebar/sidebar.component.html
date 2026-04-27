@@ -34,7 +34,10 @@
   <div class="sidebar-content">
     <nav class="sidebar-nav">
       <ul class="nav-list">
-        <li *ngFor="let item of menuItems; trackBy: trackByIndex" class="nav-item">
+        <li
+          *ngFor="let item of menuItems; trackBy: trackByIndex"
+          class="nav-item"
+        >
           <!-- Menu item with subPermissions -->
           <div
             *ngIf="item.subPermissions?.length"

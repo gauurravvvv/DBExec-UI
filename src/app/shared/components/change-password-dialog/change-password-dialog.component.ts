@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component,
+import {
+  ChangeDetectionStrategy,
+  Component,
   OnInit,
   Output,
   EventEmitter,
   Input,
-  HostListener, } from '@angular/core';
+  HostListener,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({

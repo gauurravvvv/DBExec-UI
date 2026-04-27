@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DATASET } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -168,12 +173,17 @@ export class ViewDatasetComponent implements OnInit {
     const orgId = this.route.snapshot.params['orgId'];
     const datasetId = this.route.snapshot.params['id'];
 
-    this.datasetService.viewDataset(orgId, datasetId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasetData = response.data;
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.datasetService
+      .viewDataset(orgId, datasetId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasetData = response.data;
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   goBack() {
@@ -231,7 +241,9 @@ export class ViewDatasetComponent implements OnInit {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
   }
 

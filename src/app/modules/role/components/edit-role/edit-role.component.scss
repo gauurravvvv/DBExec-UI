@@ -227,8 +227,12 @@
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .popup-content {
@@ -244,8 +248,14 @@
     animation: slideUp 0.25s ease-out;
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .popup-header {
@@ -358,13 +368,17 @@
         transition: all 0.2s ease;
         font-size: 0.9rem;
 
-        i { font-size: 0.85rem; }
+        i {
+          font-size: 0.85rem;
+        }
 
         &.btn-cancel {
           background: var(--hover-background);
           color: var(--text-color);
           border: 1px solid var(--border-color);
-          &:hover { background: var(--border-color); }
+          &:hover {
+            background: var(--border-color);
+          }
         }
 
         &.btn-confirm {
@@ -375,7 +389,9 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(33, 150, 243, 0.45);
           }
-          &:active { transform: translateY(0); }
+          &:active {
+            transform: translateY(0);
+          }
           &:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -425,7 +441,6 @@
       }
     }
   }
-
 }
 
 @media screen and (max-width: 1400px) {

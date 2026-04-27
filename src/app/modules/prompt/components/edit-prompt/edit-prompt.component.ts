@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -57,11 +64,13 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       this.loadPromptData();
     }
 
-    this.promptForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.isCancelClicked) {
-        this.isCancelClicked = false;
-      }
-    });
+    this.promptForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
   }
 
   get isFormDirty(): boolean {
@@ -95,31 +104,36 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
   loadPromptData(): void {
     this.promptService.resetCurrent();
-    this.promptService.loadOne(this.orgId, this.promptId).then(() => {
-      const data = this.promptService.current();
-      if (data) {
-        this.sectionData = data;
+    this.promptService
+      .loadOne(this.orgId, this.promptId)
+      .then(() => {
+        const data = this.promptService.current();
+        if (data) {
+          this.sectionData = data;
 
-        this.promptForm.patchValue({
-          id: this.sectionData.id,
-          name: this.sectionData.name,
-          description: this.sectionData.description,
-          organisation: this.sectionData.organisationId,
-          datasource: this.sectionData.datasourceId,
-          tab: this.sectionData.section.tab.id,
-          section: this.sectionData.section.id,
-          status: this.sectionData.status,
-        });
+          this.promptForm.patchValue({
+            id: this.sectionData.id,
+            name: this.sectionData.name,
+            description: this.sectionData.description,
+            organisation: this.sectionData.organisationId,
+            datasource: this.sectionData.datasourceId,
+            tab: this.sectionData.section.tab.id,
+            section: this.sectionData.section.id,
+            status: this.sectionData.status,
+          });
 
-        this.selectedOrgName = this.sectionData.organisationName || '';
-        this.selectedDatasourceName = this.sectionData.datasource?.name || '';
-        this.selectedTabName = this.sectionData.section.tab.name || '';
-        this.loadSectionData();
+          this.selectedOrgName = this.sectionData.organisationName || '';
+          this.selectedDatasourceName = this.sectionData.datasource?.name || '';
+          this.selectedTabName = this.sectionData.section.tab.name || '';
+          this.loadSectionData();
 
-        this.promptForm.markAsPristine();
-      }
-      this.cdr.markForCheck();
-    }).catch(() => { this.cdr.markForCheck(); });
+          this.promptForm.markAsPristine();
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadSectionData() {
@@ -129,11 +143,16 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
-    this.sectionService.listSection(param).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.sections = response.data.sections ?? response.data ?? [];
-      }
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.sectionService
+      .listSection(param)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.sections = response.data.sections ?? response.data ?? [];
+        }
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   getNameError(): string {
@@ -172,7 +191,11 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.showSaveConfirm = false; this.saveJustification = ''; this.cdr.markForCheck(); });
+        .catch(() => {
+          this.showSaveConfirm = false;
+          this.saveJustification = '';
+          this.cdr.markForCheck();
+        });
     }
   }
 
@@ -195,5 +218,4 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       this.promptForm.markAsPristine();
     }
   }
-
 }

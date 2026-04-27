@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -45,7 +52,9 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   orgId!: string;
   originalFormValue: any;
   datasetColumns: any[] = [];
-  columnValuesCache: { [columnName: string]: { label: string; value: string }[] } = {};
+  columnValuesCache: {
+    [columnName: string]: { label: string; value: string }[];
+  } = {};
   isLoadingColumnValues: { [columnName: string]: boolean } = {};
 
   operatorOptions = [
@@ -113,7 +122,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
       columnName: [c?.columnName || '', Validators.required],
       operator: [c?.operator || 'IN', Validators.required],
       values: [
-        Array.isArray(c?.values) ? c.values : (c?.values ? [c.values] : []),
+        Array.isArray(c?.values) ? c.values : c?.values ? [c.values] : [],
         nonEmptyArray,
       ],
     });
@@ -130,42 +139,53 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadRuleData(): void {
-    this.rlsRulesService.loadOne(this.orgId, this.ruleId).then(() => {
-      const rule = this.rlsRulesService.current();
-      if (!rule) return;
+    this.rlsRulesService
+      .loadOne(this.orgId, this.ruleId)
+      .then(() => {
+        const rule = this.rlsRulesService.current();
+        if (!rule) return;
 
-      this.loadDatasetColumns(rule.organisationId, rule.datasetId, () => {
-        this.conditions.clear();
-        const savedConditions = rule.conditions?.length
-          ? rule.conditions
-          : [{ columnName: '', operator: 'IN', values: [] }];
-        savedConditions.forEach((c: any) => {
-          this.conditions.push(this.createCondition(c));
-          if (c.columnName) {
-            this.loadDistinctValuesForColumn(c.columnName, rule.organisationId, rule.datasetId);
-          }
+        this.loadDatasetColumns(rule.organisationId, rule.datasetId, () => {
+          this.conditions.clear();
+          const savedConditions = rule.conditions?.length
+            ? rule.conditions
+            : [{ columnName: '', operator: 'IN', values: [] }];
+          savedConditions.forEach((c: any) => {
+            this.conditions.push(this.createCondition(c));
+            if (c.columnName) {
+              this.loadDistinctValuesForColumn(
+                c.columnName,
+                rule.organisationId,
+                rule.datasetId,
+              );
+            }
+          });
+
+          this.rlsForm.patchValue({
+            id: rule.id,
+            name: rule.name,
+            description: rule.description || '',
+            organisation: rule.organisationId,
+            datasetId: rule.datasetId,
+            isEnabled: rule.isEnabled,
+          });
+
+          this.originalFormValue = this.rlsForm.value;
+          this.isFormDirty = false;
+          this.rlsForm.markAsPristine();
+          this.cdr.markForCheck();
         });
-
-        this.rlsForm.patchValue({
-          id: rule.id,
-          name: rule.name,
-          description: rule.description || '',
-          organisation: rule.organisationId,
-          datasetId: rule.datasetId,
-          isEnabled: rule.isEnabled,
-        });
-
-        this.originalFormValue = this.rlsForm.value;
-        this.isFormDirty = false;
-        this.rlsForm.markAsPristine();
+      })
+      .catch(() => {
         this.cdr.markForCheck();
       });
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
   }
 
-  loadDatasetColumns(orgId?: string, datasetId?: string, callback?: () => void): void {
+  loadDatasetColumns(
+    orgId?: string,
+    datasetId?: string,
+    callback?: () => void,
+  ): void {
     const org = orgId || this.orgId;
     const dataset = datasetId || this.rlsForm.get('datasetId')?.value;
     if (!org || !dataset) {
@@ -175,22 +195,31 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
     this.columnValuesCache = {};
     this.isLoadingColumnValues = {};
-    this.datasetService.getDataset(org, dataset).then((response: any) => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasetColumns = (response.data.datasetFields || []).map((f: any) => ({
-          ...f,
-          columnToView: f.columnToView || f.columnToUse,
-        }));
-      }
-      this.cdr.markForCheck();
-      if (callback) callback();
-    }).catch(() => {
-      this.cdr.markForCheck();
-      if (callback) callback();
-    });
+    this.datasetService
+      .getDataset(org, dataset)
+      .then((response: any) => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasetColumns = (response.data.datasetFields || []).map(
+            (f: any) => ({
+              ...f,
+              columnToView: f.columnToView || f.columnToUse,
+            }),
+          );
+        }
+        this.cdr.markForCheck();
+        if (callback) callback();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+        if (callback) callback();
+      });
   }
 
-  async loadDistinctValuesForColumn(columnName: string, orgId?: string, datasetId?: string): Promise<void> {
+  async loadDistinctValuesForColumn(
+    columnName: string,
+    orgId?: string,
+    datasetId?: string,
+  ): Promise<void> {
     if (!columnName || this.columnValuesCache[columnName]) return;
 
     const org = orgId || this.orgId;
@@ -199,7 +228,11 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
     this.isLoadingColumnValues[columnName] = true;
     try {
-      const res: any = await this.datasetService.getDistinctColumnValues(org, dataset, columnName);
+      const res: any = await this.datasetService.getDistinctColumnValues(
+        org,
+        dataset,
+        columnName,
+      );
       if (res?.status && res.data) {
         this.columnValuesCache[columnName] = (res.data || []).map((v: any) => ({
           label: String(v),
@@ -207,7 +240,11 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
         }));
       }
     } catch (err) {
-      console.error('Failed to load distinct values for column', columnName, err);
+      console.error(
+        'Failed to load distinct values for column',
+        columnName,
+        err,
+      );
     } finally {
       this.isLoadingColumnValues[columnName] = false;
       this.cdr.markForCheck();
@@ -258,7 +295,8 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
         justification: this.saveJustification.trim(),
       };
 
-      this.rlsRulesService.update(payload)
+      this.rlsRulesService
+        .update(payload)
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             this.showSaveConfirm = false;

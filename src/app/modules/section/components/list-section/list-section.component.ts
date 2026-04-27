@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -38,8 +46,8 @@ export class ListSectionComponent implements OnInit {
   organisations: any[] = [];
   datasources: any[] = [];
   sections = this.sectionService.sections;
-  total    = this.sectionService.total;
-  loading  = this.sectionService.loading;
+  total = this.sectionService.total;
+  loading = this.sectionService.loading;
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
@@ -155,31 +163,36 @@ export class ListSectionComponent implements OnInit {
         page: DEFAULT_PAGE,
         limit: MAX_LIMIT,
       };
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = [...response.data.orgs];
-          if (this.organisations.length > 0) {
-            if (
-              preSelectedOrgId &&
-              this.organisations.find(o => o.id === preSelectedOrgId)
-            ) {
-              this.selectedOrg = preSelectedOrgId;
-            } else {
-              this.selectedOrg = this.organisations[0].id;
-            }
+      this.organisationService
+        .listOrganisation(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.organisations = [...response.data.orgs];
+            if (this.organisations.length > 0) {
+              if (
+                preSelectedOrgId &&
+                this.organisations.find(o => o.id === preSelectedOrgId)
+              ) {
+                this.selectedOrg = preSelectedOrgId;
+              } else {
+                this.selectedOrg = this.organisations[0].id;
+              }
 
-            if (!preSelectedOrgId) {
-              this.loadDatasources();
+              if (!preSelectedOrgId) {
+                this.loadDatasources();
+              }
+            } else {
+              this.selectedOrg = null;
+              this.datasources = [];
+              this.selectedDatasource = null;
             }
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
           }
-        }
-        this.cdr.markForCheck();
-        resolve();
-      }).catch(() => { this.cdr.markForCheck(); });
+          this.cdr.markForCheck();
+          resolve();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     });
   }
 
@@ -375,7 +388,9 @@ export class ListSectionComponent implements OnInit {
             this.refreshList();
           }
         })
-        .catch(() => { this.cdr.markForCheck(); })
+        .catch(() => {
+          this.cdr.markForCheck();
+        })
         .finally(() => this.closeDeletePopup());
       return;
     }
@@ -391,7 +406,9 @@ export class ListSectionComponent implements OnInit {
             this.refreshList();
           }
         })
-        .catch(() => { this.cdr.markForCheck(); })
+        .catch(() => {
+          this.cdr.markForCheck();
+        })
         .finally(() => this.closeDeletePopup());
     }
   }

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ANALYSES } from 'src/app/constants/routes';
@@ -43,16 +50,20 @@ export class ViewAnalysesComponent implements OnInit {
     private dashboardService: DashboardService,
   ) {}
 
-  get saving() { return this.analysesService.saving; }
+  get saving() {
+    return this.analysesService.saving;
+  }
 
   ngOnInit(): void {
-    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      this.orgId = params['orgId'];
-      this.analysisId = params['id'];
-      if (this.analysisId) {
-        this.loadAnalysis();
-      }
-    });
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.orgId = params['orgId'];
+        this.analysisId = params['id'];
+        if (this.analysisId) {
+          this.loadAnalysis();
+        }
+      });
   }
 
   loadAnalysis(): void {
@@ -75,14 +86,17 @@ export class ViewAnalysesComponent implements OnInit {
   }
 
   loadDatasetInfo(datasetId: string): void {
-    this.datasetService.getDataset(this.orgId, datasetId).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasetDetails = response.data;
-      }
-      this.cdr.markForCheck();
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
+    this.datasetService
+      .getDataset(this.orgId, datasetId)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasetDetails = response.data;
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadAnalysisFields(): void {
@@ -222,16 +236,19 @@ export class ViewAnalysesComponent implements OnInit {
       datasourceName: this.analysisDetails.datasource?.name || '',
     };
 
-    this.dashboardService.addDashboard(payload).then(response => {
-      if (this.globalService.handleSuccessService(response)) {
-        this.showPublishDialog = false;
-        this.publishForm = { name: '', description: '' };
-        this.router.navigate([DB_ROUTES.VIEW, this.orgId, response.data.id]);
-      }
-      this.cdr.markForCheck();
-    }).catch(() => {
-      this.cdr.markForCheck();
-    });
+    this.dashboardService
+      .addDashboard(payload)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response)) {
+          this.showPublishDialog = false;
+          this.publishForm = { name: '', description: '' };
+          this.router.navigate([DB_ROUTES.VIEW, this.orgId, response.data.id]);
+        }
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   openAddCustomFieldDialog(): void {

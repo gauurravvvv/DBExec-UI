@@ -2853,7 +2853,11 @@ export function buildPolygons3DChartOption(data: any[], config: any): any {
 
 type NodeLinkBuilder = (nodes: any[], links: any[], config: any) => any;
 type DataConfigBuilder = (data: any[], config: any) => any;
-type DataConfigTypeBuilder = (data: any[], config: any, chartType: string) => any;
+type DataConfigTypeBuilder = (
+  data: any[],
+  config: any,
+  chartType: string,
+) => any;
 
 const NODE_LINK_BUILDERS: Record<string, NodeLinkBuilder> = {
   sankey: buildSankeyChartOption,

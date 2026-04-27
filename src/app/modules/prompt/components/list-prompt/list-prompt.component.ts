@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -25,10 +33,10 @@ export class ListPromptComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   // Signal refs from service
-  prompts   = this.promptService.prompts;
-  total     = this.promptService.total;
-  loading   = this.promptService.loading;
-  saving    = this.promptService.saving;
+  prompts = this.promptService.prompts;
+  total = this.promptService.total;
+  loading = this.promptService.loading;
+  saving = this.promptService.saving;
 
   // Pagination limit for prompts
   limit = 10;
@@ -108,18 +116,18 @@ export class ListPromptComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-      if (params['orgId'] || params['datasourceId'] || params['name']) {
-        this.handleDeepLinking(params);
-      } else {
-        if (this.showOrganisationDropdown) {
-          this.loadOrganisations();
+        if (params['orgId'] || params['datasourceId'] || params['name']) {
+          this.handleDeepLinking(params);
         } else {
-          this.selectedOrg =
-            this.globalService.getTokenDetails('organisationId');
-          this.loadDatasources();
+          if (this.showOrganisationDropdown) {
+            this.loadOrganisations();
+          } else {
+            this.selectedOrg =
+              this.globalService.getTokenDetails('organisationId');
+            this.loadDatasources();
+          }
         }
-      }
-    });
+      });
   }
 
   handleDeepLinking(params: any) {
@@ -162,30 +170,36 @@ export class ListPromptComponent implements OnInit {
         page: DEFAULT_PAGE,
         limit: MAX_LIMIT,
       };
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = response.data.orgs;
-          if (this.organisations.length > 0) {
-            if (
-              preSelectedOrgId &&
-              this.organisations.find(o => o.id === preSelectedOrgId)
-            ) {
-              this.selectedOrg = preSelectedOrgId;
-            } else {
-              this.selectedOrg = this.organisations[0].id;
-            }
+      this.organisationService
+        .listOrganisation(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.organisations = response.data.orgs;
+            if (this.organisations.length > 0) {
+              if (
+                preSelectedOrgId &&
+                this.organisations.find(o => o.id === preSelectedOrgId)
+              ) {
+                this.selectedOrg = preSelectedOrgId;
+              } else {
+                this.selectedOrg = this.organisations[0].id;
+              }
 
-            if (!preSelectedOrgId) {
-              this.loadDatasources();
+              if (!preSelectedOrgId) {
+                this.loadDatasources();
+              }
+            } else {
+              this.selectedOrg = null;
+              this.datasources = [];
+              this.selectedDatasource = null;
             }
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
           }
-        }
-        resolve();
-      }).catch(() => { resolve(); this.cdr.markForCheck(); });
+          resolve();
+        })
+        .catch(() => {
+          resolve();
+          this.cdr.markForCheck();
+        });
     });
   }
 
@@ -339,9 +353,14 @@ export class ListPromptComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.promptService.load(params)
-      .then(() => { this.cdr.markForCheck(); })
-      .catch(() => { this.cdr.markForCheck(); });
+    this.promptService
+      .load(params)
+      .then(() => {
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onAddNewPrompt() {
@@ -395,7 +414,10 @@ export class ListPromptComponent implements OnInit {
           }
         })
         .catch(() => {})
-        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
+        .finally(() => {
+          this.closeDeletePopup();
+          this.cdr.markForCheck();
+        });
       return;
     }
 
@@ -411,7 +433,10 @@ export class ListPromptComponent implements OnInit {
           }
         })
         .catch(() => {})
-        .finally(() => { this.closeDeletePopup(); this.cdr.markForCheck(); });
+        .finally(() => {
+          this.closeDeletePopup();
+          this.cdr.markForCheck();
+        });
     }
   }
 

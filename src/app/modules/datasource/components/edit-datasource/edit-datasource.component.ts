@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -110,21 +117,26 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     this.loadDatasourceData();
 
     // Monitor form changes
-    this.datasourceForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.initialFormValues) {
-        this.isFormDirty = !this.isEqual(
-          this.datasourceForm.getRawValue(),
-          this.initialFormValues,
-        );
-      }
-    });
+    this.datasourceForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.initialFormValues) {
+          this.isFormDirty = !this.isEqual(
+            this.datasourceForm.getRawValue(),
+            this.initialFormValues,
+          );
+        }
+      });
 
     // Reset connection test when connection fields change
     ['host', 'port', 'database', 'username', 'password'].forEach(field => {
-      this.datasourceForm.get(field)?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-        this.connectionTested = false;
-        this.connectionTestResult = null;
-      });
+      this.datasourceForm
+        .get(field)
+        ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.connectionTested = false;
+          this.connectionTestResult = null;
+        });
     });
   }
 
@@ -272,7 +284,10 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         status: formValue.status ? 1 : 0,
       };
 
-      const response = await this.datasourceService.update(payload, this.saveJustification.trim());
+      const response = await this.datasourceService.update(
+        payload,
+        this.saveJustification.trim(),
+      );
       if (this.globalService.handleSuccessService(response)) {
         this.showSaveConfirm = false;
         this.saveJustification = '';

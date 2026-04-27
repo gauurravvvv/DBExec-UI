@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, AfterViewInit,
+import {
+  ChangeDetectionStrategy,
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
@@ -7,7 +9,8 @@ import { ChangeDetectionStrategy, AfterViewInit,
   inject,
   OnDestroy,
   OnInit,
-  ViewChild, } from '@angular/core';
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -101,7 +104,6 @@ export class EditAnalysesComponent
   configuredFilters: ConfiguredFilter[] = [];
   showFilterDialog: boolean = false;
   editingFilter: ConfiguredFilter | null = null;
-
 
   // Filter dropdown options (used by getFilterTypeLabel in template)
   filterTypeOptions = [
@@ -280,8 +282,12 @@ export class EditAnalysesComponent
     private chartDataTransformer: ChartDataTransformerService,
   ) {}
 
-  get saving() { return this.analysesService.saving; }
-  get running() { return this.analysesService.running; }
+  get saving() {
+    return this.analysesService.saving;
+  }
+  get running() {
+    return this.analysesService.running;
+  }
 
   ngOnInit(): void {
     this.route.params

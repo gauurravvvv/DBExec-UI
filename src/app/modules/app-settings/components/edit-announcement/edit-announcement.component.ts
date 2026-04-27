@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -75,13 +82,13 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   initForm(): void {
     this.announcementForm = this.fb.group(
       {
-        name: [
-          '',
-          [Validators.required, Validators.maxLength(255)],
-        ],
+        name: ['', [Validators.required, Validators.maxLength(255)]],
         description: [
           '',
-          [Validators.required, Validators.maxLength(this.maxDescriptionLength)],
+          [
+            Validators.required,
+            Validators.maxLength(this.maxDescriptionLength),
+          ],
         ],
         targetGroupId: [null, Validators.required],
         bgColor: ['#0d47a1'],
@@ -112,7 +119,10 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
           this.groups = res.data.groups || [];
         }
         this.cdr.markForCheck();
-      }).catch(() => { this.cdr.markForCheck(); });
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadAnnouncement(): void {
@@ -143,7 +153,13 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   private luminance(hex: string): number {
     const h = hex.replace('#', '');
-    const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+    const full =
+      h.length === 3
+        ? h
+            .split('')
+            .map(c => c + c)
+            .join('')
+        : h;
     const r = parseInt(full.substring(0, 2), 16) / 255;
     const g = parseInt(full.substring(2, 4), 16) / 255;
     const b = parseInt(full.substring(4, 6), 16) / 255;
@@ -232,7 +248,10 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   onStatusToggle(): void {
     // Auto-republish when flipping from inactive back to active
-    if (this.announcementForm.get('status')?.value === 1 && this.initialStatus === 0) {
+    if (
+      this.announcementForm.get('status')?.value === 1 &&
+      this.initialStatus === 0
+    ) {
       this.announcementForm.patchValue({ republish: true });
     }
   }
@@ -272,8 +291,7 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   getNameError(): string {
     const c = this.announcementForm.get('name');
     if (c?.errors?.['required']) return 'Title is required';
-    if (c?.errors?.['maxlength'])
-      return 'Title must not exceed 255 characters';
+    if (c?.errors?.['maxlength']) return 'Title must not exceed 255 characters';
     return '';
   }
 

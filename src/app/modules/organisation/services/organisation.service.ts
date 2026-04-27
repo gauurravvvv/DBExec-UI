@@ -29,7 +29,9 @@ export class OrganisationService {
   async load(params: any) {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(this.http.apiGet(ORGANISATION.LIST, { params }));
+      const res: any = await lastValueFrom(
+        this.http.apiGet(ORGANISATION.LIST, { params }),
+      );
       if (res?.status) {
         this._orgs.set(res.data.orgs ?? []);
         this._total.set(res.data.count ?? 0);
@@ -42,7 +44,9 @@ export class OrganisationService {
   async loadOne(id: string) {
     this._loading.set(true);
     try {
-      const res: any = await lastValueFrom(this.http.apiGet(ORGANISATION.VIEW + id));
+      const res: any = await lastValueFrom(
+        this.http.apiGet(ORGANISATION.VIEW + id),
+      );
       if (res?.status) this._current.set(res.data);
     } finally {
       this._loading.set(false);
@@ -53,19 +57,48 @@ export class OrganisationService {
     this._saving.set(true);
     try {
       const {
-        name, description, encryptionAlgorithm, pepperKey,
-        dbHost, dbPort, dbName, dbUsername, dbPassword, adminEmail,
-        maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
-        sessionInactivityTimeout, emailProvider,
-        smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom,
-        sesRegion, sesAccessKeyId, sesSecretAccessKey, sesFrom,
+        name,
+        description,
+        encryptionAlgorithm,
+        pepperKey,
+        dbHost,
+        dbPort,
+        dbName,
+        dbUsername,
+        dbPassword,
+        adminEmail,
+        maxLoginAttempts,
+        accountLockDurationHours,
+        passwordHistoryLimit,
+        sessionInactivityTimeout,
+        emailProvider,
+        smtpHost,
+        smtpPort,
+        smtpUser,
+        smtpPassword,
+        smtpFrom,
+        sesRegion,
+        sesAccessKeyId,
+        sesSecretAccessKey,
+        sesFrom,
       } = orgForm.value;
 
       const payload: any = {
-        name, description, encryptionAlgorithm, pepperKey,
-        dbHost, dbPort, dbName, dbUsername, dbPassword, adminEmail,
-        maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
-        sessionInactivityTimeout, emailProvider,
+        name,
+        description,
+        encryptionAlgorithm,
+        pepperKey,
+        dbHost,
+        dbPort,
+        dbName,
+        dbUsername,
+        dbPassword,
+        adminEmail,
+        maxLoginAttempts,
+        accountLockDurationHours,
+        passwordHistoryLimit,
+        sessionInactivityTimeout,
+        emailProvider,
       };
 
       if (emailProvider === 'SMTP') {
@@ -91,12 +124,28 @@ export class OrganisationService {
     this._saving.set(true);
     try {
       const {
-        id, status, description,
-        dbHost, dbPort, dbName, dbUsername, dbPassword,
-        maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
-        sessionInactivityTimeout, emailProvider,
-        smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom,
-        sesRegion, sesAccessKeyId, sesSecretAccessKey, sesFrom,
+        id,
+        status,
+        description,
+        dbHost,
+        dbPort,
+        dbName,
+        dbUsername,
+        dbPassword,
+        maxLoginAttempts,
+        accountLockDurationHours,
+        passwordHistoryLimit,
+        sessionInactivityTimeout,
+        emailProvider,
+        smtpHost,
+        smtpPort,
+        smtpUser,
+        smtpPassword,
+        smtpFrom,
+        sesRegion,
+        sesAccessKeyId,
+        sesSecretAccessKey,
+        sesFrom,
       } = orgForm.getRawValue();
 
       const payload: any = {
@@ -144,7 +193,11 @@ export class OrganisationService {
   async delete(orgId: string, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      return await lastValueFrom(this.http.apiDelete(ORGANISATION.DELETE + `${orgId}`, { body: { justification } }));
+      return await lastValueFrom(
+        this.http.apiDelete(ORGANISATION.DELETE + `${orgId}`, {
+          body: { justification },
+        }),
+      );
     } finally {
       this._saving.set(false);
     }
@@ -153,7 +206,11 @@ export class OrganisationService {
   async bulkDelete(ids: string[], justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      return await lastValueFrom(this.http.apiDelete(ORGANISATION.BULK_DELETE, { body: { ids, justification } }));
+      return await lastValueFrom(
+        this.http.apiDelete(ORGANISATION.BULK_DELETE, {
+          body: { ids, justification },
+        }),
+      );
     } finally {
       this._saving.set(false);
     }
@@ -171,19 +228,48 @@ export class OrganisationService {
 
   addOrganisation(orgForm: FormGroup) {
     const {
-      name, description, encryptionAlgorithm, pepperKey,
-      dbHost, dbPort, dbName, dbUsername, dbPassword, adminEmail,
-      maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
-      sessionInactivityTimeout, emailProvider,
-      smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom,
-      sesRegion, sesAccessKeyId, sesSecretAccessKey, sesFrom,
+      name,
+      description,
+      encryptionAlgorithm,
+      pepperKey,
+      dbHost,
+      dbPort,
+      dbName,
+      dbUsername,
+      dbPassword,
+      adminEmail,
+      maxLoginAttempts,
+      accountLockDurationHours,
+      passwordHistoryLimit,
+      sessionInactivityTimeout,
+      emailProvider,
+      smtpHost,
+      smtpPort,
+      smtpUser,
+      smtpPassword,
+      smtpFrom,
+      sesRegion,
+      sesAccessKeyId,
+      sesSecretAccessKey,
+      sesFrom,
     } = orgForm.value;
 
     const payload: any = {
-      name, description, encryptionAlgorithm, pepperKey,
-      dbHost, dbPort, dbName, dbUsername, dbPassword, adminEmail,
-      maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
-      sessionInactivityTimeout, emailProvider,
+      name,
+      description,
+      encryptionAlgorithm,
+      pepperKey,
+      dbHost,
+      dbPort,
+      dbName,
+      dbUsername,
+      dbPassword,
+      adminEmail,
+      maxLoginAttempts,
+      accountLockDurationHours,
+      passwordHistoryLimit,
+      sessionInactivityTimeout,
+      emailProvider,
     };
 
     if (emailProvider === 'SMTP') {
@@ -204,12 +290,28 @@ export class OrganisationService {
 
   editOrganisation(orgForm: FormGroup, justification?: string) {
     const {
-      id, status, description,
-      dbHost, dbPort, dbName, dbUsername, dbPassword,
-      maxLoginAttempts, accountLockDurationHours, passwordHistoryLimit,
-      sessionInactivityTimeout, emailProvider,
-      smtpHost, smtpPort, smtpUser, smtpPassword, smtpFrom,
-      sesRegion, sesAccessKeyId, sesSecretAccessKey, sesFrom,
+      id,
+      status,
+      description,
+      dbHost,
+      dbPort,
+      dbName,
+      dbUsername,
+      dbPassword,
+      maxLoginAttempts,
+      accountLockDurationHours,
+      passwordHistoryLimit,
+      sessionInactivityTimeout,
+      emailProvider,
+      smtpHost,
+      smtpPort,
+      smtpUser,
+      smtpPassword,
+      smtpFrom,
+      sesRegion,
+      sesAccessKeyId,
+      sesSecretAccessKey,
+      sesFrom,
     } = orgForm.getRawValue();
 
     const payload: any = {
@@ -252,11 +354,19 @@ export class OrganisationService {
   }
 
   bulkDeleteOrganisation(ids: string[], justification?: string) {
-    return lastValueFrom(this.http.apiDelete(ORGANISATION.BULK_DELETE, { body: { ids, justification } }));
+    return lastValueFrom(
+      this.http.apiDelete(ORGANISATION.BULK_DELETE, {
+        body: { ids, justification },
+      }),
+    );
   }
 
   deleteOrganisation(orgId: string, justification?: string) {
-    return lastValueFrom(this.http.apiDelete(ORGANISATION.DELETE + `${orgId}`, { body: { justification } }));
+    return lastValueFrom(
+      this.http.apiDelete(ORGANISATION.DELETE + `${orgId}`, {
+        body: { justification },
+      }),
+    );
   }
 
   viewOrganisation(id: string) {
@@ -264,7 +374,9 @@ export class OrganisationService {
   }
 
   refreshMasterDb(orgId: string) {
-    return lastValueFrom(this.http.apiPost(ORGANISATION.REFRESH_MASTER_DB + `${orgId}`, {}));
+    return lastValueFrom(
+      this.http.apiPost(ORGANISATION.REFRESH_MASTER_DB + `${orgId}`, {}),
+    );
   }
 
   validateDatasource(payload: {

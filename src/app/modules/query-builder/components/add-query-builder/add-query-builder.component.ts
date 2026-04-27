@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
@@ -95,11 +100,14 @@ export class AddQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       limit: MAX_LIMIT,
     };
 
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs];
-      }
-    }).catch(() => {});
+    this.organisationService
+      .listOrganisation(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = [...response.data.orgs];
+        }
+      })
+      .catch(() => {});
   }
 
   getNameError(): string {
@@ -156,10 +164,13 @@ export class AddQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       limit: MAX_LIMIT,
     };
 
-    this.datasourceService.listDatasource(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasources = [...(response.data.datasources || [])];
-      }
-    }).catch(() => {});
+    this.datasourceService
+      .listDatasource(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasources = [...(response.data.datasources || [])];
+        }
+      })
+      .catch(() => {});
   }
 }

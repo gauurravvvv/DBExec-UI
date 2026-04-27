@@ -381,7 +381,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of getChangeRows(); trackBy: trackByIndex" [class.changed]="row.changed">
+          <tr
+            *ngFor="let row of getChangeRows(); trackBy: trackByIndex"
+            [class.changed]="row.changed"
+          >
             <td class="field-cell">{{ row.field }}</td>
             <td class="old-cell">{{ row.oldVal }}</td>
             <td class="new-cell">{{ row.newVal }}</td>

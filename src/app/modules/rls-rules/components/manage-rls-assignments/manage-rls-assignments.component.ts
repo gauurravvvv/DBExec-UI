@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
@@ -19,8 +28,8 @@ export class ManageRlsAssignmentsComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   // Signal refs
-  assignments  = this.rlsRulesService.assignments;
-  saving       = this.rlsRulesService.saving;
+  assignments = this.rlsRulesService.assignments;
+  saving = this.rlsRulesService.saving;
 
   scopeTargets: { label: string; value: string }[] = [];
 
@@ -76,33 +85,41 @@ export class ManageRlsAssignmentsComponent implements OnInit {
     this.scopeTargetsLoading = true;
 
     if (scope === 'user') {
-      this.userService.listUser(params).then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.scopeTargets = (response.data.users || []).map((u: any) => ({
-            label: `${u.firstName} ${u.lastName}`,
-            value: u.id,
-          }));
-        }
-      }).catch(() => {
-        this.cdr.markForCheck();
-      }).finally(() => {
-        this.scopeTargetsLoading = false;
-        this.cdr.markForCheck();
-      });
+      this.userService
+        .listUser(params)
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.scopeTargets = (response.data.users || []).map((u: any) => ({
+              label: `${u.firstName} ${u.lastName}`,
+              value: u.id,
+            }));
+          }
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
+        })
+        .finally(() => {
+          this.scopeTargetsLoading = false;
+          this.cdr.markForCheck();
+        });
     } else if (scope === 'group') {
-      this.groupService.listGroups(params).then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.scopeTargets = (response.data.groups || []).map((g: any) => ({
-            label: g.name,
-            value: g.id,
-          }));
-        }
-      }).catch(() => {
-        this.cdr.markForCheck();
-      }).finally(() => {
-        this.scopeTargetsLoading = false;
-        this.cdr.markForCheck();
-      });
+      this.groupService
+        .listGroups(params)
+        .then((response: any) => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.scopeTargets = (response.data.groups || []).map((g: any) => ({
+              label: g.name,
+              value: g.id,
+            }));
+          }
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
+        })
+        .finally(() => {
+          this.scopeTargetsLoading = false;
+          this.cdr.markForCheck();
+        });
     }
   }
 
@@ -116,7 +133,8 @@ export class ManageRlsAssignmentsComponent implements OnInit {
       scopeId: this.newScopeId,
     };
 
-    this.rlsRulesService.addAssignment(payload)
+    this.rlsRulesService
+      .addAssignment(payload)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response)) {
           this.newScope = '';

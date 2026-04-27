@@ -37,7 +37,9 @@
             <i class="pi pi-database"></i>
           </div>
           <div class="stat-info">
-            <span class="stat-value">{{ dbData?.statistics?.databaseSizeMB | fileSize }}</span>
+            <span class="stat-value">{{
+              dbData?.statistics?.databaseSizeMB | fileSize
+            }}</span>
             <span class="stat-label">Datasource Size</span>
           </div>
         </div>
@@ -221,7 +223,10 @@
                       <h5>Tables</h5>
                       <div
                         class="table-item"
-                        *ngFor="let table of getTablesForSchema(schema.name); trackBy: trackByName"
+                        *ngFor="
+                          let table of getTablesForSchema(schema.name);
+                          trackBy: trackByName
+                        "
                       >
                         <div
                           class="table-name"
@@ -258,7 +263,10 @@
             </div>
             <div class="card-content">
               <div class="top-tables">
-                <div class="table-item" *ngFor="let table of topStorageTables; trackBy: trackByName">
+                <div
+                  class="table-item"
+                  *ngFor="let table of topStorageTables; trackBy: trackByName"
+                >
                   <div class="table-info">
                     <span class="table-name"
                       >{{ table.schema }}.{{ table.name }}</span
@@ -431,7 +439,10 @@
       <div class="detail-section">
         <h4>Columns ({{ selectedTable.columns?.length || 0 }})</h4>
         <div class="columns-list">
-          <div class="column-item" *ngFor="let column of selectedTable.columns; trackBy: trackByName">
+          <div
+            class="column-item"
+            *ngFor="let column of selectedTable.columns; trackBy: trackByName"
+          >
             <span class="column-name">
               <i class="pi pi-tag"></i> <span>{{ column.name }}</span>
             </span>

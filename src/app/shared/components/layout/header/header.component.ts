@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component,
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
   DestroyRef,
   OnInit,
   HostListener,
   ElementRef,
   ViewChild,
-  inject, } from '@angular/core';
+  inject,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -156,19 +160,22 @@ export class HeaderComponent implements OnInit {
   }
 
   private fetchAnnouncements() {
-    this.announcementService.getActive().then(res => {
-      if (!res?.status || !Array.isArray(res?.data)) return;
-      this.mergeAnnouncements(
-        res.data.map((a: any) => ({
-          id: a.id,
-          name: a.name,
-          description: a.description,
-          bgColor: a.bgColor || '#0d47a1',
-          textColor: a.textColor || '#ffffff',
-        })),
-      );
-      this.cdr.markForCheck();
-    }).catch(() => {});
+    this.announcementService
+      .getActive()
+      .then(res => {
+        if (!res?.status || !Array.isArray(res?.data)) return;
+        this.mergeAnnouncements(
+          res.data.map((a: any) => ({
+            id: a.id,
+            name: a.name,
+            description: a.description,
+            bgColor: a.bgColor || '#0d47a1',
+            textColor: a.textColor || '#ffffff',
+          })),
+        );
+        this.cdr.markForCheck();
+      })
+      .catch(() => {});
   }
 
   /**
@@ -239,12 +246,13 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    this.loginService.logout().pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: () => this.clearSessionAndNavigate(),
-      error: () => this.clearSessionAndNavigate(),
-    });
+    this.loginService
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.clearSessionAndNavigate(),
+        error: () => this.clearSessionAndNavigate(),
+      });
   }
 
   private clearSessionAndNavigate() {

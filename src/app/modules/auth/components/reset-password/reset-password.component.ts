@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy,
+import {
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   inject,
@@ -6,7 +7,8 @@ import {ChangeDetectionStrategy,
   QueryList,
   ViewChildren,
   ElementRef,
-  signal} from '@angular/core';
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormGroup,
@@ -72,13 +74,15 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      this.userId = params['id'];
-      this.orgId = params['orgId'];
-      if (!this.userId || !this.orgId) {
-        this.router.navigate([AUTH.LOGIN]);
-      }
-    });
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.userId = params['id'];
+        this.orgId = params['orgId'];
+        if (!this.userId || !this.orgId) {
+          this.router.navigate([AUTH.LOGIN]);
+        }
+      });
   }
 
   trackByIndex(index: number): number {
@@ -170,7 +174,10 @@ export class ResetPasswordComponent implements OnInit {
       try {
         const otp = this.otpValue;
         const res: any = await this.loginService.resetPassword(
-          this.resetPasswordForm, this.userId, this.orgId, otp
+          this.resetPasswordForm,
+          this.userId,
+          this.orgId,
+          otp,
         );
         if (this.globalService.handleSuccessService(res)) {
           this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
@@ -178,7 +185,9 @@ export class ResetPasswordComponent implements OnInit {
           this.error.set(res.message || 'Password reset failed.');
         }
       } catch (err: any) {
-        this.error.set(err?.message || 'Password reset failed. Please try again.');
+        this.error.set(
+          err?.message || 'Password reset failed. Please try again.',
+        );
       } finally {
         this.loading.set(false);
       }
@@ -211,5 +220,4 @@ export class ResetPasswordComponent implements OnInit {
     const input = document.getElementById(id) as HTMLInputElement;
     input.type = this.showPassword ? 'text' : 'password';
   }
-
 }

@@ -199,7 +199,10 @@
                           >
                             <div
                               class="group-bullet"
-                              *ngFor="let groupId of Object.keys(groups); trackBy: trackByIndex"
+                              *ngFor="
+                                let groupId of Object.keys(groups);
+                                trackBy: trackByIndex
+                              "
                               [ngStyle]="getGroupBulletStyle(+groupId, section)"
                               (click)="
                                 $event.stopPropagation();

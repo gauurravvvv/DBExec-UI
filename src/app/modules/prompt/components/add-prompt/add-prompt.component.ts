@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,9 +28,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
   styleUrls: ['./add-prompt.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddPromptComponent
-  implements OnInit, HasUnsavedChanges
-{
+export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -303,11 +308,16 @@ export class AddPromptComponent
       limit: MAX_LIMIT,
     };
 
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs;
-      }
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.organisationService
+      .listOrganisation(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.organisations = response.data.orgs;
+        }
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onSubmit() {
@@ -326,7 +336,8 @@ export class AddPromptComponent
         prompts: this.transformPrompts(),
       };
 
-      this.promptService.add(transformedData)
+      this.promptService
+        .add(transformedData)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
             this.sectionForm.markAsPristine();
@@ -334,7 +345,9 @@ export class AddPromptComponent
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
   }
 
@@ -411,11 +424,16 @@ export class AddPromptComponent
       limit: MAX_LIMIT,
     };
 
-    this.datasourceService.listDatasource(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.datasources = response.data.datasources || [];
-      }
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.datasourceService
+      .listDatasource(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.datasources = response.data.datasources || [];
+        }
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onDatasourceChange(event: any) {
@@ -456,11 +474,16 @@ export class AddPromptComponent
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
-    this.tabService.listTab(param).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.tabs = [...response.data.tabs];
-      }
-    }).catch(() => { this.cdr.markForCheck(); });
+    this.tabService
+      .listTab(param)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.tabs = [...response.data.tabs];
+        }
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   loadSections() {
@@ -477,14 +500,19 @@ export class AddPromptComponent
       page: DEFAULT_PAGE,
       limit: MAX_LIMIT,
     };
-    this.sectionService.listSection(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.sections = [...response.data.sections];
-        if (this.sectionGroups.length === 0) {
-          this.addSectionGroup();
+    this.sectionService
+      .listSection(params)
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          this.sections = [...response.data.sections];
+          if (this.sectionGroups.length === 0) {
+            this.addSectionGroup();
+          }
         }
-      }
-    }).catch(() => { this.cdr.markForCheck(); });
+      })
+      .catch(() => {
+        this.cdr.markForCheck();
+      });
   }
 
   onSectionChange(event: any, groupIndex: number) {

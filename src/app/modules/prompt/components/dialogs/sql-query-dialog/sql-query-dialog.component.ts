@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, AfterViewInit,
+import {
+  ChangeDetectionStrategy,
+  AfterViewInit,
   Component,
   EventEmitter,
   HostListener,
@@ -8,7 +10,8 @@ import { ChangeDetectionStrategy, AfterViewInit,
   Output,
   SimpleChanges,
   ViewChild,
-  ElementRef, } from '@angular/core';
+  ElementRef,
+} from '@angular/core';
 import { MonacoIntelliSenseService } from '../../../../dataset/services/monaco-intellisense.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 
@@ -102,7 +105,8 @@ const MONACO_EDITOR_OPTIONS = {
 export class SqlQueryDialogComponent
   implements OnChanges, AfterViewInit, OnDestroy
 {
-  @ViewChild('sqlQueryEditorContainer') sqlQueryEditorContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('sqlQueryEditorContainer')
+  sqlQueryEditorContainer!: ElementRef<HTMLDivElement>;
   @Input() visible = false;
   @Input() schemaData: any[] = []; // Schema structure with tables and columns
   @Input() currentSchema: string = '';
@@ -227,12 +231,15 @@ export class SqlQueryDialogComponent
   }
 
   private loadMonacoEditor(): void {
-    this.monacoLoader.load().then(() => {
-      this.initMonaco();
-    }).catch(() => {
-      this.isLoadingEditor = false;
-      this.monacoLoadFailed = true;
-    });
+    this.monacoLoader
+      .load()
+      .then(() => {
+        this.initMonaco();
+      })
+      .catch(() => {
+        this.isLoadingEditor = false;
+        this.monacoLoadFailed = true;
+      });
   }
 
   retryLoadMonaco(): void {

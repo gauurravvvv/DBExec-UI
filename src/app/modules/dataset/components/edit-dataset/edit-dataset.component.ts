@@ -59,7 +59,8 @@ export class EditDatasetComponent
 {
   // ViewChild for file input
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('sqlEditorContainer') sqlEditorContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('sqlEditorContainer')
+  sqlEditorContainer!: ElementRef<HTMLDivElement>;
 
   // Dataset ID from route
   datasetId?: string;
@@ -210,40 +211,44 @@ export class EditDatasetComponent
 
   ngOnInit(): void {
     // Setup debounce for result filter changes
-    this.resultFilterSubject.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (!this.lastExecutedQuery) return;
+    this.resultFilterSubject
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.lastExecutedQuery) return;
 
-      // Reset to first page on filter change
-      this.resultPage = 1;
+        // Reset to first page on filter change
+        this.resultPage = 1;
 
-      // Build filter object from non-empty filter values
-      const filter: { [key: string]: string } = {};
-      for (const col of Object.keys(this.resultFilterValues)) {
-        if (this.resultFilterValues[col]) {
-          filter[col] = this.resultFilterValues[col];
+        // Build filter object from non-empty filter values
+        const filter: { [key: string]: string } = {};
+        for (const col of Object.keys(this.resultFilterValues)) {
+          if (this.resultFilterValues[col]) {
+            filter[col] = this.resultFilterValues[col];
+          }
         }
-      }
 
-      this.executeQueryForDatasource(
-        this.lastExecutedQuery,
-        1,
-        this.resultRows,
-        filter,
-      );
-    });
+        this.executeQueryForDatasource(
+          this.lastExecutedQuery,
+          1,
+          this.resultRows,
+          filter,
+        );
+      });
 
     // Fetch orgId and datasetId from route params
-    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      this.datasetId = params['id'] ? params['id'] : undefined;
-      this.orgId = params['orgId']
-        ? params['orgId']
-        : this.globalService.getTokenDetails('organisationId');
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.datasetId = params['id'] ? params['id'] : undefined;
+        this.orgId = params['orgId']
+          ? params['orgId']
+          : this.globalService.getTokenDetails('organisationId');
 
-      // If datasetId is present, fetch dataset data first
-      if (this.datasetId && this.orgId) {
-        this.fetchDatasetData();
-      }
-    });
+        // If datasetId is present, fetch dataset data first
+        if (this.datasetId && this.orgId) {
+          this.fetchDatasetData();
+        }
+      });
   }
 
   private initializeComponent(): void {
@@ -379,14 +384,17 @@ export class EditDatasetComponent
   }
 
   private loadMonacoEditor(): void {
-    this.monacoLoader.load().then(() => {
-      this.initMonaco();
-    }).catch(() => {
-      this.isLoadingEditor = false;
-      this.monacoLoadFailed = true;
-      this.showMonacoLoadError();
-      this.cdr.markForCheck();
-    });
+    this.monacoLoader
+      .load()
+      .then(() => {
+        this.initMonaco();
+      })
+      .catch(() => {
+        this.isLoadingEditor = false;
+        this.monacoLoadFailed = true;
+        this.showMonacoLoadError();
+        this.cdr.markForCheck();
+      });
   }
 
   private showMonacoLoadError(): void {}
@@ -1071,7 +1079,9 @@ export class EditDatasetComponent
           }
           this.cdr.markForCheck();
         })
-        .catch(() => { this.cdr.markForCheck(); });
+        .catch(() => {
+          this.cdr.markForCheck();
+        });
     }
   }
 

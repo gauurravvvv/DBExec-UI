@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, AfterViewInit,
+import {
+  ChangeDetectionStrategy,
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
@@ -7,7 +9,8 @@ import { ChangeDetectionStrategy, AfterViewInit,
   OnDestroy,
   OnInit,
   signal,
-  ViewChild, } from '@angular/core';
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
@@ -42,7 +45,7 @@ export class ViewDashboardComponent
 
   // Signal refs from service
   rendered = this._dashboardService.rendered;
-  loading  = this._dashboardService.loading;
+  loading = this._dashboardService.loading;
 
   orgId = '';
   dashboardId = '';

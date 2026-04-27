@@ -195,9 +195,11 @@
                 label="Encryption Configuration"
                 description="I understand that the encryption method and pepper key are critical security settings that cannot be modified after organisation creation. These settings will be used for all sensitive data encryption within the organisation."
                 [showError]="
-                  !!(!orgForm.get('confirmationChecked')?.value &&
-                  orgForm.get('encryptionAlgorithm')?.valid &&
-                  orgForm.get('pepperKey')?.valid)
+                  !!(
+                    !orgForm.get('confirmationChecked')?.value &&
+                    orgForm.get('encryptionAlgorithm')?.valid &&
+                    orgForm.get('pepperKey')?.valid
+                  )
                 "
                 errorMessage="Please acknowledge the encryption configuration settings"
               ></app-custom-binary-checkbox>
@@ -642,8 +644,8 @@
             <div *ngIf="!selectedEmailProvider" class="no-provider-message">
               <i class="pi pi-info-circle"></i>
               <span
-                >Emails will be sent using the system default
-                configuration managed by the system administrator.</span
+                >Emails will be sent using the system default configuration
+                managed by the system administrator.</span
               >
             </div>
           </div>

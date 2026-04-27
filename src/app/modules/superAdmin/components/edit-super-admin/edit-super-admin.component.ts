@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -47,11 +53,13 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
     this.initForm();
 
     // Subscribe to form value changes
-    this.adminForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.isCancelClicked) {
-        this.isCancelClicked = false;
-      }
-    });
+    this.adminForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
   }
 
   private initForm(): void {
@@ -88,12 +96,14 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
       status: [false],
     });
 
-    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      this.adminId = params['id'];
-      if (this.adminId) {
-        this.patchFormValues();
-      }
-    });
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.adminId = params['id'];
+        if (this.adminId) {
+          this.patchFormValues();
+        }
+      });
   }
 
   async patchFormValues(): Promise<void> {
@@ -122,7 +132,10 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
 
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
-      const response: any = await this.superAdminService.update(this.adminForm, this.saveJustification.trim());
+      const response: any = await this.superAdminService.update(
+        this.adminForm,
+        this.saveJustification.trim(),
+      );
       if (this.globalService.handleSuccessService(response)) {
         this.showSaveConfirm = false;
         this.saveJustification = '';

@@ -111,7 +111,7 @@ export const DATASET = {
   VALIDATE_FIELD: '/dataset/validate/field',
   ADD_FIELD: '/dataset/add/field',
   RUN_QUERY: '/dataset/run',
-  DISTINCT_VALUES: '/dataset/distinct-values/',  // POST /:orgId/:datasetId, body: { columnName }
+  DISTINCT_VALUES: '/dataset/distinct-values/', // POST /:orgId/:datasetId, body: { columnName }
   DUPLICATE: '/dataset/duplicate/',
 };
 

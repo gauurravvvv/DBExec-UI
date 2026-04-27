@@ -22,7 +22,9 @@ $radius-sm: 8px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
 
-    span:first-child { visibility: hidden; }
+    span:first-child {
+      visibility: hidden;
+    }
   }
 
   .condition-table-row {
@@ -34,9 +36,13 @@ $radius-sm: 8px;
     border-bottom: 1px solid var(--border-color);
     transition: background 0.15s ease;
 
-    &:last-child { border-bottom: none; }
+    &:last-child {
+      border-bottom: none;
+    }
 
-    &:hover { background: var(--hover-background); }
+    &:hover {
+      background: var(--hover-background);
+    }
 
     .cond-index {
       width: 22px;

@@ -3,16 +3,32 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" routerLink="/app/users">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/users"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>Edit User</h2>
       </div>
       <div class="action-buttons">
-        <button pButton type="button" label="Cancel" class="p-button-outlined btn-cancel"
-          [disabled]="!isFormDirty || isCancelClicked" (click)="onCancel()"></button>
-        <button pButton class="p-button-primary btn-save" type="submit" label="Save"
-          [disabled]="userForm.invalid || !isFormDirty || saving()" (click)="onSubmit()">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-outlined btn-cancel"
+          [disabled]="!isFormDirty || isCancelClicked"
+          (click)="onCancel()"
+        ></button>
+        <button
+          pButton
+          class="p-button-primary btn-save"
+          type="submit"
+          label="Save"
+          [disabled]="userForm.invalid || !isFormDirty || saving()"
+          (click)="onSubmit()"
+        >
           <i class="pi pi-save mr-2"></i>
         </button>
       </div>
@@ -22,68 +38,117 @@
     <form [formGroup]="userForm" class="admin-form">
       <div class="form-grid">
         <!-- First Name -->
-        <app-custom-input formControlName="firstName" label="First Name" placeholder="Enter first name" icon="pi-user"
-          [required]="true" [showError]="
+        <app-custom-input
+          formControlName="firstName"
+          label="First Name"
+          placeholder="Enter first name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
             !!(
               userForm.get('firstName')?.invalid &&
               userForm.get('firstName')?.touched
             )
-          " [errorMessage]="getFirstNameError()">
+          "
+          [errorMessage]="getFirstNameError()"
+        >
         </app-custom-input>
 
         <!-- Last Name -->
-        <app-custom-input formControlName="lastName" label="Last Name" placeholder="Enter last name" icon="pi-user"
-          [required]="true" [showError]="
+        <app-custom-input
+          formControlName="lastName"
+          label="Last Name"
+          placeholder="Enter last name"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
             !!(
               userForm.get('lastName')?.invalid &&
               userForm.get('lastName')?.touched
             )
-          " [errorMessage]="getLastNameError()">
+          "
+          [errorMessage]="getLastNameError()"
+        >
         </app-custom-input>
 
-
-
         <!-- Username (disabled) -->
-        <app-custom-input formControlName="username" label="Username" placeholder="Enter username" icon="pi-user-edit"
-          [required]="true" [inputDisabled]="true">
+        <app-custom-input
+          formControlName="username"
+          label="Username"
+          placeholder="Enter username"
+          icon="pi-user-edit"
+          [required]="true"
+          [inputDisabled]="true"
+        >
         </app-custom-input>
 
         <!-- Email -->
-        <app-custom-input formControlName="email" label="Email" placeholder="Enter email address" icon="pi-envelope"
-          type="email" [required]="true" [showError]="
+        <app-custom-input
+          formControlName="email"
+          label="Email"
+          placeholder="Enter email address"
+          icon="pi-envelope"
+          type="email"
+          [required]="true"
+          [showError]="
             !!(userForm.get('email')?.invalid && userForm.get('email')?.touched)
-          " [errorMessage]="
+          "
+          [errorMessage]="
             userForm.get('email')?.errors?.['required']
               ? 'Email is required'
               : userForm.get('email')?.errors?.['email']
                 ? 'Please enter a valid email'
                 : ''
-          ">
+          "
+        >
         </app-custom-input>
 
         <!-- Organisation (disabled) -->
-        <app-custom-input *ngIf="showOrganisationDropdown" [ngModel]="selectedOrgName"
-          [ngModelOptions]="{ standalone: true }" label="Organisation" placeholder="Organisation" icon="pi-building"
-          [inputDisabled]="true">
+        <app-custom-input
+          *ngIf="showOrganisationDropdown"
+          [ngModel]="selectedOrgName"
+          [ngModelOptions]="{ standalone: true }"
+          label="Organisation"
+          placeholder="Organisation"
+          icon="pi-building"
+          [inputDisabled]="true"
+        >
         </app-custom-input>
 
         <!-- Groups -->
         <div class="form-field">
           <label>Groups <span class="required">*</span></label>
-          <app-custom-multiselect formControlName="groupIds" [options]="groups" optionLabel="name" optionValue="id"
-            placeholder="Select groups" display="chip" [filter]="true" appendTo="body"></app-custom-multiselect>
-          <small class="error-text" *ngIf="
-                userForm.get('groupIds')?.touched &&
-                userForm.get('groupIds')?.errors?.['required']
-              ">
+          <app-custom-multiselect
+            formControlName="groupIds"
+            [options]="groups"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select groups"
+            display="chip"
+            [filter]="true"
+            appendTo="body"
+          ></app-custom-multiselect>
+          <small
+            class="error-text"
+            *ngIf="
+              userForm.get('groupIds')?.touched &&
+              userForm.get('groupIds')?.errors?.['required']
+            "
+          >
             At least one group is required
           </small>
         </div>
 
         <!-- Status -->
         <div>
-          <app-custom-toggle formControlName="status" label="Status" [trueValue]="1" [falseValue]="0" trueLabel="Active"
-            falseLabel="Inactive">
+          <app-custom-toggle
+            formControlName="status"
+            label="Status"
+            [trueValue]="1"
+            [falseValue]="0"
+            trueLabel="Active"
+            falseLabel="Inactive"
+          >
           </app-custom-toggle>
           <small *ngIf="isLocked" class="locked-note">
             <i class="pi pi-lock"></i>
@@ -106,9 +171,16 @@
     <div class="standard-delete-section">
       <p class="delete-intro">Are you sure you want to update this user?</p>
       <div class="justification-section">
-        <label for="saveJustification">Justification <span class="required">*</span></label>
-        <textarea id="saveJustification" [(ngModel)]="saveJustification" placeholder="Provide a reason for this update"
-          rows="3" maxlength="500"></textarea>
+        <label for="saveJustification"
+          >Justification <span class="required">*</span></label
+        >
+        <textarea
+          id="saveJustification"
+          [(ngModel)]="saveJustification"
+          placeholder="Provide a reason for this update"
+          rows="3"
+          maxlength="500"
+        ></textarea>
         <small class="char-count">{{ saveJustification.length }}/500</small>
       </div>
     </div>
@@ -117,7 +189,11 @@
         <i class="pi pi-times"></i>
         Cancel
       </button>
-      <button class="btn-confirm" (click)="proceedSave()" [disabled]="!saveJustification.trim()">
+      <button
+        class="btn-confirm"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim()"
+      >
         <i class="pi pi-check"></i>
         Update
       </button>

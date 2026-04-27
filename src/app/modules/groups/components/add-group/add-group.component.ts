@@ -1,10 +1,13 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GROUP } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -87,8 +90,9 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       users: [[]],
     });
 
-    this.userGroupForm.get('organisation')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.userGroupForm
+      .get('organisation')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(value => {
         this.userGroupForm.patchValue(
           { roleId: '', users: [] },
@@ -178,5 +182,4 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       return 'Group name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
     return '';
   }
-
 }

@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -20,7 +28,9 @@ export class ViewProfileComponent implements OnInit {
   profile = this.profileService.profile;
   loading = this.profileService.loading;
 
-  avatarBackground = computed(() => this.generateAvatarColor(this.profile()?.firstName ?? ''));
+  avatarBackground = computed(() =>
+    this.generateAvatarColor(this.profile()?.firstName ?? ''),
+  );
   showChangePasswordDialog = signal(false);
 
   constructor(
@@ -52,10 +62,14 @@ export class ViewProfileComponent implements OnInit {
   get roleLabel(): string {
     const p = this.profile();
     switch (p?.role) {
-      case 'SUPER-ADMIN': return 'Super Admin';
-      case 'ORG-ADMIN': return 'Organisation Admin';
-      case 'ORG-USER': return 'User';
-      default: return p?.role || '';
+      case 'SUPER-ADMIN':
+        return 'Super Admin';
+      case 'ORG-ADMIN':
+        return 'Organisation Admin';
+      case 'ORG-USER':
+        return 'User';
+      default:
+        return p?.role || '';
     }
   }
 
@@ -77,10 +91,13 @@ export class ViewProfileComponent implements OnInit {
   }
 
   private logoutAndRedirect() {
-    this.loginService.logout().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => this.clearSessionAndNavigate(),
-      error: () => this.clearSessionAndNavigate(),
-    });
+    this.loginService
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.clearSessionAndNavigate(),
+        error: () => this.clearSessionAndNavigate(),
+      });
   }
 
   private clearSessionAndNavigate() {
@@ -90,7 +107,18 @@ export class ViewProfileComponent implements OnInit {
   }
 
   private generateAvatarColor(name: string): string {
-    const colors = ['#2196F3','#4CAF50','#FF9800','#9C27B0','#00BCD4','#E91E63','#3F51B5','#009688','#FF5722','#607D8B'];
+    const colors = [
+      '#2196F3',
+      '#4CAF50',
+      '#FF9800',
+      '#9C27B0',
+      '#00BCD4',
+      '#E91E63',
+      '#3F51B5',
+      '#009688',
+      '#FF5722',
+      '#607D8B',
+    ];
     let hash = 0;
     for (let i = 0; i < (name || '').length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);

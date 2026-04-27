@@ -155,7 +155,11 @@ export class GlobalService {
   private checkPermissionTree(permissions: any[], value: string): boolean {
     for (const perm of permissions) {
       if (perm.value === value) return true;
-      if (perm.subPermissions && this.checkPermissionTree(perm.subPermissions, value)) return true;
+      if (
+        perm.subPermissions &&
+        this.checkPermissionTree(perm.subPermissions, value)
+      )
+        return true;
     }
     return false;
   }

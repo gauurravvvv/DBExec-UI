@@ -15,7 +15,10 @@
       gap: gapValue,
     }"
   >
-    <div class="checkbox-option" *ngFor="let opt of options; trackBy: trackByIndex">
+    <div
+      class="checkbox-option"
+      *ngFor="let opt of options; trackBy: trackByIndex"
+    >
       <p-checkbox
         [value]="opt[optionValue]"
         [label]="opt[optionLabel]"

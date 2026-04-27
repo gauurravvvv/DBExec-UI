@@ -14,7 +14,10 @@ import { MessageService } from 'primeng/api';
 export class HttpErrorInterceptor implements HttpInterceptor {
   constructor(private messageService: MessageService) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse | any) => {
         // 440 is handled by HttpRequestInterceptor (session refresh)
@@ -25,14 +28,26 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
         if (error instanceof HttpErrorResponse) {
           if (error.status === 0) {
-            this.show('error', 'Network Error', 'Cannot reach the server. Check your connection.');
+            this.show(
+              'error',
+              'Network Error',
+              'Cannot reach the server. Check your connection.',
+            );
           } else if (error.status >= 500) {
-            this.show('error', 'Server Error', `Something went wrong (${error.status}). Please try again.`);
+            this.show(
+              'error',
+              'Server Error',
+              `Something went wrong (${error.status}). Please try again.`,
+            );
           }
           // 4xx errors are business-logic errors handled at component level
         } else {
           // Non-HTTP errors (e.g., RxJS errors, JS exceptions)
-          this.show('error', 'Unexpected Error', 'An unexpected error occurred.');
+          this.show(
+            'error',
+            'Unexpected Error',
+            'An unexpected error occurred.',
+          );
         }
 
         return throwError(error);

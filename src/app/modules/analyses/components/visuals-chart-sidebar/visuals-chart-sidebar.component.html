@@ -53,7 +53,10 @@
           <div class="chart-type-grid">
             <div
               class="chart-type-card"
-              *ngFor="let chartType of getChartsByCategory(category); trackBy: trackById"
+              *ngFor="
+                let chartType of getChartsByCategory(category);
+                trackBy: trackById
+              "
               [class.selected]="focusedVisual.chartType === chartType.id"
               (click)="setVisualChartType(chartType)"
               [pTooltip]="chartType.description"
@@ -105,18 +108,13 @@
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.xAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('x', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.xAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -137,18 +135,13 @@
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.yAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('y', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.yAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -162,18 +155,13 @@
         >
           <div class="axis-label">Value</div>
           <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.zAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.zAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('z', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.zAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.zAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -191,18 +179,13 @@
         >
           <div class="axis-label">X-Axis</div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.xAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('x', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.xAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -216,18 +199,13 @@
         >
           <div class="axis-label">Y-Axis</div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.yAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('y', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.yAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -241,18 +219,13 @@
         >
           <div class="axis-label">Size (optional)</div>
           <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.zAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.zAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('z', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.zAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.zAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -260,9 +233,7 @@
       </ng-container>
 
       <!-- 3D Coordinate Charts: X-Axis, Y-Axis, Z-Axis (bar3d, line3d, scatter3d, polygons3d) -->
-      <ng-container
-        *ngIf="is3DCoordinateChartType(focusedVisual.chartType)"
-      >
+      <ng-container *ngIf="is3DCoordinateChartType(focusedVisual.chartType)">
         <!-- X-Axis Slot -->
         <div
           class="axis-slot"
@@ -272,24 +243,17 @@
         >
           <div class="axis-label">
             {{
-              isPolygons3dChartType(focusedVisual.chartType)
-                ? 'Name'
-                : 'X-Axis'
+              isPolygons3dChartType(focusedVisual.chartType) ? 'Name' : 'X-Axis'
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.xAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('x', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.xAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -309,18 +273,13 @@
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.yAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('y', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.yAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -340,18 +299,13 @@
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.zAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.zAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('z', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.zAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.zAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -377,18 +331,13 @@
         >
           <div class="axis-label">X-Axis</div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.xAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('x', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.xAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -402,18 +351,13 @@
         >
           <div class="axis-label">Y-Axis</div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.yAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('y', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.yAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -440,18 +384,13 @@
         >
           <div class="axis-label">Category</div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.xAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('x', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.xAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -465,18 +404,13 @@
         >
           <div class="axis-label">Value</div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.yAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('y', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.yAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -494,18 +428,13 @@
         >
           <div class="axis-label">Longitude</div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.xAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('x', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.xAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>
@@ -519,18 +448,13 @@
         >
           <div class="axis-label">Latitude</div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
-            <span>{{
-              getFieldDisplayName(focusedVisual.yAxisColumn)
-            }}</span>
+            <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
               class="pi pi-times clear-btn"
               (click)="clearAxisField('y', $event)"
             ></i>
           </div>
-          <div
-            class="axis-placeholder"
-            *ngIf="!focusedVisual.yAxisColumn"
-          >
+          <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
             <span>Click to select field</span>
           </div>

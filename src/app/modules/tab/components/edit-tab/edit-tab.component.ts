@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -51,11 +58,13 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
       this.loadTabData();
     }
 
-    this.tabForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.isCancelClicked) {
-        this.isCancelClicked = false;
-      }
-    });
+    this.tabForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
   }
 
   get isFormDirty(): boolean {
@@ -123,7 +132,8 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
       try {
-        const { id, name, description, organisation, datasource, status } = this.tabForm.getRawValue();
+        const { id, name, description, organisation, datasource, status } =
+          this.tabForm.getRawValue();
         const response = await this.tabService.update({
           id,
           name,
@@ -162,7 +172,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
 
   onCancel(): void {
     if (this.isFormDirty) {
-      if (!this.tabData) return;  // guard: data not loaded yet
+      if (!this.tabData) return; // guard: data not loaded yet
       // Restore basic form values
       this.tabForm.patchValue({
         id: this.tabData.id,
@@ -180,5 +190,4 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
       this.router.navigate([TAB.LIST]);
     }
   }
-
 }

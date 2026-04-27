@@ -1,4 +1,11 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrganisationService } from '../../services/organisation.service';
@@ -81,10 +88,12 @@ export class ViewOrganisationComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      this.organisationId = params['id'];
-      this.loadOrganisationData();
-    });
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.organisationId = params['id'];
+        this.loadOrganisationData();
+      });
   }
 
   loadOrganisationData() {

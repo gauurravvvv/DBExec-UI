@@ -1,4 +1,14 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild, signal} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
@@ -18,7 +28,13 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
 
   features = CLI_AUTH_PAGE_OPTIONS;
 
-  pageState: 'prompt' | 'authorizing' | 'success' | 'denied' | 'not-logged-in' | 'error' = 'prompt';
+  pageState:
+    | 'prompt'
+    | 'authorizing'
+    | 'success'
+    | 'denied'
+    | 'not-logged-in'
+    | 'error' = 'prompt';
   message = '';
   userName = '';
   userRole = '';
@@ -37,7 +53,8 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     if (!this.loginService.isLoggedIn()) {
       this.pageState = 'not-logged-in';
-      this.message = 'You need to be logged in to DBExec to authorize CLI access.';
+      this.message =
+        'You need to be logged in to DBExec to authorize CLI access.';
       return;
     }
 
@@ -47,7 +64,8 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
         const payload = JSON.parse(atob(token.split('.')[1]));
         this.userName = payload.name || payload.username;
         this.userRole = StorageService.get(StorageType.ROLE) || payload.role;
-        this.userOrg = StorageService.get(StorageType.ORGANISATION) || payload.organisation;
+        this.userOrg =
+          StorageService.get(StorageType.ORGANISATION) || payload.organisation;
       }
     } catch {
       this.userRole = StorageService.get(StorageType.ROLE) || '';
@@ -65,7 +83,10 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
 
   onCodeInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.code = input.value.toUpperCase().replace(/[^A-Z2-9]/g, '').slice(0, 8);
+    this.code = input.value
+      .toUpperCase()
+      .replace(/[^A-Z2-9]/g, '')
+      .slice(0, 8);
     input.value = this.code;
     this.codeError = '';
   }
@@ -83,26 +104,31 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
     this.codeError = '';
     this.pageState = 'authorizing';
 
-    this.loginService.cliAuthorize(trimmed, 'authorize').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (response: any) => {
-        if (response.status) {
-          this.pageState = 'success';
-          const d = response.data;
-          this.message = d
-            ? `Signed in as ${d.name} (${d.role}) in ${d.organisation}`
-            : 'CLI access authorized successfully.';
-        } else {
+    this.loginService
+      .cliAuthorize(trimmed, 'authorize')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any) => {
+          if (response.status) {
+            this.pageState = 'success';
+            const d = response.data;
+            this.message = d
+              ? `Signed in as ${d.name} (${d.role}) in ${d.organisation}`
+              : 'CLI access authorized successfully.';
+          } else {
+            this.pageState = 'error';
+            this.message = response.message || 'Authorization failed.';
+          }
+          this.loading.set(false);
+        },
+        error: (err: any) => {
           this.pageState = 'error';
-          this.message = response.message || 'Authorization failed.';
-        }
-        this.loading.set(false);
-      },
-      error: (err: any) => {
-        this.pageState = 'error';
-        this.message = err?.error?.message || 'Authorization failed. The code may be invalid or expired.';
-        this.loading.set(false);
-      },
-    });
+          this.message =
+            err?.error?.message ||
+            'Authorization failed. The code may be invalid or expired.';
+          this.loading.set(false);
+        },
+      });
   }
 
   deny(): void {
@@ -117,18 +143,20 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
     this.loading.set(true);
     this.codeError = '';
 
-    this.loginService.cliAuthorize(trimmed, 'deny').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.pageState = 'denied';
-        this.message = 'CLI access has been denied. You can close this tab.';
-        this.loading.set(false);
-      },
-      error: () => {
-        this.pageState = 'denied';
-        this.message = 'CLI access has been denied. You can close this tab.';
-        this.loading.set(false);
-      },
-    });
+    this.loginService
+      .cliAuthorize(trimmed, 'deny')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.pageState = 'denied';
+          this.message = 'CLI access has been denied. You can close this tab.';
+          this.loading.set(false);
+        },
+        error: () => {
+          this.pageState = 'denied';
+          this.message = 'CLI access has been denied. You can close this tab.';
+          this.loading.set(false);
+        },
+      });
   }
-
 }

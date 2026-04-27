@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuItem, LazyLoadEvent } from 'primeng/api';
@@ -96,19 +103,21 @@ export class ListQueryBuilderComponent implements OnInit {
         this.loadQueryBuilders();
       });
 
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      if (params['orgId'] || params['datasourceId'] || params['name']) {
-        this.handleDeepLinking(params);
-      } else {
-        if (this.showOrganisationDropdown) {
-          this.loadOrganisations();
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        if (params['orgId'] || params['datasourceId'] || params['name']) {
+          this.handleDeepLinking(params);
         } else {
-          this.selectedOrg =
-            this.globalService.getTokenDetails('organisationId');
-          this.loadDatasources();
+          if (this.showOrganisationDropdown) {
+            this.loadOrganisations();
+          } else {
+            this.selectedOrg =
+              this.globalService.getTokenDetails('organisationId');
+            this.loadDatasources();
+          }
         }
-      }
-    });
+      });
   }
 
   handleDeepLinking(params: any) {
@@ -152,33 +161,36 @@ export class ListQueryBuilderComponent implements OnInit {
         limit: MAX_LIMIT,
       };
 
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = [...response.data.orgs];
-          if (this.organisations.length > 0) {
-            if (
-              preSelectedOrgId &&
-              this.organisations.find(o => o.id === preSelectedOrgId)
-            ) {
-              this.selectedOrg = preSelectedOrgId;
-            } else {
-              this.selectedOrg = this.organisations[0].id;
-            }
+      this.organisationService
+        .listOrganisation(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.organisations = [...response.data.orgs];
+            if (this.organisations.length > 0) {
+              if (
+                preSelectedOrgId &&
+                this.organisations.find(o => o.id === preSelectedOrgId)
+              ) {
+                this.selectedOrg = preSelectedOrgId;
+              } else {
+                this.selectedOrg = this.organisations[0].id;
+              }
 
-            if (!preSelectedOrgId) {
-              this.loadDatasources();
+              if (!preSelectedOrgId) {
+                this.loadDatasources();
+              }
+            } else {
+              this.selectedOrg = null;
+              this.datasources = [];
+              this.selectedDatasource = null;
+              this.queryBuilders = [];
+              this.filteredQueryBuilders = [];
+              this.totalRecords = 0;
             }
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
-            this.queryBuilders = [];
-            this.filteredQueryBuilders = [];
-            this.totalRecords = 0;
           }
-        }
-        resolve();
-      }).catch(() => resolve());
+          resolve();
+        })
+        .catch(() => resolve());
     });
   }
 

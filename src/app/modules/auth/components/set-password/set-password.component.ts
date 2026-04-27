@@ -1,4 +1,11 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -55,16 +62,18 @@ export class SetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      this.userId = params['id'];
-      this.orgId = params['orgId'];
-      this.token = params['token'];
-      if (!this.userId || !this.orgId || !this.token) {
-        this.router.navigate([AUTH.LOGIN]);
-        return;
-      }
-      this.verifyToken();
-    });
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.userId = params['id'];
+        this.orgId = params['orgId'];
+        this.token = params['token'];
+        if (!this.userId || !this.orgId || !this.token) {
+          this.router.navigate([AUTH.LOGIN]);
+          return;
+        }
+        this.verifyToken();
+      });
   }
 
   verifyToken() {
@@ -86,12 +95,15 @@ export class SetPasswordComponent implements OnInit {
 
   resendLink() {
     this.resending = true;
-    this.loginService.resendSetupLink(this.userId, this.orgId).then(res => {
-      this.resending = false;
-      if (this.globalService.handleSuccessService(res)) {
-        this.pageState = 'resent';
-      }
-    }).catch(() => {});
+    this.loginService
+      .resendSetupLink(this.userId, this.orgId)
+      .then(res => {
+        this.resending = false;
+        if (this.globalService.handleSuccessService(res)) {
+          this.pageState = 'resent';
+        }
+      })
+      .catch(() => {});
   }
 
   passwordMatchValidator(g: FormGroup) {
@@ -107,7 +119,10 @@ export class SetPasswordComponent implements OnInit {
       try {
         const { newPassword } = this.setPasswordForm.value;
         const res: any = await this.loginService.setPassword(
-          newPassword, this.userId, this.orgId, this.token
+          newPassword,
+          this.userId,
+          this.orgId,
+          this.token,
         );
         if (this.globalService.handleSuccessService(res)) {
           StorageService.clear();
@@ -116,7 +131,9 @@ export class SetPasswordComponent implements OnInit {
           this.error.set(res.message || 'Failed to set password.');
         }
       } catch (err: any) {
-        this.error.set(err?.message || 'Failed to set password. Please try again.');
+        this.error.set(
+          err?.message || 'Failed to set password. Please try again.',
+        );
       } finally {
         this.loading.set(false);
       }
@@ -153,5 +170,4 @@ export class SetPasswordComponent implements OnInit {
     const input = document.getElementById(id) as HTMLInputElement;
     input.type = this.showPassword ? 'text' : 'password';
   }
-
 }

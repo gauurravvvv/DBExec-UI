@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
@@ -28,10 +36,10 @@ export class ListRlsRulesComponent implements OnInit {
   lastTableLazyLoadEvent: any;
 
   // Signal refs — template binds directly to these
-  rules   = this.rlsRulesService.rules;
-  total   = this.rlsRulesService.total;
+  rules = this.rlsRulesService.rules;
+  total = this.rlsRulesService.total;
   loading = this.rlsRulesService.loading;
-  saving  = this.rlsRulesService.saving;
+  saving = this.rlsRulesService.saving;
 
   datasources: any[] = [];
   selectedDatasource: any = null;
@@ -95,24 +103,27 @@ export class ListRlsRulesComponent implements OnInit {
   loadOrganisations(): Promise<void> {
     return new Promise(resolve => {
       const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
-      this.organisationService.listOrganisation(params).then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = response.data.orgs || [];
-          if (this.organisations.length > 0) {
-            this.selectedOrg = this.organisations[0].id;
-            this.loadDatasources();
-          } else {
-            this.selectedOrg = null;
-            this.datasources = [];
-            this.selectedDatasource = null;
+      this.organisationService
+        .listOrganisation(params)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response, false)) {
+            this.organisations = response.data.orgs || [];
+            if (this.organisations.length > 0) {
+              this.selectedOrg = this.organisations[0].id;
+              this.loadDatasources();
+            } else {
+              this.selectedOrg = null;
+              this.datasources = [];
+              this.selectedDatasource = null;
+            }
           }
-        }
-        this.cdr.markForCheck();
-        resolve();
-      }).catch(() => {
-        this.cdr.markForCheck();
-        resolve();
-      });
+          this.cdr.markForCheck();
+          resolve();
+        })
+        .catch(() => {
+          this.cdr.markForCheck();
+          resolve();
+        });
     });
   }
 
@@ -193,9 +204,13 @@ export class ListRlsRulesComponent implements OnInit {
     const params: any = { page, limit };
 
     const filter: any = {};
-    if (this.filterValues.datasetName) filter.datasetName = this.filterValues.datasetName;
+    if (this.filterValues.datasetName)
+      filter.datasetName = this.filterValues.datasetName;
     if (this.filterValues.name) filter.name = this.filterValues.name;
-    if (this.filterValues.status !== null && this.filterValues.status !== undefined) {
+    if (
+      this.filterValues.status !== null &&
+      this.filterValues.status !== undefined
+    ) {
       filter.status = this.filterValues.status;
     }
     if (Object.keys(filter).length > 0) params.filter = JSON.stringify(filter);
@@ -246,7 +261,11 @@ export class ListRlsRulesComponent implements OnInit {
   proceedDelete() {
     if (this.ruleToDelete && this.deleteJustification.trim()) {
       this.rlsRulesService
-        .delete(this.selectedOrg, this.ruleToDelete, this.deleteJustification.trim())
+        .delete(
+          this.selectedOrg,
+          this.ruleToDelete,
+          this.deleteJustification.trim(),
+        )
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {
             if (this.lastTableLazyLoadEvent) {
