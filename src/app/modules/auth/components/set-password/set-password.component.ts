@@ -34,14 +34,8 @@ export class SetPasswordComponent implements OnInit {
   orgId!: string;
   token!: string;
 
-  pageState:
-    | 'loading'
-    | 'valid'
-    | 'expired'
-    | 'already_set'
-    | 'invalid'
-    | 'resent' = 'loading';
-  resending = false;
+  pageState = signal<'loading' | 'valid' | 'expired' | 'already_set' | 'invalid' | 'resent'>('loading');
+  resending = signal(false);
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -77,30 +71,30 @@ export class SetPasswordComponent implements OnInit {
   }
 
   verifyToken() {
-    this.pageState = 'loading';
+    this.pageState.set('loading');
     this.loginService
       .verifySetupToken(this.userId, this.orgId, this.token)
       .then(res => {
         if (res.status && res.data?.tokenStatus) {
-          this.pageState = res.data.tokenStatus;
-          if (this.pageState === 'already_set') {
+          this.pageState.set(res.data.tokenStatus);
+          if (this.pageState() === 'already_set') {
             setTimeout(() => this.router.navigate([AUTH.LOGIN]), 3000);
           }
         } else {
-          this.pageState = 'invalid';
+          this.pageState.set('invalid');
         }
       })
       .catch(() => {});
   }
 
   resendLink() {
-    this.resending = true;
+    this.resending.set(true);
     this.loginService
       .resendSetupLink(this.userId, this.orgId)
       .then(res => {
-        this.resending = false;
+        this.resending.set(false);
         if (this.globalService.handleSuccessService(res)) {
-          this.pageState = 'resent';
+          this.pageState.set('resent');
         }
       })
       .catch(() => {});

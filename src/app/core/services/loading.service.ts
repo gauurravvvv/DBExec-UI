@@ -1,19 +1,18 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal, computed } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LoadingService {
-  constructor() {}
+  private _activeRequests = signal(0);
 
-  isLoadingSubject = new BehaviorSubject<boolean>(false);
+  readonly loading = computed(() => this._activeRequests() > 0);
 
   showLoader() {
-    this.isLoadingSubject.next(true);
+    this._activeRequests.update(n => n + 1);
   }
 
   hideLoader() {
-    this.isLoadingSubject.next(false);
+    this._activeRequests.update(n => Math.max(0, n - 1));
   }
 }

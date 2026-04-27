@@ -16,7 +16,7 @@ import { LoginService } from './core/services/login.service';
 import { StorageService } from './core/services/storage.service';
 import { StorageType } from './constants/storageType';
 import { PrimeNGConfig } from 'primeng/api';
-import { delay, filter } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +27,7 @@ import { delay, filter } from 'rxjs/operators';
 export class AppComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
 
-  public loading = false;
+  readonly loading = this.loadingService.loading;
   showSessionExpiredDialog = false;
   showIdleWarningDialog = false;
   idleCountdown = 0;
@@ -57,7 +57,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.primengConfig.ripple = true;
-    this.listenToLoading();
 
     // Session expired (refresh token invalidated)
     this.sessionExpiredService.onSessionExpired
@@ -155,13 +154,5 @@ export class AppComponent implements OnInit, OnDestroy {
   private finalizeLogout(): void {
     StorageService.clear();
     this.router.navigate(['/login']);
-  }
-
-  listenToLoading() {
-    this.loadingService.isLoadingSubject
-      .pipe(delay(0), takeUntilDestroyed(this.destroyRef))
-      .subscribe((loading: any) => {
-        if (this.loading !== loading) this.loading = loading;
-      });
   }
 }
