@@ -26,9 +26,9 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   loading = signal(false);
   error = signal('');
 
-  otpSent = false;
-  countdownDisplay = '';
-  canResend = false;
+  otpSent = signal(false);
+  countdownDisplay = signal('');
+  canResend = signal(false);
   private countdownInterval: any;
 
   constructor(
@@ -110,8 +110,8 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   private startCountdown(expiresAt: Date): void {
     this.clearCountdown();
-    this.otpSent = true;
-    this.canResend = false;
+    this.otpSent.set(true);
+    this.canResend.set(false);
     this.updateCountdown(expiresAt);
     this.countdownInterval = setInterval(() => {
       this.updateCountdown(expiresAt);
@@ -121,14 +121,14 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   private updateCountdown(expiresAt: Date): void {
     const remainingMs = expiresAt.getTime() - Date.now();
     if (remainingMs <= 0) {
-      this.countdownDisplay = '';
-      this.canResend = true;
+      this.countdownDisplay.set('');
+      this.canResend.set(true);
       this.clearCountdown();
       return;
     }
     const minutes = Math.floor(remainingMs / 60000);
     const seconds = Math.floor((remainingMs % 60000) / 1000);
-    this.countdownDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    this.countdownDisplay.set(`${minutes}:${seconds.toString().padStart(2, '0')}`);
   }
 
   private clearCountdown(): void {
