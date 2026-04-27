@@ -310,32 +310,32 @@
               <span
                 class="test-connection-link"
                 [class.disabled]="
-                  !isDbConnectionFieldsValid() || connectionTestLoading
+                  !isDbConnectionFieldsValid() || connectionTestLoading()
                 "
                 (click)="testConnection()"
               >
                 <i
                   [class]="
-                    connectionTestLoading
+                    connectionTestLoading()
                       ? 'pi pi-spin pi-spinner'
                       : 'pi pi-bolt'
                   "
                 ></i>
                 {{
-                  connectionTestLoading
+                  connectionTestLoading()
                     ? 'Testing connection...'
                     : 'Test Connection'
                 }}
               </span>
               <span
                 class="connection-status success"
-                *ngIf="connectionTestResult === 'success'"
+                *ngIf="connectionTestResult() === 'success'"
               >
                 <i class="pi pi-check-circle"></i> Connected
               </span>
               <span
                 class="connection-status failed"
-                *ngIf="connectionTestResult === 'failed'"
+                *ngIf="connectionTestResult() === 'failed'"
               >
                 <i class="pi pi-times-circle"></i> Connection failed
               </span>

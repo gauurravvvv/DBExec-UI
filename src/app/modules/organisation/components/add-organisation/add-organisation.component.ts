@@ -4,6 +4,7 @@ import {
   DestroyRef,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -34,9 +35,9 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   }
 
   showDbPassword = false;
-  connectionTested = false;
-  connectionTestLoading = false;
-  connectionTestResult: 'success' | 'failed' | null = null;
+  connectionTested = signal(false);
+  connectionTestLoading = signal(false);
+  connectionTestResult = signal<'success' | 'failed' | null>(null);
 
   constructor(
     private fb: FormBuilder,
@@ -153,8 +154,8 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
           .get(field)
           ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe(() => {
-            this.connectionTested = false;
-            this.connectionTestResult = null;
+            this.connectionTested.set(false);
+            this.connectionTestResult.set(null);
           });
       },
     );
@@ -313,8 +314,8 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   testConnection() {
     if (!this.isDbConnectionFieldsValid()) return;
 
-    this.connectionTestLoading = true;
-    this.connectionTestResult = null;
+    this.connectionTestLoading.set(true);
+    this.connectionTestResult.set(null);
 
     const formValue = this.orgForm.value;
     this.organisationService
@@ -327,19 +328,19 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
         password: formValue.dbPassword,
       })
       .then((response: any) => {
-        this.connectionTestLoading = false;
+        this.connectionTestLoading.set(false);
         if (response?.isConnected) {
-          this.connectionTested = true;
-          this.connectionTestResult = 'success';
+          this.connectionTested.set(true);
+          this.connectionTestResult.set('success');
         } else {
-          this.connectionTested = false;
-          this.connectionTestResult = 'failed';
+          this.connectionTested.set(false);
+          this.connectionTestResult.set('failed');
         }
       })
       .catch(() => {
-        this.connectionTestLoading = false;
-        this.connectionTested = false;
-        this.connectionTestResult = 'failed';
+        this.connectionTestLoading.set(false);
+        this.connectionTested.set(false);
+        this.connectionTestResult.set('failed');
       });
   }
 
@@ -358,8 +359,8 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     this.orgForm.reset();
     this.currentStep = 0;
     this.isFormDirty = false;
-    this.connectionTested = false;
-    this.connectionTestResult = null;
+    this.connectionTested.set(false);
+    this.connectionTestResult.set(null);
     this.orgForm.markAsPristine();
     Object.keys(this.orgForm.controls).forEach(key => {
       this.orgForm.get(key)?.setValue('');
@@ -398,7 +399,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       this.orgForm.get('confirmationChecked')?.value &&
       this.orgForm.get('dbAcknowledgment')?.value &&
       this.orgForm.get('schemaAcknowledgment')?.value &&
-      this.connectionTested
+      this.connectionTested()
     );
   }
 
