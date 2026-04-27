@@ -69,7 +69,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.pageState === 'prompt' && this.codeInputRef) {
+    if (this.pageState() === 'prompt' && this.codeInputRef) {
       setTimeout(() => this.codeInputRef.nativeElement.focus());
     }
   }
