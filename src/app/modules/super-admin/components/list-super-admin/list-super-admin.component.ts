@@ -14,7 +14,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { SuperAdminService } from '../../services/superAdmin.service';
+import { SuperAdminService } from '../../services/super-admin.service';
 
 @Component({
   selector: 'app-list-super-admin',
