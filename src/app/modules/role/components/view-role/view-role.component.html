@@ -6,11 +6,11 @@
         <button pButton class="p-button-text back-button" (click)="goBack()">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Role Details</h2>
+        <h2>{{ 'ROLE.VIEW_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions" *ngIf="roleData?.isDefault !== 1">
         <button class="btn-primary" type="button" (click)="onEdit()">
-          <i class="pi pi-pencil"></i> Edit
+          <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
         </button>
       </div>
     </div>
@@ -27,31 +27,31 @@
             </div>
             <h3 class="role-name">{{ roleData.name }}</h3>
             <span *ngIf="roleData.isDefault === 1" class="default-badge"
-              >Default</span
+              >{{ 'ROLE.DEFAULT' | translate }}</span
             >
           </div>
 
           <!-- Role Information -->
           <div class="detail-group">
-            <h4>Role Information</h4>
+            <h4>{{ 'ROLE.ROLE_INFORMATION' | translate }}</h4>
             <div class="detail-item" *ngIf="roleData.description">
               <span class="label">
                 <i class="pi pi-align-left"></i>
-                Description
+                {{ 'ROLE.DESCRIPTION' | translate }}
               </span>
               <span class="value">{{ roleData.description }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-check-circle"></i>
-                Status
+                {{ 'COMMON.STATUS' | translate }}
               </span>
               <span class="value">
                 <span
                   class="status-badge"
                   [class.active]="roleData.status === 1"
                 >
-                  {{ roleData.status === 1 ? 'Active' : 'Inactive' }}
+                  {{ roleData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
                 </span>
               </span>
             </div>
@@ -61,7 +61,7 @@
 
       <!-- Permissions Section -->
       <div class="permissions-section" *ngIf="permissions.length > 0">
-        <h4 class="section-title">Screen Permissions</h4>
+        <h4 class="section-title">{{ 'ROLE.SCREEN_PERMISSIONS' | translate }}</h4>
         <div class="permission-columns">
           <div
             class="column"
@@ -91,7 +91,7 @@
       </div>
 
       <div *ngIf="permissions.length === 0" class="no-permissions">
-        No permissions configured for this role.
+        {{ 'ROLE.NO_PERMISSIONS' | translate }}
       </div>
     </div>
   </div>

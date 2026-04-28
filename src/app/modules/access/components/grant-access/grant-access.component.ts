@@ -14,6 +14,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { ConnectionService } from 'src/app/modules/connection/services/connection.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { AccessService } from '../../services/access.service';
 
 @Component({
@@ -46,6 +47,7 @@ export class GrantAccessComponent implements OnInit {
     private acessService: AccessService,
     private connectionService: ConnectionService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {}
 
   get isFormDirty(): boolean {
@@ -175,7 +177,7 @@ export class GrantAccessComponent implements OnInit {
           this.onCancel();
         }
       } catch (error) {
-        console.error('Error granting access:', error);
+        console.error(this.translate.instant('ACCESS.ERROR_GRANTING_ACCESS'), error);
       }
     }
   }

@@ -7,6 +7,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { AnalysesService } from '../../services/analyses.service';
@@ -24,39 +25,39 @@ export interface ConfiguredFilter {
   sequence: number;
 }
 
-export const FILTER_OPERATORS: Record<
+export const FILTER_OPERATOR_KEYS: Record<
   string,
-  { label: string; value: string }[]
+  { labelKey: string; value: string }[]
 > = {
   category: [
-    { label: 'Equals', value: 'EQUALS' },
-    { label: 'Does Not Equal', value: 'DOES_NOT_EQUAL' },
-    { label: 'Contains', value: 'CONTAINS' },
-    { label: 'Does Not Contain', value: 'DOES_NOT_CONTAIN' },
-    { label: 'Starts With', value: 'STARTS_WITH' },
-    { label: 'Ends With', value: 'ENDS_WITH' },
+    { labelKey: 'ANALYSES.OPERATOR_EQUALS', value: 'EQUALS' },
+    { labelKey: 'ANALYSES.OPERATOR_DOES_NOT_EQUAL', value: 'DOES_NOT_EQUAL' },
+    { labelKey: 'ANALYSES.OPERATOR_CONTAINS', value: 'CONTAINS' },
+    { labelKey: 'ANALYSES.OPERATOR_DOES_NOT_CONTAIN', value: 'DOES_NOT_CONTAIN' },
+    { labelKey: 'ANALYSES.OPERATOR_STARTS_WITH', value: 'STARTS_WITH' },
+    { labelKey: 'ANALYSES.OPERATOR_ENDS_WITH', value: 'ENDS_WITH' },
   ],
   numeric_equality: [
-    { label: 'Equals', value: 'EQUALS' },
-    { label: 'Not Equals', value: 'NOT_EQUALS' },
-    { label: 'Greater Than', value: 'GREATER_THAN' },
-    { label: 'Greater Than or Equal', value: 'GREATER_THAN_OR_EQUAL' },
-    { label: 'Less Than', value: 'LESS_THAN' },
-    { label: 'Less Than or Equal', value: 'LESS_THAN_OR_EQUAL' },
+    { labelKey: 'ANALYSES.OPERATOR_EQUALS', value: 'EQUALS' },
+    { labelKey: 'ANALYSES.OPERATOR_NOT_EQUALS', value: 'NOT_EQUALS' },
+    { labelKey: 'ANALYSES.OPERATOR_GREATER_THAN', value: 'GREATER_THAN' },
+    { labelKey: 'ANALYSES.OPERATOR_GREATER_THAN_OR_EQUAL', value: 'GREATER_THAN_OR_EQUAL' },
+    { labelKey: 'ANALYSES.OPERATOR_LESS_THAN', value: 'LESS_THAN' },
+    { labelKey: 'ANALYSES.OPERATOR_LESS_THAN_OR_EQUAL', value: 'LESS_THAN_OR_EQUAL' },
   ],
-  numeric_range: [{ label: 'Between', value: 'BETWEEN' }],
+  numeric_range: [{ labelKey: 'ANALYSES.OPERATOR_BETWEEN', value: 'BETWEEN' }],
   time_equality: [
-    { label: 'Equals', value: 'EQUALS' },
-    { label: 'Before', value: 'BEFORE' },
-    { label: 'After', value: 'AFTER' },
+    { labelKey: 'ANALYSES.OPERATOR_EQUALS', value: 'EQUALS' },
+    { labelKey: 'ANALYSES.OPERATOR_BEFORE', value: 'BEFORE' },
+    { labelKey: 'ANALYSES.OPERATOR_AFTER', value: 'AFTER' },
   ],
-  time_range: [{ label: 'Between', value: 'BETWEEN' }],
+  time_range: [{ labelKey: 'ANALYSES.OPERATOR_BETWEEN', value: 'BETWEEN' }],
 };
 
-export const NULL_OPTIONS = [
-  { label: 'All Values', value: 'ALL_VALUES' },
-  { label: 'Non-Nulls Only', value: 'NON_NULLS_ONLY' },
-  { label: 'Nulls Only', value: 'NULLS_ONLY' },
+export const NULL_OPTION_KEYS = [
+  { labelKey: 'ANALYSES.NULL_ALL_VALUES', value: 'ALL_VALUES' },
+  { labelKey: 'ANALYSES.NULL_NON_NULLS_ONLY', value: 'NON_NULLS_ONLY' },
+  { labelKey: 'ANALYSES.NULL_NULLS_ONLY', value: 'NULLS_ONLY' },
 ];
 
 export const DATE_FORMAT_OPTIONS = [
@@ -104,16 +105,10 @@ export class FilterDialogComponent implements OnChanges {
   isSavingFilter: boolean = false;
 
   // Dropdown options
-  filterTypeOptions = [
-    { label: 'Category', value: 'category' },
-    { label: 'Numeric (Exact)', value: 'numeric_equality' },
-    { label: 'Numeric (Range)', value: 'numeric_range' },
-    { label: 'Date/Time (Exact)', value: 'time_equality' },
-    { label: 'Date/Time (Range)', value: 'time_range' },
-  ];
+  filterTypeOptions: { label: string; value: string }[] = [];
   controlTypeOptions: { label: string; value: string }[] = [];
   operatorOptions: { label: string; value: string }[] = [];
-  nullOptions = NULL_OPTIONS;
+  nullOptions: { label: string; value: string }[] = [];
   dateFormatOptions = DATE_FORMAT_OPTIONS;
 
   private columnValuesCache: {
@@ -124,7 +119,20 @@ export class FilterDialogComponent implements OnChanges {
     private globalService: GlobalService,
     private analysesService: AnalysesService,
     private datasetService: DatasetService,
-  ) {}
+    private translate: TranslateService,
+  ) {
+    this.filterTypeOptions = [
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_CATEGORY'), value: 'category' },
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_EXACT'), value: 'numeric_equality' },
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_RANGE'), value: 'numeric_range' },
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_EXACT'), value: 'time_equality' },
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_RANGE'), value: 'time_range' },
+    ];
+    this.nullOptions = NULL_OPTION_KEYS.map(o => ({
+      label: this.translate.instant(o.labelKey),
+      value: o.value,
+    }));
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
@@ -215,7 +223,7 @@ export class FilterDialogComponent implements OnChanges {
       ) {
         this.globalService.handleErrorService({
           status: false,
-          message: 'Range minimum cannot be greater than maximum',
+          message: this.translate.instant('VALIDATION.RANGE_MIN_GREATER_THAN_MAX'),
         });
         return;
       }
@@ -231,7 +239,7 @@ export class FilterDialogComponent implements OnChanges {
       ) {
         this.globalService.handleErrorService({
           status: false,
-          message: 'Start date cannot be after end date',
+          message: this.translate.instant('VALIDATION.START_DATE_AFTER_END'),
         });
         return;
       }
@@ -391,26 +399,26 @@ export class FilterDialogComponent implements OnChanges {
     switch (this.filterDialogType) {
       case 'category':
         this.controlTypeOptions = [
-          { label: 'Dropdown', value: 'dropdown' },
-          { label: 'Multi-Select List', value: 'list' },
+          { label: this.translate.instant('ANALYSES.CONTROL_DROPDOWN'), value: 'dropdown' },
+          { label: this.translate.instant('ANALYSES.CONTROL_MULTI_SELECT'), value: 'list' },
         ];
         break;
       case 'numeric_equality':
         this.controlTypeOptions = [
-          { label: 'Text Input', value: 'text' },
-          { label: 'Dropdown', value: 'dropdown' },
+          { label: this.translate.instant('ANALYSES.CONTROL_TEXT_INPUT'), value: 'text' },
+          { label: this.translate.instant('ANALYSES.CONTROL_DROPDOWN'), value: 'dropdown' },
         ];
         break;
       case 'numeric_range':
         this.controlTypeOptions = [
-          { label: 'Slider', value: 'slider' },
-          { label: 'Text Input', value: 'text' },
+          { label: this.translate.instant('ANALYSES.CONTROL_SLIDER'), value: 'slider' },
+          { label: this.translate.instant('ANALYSES.CONTROL_TEXT_INPUT'), value: 'text' },
         ];
         break;
       case 'time_equality':
       case 'time_range':
         this.controlTypeOptions = [
-          { label: 'Date Picker', value: 'datepicker' },
+          { label: this.translate.instant('ANALYSES.CONTROL_DATE_PICKER'), value: 'datepicker' },
         ];
         break;
       default:
@@ -419,7 +427,11 @@ export class FilterDialogComponent implements OnChanges {
   }
 
   private updateOperatorOptions(): void {
-    this.operatorOptions = FILTER_OPERATORS[this.filterDialogType] || [];
+    const keys = FILTER_OPERATOR_KEYS[this.filterDialogType] || [];
+    this.operatorOptions = keys.map(o => ({
+      label: this.translate.instant(o.labelKey),
+      value: o.value,
+    }));
   }
 
   async loadColumnDistinctValues(): Promise<void> {

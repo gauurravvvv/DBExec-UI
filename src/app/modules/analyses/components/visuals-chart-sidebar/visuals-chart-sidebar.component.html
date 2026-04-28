@@ -3,10 +3,10 @@
     <div class="dataset-label">
       {{
         focusedVisualId && !focusedVisual.chartType
-          ? 'Chart Type'
+          ? ('ANALYSES.CHART_TYPE' | translate)
           : focusedVisualId && focusedVisual.chartType
-            ? 'Field Mapping'
-            : 'Charts'
+            ? ('ANALYSES.FIELD_MAPPING' | translate)
+            : ('ANALYSES.CHARTS' | translate)
       }}
     </div>
   </div>
@@ -16,12 +16,12 @@
     <div class="add-visual-section">
       <button
         pButton
-        label="Add Visual"
+        [label]="'ANALYSES.ADD_VISUAL' | translate"
         icon="pi pi-plus"
         class="p-button-outlined p-button-sm add-visual-button"
         (click)="addVisualClicked.emit()"
         [disabled]="!isDataLoaded"
-        pTooltip="Load data first to add visuals"
+        [pTooltip]="'ANALYSES.LOAD_DATA_FIRST_TO_ADD_VISUALS' | translate"
         [tooltipDisabled]="isDataLoaded"
         tooltipPosition="top"
       ></button>
@@ -34,13 +34,13 @@
     >
       <div class="chart-type-hint">
         <i class="pi pi-info-circle"></i>
-        <span>Select a chart type for this visual</span>
+        <span>{{ 'ANALYSES.SELECT_CHART_TYPE_FOR_VISUAL' | translate }}</span>
       </div>
       <!-- Search Input for Charts -->
       <div class="chart-search-wrapper">
         <app-custom-input
           [(ngModel)]="chartSearchQuery"
-          placeholder="Search charts..."
+          [placeholder]="'ANALYSES.SEARCH_CHARTS' | translate"
           icon="pi-search"
         ></app-custom-input>
       </div>
@@ -78,10 +78,10 @@
       *ngIf="focusedVisualId && focusedVisual?.chartType"
     >
       <div class="section-divider"></div>
-      <div class="axis-selection-title">Data Mapping</div>
+      <div class="axis-selection-title">{{ 'ANALYSES.DATA_MAPPING' | translate }}</div>
       <div class="axis-hint" *ngIf="activeAxisSelection">
         <i class="pi pi-arrow-left"></i>
-        <span>Click a field from the left panel</span>
+        <span>{{ 'ANALYSES.CLICK_FIELD_FROM_LEFT_PANEL' | translate }}</span>
       </div>
 
       <!-- Heat Map / Sankey / Graph: 3 fields -->
@@ -103,8 +103,8 @@
             {{
               isSankeyChartType(focusedVisual.chartType) ||
               isGraphChartType(focusedVisual.chartType)
-                ? 'Source'
-                : 'Row'
+                ? ('ANALYSES.SOURCE' | translate)
+                : ('ANALYSES.ROW' | translate)
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
@@ -116,7 +116,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Second Field Slot -->
@@ -130,8 +130,8 @@
             {{
               isSankeyChartType(focusedVisual.chartType) ||
               isGraphChartType(focusedVisual.chartType)
-                ? 'Target'
-                : 'Column'
+                ? ('ANALYSES.TARGET' | translate)
+                : ('ANALYSES.COLUMN' | translate)
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
@@ -143,7 +143,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Value Slot -->
@@ -153,7 +153,7 @@
           [class.has-value]="focusedVisual.zAxisColumn"
           (click)="startAxisSelection('z')"
         >
-          <div class="axis-label">Value</div>
+          <div class="axis-label">{{ 'ANALYSES.VALUE' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.zAxisColumn) }}</span>
             <i
@@ -163,7 +163,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.zAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
       </ng-container>
@@ -177,7 +177,7 @@
           [class.has-value]="focusedVisual.xAxisColumn"
           (click)="startAxisSelection('x')"
         >
-          <div class="axis-label">X-Axis</div>
+          <div class="axis-label">{{ 'ANALYSES.X_AXIS' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
@@ -187,7 +187,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Y-Axis Slot -->
@@ -197,7 +197,7 @@
           [class.has-value]="focusedVisual.yAxisColumn"
           (click)="startAxisSelection('y')"
         >
-          <div class="axis-label">Y-Axis</div>
+          <div class="axis-label">{{ 'ANALYSES.Y_AXIS' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
@@ -207,7 +207,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Size Slot (optional for bubble) -->
@@ -217,7 +217,7 @@
           [class.has-value]="focusedVisual.zAxisColumn"
           (click)="startAxisSelection('z')"
         >
-          <div class="axis-label">Size (optional)</div>
+          <div class="axis-label">{{ 'ANALYSES.SIZE_OPTIONAL' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.zAxisColumn) }}</span>
             <i
@@ -227,7 +227,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.zAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
       </ng-container>
@@ -243,7 +243,7 @@
         >
           <div class="axis-label">
             {{
-              isPolygons3dChartType(focusedVisual.chartType) ? 'Name' : 'X-Axis'
+              isPolygons3dChartType(focusedVisual.chartType) ? ('ANALYSES.NAME' | translate) : ('ANALYSES.X_AXIS' | translate)
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
@@ -255,7 +255,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Y-Axis Slot -->
@@ -268,8 +268,8 @@
           <div class="axis-label">
             {{
               isPolygons3dChartType(focusedVisual.chartType)
-                ? 'Longitude'
-                : 'Y-Axis'
+                ? ('ANALYSES.LONGITUDE' | translate)
+                : ('ANALYSES.Y_AXIS' | translate)
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
@@ -281,7 +281,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Z-Axis Slot -->
@@ -294,8 +294,8 @@
           <div class="axis-label">
             {{
               isPolygons3dChartType(focusedVisual.chartType)
-                ? 'Latitude'
-                : 'Z-Axis'
+                ? ('ANALYSES.LATITUDE' | translate)
+                : ('ANALYSES.Z_AXIS' | translate)
             }}
           </div>
           <div class="axis-value" *ngIf="focusedVisual.zAxisColumn">
@@ -307,7 +307,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.zAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
       </ng-container>
@@ -329,7 +329,7 @@
           [class.has-value]="focusedVisual.xAxisColumn"
           (click)="startAxisSelection('x')"
         >
-          <div class="axis-label">X-Axis</div>
+          <div class="axis-label">{{ 'ANALYSES.X_AXIS' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
@@ -339,7 +339,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Y-Axis Slot -->
@@ -349,7 +349,7 @@
           [class.has-value]="focusedVisual.yAxisColumn"
           (click)="startAxisSelection('y')"
         >
-          <div class="axis-label">Y-Axis</div>
+          <div class="axis-label">{{ 'ANALYSES.Y_AXIS' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
@@ -359,7 +359,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
       </ng-container>
@@ -382,7 +382,7 @@
           [class.has-value]="focusedVisual.xAxisColumn"
           (click)="startAxisSelection('x')"
         >
-          <div class="axis-label">Category</div>
+          <div class="axis-label">{{ 'ANALYSES.CATEGORY' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
@@ -392,7 +392,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Value Slot -->
@@ -402,7 +402,7 @@
           [class.has-value]="focusedVisual.yAxisColumn"
           (click)="startAxisSelection('y')"
         >
-          <div class="axis-label">Value</div>
+          <div class="axis-label">{{ 'ANALYSES.VALUE' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
@@ -412,7 +412,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
       </ng-container>
@@ -426,7 +426,7 @@
           [class.has-value]="focusedVisual.xAxisColumn"
           (click)="startAxisSelection('x')"
         >
-          <div class="axis-label">Longitude</div>
+          <div class="axis-label">{{ 'ANALYSES.LONGITUDE' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.xAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.xAxisColumn) }}</span>
             <i
@@ -436,7 +436,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.xAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
         <!-- Latitude Slot -->
@@ -446,7 +446,7 @@
           [class.has-value]="focusedVisual.yAxisColumn"
           (click)="startAxisSelection('y')"
         >
-          <div class="axis-label">Latitude</div>
+          <div class="axis-label">{{ 'ANALYSES.LATITUDE' | translate }}</div>
           <div class="axis-value" *ngIf="focusedVisual.yAxisColumn">
             <span>{{ getFieldDisplayName(focusedVisual.yAxisColumn) }}</span>
             <i
@@ -456,7 +456,7 @@
           </div>
           <div class="axis-placeholder" *ngIf="!focusedVisual.yAxisColumn">
             <i class="pi pi-plus"></i>
-            <span>Click to select field</span>
+            <span>{{ 'ANALYSES.CLICK_TO_SELECT_FIELD' | translate }}</span>
           </div>
         </div>
       </ng-container>

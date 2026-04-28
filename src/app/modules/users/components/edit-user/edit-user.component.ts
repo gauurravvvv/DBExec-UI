@@ -13,6 +13,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
+import { TranslateService } from '@ngx-translate/core';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -46,6 +47,7 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
     private groupService: GroupService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -187,25 +189,25 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
 
   getFirstNameError(): string {
     const control = this.userForm.get('firstName');
-    if (control?.errors?.['required']) return 'First name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.FIRST_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.FIRST_NAME_MIN', { min: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `First name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.FIRST_NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'First name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+      return this.translate.instant('VALIDATION.FIRST_NAME_PATTERN');
     return '';
   }
 
   getLastNameError(): string {
     const control = this.userForm.get('lastName');
-    if (control?.errors?.['required']) return 'Last name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.LAST_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.LAST_NAME_MIN', { min: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Last name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.LAST_NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+      return this.translate.instant('VALIDATION.LAST_NAME_PATTERN');
     return '';
   }
 }

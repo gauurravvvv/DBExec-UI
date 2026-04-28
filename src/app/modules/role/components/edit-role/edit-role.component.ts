@@ -15,6 +15,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
 import { ROLE } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { TranslateService } from '@ngx-translate/core';
 import { RoleService } from '../../services/role.service';
 
 @Component({
@@ -42,6 +43,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
     private roleService: RoleService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -203,9 +205,9 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const nameControl = this.roleForm.get('name');
-    if (nameControl?.errors?.['required']) return 'Name is required';
+    if (nameControl?.errors?.['required']) return this.translate.instant('VALIDATION.NAME_REQUIRED');
     if (nameControl?.errors?.['pattern'])
-      return 'Name can only contain letters, spaces and hyphens';
+      return this.translate.instant('VALIDATION.NAME_PATTERN');
     return '';
   }
 

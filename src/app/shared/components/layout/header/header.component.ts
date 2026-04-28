@@ -21,6 +21,7 @@ import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { AnnouncementService } from 'src/app/modules/app-settings/services/announcement.service';
+import { LocaleService, SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import { GlobalSearchService } from '../../../services/global-search.service';
 
 interface Announcement {
@@ -48,6 +49,9 @@ export class HeaderComponent implements OnInit {
   isDarkMode = false;
   isAnimating = false;
   isFullscreen = false;
+  locales = [...SUPPORTED_LOCALES];
+  currentLocale = 'en';
+  changingLocale = false;
   @ViewChild('notificationMenu') notificationMenu!: ElementRef;
 
   // Announcements (multiple, queued)
@@ -119,6 +123,7 @@ export class HeaderComponent implements OnInit {
     private globalSearchService: GlobalSearchService,
     private loginService: LoginService,
     private announcementService: AnnouncementService,
+    private localeService: LocaleService,
   ) {
     this.isDarkMode = false;
     this.applyTheme();
@@ -137,6 +142,9 @@ export class HeaderComponent implements OnInit {
     this.userName = userFullName;
     this.userInitials = this.globalService.chipNameProvider(userFullName);
     this.userRole = this.globalService.getTokenDetails('role');
+
+    this.localeService.initFromToken();
+    this.currentLocale = this.localeService.currentLocale;
 
     this.updateUnreadCount();
 
@@ -459,6 +467,14 @@ export class HeaderComponent implements OnInit {
       (this.currentAnnouncementIndex + 1) % this.announcements.length;
     this.startTypewriter();
     this.scheduleRotation();
+  }
+
+  async onLocaleChange(locale: string) {
+    if (this.changingLocale) return;
+    this.changingLocale = true;
+    await this.localeService.changeLocale(locale);
+    this.changingLocale = false;
+    this.cdr.markForCheck();
   }
 
   trackById(index: number, item: any): any {

@@ -9,6 +9,7 @@ import {
   Output,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/constants/regex.constant';
 
 export interface DatasetFormData {
@@ -27,13 +28,18 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
   @Input() visible = false;
   @Input() initialName = '';
   @Input() initialDescription = '';
-  @Input() dialogTitle = 'Save as Dataset';
+  @Input() dialogTitle = '';
   @Input() showJustification = false;
   @Output() close = new EventEmitter<DatasetFormData | null>();
 
   datasetForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private translate: TranslateService,
+  ) {
+    this.dialogTitle = this.translate.instant('DATASET.SAVE_AS_DATASET');
+  }
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscapeKey(event: KeyboardEvent) {
@@ -85,13 +91,13 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
 
   getNameError(): string {
     const control = this.datasetForm.get('name');
-    if (control?.errors?.['required']) return 'Dataset name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.DATASET_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Dataset name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.DATASET_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Dataset name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.DATASET_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Dataset name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('VALIDATION.DATASET_NAME_PATTERN');
     return '';
   }
 

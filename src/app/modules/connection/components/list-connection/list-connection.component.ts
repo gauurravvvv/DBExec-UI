@@ -18,6 +18,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { ConnectionService } from '../../services/connection.service';
 
 @Component({
@@ -54,10 +55,7 @@ export class ListConnectionComponent implements OnInit {
 
   today = new Date();
 
-  statusOptions = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 },
-  ];
+  statusOptions: any[] = [];
 
   // Filter values for column filtering
   filterValues: any = {
@@ -99,9 +97,15 @@ export class ListConnectionComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {
+    this.statusOptions = [
+      { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
+      { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
+    ];
+
     // Setup debounced filter
     this.filter$
       .pipe(debounceTime(400))

@@ -22,6 +22,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { DatasourceService } from '../../services/datasource.service';
 
 @Component({
@@ -104,6 +105,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -319,29 +321,29 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
   getErrorMessage(fieldName: string): string {
     const control = this.datasourceForm.get(fieldName);
     if (control?.errors) {
-      if (control.errors['required']) return 'This field is required';
+      if (control.errors['required']) return this.translate.instant('VALIDATION.FIELD_REQUIRED');
       if (control.errors['minlength'])
-        return `Must be at least ${control.errors['minlength'].requiredLength} characters`;
+        return this.translate.instant('VALIDATION.MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
       if (control.errors['maxlength'])
-        return `Must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+        return this.translate.instant('VALIDATION.MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
       if (control.errors['pattern']) {
         switch (fieldName) {
           case 'name':
-            return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+            return this.translate.instant('VALIDATION.NAME_PATTERN');
           case 'host':
-            return 'Invalid host format';
+            return this.translate.instant('VALIDATION.INVALID_HOST_FORMAT');
           case 'port':
-            return 'Port must be a number';
+            return this.translate.instant('VALIDATION.PORT_MUST_BE_NUMBER');
           case 'database':
-            return 'Database name can only contain letters, numbers, underscores and hyphens';
+            return this.translate.instant('VALIDATION.DATABASE_NAME_PATTERN');
           default:
-            return 'Invalid format';
+            return this.translate.instant('VALIDATION.INVALID_FORMAT');
         }
       }
       if (control.errors['min'] && fieldName === 'port')
-        return 'Port must be at least 1';
+        return this.translate.instant('VALIDATION.PORT_MIN');
       if (control.errors['max'] && fieldName === 'port')
-        return 'Port cannot exceed 65535';
+        return this.translate.instant('VALIDATION.PORT_MAX');
     }
     return '';
   }

@@ -6,8 +6,8 @@
       <div class="form-field">
         <app-custom-input
           formControlName="name"
-          label="Name"
-          placeholder="Enter analysis name"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'ANALYSES.ENTER_ANALYSIS_NAME' | translate"
           icon="pi-chart-bar"
           [required]="true"
           [showError]="
@@ -17,6 +17,7 @@
             )
           "
           [errorMessage]="getNameError()"
+
         >
         </app-custom-input>
       </div>
@@ -25,27 +26,27 @@
       <div class="form-field">
         <app-custom-input
           formControlName="description"
-          label="Description"
-          placeholder="Enter analysis description (optional)"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'ANALYSES.ENTER_ANALYSIS_DESCRIPTION' | translate"
           icon="pi-align-left"
         >
         </app-custom-input>
         <small class="char-count">
           {{ analysisForm.get('description')?.value?.length || 0 }}/500
-          characters
+          {{ 'ANALYSES.CHARACTERS' | translate }}
         </small>
       </div>
 
       <!-- Justification (for updates only) -->
       <div class="form-field justification-field" *ngIf="showJustification">
         <label for="saveJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="saveJustification"
           [(ngModel)]="saveJustification"
           [ngModelOptions]="{ standalone: true }"
-          placeholder="Provide a reason for this update"
+          [placeholder]="'ANALYSES.PROVIDE_UPDATE_REASON' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -56,14 +57,14 @@
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           (click)="onCancel()"
         ></button>
         <button
           pButton
           type="submit"
-          label="Save Analysis"
+          [label]="'ANALYSES.SAVE_ANALYSIS' | translate"
           class="p-button-primary btn-save"
           [disabled]="
             analysisForm.invalid ||

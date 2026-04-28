@@ -7,8 +7,8 @@
         <div class="input-group">
           <app-custom-input
             [(ngModel)]="editableField.columnToUse"
-            label="Field name to use"
-            placeholder="Column name"
+            [label]="'DATASET.FIELD_NAME_TO_USE' | translate"
+            [placeholder]="'DATASET.COLUMN_NAME' | translate"
             [inputDisabled]="true"
           >
           </app-custom-input>
@@ -16,8 +16,8 @@
         <div class="input-group">
           <app-custom-input
             [(ngModel)]="editableField.columnToView"
-            label="Field name to show"
-            placeholder="Display name"
+            [label]="'DATASET.FIELD_NAME_TO_SHOW' | translate"
+            [placeholder]="'DATASET.DISPLAY_NAME' | translate"
             [maxLength]="MAX_NAME_LENGTH"
             [showError]="!!nameError"
             [errorMessage]="nameError"
@@ -33,18 +33,17 @@
             [options]="analyticalTypes"
             [ngModel]="editableField.dataType"
             (ngModelChange)="onDataTypeChange($event)"
-            label="Data Type"
+            [label]="'DATASET.DATA_TYPE' | translate"
             optionLabel="label"
             optionValue="value"
-            placeholder="Select data type"
+            [placeholder]="'DATASET.SELECT_DATA_TYPE' | translate"
             [filter]="true"
             [autoDisplayFirst]="false"
             appendTo="body"
           >
           </app-custom-dropdown>
           <small class="type-hint">
-            Changing the data type affects how this field is interpreted in
-            visualizations
+            {{ 'DATASET.DATA_TYPE_HINT' | translate }}
           </small>
         </div>
       </div>
@@ -53,7 +52,7 @@
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           (click)="onCancel()"
           [disabled]="isSubmitting"
@@ -61,7 +60,7 @@
         <button
           pButton
           type="button"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           class="p-button-primary btn-save"
           (click)="onSubmit()"
           [disabled]="!isSaveEnabled || isSubmitting"

@@ -37,6 +37,7 @@ import {
   selectIsSchemaStale,
   selectSchemaByKey,
 } from '../../store';
+import { TranslateService } from '@ngx-translate/core';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
 // Declare Monaco and window for TypeScript
@@ -198,6 +199,7 @@ export class EditDatasetComponent
     private store: Store,
     private cdr: ChangeDetectorRef,
     private monacoLoader: MonacoLoaderService,
+    private translate: TranslateService,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
     this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
@@ -625,7 +627,7 @@ export class EditDatasetComponent
                 AddDatasetActions.loadSchemaDataFailure({
                   orgId,
                   dbId: dbIdStr,
-                  error: error.message || 'Failed to load schema',
+                  error: error.message || this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
                 }),
               );
 
@@ -639,7 +641,7 @@ export class EditDatasetComponent
           AddDatasetActions.loadSchemaDataFailure({
             orgId,
             dbId: dbIdStr,
-            error: error.message || 'Failed to load schema',
+            error: error.message || this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
           }),
         );
 
@@ -740,8 +742,8 @@ export class EditDatasetComponent
     if (!fileName.endsWith('.sql') && !fileName.endsWith('.txt')) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Invalid File Format',
-        detail: 'Please upload a valid SQL file (.sql or .txt)',
+        summary: this.translate.instant('DATASET.INVALID_FILE_FORMAT'),
+        detail: this.translate.instant('DATASET.INVALID_FILE_FORMAT_DESC'),
         key: 'topRight',
         life: 3000,
         styleClass: 'custom-toast',
@@ -757,8 +759,8 @@ export class EditDatasetComponent
     if (file.size > maxSizeInBytes) {
       this.messageService.add({
         severity: 'error',
-        summary: 'File Too Large',
-        detail: `File size must be less than ${maxSizeInMB}MB`,
+        summary: this.translate.instant('DATASET.FILE_TOO_LARGE'),
+        detail: this.translate.instant('DATASET.FILE_SIZE_LIMIT', { size: maxSizeInMB }),
         key: 'topRight',
         life: 3000,
         styleClass: 'custom-toast',
@@ -783,8 +785,8 @@ export class EditDatasetComponent
     reader.onerror = () => {
       this.messageService.add({
         severity: 'error',
-        summary: 'Import Failed',
-        detail: 'Failed to read the file. Please try again.',
+        summary: this.translate.instant('DATASET.IMPORT_FAILED'),
+        detail: this.translate.instant('DATASET.IMPORT_FAILED_DESC'),
         key: 'topRight',
         life: 3000,
         styleClass: 'custom-toast',
@@ -875,11 +877,11 @@ export class EditDatasetComponent
         this.isExportingResults = false;
         this.messageService.add({
           severity: 'error',
-          summary: 'Export Failed',
+          summary: this.translate.instant('DATASET.EXPORT_FAILED'),
           detail:
             error.error?.message ||
             error.message ||
-            'Failed to export query results',
+            this.translate.instant('DATASET.EXPORT_FAILED_DESC'),
           key: 'topRight',
           life: 3000,
           styleClass: 'custom-toast',
@@ -955,7 +957,7 @@ export class EditDatasetComponent
             rows: [],
             rowCount: 0,
             executionTime: executionTime,
-            error: response.message || 'Query execution failed',
+            error: response.message || this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
           };
           this.isExecutingQuery = false;
           return;
@@ -1024,7 +1026,7 @@ export class EditDatasetComponent
         const executionTime = `${Date.now() - startTime}ms`;
 
         // Extract error message
-        let errorMessage = 'Query execution failed';
+        let errorMessage = this.translate.instant('DATASET.QUERY_EXECUTION_FAILED');
         if (error.error?.message) {
           errorMessage = error.error.message;
         } else if (error.message) {
@@ -1184,7 +1186,7 @@ export class EditDatasetComponent
 
     this.contextMenuItems = [
       {
-        label: 'Refresh Schema',
+        label: this.translate.instant('DATASET.REFRESH_SCHEMA'),
         icon: 'pi pi-refresh',
         command: () => this.refreshDatasourceFromContext(),
       },

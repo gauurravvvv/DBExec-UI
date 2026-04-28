@@ -23,6 +23,7 @@ import {
   getAllFunctions,
 } from '../../constants/functions-reference';
 import { DatasetService } from '../../services/dataset.service';
+import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICAL_TYPES } from '../edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
 import {
   createFieldCompletionItem,
@@ -112,6 +113,7 @@ export class AddCustomFieldDialogComponent
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
     private monacoLoader: MonacoLoaderService,
+    private translate: TranslateService,
   ) {}
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -398,7 +400,7 @@ export class AddCustomFieldDialogComponent
 
     // Check if field name conflicts with a formula function name
     if (name && this.reservedNames.has(name)) {
-      this.fieldNameError = `"${name}" is a reserved function name and cannot be used as a field name`;
+      this.fieldNameError = this.translate.instant('DATASET.RESERVED_FUNCTION_NAME', { name });
       this.isSaveEnabled = false;
       return;
     }
@@ -550,7 +552,7 @@ export class AddCustomFieldDialogComponent
           this.isValidated = true;
           this.validationResult = {
             valid: true,
-            message: response.message || 'Formula validated successfully!',
+            message: response.message || this.translate.instant('DATASET.FORMULA_VALIDATED'),
           };
           // Update save button state - we just set isValidated to true above
           this.isSaveEnabled =
@@ -561,7 +563,7 @@ export class AddCustomFieldDialogComponent
           this.isValidated = false;
           this.validationResult = {
             valid: false,
-            message: response.message || 'Validation failed',
+            message: response.message || this.translate.instant('DATASET.VALIDATION_FAILED'),
           };
         }
         this.cdr.markForCheck();
@@ -572,7 +574,7 @@ export class AddCustomFieldDialogComponent
         this.validationResult = {
           valid: false,
           message:
-            error?.error?.message || 'Validation failed. Please try again.',
+            error?.error?.message || this.translate.instant('DATASET.VALIDATION_FAILED_RETRY'),
         };
         this.cdr.markForCheck();
       });

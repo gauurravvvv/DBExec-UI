@@ -20,6 +20,7 @@ import { CustomRangesliderComponent } from './components/custom-rangeslider/cust
 import { CustomTextareaComponent } from './components/custom-textarea/custom-textarea.component';
 import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.component';
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
+import { TranslateModule } from '@ngx-translate/core';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import {
@@ -54,7 +55,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     FilterTablesPipe,
     ReplaceUnderscoresPipe,
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, AppPrimeNGModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AppPrimeNGModule, TranslateModule],
   exports: [
     ChangePasswordDialogComponent,
     ConfirmLeaveDialogComponent,
@@ -79,6 +80,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     FilterSchemasPipe,
     FilterTablesPipe,
     ReplaceUnderscoresPipe,
+    TranslateModule,
   ],
 })
 export class SharedModule {}

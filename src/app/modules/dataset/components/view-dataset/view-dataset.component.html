@@ -10,16 +10,16 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h2>Dataset Details</h2>
+        <h2>{{ 'DATASET.DATASET_DETAILS' | translate }}</h2>
       </div>
       <div class="header-actions">
         <button class="btn-primary" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
-          Edit
+          {{ 'COMMON.EDIT' | translate }}
         </button>
         <button class="btn-danger" type="button" (click)="confirmDelete()">
           <i class="pi pi-trash"></i>
-          Delete
+          {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
@@ -31,23 +31,23 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-info-circle mr-2"></i>
-            Basic Information
+            {{ 'DATASET.BASIC_INFORMATION' | translate }}
           </h3>
           <div class="info-grid">
             <div class="info-item">
-              <label>Dataset Name</label>
+              <label>{{ 'DATASET.DATASET_NAME' | translate }}</label>
               <p>{{ datasetData.name }}</p>
             </div>
             <div class="info-item">
-              <label>Description</label>
-              <p>{{ datasetData.description || 'No description available' }}</p>
+              <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
+              <p>{{ datasetData.description || ('DATASET.NO_DESCRIPTION' | translate) }}</p>
             </div>
             <div class="info-item">
-              <label>Type</label>
-              <p>{{ datasetData.type === 1 ? 'SQL Based' : 'Prompt Based' }}</p>
+              <label>{{ 'COMMON.TYPE' | translate }}</label>
+              <p>{{ datasetData.type === 1 ? ('DATASET.SQL_BASED' | translate) : ('DATASET.PROMPT_BASED' | translate) }}</p>
             </div>
             <div class="info-item">
-              <label>Status</label>
+              <label>{{ 'COMMON.STATUS' | translate }}</label>
               <span
                 class="status-badge"
                 [class.active]="datasetData.status === 1"
@@ -60,25 +60,25 @@
                       : 'pi-times-circle'
                   "
                 ></i>
-                {{ datasetData.status === 1 ? 'Active' : 'Inactive' }}
+                {{ datasetData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
               </span>
             </div>
             <div class="info-item">
-              <label>Organisation</label>
+              <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-building mr-2"></i>
                 {{ datasetData.organisationName }}
               </p>
             </div>
             <div class="info-item">
-              <label>Datasource</label>
+              <label>{{ 'COMMON.DATASOURCE' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-database mr-2"></i>
                 {{ datasetData.datasource?.name }}
               </p>
             </div>
             <div class="info-item">
-              <label>Created On</label>
+              <label>{{ 'COMMON.CREATED_ON' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-calendar mr-2"></i>
                 {{ datasetData.createdOn | date: 'medium' }}
@@ -95,12 +95,12 @@
           <div class="section-header">
             <h3>
               <i class="pi pi-sliders-h mr-2"></i>
-              Query Builder Configuration
+              {{ 'DATASET.QB_CONFIGURATION' | translate }}
             </h3>
           </div>
           <div class="info-grid">
             <div class="info-item">
-              <label>Query Builder</label>
+              <label>{{ 'DATASET.QUERY_BUILDER' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-sitemap mr-2"></i>
                 {{
@@ -180,14 +180,14 @@
           <div class="section-header">
             <h3>
               <i class="pi pi-code mr-2"></i>
-              {{ datasetData.type === 2 ? 'Generated SQL Query' : 'SQL Query' }}
+              {{ datasetData.type === 2 ? ('DATASET.GENERATED_SQL_QUERY' | translate) : ('DATASET.SQL_QUERY' | translate) }}
             </h3>
             <div class="sql-actions">
               <button
                 pButton
                 class="p-button-text btn-export"
                 (click)="copySQLToClipboard()"
-                pTooltip="Copy SQL"
+                [pTooltip]="'DATASET.COPY_SQL' | translate"
                 tooltipPosition="top"
               >
                 <i class="pi pi-copy"></i>
@@ -196,7 +196,7 @@
                 pButton
                 class="p-button-text btn-export"
                 (click)="downloadSQL()"
-                pTooltip="Download SQL"
+                [pTooltip]="'DATASET.DOWNLOAD_SQL' | translate"
                 tooltipPosition="top"
               >
                 <i class="pi pi-download"></i>
@@ -213,14 +213,14 @@
           <div class="section-header">
             <h3>
               <i class="pi pi-list mr-2"></i>
-              Fields
+              {{ 'DATASET.FIELDS' | translate }}
               <span class="count-badge">{{
                 datasetData.datasetFields?.length || 0
               }}</span>
             </h3>
             <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
               <i class="pi pi-plus"></i>
-              Add Custom Field
+              {{ 'DATASET.ADD_CUSTOM_FIELD' | translate }}
             </button>
           </div>
           <div class="column-mapping-container">
@@ -249,7 +249,7 @@
                   <span
                     class="field-datatype"
                     *ngIf="entity.dataType"
-                    [pTooltip]="'Source: ' + entity.dataType"
+                    [pTooltip]="('DATASET.SOURCE' | translate) + ': ' + entity.dataType"
                     tooltipPosition="top"
                   >
                     <i
@@ -265,7 +265,7 @@
                       pButton
                       class="p-button-text p-button-sm btn-edit"
                       (click)="openEditFieldDialog(entity, i)"
-                      pTooltip="Edit field"
+                      [pTooltip]="'DATASET.EDIT_FIELD' | translate"
                       tooltipPosition="top"
                     >
                       <i class="pi pi-pencil"></i>
@@ -274,7 +274,7 @@
                       pButton
                       class="p-button-text p-button-sm p-button-danger btn-delete"
                       (click)="confirmDeleteField(entity, i)"
-                      pTooltip="Delete field"
+                      [pTooltip]="'DATASET.DELETE_FIELD' | translate"
                       tooltipPosition="top"
                       [disabled]="entity.type !== 2"
                     >
@@ -287,7 +287,7 @@
             <ng-template #noMappings>
               <div class="no-data">
                 <i class="pi pi-info-circle"></i>
-                <span>No fields found</span>
+                <span>{{ 'DATASET.NO_FIELDS_FOUND' | translate }}</span>
               </div>
             </ng-template>
           </div>
@@ -297,7 +297,7 @@
         <div class="info-section full-width">
           <h3>
             <i class="pi pi-chart-bar mr-2"></i>
-            Analyses
+            {{ 'DATASET.ANALYSES' | translate }}
             <span class="count-badge">{{
               datasetData.analyses?.length || 0
             }}</span>
@@ -319,7 +319,7 @@
               "
               class="no-data"
             >
-              No analyses found
+              {{ 'DATASET.NO_ANALYSES_FOUND' | translate }}
             </div>
           </div>
         </div>
@@ -366,36 +366,36 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to delete this dataset?</p>
+      <p class="delete-intro">{{ 'DATASET.CONFIRM_DELETE_SINGLE' | translate }}</p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>All associated analyses will be affected</span>
+          <span>{{ 'DATASET.DELETE_ANALYSES_AFFECTED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Dataset configurations will be removed</span>
+          <span>{{ 'DATASET.DELETE_CONFIGS_REMOVED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this deletion"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -407,7 +407,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -415,7 +415,7 @@
         [disabled]="!deleteJustification.trim()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>
@@ -429,21 +429,21 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete Field</h3>
+      <h3>{{ 'DATASET.CONFIRM_DELETE_FIELD' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to delete this field?</p>
+      <p class="delete-intro">{{ 'DATASET.CONFIRM_DELETE_FIELD_MSG' | translate }}</p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This field will be removed from the dataset</span>
+          <span>{{ 'DATASET.FIELD_WILL_BE_REMOVED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
     </div>
@@ -452,11 +452,11 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDeleteField()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button class="btn-confirm" (click)="proceedDeleteField()">
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

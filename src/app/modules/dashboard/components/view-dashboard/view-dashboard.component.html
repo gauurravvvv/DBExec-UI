@@ -10,7 +10,7 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h2>{{ dashboard?.name || 'Dashboard' }}</h2>
+        <h2>{{ dashboard?.name || ('DASHBOARD.DASHBOARD' | translate) }}</h2>
         <span
           *ngIf="dashboard"
           class="status-badge"
@@ -22,7 +22,7 @@
               dashboard.status === 1 ? 'pi-check-circle' : 'pi-times-circle'
             "
           ></i>
-          {{ dashboard.status === 1 ? 'Live' : 'Inactive' }}
+          {{ dashboard.status === 1 ? ('DASHBOARD.LIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
         </span>
       </div>
       <div class="header-actions">
@@ -32,7 +32,7 @@
           [class.active]="isFilterSidebarOpen"
           (click)="toggleFilterSidebar()"
           *ngIf="filters.length > 0"
-          title="Toggle Filters"
+          [title]="'DASHBOARD.TOGGLE_FILTERS' | translate"
         >
           <i class="pi pi-filter"></i>
         </button>
@@ -45,7 +45,7 @@
             class="pi"
             [ngClass]="isDataLoading() ? 'pi-spin pi-spinner' : 'pi-refresh'"
           ></i>
-          Refresh
+          {{ 'COMMON.REFRESH' | translate }}
         </button>
       </div>
     </div>
@@ -53,7 +53,7 @@
     <!-- Loading State -->
     <div class="loading-section" *ngIf="loading()">
       <i class="pi pi-spin pi-spinner"></i>
-      <p>Loading dashboard...</p>
+      <p>{{ 'DASHBOARD.LOADING_DASHBOARD' | translate }}</p>
     </div>
 
     <!-- Content Section -->
@@ -66,7 +66,7 @@
       >
         <div class="sidebar-content">
           <div class="sidebar-header-info">
-            <div class="sidebar-label">Filters</div>
+            <div class="sidebar-label">{{ 'DASHBOARD.FILTERS' | translate }}</div>
             <span class="filter-count-badge" *ngIf="filters.length > 0">
               {{ filters.length }}
             </span>
@@ -88,10 +88,9 @@
         <!-- Empty State -->
         <div class="empty-state" *ngIf="visuals.length === 0">
           <i class="pi pi-chart-bar"></i>
-          <h3>No Visuals</h3>
+          <h3>{{ 'DASHBOARD.NO_VISUALS' | translate }}</h3>
           <p>
-            This dashboard has no visuals configured. Edit the source analysis
-            to add visuals.
+            {{ 'DASHBOARD.NO_VISUALS_DESCRIPTION' | translate }}
           </p>
         </div>
 
@@ -108,7 +107,7 @@
             <!-- Inline Title -->
             <div class="visual-inline-title">
               <span class="inline-title-text">{{
-                visual.title || 'Untitled Visual'
+                visual.title || ('DASHBOARD.UNTITLED_VISUAL' | translate)
               }}</span>
             </div>
 
@@ -118,7 +117,7 @@
               <div class="visual-loading-placeholder" *ngIf="visual.loading">
                 <div class="loading-content">
                   <i class="pi pi-spin pi-spinner loading-spinner"></i>
-                  <span class="loading-text">Loading visualization...</span>
+                  <span class="loading-text">{{ 'DASHBOARD.LOADING_VISUALIZATION' | translate }}</span>
                 </div>
               </div>
 
@@ -129,7 +128,7 @@
               >
                 <div class="error-content">
                   <i class="pi pi-exclamation-triangle error-icon"></i>
-                  <span class="error-text">Failed to load data</span>
+                  <span class="error-text">{{ 'DASHBOARD.FAILED_TO_LOAD_DATA' | translate }}</span>
                 </div>
               </div>
 
@@ -146,7 +145,7 @@
                 <div class="placeholder-icon-wrap">
                   <i class="pi pi-info-circle"></i>
                 </div>
-                <p>No chart configured</p>
+                <p>{{ 'DASHBOARD.NO_CHART_CONFIGURED' | translate }}</p>
               </div>
 
               <!-- Chart Components -->

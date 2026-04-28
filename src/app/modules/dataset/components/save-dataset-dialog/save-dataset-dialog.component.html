@@ -15,8 +15,8 @@
         <div class="form-field">
           <app-custom-input
             formControlName="name"
-            label="Name"
-            placeholder="Enter dataset name"
+            [label]="'COMMON.NAME' | translate"
+            [placeholder]="'DATASET.ENTER_DATASET_NAME' | translate"
             icon="pi-database"
             [required]="true"
             [showError]="
@@ -34,26 +34,26 @@
         <div class="form-field">
           <app-custom-input
             formControlName="description"
-            label="Description"
-            placeholder="Enter dataset description (optional)"
+            [label]="'COMMON.DESCRIPTION' | translate"
+            [placeholder]="'DATASET.ENTER_DATASET_DESCRIPTION' | translate"
             icon="pi-align-left"
           >
           </app-custom-input>
           <small class="char-count">
             {{ datasetForm.get('description')?.value?.length || 0 }}/500
-            characters
+            {{ 'COMMON.CHARACTERS' | translate }}
           </small>
         </div>
 
         <!-- Justification (for updates) -->
         <div class="form-field justification-section" *ngIf="showJustification">
           <label for="justification"
-            >Justification <span class="required">*</span></label
+            >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
           >
           <textarea
             id="justification"
             formControlName="justification"
-            placeholder="Provide a reason for this update"
+            [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
             rows="3"
             maxlength="500"
           ></textarea>
@@ -68,7 +68,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="onCancel()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -76,7 +76,7 @@
         (click)="onSubmit()"
       >
         <i class="pi pi-save"></i>
-        Save Dataset
+        {{ 'DATASET.SAVE_DATASET' | translate }}
       </button>
     </div>
   </div>

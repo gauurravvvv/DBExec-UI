@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DATASOURCE } from 'src/app/constants/routes';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from '../../services/datasource.service';
 
@@ -60,6 +61,7 @@ export class ViewDatasourceComponent implements OnInit {
     private datasourceService: DatasourceService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     // Initialize chart options with default values
     this.initChartOptions();
@@ -274,7 +276,7 @@ export class ViewDatasourceComponent implements OnInit {
         },
         title: {
           display: true,
-          text: 'Top 10 Schemas by Size',
+          text: this.translate.instant('DATASOURCE.TOP_10_SCHEMAS_BY_SIZE'),
           color: getComputedStyle(document.documentElement).getPropertyValue(
             '--text-color',
           ),

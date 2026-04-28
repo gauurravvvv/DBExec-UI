@@ -18,6 +18,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { RoleService } from 'src/app/modules/role/services/role.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
+import { TranslateService } from '@ngx-translate/core';
 import { GroupService } from '../../services/group.service';
 
 @Component({
@@ -47,6 +48,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     private userService: UserService,
     private roleService: RoleService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -173,13 +175,13 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const control = this.userGroupForm.get('name');
-    if (control?.errors?.['required']) return 'Group name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.GROUP_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Group name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.GROUP_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Group name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.GROUP_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Group name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('VALIDATION.GROUP_NAME_PATTERN');
     return '';
   }
 }

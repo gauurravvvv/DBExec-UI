@@ -14,6 +14,7 @@ import { CONNECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { TranslateService } from '@ngx-translate/core';
 import { ConnectionService } from '../../services/connection.service';
 
 @Component({
@@ -47,6 +48,7 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
     private globalService: GlobalService,
     private connectionService: ConnectionService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -176,13 +178,13 @@ export class EditConnectionComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const control = this.connectionForm.get('name');
-    if (control?.errors?.['required']) return 'Connection name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.CONNECTION_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Connection name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.CONNECTION_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Connection name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.CONNECTION_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('VALIDATION.CONNECTION_NAME_PATTERN');
     return '';
   }
 }

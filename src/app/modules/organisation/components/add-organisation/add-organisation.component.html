@@ -10,13 +10,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Add Organisation</h2>
+        <h2>{{ 'ORG.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty || orgForm.pristine"
           (click)="onCancel()"
@@ -25,7 +25,7 @@
           *ngIf="currentStep > 0"
           pButton
           type="button"
-          label="Previous"
+          [label]="'ORG.PREVIOUS' | translate"
           icon="pi pi-arrow-left"
           iconPos="left"
           class="p-button-outlined btn-cancel"
@@ -35,7 +35,7 @@
           *ngIf="currentStep === 0 || currentStep === 1"
           pButton
           type="button"
-          label="Next"
+          [label]="'ORG.NEXT' | translate"
           icon="pi pi-arrow-right"
           iconPos="right"
           (click)="nextStep()"
@@ -47,7 +47,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           icon="pi pi-save"
           iconPos="left"
           (click)="onSubmit()"
@@ -68,7 +68,7 @@
           <i class="pi pi-check" *ngIf="currentStep > 0"></i>
           <span *ngIf="currentStep <= 0">1</span>
         </div>
-        <span class="step-label">Organisation Config</span>
+        <span class="step-label">{{ 'ORG.STEP_ORG_CONFIG' | translate }}</span>
       </div>
       <div class="step-line"></div>
       <div
@@ -81,7 +81,7 @@
           <i class="pi pi-check" *ngIf="currentStep > 1"></i>
           <span *ngIf="currentStep <= 1">2</span>
         </div>
-        <span class="step-label">Master Datasource</span>
+        <span class="step-label">{{ 'ORG.STEP_MASTER_DATASOURCE' | translate }}</span>
       </div>
       <div class="step-line"></div>
       <div
@@ -90,7 +90,7 @@
         (click)="onStepClick(2)"
       >
         <div class="step-dot">3</div>
-        <span class="step-label">Security & Email</span>
+        <span class="step-label">{{ 'ORG.STEP_SECURITY_EMAIL' | translate }}</span>
       </div>
     </div>
 
@@ -103,13 +103,13 @@
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-building"></i>
-              <span>Basic Information</span>
+              <span>{{ 'ORG.BASIC_INFORMATION' | translate }}</span>
             </div>
 
             <app-custom-input
               formControlName="name"
-              label="Organisation Name"
-              placeholder="e.g. Acme Corp"
+              [label]="'ORG.ORG_NAME' | translate"
+              [placeholder]="'ORG.ORG_NAME_PLACEHOLDER' | translate"
               icon="pi-building"
               [required]="true"
               [showError]="
@@ -121,8 +121,8 @@
 
             <app-custom-input
               formControlName="description"
-              label="Description"
-              placeholder="Brief description of this organisation"
+              [label]="'ORG.DESCRIPTION' | translate"
+              [placeholder]="'ORG.DESCRIPTION_PLACEHOLDER' | translate"
               icon="pi-align-left"
               [required]="true"
               [showError]="
@@ -140,13 +140,13 @@
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-shield"></i>
-              <span>Encryption Config</span>
+              <span>{{ 'ORG.ENCRYPTION_CONFIG' | translate }}</span>
             </div>
 
             <app-custom-dropdown
               formControlName="encryptionAlgorithm"
-              label="Encryption Method"
-              placeholder="Select Encryption Method"
+              [label]="'ORG.ENCRYPTION_METHOD' | translate"
+              [placeholder]="'ORG.SELECT_ENCRYPTION_METHOD' | translate"
               [options]="encryptionAlgorithms"
               optionLabel="label"
               optionValue="value"
@@ -160,14 +160,14 @@
                   orgForm.get('encryptionAlgorithm')?.touched
                 )
               "
-              errorMessage="Encryption method is required"
+              [errorMessage]="'VALIDATION.ENCRYPTION_METHOD_REQUIRED' | translate"
             >
             </app-custom-dropdown>
 
             <app-custom-input
               formControlName="pepperKey"
-              label="Pepper Key"
-              placeholder="Min 32 characters"
+              [label]="'ORG.PEPPER_KEY' | translate"
+              [placeholder]="'ORG.PEPPER_KEY_PLACEHOLDER' | translate"
               icon="pi-lock"
               [required]="true"
               [showPasswordToggle]="true"
@@ -187,13 +187,13 @@
         <div class="step-1-right">
           <div class="acknowledgments-container">
             <div class="acknowledgments-title">
-              Security Configuration Acknowledgment
+              {{ 'ORG.SECURITY_CONFIG_ACK_TITLE' | translate }}
             </div>
             <div class="acknowledgment-card">
               <app-custom-binary-checkbox
                 formControlName="confirmationChecked"
-                label="Encryption Configuration"
-                description="I understand that the encryption method and pepper key are critical security settings that cannot be modified after organisation creation. These settings will be used for all sensitive data encryption within the organisation."
+                [label]="'ORG.ENCRYPTION_CONFIG' | translate"
+                [description]="'ORG.ENCRYPTION_ACK_DESC' | translate"
                 [showError]="
                   !!(
                     !orgForm.get('confirmationChecked')?.value &&
@@ -201,7 +201,7 @@
                     orgForm.get('pepperKey')?.valid
                   )
                 "
-                errorMessage="Please acknowledge the encryption configuration settings"
+                [errorMessage]="'ORG.ENCRYPTION_ACK_ERROR' | translate"
               ></app-custom-binary-checkbox>
             </div>
           </div>
@@ -216,14 +216,14 @@
           <div class="db-connection-group">
             <div class="group-header">
               <i class="pi pi-server"></i>
-              <span>Connection Details</span>
+              <span>{{ 'ORG.CONNECTION_DETAILS' | translate }}</span>
             </div>
 
             <div class="db-fields-row">
               <app-custom-input
                 formControlName="dbHost"
-                label="Host"
-                placeholder="e.g. localhost"
+                [label]="'ORG.HOST' | translate"
+                [placeholder]="'ORG.HOST_PLACEHOLDER' | translate"
                 icon="pi-desktop"
                 [required]="true"
                 [showError]="
@@ -238,8 +238,8 @@
 
               <app-custom-input
                 formControlName="dbPort"
-                label="Port"
-                placeholder="e.g. 5432"
+                [label]="'ORG.PORT' | translate"
+                [placeholder]="'ORG.PORT_PLACEHOLDER' | translate"
                 icon="pi-hashtag"
                 type="number"
                 [required]="true"
@@ -256,8 +256,8 @@
 
             <app-custom-input
               formControlName="dbName"
-              label="Datasource"
-              placeholder="e.g. mydb"
+              [label]="'ORG.DATASOURCE' | translate"
+              [placeholder]="'ORG.DATASOURCE_PLACEHOLDER' | translate"
               icon="pi-database"
               [required]="true"
               [showError]="
@@ -273,8 +273,8 @@
             <div class="db-fields-row">
               <app-custom-input
                 formControlName="dbUsername"
-                label="Username"
-                placeholder="e.g. postgres"
+                [label]="'COMMON.USERNAME' | translate"
+                [placeholder]="'ORG.DB_USERNAME_PLACEHOLDER' | translate"
                 icon="pi-user"
                 [required]="true"
                 [showError]="
@@ -289,8 +289,8 @@
 
               <app-custom-input
                 formControlName="dbPassword"
-                label="Password"
-                placeholder="Enter password"
+                [label]="'ORG.PASSWORD' | translate"
+                [placeholder]="'ORG.ENTER_PASSWORD' | translate"
                 icon="pi-lock"
                 [required]="true"
                 [showPasswordToggle]="true"
@@ -323,21 +323,21 @@
                 ></i>
                 {{
                   connectionTestLoading()
-                    ? 'Testing connection...'
-                    : 'Test Connection'
+                    ? ('ORG.TESTING_CONNECTION' | translate)
+                    : ('ORG.TEST_CONNECTION' | translate)
                 }}
               </span>
               <span
                 class="connection-status success"
                 *ngIf="connectionTestResult() === 'success'"
               >
-                <i class="pi pi-check-circle"></i> Connected
+                <i class="pi pi-check-circle"></i> {{ 'ORG.CONNECTED' | translate }}
               </span>
               <span
                 class="connection-status failed"
                 *ngIf="connectionTestResult() === 'failed'"
               >
-                <i class="pi pi-times-circle"></i> Connection failed
+                <i class="pi pi-times-circle"></i> {{ 'ORG.CONNECTION_FAILED' | translate }}
               </span>
             </div>
           </div>
@@ -346,13 +346,13 @@
           <div class="admin-setup-group">
             <div class="group-header">
               <i class="pi pi-user-plus"></i>
-              <span>Organisation Admin</span>
+              <span>{{ 'ORG.ORG_ADMIN' | translate }}</span>
             </div>
 
             <app-custom-input
               formControlName="adminEmail"
-              label="Admin Email"
-              placeholder="admin@example.com"
+              [label]="'ORG.ADMIN_EMAIL' | translate"
+              [placeholder]="'ORG.ADMIN_EMAIL_PLACEHOLDER' | translate"
               icon="pi-envelope"
               type="email"
               [required]="true"
@@ -368,8 +368,7 @@
 
             <p class="admin-setup-note">
               <i class="pi pi-info-circle"></i>
-              A setup email will be sent to this address. The admin will set
-              their own password.
+              {{ 'ORG.ADMIN_SETUP_NOTE' | translate }}
             </p>
           </div>
         </div>
@@ -378,21 +377,21 @@
         <div class="step-2-right">
           <div class="acknowledgments-container">
             <div class="acknowledgments-title">
-              Datasource Configuration Acknowledgments
+              {{ 'ORG.DATASOURCE_ACK_TITLE' | translate }}
             </div>
             <div class="acknowledgment-card">
               <app-custom-binary-checkbox
                 formControlName="dbAcknowledgment"
-                label="Datasource Administrator Privileges"
-                description="I acknowledge that the username provided has admin privileges for this database."
+                [label]="'ORG.DB_ADMIN_PRIVILEGES' | translate"
+                [description]="'ORG.DB_ADMIN_PRIVILEGES_DESC' | translate"
               ></app-custom-binary-checkbox>
             </div>
 
             <div class="acknowledgment-card">
               <app-custom-binary-checkbox
                 formControlName="schemaAcknowledgment"
-                label="Schema Creation Authorization"
-                description="I hereby authorize DBExec to create and maintain a 'dbexec_master' schema with all necessary database objects required for system operations."
+                [label]="'ORG.SCHEMA_CREATION_AUTH' | translate"
+                [description]="'ORG.SCHEMA_CREATION_AUTH_DESC' | translate"
               ></app-custom-binary-checkbox>
             </div>
           </div>
@@ -406,16 +405,16 @@
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-shield"></i>
-              <span>Security Settings</span>
+              <span>{{ 'ORG.SECURITY_SETTINGS' | translate }}</span>
             </div>
             <div class="db-fields-row">
               <app-custom-input
                 formControlName="maxLoginAttempts"
-                label="Max Login Attempts"
+                [label]="'ORG.MAX_LOGIN_ATTEMPTS' | translate"
                 type="number"
                 icon="pi-lock"
                 [required]="true"
-                tooltip="Allowed range: 3 – 10 attempts"
+                [tooltip]="'ORG.MAX_LOGIN_ATTEMPTS_TOOLTIP' | translate"
                 [showError]="
                   !!(
                     orgForm.get('maxLoginAttempts')?.invalid &&
@@ -426,11 +425,11 @@
               ></app-custom-input>
               <app-custom-input
                 formControlName="accountLockDurationHours"
-                label="Account Lock Duration (Hours)"
+                [label]="'ORG.ACCOUNT_LOCK_DURATION' | translate"
                 type="number"
                 icon="pi-clock"
                 [required]="true"
-                tooltip="Allowed range: 0 – 24 hours. Set 0 for permanent lock (admin must unlock manually)"
+                [tooltip]="'ORG.ACCOUNT_LOCK_DURATION_TOOLTIP' | translate"
                 [showError]="
                   !!(
                     orgForm.get('accountLockDurationHours')?.invalid &&
@@ -445,11 +444,11 @@
             <div class="db-fields-row">
               <app-custom-input
                 formControlName="passwordHistoryLimit"
-                label="Password History Limit"
+                [label]="'ORG.PASSWORD_HISTORY_LIMIT' | translate"
                 type="number"
                 icon="pi-history"
                 [required]="true"
-                tooltip="Allowed range: 1 – 24 passwords remembered"
+                [tooltip]="'ORG.PASSWORD_HISTORY_LIMIT_TOOLTIP' | translate"
                 [showError]="
                   !!(
                     orgForm.get('passwordHistoryLimit')?.invalid &&
@@ -460,11 +459,11 @@
               ></app-custom-input>
               <app-custom-input
                 formControlName="sessionInactivityTimeout"
-                label="Idle Session Timeout (Minutes)"
+                [label]="'ORG.IDLE_SESSION_TIMEOUT' | translate"
                 type="number"
                 icon="pi-sign-out"
                 [required]="true"
-                tooltip="Allowed range: 5 – 1440 minutes (up to 24 hours). User is logged out after this period of inactivity"
+                [tooltip]="'ORG.IDLE_SESSION_TIMEOUT_TOOLTIP' | translate"
                 [showError]="
                   !!(
                     orgForm.get('sessionInactivityTimeout')?.invalid &&
@@ -482,7 +481,7 @@
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-envelope"></i>
-              <span>Email Configuration</span>
+              <span>{{ 'ORG.EMAIL_CONFIGURATION' | translate }}</span>
             </div>
 
             <!-- Provider toggle -->
@@ -493,7 +492,7 @@
                 [class.active]="!selectedEmailProvider"
                 (click)="orgForm.get('emailProvider')?.setValue(null)"
               >
-                <i class="pi pi-cog"></i> System Default
+                <i class="pi pi-cog"></i> {{ 'ORG.SYSTEM_DEFAULT' | translate }}
               </button>
               <button
                 type="button"
@@ -501,7 +500,7 @@
                 [class.active]="selectedEmailProvider === 'SMTP'"
                 (click)="orgForm.get('emailProvider')?.setValue('SMTP')"
               >
-                <i class="pi pi-server"></i> Custom SMTP
+                <i class="pi pi-server"></i> {{ 'ORG.CUSTOM_SMTP' | translate }}
               </button>
               <button
                 type="button"
@@ -509,7 +508,7 @@
                 [class.active]="selectedEmailProvider === 'SES'"
                 (click)="orgForm.get('emailProvider')?.setValue('SES')"
               >
-                <i class="pi pi-cloud"></i> Custom AWS SES
+                <i class="pi pi-cloud"></i> {{ 'ORG.CUSTOM_AWS_SES' | translate }}
               </button>
             </div>
 
@@ -518,8 +517,8 @@
               <div class="db-fields-row">
                 <app-custom-input
                   formControlName="smtpHost"
-                  label="SMTP Host"
-                  placeholder="e.g. smtp.gmail.com"
+                  [label]="'ORG.SMTP_HOST' | translate"
+                  [placeholder]="'ORG.SMTP_HOST_PLACEHOLDER' | translate"
                   icon="pi-server"
                   [required]="true"
                   [showError]="
@@ -532,8 +531,8 @@
                 ></app-custom-input>
                 <app-custom-input
                   formControlName="smtpPort"
-                  label="SMTP Port"
-                  placeholder="e.g. 587"
+                  [label]="'ORG.SMTP_PORT' | translate"
+                  [placeholder]="'ORG.SMTP_PORT_PLACEHOLDER' | translate"
                   type="number"
                   icon="pi-hashtag"
                   [required]="true"
@@ -549,8 +548,8 @@
               <div class="db-fields-row">
                 <app-custom-input
                   formControlName="smtpUser"
-                  label="SMTP Username"
-                  placeholder="e.g. user@gmail.com"
+                  [label]="'ORG.SMTP_USERNAME' | translate"
+                  [placeholder]="'ORG.SMTP_USERNAME_PLACEHOLDER' | translate"
                   icon="pi-user"
                   [required]="true"
                   [showError]="
@@ -563,16 +562,16 @@
                 ></app-custom-input>
                 <app-custom-input
                   formControlName="smtpPassword"
-                  label="SMTP Password"
-                  placeholder="Enter SMTP password"
+                  [label]="'ORG.SMTP_PASSWORD' | translate"
+                  [placeholder]="'ORG.SMTP_PASSWORD_PLACEHOLDER' | translate"
                   icon="pi-lock"
                   [showPasswordToggle]="true"
                 ></app-custom-input>
               </div>
               <app-custom-input
                 formControlName="smtpFrom"
-                label="From Email"
-                placeholder="e.g. noreply@company.com"
+                [label]="'ORG.FROM_EMAIL' | translate"
+                [placeholder]="'ORG.FROM_EMAIL_PLACEHOLDER' | translate"
                 icon="pi-at"
                 [required]="true"
                 [showError]="
@@ -589,8 +588,8 @@
             <div *ngIf="selectedEmailProvider === 'SES'" class="email-fields">
               <app-custom-input
                 formControlName="sesRegion"
-                label="AWS Region"
-                placeholder="e.g. us-east-1"
+                [label]="'ORG.AWS_REGION' | translate"
+                [placeholder]="'ORG.AWS_REGION_PLACEHOLDER' | translate"
                 icon="pi-globe"
                 [required]="true"
                 [showError]="
@@ -604,8 +603,8 @@
               <div class="db-fields-row">
                 <app-custom-input
                   formControlName="sesAccessKeyId"
-                  label="Access Key ID"
-                  placeholder="e.g. AKIAIOSFODNN7EXAMPLE"
+                  [label]="'ORG.ACCESS_KEY_ID' | translate"
+                  [placeholder]="'ORG.ACCESS_KEY_ID_PLACEHOLDER' | translate"
                   icon="pi-key"
                   [required]="true"
                   [showError]="
@@ -618,16 +617,16 @@
                 ></app-custom-input>
                 <app-custom-input
                   formControlName="sesSecretAccessKey"
-                  label="Secret Access Key"
-                  placeholder="Enter secret access key"
+                  [label]="'ORG.SECRET_ACCESS_KEY' | translate"
+                  [placeholder]="'ORG.SECRET_ACCESS_KEY_PLACEHOLDER' | translate"
                   icon="pi-lock"
                   [showPasswordToggle]="true"
                 ></app-custom-input>
               </div>
               <app-custom-input
                 formControlName="sesFrom"
-                label="From Email"
-                placeholder="e.g. noreply@company.com"
+                [label]="'ORG.FROM_EMAIL' | translate"
+                [placeholder]="'ORG.FROM_EMAIL_PLACEHOLDER' | translate"
                 icon="pi-at"
                 [required]="true"
                 [showError]="
@@ -643,10 +642,7 @@
             <!-- No provider message -->
             <div *ngIf="!selectedEmailProvider" class="no-provider-message">
               <i class="pi pi-info-circle"></i>
-              <span
-                >Emails will be sent using the system default configuration
-                managed by the system administrator.</span
-              >
+              <span>{{ 'ORG.SYSTEM_DEFAULT_EMAIL_NOTE' | translate }}</span>
             </div>
           </div>
         </div>
@@ -656,24 +652,24 @@
           <div class="readonly-info-container">
             <div class="readonly-info-title">
               <i class="pi pi-shield"></i>
-              Encryption Configuration
+              {{ 'ORG.ENCRYPTION_CONFIGURATION' | translate }}
             </div>
             <div class="readonly-info-card">
               <div class="info-row">
-                <span class="info-label">Encryption Method</span>
+                <span class="info-label">{{ 'ORG.ENCRYPTION_METHOD' | translate }}</span>
                 <span class="info-value">{{
-                  orgForm.get('encryptionAlgorithm')?.value || 'Not configured'
+                  orgForm.get('encryptionAlgorithm')?.value || ('ORG.NOT_CONFIGURED' | translate)
                 }}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Pepper Key</span>
+                <span class="info-label">{{ 'ORG.PEPPER_KEY' | translate }}</span>
                 <span class="info-value masked">{{
-                  orgForm.get('pepperKey')?.value ? '********' : 'Not set'
+                  orgForm.get('pepperKey')?.value ? '********' : ('ORG.NOT_SET' | translate)
                 }}</span>
               </div>
               <p class="readonly-note">
                 <i class="pi pi-lock"></i>
-                Encryption settings cannot be modified after creation.
+                {{ 'ORG.ENCRYPTION_IMMUTABLE_NOTE' | translate }}
               </p>
             </div>
           </div>

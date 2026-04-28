@@ -10,13 +10,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Add Super Admin</h2>
+        <h2>{{ 'SUPER_ADMIN.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -25,7 +25,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="adminForm.invalid || saving()"
         >
@@ -40,8 +40,8 @@
         <!-- First Name -->
         <app-custom-input
           formControlName="firstName"
-          label="First Name"
-          placeholder="Enter first name"
+          [label]="'COMMON.FIRST_NAME' | translate"
+          [placeholder]="'COMMON.ENTER_FIRST_NAME' | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -57,8 +57,8 @@
         <!-- Last Name -->
         <app-custom-input
           formControlName="lastName"
-          label="Last Name"
-          placeholder="Enter last name"
+          [label]="'COMMON.LAST_NAME' | translate"
+          [placeholder]="'COMMON.ENTER_LAST_NAME' | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -74,8 +74,8 @@
         <!-- Username -->
         <app-custom-input
           formControlName="username"
-          label="Username"
-          placeholder="Enter username"
+          [label]="'COMMON.USERNAME' | translate"
+          [placeholder]="'COMMON.ENTER_USERNAME' | translate"
           icon="pi-user-edit"
           [required]="true"
           [showError]="
@@ -91,8 +91,8 @@
         <!-- Email -->
         <app-custom-input
           formControlName="email"
-          label="Email"
-          placeholder="Enter email address"
+          [label]="'COMMON.EMAIL' | translate"
+          [placeholder]="'COMMON.ENTER_EMAIL' | translate"
           icon="pi-envelope"
           type="email"
           [required]="true"
@@ -101,13 +101,7 @@
               adminForm.get('email')?.invalid && adminForm.get('email')?.touched
             )
           "
-          [errorMessage]="
-            adminForm.get('email')?.errors?.['required']
-              ? 'Email is required'
-              : adminForm.get('email')?.errors?.['email']
-                ? 'Please enter a valid email'
-                : ''
-          "
+          [errorMessage]="getEmailError()"
         >
         </app-custom-input>
       </div>

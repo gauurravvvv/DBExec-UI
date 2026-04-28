@@ -9,6 +9,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../services/dataset.service';
 
@@ -36,7 +37,7 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
   @Input() visible = false;
   @Input() field: any = null; // Now receives the full field data from API
   @Input() fieldIndex: number = -1;
-  @Input() dialogTitle = 'Edit Field';
+  @Input() dialogTitle = '';
   @Output() close = new EventEmitter<any>();
 
   editableField: any = null;
@@ -55,7 +56,10 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
-  ) {}
+    private translate: TranslateService,
+  ) {
+    this.dialogTitle = this.translate.instant('DATASET.EDIT_FIELD');
+  }
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscapeKey(event: KeyboardEvent) {
@@ -125,11 +129,11 @@ export class EditDatasetFieldsDialogComponent implements OnChanges {
   validateName() {
     const name = this.editableField?.columnToView?.trim() || '';
     if (!name) {
-      this.nameError = 'Field name is required';
+      this.nameError = this.translate.instant('VALIDATION.FIELD_NAME_REQUIRED');
     } else if (name.length < this.MIN_NAME_LENGTH) {
-      this.nameError = `Field name must be at least ${this.MIN_NAME_LENGTH} character`;
+      this.nameError = this.translate.instant('VALIDATION.FIELD_NAME_MIN_LENGTH', { length: this.MIN_NAME_LENGTH });
     } else if (name.length > this.MAX_NAME_LENGTH) {
-      this.nameError = `Field name must not exceed ${this.MAX_NAME_LENGTH} characters`;
+      this.nameError = this.translate.instant('VALIDATION.FIELD_NAME_MAX_LENGTH', { length: this.MAX_NAME_LENGTH });
     } else {
       this.nameError = '';
     }

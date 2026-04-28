@@ -10,13 +10,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Add Datasource</h2>
+        <h2>{{ 'DATASOURCE.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -25,7 +25,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="!isFormValid() || saving()"
         >
@@ -42,8 +42,8 @@
           <!-- Name Field -->
           <app-custom-input
             formControlName="name"
-            label="Name"
-            placeholder="Enter name"
+            [label]="'COMMON.NAME' | translate"
+            [placeholder]="'COMMON.ENTER_NAME' | translate"
             icon="pi-database"
             [required]="true"
             [showError]="
@@ -59,8 +59,8 @@
           <!-- Description Field -->
           <app-custom-input
             formControlName="description"
-            label="Description"
-            placeholder="Enter description"
+            [label]="'COMMON.DESCRIPTION' | translate"
+            [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
             icon="pi-align-left"
             [showError]="
               !!(
@@ -76,8 +76,8 @@
           <app-custom-dropdown
             *ngIf="showOrganisationDropdown"
             formControlName="organisation"
-            label="Organisation"
-            placeholder="Select Organisation"
+            [label]="'COMMON.ORGANISATION' | translate"
+            [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
             [options]="organisations"
             optionLabel="name"
             optionValue="id"
@@ -90,14 +90,14 @@
                 datasourceForm.get('organisation')?.touched
               )
             "
-            errorMessage="Organisation is required"
+            [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
           >
           </app-custom-dropdown>
 
           <!-- Type Field (disabled) -->
           <app-custom-input
             formControlName="type"
-            label="Type"
+            [label]="'COMMON.TYPE' | translate"
             icon="pi-database"
             [inputDisabled]="true"
           >
@@ -106,8 +106,8 @@
           <!-- Host Field -->
           <app-custom-input
             formControlName="host"
-            label="Host"
-            placeholder="Enter database host"
+            [label]="'DATASOURCE.HOST' | translate"
+            [placeholder]="'DATASOURCE.ENTER_HOST' | translate"
             icon="pi-desktop"
             [required]="true"
             [showError]="
@@ -123,8 +123,8 @@
           <!-- Port Field -->
           <app-custom-input
             formControlName="port"
-            label="Port"
-            placeholder="Enter database port"
+            [label]="'DATASOURCE.PORT' | translate"
+            [placeholder]="'DATASOURCE.ENTER_PORT' | translate"
             icon="pi-hashtag"
             type="number"
             [required]="true"
@@ -141,8 +141,8 @@
           <!-- Database Name Field -->
           <app-custom-input
             formControlName="database"
-            label="Database Name"
-            placeholder="Enter database name"
+            [label]="'DATASOURCE.DATABASE_NAME' | translate"
+            [placeholder]="'DATASOURCE.ENTER_DATABASE_NAME' | translate"
             icon="pi-database"
             [required]="true"
             [showError]="
@@ -158,8 +158,8 @@
           <!-- Username Field -->
           <app-custom-input
             formControlName="username"
-            label="Username"
-            placeholder="Enter database username"
+            [label]="'DATASOURCE.USERNAME' | translate"
+            [placeholder]="'DATASOURCE.ENTER_USERNAME' | translate"
             icon="pi-user"
             [required]="true"
             [showError]="
@@ -175,8 +175,8 @@
           <!-- Database Password Field -->
           <app-custom-input
             formControlName="password"
-            label="Password"
-            placeholder="Enter database password"
+            [label]="'DATASOURCE.PASSWORD' | translate"
+            [placeholder]="'DATASOURCE.ENTER_PASSWORD' | translate"
             icon="pi-lock"
             [required]="true"
             [showPasswordToggle]="true"
@@ -211,19 +211,19 @@
                 ></i>
                 {{
                   connectionTestLoading
-                    ? 'Testing...'
+                    ? ('DATASOURCE.TESTING' | translate)
                     : connectionTestResult === 'success'
-                      ? 'Connection Successful'
+                      ? ('DATASOURCE.CONNECTION_SUCCESSFUL' | translate)
                       : connectionTestResult === 'failed'
-                        ? 'Connection Failed - Retry'
-                        : 'Test Connection'
+                        ? ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate)
+                        : ('DATASOURCE.TEST_CONNECTION' | translate)
                 }}
               </a>
               <small
                 class="connection-hint"
                 *ngIf="!connectionTested && !connectionTestLoading"
               >
-                Connection test required before saving
+                {{ 'DATASOURCE.CONNECTION_TEST_REQUIRED' | translate }}
               </small>
             </div>
           </div>
