@@ -30,7 +30,7 @@ import {
   selectIsSchemaStale,
   selectSchemaByKey,
 } from '../../store';
-import { SqlQueryDialogComponent } from '../dialogs/sql-query-dialog/sql-query-dialog.component';
+import { SqlQueryDialogComponent } from '../sql-query-dialog/sql-query-dialog.component';
 
 @Component({
   selector: 'app-config-prompt',
