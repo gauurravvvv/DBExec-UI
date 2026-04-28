@@ -1,6 +1,6 @@
 // Barrel exports for core module
 export * from './guards/auth.guard';
-export * from './interceptor/HttpRequestInterceptor';
+export * from './interceptors/http-request.interceptor';
 export * from './interfaces/global.interface';
 export * from './services/global.service';
 export * from './services/loading.service';
