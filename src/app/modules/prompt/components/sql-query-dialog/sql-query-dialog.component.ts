@@ -13,7 +13,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
-import { MonacoIntelliSenseService } from '../../../../dataset/services/monaco-intellisense.service';
+import { MonacoIntelliSenseService } from '../../../dataset/services/monaco-intellisense.service';
 
 declare const monaco: any;
 declare const window: any;
