@@ -3,11 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { PERMISSIONS } from './constants/permissions.constant';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
-import { CliAuthComponent } from './modules/auth/components/cli-auth/cli-auth.component';
-import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
-import { LoginComponent } from './modules/auth/components/login/login.component';
-import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
-import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
+import { AUTH_ROUTES } from './modules/auth/auth-routing.module';
 import { HomeComponent } from './shared/components/layout/home/home.component';
 
 const routes: Routes = [
@@ -16,34 +12,7 @@ const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
-  {
-    path: 'login',
-    component: LoginComponent,
-    canActivate: [AuthGuard],
-    data: { title: 'Login' },
-  },
-  {
-    path: 'forgot-password',
-    component: ForgotPasswordComponent,
-    canActivate: [AuthGuard],
-    data: { title: 'Forgot Password' },
-  },
-  {
-    path: 'reset-password',
-    component: ResetPasswordComponent,
-    canActivate: [AuthGuard],
-    data: { title: 'Reset Password' },
-  },
-  {
-    path: 'set-password',
-    component: SetPasswordComponent,
-    data: { title: 'Set Password' },
-  },
-  {
-    path: 'cli-auth',
-    component: CliAuthComponent,
-    data: { title: 'CLI Authentication' },
-  },
+  ...AUTH_ROUTES,
   {
     path: 'app',
     component: HomeComponent,

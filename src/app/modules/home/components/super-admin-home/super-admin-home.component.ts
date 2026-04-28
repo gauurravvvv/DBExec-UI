@@ -10,7 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { HomeService } from '../services/home.service';
+import { HomeService } from '../../services/home.service';
 
 @Component({
   selector: 'app-super-admin-home',

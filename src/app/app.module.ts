@@ -16,11 +16,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 import { HttpRequestInterceptor } from './core/interceptors/http-request.interceptor';
-import { CliAuthComponent } from './modules/auth/components/cli-auth/cli-auth.component';
-import { ForgotPasswordComponent } from './modules/auth/components/forgot-password/forgot-password.component';
-import { LoginComponent } from './modules/auth/components/login/login.component';
-import { ResetPasswordComponent } from './modules/auth/components/reset-password/reset-password.component';
-import { SetPasswordComponent } from './modules/auth/components/set-password/set-password.component';
+import { AuthModule } from './modules/auth/auth.module';
 import { FooterComponent } from './shared/components/layout/footer/footer.component';
 import { HeaderComponent } from './shared/components/layout/header/header.component';
 import { HomeComponent } from './shared/components/layout/home/home.component';
@@ -31,11 +27,6 @@ import { SharedModule } from './shared/shared.module';
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
-    ForgotPasswordComponent,
-    ResetPasswordComponent,
-    SetPasswordComponent,
-    CliAuthComponent,
     HomeComponent,
     HeaderComponent,
     SidebarComponent,
@@ -55,6 +46,7 @@ import { SharedModule } from './shared/shared.module';
     InputTextareaModule,
     AppPrimeNGModule,
     SharedModule,
+    AuthModule,
     // NgRx Store
     StoreModule.forRoot({}),
     EffectsModule.forRoot([]),
