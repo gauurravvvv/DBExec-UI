@@ -85,7 +85,7 @@
     <!-- Content -->
     <div class="screen-content">
       <!-- Tab Loading Skeleton -->
-      <div class="tab-skeleton-container" *ngIf="loadingTabs">
+      <div class="tab-skeleton-container" *ngIf="loadingTabs()">
         <div class="tab-skeleton-header">
           <p-skeleton
             *ngFor="let i of skeletonTabs; trackBy: trackByIndex"
@@ -97,9 +97,9 @@
       </div>
 
       <!-- Tab Error State -->
-      <div class="error-state" *ngIf="!loadingTabs && tabError">
+      <div class="error-state" *ngIf="!loadingTabs() && tabError()">
         <i class="pi pi-exclamation-triangle"></i>
-        <span>{{ tabError }}</span>
+        <span>{{ tabError() }}</span>
         <button
           pButton
           label="Retry"
@@ -111,7 +111,7 @@
       <!-- Empty State -->
       <div
         class="empty-state"
-        *ngIf="!loadingTabs && !tabError && tabs.length === 0"
+        *ngIf="!loadingTabs() && !tabError() && tabs.length === 0"
       >
         <i class="pi pi-inbox"></i>
         <span>No tabs configured for this query builder</span>
@@ -119,7 +119,7 @@
 
       <!-- Tab View -->
       <p-tabView
-        *ngIf="!loadingTabs && !tabError && tabs.length > 0"
+        *ngIf="!loadingTabs() && !tabError() && tabs.length > 0"
         [(activeIndex)]="activeTabIndex"
         (onChange)="onTabChange($event)"
         [scrollable]="true"
