@@ -1,25 +1,25 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
-import { AddUsersComponent } from './components/add-users/add-users.component';
-import { EditUsersComponent } from './components/edit-users/edit-users.component';
-import { ListUsersComponent } from './components/list-users/list-users.component';
-import { ViewUsersComponent } from './components/view-users/view-users.component';
+import { AddUserComponent } from './components/add-user/add-user.component';
+import { EditUserComponent } from './components/edit-user/edit-user.component';
+import { ListUserComponent } from './components/list-user/list-user.component';
+import { ViewUserComponent } from './components/view-user/view-user.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: ListUsersComponent,
+    component: ListUserComponent,
   },
   {
     path: 'add',
-    component: AddUsersComponent,
+    component: AddUserComponent,
     canDeactivate: [UnsavedChangesGuard],
   },
-  { path: 'view/:orgId/:id', component: ViewUsersComponent },
+  { path: 'view/:orgId/:id', component: ViewUserComponent },
   {
     path: 'edit/:orgId/:id',
-    component: EditUsersComponent,
+    component: EditUserComponent,
     canDeactivate: [UnsavedChangesGuard],
   },
 ];
