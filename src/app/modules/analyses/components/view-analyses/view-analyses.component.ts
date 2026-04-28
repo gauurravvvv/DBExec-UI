@@ -12,7 +12,7 @@ import { ANALYSES, DASHBOARD as DB_ROUTES } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DashboardService } from '../../../dashboard/services/dashboard.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
-import { AnalysesService } from '../../service/analyses.service';
+import { AnalysesService } from '../../services/analyses.service';
 
 @Component({
   selector: 'app-view-analyses',

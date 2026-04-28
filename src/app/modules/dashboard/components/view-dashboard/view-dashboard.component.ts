@@ -27,7 +27,7 @@ import {
   isSankeyChartType,
 } from '../../../analyses/constants/charts.constants';
 import { Visual } from '../../../analyses/models/visual.model';
-import { AnalysesService } from '../../../analyses/service/analyses.service';
+import { AnalysesService } from '../../../analyses/services/analyses.service';
 import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
 import { DashboardService } from '../../services/dashboard.service';
 
