@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from 'src/app/core/guards/auth.guard';
+import { authGuard } from 'src/app/core/guards/auth.guard';
 import { CliAuthComponent } from './components/cli-auth/cli-auth.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { LoginComponent } from './components/login/login.component';
@@ -10,19 +10,19 @@ export const AUTH_ROUTES: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { title: 'Login' },
   },
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { title: 'Forgot Password' },
   },
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { title: 'Reset Password' },
   },
   {

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
+import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddPromptComponent } from './components/add-prompt/add-prompt.component';
 import { ConfigPromptComponent } from './components/config-prompt/config-prompt.component';
 import { EditPromptComponent } from './components/edit-prompt/edit-prompt.component';
@@ -15,13 +15,13 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddPromptComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewPromptComponent },
   {
     path: 'edit/:orgId/:id',
     component: EditPromptComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   { path: 'config/:orgId/:id', component: ConfigPromptComponent },
 ];

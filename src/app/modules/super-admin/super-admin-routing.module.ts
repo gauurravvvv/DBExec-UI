@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
+import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddSuperAdminComponent } from './components/add-super-admin/add-super-admin.component';
 import { EditSuperAdminComponent } from './components/edit-super-admin/edit-super-admin.component';
 import { ListSuperAdminComponent } from './components/list-super-admin/list-super-admin.component';
@@ -14,13 +14,13 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddSuperAdminComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   { path: 'view/:id', component: ViewSuperAdminComponent },
   {
     path: 'edit/:id',
     component: EditSuperAdminComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
 ];
 

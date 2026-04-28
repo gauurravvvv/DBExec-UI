@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
+import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { EditAnalysesComponent } from './components/edit-analyses/edit-analyses.component';
 import { ListAnalysesComponent } from './components/list-analyses/list-analyses.component';
 import { ViewAnalysesComponent } from './components/view-analyses/view-analyses.component';
@@ -13,7 +13,7 @@ const routes: Routes = [
   {
     path: 'edit/:orgId/:id',
     component: EditAnalysesComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewAnalysesComponent },
 ];

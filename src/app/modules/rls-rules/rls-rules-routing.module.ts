@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
+import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddRlsRuleComponent } from './components/add-rls-rule/add-rls-rule.component';
 import { EditRlsRuleComponent } from './components/edit-rls-rule/edit-rls-rule.component';
 import { ListRlsRuleComponent } from './components/list-rls-rule/list-rls-rule.component';
@@ -11,13 +11,13 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddRlsRuleComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewRlsRuleComponent },
   {
     path: 'edit/:orgId/:id',
     component: EditRlsRuleComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
 ];
 
