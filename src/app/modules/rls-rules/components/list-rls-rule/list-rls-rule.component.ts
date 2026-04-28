@@ -21,12 +21,12 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 @Component({
-  selector: 'app-list-rls-rules',
-  templateUrl: './list-rls-rules.component.html',
-  styleUrls: ['./list-rls-rules.component.scss'],
+  selector: 'app-list-rls-rule',
+  templateUrl: './list-rls-rule.component.html',
+  styleUrls: ['./list-rls-rule.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListRlsRulesComponent implements OnInit {
+export class ListRlsRuleComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
   private destroyRef = inject(DestroyRef);

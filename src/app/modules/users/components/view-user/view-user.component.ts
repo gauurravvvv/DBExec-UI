@@ -10,12 +10,12 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
-  selector: 'app-view-users',
-  templateUrl: './view-users.component.html',
-  styleUrls: ['./view-users.component.scss'],
+  selector: 'app-view-user',
+  templateUrl: './view-user.component.html',
+  styleUrls: ['./view-user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewUsersComponent implements OnInit {
+export class ViewUserComponent implements OnInit {
   userId: string = '';
   userData: any;
   showDeleteConfirm = false;

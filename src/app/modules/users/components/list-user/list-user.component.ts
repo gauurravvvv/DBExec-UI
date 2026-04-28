@@ -21,12 +21,12 @@ import { OrganisationService } from 'src/app/modules/organisation/services/organ
 import { UserService } from '../../services/user.service';
 
 @Component({
-  selector: 'app-list-users',
-  templateUrl: './list-users.component.html',
-  styleUrls: ['./list-users.component.scss'],
+  selector: 'app-list-user',
+  templateUrl: './list-user.component.html',
+  styleUrls: ['./list-user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListUsersComponent implements OnInit {
+export class ListUserComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
 
   // Signal refs from service
