@@ -345,7 +345,10 @@ export class ListUsersComponent implements OnInit {
             this.refreshList();
           }
         })
-        .finally(() => this.closeDeletePopup());
+        .finally(() => {
+          this.closeDeletePopup();
+          this.cdr.markForCheck();
+        });
       return;
     }
 
@@ -359,6 +362,7 @@ export class ListUsersComponent implements OnInit {
             );
             this.refreshList();
           }
+          this.cdr.markForCheck();
         });
     }
     this.closeDeletePopup();

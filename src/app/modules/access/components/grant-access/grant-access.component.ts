@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
@@ -44,6 +45,7 @@ export class GrantAccessComponent implements OnInit {
     private datasourceService: DatasourceService,
     private acessService: AccessService,
     private connectionService: ConnectionService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   get isFormDirty(): boolean {
@@ -102,9 +104,11 @@ export class GrantAccessComponent implements OnInit {
         } else {
           this.organisations = [];
         }
+        this.cdr.markForCheck();
       })
-      .catch(error => {
+      .catch(() => {
         this.organisations = [];
+        this.cdr.markForCheck();
       });
   }
 
@@ -127,9 +131,11 @@ export class GrantAccessComponent implements OnInit {
         } else {
           this.connections = [];
         }
+        this.cdr.markForCheck();
       })
-      .catch(error => {
+      .catch(() => {
         this.connections = [];
+        this.cdr.markForCheck();
       });
   }
 
@@ -151,9 +157,11 @@ export class GrantAccessComponent implements OnInit {
         } else {
           this.datasources = [];
         }
+        this.cdr.markForCheck();
       })
-      .catch(error => {
+      .catch(() => {
         this.datasources = [];
+        this.cdr.markForCheck();
       });
   }
 
@@ -260,6 +268,7 @@ export class GrantAccessComponent implements OnInit {
           { emitEvent: false },
         );
       }
+      this.cdr.markForCheck();
     } catch (error) {
       this.users = [];
       this.groups = [];
@@ -267,6 +276,7 @@ export class GrantAccessComponent implements OnInit {
         { users: [], groups: [] },
         { emitEvent: false },
       );
+      this.cdr.markForCheck();
     }
   }
 }

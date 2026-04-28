@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -90,8 +91,8 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
   activeTabIndex = 0;
 
   // Loading states
-  loadingTabs = true;
-  tabError: string | null = null;
+  loadingTabs = signal(true);
+  tabError = signal<string | null>(null);
 
   // Form
   promptForm!: FormGroup;
@@ -158,6 +159,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     private queryBuilderService: QueryBuilderService,
     private datasetService: DatasetService,
     private queryService: QueryService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.orgId = this.route.snapshot.params['orgId'];
     this.datasourceId = this.route.snapshot.params['dbId'];
@@ -217,15 +219,15 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
    * Step 1: Load screen tabs from API
    */
   loadTabs(): void {
-    this.loadingTabs = true;
-    this.tabError = null;
+    this.loadingTabs.set(true);
+    this.tabError.set(null);
 
     this.queryBuilderService
       .getQueryBuilderTabs(this.orgId, this.queryBuilderId)
       .then((response: any) => {
         if (response.status) {
           this.tabs = (response.data || []).map(transformTabResponse);
-          this.loadingTabs = false;
+          this.loadingTabs.set(false);
 
           if (this.tabs.length > 0) {
             if (this.isEditMode) {
@@ -237,13 +239,13 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             }
           }
         } else {
-          this.tabError = response.message || 'Failed to load tabs';
-          this.loadingTabs = false;
+          this.tabError.set(response.message || 'Failed to load tabs');
+          this.loadingTabs.set(false);
         }
       })
       .catch(() => {
-        this.tabError = 'Failed to load tabs';
-        this.loadingTabs = false;
+        this.tabError.set('Failed to load tabs');
+        this.loadingTabs.set(false);
       });
   }
 
@@ -273,10 +275,12 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           tab.error = response.message || 'Failed to load sections';
           tab.loading = false;
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         tab.error = 'Failed to load sections';
         tab.loading = false;
+        this.cdr.markForCheck();
       });
   }
 
@@ -317,10 +321,12 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           section.error = response.message || 'Failed to load prompts';
           section.loading = false;
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         section.error = 'Failed to load prompts';
         section.loading = false;
+        this.cdr.markForCheck();
       });
   }
 
@@ -435,9 +441,11 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           this.executeError = response.message || 'Failed to generate SQL';
           this.globalService.handleSuccessService(response, false);
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.executeError = 'Failed to generate SQL';
+        this.cdr.markForCheck();
       });
   }
 
@@ -496,6 +504,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           };
           this.isExecutingQuery = false;
           this.showResultsPopup = true;
+          this.cdr.markForCheck();
           return;
         }
 
@@ -532,6 +541,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
         this.queryRanSuccessfully = true;
         this.isExecutingQuery = false;
         this.showResultsPopup = true;
+        this.cdr.markForCheck();
       },
       error: (error: any) => {
         let errorMessage = 'Query execution failed';
@@ -552,6 +562,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
         };
         this.isExecutingQuery = false;
         this.showResultsPopup = true;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -1019,9 +1030,11 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           this.structureTreeNodes = this.buildTreeNodes(response.data);
         }
         this.loadingStructure = false;
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.loadingStructure = false;
+        this.cdr.markForCheck();
       });
   }
 
@@ -1113,6 +1126,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     ) {
       this.showStructureTree = false;
       document.removeEventListener('click', this.clickOutsideHandler);
+      this.cdr.markForCheck();
     }
   }
 
@@ -1220,6 +1234,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.highlightedElementId = null;
+      this.cdr.markForCheck();
     }, 2500);
   }
 
