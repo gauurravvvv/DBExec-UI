@@ -1,20 +1,35 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { SuperAdminService } from '../../services/superAdmin.service';
+import { SuperAdminService } from '../../services/super-admin.service';
 
 @Component({
-  selector: 'app-add-super-admin',
-  templateUrl: './add-super-admin.component.html',
-  styleUrls: ['./add-super-admin.component.scss'],
+  selector: 'app-edit-super-admin',
+  templateUrl: './edit-super-admin.component.html',
+  styleUrls: ['./edit-super-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
+export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
+  private destroyRef = inject(DestroyRef);
+
   adminForm!: FormGroup;
+  adminId: string = '';
+  adminData: any;
+  isCancelClicked: boolean = false;
+  isLocked: boolean = false;
+  showSaveConfirm = false;
+  saveJustification = '';
   saving = this.superAdminService.saving;
 
   // Add getter for form dirty state
@@ -30,15 +45,26 @@ export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
     private fb: FormBuilder,
     private superAdminService: SuperAdminService,
     private router: Router,
+    private route: ActivatedRoute,
     private globalService: GlobalService,
   ) {}
 
   ngOnInit(): void {
     this.initForm();
+
+    // Subscribe to form value changes
+    this.adminForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
   }
 
   private initForm(): void {
     this.adminForm = this.fb.group({
+      id: [''],
       firstName: [
         '',
         [
@@ -67,31 +93,62 @@ export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
+      status: [false],
     });
+
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.adminId = params['id'];
+        if (this.adminId) {
+          this.patchFormValues();
+        }
+      });
   }
 
-  async onSubmit(): Promise<void> {
+  async patchFormValues(): Promise<void> {
+    await this.superAdminService.loadOne(this.adminId);
+    const data = this.superAdminService.current();
+    if (data) {
+      this.adminData = data;
+      this.isLocked = !!this.adminData.isLocked;
+      this.adminForm.patchValue(this.adminData);
+      if (this.isLocked) {
+        this.adminForm.get('status')?.disable();
+      }
+    }
+  }
+
+  onSubmit(): void {
     if (this.adminForm.valid) {
-      const response: any = await this.superAdminService.add(this.adminForm);
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  async proceedSave(): Promise<void> {
+    if (this.saveJustification.trim()) {
+      const response: any = await this.superAdminService.update(
+        this.adminForm,
+        this.saveJustification.trim(),
+      );
       if (this.globalService.handleSuccessService(response)) {
+        this.showSaveConfirm = false;
+        this.saveJustification = '';
         this.adminForm.markAsPristine();
         this.router.navigate([SUPER_ADMIN.LIST]);
       }
-    } else {
-      // Mark all fields as touched to trigger validation messages
-      Object.keys(this.adminForm.controls).forEach(key => {
-        const control = this.adminForm.get(key);
-        control?.markAsTouched();
-      });
     }
   }
 
   onCancel(): void {
-    this.adminForm.reset();
-    // Reset specific form controls to empty strings
-    Object.keys(this.adminForm.controls).forEach(key => {
-      this.adminForm.get(key)?.setValue('');
-    });
+    this.adminForm.patchValue(this.adminData);
+    this.adminForm.markAsPristine();
+    this.isCancelClicked = true;
   }
 
   getFirstNameError(): string {
@@ -115,18 +172,6 @@ export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
       return `Last name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
     if (control?.errors?.['pattern'])
       return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
-    return '';
-  }
-
-  getUsernameError(): string {
-    const control = this.adminForm.get('username');
-    if (control?.errors?.['required']) return 'Username is required';
-    if (control?.errors?.['minlength'])
-      return `Username must be at least ${control.errors['minlength'].requiredLength} characters`;
-    if (control?.errors?.['maxlength'])
-      return `Username must not exceed ${control.errors['maxlength'].requiredLength} characters`;
-    if (control?.errors?.['pattern'])
-      return 'Username must start with a letter and can only contain letters, numbers, dots, hyphens and underscores';
     return '';
   }
 }

@@ -63,7 +63,7 @@ const routes: Routes = [
       {
         path: 'super-admin',
         loadChildren: () =>
-          import('./modules/superAdmin/super-admin.module').then(
+          import('./modules/super-admin/super-admin.module').then(
             m => m.SuperAdminModule,
           ),
         canActivate: [RoleGuard],
