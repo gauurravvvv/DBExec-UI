@@ -7,7 +7,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { AnalysesService } from '../../../modules/analyses/service/analyses.service';
+import { AnalysesService } from '../../../modules/analyses/services/analyses.service';
 
 @Component({
   selector: 'app-analysis-filter-bar',

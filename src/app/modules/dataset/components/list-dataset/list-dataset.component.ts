@@ -19,7 +19,7 @@ import { ANALYSES, DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
-import { AnalysesService } from 'src/app/modules/analyses/service/analyses.service';
+import { AnalysesService } from 'src/app/modules/analyses/services/analyses.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';

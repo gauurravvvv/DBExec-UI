@@ -34,7 +34,7 @@ import {
   isWorldMapChartType,
 } from '../../constants/charts.constants';
 import { createVisual, Visual } from '../../models';
-import { AnalysesService } from '../../service/analyses.service';
+import { AnalysesService } from '../../services/analyses.service';
 import { ChartDataTransformerService } from '../../services';
 import {
   AddAnalysesActions,

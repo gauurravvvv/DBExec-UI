@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from '../../../dataset/services/dataset.service';
-import { AnalysesService } from '../../service/analyses.service';
+import { AnalysesService } from '../../services/analyses.service';
 
 export interface ConfiguredFilter {
   tempId: string;
