@@ -1,18 +1,14 @@
-import { Injectable } from '@angular/core';
-import { CanDeactivate } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanDeactivateFn } from '@angular/router';
 import { HasUnsavedChanges } from '../interfaces/has-unsaved-changes';
 import { UnsavedChangesService } from '../services/unsaved-changes.service';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class UnsavedChangesGuard implements CanDeactivate<HasUnsavedChanges> {
-  constructor(private unsavedChangesService: UnsavedChangesService) {}
-
-  async canDeactivate(component: HasUnsavedChanges): Promise<boolean> {
-    if (component?.hasUnsavedChanges?.()) {
-      return this.unsavedChangesService.confirm();
-    }
-    return true;
+export const unsavedChangesGuard: CanDeactivateFn<HasUnsavedChanges> = (
+  component,
+) => {
+  if (component?.hasUnsavedChanges?.()) {
+    const unsavedChangesService = inject(UnsavedChangesService);
+    return unsavedChangesService.confirm();
   }
-}
+  return true;
+};

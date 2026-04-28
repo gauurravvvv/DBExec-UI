@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
+import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddTabComponent } from './components/add-tab/add-tab.component';
 import { EditTabComponent } from './components/edit-tab/edit-tab.component';
 import { ListTabComponent } from './components/list-tab/list-tab.component';
@@ -14,13 +14,13 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddTabComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewTabComponent },
   {
     path: 'edit/:orgId/:id',
     component: EditTabComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
 ];
 

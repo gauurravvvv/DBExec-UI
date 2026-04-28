@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
+import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddQueryBuilderComponent } from './components/add-query-builder/add-query-builder.component';
 import { ConfigureQueryBuilderComponent } from './components/configure-query-builder/configure-query-builder.component';
 import { EditQueryBuilderComponent } from './components/edit-query-builder/edit-query-builder.component';
@@ -16,13 +16,13 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddQueryBuilderComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewQueryBuilderComponent },
   {
     path: 'edit/:orgId/:id',
     component: EditQueryBuilderComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   {
     path: 'config/:orgId/:dbId/:id',

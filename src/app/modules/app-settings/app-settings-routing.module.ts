@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
+import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddAnnouncementComponent } from './components/add-announcement/add-announcement.component';
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
 import { ListAnnouncementsComponent } from './components/list-announcements/list-announcements.component';
@@ -16,7 +16,7 @@ const routes: Routes = [
   {
     path: 'announcements/add',
     component: AddAnnouncementComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
     data: { title: 'Add Announcement' },
   },
   {
@@ -27,7 +27,7 @@ const routes: Routes = [
   {
     path: 'announcements/edit/:orgId/:id',
     component: EditAnnouncementComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
     data: { title: 'Edit Announcement' },
   },
 ];

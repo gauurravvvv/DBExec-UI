@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { RoleGuard } from 'src/app/core/guards/role.guard';
+import { roleGuard } from 'src/app/core/guards/role.guard';
 import { EmptyRootComponent } from './components/empty-root/empty-root.component';
 import { OrgHomeComponent } from './components/org-home/org-home.component';
 import { SuperAdminHomeComponent } from './components/super-admin-home/super-admin-home.component';
@@ -13,7 +13,7 @@ const routes: Routes = [
   {
     path: 'super-admin',
     component: SuperAdminHomeComponent,
-    canActivate: [RoleGuard],
+    canActivate: [roleGuard],
     data: { roles: ['SUPER-ADMIN'] },
   },
   {

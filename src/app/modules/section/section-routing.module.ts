@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
+import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddSectionComponent } from './components/add-section/add-section.component';
 import { EditSectionComponent } from './components/edit-section/edit-section.component';
 import { ListSectionComponent } from './components/list-section/list-section.component';
@@ -14,13 +14,13 @@ const routes: Routes = [
   {
     path: 'add',
     component: AddSectionComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
   { path: 'view/:orgId/:id', component: ViewSectionComponent },
   {
     path: 'edit/:orgId/:id',
     component: EditSectionComponent,
-    canDeactivate: [UnsavedChangesGuard],
+    canDeactivate: [unsavedChangesGuard],
   },
 ];
 
