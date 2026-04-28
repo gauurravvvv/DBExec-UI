@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -25,7 +26,10 @@ export class AnalysisFilterBarComponent implements OnInit {
   appliedValues: { [filterId: string]: any } = {};
   isLoading = false;
 
-  constructor(private analysesService: AnalysesService) {}
+  constructor(
+    private analysesService: AnalysesService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.loadFilters();
@@ -49,6 +53,7 @@ export class AnalysisFilterBarComponent implements OnInit {
       console.error('Failed to load filters', err);
     } finally {
       this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 
