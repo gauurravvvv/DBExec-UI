@@ -11,7 +11,7 @@
           >
             <i class="pi pi-arrow-left text-xl"></i>
           </button>
-          <h2 class="m-0">Super Admin Details</h2>
+          <h2 class="m-0">{{ 'SUPER_ADMIN.VIEW_TITLE' | translate }}</h2>
         </div>
       </div>
 
@@ -22,7 +22,7 @@
           [routerLink]="['/app/super-admin/edit', adminId]"
         >
           <i class="pi pi-pencil"></i>
-          Edit
+          {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
           class="btn-danger"
@@ -30,15 +30,15 @@
           [pTooltip]="
             !adminData?.canDelete
               ? adminData?.isDefault === 1
-                ? 'Default admin cannot be deleted'
-                : 'Cannot delete yourself'
-              : 'Delete'
+                ? ('COMMON.DEFAULT_ADMIN_NO_DELETE' | translate)
+                : ('COMMON.CANNOT_DELETE_SELF' | translate)
+              : ('COMMON.DELETE' | translate)
           "
           tooltipPosition="bottom"
           (click)="confirmDelete(adminId)"
         >
           <i class="pi pi-trash"></i>
-          Delete
+          {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
@@ -67,32 +67,32 @@
             >
               {{
                 adminData?.isLocked
-                  ? 'Locked'
+                  ? ('COMMON.LOCKED' | translate)
                   : adminData?.status === 1
-                    ? 'Active'
-                    : 'Inactive'
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
               }}
             </span>
             <button
               *ngIf="adminData?.isLocked"
               class="btn-unlock"
               (click)="onUnlock()"
-              pTooltip="Unlock account"
+              [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
               tooltipPosition="bottom"
             >
               <i class="pi pi-lock-open"></i>
-              Unlock
+              {{ 'COMMON.UNLOCK' | translate }}
             </button>
           </div>
         </div>
 
         <div class="identity-meta">
           <div class="meta-item">
-            <span class="label">Role</span>
-            <span class="value">Super Admin</span>
+            <span class="label">{{ 'COMMON.ROLE' | translate }}</span>
+            <span class="value">{{ 'PROFILE.ROLE_SUPER_ADMIN' | translate }}</span>
           </div>
           <div class="meta-item">
-            <span class="label">Member Since</span>
+            <span class="label">{{ 'COMMON.MEMBER_SINCE' | translate }}</span>
             <span class="value">{{
               adminData?.createdOn | date: 'mediumDate'
             }}</span>
@@ -103,68 +103,68 @@
       <!-- 2. Details Section (Right) -->
       <div class="details-section">
         <div class="section-header">
-          <h3>Account Information</h3>
+          <h3>{{ 'COMMON.ACCOUNT_INFORMATION' | translate }}</h3>
         </div>
 
         <div class="info-grid">
           <!-- Personal Info -->
           <div class="info-group">
-            <h4>Personal Details</h4>
+            <h4>{{ 'COMMON.PERSONAL_DETAILS' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-user"></i> First Name</span>
+              <span class="label"><i class="pi pi-user"></i> {{ 'COMMON.FIRST_NAME' | translate }}</span>
               <span class="value">{{ adminData?.firstName }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-user"></i> Last Name</span>
+              <span class="label"><i class="pi pi-user"></i> {{ 'COMMON.LAST_NAME' | translate }}</span>
               <span class="value">{{ adminData?.lastName }}</span>
             </div>
           </div>
 
           <!-- Contact Info -->
           <div class="info-group">
-            <h4>Contact Details</h4>
+            <h4>{{ 'COMMON.CONTACT_DETAILS' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-envelope"></i> Email</span>
+              <span class="label"><i class="pi pi-envelope"></i> {{ 'COMMON.EMAIL' | translate }}</span>
               <span class="value">{{ adminData?.email }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-phone"></i> Mobile</span>
+              <span class="label"><i class="pi pi-phone"></i> {{ 'COMMON.MOBILE' | translate }}</span>
               <span class="value">{{
-                adminData?.mobile || 'Not provided'
+                adminData?.mobile || ('COMMON.NOT_PROVIDED' | translate)
               }}</span>
             </div>
           </div>
 
           <!-- Org Info -->
           <div class="info-group">
-            <h4>Organisation</h4>
+            <h4>{{ 'COMMON.ORGANISATION' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-building"></i> Name</span>
+              <span class="label"><i class="pi pi-building"></i> {{ 'COMMON.NAME' | translate }}</span>
               <span class="value">{{ adminData?.organisationName }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-id-card"></i> Org ID</span>
+              <span class="label"><i class="pi pi-id-card"></i> {{ 'COMMON.ORG_ID' | translate }}</span>
               <span class="value">#{{ adminData?.organisationId }}</span>
             </div>
           </div>
 
           <!-- System Info -->
           <div class="info-group">
-            <h4>System</h4>
+            <h4>{{ 'COMMON.SYSTEM' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-clock"></i> Last Login</span>
+              <span class="label"><i class="pi pi-clock"></i> {{ 'COMMON.LAST_LOGIN' | translate }}</span>
               <span class="value">{{
                 adminData?.lastLogin
                   ? (adminData?.lastLogin | date: 'medium')
-                  : 'Never'
+                  : ('COMMON.NEVER' | translate)
               }}</span>
             </div>
             <div class="detail-row">
               <span class="label"
-                ><i class="pi pi-shield"></i> Default User</span
+                ><i class="pi pi-shield"></i> {{ 'COMMON.DEFAULT_USER' | translate }}</span
               >
               <span class="value">{{
-                adminData?.isDefault === 1 ? 'Yes' : 'No'
+                adminData?.isDefault === 1 ? ('COMMON.YES' | translate) : ('COMMON.NO' | translate)
               }}</span>
             </div>
           </div>
@@ -181,38 +181,38 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
       <p class="delete-intro">
-        Are you sure you want to delete this super admin?
+        {{ 'SUPER_ADMIN.DELETE_SINGLE' | translate }}
       </p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>User access will be revoked immediately</span>
+          <span>{{ 'COMMON.DELETE_ACCESS_REVOKED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Login credentials will be invalidated</span>
+          <span>{{ 'COMMON.DELETE_CREDENTIALS_INVALIDATED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this action"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -224,7 +224,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -232,7 +232,7 @@
         [disabled]="!deleteJustification.trim()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

@@ -35,6 +35,7 @@ import {
 } from '../../constants/charts.constants';
 import { createVisual, Visual } from '../../models';
 import { AnalysesService } from '../../services/analyses.service';
+import { TranslateService } from '@ngx-translate/core';
 import { ChartDataTransformerService } from '../../services';
 import {
   AddAnalysesActions,
@@ -48,8 +49,8 @@ import {
 import {
   ConfiguredFilter,
   DATE_FORMAT_OPTIONS,
-  FILTER_OPERATORS,
-  NULL_OPTIONS,
+  FILTER_OPERATOR_KEYS,
+  NULL_OPTION_KEYS,
 } from '../filter-dialog/filter-dialog.component';
 
 @Component({
@@ -106,13 +107,7 @@ export class EditAnalysesComponent
   editingFilter: ConfiguredFilter | null = null;
 
   // Filter dropdown options (used by getFilterTypeLabel in template)
-  filterTypeOptions = [
-    { label: 'Category', value: 'category' },
-    { label: 'Numeric (Exact)', value: 'numeric_equality' },
-    { label: 'Numeric (Range)', value: 'numeric_range' },
-    { label: 'Date/Time (Exact)', value: 'time_equality' },
-    { label: 'Date/Time (Range)', value: 'time_range' },
-  ];
+  filterTypeOptions: { label: string; value: string }[] = [];
 
   // Search queries
   visualListSearchQuery: string = '';
@@ -280,6 +275,7 @@ export class EditAnalysesComponent
     private globalService: GlobalService,
     private analysesService: AnalysesService,
     private chartDataTransformer: ChartDataTransformerService,
+    private translate: TranslateService,
   ) {}
 
   get saving() {
@@ -290,6 +286,14 @@ export class EditAnalysesComponent
   }
 
   ngOnInit(): void {
+    this.filterTypeOptions = [
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_CATEGORY'), value: 'category' },
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_EXACT'), value: 'numeric_equality' },
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_NUMERIC_RANGE'), value: 'numeric_range' },
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_EXACT'), value: 'time_equality' },
+      { label: this.translate.instant('ANALYSES.FILTER_TYPE_DATETIME_RANGE'), value: 'time_range' },
+    ];
+
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
@@ -678,7 +682,7 @@ export class EditAnalysesComponent
             AddAnalysesActions.loadDatasetDataFailure({
               orgId: this.orgId,
               datasetId: this.datasetId,
-              error: response?.message || 'Failed to load graph data',
+              error: response?.message || this.translate.instant('ANALYSES.FAILED_LOAD_GRAPH_DATA'),
             }),
           );
         }
@@ -689,7 +693,7 @@ export class EditAnalysesComponent
           AddAnalysesActions.loadDatasetDataFailure({
             orgId: this.orgId,
             datasetId: this.datasetId,
-            error: error?.message || 'Error loading graph data',
+            error: error?.message || this.translate.instant('ANALYSES.ERROR_LOADING_GRAPH_DATA'),
           }),
         );
       });
@@ -729,7 +733,7 @@ export class EditAnalysesComponent
 
             const visual: any = {
               id: visualData.id,
-              title: visualData.title || 'Loading...',
+              title: visualData.title || this.translate.instant('COMMON.LOADING'),
               x: visualData.x || 0,
               y: visualData.y || 0,
               width: visualData.width || 400,
@@ -1076,12 +1080,14 @@ export class EditAnalysesComponent
   }
 
   getOperatorLabel(filterType: string, operatorValue: string): string {
-    const ops = FILTER_OPERATORS[filterType] || [];
-    return ops.find(o => o.value === operatorValue)?.label || operatorValue;
+    const ops = FILTER_OPERATOR_KEYS[filterType] || [];
+    const match = ops.find((o: { labelKey: string; value: string }) => o.value === operatorValue);
+    return match ? this.translate.instant(match.labelKey) : operatorValue;
   }
 
   getNullOptionLabel(value: string): string {
-    return NULL_OPTIONS.find(o => o.value === value)?.label || value;
+    const match = NULL_OPTION_KEYS.find((o: { labelKey: string; value: string }) => o.value === value);
+    return match ? this.translate.instant(match.labelKey) : value;
   }
 
   getFilterConfigSummary(filter: ConfiguredFilter): string {
@@ -1100,25 +1106,25 @@ export class EditAnalysesComponent
     }
     if (config.defaultValue) {
       if (Array.isArray(config.defaultValue)) {
-        parts.push(`Default: ${config.defaultValue.length} values`);
+        parts.push(this.translate.instant('ANALYSES.DEFAULT_VALUES_COUNT', { count: config.defaultValue.length }));
       } else {
-        parts.push(`Default: ${config.defaultValue}`);
+        parts.push(this.translate.instant('ANALYSES.DEFAULT_VALUE', { value: config.defaultValue }));
       }
     }
     if (config.rangeMin !== undefined || config.rangeMax !== undefined) {
       parts.push(
-        `Range: ${config.rangeMin ?? '...'} - ${config.rangeMax ?? '...'}`,
+        this.translate.instant('ANALYSES.RANGE_SUMMARY', { min: config.rangeMin ?? '...', max: config.rangeMax ?? '...' }),
       );
     }
     if (config.dateRangeStart || config.dateRangeEnd) {
-      parts.push('Date range set');
+      parts.push(this.translate.instant('ANALYSES.DATE_RANGE_SET'));
     }
     if (config.dateFormat) {
       const fmt = DATE_FORMAT_OPTIONS.find(o => o.value === config.dateFormat);
       parts.push(fmt ? fmt.label : config.dateFormat);
     }
     if (config.includeTime) {
-      parts.push('With time');
+      parts.push(this.translate.instant('ANALYSES.WITH_TIME'));
     }
     return parts.join(' · ');
   }
@@ -1265,7 +1271,7 @@ export class EditAnalysesComponent
   }
 
   getVisualChartLabel(chartType: string | null | undefined): string {
-    if (!chartType) return 'No chart selected';
+    if (!chartType) return this.translate.instant('ANALYSES.NO_CHART_SELECTED');
     return CHART_TYPES.find(c => c.id === chartType)?.name ?? chartType;
   }
 
@@ -1337,7 +1343,7 @@ export class EditAnalysesComponent
     const target = visual || this.getFocusedVisual();
     if (target) {
       target.chartType = null;
-      target.title = 'Untitled Visual';
+      target.title = this.translate.instant('ANALYSES.UNTITLED_VISUAL');
       target.xAxisColumn = null;
       target.yAxisColumn = null;
       target.zAxisColumn = null;
@@ -1707,20 +1713,20 @@ export class EditAnalysesComponent
   } {
     if (!visual.chartType) {
       return {
-        label: 'No chart type',
+        label: this.translate.instant('ANALYSES.STATUS_NO_CHART_TYPE'),
         class: 'status-incomplete',
         icon: 'pi-circle',
       };
     }
     if (!this.hasRequiredChartFields(visual)) {
       return {
-        label: 'Fields needed',
+        label: this.translate.instant('ANALYSES.STATUS_FIELDS_NEEDED'),
         class: 'status-incomplete',
         icon: 'pi-exclamation-circle',
       };
     }
     return {
-      label: 'Ready',
+      label: this.translate.instant('ANALYSES.STATUS_READY'),
       class: 'status-complete',
       icon: 'pi-check-circle',
     };

@@ -9,6 +9,7 @@ import {
   Output,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 import { REGEX } from 'src/app/constants/regex.constant';
 
 export interface AnalysisFormData {
@@ -27,14 +28,14 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   @Input() visible = false;
   @Input() initialName = '';
   @Input() initialDescription = '';
-  @Input() dialogTitle = 'Save Analysis';
+  @Input() dialogTitle = '';
   @Input() showJustification = false;
   @Output() close = new EventEmitter<AnalysisFormData | null>();
 
   analysisForm!: FormGroup;
   saveJustification = '';
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private translate: TranslateService) {}
 
   @HostListener('document:keydown.escape', ['$event'])
   handleEscapeKey(event: KeyboardEvent) {
@@ -44,6 +45,9 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    if (!this.dialogTitle) {
+      this.dialogTitle = this.translate.instant('ANALYSES.SAVE_ANALYSIS');
+    }
     this.initForm();
   }
 
@@ -74,13 +78,13 @@ export class SaveAnalysesDialogComponent implements OnInit, OnChanges {
 
   getNameError(): string {
     const control = this.analysisForm.get('name');
-    if (control?.errors?.['required']) return 'Analysis name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.ANALYSIS_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Analysis name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.ANALYSIS_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Analysis name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.ANALYSIS_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Analysis name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('VALIDATION.ANALYSIS_NAME_PATTERN');
     return '';
   }
 

@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SuperAdminService } from '../../services/super-admin.service';
 
@@ -47,6 +48,7 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private route: ActivatedRoute,
     private globalService: GlobalService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -153,25 +155,32 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
 
   getFirstNameError(): string {
     const control = this.adminForm.get('firstName');
-    if (control?.errors?.['required']) return 'First name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.FIRST_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `First name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.FIRST_NAME_MIN', { min: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `First name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.FIRST_NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'First name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+      return this.translate.instant('VALIDATION.FIRST_NAME_PATTERN');
     return '';
   }
 
   getLastNameError(): string {
     const control = this.adminForm.get('lastName');
-    if (control?.errors?.['required']) return 'Last name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.LAST_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Last name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.LAST_NAME_MIN', { min: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Last name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.LAST_NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Last name must start with a letter and can only contain letters, hyphens, apostrophes and spaces';
+      return this.translate.instant('VALIDATION.LAST_NAME_PATTERN');
+    return '';
+  }
+
+  getEmailError(): string {
+    const control = this.adminForm.get('email');
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.EMAIL_REQUIRED');
+    if (control?.errors?.['email']) return this.translate.instant('VALIDATION.EMAIL_INVALID');
     return '';
   }
 }

@@ -10,13 +10,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Edit Organisation</h2>
+        <h2>{{ 'ORG.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty || isCancelClicked"
           (click)="onCancel()"
@@ -25,7 +25,7 @@
           *ngIf="currentStep > 0"
           pButton
           type="button"
-          label="Previous"
+          [label]="'ORG.PREVIOUS' | translate"
           icon="pi pi-arrow-left"
           iconPos="left"
           class="p-button-outlined btn-cancel"
@@ -35,7 +35,7 @@
           *ngIf="currentStep === 0 || (hasMasterDb && currentStep === 1)"
           pButton
           type="button"
-          label="Next"
+          [label]="'ORG.NEXT' | translate"
           icon="pi pi-arrow-right"
           iconPos="right"
           (click)="nextStep()"
@@ -47,7 +47,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           icon="pi pi-save"
           iconPos="left"
           (click)="onSubmit()"
@@ -68,7 +68,7 @@
           <i class="pi pi-check" *ngIf="currentStep > 0"></i>
           <span *ngIf="currentStep <= 0">1</span>
         </div>
-        <span class="step-label">Organisation Details</span>
+        <span class="step-label">{{ 'ORG.STEP_ORG_DETAILS' | translate }}</span>
       </div>
       <div class="step-line" *ngIf="hasMasterDb"></div>
       <div
@@ -82,7 +82,7 @@
           <i class="pi pi-check" *ngIf="currentStep > 1"></i>
           <span *ngIf="currentStep <= 1">2</span>
         </div>
-        <span class="step-label">Master Datasource</span>
+        <span class="step-label">{{ 'ORG.STEP_MASTER_DATASOURCE' | translate }}</span>
       </div>
       <div class="step-line"></div>
       <div
@@ -91,7 +91,7 @@
         (click)="onStepClick(2)"
       >
         <div class="step-dot">{{ hasMasterDb ? '3' : '2' }}</div>
-        <span class="step-label">Security & Email</span>
+        <span class="step-label">{{ 'ORG.STEP_SECURITY_EMAIL' | translate }}</span>
       </div>
     </div>
 
@@ -103,13 +103,13 @@
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-building"></i>
-              <span>Basic Information</span>
+              <span>{{ 'ORG.BASIC_INFORMATION' | translate }}</span>
             </div>
 
             <app-custom-input
               formControlName="name"
-              label="Organisation Name"
-              placeholder="e.g. Acme Corp"
+              [label]="'ORG.ORG_NAME' | translate"
+              [placeholder]="'ORG.ORG_NAME_PLACEHOLDER' | translate"
               icon="pi-building"
               [required]="true"
               [showError]="
@@ -121,8 +121,8 @@
 
             <app-custom-input
               formControlName="description"
-              label="Description"
-              placeholder="Brief description of this organisation"
+              [label]="'ORG.DESCRIPTION' | translate"
+              [placeholder]="'ORG.DESCRIPTION_PLACEHOLDER' | translate"
               icon="pi-align-left"
               [required]="true"
               [showError]="
@@ -137,11 +137,11 @@
 
             <app-custom-toggle
               formControlName="status"
-              label="Status"
+              [label]="'COMMON.STATUS' | translate"
               [trueValue]="1"
               [falseValue]="0"
-              trueLabel="Active"
-              falseLabel="Inactive"
+              [trueLabel]="'COMMON.ACTIVE' | translate"
+              [falseLabel]="'COMMON.INACTIVE' | translate"
             >
             </app-custom-toggle>
           </div>
@@ -152,17 +152,16 @@
           <div class="readonly-info-container">
             <div class="readonly-info-title">
               <i class="pi pi-info-circle"></i>
-              Organisation Info
+              {{ 'ORG.ORG_INFO' | translate }}
             </div>
             <div class="readonly-info-card">
               <p class="update-info-text">
                 <i class="pi pi-circle-fill"></i>
-                Organisation name cannot be changed after creation.
+                {{ 'ORG.NAME_IMMUTABLE_NOTE' | translate }}
               </p>
               <p class="update-info-text">
                 <i class="pi pi-circle-fill"></i>
-                Encryption and security settings can be reviewed in Step
-                {{ hasMasterDb ? '3' : '2' }}.
+                {{ 'ORG.ENCRYPTION_REVIEW_STEP' | translate:{ step: hasMasterDb ? '3' : '2' } }}
               </p>
             </div>
           </div>
@@ -176,14 +175,14 @@
           <div class="db-connection-group">
             <div class="group-header">
               <i class="pi pi-server"></i>
-              <span>Connection Details</span>
+              <span>{{ 'ORG.CONNECTION_DETAILS' | translate }}</span>
             </div>
 
             <div class="db-fields-row">
               <app-custom-input
                 formControlName="dbHost"
-                label="Host"
-                placeholder="e.g. localhost"
+                [label]="'ORG.HOST' | translate"
+                [placeholder]="'ORG.HOST_PLACEHOLDER' | translate"
                 icon="pi-desktop"
                 [showError]="
                   !!(
@@ -197,8 +196,8 @@
 
               <app-custom-input
                 formControlName="dbPort"
-                label="Port"
-                placeholder="e.g. 5432"
+                [label]="'ORG.PORT' | translate"
+                [placeholder]="'ORG.PORT_PLACEHOLDER' | translate"
                 icon="pi-hashtag"
                 type="number"
                 [showError]="
@@ -214,8 +213,8 @@
 
             <app-custom-input
               formControlName="dbName"
-              label="Datasource"
-              placeholder="e.g. mydb"
+              [label]="'ORG.DATASOURCE' | translate"
+              [placeholder]="'ORG.DATASOURCE_PLACEHOLDER' | translate"
               icon="pi-database"
               [showError]="
                 !!(
@@ -230,8 +229,8 @@
             <div class="db-fields-row">
               <app-custom-input
                 formControlName="dbUsername"
-                label="Username"
-                placeholder="e.g. postgres"
+                [label]="'COMMON.USERNAME' | translate"
+                [placeholder]="'ORG.DB_USERNAME_PLACEHOLDER' | translate"
                 icon="pi-user"
                 [showError]="
                   !!(
@@ -245,8 +244,8 @@
 
               <app-custom-input
                 formControlName="dbPassword"
-                label="Password"
-                placeholder="Leave blank to keep current"
+                [label]="'ORG.PASSWORD' | translate"
+                [placeholder]="'ORG.LEAVE_BLANK_KEEP_CURRENT' | translate"
                 icon="pi-lock"
                 [showPasswordToggle]="true"
               >
@@ -271,21 +270,21 @@
                 ></i>
                 {{
                   connectionTestLoading
-                    ? 'Testing connection...'
-                    : 'Test Connection'
+                    ? ('ORG.TESTING_CONNECTION' | translate)
+                    : ('ORG.TEST_CONNECTION' | translate)
                 }}
               </span>
               <span
                 class="connection-status success"
                 *ngIf="connectionTestResult === 'success'"
               >
-                <i class="pi pi-check-circle"></i> Connected
+                <i class="pi pi-check-circle"></i> {{ 'ORG.CONNECTED' | translate }}
               </span>
               <span
                 class="connection-status failed"
                 *ngIf="connectionTestResult === 'failed'"
               >
-                <i class="pi pi-times-circle"></i> Connection failed
+                <i class="pi pi-times-circle"></i> {{ 'ORG.CONNECTION_FAILED' | translate }}
               </span>
             </div>
           </div>
@@ -296,43 +295,38 @@
           <div class="readonly-info-container">
             <div class="readonly-info-title warning-title">
               <i class="pi pi-exclamation-triangle"></i>
-              Master Datasource Configuration
+              {{ 'ORG.MASTER_DS_CONFIG' | translate }}
             </div>
             <div class="readonly-info-card warning-card">
               <p class="update-info-text warning-text">
                 <i class="pi pi-circle-fill"></i>
-                This is the master datasource that manages core system
-                operations for this organisation.
+                {{ 'ORG.MASTER_DS_WARNING_1' | translate }}
               </p>
               <p class="update-info-text warning-text">
                 <i class="pi pi-circle-fill"></i>
-                Any modifications may affect all users and services connected to
-                this organisation.
+                {{ 'ORG.MASTER_DS_WARNING_2' | translate }}
               </p>
               <p class="update-info-text warning-text">
                 <i class="pi pi-circle-fill"></i>
-                Please ensure all changes are carefully reviewed and backed up
-                before saving.
+                {{ 'ORG.MASTER_DS_WARNING_3' | translate }}
               </p>
             </div>
             <div class="readonly-info-title" style="margin-top: 1.25rem">
               <i class="pi pi-info-circle"></i>
-              Update Information
+              {{ 'ORG.UPDATE_INFORMATION' | translate }}
             </div>
             <div class="readonly-info-card">
               <p class="update-info-text">
                 <i class="pi pi-circle-fill"></i>
-                Only modified fields will be updated. Unchanged fields retain
-                their current values.
+                {{ 'ORG.UPDATE_INFO_1' | translate }}
               </p>
               <p class="update-info-text">
                 <i class="pi pi-circle-fill"></i>
-                If password is left blank, the existing password will be
-                preserved.
+                {{ 'ORG.UPDATE_INFO_2' | translate }}
               </p>
               <p class="update-info-text">
                 <i class="pi pi-circle-fill"></i>
-                It is recommended to test the connection before saving changes.
+                {{ 'ORG.UPDATE_INFO_3' | translate }}
               </p>
             </div>
           </div>
@@ -346,16 +340,16 @@
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-shield"></i>
-              <span>Security Settings</span>
+              <span>{{ 'ORG.SECURITY_SETTINGS' | translate }}</span>
             </div>
             <div class="db-fields-row">
               <app-custom-input
                 formControlName="maxLoginAttempts"
-                label="Max Login Attempts"
+                [label]="'ORG.MAX_LOGIN_ATTEMPTS' | translate"
                 type="number"
                 icon="pi-lock"
                 [required]="true"
-                tooltip="Allowed range: 3 – 10 attempts"
+                [tooltip]="'ORG.MAX_LOGIN_ATTEMPTS_TOOLTIP' | translate"
                 [showError]="
                   !!(
                     orgForm.get('maxLoginAttempts')?.invalid &&
@@ -366,11 +360,11 @@
               ></app-custom-input>
               <app-custom-input
                 formControlName="accountLockDurationHours"
-                label="Account Lock Duration (Hours)"
+                [label]="'ORG.ACCOUNT_LOCK_DURATION' | translate"
                 type="number"
                 icon="pi-clock"
                 [required]="true"
-                tooltip="Allowed range: 0 – 24 hours. Set 0 for permanent lock (admin must unlock manually)"
+                [tooltip]="'ORG.ACCOUNT_LOCK_DURATION_TOOLTIP' | translate"
                 [showError]="
                   !!(
                     orgForm.get('accountLockDurationHours')?.invalid &&
@@ -385,11 +379,11 @@
             <div class="db-fields-row">
               <app-custom-input
                 formControlName="passwordHistoryLimit"
-                label="Password History Limit"
+                [label]="'ORG.PASSWORD_HISTORY_LIMIT' | translate"
                 type="number"
                 icon="pi-history"
                 [required]="true"
-                tooltip="Allowed range: 1 – 24 passwords remembered"
+                [tooltip]="'ORG.PASSWORD_HISTORY_LIMIT_TOOLTIP' | translate"
                 [showError]="
                   !!(
                     orgForm.get('passwordHistoryLimit')?.invalid &&
@@ -400,11 +394,11 @@
               ></app-custom-input>
               <app-custom-input
                 formControlName="sessionInactivityTimeout"
-                label="Idle Session Timeout (Minutes)"
+                [label]="'ORG.IDLE_SESSION_TIMEOUT' | translate"
                 type="number"
                 icon="pi-sign-out"
                 [required]="true"
-                tooltip="Allowed range: 5 – 1440 minutes (up to 24 hours). User is logged out after this period of inactivity"
+                [tooltip]="'ORG.IDLE_SESSION_TIMEOUT_TOOLTIP' | translate"
                 [showError]="
                   !!(
                     orgForm.get('sessionInactivityTimeout')?.invalid &&
@@ -422,7 +416,7 @@
           <div class="form-group-section">
             <div class="group-header">
               <i class="pi pi-envelope"></i>
-              <span>Email Configuration</span>
+              <span>{{ 'ORG.EMAIL_CONFIGURATION' | translate }}</span>
             </div>
 
             <!-- Provider toggle -->
@@ -433,7 +427,7 @@
                 [class.active]="!selectedEmailProvider"
                 (click)="orgForm.get('emailProvider')?.setValue(null)"
               >
-                <i class="pi pi-cog"></i> System Default
+                <i class="pi pi-cog"></i> {{ 'ORG.SYSTEM_DEFAULT' | translate }}
               </button>
               <button
                 type="button"
@@ -441,7 +435,7 @@
                 [class.active]="selectedEmailProvider === 'SMTP'"
                 (click)="orgForm.get('emailProvider')?.setValue('SMTP')"
               >
-                <i class="pi pi-server"></i> Custom SMTP
+                <i class="pi pi-server"></i> {{ 'ORG.CUSTOM_SMTP' | translate }}
               </button>
               <button
                 type="button"
@@ -449,7 +443,7 @@
                 [class.active]="selectedEmailProvider === 'SES'"
                 (click)="orgForm.get('emailProvider')?.setValue('SES')"
               >
-                <i class="pi pi-cloud"></i> Custom AWS SES
+                <i class="pi pi-cloud"></i> {{ 'ORG.CUSTOM_AWS_SES' | translate }}
               </button>
             </div>
 
@@ -458,8 +452,8 @@
               <div class="db-fields-row">
                 <app-custom-input
                   formControlName="smtpHost"
-                  label="SMTP Host"
-                  placeholder="e.g. smtp.gmail.com"
+                  [label]="'ORG.SMTP_HOST' | translate"
+                  [placeholder]="'ORG.SMTP_HOST_PLACEHOLDER' | translate"
                   icon="pi-server"
                   [required]="true"
                   [showError]="
@@ -472,8 +466,8 @@
                 ></app-custom-input>
                 <app-custom-input
                   formControlName="smtpPort"
-                  label="SMTP Port"
-                  placeholder="e.g. 587"
+                  [label]="'ORG.SMTP_PORT' | translate"
+                  [placeholder]="'ORG.SMTP_PORT_PLACEHOLDER' | translate"
                   type="number"
                   icon="pi-hashtag"
                   [required]="true"
@@ -489,8 +483,8 @@
               <div class="db-fields-row">
                 <app-custom-input
                   formControlName="smtpUser"
-                  label="SMTP Username"
-                  placeholder="e.g. user@gmail.com"
+                  [label]="'ORG.SMTP_USERNAME' | translate"
+                  [placeholder]="'ORG.SMTP_USERNAME_PLACEHOLDER' | translate"
                   icon="pi-user"
                   [required]="true"
                   [showError]="
@@ -503,16 +497,16 @@
                 ></app-custom-input>
                 <app-custom-input
                   formControlName="smtpPassword"
-                  label="SMTP Password"
-                  placeholder="Leave blank to keep current"
+                  [label]="'ORG.SMTP_PASSWORD' | translate"
+                  [placeholder]="'ORG.LEAVE_BLANK_KEEP_CURRENT' | translate"
                   icon="pi-lock"
                   [showPasswordToggle]="true"
                 ></app-custom-input>
               </div>
               <app-custom-input
                 formControlName="smtpFrom"
-                label="From Email"
-                placeholder="e.g. noreply@company.com"
+                [label]="'ORG.FROM_EMAIL' | translate"
+                [placeholder]="'ORG.FROM_EMAIL_PLACEHOLDER' | translate"
                 icon="pi-at"
                 [required]="true"
                 [showError]="
@@ -529,8 +523,8 @@
             <div *ngIf="selectedEmailProvider === 'SES'" class="email-fields">
               <app-custom-input
                 formControlName="sesRegion"
-                label="AWS Region"
-                placeholder="e.g. us-east-1"
+                [label]="'ORG.AWS_REGION' | translate"
+                [placeholder]="'ORG.AWS_REGION_PLACEHOLDER' | translate"
                 icon="pi-globe"
                 [required]="true"
                 [showError]="
@@ -544,8 +538,8 @@
               <div class="db-fields-row">
                 <app-custom-input
                   formControlName="sesAccessKeyId"
-                  label="Access Key ID"
-                  placeholder="e.g. AKIAIOSFODNN7EXAMPLE"
+                  [label]="'ORG.ACCESS_KEY_ID' | translate"
+                  [placeholder]="'ORG.ACCESS_KEY_ID_PLACEHOLDER' | translate"
                   icon="pi-key"
                   [required]="true"
                   [showError]="
@@ -558,16 +552,16 @@
                 ></app-custom-input>
                 <app-custom-input
                   formControlName="sesSecretAccessKey"
-                  label="Secret Access Key"
-                  placeholder="Leave blank to keep current"
+                  [label]="'ORG.SECRET_ACCESS_KEY' | translate"
+                  [placeholder]="'ORG.LEAVE_BLANK_KEEP_CURRENT' | translate"
                   icon="pi-lock"
                   [showPasswordToggle]="true"
                 ></app-custom-input>
               </div>
               <app-custom-input
                 formControlName="sesFrom"
-                label="From Email"
-                placeholder="e.g. noreply@company.com"
+                [label]="'ORG.FROM_EMAIL' | translate"
+                [placeholder]="'ORG.FROM_EMAIL_PLACEHOLDER' | translate"
                 icon="pi-at"
                 [required]="true"
                 [showError]="
@@ -583,10 +577,7 @@
             <!-- No provider message -->
             <div *ngIf="!selectedEmailProvider" class="no-provider-message">
               <i class="pi pi-info-circle"></i>
-              <span
-                >Emails will be sent using the system default configuration
-                managed by the system administrator.</span
-              >
+              <span>{{ 'ORG.SYSTEM_DEFAULT_EMAIL_NOTE' | translate }}</span>
             </div>
           </div>
         </div>
@@ -596,22 +587,22 @@
           <div class="readonly-info-container" *ngIf="orgData">
             <div class="readonly-info-title">
               <i class="pi pi-shield"></i>
-              Encryption Configuration
+              {{ 'ORG.ENCRYPTION_CONFIGURATION' | translate }}
             </div>
             <div class="readonly-info-card">
               <div class="info-row">
-                <span class="info-label">Encryption Method</span>
+                <span class="info-label">{{ 'ORG.ENCRYPTION_METHOD' | translate }}</span>
                 <span class="info-value">{{
-                  orgData?.encryptionAlgorithm || 'Not configured'
+                  orgData?.encryptionAlgorithm || ('ORG.NOT_CONFIGURED' | translate)
                 }}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Pepper Key</span>
+                <span class="info-label">{{ 'ORG.PEPPER_KEY' | translate }}</span>
                 <span class="info-value masked">********</span>
               </div>
               <p class="readonly-note">
                 <i class="pi pi-lock"></i>
-                Encryption settings cannot be modified after creation.
+                {{ 'ORG.ENCRYPTION_IMMUTABLE_NOTE' | translate }}
               </p>
             </div>
           </div>
@@ -627,20 +618,20 @@
       <div class="popup-icon">
         <i class="pi pi-save"></i>
       </div>
-      <h3>Confirm Update</h3>
+      <h3>{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
       <p class="delete-intro">
-        Are you sure you want to update this organisation?
+        {{ 'ORG.CONFIRM_UPDATE_MSG' | translate }}
       </p>
       <div class="justification-section">
         <label for="saveJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="saveJustification"
           [(ngModel)]="saveJustification"
-          placeholder="Provide a reason for this update"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -650,7 +641,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelSave()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -658,7 +649,7 @@
         [disabled]="!saveJustification.trim()"
       >
         <i class="pi pi-check"></i>
-        Update
+        {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>
   </div>

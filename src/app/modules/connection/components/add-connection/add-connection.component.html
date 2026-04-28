@@ -10,13 +10,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Add Connection</h2>
+        <h2>{{ 'CONNECTION.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -25,7 +25,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="connectionForm.invalid"
         >
@@ -40,8 +40,8 @@
         <!-- Name Field -->
         <app-custom-input
           formControlName="name"
-          label="Name"
-          placeholder="Enter name"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'CONNECTION.ENTER_NAME' | translate"
           icon="pi-box"
           [required]="true"
           [showError]="
@@ -57,8 +57,8 @@
         <!-- Description Field -->
         <app-custom-input
           formControlName="description"
-          label="Description"
-          placeholder="Enter description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'CONNECTION.ENTER_DESCRIPTION' | translate"
           icon="pi-align-left"
         >
         </app-custom-input>
@@ -67,8 +67,8 @@
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
-          label="Organisation"
-          placeholder="Select Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
+          [placeholder]="'CONNECTION.SELECT_ORGANISATION' | translate"
           [options]="organisations"
           optionLabel="name"
           optionValue="id"
@@ -81,7 +81,7 @@
               connectionForm.get('organisation')?.touched
             )
           "
-          errorMessage="Organisation is required"
+          [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
           (onChangeEvent)="onOrganisationChange()"
         >
         </app-custom-dropdown>
@@ -89,8 +89,8 @@
         <!-- Datasource Dropdown -->
         <app-custom-dropdown
           formControlName="datasource"
-          label="Datasource"
-          placeholder="Select Datasource"
+          [label]="'CONNECTION.DATASOURCE' | translate"
+          [placeholder]="'CONNECTION.SELECT_DATASOURCE' | translate"
           [options]="datasources"
           optionLabel="name"
           optionValue="id"
@@ -103,15 +103,15 @@
               connectionForm.get('datasource')?.touched
             )
           "
-          errorMessage="Datasource is required"
+          [errorMessage]="'VALIDATION.DATASOURCE_REQUIRED' | translate"
         >
         </app-custom-dropdown>
 
         <!-- DB Username -->
         <app-custom-input
           formControlName="dbUsername"
-          label="Datasource Username"
-          placeholder="Enter Datasource Username"
+          [label]="'CONNECTION.DATASOURCE_USERNAME' | translate"
+          [placeholder]="'CONNECTION.ENTER_DATASOURCE_USERNAME' | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -120,15 +120,15 @@
               connectionForm.get('dbUsername')?.touched
             )
           "
-          errorMessage="Datasource Username is required"
+          [errorMessage]="'VALIDATION.DATASOURCE_USERNAME_REQUIRED' | translate"
         >
         </app-custom-input>
 
         <!-- DB Password -->
         <app-custom-input
           formControlName="dbPassword"
-          label="Datasource Password"
-          placeholder="Enter password"
+          [label]="'CONNECTION.DATASOURCE_PASSWORD' | translate"
+          [placeholder]="'CONNECTION.ENTER_PASSWORD' | translate"
           icon="pi-lock"
           [required]="true"
           [showPasswordToggle]="true"
@@ -138,7 +138,7 @@
               connectionForm.get('dbPassword')?.touched
             )
           "
-          errorMessage="Datasource Password is required"
+          [errorMessage]="'VALIDATION.DATASOURCE_PASSWORD_REQUIRED' | translate"
         >
         </app-custom-input>
       </div>

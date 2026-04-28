@@ -1,5 +1,5 @@
 <p-dialog
-  header="{{ editingFilter ? 'Edit Filter' : 'Add Filter' }}"
+  [header]="editingFilter ? ('ANALYSES.EDIT_FILTER' | translate) : ('ANALYSES.ADD_FILTER' | translate)"
   [(visible)]="visible"
   [modal]="true"
   [draggable]="false"
@@ -15,9 +15,9 @@
       <app-custom-dropdown
         [options]="datasetFields"
         [(ngModel)]="filterDialogColumn"
-        label="Column"
+        [label]="'ANALYSES.COLUMN' | translate"
         optionLabel="columnToView"
-        placeholder="Select a dataset column"
+        [placeholder]="'ANALYSES.SELECT_DATASET_COLUMN' | translate"
         [filter]="true"
         filterBy="columnToView"
         [required]="true"
@@ -31,9 +31,9 @@
     <div class="filter-dialog-field">
       <app-custom-input
         [(ngModel)]="filterDialogName"
-        label="Display Name"
+        [label]="'ANALYSES.DISPLAY_NAME' | translate"
         icon="pi-tag"
-        placeholder="Filter label (defaults to column name)"
+        [placeholder]="'ANALYSES.FILTER_LABEL_PLACEHOLDER' | translate"
       ></app-custom-input>
     </div>
 
@@ -43,9 +43,9 @@
         <app-custom-dropdown
           [options]="filterTypeOptions"
           [(ngModel)]="filterDialogType"
-          label="Filter Type"
+          [label]="'ANALYSES.FILTER_TYPE' | translate"
           optionValue="value"
-          placeholder="Select type"
+          [placeholder]="'ANALYSES.SELECT_TYPE' | translate"
           [required]="true"
           [autoDisplayFirst]="false"
           appendTo="body"
@@ -56,9 +56,9 @@
         <app-custom-dropdown
           [options]="controlTypeOptions"
           [(ngModel)]="filterDialogControl"
-          label="Control Type"
+          [label]="'ANALYSES.CONTROL_TYPE' | translate"
           optionValue="value"
-          placeholder="Select control"
+          [placeholder]="'ANALYSES.SELECT_CONTROL' | translate"
           [required]="true"
           [autoDisplayFirst]="false"
           appendTo="body"
@@ -72,9 +72,9 @@
         <app-custom-dropdown
           [options]="operatorOptions"
           [(ngModel)]="filterDialogOperator"
-          label="Match Operator"
+          [label]="'ANALYSES.MATCH_OPERATOR' | translate"
           optionValue="value"
-          placeholder="Select operator"
+          [placeholder]="'ANALYSES.SELECT_OPERATOR' | translate"
           [autoDisplayFirst]="false"
           appendTo="body"
         ></app-custom-dropdown>
@@ -83,7 +83,7 @@
         <app-custom-dropdown
           [options]="nullOptions"
           [(ngModel)]="filterDialogNullOption"
-          label="Null Handling"
+          [label]="'ANALYSES.NULL_HANDLING' | translate"
           optionValue="value"
           [autoDisplayFirst]="false"
           appendTo="body"
@@ -96,13 +96,13 @@
       <app-custom-multiselect
         [options]="filterDialogCategoryValues"
         [(ngModel)]="filterDialogDefaultValue"
-        label="Default Values"
+        [label]="'ANALYSES.DEFAULT_VALUES' | translate"
         optionValue="value"
-        placeholder="{{
+        [placeholder]="
           isLoadingFilterValues
-            ? 'Loading values...'
-            : 'Select default values...'
-        }}"
+            ? ('ANALYSES.LOADING_VALUES' | translate)
+            : ('ANALYSES.SELECT_DEFAULT_VALUES' | translate)
+        "
         [filter]="true"
         display="chip"
         appendTo="body"
@@ -113,7 +113,7 @@
           filterDialogCategoryValues.length === 0 && !isLoadingFilterValues
         "
       >
-        <i class="pi pi-info-circle"></i> Load data to see available values
+        <i class="pi pi-info-circle"></i> {{ 'ANALYSES.LOAD_DATA_TO_SEE_VALUES' | translate }}
       </small>
     </div>
 
@@ -124,8 +124,8 @@
     >
       <app-custom-number
         [(ngModel)]="filterDialogDefaultValue"
-        label="Default Value"
-        placeholder="Enter default number..."
+        [label]="'ANALYSES.DEFAULT_VALUE_LABEL' | translate"
+        [placeholder]="'ANALYSES.ENTER_DEFAULT_NUMBER' | translate"
       ></app-custom-number>
     </div>
 
@@ -134,15 +134,15 @@
       <div class="filter-dialog-field">
         <app-custom-number
           [(ngModel)]="filterDialogDefaultValue.min"
-          label="Range Min"
-          placeholder="Min"
+          [label]="'ANALYSES.RANGE_MIN' | translate"
+          [placeholder]="'ANALYSES.MIN' | translate"
         ></app-custom-number>
       </div>
       <div class="filter-dialog-field">
         <app-custom-number
           [(ngModel)]="filterDialogDefaultValue.max"
-          label="Range Max"
-          placeholder="Max"
+          [label]="'ANALYSES.RANGE_MAX' | translate"
+          [placeholder]="'ANALYSES.MAX' | translate"
         ></app-custom-number>
       </div>
     </div>
@@ -161,7 +161,7 @@
           [options]="dateFormatOptions"
           optionLabel="label"
           optionValue="value"
-          label="Date Format"
+          [label]="'ANALYSES.DATE_FORMAT' | translate"
           appendTo="body"
           (onChangeEvent)="onDateFormatChange()"
         ></app-custom-dropdown>
@@ -172,9 +172,9 @@
           (ngModelChange)="
             filterDialogIncludeTime = $event; onIncludeTimeChange()
           "
-          label="Include Time"
-          trueLabel="Date & Time"
-          falseLabel="Date Only"
+          [label]="'ANALYSES.INCLUDE_TIME' | translate"
+          [trueLabel]="'ANALYSES.DATE_AND_TIME' | translate"
+          [falseLabel]="'ANALYSES.DATE_ONLY' | translate"
         ></app-custom-toggle>
       </div>
     </div>
@@ -186,9 +186,9 @@
     >
       <app-custom-calendar
         [(ngModel)]="filterDialogDefaultValue"
-        label="Default Date"
+        [label]="'ANALYSES.DEFAULT_DATE' | translate"
         [placeholder]="
-          filterDialogIncludeTime ? 'Select date & time...' : 'Select date...'
+          filterDialogIncludeTime ? ('ANALYSES.SELECT_DATE_TIME' | translate) : ('ANALYSES.SELECT_DATE' | translate)
         "
         [showTime]="filterDialogIncludeTime"
         [showIcon]="true"
@@ -201,11 +201,11 @@
     <div class="filter-dialog-field" *ngIf="filterDialogType === 'time_range'">
       <app-custom-daterange
         [(ngModel)]="filterDialogDefaultValue"
-        label="Date Range"
+        [label]="'ANALYSES.DATE_RANGE' | translate"
         [placeholder]="
           filterDialogIncludeTime
-            ? 'Select date & time range...'
-            : 'Select date range...'
+            ? ('ANALYSES.SELECT_DATE_TIME_RANGE' | translate)
+            : ('ANALYSES.SELECT_DATE_RANGE' | translate)
         "
         [showTime]="filterDialogIncludeTime"
         [showIcon]="true"
@@ -219,9 +219,9 @@
     <div class="filter-dialog-field" *ngIf="filterDialogType">
       <app-custom-input
         [(ngModel)]="filterDialogPlaceholder"
-        label="Placeholder Text"
+        [label]="'ANALYSES.PLACEHOLDER_TEXT' | translate"
         icon="pi-pencil"
-        placeholder="Text shown when no value selected"
+        [placeholder]="'ANALYSES.PLACEHOLDER_HINT' | translate"
       ></app-custom-input>
     </div>
 
@@ -229,15 +229,15 @@
     <div class="filter-dialog-options">
       <app-custom-toggle
         [(ngModel)]="filterDialogEnabled"
-        label="Status"
-        trueLabel="Enabled"
-        falseLabel="Disabled"
+        [label]="'COMMON.STATUS' | translate"
+        [trueLabel]="'ANALYSES.ENABLED' | translate"
+        [falseLabel]="'ANALYSES.DISABLED' | translate"
       ></app-custom-toggle>
       <app-custom-toggle
         [(ngModel)]="filterDialogMandatory"
-        label="Required"
-        trueLabel="Required"
-        falseLabel="Optional"
+        [label]="'ANALYSES.REQUIRED' | translate"
+        [trueLabel]="'ANALYSES.REQUIRED' | translate"
+        [falseLabel]="'ANALYSES.OPTIONAL' | translate"
       ></app-custom-toggle>
     </div>
   </div>
@@ -246,7 +246,7 @@
     <div class="dialog-footer">
       <button class="btn-cancel" type="button" (click)="cancel()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-primary"
@@ -265,10 +265,10 @@
         ></i>
         {{
           isSavingFilter
-            ? 'Saving...'
+            ? ('ANALYSES.SAVING' | translate)
             : editingFilter
-              ? 'Update Filter'
-              : 'Add Filter'
+              ? ('ANALYSES.UPDATE_FILTER' | translate)
+              : ('ANALYSES.ADD_FILTER' | translate)
         }}
       </button>
     </div>

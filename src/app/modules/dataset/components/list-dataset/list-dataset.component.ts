@@ -23,6 +23,7 @@ import { AnalysesService } from 'src/app/modules/analyses/services/analyses.serv
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';
+import { TranslateService } from '@ngx-translate/core';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 
@@ -67,10 +68,7 @@ export class ListDatasetComponent implements OnInit {
 
   today = new Date();
 
-  statusOptions = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 },
-  ];
+  statusOptions: any[] = [];
 
   // Filter values for column filtering
   filterValues: any = {
@@ -108,13 +106,7 @@ export class ListDatasetComponent implements OnInit {
     );
   }
 
-  addDatasetItems: MenuItem[] = [
-    {
-      label: 'via Query Builder',
-      icon: 'pi pi-comments',
-      command: () => this.onAddViaPrompts(),
-    },
-  ];
+  addDatasetItems: MenuItem[] = [];
 
   // Create Analysis dialog
   showCreateAnalysisDialog = false;
@@ -129,9 +121,23 @@ export class ListDatasetComponent implements OnInit {
     private queryBuilderService: QueryBuilderService,
     private analysesService: AnalysesService,
     private route: ActivatedRoute,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {
+    this.statusOptions = [
+      { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
+      { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
+    ];
+
+    this.addDatasetItems = [
+      {
+        label: this.translate.instant('DATASET.VIA_QUERY_BUILDER'),
+        icon: 'pi pi-comments',
+        command: () => this.onAddViaPrompts(),
+      },
+    ];
+
     // Setup debounced filter
     this.filter$
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))

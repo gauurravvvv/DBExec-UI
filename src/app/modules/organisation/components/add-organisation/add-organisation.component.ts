@@ -13,6 +13,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { TranslateService } from '@ngx-translate/core';
 import { OrganisationService } from '../../services/organisation.service';
 
 @Component({
@@ -44,6 +45,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private organisationService: OrganisationService,
     private globalService: GlobalService,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -243,17 +245,17 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   getEmailFieldError(fieldName: string): string {
     const control = this.orgForm.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return 'This field is required';
-    if (control.errors['email']) return 'Please enter a valid email address';
+    if (control.errors['required']) return this.translate.instant('VALIDATION.FIELD_REQUIRED');
+    if (control.errors['email']) return this.translate.instant('VALIDATION.EMAIL_INVALID');
     if (control.errors['maxlength'])
-      return `Must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
     if (control.errors['minlength'])
-      return `Must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control.errors['min'])
-      return `Minimum value is ${control.errors['min'].min}`;
+      return this.translate.instant('VALIDATION.MIN_VALUE', { value: control.errors['min'].min });
     if (control.errors['max'])
-      return `Maximum value is ${control.errors['max'].max}`;
-    if (control.errors['pattern']) return 'Invalid format (e.g. us-east-1)';
+      return this.translate.instant('VALIDATION.MAX_VALUE', { value: control.errors['max'].max });
+    if (control.errors['pattern']) return this.translate.instant('VALIDATION.INVALID_FORMAT_REGION');
     return '';
   }
 
@@ -405,68 +407,68 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const control = this.orgForm.get('name');
-    if (control?.errors?.['required']) return 'Organisation name is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.ORG_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Organisation name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.ORG_NAME_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Organisation name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.ORG_NAME_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Organisation name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('VALIDATION.ORG_NAME_PATTERN');
     return '';
   }
 
   getDescriptionError(): string {
     const control = this.orgForm.get('description');
-    if (control?.errors?.['required']) return 'Description is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.DESCRIPTION_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Description must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.DESCRIPTION_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Description must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.DESCRIPTION_MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
     return '';
   }
 
   getPepperKeyError(): string {
     const control = this.orgForm.get('pepperKey');
-    if (control?.errors?.['required']) return 'Pepper key is required';
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.PEPPER_KEY_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Pepper key must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('VALIDATION.PEPPER_KEY_MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Pepper key can only contain letters, numbers and special characters (no spaces)';
+      return this.translate.instant('VALIDATION.PEPPER_KEY_PATTERN');
     return '';
   }
 
   getSecurityFieldError(fieldName: string): string {
     const control = this.orgForm.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return 'This field is required';
+    if (control.errors['required']) return this.translate.instant('VALIDATION.FIELD_REQUIRED');
     if (control.errors['min'])
-      return `Minimum value is ${control.errors['min'].min}`;
+      return this.translate.instant('VALIDATION.MIN_VALUE', { value: control.errors['min'].min });
     if (control.errors['max'])
-      return `Maximum value is ${control.errors['max'].max}`;
+      return this.translate.instant('VALIDATION.MAX_VALUE', { value: control.errors['max'].max });
     return '';
   }
 
   getDbFieldError(fieldName: string): string {
     const control = this.orgForm.get(fieldName);
     if (control?.errors) {
-      if (control.errors['required']) return 'This field is required';
+      if (control.errors['required']) return this.translate.instant('VALIDATION.FIELD_REQUIRED');
       if (control.errors['pattern']) {
         switch (fieldName) {
           case 'dbHost':
-            return 'Invalid host format';
+            return this.translate.instant('VALIDATION.INVALID_HOST_FORMAT');
           case 'dbPort':
-            return 'Port must be a number';
+            return this.translate.instant('VALIDATION.PORT_MUST_BE_NUMBER');
           case 'dbName':
-            return 'Database name can only contain letters, numbers, underscores and hyphens';
+            return this.translate.instant('VALIDATION.DB_NAME_PATTERN');
           default:
-            return 'Invalid format';
+            return this.translate.instant('VALIDATION.INVALID_FORMAT');
         }
       }
       if (control.errors['min'] && fieldName === 'dbPort')
-        return 'Port must be at least 1';
+        return this.translate.instant('VALIDATION.PORT_MIN');
       if (control.errors['max'] && fieldName === 'dbPort')
-        return 'Port cannot exceed 65535';
-      if (control.errors['email']) return 'Please enter a valid email';
+        return this.translate.instant('VALIDATION.PORT_MAX');
+      if (control.errors['email']) return this.translate.instant('VALIDATION.EMAIL_INVALID');
     }
     return '';
   }

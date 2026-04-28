@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
@@ -39,6 +40,7 @@ export class ViewProfileComponent implements OnInit {
     private loginService: LoginService,
     private router: Router,
     private store: Store,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -63,11 +65,11 @@ export class ViewProfileComponent implements OnInit {
     const p = this.profile();
     switch (p?.role) {
       case 'SUPER-ADMIN':
-        return 'Super Admin';
+        return this.translate.instant('PROFILE.ROLE_SUPER_ADMIN');
       case 'ORG-ADMIN':
-        return 'Organisation Admin';
+        return this.translate.instant('PROFILE.ROLE_ORG_ADMIN');
       case 'ORG-USER':
-        return 'User';
+        return this.translate.instant('PROFILE.ROLE_ORG_USER');
       default:
         return p?.role || '';
     }

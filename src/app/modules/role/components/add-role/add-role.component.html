@@ -6,13 +6,13 @@
         <button pButton class="p-button-text" routerLink="/app/role">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Add Role</h2>
+        <h2>{{ 'ROLE.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -21,7 +21,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="roleForm.invalid || saving()"
         >
@@ -37,8 +37,8 @@
         <!-- Role Name -->
         <app-custom-input
           formControlName="name"
-          label="Role Name"
-          placeholder="Enter role name"
+          [label]="'ROLE.ROLE_NAME' | translate"
+          [placeholder]="'ROLE.ENTER_ROLE_NAME' | translate"
           icon="pi-box"
           [required]="true"
           [showError]="
@@ -51,8 +51,8 @@
         <!-- Description -->
         <app-custom-input
           formControlName="description"
-          label="Role Description"
-          placeholder="Enter role description"
+          [label]="'ROLE.ROLE_DESCRIPTION' | translate"
+          [placeholder]="'ROLE.ENTER_ROLE_DESCRIPTION' | translate"
           icon="pi-align-left"
         >
         </app-custom-input>
@@ -61,8 +61,8 @@
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
-          label="Organisation"
-          placeholder="Select Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
+          [placeholder]="'ROLE.SELECT_ORGANISATION' | translate"
           [options]="organisations"
           optionLabel="name"
           optionValue="id"
@@ -75,7 +75,7 @@
               roleForm.get('organisation')?.touched
             )
           "
-          errorMessage="Organisation is required"
+          [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
           (onChangeEvent)="onOrganisationChange({ value: $event })"
         >
         </app-custom-dropdown>
@@ -84,7 +84,7 @@
       <!-- Permissions Section -->
       <div class="permissions-section" *ngIf="permissions.length > 0">
         <label class="section-title"
-          >Screen Permissions<span class="required"> *</span></label
+          >{{ 'ROLE.SCREEN_PERMISSIONS' | translate }}<span class="required"> *</span></label
         >
 
         <div class="permissions-grid">

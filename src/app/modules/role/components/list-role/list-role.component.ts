@@ -17,6 +17,7 @@ import { ROLE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { RoleService } from '../../services/role.service';
 
 @Component({
@@ -49,10 +50,7 @@ export class ListRoleComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
   today = new Date();
 
-  statusOptions = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 },
-  ];
+  statusOptions: { label: string; value: number }[] = [];
 
   filterValues: any = {
     name: '',
@@ -79,9 +77,15 @@ export class ListRoleComponent implements OnInit {
     private globalService: GlobalService,
     private roleService: RoleService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {
+    this.statusOptions = [
+      { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
+      { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
+    ];
+
     this.filter$
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadRoles());

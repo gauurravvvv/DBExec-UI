@@ -10,7 +10,7 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h3 class="toolbar-label">Edit Analysis</h3>
+        <h3 class="toolbar-label">{{ 'ANALYSES.EDIT_ANALYSIS' | translate }}</h3>
       </div>
     </div>
     <div class="toolbar-center">
@@ -20,7 +20,7 @@
       <button
         pButton
         class="p-button-text btn-primary"
-        title="Refresh Data"
+        [title]="'ANALYSES.REFRESH_DATA' | translate"
         (click)="refreshData()"
         [disabled]="(datasetStatus$ | async) === 'loading' || running()"
       >
@@ -32,7 +32,7 @@
       <button
         pButton
         class="p-button-text btn-primary"
-        title="Save Analysis"
+        [title]="'ANALYSES.SAVE_ANALYSIS' | translate"
         (click)="saveAnalysis()"
         [disabled]="!canSave || saving()"
       >
@@ -48,7 +48,7 @@
       class="p-button-text btn-primary visual-list-btn"
       [class.active]="isVisualListPanelOpen"
       (click)="toggleVisualListPanel()"
-      title="Toggle Visual List Pane"
+      [title]="'ANALYSES.TOGGLE_VISUAL_LIST' | translate"
     >
       <i class="pi pi-list"></i>
     </button>
@@ -57,7 +57,7 @@
       class="p-button-text btn-primary field-btn"
       [class.active]="isFieldsPanelOpen"
       (click)="toggleFieldsPanel()"
-      title="Toggle Fields Pane"
+      [title]="'ANALYSES.TOGGLE_FIELDS' | translate"
     >
       <i class="pi pi-database"></i>
     </button>
@@ -66,7 +66,7 @@
       class="p-button-text btn-primary visual-btn"
       [class.active]="isVisualsPanelOpen"
       (click)="toggleVisualsPanel()"
-      title="Toggle Visuals Pane"
+      [title]="'ANALYSES.TOGGLE_VISUALS' | translate"
     >
       <i class="pi pi-chart-bar"></i>
     </button>
@@ -75,14 +75,14 @@
       class="p-button-text btn-primary filter-btn"
       [class.active]="isFilterPanelOpen"
       (click)="toggleFilterPanel()"
-      title="Toggle Filter Pane"
+      [title]="'ANALYSES.TOGGLE_FILTERS' | translate"
     >
       <i class="pi pi-filter"></i>
     </button>
 
     <i
       class="pi pi-info-circle row-limit-hint"
-      pTooltip="Data limited to 1000 rows"
+      [pTooltip]="'ANALYSES.ROW_LIMIT_HINT' | translate"
       tooltipPosition="left"
       [tooltipOptions]="{ tooltipStyleClass: 'row-limit-tooltip' }"
     ></i>
@@ -95,15 +95,15 @@
       <ng-container [ngSwitch]="status">
         <div *ngSwitchCase="'loading'" class="status-loading">
           <i class="pi pi-spin pi-spinner"></i>
-          <span>Retrieving data...</span>
+          <span>{{ 'ANALYSES.RETRIEVING_DATA' | translate }}</span>
         </div>
         <div *ngSwitchCase="'loaded'" class="status-loaded">
           <i class="pi pi-check-circle"></i>
-          <span>{{ rawGraphData.length || 0 }} rows loaded</span>
+          <span>{{ 'ANALYSES.ROWS_LOADED' | translate:{ count: (rawGraphData.length || 0) } }}</span>
         </div>
         <div *ngSwitchCase="'error'" class="status-error">
           <i class="pi pi-exclamation-circle"></i>
-          <span>Error loading data</span>
+          <span>{{ 'ANALYSES.ERROR_LOADING_DATA' | translate }}</span>
         </div>
       </ng-container>
     </div>
@@ -115,7 +115,7 @@
     <div class="visual-list-sidebar" [class.collapsed]="!isVisualListPanelOpen">
       <div class="sidebar-content">
         <div class="sidebar-header-info">
-          <div class="dataset-label">Layers</div>
+          <div class="dataset-label">{{ 'ANALYSES.LAYERS' | translate }}</div>
           <span class="visual-count-badge" *ngIf="visuals.length > 0">
             {{ visuals.length }}
           </span>
@@ -126,7 +126,7 @@
           <div class="search-wrapper" *ngIf="visuals.length > 0">
             <app-custom-input
               [(ngModel)]="visualListSearchQuery"
-              placeholder="Search visuals..."
+              [placeholder]="'ANALYSES.SEARCH_VISUALS' | translate"
               icon="pi-search"
             ></app-custom-input>
           </div>
@@ -134,7 +134,7 @@
           <!-- Empty State -->
           <div class="visual-list-empty" *ngIf="visuals.length === 0">
             <i class="pi pi-inbox"></i>
-            <p>No visuals yet</p>
+            <p>{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</p>
           </div>
 
           <!-- Visual List Items -->
@@ -169,7 +169,7 @@
     <div class="datasource-sidebar" [class.collapsed]="!isFieldsPanelOpen">
       <div class="sidebar-content">
         <div class="sidebar-header-info">
-          <div class="dataset-label">Data</div>
+          <div class="dataset-label">{{ 'ANALYSES.DATA' | translate }}</div>
           <span class="visual-count-badge" *ngIf="allFields.length > 0">
             {{ allFields.length }}
           </span>
@@ -190,7 +190,7 @@
             <div class="search-wrapper" *ngIf="allFields.length">
               <app-custom-input
                 [(ngModel)]="datasetFieldsSearchQuery"
-                placeholder="Search fields..."
+                [placeholder]="'ANALYSES.SEARCH_FIELDS' | translate"
                 icon="pi-search"
               ></app-custom-input>
             </div>
@@ -199,11 +199,11 @@
             <div class="add-field-action">
               <button
                 pButton
-                label="Add Field"
+                [label]="'ANALYSES.ADD_FIELD' | translate"
                 icon="pi pi-plus"
                 class="p-button-outlined p-button-sm add-field-btn"
                 (click)="openAddCustomField()"
-                pTooltip="Add analysis custom field"
+                [pTooltip]="'ANALYSES.ADD_CUSTOM_FIELD_TOOLTIP' | translate"
                 tooltipPosition="right"
               ></button>
             </div>
@@ -216,7 +216,7 @@
               *ngIf="datasetDetails?.datasetFields?.length"
               class="fields-section-label analysis-label"
             >
-              Dataset Fields
+              {{ 'ANALYSES.DATASET_FIELDS' | translate }}
             </div>
             <div
               class="fields-list"
@@ -247,7 +247,7 @@
 
             <!-- Analysis Fields Section -->
             <div class="fields-section-label analysis-label">
-              Analysis Fields
+              {{ 'ANALYSES.ANALYSIS_FIELDS' | translate }}
             </div>
             <div
               class="fields-list"
@@ -278,7 +278,7 @@
                       (click)="
                         openEditCustomField(field); $event.stopPropagation()
                       "
-                      pTooltip="Edit"
+                      [pTooltip]="'COMMON.EDIT' | translate"
                       tooltipPosition="top"
                     ></i>
                     <i
@@ -286,7 +286,7 @@
                       (click)="
                         confirmDeleteField(field); $event.stopPropagation()
                       "
-                      pTooltip="Delete"
+                      [pTooltip]="'COMMON.DELETE' | translate"
                       tooltipPosition="top"
                     ></i>
                   </div>
@@ -301,7 +301,7 @@
                   text-align: center;
                 "
               >
-                No analysis-level fields yet
+                {{ 'ANALYSES.NO_ANALYSIS_FIELDS_YET' | translate }}
               </div>
             </div>
           </div>
@@ -341,7 +341,7 @@
     <div class="filter-sidebar" [class.collapsed]="!isFilterPanelOpen">
       <div class="sidebar-content">
         <div class="sidebar-header-info">
-          <div class="dataset-label">Filters</div>
+          <div class="dataset-label">{{ 'ANALYSES.FILTERS' | translate }}</div>
           <span class="visual-count-badge" *ngIf="configuredFilters.length > 0">
             {{ configuredFilters.length }}
           </span>
@@ -352,7 +352,7 @@
           <div class="add-filter-section">
             <button
               pButton
-              label="Add Filter"
+              [label]="'ANALYSES.ADD_FILTER' | translate"
               icon="pi pi-plus"
               class="p-button-outlined p-button-sm add-filter-button"
               (click)="addFilter()"
@@ -360,7 +360,7 @@
               [pTooltip]="
                 datasetDetails?.datasetFields?.length
                   ? ''
-                  : 'Load data first to add filters'
+                  : ('ANALYSES.LOAD_DATA_FIRST_FILTERS' | translate)
               "
               tooltipPosition="bottom"
             ></button>
@@ -389,7 +389,7 @@
                   <i
                     class="pi pi-pencil"
                     (click)="editFilter(filter)"
-                    pTooltip="Edit"
+                    [pTooltip]="'COMMON.EDIT' | translate"
                     tooltipPosition="top"
                   ></i>
                   <i
@@ -401,8 +401,8 @@
                     (click)="removeFilter(filter)"
                     [pTooltip]="
                       isDeletingFilter === filter.tempId
-                        ? 'Deleting...'
-                        : 'Remove'
+                        ? ('ANALYSES.DELETING' | translate)
+                        : ('ANALYSES.REMOVE' | translate)
                     "
                     tooltipPosition="top"
                     [style.pointer-events]="isDeletingFilter ? 'none' : 'auto'"
@@ -423,10 +423,10 @@
               </div>
               <div class="filter-card-badges">
                 <span class="badge badge-mandatory" *ngIf="filter.isMandatory"
-                  >Required</span
+                  >{{ 'ANALYSES.REQUIRED' | translate }}</span
                 >
                 <span class="badge badge-disabled" *ngIf="!filter.isEnabled"
-                  >Disabled</span
+                  >{{ 'ANALYSES.DISABLED' | translate }}</span
                 >
               </div>
             </div>
@@ -435,7 +435,7 @@
           <!-- Empty State -->
           <div class="filter-list-empty" *ngIf="configuredFilters.length === 0">
             <i class="pi pi-filter-slash"></i>
-            <p>No filters yet</p>
+            <p>{{ 'ANALYSES.NO_FILTERS_YET' | translate }}</p>
           </div>
         </div>
       </div>
@@ -497,20 +497,20 @@
                 "
                 class="pi pi-window-maximize action-icon maximize-icon"
                 (click)="maximizeVisual(visual, $event)"
-                pTooltip="Maximize"
+                [pTooltip]="'ANALYSES.MAXIMIZE' | translate"
                 tooltipPosition="top"
               ></i>
               <i
                 *ngIf="visual.chartType"
                 class="pi pi-refresh action-icon change-chart-icon"
                 (click)="clearChartType(visual); $event.stopPropagation()"
-                pTooltip="Change chart type"
+                [pTooltip]="'ANALYSES.CHANGE_CHART_TYPE' | translate"
                 tooltipPosition="top"
               ></i>
               <i
                 class="pi pi-times action-icon remove-icon"
                 (click)="removeVisual(visual.id); $event.stopPropagation()"
-                pTooltip="Remove"
+                [pTooltip]="'ANALYSES.REMOVE' | translate"
                 tooltipPosition="top"
               ></i>
             </div>
@@ -520,7 +520,7 @@
             <div class="visual-loading-placeholder" *ngIf="visual.loading">
               <div class="loading-content">
                 <i class="pi pi-spin pi-spinner loading-spinner"></i>
-                <span class="loading-text">Loading visualization...</span>
+                <span class="loading-text">{{ 'ANALYSES.LOADING_VISUALIZATION' | translate }}</span>
               </div>
             </div>
 
@@ -528,7 +528,7 @@
             <div class="visual-error-placeholder" *ngIf="visual.error">
               <div class="error-content">
                 <i class="pi pi-exclamation-triangle error-icon"></i>
-                <span class="error-text">Failed to load visualization</span>
+                <span class="error-text">{{ 'ANALYSES.FAILED_LOAD_VISUALIZATION' | translate }}</span>
               </div>
             </div>
 
@@ -540,8 +540,8 @@
               <div class="placeholder-icon-wrap">
                 <i class="pi pi-chart-bar"></i>
               </div>
-              <p>Select a chart type</p>
-              <small>Click to configure, right-click for options</small>
+              <p>{{ 'ANALYSES.SELECT_CHART_TYPE' | translate }}</p>
+              <small>{{ 'ANALYSES.CLICK_TO_CONFIGURE' | translate }}</small>
             </div>
 
             <!-- Placeholder when chart type selected but fields not mapped -->
@@ -560,25 +560,25 @@
               <div class="placeholder-icon-wrap">
                 <i class="pi pi-database"></i>
               </div>
-              <p>Map data fields</p>
+              <p>{{ 'ANALYSES.MAP_DATA_FIELDS' | translate }}</p>
               <small
-                >Assign
+                >{{ 'ANALYSES.ASSIGN' | translate }}
                 {{
                   isHeatMapChartType(visual.chartType)
-                    ? 'Row, Column and Value'
+                    ? ('ANALYSES.ROW_COLUMN_VALUE' | translate)
                     : isSankeyChartType(visual.chartType) ||
                         isGraphChartType(visual.chartType) ||
                         isFlowLinesChartType(visual.chartType)
-                      ? 'Source, Target and Value'
+                      ? ('ANALYSES.SOURCE_TARGET_VALUE' | translate)
                       : isWorldMapChartType(visual.chartType)
-                        ? 'Region and Value'
+                        ? ('ANALYSES.REGION_AND_VALUE' | translate)
                         : isLines3dChartType(visual.chartType)
-                          ? 'Longitude and Latitude'
+                          ? ('ANALYSES.LONGITUDE_AND_LATITUDE' | translate)
                           : isPolygons3dChartType(visual.chartType)
-                            ? 'Name, Longitude and Latitude'
-                            : 'X-Axis and Y-Axis'
+                            ? ('ANALYSES.NAME_LONGITUDE_LATITUDE' | translate)
+                            : ('ANALYSES.X_AXIS_AND_Y_AXIS' | translate)
                 }}
-                in the sidebar</small
+                {{ 'ANALYSES.IN_THE_SIDEBAR' | translate }}</small
               >
             </div>
 
@@ -614,20 +614,20 @@
       <!-- Empty State -->
       <div class="empty-state" *ngIf="visuals.length === 0">
         <i class="pi pi-chart-bar"></i>
-        <h3>No Visuals Yet</h3>
-        <p>Click the "Add Visual" button to create your first visualization</p>
+        <h3>{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</h3>
+        <p>{{ 'ANALYSES.ADD_VISUAL_HINT' | translate }}</p>
         <div class="empty-state-tips">
           <div class="tip-item">
             <i class="pi pi-info-circle"></i>
-            <span>Click to select chart type, right-click to configure</span>
+            <span>{{ 'ANALYSES.TIP_CLICK_CHART' | translate }}</span>
           </div>
           <div class="tip-item">
             <i class="pi pi-info-circle"></i>
-            <span>Drag edges to resize</span>
+            <span>{{ 'ANALYSES.TIP_DRAG_RESIZE' | translate }}</span>
           </div>
           <div class="tip-item">
             <i class="pi pi-info-circle"></i>
-            <span>Right-click to configure</span>
+            <span>{{ 'ANALYSES.TIP_RIGHT_CLICK' | translate }}</span>
           </div>
         </div>
       </div>
@@ -656,7 +656,7 @@
         icon="pi pi-times"
         class="p-button-text p-button-rounded close-maximize-btn"
         (click)="minimizeVisual()"
-        pTooltip="Close"
+        [pTooltip]="'COMMON.CLOSE' | translate"
         tooltipPosition="left"
       ></button>
     </div>
@@ -675,7 +675,7 @@
   [visible]="showSaveDialog"
   [initialName]="analysisDetails?.name"
   [initialDescription]="analysisDetails?.description"
-  [dialogTitle]="'Update Analysis'"
+  [dialogTitle]="'ANALYSES.UPDATE_ANALYSIS' | translate"
   [showJustification]="true"
   (close)="handleSaveDialogClose($event)"
 >
@@ -688,29 +688,29 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete Field</h3>
+      <h3>{{ 'ANALYSES.CONFIRM_DELETE_FIELD' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to delete this field?</p>
+      <p class="delete-intro">{{ 'ANALYSES.CONFIRM_DELETE_FIELD_MSG' | translate }}</p>
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This field will be removed from the analysis</span>
+          <span>{{ 'ANALYSES.DELETE_FIELD_INFO' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
     </div>
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDeleteField()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button class="btn-confirm" (click)="proceedDeleteField()">
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

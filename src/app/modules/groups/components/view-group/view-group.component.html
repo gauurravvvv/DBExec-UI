@@ -6,15 +6,15 @@
         <button pButton class="p-button-text back-button" (click)="goBack()">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Group Details</h2>
+        <h2>{{ 'GROUP.VIEW_TITLE' | translate }}</h2>
         <span *ngIf="groupData?.isDefault === 1" class="default-badge"
-          >Default</span
+          >{{ 'GROUP.DEFAULT' | translate }}</span
         >
       </div>
       <div class="header-actions">
         <button class="btn-primary" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
-          {{ groupData?.isDefault === 1 ? 'Manage Users' : 'Edit' }}
+          {{ groupData?.isDefault === 1 ? ('GROUP.MANAGE_USERS' | translate) : ('COMMON.EDIT' | translate) }}
         </button>
         <button
           *ngIf="groupData?.isDefault !== 1"
@@ -22,7 +22,7 @@
           type="button"
           (click)="confirmDelete()"
         >
-          <i class="pi pi-trash"></i> Delete
+          <i class="pi pi-trash"></i> {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
@@ -34,19 +34,19 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-info-circle mr-2"></i>
-            Basic Information
+            {{ 'GROUP.BASIC_INFORMATION' | translate }}
           </h3>
           <div class="info-grid">
             <div class="info-item">
-              <label>Name</label>
+              <label>{{ 'COMMON.NAME' | translate }}</label>
               <p>{{ groupData.name }}</p>
             </div>
             <div class="info-item">
-              <label>Description</label>
-              <p>{{ groupData.description || 'No description available' }}</p>
+              <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
+              <p>{{ groupData.description || ('GROUP.NO_DESCRIPTION' | translate) }}</p>
             </div>
             <div class="info-item">
-              <label>Status</label>
+              <label>{{ 'COMMON.STATUS' | translate }}</label>
               <span
                 class="status-badge"
                 [class.active]="groupData.status === 1"
@@ -59,18 +59,18 @@
                       : 'pi-times-circle'
                   "
                 ></i>
-                {{ groupData.status === 1 ? 'Active' : 'Inactive' }}
+                {{ groupData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
               </span>
             </div>
             <div class="info-item">
-              <label>Organisation</label>
+              <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-building mr-2"></i>
                 {{ groupData.organisationName }}
               </p>
             </div>
             <div class="info-item">
-              <label>Created On</label>
+              <label>{{ 'COMMON.CREATED_ON' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-calendar mr-2"></i>
                 {{ groupData.createdOn | date: 'medium' }}
@@ -83,7 +83,7 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-users mr-2"></i>
-            Users Mapping
+            {{ 'GROUP.USERS_MAPPING' | translate }}
             <span class="count-badge">{{ groupData.userGroups.length }}</span>
           </h3>
           <div class="fields-list">
@@ -95,7 +95,7 @@
               {{ field.user.username }}
             </div>
             <div *ngIf="groupData?.userGroups.length === 0" class="no-data">
-              No users found
+              {{ 'GROUP.NO_USERS_FOUND' | translate }}
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-database mr-2"></i>
-            Datasource and Connections
+            {{ 'GROUP.DATASOURCE_AND_CONNECTIONS' | translate }}
             <span class="count-badge">{{ groupData.connections.length }}</span>
           </h3>
           <div class="fields-list">
@@ -119,7 +119,7 @@
             </div>
 
             <div *ngIf="groupData?.connections.length === 0" class="no-data">
-              No datasource connection found
+              {{ 'GROUP.NO_DATASOURCE_CONNECTION_FOUND' | translate }}
             </div>
           </div>
         </div>
@@ -135,36 +135,36 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to delete this group?</p>
+      <p class="delete-intro">{{ 'GROUP.CONFIRM_DELETE_SINGLE' | translate }}</p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>All users will be removed from this group</span>
+          <span>{{ 'GROUP.DELETE_INFO_USERS_REMOVED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Group permissions will be revoked</span>
+          <span>{{ 'GROUP.DELETE_INFO_PERMISSIONS_REVOKED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this action"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -176,7 +176,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -184,7 +184,7 @@
         [disabled]="!deleteJustification.trim()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

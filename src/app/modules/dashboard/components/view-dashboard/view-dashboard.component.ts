@@ -29,6 +29,7 @@ import {
 import { Visual } from '../../../analyses/models/visual.model';
 import { AnalysesService } from '../../../analyses/services/analyses.service';
 import { ChartDataTransformerService } from '../../../analyses/services/chart-data-transformer.service';
+import { TranslateService } from '@ngx-translate/core';
 import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
@@ -83,6 +84,7 @@ export class ViewDashboardComponent
     private globalService: GlobalService,
     private analysesService: AnalysesService,
     private chartDataTransformer: ChartDataTransformerService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -189,7 +191,7 @@ export class ViewDashboardComponent
 
       const visual: Visual = {
         id: v.id,
-        title: v.title || 'Untitled Visual',
+        title: v.title || this.translate.instant('DASHBOARD.UNTITLED_VISUAL'),
         width: 400,
         height: 350,
         widthRatio,

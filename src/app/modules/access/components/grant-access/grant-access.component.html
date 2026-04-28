@@ -3,13 +3,13 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="left-section">
-        <h2>Access Manager</h2>
+        <h2>{{ 'ACCESS.ACCESS_MANAGER' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -18,7 +18,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Grant Access"
+          [label]="'ACCESS.GRANT_ACCESS' | translate"
           (click)="onSubmit()"
           [disabled]="accessForm.invalid || saving()"
         >
@@ -34,8 +34,8 @@
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
-          label="Organisation"
-          placeholder="Select Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
+          [placeholder]="'ACCESS.SELECT_ORGANISATION' | translate"
           [options]="organisations"
           optionLabel="name"
           optionValue="id"
@@ -49,15 +49,15 @@
               accessForm.get('organisation')?.touched
             )
           "
-          errorMessage="Organisation is required"
+          [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
         >
         </app-custom-dropdown>
 
         <!-- Datasource Dropdown -->
         <app-custom-dropdown
           formControlName="datasource"
-          label="Datasource"
-          placeholder="Select Datasource"
+          [label]="'COMMON.DATASOURCE' | translate"
+          [placeholder]="'ACCESS.SELECT_DATASOURCE' | translate"
           [options]="datasources"
           optionLabel="name"
           optionValue="id"
@@ -71,15 +71,15 @@
               accessForm.get('datasource')?.touched
             )
           "
-          errorMessage="Datasource is required"
+          [errorMessage]="'VALIDATION.DATASOURCE_REQUIRED' | translate"
         >
         </app-custom-dropdown>
 
         <!-- Connection Dropdown -->
         <app-custom-dropdown
           formControlName="connection"
-          label="Connection"
-          placeholder="Select Connection"
+          [label]="'COMMON.CONNECTION' | translate"
+          [placeholder]="'ACCESS.SELECT_CONNECTION' | translate"
           [options]="connections"
           optionLabel="name"
           optionValue="id"
@@ -93,15 +93,15 @@
               accessForm.get('connection')?.touched
             )
           "
-          errorMessage="Connection is required"
+          [errorMessage]="'VALIDATION.CONNECTION_REQUIRED' | translate"
         >
         </app-custom-dropdown>
 
         <!-- Groups Multiselect -->
         <app-custom-multiselect
           formControlName="groups"
-          label="Groups"
-          placeholder="Select Groups"
+          [label]="'COMMON.GROUPS' | translate"
+          [placeholder]="'ACCESS.SELECT_GROUPS' | translate"
           [options]="groups"
           optionLabel="name"
           optionValue="id"
@@ -114,15 +114,15 @@
               accessForm.get('groups')?.touched
             )
           "
-          errorMessage="Groups are required"
+          [errorMessage]="'VALIDATION.GROUPS_REQUIRED' | translate"
         >
         </app-custom-multiselect>
 
         <!-- Users Multiselect -->
         <app-custom-multiselect
           formControlName="users"
-          label="Users"
-          placeholder="Select Users"
+          [label]="'COMMON.USERS' | translate"
+          [placeholder]="'ACCESS.SELECT_USERS' | translate"
           [options]="users"
           optionLabel="username"
           optionValue="id"
@@ -135,7 +135,7 @@
               accessForm.get('users')?.touched
             )
           "
-          errorMessage="Users are required"
+          [errorMessage]="'VALIDATION.USERS_REQUIRED' | translate"
         >
         </app-custom-multiselect>
       </div>

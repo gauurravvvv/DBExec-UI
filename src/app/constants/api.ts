@@ -250,6 +250,7 @@ export const AUDIT = {
 export const PROFILE = {
   GET: '/profile/get',
   CHANGE_PASSWORD: '/profile/change-password',
+  UPDATE_LOCALE: '/profile/locale',
 };
 
 export const DASHBOARD = {

@@ -6,13 +6,13 @@
         <button pButton class="p-button-text" routerLink="/app/datasource">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Edit Datasource</h2>
+        <h2>{{ 'DATASOURCE.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined p-button-danger"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -21,7 +21,7 @@
           pButton
           class="p-button-outlined"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           icon="pi pi-save"
           iconPos="left"
           (click)="onSubmit()"
@@ -35,9 +35,7 @@
       <div class="warning-message">
         <div class="warning-header" (click)="toggleWarning()">
           <i class="pi pi-exclamation-triangle"></i>
-          <span class="warning-title"
-            >You are editing a datasource connection</span
-          >
+          <span class="warning-title">{{ 'DATASOURCE.EDIT_WARNING_TITLE' | translate }}</span>
           <i
             class="pi"
             [ngClass]="{
@@ -52,16 +50,13 @@
         >
           <div class="warning-text">
             <p>
-              <i class="pi pi-circle-fill"></i> Changes to connection details
-              will affect all datasets and queries using this datasource
+              <i class="pi pi-circle-fill"></i> {{ 'DATASOURCE.EDIT_WARNING_CHANGES' | translate }}
             </p>
             <p>
-              <i class="pi pi-circle-fill"></i> A successful connection test is
-              required before saving
+              <i class="pi pi-circle-fill"></i> {{ 'DATASOURCE.EDIT_WARNING_TEST_REQUIRED' | translate }}
             </p>
             <p>
-              <i class="pi pi-circle-fill"></i> Existing connections will be
-              updated with the new credentials
+              <i class="pi pi-circle-fill"></i> {{ 'DATASOURCE.EDIT_WARNING_CREDENTIALS' | translate }}
             </p>
           </div>
         </div>
@@ -74,8 +69,8 @@
         <!-- Name Field -->
         <app-custom-input
           formControlName="name"
-          label="Name"
-          placeholder="Enter name"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'COMMON.ENTER_NAME' | translate"
           icon="pi-database"
           [required]="true"
           [showError]="
@@ -91,8 +86,8 @@
         <!-- Description Field -->
         <app-custom-input
           formControlName="description"
-          label="Description"
-          placeholder="Enter description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
           icon="pi-align-left"
           [showError]="
             !!(
@@ -109,8 +104,8 @@
           *ngIf="showOrganisationDropdown"
           [ngModel]="organisationName"
           [ngModelOptions]="{ standalone: true }"
-          label="Organisation"
-          placeholder="Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
+          [placeholder]="'COMMON.ORGANISATION' | translate"
           icon="pi-building"
           [inputDisabled]="true"
         >
@@ -119,7 +114,7 @@
         <!-- Type Field (disabled) -->
         <app-custom-input
           formControlName="type"
-          label="Type"
+          [label]="'COMMON.TYPE' | translate"
           icon="pi-database"
           [inputDisabled]="true"
         >
@@ -128,8 +123,8 @@
         <!-- Host Field -->
         <app-custom-input
           formControlName="host"
-          label="Host"
-          placeholder="Enter database host"
+          [label]="'DATASOURCE.HOST' | translate"
+          [placeholder]="'DATASOURCE.ENTER_HOST' | translate"
           icon="pi-desktop"
           [required]="true"
           [showError]="
@@ -145,8 +140,8 @@
         <!-- Port Field -->
         <app-custom-input
           formControlName="port"
-          label="Port"
-          placeholder="Enter database port"
+          [label]="'DATASOURCE.PORT' | translate"
+          [placeholder]="'DATASOURCE.ENTER_PORT' | translate"
           icon="pi-hashtag"
           type="number"
           [required]="true"
@@ -163,8 +158,8 @@
         <!-- Database Name Field -->
         <app-custom-input
           formControlName="database"
-          label="Database Name"
-          placeholder="Enter database name"
+          [label]="'DATASOURCE.DATABASE_NAME' | translate"
+          [placeholder]="'DATASOURCE.ENTER_DATABASE_NAME' | translate"
           icon="pi-database"
           [required]="true"
           [showError]="
@@ -180,8 +175,8 @@
         <!-- Username Field -->
         <app-custom-input
           formControlName="username"
-          label="Username"
-          placeholder="Enter database username"
+          [label]="'DATASOURCE.USERNAME' | translate"
+          [placeholder]="'DATASOURCE.ENTER_USERNAME' | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -197,8 +192,8 @@
         <!-- Password Field -->
         <app-custom-input
           formControlName="password"
-          label="Password"
-          placeholder="Leave blank to keep current password"
+          [label]="'DATASOURCE.PASSWORD' | translate"
+          [placeholder]="'DATASOURCE.LEAVE_BLANK_PASSWORD' | translate"
           icon="pi-lock"
           [showPasswordToggle]="true"
         >
@@ -225,26 +220,26 @@
               ></i>
               {{
                 connectionTestLoading
-                  ? 'Testing...'
+                  ? ('DATASOURCE.TESTING' | translate)
                   : connectionTestResult === 'success'
-                    ? 'Connection Successful'
+                    ? ('DATASOURCE.CONNECTION_SUCCESSFUL' | translate)
                     : connectionTestResult === 'failed'
-                      ? 'Connection Failed - Retry'
-                      : 'Test Connection'
+                      ? ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate)
+                      : ('DATASOURCE.TEST_CONNECTION' | translate)
               }}
             </a>
             <small
               class="connection-hint"
               *ngIf="!connectionTested && !connectionTestLoading"
             >
-              Connection test required before saving
+              {{ 'DATASOURCE.CONNECTION_TEST_REQUIRED' | translate }}
             </small>
           </div>
         </div>
 
         <!-- Status Field -->
         <div class="form-field">
-          <label for="status">Status</label>
+          <label for="status">{{ 'COMMON.STATUS' | translate }}</label>
           <div class="status-toggle ml-3">
             <p-inputSwitch
               [formControlName]="'status'"
@@ -252,7 +247,7 @@
             >
             </p-inputSwitch>
             <span class="status-label">{{
-              datasourceForm.get('status')?.value ? 'Active' : 'Inactive'
+              datasourceForm.get('status')?.value ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate)
             }}</span>
           </div>
         </div>
@@ -267,22 +262,22 @@
       <div class="popup-icon">
         <i class="pi pi-save"></i>
       </div>
-      <h3>Confirm Update</h3>
+      <h3>{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
     </div>
 
     <div class="standard-delete-section">
       <p class="delete-intro">
-        Are you sure you want to update this datasource?
+        {{ 'DATASOURCE.CONFIRM_UPDATE_MESSAGE' | translate }}
       </p>
 
       <div class="justification-section">
         <label for="saveJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="saveJustification"
           [(ngModel)]="saveJustification"
-          placeholder="Provide a reason for this update"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -293,7 +288,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelSave()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -301,7 +296,7 @@
         [disabled]="!saveJustification.trim() || saving()"
       >
         <i class="pi pi-check"></i>
-        Update
+        {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>
   </div>

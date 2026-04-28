@@ -10,13 +10,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Add User</h2>
+        <h2>{{ 'USER.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -25,7 +25,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="userForm.invalid || saving()"
         >
@@ -40,8 +40,8 @@
         <!-- First Name -->
         <app-custom-input
           formControlName="firstName"
-          label="First Name"
-          placeholder="Enter first name"
+          [label]="'COMMON.FIRST_NAME' | translate"
+          [placeholder]="'COMMON.ENTER_FIRST_NAME' | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -57,8 +57,8 @@
         <!-- Last Name -->
         <app-custom-input
           formControlName="lastName"
-          label="Last Name"
-          placeholder="Enter last name"
+          [label]="'COMMON.LAST_NAME' | translate"
+          [placeholder]="'COMMON.ENTER_LAST_NAME' | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
@@ -74,8 +74,8 @@
         <!-- Username -->
         <app-custom-input
           formControlName="username"
-          label="Username"
-          placeholder="Enter username"
+          [label]="'COMMON.USERNAME' | translate"
+          [placeholder]="'COMMON.ENTER_USERNAME' | translate"
           icon="pi-user-edit"
           [required]="true"
           [showError]="
@@ -91,8 +91,8 @@
         <!-- Email -->
         <app-custom-input
           formControlName="email"
-          label="Email"
-          placeholder="Enter email address"
+          [label]="'COMMON.EMAIL' | translate"
+          [placeholder]="'COMMON.ENTER_EMAIL' | translate"
           icon="pi-envelope"
           type="email"
           [required]="true"
@@ -101,9 +101,9 @@
           "
           [errorMessage]="
             userForm.get('email')?.errors?.['required']
-              ? 'Email is required'
+              ? ('VALIDATION.EMAIL_REQUIRED' | translate)
               : userForm.get('email')?.errors?.['email']
-                ? 'Please enter a valid email'
+                ? ('VALIDATION.EMAIL_INVALID' | translate)
                 : ''
           "
         >
@@ -113,8 +113,8 @@
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
-          label="Organisation"
-          placeholder="Select Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
+          [placeholder]="'USER.SELECT_ORGANISATION' | translate"
           [options]="organisations"
           optionLabel="name"
           optionValue="id"
@@ -127,20 +127,20 @@
               userForm.get('organisation')?.touched
             )
           "
-          errorMessage="Organisation is required"
+          [errorMessage]="'USER.ORGANISATION_REQUIRED' | translate"
           (onChangeEvent)="onOrganisationChange($event)"
         >
         </app-custom-dropdown>
 
         <!-- Groups -->
         <div class="form-field">
-          <label>Groups <span class="required">*</span></label>
+          <label>{{ 'USER.GROUPS' | translate }} <span class="required">*</span></label>
           <app-custom-multiselect
             formControlName="groupIds"
             [options]="groups"
             optionLabel="name"
             optionValue="id"
-            placeholder="Select groups"
+            [placeholder]="'USER.SELECT_GROUPS' | translate"
             display="chip"
             [filter]="true"
             appendTo="body"
@@ -152,7 +152,7 @@
               userForm.get('groupIds')?.errors?.['required']
             "
           >
-            At least one group is required
+            {{ 'USER.GROUP_REQUIRED' | translate }}
           </small>
         </div>
       </div>

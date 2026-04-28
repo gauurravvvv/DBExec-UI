@@ -131,6 +131,8 @@ export class GlobalService {
           return decodeToken?.permissions;
         case 'userId':
           return decodeToken?.id;
+        case 'locale':
+          return decodeToken?.locale || 'en';
         default:
           return null;
       }

@@ -10,13 +10,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Add Group</h2>
+        <h2>{{ 'GROUP.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -25,7 +25,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="!canSubmit() || saving()"
         >
@@ -40,8 +40,8 @@
         <!-- Name Field -->
         <app-custom-input
           formControlName="name"
-          label="Name"
-          placeholder="Enter name"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'COMMON.ENTER_NAME' | translate"
           icon="pi-key"
           [required]="true"
           [showError]="
@@ -57,8 +57,8 @@
         <!-- Description Field -->
         <app-custom-input
           formControlName="description"
-          label="Description"
-          placeholder="Enter description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
           icon="pi-align-left"
         >
         </app-custom-input>
@@ -67,8 +67,8 @@
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
-          label="Organisation"
-          placeholder="Select Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
+          [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
           [options]="organisations"
           optionLabel="name"
           optionValue="id"
@@ -81,15 +81,15 @@
               userGroupForm.get('organisation')?.touched
             )
           "
-          errorMessage="Organisation is required"
+          [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
         >
         </app-custom-dropdown>
 
         <!-- Role Dropdown -->
         <app-custom-dropdown
           formControlName="roleId"
-          label="Role"
-          placeholder="Select Role"
+          [label]="'COMMON.ROLE' | translate"
+          [placeholder]="'COMMON.SELECT_ROLE' | translate"
           [options]="roles"
           optionLabel="name"
           optionValue="id"
@@ -102,15 +102,15 @@
               userGroupForm.get('roleId')?.touched
             )
           "
-          errorMessage="Role is required"
+          [errorMessage]="'VALIDATION.ROLE_REQUIRED' | translate"
         >
         </app-custom-dropdown>
 
         <!-- Users Multiselect (optional - can add later) -->
         <app-custom-multiselect
           formControlName="users"
-          label="Users"
-          placeholder="Select Users (optional)"
+          [label]="'GROUP.USERS' | translate"
+          [placeholder]="'GROUP.SELECT_USERS_OPTIONAL' | translate"
           [options]="users"
           optionLabel="username"
           optionValue="id"

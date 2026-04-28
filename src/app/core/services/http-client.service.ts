@@ -44,6 +44,18 @@ export class HttpClientService {
     ) as Observable<T>;
   }
 
+  apiPatch<T = any>(
+    url: string,
+    body: any,
+    options?: RequestOptions,
+  ): Observable<T> {
+    return this.http.patch<T>(
+      url,
+      body,
+      this.buildOptions(options),
+    ) as Observable<T>;
+  }
+
   apiDelete<T = any>(url: string, options?: RequestOptions): Observable<T> {
     return this.http.delete<T>(
       url,

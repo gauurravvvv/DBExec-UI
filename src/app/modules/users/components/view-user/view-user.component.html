@@ -10,7 +10,7 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>User Details</h2>
+        <h2>{{ 'USER.VIEW_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions">
         <button
@@ -19,7 +19,7 @@
           [disabled]="userId == loggedInUserId"
           [routerLink]="['/app/users/edit', orgId, userId]"
         >
-          <i class="pi pi-pencil"></i> Edit
+          <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
         </button>
         <button
           class="btn-danger"
@@ -27,13 +27,13 @@
           [disabled]="!userData?.canDelete"
           [pTooltip]="
             !userData?.canDelete
-              ? 'You do not have permission to delete'
-              : 'Delete'
+              ? ('COMMON.NO_DELETE_PERMISSION' | translate)
+              : ('COMMON.DELETE' | translate)
           "
           tooltipPosition="bottom"
           (click)="confirmDelete()"
         >
-          <i class="pi pi-trash"></i> Delete
+          <i class="pi pi-trash"></i> {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
@@ -59,18 +59,18 @@
 
           <!-- Personal Information -->
           <div class="detail-group">
-            <h4>Personal Information</h4>
+            <h4>{{ 'USER.PERSONAL_INFORMATION' | translate }}</h4>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-user"></i>
-                First Name
+                {{ 'COMMON.FIRST_NAME' | translate }}
               </span>
               <span class="value">{{ userData?.firstName }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-user"></i>
-                Last Name
+                {{ 'COMMON.LAST_NAME' | translate }}
               </span>
               <span class="value">{{ userData?.lastName }}</span>
             </div>
@@ -81,18 +81,18 @@
         <div class="second-row">
           <!-- Contact Information -->
           <div class="detail-group">
-            <h4>Contact Information</h4>
+            <h4>{{ 'USER.CONTACT_INFORMATION' | translate }}</h4>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-envelope"></i>
-                Email
+                {{ 'COMMON.EMAIL' | translate }}
               </span>
               <span class="value">{{ userData?.email }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-building"></i>
-                Organisation
+                {{ 'COMMON.ORGANISATION' | translate }}
               </span>
               <span class="value">{{ userData?.organisationName }}</span>
             </div>
@@ -100,29 +100,29 @@
 
           <!-- Account Information -->
           <div class="detail-group">
-            <h4>Account Information</h4>
+            <h4>{{ 'USER.ACCOUNT_INFORMATION' | translate }}</h4>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-id-card"></i>
-                Role
+                {{ 'COMMON.ROLE' | translate }}
               </span>
               <span class="value">{{ userData?.roleName || '—' }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-clock"></i>
-                Last Login
+                {{ 'COMMON.LAST_LOGIN' | translate }}
               </span>
               <span class="value">{{
                 userData?.lastLogin
                   ? (userData?.lastLogin | date: 'medium')
-                  : 'Never logged in'
+                  : ('USER.NEVER_LOGGED_IN' | translate)
               }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-check-circle"></i>
-                Status
+                {{ 'COMMON.STATUS' | translate }}
               </span>
               <span class="value">
                 <span
@@ -132,28 +132,28 @@
                 >
                   {{
                     userData?.isLocked
-                      ? 'Locked'
+                      ? ('COMMON.LOCKED' | translate)
                       : userData?.status === 1
-                        ? 'Active'
-                        : 'Inactive'
+                        ? ('COMMON.ACTIVE' | translate)
+                        : ('COMMON.INACTIVE' | translate)
                   }}
                 </span>
                 <button
                   *ngIf="userData?.isLocked"
                   class="btn-unlock-inline"
                   (click)="onUnlock()"
-                  pTooltip="Unlock account"
+                  [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
                   tooltipPosition="bottom"
                 >
                   <i class="pi pi-lock-open"></i>
-                  Unlock
+                  {{ 'COMMON.UNLOCK' | translate }}
                 </button>
               </span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-calendar"></i>
-                Created On
+                {{ 'COMMON.CREATED_ON' | translate }}
               </span>
               <span class="value">{{
                 userData?.createdOn | date: 'medium'
@@ -173,36 +173,36 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to delete this user?</p>
+      <p class="delete-intro">{{ 'USER.CONFIRM_DELETE_SINGLE' | translate }}</p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>User access will be revoked</span>
+          <span>{{ 'COMMON.DELETE_ACCESS_REVOKED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Login credentials will be invalidated</span>
+          <span>{{ 'COMMON.DELETE_CREDENTIALS_INVALIDATED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this action"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -214,7 +214,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -222,7 +222,7 @@
         [disabled]="!deleteJustification.trim()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

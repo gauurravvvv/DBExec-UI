@@ -3,12 +3,12 @@
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>My Profile</h2>
+        <h2>{{ 'PROFILE.TITLE' | translate }}</h2>
       </div>
       <div class="header-actions">
         <button class="btn-secondary" (click)="openChangePasswordDialog()">
           <i class="pi pi-key"></i>
-          Change Password
+          {{ 'PROFILE.CHANGE_PASSWORD' | translate }}
         </button>
       </div>
     </div>
@@ -34,10 +34,10 @@
             >
               {{
                 profile()?.isLocked
-                  ? 'Locked'
+                  ? ('COMMON.LOCKED' | translate)
                   : profile()?.status === 1
-                    ? 'Active'
-                    : 'Inactive'
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
               }}
             </span>
           </div>
@@ -45,11 +45,11 @@
 
         <div class="identity-meta">
           <div class="meta-item">
-            <span class="label">Role</span>
+            <span class="label">{{ 'PROFILE.ROLE' | translate }}</span>
             <span class="value">{{ roleLabel }}</span>
           </div>
           <div class="meta-item">
-            <span class="label">Member Since</span>
+            <span class="label">{{ 'PROFILE.MEMBER_SINCE' | translate }}</span>
             <span class="value">{{
               profile()?.createdOn | date: 'mediumDate'
             }}</span>
@@ -60,45 +60,45 @@
       <!-- Details Section (Right) -->
       <div class="details-section">
         <div class="section-header">
-          <h3>Account Information</h3>
+          <h3>{{ 'PROFILE.ACCOUNT_INFORMATION' | translate }}</h3>
         </div>
 
         <div class="info-grid">
           <!-- Personal Info -->
           <div class="info-group">
-            <h4>Personal Details</h4>
+            <h4>{{ 'PROFILE.PERSONAL_DETAILS' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-user"></i> First Name</span>
+              <span class="label"><i class="pi pi-user"></i> {{ 'PROFILE.FIRST_NAME' | translate }}</span>
               <span class="value">{{ profile()?.firstName }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-user"></i> Last Name</span>
+              <span class="label"><i class="pi pi-user"></i> {{ 'PROFILE.LAST_NAME' | translate }}</span>
               <span class="value">{{
-                profile()?.lastName || 'Not provided'
+                profile()?.lastName || ('COMMON.NOT_PROVIDED' | translate)
               }}</span>
             </div>
           </div>
 
           <!-- Contact Info -->
           <div class="info-group">
-            <h4>Contact Details</h4>
+            <h4>{{ 'PROFILE.CONTACT_DETAILS' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-envelope"></i> Email</span>
+              <span class="label"><i class="pi pi-envelope"></i> {{ 'PROFILE.EMAIL' | translate }}</span>
               <span class="value">{{ profile()?.email }}</span>
             </div>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-at"></i> Username</span>
+              <span class="label"><i class="pi pi-at"></i> {{ 'PROFILE.USERNAME' | translate }}</span>
               <span class="value">{{ profile()?.username }}</span>
             </div>
           </div>
 
           <!-- Organisation Info -->
           <div class="info-group">
-            <h4>Organisation</h4>
+            <h4>{{ 'PROFILE.ORGANISATION' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-building"></i> Name</span>
+              <span class="label"><i class="pi pi-building"></i> {{ 'PROFILE.NAME' | translate }}</span>
               <span class="value">{{
-                profile()?.organisationName || 'N/A'
+                profile()?.organisationName || ('COMMON.NA' | translate)
               }}</span>
             </div>
             <div
@@ -106,7 +106,7 @@
               *ngIf="profile()?.organisation?.description"
             >
               <span class="label"
-                ><i class="pi pi-info-circle"></i> Description</span
+                ><i class="pi pi-info-circle"></i> {{ 'PROFILE.DESCRIPTION' | translate }}</span
               >
               <span class="value">{{
                 profile()?.organisation?.description
@@ -116,13 +116,13 @@
 
           <!-- System Info -->
           <div class="info-group">
-            <h4>System</h4>
+            <h4>{{ 'PROFILE.SYSTEM' | translate }}</h4>
             <div class="detail-row">
-              <span class="label"><i class="pi pi-clock"></i> Last Login</span>
+              <span class="label"><i class="pi pi-clock"></i> {{ 'PROFILE.LAST_LOGIN' | translate }}</span>
               <span class="value">{{
                 profile()?.lastLogin
                   ? (profile()?.lastLogin | date: 'medium')
-                  : 'Never'
+                  : ('COMMON.NEVER' | translate)
               }}</span>
             </div>
           </div>
@@ -137,7 +137,7 @@
   <div class="profile-content-container">
     <div class="loading-spinner">
       <i class="pi pi-spin pi-spinner"></i>
-      <p>Loading profile...</p>
+      <p>{{ 'PROFILE.LOADING_PROFILE' | translate }}</p>
     </div>
   </div>
 </div>

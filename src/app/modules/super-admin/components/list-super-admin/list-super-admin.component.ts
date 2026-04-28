@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 import { SUPER_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SuperAdminService } from '../../services/super-admin.service';
@@ -44,10 +45,7 @@ export class ListSuperAdminComponent implements OnInit {
 
   today = new Date();
 
-  statusOptions = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 },
-  ];
+  statusOptions: { label: string; value: number }[] = [];
 
   // Component-managed filter values
   filterValues: any = {
@@ -65,12 +63,17 @@ export class ListSuperAdminComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {}
 
   lastTableLazyLoadEvent: any;
 
   ngOnInit(): void {
     this.loggedInUserId = this.globalService.getTokenDetails('userId');
+    this.statusOptions = [
+      { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
+      { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
+    ];
     // Initial load will be triggered by p-table lazy load if [lazy]="true" is set
 
     // Setup debounce for filter changes

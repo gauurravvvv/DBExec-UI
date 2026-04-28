@@ -7,8 +7,8 @@
         *ngIf="showOrganisationDropdown"
         [ngModel]="selectedOrgName"
         [ngModelOptions]="{ standalone: true }"
-        label="Organisation"
-        placeholder="Organisation"
+        [label]="'COMMON.ORGANISATION' | translate"
+        [placeholder]="'COMMON.ORGANISATION' | translate"
         icon="pi-building"
         [inputDisabled]="true"
       >
@@ -18,8 +18,8 @@
       <app-custom-input
         [ngModel]="selectedDatasourceName"
         [ngModelOptions]="{ standalone: true }"
-        label="Datasource"
-        placeholder="Datasource"
+        [label]="'COMMON.DATASOURCE' | translate"
+        [placeholder]="'COMMON.DATASOURCE' | translate"
         icon="pi-database"
         [inputDisabled]="true"
       >
@@ -37,7 +37,7 @@
           isQueryEmpty ||
           !hasQueryChanged
         "
-        title="Update Dataset"
+        [title]="'DATASET.UPDATE_DATASET' | translate"
       >
         <i class="pi pi-save"></i>
       </button>
@@ -51,7 +51,7 @@
           !editor ||
           !hasQueryChanged
         "
-        title="Reset to Original"
+        [title]="'DATASET.RESET_TO_ORIGINAL' | translate"
       >
         <i class="pi pi-undo"></i>
       </button>
@@ -60,7 +60,7 @@
         class="p-button-text btn-export"
         (click)="triggerFileInput()"
         [disabled]="isLoadingEditor || !selectedDatasourceObj || !editor"
-        title="Import SQL File"
+        [title]="'DATASET.IMPORT_SQL_FILE' | translate"
       >
         <i class="pi pi-upload"></i>
       </button>
@@ -71,7 +71,7 @@
         [disabled]="
           isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
         "
-        title="Export Script"
+        [title]="'DATASET.EXPORT_SCRIPT' | translate"
       >
         <i class="pi pi-download"></i>
       </button>
@@ -82,7 +82,7 @@
         [disabled]="
           isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
         "
-        title="Clear Editor"
+        [title]="'DATASET.CLEAR_EDITOR' | translate"
       >
         <i class="pi pi-trash"></i>
       </button>
@@ -97,7 +97,7 @@
           isExecutingQuery ||
           isQueryEmpty
         "
-        title="Execute Query (Ctrl+Enter)"
+        [title]="'DATASET.EXECUTE_QUERY' | translate"
       >
         <i
           class="pi"
@@ -115,7 +115,7 @@
         <div class="sidebar-header">
           <h4>
             <i class="pi pi-sitemap"></i>
-            Schema Explorer
+            {{ 'DATASET.SCHEMA_EXPLORER' | translate }}
           </h4>
           <button
             pButton
@@ -125,7 +125,7 @@
               !selectedDatasourceObj ||
               loadingDatasources[selectedDatasourceObj?.id]
             "
-            title="Refresh Schema"
+            [title]="'DATASET.REFRESH_SCHEMA' | translate"
           >
             <i
               class="pi pi-refresh"
@@ -141,7 +141,7 @@
           <div class="schema-search">
             <input
               type="text"
-              placeholder="Search tables..."
+              [placeholder]="'DATASET.SEARCH_TABLES' | translate"
               [(ngModel)]="schemaSearchText"
               class="search-input"
             />
@@ -153,7 +153,7 @@
             *ngIf="!selectedDatasourceObj && !isLoadingDataset"
           >
             <i class="pi pi-database" style="font-size: 3rem; opacity: 0.3"></i>
-            <p>Loading dataset information...</p>
+            <p>{{ 'DATASET.LOADING_DATASET_INFO' | translate }}</p>
           </div>
 
           <!-- Loading State -->
@@ -165,7 +165,7 @@
             "
           >
             <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
-            <p>Loading schema...</p>
+            <p>{{ 'DATASET.LOADING_SCHEMA' | translate }}</p>
           </div>
 
           <!-- Schema Structure (only for selected datasource) -->
@@ -203,7 +203,7 @@
                 <i class="pi pi-folder"></i>
                 <span class="schema-name">{{ schema.name }}</span>
                 <span class="table-count"
-                  >{{ schema.tables.length }} tables</span
+                  >{{ schema.tables.length }} {{ 'DATASET.TABLES' | translate }}</span
                 >
               </div>
 
@@ -254,7 +254,7 @@
                     <i class="pi pi-table"></i>
                     <span class="table-name">{{ table.name }}</span>
                     <span class="column-count"
-                      >{{ table.columns.length }} cols</span
+                      >{{ table.columns.length }} {{ 'DATASET.COLS' | translate }}</span
                     >
                   </div>
 
@@ -281,7 +281,7 @@
                         )
                       "
                       [title]="
-                        'Click to insert ' + table.name + '.' + column.name
+                        ('DATASET.CLICK_TO_INSERT' | translate) + ' ' + table.name + '.' + column.name
                       "
                     >
                       <i
@@ -313,7 +313,7 @@
 
         <!-- Rotated Title (When Collapsed) -->
         <div class="rotated-title" *ngIf="!showDatasourceSidebar">
-          SCHEMA EXPLORER
+          {{ 'DATASET.SCHEMA_EXPLORER' | translate }}
         </div>
       </div>
     </div>
@@ -323,7 +323,7 @@
       <button
         class="toggle-btn"
         (click)="toggleDatasourceSidebar()"
-        title="Toggle Datasource Sidebar"
+        [title]="'DATASET.TOGGLE_SIDEBAR' | translate"
       >
         <i
           class="pi"
@@ -357,8 +357,8 @@
           "
         >
           <i class="pi pi-database"></i>
-          <h3>Loading Dataset</h3>
-          <p>Please wait while we load your dataset information...</p>
+          <h3>{{ 'DATASET.LOADING_DATASET' | translate }}</h3>
+          <p>{{ 'DATASET.LOADING_DATASET_WAIT' | translate }}</p>
         </div>
 
         <!-- Loading State -->
@@ -367,23 +367,23 @@
           *ngIf="isLoadingEditor && !monacoLoadFailed"
         >
           <i class="pi pi-spin pi-spinner"></i>
-          <p>Loading Monaco Editor...</p>
-          <p class="loading-hint">This may take a few seconds on first load</p>
+          <p>{{ 'DATASET.LOADING_MONACO' | translate }}</p>
+          <p class="loading-hint">{{ 'DATASET.LOADING_MONACO_HINT' | translate }}</p>
         </div>
 
         <!-- Error State -->
         <div class="editor-error" *ngIf="monacoLoadFailed">
           <i class="pi pi-exclamation-triangle"></i>
-          <h4>Failed to Load Editor</h4>
-          <p>Monaco Editor could not be loaded from CDN.</p>
+          <h4>{{ 'DATASET.EDITOR_LOAD_FAILED' | translate }}</h4>
+          <p>{{ 'DATASET.EDITOR_LOAD_FAILED_DESC' | translate }}</p>
           <ul>
-            <li>Check your internet connection</li>
-            <li>Disable ad blockers or security extensions</li>
-            <li>Check browser console for network errors</li>
+            <li>{{ 'DATASET.CHECK_INTERNET' | translate }}</li>
+            <li>{{ 'DATASET.DISABLE_AD_BLOCKERS' | translate }}</li>
+            <li>{{ 'DATASET.CHECK_CONSOLE' | translate }}</li>
           </ul>
           <button class="btn btn-primary" (click)="retryLoadMonaco()">
             <i class="pi pi-refresh"></i>
-            Retry
+            {{ 'DATASET.RETRY' | translate }}
           </button>
         </div>
       </div>
@@ -409,7 +409,7 @@
             ></i>
           </span>
           <span class="status-text" *ngIf="queryResult.error"
-            >Query failed</span
+            >{{ 'DATASET.QUERY_FAILED' | translate }}</span
           >
           <span
             class="status-text"
@@ -435,22 +435,22 @@
               !queryResult.message
             "
           >
-            No rows returned ({{ queryResult.executionTime }})
+            {{ 'DATASET.NO_ROWS_RETURNED' | translate:{ time: queryResult.executionTime } }}
           </span>
         </div>
         <div class="status-bar-right">
           <button
             class="status-bar-btn view-btn"
             (click)="showResultsPopup = true"
-            title="View Results"
+            [title]="'DATASET.VIEW_RESULTS' | translate"
           >
             <i class="pi pi-external-link"></i>
-            View Results
+            {{ 'DATASET.VIEW_RESULTS' | translate }}
           </button>
           <button
             class="status-bar-btn close-btn"
             (click)="queryResult = null"
-            title="Dismiss"
+            [title]="'COMMON.DISMISS' | translate"
           >
             <i class="pi pi-times"></i>
           </button>
@@ -465,7 +465,7 @@
   [visible]="showDatasetDialog"
   [initialName]="datasetName"
   [initialDescription]="datasetDescription"
-  [dialogTitle]="'Update Dataset'"
+  [dialogTitle]="'DATASET.UPDATE_DATASET' | translate"
   [showJustification]="true"
   (close)="onDatasetDialogClose($event)"
 >
@@ -491,7 +491,7 @@
     <div class="results-popup-header">
       <div class="popup-header-left">
         <i class="pi pi-table"></i>
-        <span class="popup-title">Query Results</span>
+        <span class="popup-title">{{ 'DATASET.QUERY_RESULTS' | translate }}</span>
         <span
           class="popup-meta"
           *ngIf="!queryResult.error && queryResult.columns.length > 0"
@@ -502,7 +502,7 @@
       <div class="popup-header-right">
         <button
           pButton
-          label="Export CSV"
+          [label]="'DATASET.EXPORT_CSV' | translate"
           icon="pi pi-download"
           class="p-button-outlined p-button-success p-button-sm export-csv-btn"
           (click)="exportResultsAsCsv()"
@@ -511,7 +511,7 @@
         ></button>
         <button
           pButton
-          label="Clear"
+          [label]="'COMMON.CLEAR' | translate"
           icon="pi pi-filter-slash"
           class="p-button-outlined p-button-danger p-button-sm clear-filters-btn"
           (click)="clearResultFilters()"
@@ -523,7 +523,7 @@
           class="p-button-text p-button-rounded p-button-sm"
           icon="pi pi-times"
           (click)="showResultsPopup = false"
-          pTooltip="Close"
+          [pTooltip]="'COMMON.CLOSE' | translate"
           tooltipPosition="bottom"
         ></button>
       </div>
@@ -536,7 +536,7 @@
         <div class="error-icon-wrapper">
           <i class="pi pi-times"></i>
         </div>
-        <h4>Query Execution Failed</h4>
+        <h4>{{ 'DATASET.QUERY_EXECUTION_FAILED' | translate }}</h4>
         <div class="error-message-box">
           <code>{{ queryResult.error }}</code>
         </div>
@@ -554,7 +554,7 @@
         <div class="success-icon-wrapper">
           <i class="pi pi-check"></i>
         </div>
-        <h4>Query Executed Successfully</h4>
+        <h4>{{ 'DATASET.QUERY_EXECUTED_SUCCESS' | translate }}</h4>
         <p class="success-message">{{ queryResult.message }}</p>
         <div class="success-meta" *ngIf="queryResult.executionTime">
           <i class="pi pi-clock"></i>
@@ -646,7 +646,7 @@
                 [attr.colspan]="queryResult.columns.length + 1"
                 class="empty-message-cell text-center"
               >
-                No matching records found
+                {{ 'COMMON.NO_MATCHING_RECORDS' | translate }}
               </td>
             </tr>
           </ng-template>

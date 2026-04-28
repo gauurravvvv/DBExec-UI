@@ -4,14 +4,14 @@
     <div class="dialog-header">
       <div class="header-left">
         <i class="pi pi-code"></i>
-        <h2>{{ editMode ? 'Edit Custom Field' : 'Add Custom Field' }}</h2>
+        <h2>{{ editMode ? ('DATASET.EDIT_CUSTOM_FIELD' | translate) : ('DATASET.ADD_CUSTOM_FIELD' | translate) }}</h2>
       </div>
       <button
         pButton
         class="p-button-text p-button-rounded p-button-sm close-btn"
         icon="pi pi-times"
         (click)="onCancel()"
-        pTooltip="Close"
+        [pTooltip]="'COMMON.CLOSE' | translate"
         tooltipPosition="bottom"
       ></button>
     </div>
@@ -23,15 +23,15 @@
         <div class="panel-header">
           <h4>
             <i class="pi pi-database mr-2"></i>
-            Dataset Fields
+            {{ 'DATASET.DATASET_FIELDS' | translate }}
           </h4>
-          <span class="field-count">{{ filteredFields.length }} fields</span>
+          <span class="field-count">{{ filteredFields.length }} {{ 'DATASET.FIELDS' | translate | lowercase }}</span>
         </div>
 
         <div class="search-box">
           <app-custom-input
             [(ngModel)]="fieldSearchQuery"
-            placeholder="Search fields..."
+            [placeholder]="'DATASET.SEARCH_FIELDS' | translate"
             icon="pi-search"
             (ngModelChange)="onFieldSearch()"
           ></app-custom-input>
@@ -52,7 +52,7 @@
 
           <div class="no-results" *ngIf="filteredFields.length === 0">
             <i class="pi pi-database"></i>
-            <p>No fields found</p>
+            <p>{{ 'DATASET.NO_FIELDS_FOUND' | translate }}</p>
           </div>
         </div>
 
@@ -67,11 +67,11 @@
             >{{ '{' }}{{ selectedField.columnToUse }}{{ '}' }}</code
           >
           <p class="selected-fn-desc">
-            Column: {{ selectedField.columnToUse }}
+            {{ 'DATASET.COLUMN' | translate }}: {{ selectedField.columnToUse }}
           </p>
         </div>
         <div class="description-section empty" *ngIf="!selectedField">
-          <p>Click to view, double-click to insert</p>
+          <p>{{ 'DATASET.CLICK_TO_VIEW_INSERT' | translate }}</p>
         </div>
       </div>
 
@@ -80,8 +80,8 @@
         <div class="form-field">
           <app-custom-input
             [(ngModel)]="customField.columnToView"
-            label="Field Name to Display"
-            placeholder="Enter the display name for this field"
+            [label]="'DATASET.FIELD_NAME_TO_DISPLAY' | translate"
+            [placeholder]="'DATASET.ENTER_DISPLAY_NAME' | translate"
             icon="pi-tag"
             [required]="true"
             (ngModelChange)="onFieldNameChange()"
@@ -97,10 +97,10 @@
           <app-custom-dropdown
             [options]="analyticalTypes"
             [(ngModel)]="customField.dataType"
-            label="Data Type"
+            [label]="'DATASET.DATA_TYPE' | translate"
             optionLabel="label"
             optionValue="value"
-            placeholder="Select data type"
+            [placeholder]="'DATASET.SELECT_DATA_TYPE' | translate"
             [filter]="true"
             [autoDisplayFirst]="false"
             appendTo="body"
@@ -109,7 +109,7 @@
         </div>
 
         <div class="form-field custom-logic-field">
-          <label>Custom Logic <span class="required">*</span></label>
+          <label>{{ 'DATASET.CUSTOM_LOGIC' | translate }} <span class="required">*</span></label>
 
           <!-- Monaco Editor Container -->
           <div
@@ -129,14 +129,14 @@
             *ngIf="isLoadingEditor && !monacoLoadFailed"
           >
             <i class="pi pi-spin pi-spinner"></i>
-            <span>Loading editor...</span>
+            <span>{{ 'DATASET.LOADING_EDITOR' | translate }}</span>
           </div>
 
           <!-- Error Fallback -->
           <div class="editor-fallback" *ngIf="monacoLoadFailed">
             <app-custom-input
               [(ngModel)]="customField.columnToUse"
-              placeholder="Enter your formula here..."
+              [placeholder]="'DATASET.ENTER_FORMULA' | translate"
               inputMode="textarea"
               [rows]="5"
               (ngModelChange)="onFormulaChange()"
@@ -145,8 +145,7 @@
 
           <small class="hint">
             <i class="pi pi-lightbulb"></i>
-            Type {{ '{' }} to insert fields, start typing for function
-            suggestions
+            {{ 'DATASET.FORMULA_HINT' | translate }}
           </small>
 
           <!-- Validation Result -->
@@ -175,7 +174,7 @@
             [disabled]="isSubmitting"
           >
             <i class="pi pi-times"></i>
-            Cancel
+            {{ 'COMMON.CANCEL' | translate }}
           </button>
           <button
             type="button"
@@ -184,7 +183,7 @@
             [disabled]="!customField.columnToUse || isValidating"
           >
             <i class="pi pi-check-circle"></i>
-            Validate
+            {{ 'DATASET.VALIDATE' | translate }}
           </button>
           <button
             type="button"
@@ -193,7 +192,7 @@
             [disabled]="!isSaveEnabled || isSubmitting"
           >
             <i class="pi" [ngClass]="editMode ? 'pi-save' : 'pi-plus'"></i>
-            {{ editMode ? 'Save Changes' : 'Add Field' }}
+            {{ editMode ? ('DATASET.SAVE_CHANGES' | translate) : ('DATASET.ADD_FIELD' | translate) }}
           </button>
         </div>
       </div>
@@ -203,7 +202,7 @@
         <div class="panel-header">
           <h4>
             <i class="pi pi-book mr-2"></i>
-            Functions Reference
+            {{ 'DATASET.FUNCTIONS_REFERENCE' | translate }}
           </h4>
           <span class="function-count"
             >{{
@@ -211,14 +210,14 @@
                 ? getFilteredFunctionCount() + ' / ' + getTotalFunctionCount()
                 : getTotalFunctionCount()
             }}
-            functions</span
+            {{ 'DATASET.FUNCTIONS' | translate }}</span
           >
         </div>
 
         <div class="search-box">
           <app-custom-input
             [(ngModel)]="functionSearchQuery"
-            placeholder="Search functions..."
+            [placeholder]="'DATASET.SEARCH_FUNCTIONS' | translate"
             icon="pi-search"
             (ngModelChange)="onFunctionSearch()"
           ></app-custom-input>
@@ -261,7 +260,7 @@
 
           <div class="no-results" *ngIf="filteredCategories.length === 0">
             <i class="pi pi-search"></i>
-            <p>No functions found</p>
+            <p>{{ 'DATASET.NO_FUNCTIONS_FOUND' | translate }}</p>
           </div>
         </div>
 
@@ -274,7 +273,7 @@
           <p class="selected-fn-desc">{{ selectedFunction.description }}</p>
         </div>
         <div class="description-section empty" *ngIf="!selectedFunction">
-          <p>Click to view description, double-click to insert</p>
+          <p>{{ 'DATASET.CLICK_VIEW_DESC_INSERT' | translate }}</p>
         </div>
       </div>
     </div>

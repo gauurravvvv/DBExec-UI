@@ -10,20 +10,20 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h2>Analysis Details</h2>
+        <h2>{{ 'ANALYSES.ANALYSIS_DETAILS' | translate }}</h2>
       </div>
       <div class="header-actions">
         <button class="btn-primary" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
-          Edit
+          {{ 'COMMON.EDIT' | translate }}
         </button>
         <button class="btn-publish" (click)="openPublishDialog()">
           <i class="pi pi-send"></i>
-          Publish
+          {{ 'ANALYSES.PUBLISH' | translate }}
         </button>
         <button class="btn-danger" type="button" (click)="onDelete()">
           <i class="pi pi-trash"></i>
-          Delete
+          {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
@@ -35,35 +35,35 @@
         <div class="info-section">
           <h3>
             <i class="pi pi-info-circle mr-2"></i>
-            Basic Information
+            {{ 'ANALYSES.BASIC_INFORMATION' | translate }}
           </h3>
           <div class="info-grid">
             <div class="info-item">
-              <label>Analysis Name</label>
+              <label>{{ 'ANALYSES.ANALYSIS_NAME' | translate }}</label>
               <p>{{ analysisDetails.name }}</p>
             </div>
             <div class="info-item">
-              <label>Description</label>
+              <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
               <p>
-                {{ analysisDetails.description || 'No description available' }}
+                {{ analysisDetails.description || ('ANALYSES.NO_DESCRIPTION' | translate) }}
               </p>
             </div>
             <div class="info-item">
-              <label>Dataset</label>
+              <label>{{ 'COMMON.DATASET' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-table mr-2"></i>
-                {{ datasetDetails?.name || 'N/A' }}
+                {{ datasetDetails?.name || ('COMMON.NA' | translate) }}
               </p>
             </div>
             <div class="info-item">
-              <label>Datasource</label>
+              <label>{{ 'COMMON.DATASOURCE' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-database mr-2"></i>
-                {{ datasetDetails?.datasource?.name || 'N/A' }}
+                {{ datasetDetails?.datasource?.name || ('COMMON.NA' | translate) }}
               </p>
             </div>
             <div class="info-item">
-              <label>Status</label>
+              <label>{{ 'COMMON.STATUS' | translate }}</label>
               <span
                 class="status-badge"
                 [class.active]="analysisDetails.status === 1"
@@ -76,11 +76,11 @@
                       : 'pi-times-circle'
                   "
                 ></i>
-                {{ analysisDetails.status === 1 ? 'Active' : 'Inactive' }}
+                {{ analysisDetails.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
               </span>
             </div>
             <div class="info-item">
-              <label>Created On</label>
+              <label>{{ 'COMMON.CREATED_ON' | translate }}</label>
               <p class="with-icon">
                 <i class="pi pi-calendar mr-2"></i>
                 {{ analysisDetails.createdOn | date: 'medium' }}
@@ -93,7 +93,7 @@
         <div class="info-section full-width">
           <h3>
             <i class="pi pi-list mr-2"></i>
-            Dataset Fields
+            {{ 'ANALYSES.DATASET_FIELDS' | translate }}
             <span class="count-badge">{{
               datasetDetails?.datasetFields?.length || 0
             }}</span>
@@ -137,7 +137,7 @@
             <ng-template #noDatasetFields>
               <div class="no-data">
                 <i class="pi pi-info-circle"></i>
-                <span>No dataset fields found</span>
+                <span>{{ 'ANALYSES.NO_DATASET_FIELDS' | translate }}</span>
               </div>
             </ng-template>
           </div>
@@ -148,12 +148,12 @@
           <div class="section-header">
             <h3>
               <i class="pi pi-sliders-h mr-2"></i>
-              Analysis Fields
+              {{ 'ANALYSES.ANALYSIS_FIELDS' | translate }}
               <span class="count-badge">{{ analysisFields.length || 0 }}</span>
             </h3>
             <button class="btn-add-field" (click)="openAddCustomFieldDialog()">
               <i class="pi pi-plus"></i>
-              Add Custom Field
+              {{ 'ANALYSES.ADD_CUSTOM_FIELD' | translate }}
             </button>
           </div>
           <div class="column-mapping-container">
@@ -195,7 +195,7 @@
             <ng-template #noAnalysisFields>
               <div class="no-data">
                 <i class="pi pi-info-circle"></i>
-                <span>No analysis fields found</span>
+                <span>{{ 'ANALYSES.NO_ANALYSIS_FIELDS' | translate }}</span>
               </div>
             </ng-template>
           </div>
@@ -205,7 +205,7 @@
         <div class="info-section full-width">
           <h3>
             <i class="pi pi-chart-bar mr-2"></i>
-            Visuals
+            {{ 'ANALYSES.VISUALS' | translate }}
             <span class="count-badge">{{ visuals.length || 0 }}</span>
           </h3>
           <div class="fields-list">
@@ -214,10 +214,10 @@
               *ngFor="let visual of visuals; trackBy: trackById"
             >
               <i class="pi pi-chart-line"></i>
-              {{ visual.title || visual.name || 'Untitled Visual' }}
+              {{ visual.title || visual.name || ('ANALYSES.UNTITLED_VISUAL' | translate) }}
             </div>
             <div *ngIf="!visuals || visuals.length === 0" class="no-data">
-              No visuals found
+              {{ 'ANALYSES.NO_VISUALS_FOUND' | translate }}
             </div>
           </div>
         </div>
@@ -244,15 +244,15 @@
       <div class="popup-icon publish-icon">
         <i class="pi pi-send"></i>
       </div>
-      <h3>Publish Dashboard</h3>
+      <h3>{{ 'ANALYSES.PUBLISH_DASHBOARD' | translate }}</h3>
     </div>
 
     <div class="publish-form-section">
       <div class="form-group">
         <app-custom-input
           [(ngModel)]="publishForm.name"
-          label="Dashboard Name"
-          placeholder="Enter dashboard name"
+          [label]="'ANALYSES.DASHBOARD_NAME' | translate"
+          [placeholder]="'ANALYSES.ENTER_DASHBOARD_NAME' | translate"
           [required]="true"
           [maxLength]="200"
         >
@@ -262,8 +262,8 @@
       <div class="form-group">
         <app-custom-input
           [(ngModel)]="publishForm.description"
-          label="Description"
-          placeholder="Enter dashboard description (optional)"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'ANALYSES.ENTER_DASHBOARD_DESCRIPTION' | translate"
           inputMode="textarea"
           [rows]="3"
           [maxLength]="500"
@@ -272,18 +272,18 @@
       </div>
 
       <div class="publish-info">
-        <h4>Source Information</h4>
+        <h4>{{ 'ANALYSES.SOURCE_INFORMATION' | translate }}</h4>
         <div class="info-row">
           <i class="pi pi-chart-bar"></i>
           <span>{{ analysisDetails?.name }}</span>
         </div>
         <div class="info-row">
           <i class="pi pi-table"></i>
-          <span>{{ datasetDetails?.name || 'N/A' }}</span>
+          <span>{{ datasetDetails?.name || ('COMMON.NA' | translate) }}</span>
         </div>
         <div class="info-row">
           <i class="pi pi-database"></i>
-          <span>{{ datasetDetails?.datasource?.name || 'N/A' }}</span>
+          <span>{{ datasetDetails?.datasource?.name || ('COMMON.NA' | translate) }}</span>
         </div>
       </div>
     </div>
@@ -291,7 +291,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelPublish()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm btn-publish-confirm"
@@ -299,7 +299,7 @@
         [disabled]="!publishForm.name.trim()"
       >
         <i class="pi pi-send"></i>
-        Publish
+        {{ 'ANALYSES.PUBLISH' | translate }}
       </button>
     </div>
   </div>
@@ -313,33 +313,33 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to delete this analysis?</p>
+      <p class="delete-intro">{{ 'ANALYSES.CONFIRM_DELETE_SINGLE' | translate }}</p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This will permanently remove the analysis</span>
+          <span>{{ 'ANALYSES.DELETE_INFO_PERMANENT' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Associated dashboards may be affected</span>
+          <span>{{ 'ANALYSES.DELETE_INFO_DASHBOARDS' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <app-custom-input
           [(ngModel)]="deleteJustification"
-          label="Justification"
-          placeholder="Provide a reason for this action"
+          [label]="'COMMON.JUSTIFICATION' | translate"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
           inputMode="textarea"
           [rows]="3"
           [maxLength]="500"
@@ -353,7 +353,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -361,7 +361,7 @@
         [disabled]="!deleteJustification.trim() || saving()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

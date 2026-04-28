@@ -10,7 +10,7 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h2>Organisation Details</h2>
+        <h2>{{ 'ORG.STEP_ORG_DETAILS' | translate }}</h2>
       </div>
       <div class="header-actions flex gap-2">
         <button
@@ -18,11 +18,11 @@
           [routerLink]="['/app/organisation/edit', organisationId]"
         >
           <i class="pi pi-pencil"></i>
-          Edit
+          {{ 'COMMON.EDIT' | translate }}
         </button>
         <button class="btn-danger" (click)="confirmDelete(organisationId)">
           <i class="pi pi-trash"></i>
-          Delete
+          {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
@@ -47,7 +47,7 @@
                   class="status-badge"
                   [class.active]="organisationData.status === 1"
                 >
-                  {{ organisationData.status === 1 ? 'Active' : 'Inactive' }}
+                  {{ organisationData.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
                 </span>
               </div>
             </div>
@@ -55,25 +55,25 @@
 
           <!-- Basic Information -->
           <div class="detail-group">
-            <h4>Basic Information</h4>
+            <h4>{{ 'ORG.BASIC_INFORMATION' | translate }}</h4>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-building"></i>
-                Organisation Name
+                {{ 'ORG.ORG_NAME' | translate }}
               </span>
               <span class="value">{{ organisationData.name }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-id-card"></i>
-                Organisation ID
+                {{ 'COMMON.ORG_ID' | translate }}
               </span>
               <span class="value">#{{ organisationData.id }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-calendar"></i>
-                Created On
+                {{ 'COMMON.CREATED_ON' | translate }}
               </span>
               <span class="value">{{
                 organisationData.createdOn | date: 'medium'
@@ -88,10 +88,7 @@
           *ngIf="organisationData.dbStatus === 'connection_failed'"
         >
           <i class="pi pi-exclamation-triangle"></i>
-          <span
-            >Unable to connect to the master datasource. Please check the
-            database configuration and ensure the server is running.</span
-          >
+          <span>{{ 'ORG.DB_CONNECTION_FAILED_BANNER' | translate }}</span>
         </div>
 
         <!-- Stats Overview -->
@@ -102,7 +99,7 @@
               <span class="stat-value">{{
                 organisationData.usersCount || 0
               }}</span>
-              <span class="stat-label">Users</span>
+              <span class="stat-label">{{ 'ORG.USERS' | translate }}</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
@@ -110,7 +107,7 @@
               <span class="stat-value">{{
                 organisationData.adminsCount || 0
               }}</span>
-              <span class="stat-label">Admins</span>
+              <span class="stat-label">{{ 'ORG.ADMINS' | translate }}</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
@@ -118,7 +115,7 @@
               <span class="stat-value">{{
                 organisationData.groupsCount || 0
               }}</span>
-              <span class="stat-label">Groups</span>
+              <span class="stat-label">{{ 'ORG.GROUPS' | translate }}</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
@@ -126,7 +123,7 @@
               <span class="stat-value">{{
                 organisationData.datasourcesCount || 0
               }}</span>
-              <span class="stat-label">Datasources</span>
+              <span class="stat-label">{{ 'ORG.DATASOURCES' | translate }}</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-item">
@@ -134,7 +131,7 @@
               <span class="stat-value">{{
                 organisationData.connectionsCount || 0
               }}</span>
-              <span class="stat-label">Connections</span>
+              <span class="stat-label">{{ 'ORG.CONNECTIONS' | translate }}</span>
             </div>
           </div>
         </div>
@@ -147,7 +144,7 @@
           <div class="section-header-row">
             <h4>
               <i class="pi pi-database"></i>
-              Master Datasource
+              {{ 'ORG.MASTER_DATASOURCE' | translate }}
             </h4>
             <button
               class="btn-refresh-db"
@@ -156,7 +153,7 @@
                 isRefreshingMasterDb ||
                 organisationData.dbStatus !== 'connected'
               "
-              title="Refresh master datasource schema to sync new entities and columns"
+              [title]="'ORG.REFRESH_SCHEMA_TOOLTIP' | translate"
             >
               <i
                 class="pi"
@@ -164,14 +161,14 @@
                   isRefreshingMasterDb ? 'pi-spin pi-spinner' : 'pi-refresh'
                 "
               ></i>
-              {{ isRefreshingMasterDb ? 'Refreshing...' : 'Refresh Schema' }}
+              {{ isRefreshingMasterDb ? ('ORG.REFRESHING' | translate) : ('ORG.REFRESH_SCHEMA' | translate) }}
             </button>
           </div>
           <div class="master-db-grid">
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-desktop"></i>
-                Hostname
+                {{ 'ORG.HOSTNAME' | translate }}
               </span>
               <span class="value">{{
                 organisationData.masterDbConfig.hostname
@@ -180,7 +177,7 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-hashtag"></i>
-                Port
+                {{ 'ORG.PORT' | translate }}
               </span>
               <span class="value">{{
                 organisationData.masterDbConfig.port
@@ -189,7 +186,7 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-database"></i>
-                Datasource Name
+                {{ 'ORG.DATASOURCE_NAME' | translate }}
               </span>
               <span class="value">{{
                 organisationData.masterDbConfig.dbName
@@ -198,7 +195,7 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-user"></i>
-                Username
+                {{ 'COMMON.USERNAME' | translate }}
               </span>
               <span class="value">{{
                 organisationData.masterDbConfig.username
@@ -213,12 +210,12 @@
           <div class="detail-group">
             <h4>
               <i class="pi pi-shield"></i>
-              Security Settings
+              {{ 'ORG.SECURITY_SETTINGS' | translate }}
             </h4>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-lock"></i>
-                Max Login Attempts
+                {{ 'ORG.MAX_LOGIN_ATTEMPTS' | translate }}
               </span>
               <span class="value">{{
                 organisationData.orgConfig.maxLoginAttempts
@@ -227,39 +224,32 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-clock"></i>
-                Account Lock Duration
+                {{ 'ORG.ACCOUNT_LOCK_DURATION_LABEL' | translate }}
               </span>
               <span class="value">
                 {{
                   organisationData.orgConfig.accountLockDurationHours === 0
-                    ? 'Permanent (admin must unlock)'
-                    : organisationData.orgConfig.accountLockDurationHours +
-                      ' hour(s)'
+                    ? ('ORG.PERMANENT_LOCK' | translate)
+                    : ('ORG.HOURS_VALUE' | translate:{ value: organisationData.orgConfig.accountLockDurationHours })
                 }}
               </span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-history"></i>
-                Password History Limit
+                {{ 'ORG.PASSWORD_HISTORY_LIMIT' | translate }}
               </span>
               <span class="value"
-                >{{
-                  organisationData.orgConfig.passwordHistoryLimit
-                }}
-                password(s)</span
+                >{{ 'ORG.PASSWORDS_VALUE' | translate:{ value: organisationData.orgConfig.passwordHistoryLimit } }}</span
               >
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-sign-out"></i>
-                Idle Session Timeout
+                {{ 'ORG.IDLE_SESSION_TIMEOUT_LABEL' | translate }}
               </span>
               <span class="value"
-                >{{
-                  organisationData.orgConfig.sessionInactivityTimeout
-                }}
-                minutes</span
+                >{{ 'ORG.MINUTES_VALUE' | translate:{ value: organisationData.orgConfig.sessionInactivityTimeout } }}</span
               >
             </div>
           </div>
@@ -268,12 +258,12 @@
           <div class="detail-group">
             <h4>
               <i class="pi pi-envelope"></i>
-              Email Configuration
+              {{ 'ORG.EMAIL_CONFIGURATION' | translate }}
             </h4>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-cog"></i>
-                Email Provider
+                {{ 'ORG.EMAIL_PROVIDER' | translate }}
               </span>
               <span class="value">
                 <span
@@ -285,7 +275,7 @@
                 >
                   {{
                     organisationData.orgConfig.emailProvider ||
-                      'Global (Default)'
+                      ('ORG.GLOBAL_DEFAULT' | translate)
                   }}
                 </span>
               </span>
@@ -298,7 +288,7 @@
               <div class="detail-item">
                 <span class="label">
                   <i class="pi pi-server"></i>
-                  SMTP Host
+                  {{ 'ORG.SMTP_HOST' | translate }}
                 </span>
                 <span class="value">{{
                   organisationData.orgConfig.smtpHost || '—'
@@ -307,7 +297,7 @@
               <div class="detail-item">
                 <span class="label">
                   <i class="pi pi-hashtag"></i>
-                  SMTP Port
+                  {{ 'ORG.SMTP_PORT' | translate }}
                 </span>
                 <span class="value">{{
                   organisationData.orgConfig.smtpPort || '—'
@@ -316,7 +306,7 @@
               <div class="detail-item">
                 <span class="label">
                   <i class="pi pi-user"></i>
-                  SMTP Username
+                  {{ 'ORG.SMTP_USERNAME' | translate }}
                 </span>
                 <span class="value">{{
                   organisationData.orgConfig.smtpUser || '—'
@@ -325,7 +315,7 @@
               <div class="detail-item">
                 <span class="label">
                   <i class="pi pi-at"></i>
-                  From Email
+                  {{ 'ORG.FROM_EMAIL' | translate }}
                 </span>
                 <span class="value">{{
                   organisationData.orgConfig.smtpFrom || '—'
@@ -340,7 +330,7 @@
               <div class="detail-item">
                 <span class="label">
                   <i class="pi pi-globe"></i>
-                  AWS Region
+                  {{ 'ORG.AWS_REGION' | translate }}
                 </span>
                 <span class="value">{{
                   organisationData.orgConfig.sesRegion || '—'
@@ -349,7 +339,7 @@
               <div class="detail-item">
                 <span class="label">
                   <i class="pi pi-key"></i>
-                  Access Key ID
+                  {{ 'ORG.ACCESS_KEY_ID' | translate }}
                 </span>
                 <span class="value masked-value">{{
                   organisationData.orgConfig.sesAccessKeyId
@@ -361,7 +351,7 @@
               <div class="detail-item">
                 <span class="label">
                   <i class="pi pi-at"></i>
-                  From Email
+                  {{ 'ORG.FROM_EMAIL' | translate }}
                 </span>
                 <span class="value">{{
                   organisationData.orgConfig.sesFrom || '—'
@@ -374,7 +364,7 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-shield"></i>
-                Encryption Algorithm
+                {{ 'ORG.ENCRYPTION_ALGORITHM' | translate }}
               </span>
               <span class="value">{{
                 organisationData.orgConfig.encryptionAlgorithm ||
@@ -385,7 +375,7 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-lock"></i>
-                Pepper Key
+                {{ 'ORG.PEPPER_KEY' | translate }}
               </span>
               <span class="value masked-value">••••••••••••••••</span>
             </div>
@@ -396,11 +386,11 @@
         <div class="second-row">
           <!-- Configuration Limits -->
           <div class="detail-group">
-            <h4>Configuration Limits</h4>
+            <h4>{{ 'ORG.CONFIGURATION_LIMITS' | translate }}</h4>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-database"></i>
-                Max Datasources
+                {{ 'ORG.MAX_DATASOURCES' | translate }}
               </span>
               <span class="value">{{
                 organisationData.config.maxDatasources
@@ -409,14 +399,14 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-user"></i>
-                Max Users
+                {{ 'ORG.MAX_USERS' | translate }}
               </span>
               <span class="value">{{ organisationData.config.maxUsers }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-shield"></i>
-                Max Admins
+                {{ 'ORG.MAX_ADMINS' | translate }}
               </span>
               <span class="value">{{ organisationData.config.maxAdmins }}</span>
             </div>
@@ -424,18 +414,18 @@
 
           <!-- Additional Limits -->
           <div class="detail-group">
-            <h4>Additional Limits</h4>
+            <h4>{{ 'ORG.ADDITIONAL_LIMITS' | translate }}</h4>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-users"></i>
-                Max Groups
+                {{ 'ORG.MAX_GROUPS' | translate }}
               </span>
               <span class="value">{{ organisationData.config.maxGroups }}</span>
             </div>
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-globe"></i>
-                Max Environments
+                {{ 'ORG.MAX_ENVIRONMENTS' | translate }}
               </span>
               <span class="value">{{
                 organisationData.config.maxEnvironment
@@ -444,7 +434,7 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-list"></i>
-                Max Categories
+                {{ 'ORG.MAX_CATEGORIES' | translate }}
               </span>
               <span class="value">{{
                 organisationData.config.maxCategories
@@ -464,34 +454,34 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
       <p class="delete-intro">
-        Are you sure you want to delete this organisation?
+        {{ 'ORG.CONFIRM_DELETE_SINGLE' | translate }}
       </p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>All associated users will lose access</span>
+          <span>{{ 'COMMON.DELETE_ACCESS_REVOKED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this action"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -503,7 +493,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -511,7 +501,7 @@
         [disabled]="!deleteJustification.trim()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

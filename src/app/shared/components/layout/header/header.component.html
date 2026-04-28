@@ -24,7 +24,7 @@
         *ngIf="userRole !== 'SUPER-ADMIN'"
       >
         <i class="pi pi-search"></i>
-        <span class="placeholder">Search anything...</span>
+        <span class="placeholder">{{ 'HEADER.SEARCH_PLACEHOLDER' | translate }}</span>
         <kbd class="shortcut">⌘K</kbd>
       </div>
 
@@ -32,7 +32,7 @@
       <button
         class="icon-btn"
         (click)="toggleFullscreen()"
-        [pTooltip]="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
+        [pTooltip]="(isFullscreen ? 'HEADER.EXIT_FULLSCREEN' : 'HEADER.FULLSCREEN') | translate"
         tooltipPosition="bottom"
       >
         <i
@@ -41,11 +41,24 @@
         ></i>
       </button>
 
+      <!-- Language Selector -->
+      <app-custom-dropdown
+        [(ngModel)]="currentLocale"
+        [options]="locales"
+        optionLabel="label"
+        optionValue="code"
+        [filter]="false"
+        [autoDisplayFirst]="false"
+        [disabled]="changingLocale"
+        appendTo="body"
+        (onChangeEvent)="onLocaleChange($event)"
+      ></app-custom-dropdown>
+
       <!-- Notifications -->
       <button
         class="icon-btn notification-btn"
         (click)="toggleNotificationMenu($event)"
-        pTooltip="Notifications"
+        [pTooltip]="'HEADER.NOTIFICATIONS' | translate"
         tooltipPosition="bottom"
       >
         <i class="pi pi-bell"></i>
@@ -84,13 +97,13 @@
             <li class="menu-item">
               <a (click)="viewProfile(); $event.stopPropagation()">
                 <i class="pi pi-user"></i>
-                <span>My Profile</span>
+                <span>{{ 'HEADER.MY_PROFILE' | translate }}</span>
               </a>
             </li>
             <li class="menu-item logout">
               <a (click)="logout()">
                 <i class="pi pi-sign-out"></i>
-                <span>Sign Out</span>
+                <span>{{ 'HEADER.SIGN_OUT' | translate }}</span>
               </a>
             </li>
           </ul>
@@ -115,7 +128,7 @@
   <div class="banner-content">
     <div class="banner-text-wrapper">
       <span class="banner-label" (click)="openAnnouncementPopup()">
-        ANNOUNCEMENT
+        {{ 'HEADER.ANNOUNCEMENT' | translate }}
         <span *ngIf="announcements.length > 1" class="banner-count">
           ({{ currentAnnouncementIndex + 1 }}/{{ announcements.length }})
         </span>
@@ -130,7 +143,7 @@
       <button
         class="banner-nav-btn"
         (click)="prevAnnouncement()"
-        pTooltip="Previous"
+        [pTooltip]="'HEADER.PREVIOUS' | translate"
         tooltipPosition="bottom"
       >
         <i class="pi pi-chevron-left"></i>
@@ -138,7 +151,7 @@
       <button
         class="banner-nav-btn"
         (click)="nextAnnouncement()"
-        pTooltip="Next"
+        [pTooltip]="'HEADER.NEXT' | translate"
         tooltipPosition="bottom"
       >
         <i class="pi pi-chevron-right"></i>
@@ -163,7 +176,7 @@
         <span
           class="popup-tag"
           [ngStyle]="{ color: currentAnnouncement.bgColor }"
-          >Announcement</span
+          >{{ 'HEADER.ANNOUNCEMENT' | translate }}</span
         >
       </div>
       <h3 class="popup-title">{{ currentAnnouncement.name }}</h3>
@@ -171,10 +184,10 @@
       <div class="popup-footer-row">
         <label class="do-not-show">
           <p-checkbox [(ngModel)]="doNotShowAgain" [binary]="true"></p-checkbox>
-          <span>Do not show again</span>
+          <span>{{ 'HEADER.DO_NOT_SHOW_AGAIN' | translate }}</span>
         </label>
         <button class="popup-btn" (click)="closeAnnouncementPopup()">
-          Dismiss
+          {{ 'HEADER.DISMISS' | translate }}
         </button>
       </div>
     </div>
@@ -188,14 +201,14 @@
   #notificationMenu
 >
   <div class="notification-header">
-    <h3>Notifications</h3>
+    <h3>{{ 'HEADER.NOTIFICATIONS' | translate }}</h3>
     <button
       pButton
       class="p-button-text"
       *ngIf="hasNotifications"
       (click)="markAllAsRead()"
     >
-      Mark all read
+      {{ 'HEADER.MARK_ALL_READ' | translate }}
     </button>
   </div>
   <div class="notification-list" *ngIf="hasNotifications; else noNotifications">
@@ -220,10 +233,10 @@
   <ng-template #noNotifications>
     <div class="no-notifications">
       <i class="pi pi-bell-slash"></i>
-      <p>All caught up</p>
+      <p>{{ 'HEADER.ALL_CAUGHT_UP' | translate }}</p>
     </div>
   </ng-template>
-  <div class="notification-footer">Showing last 30 days</div>
+  <div class="notification-footer">{{ 'HEADER.SHOWING_LAST_30_DAYS' | translate }}</div>
 </div>
 
 <!-- Global Search -->
