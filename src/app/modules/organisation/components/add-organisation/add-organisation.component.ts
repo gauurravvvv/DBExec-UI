@@ -13,6 +13,7 @@ import { REGEX } from 'src/app/constants/regex.constant';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import { TranslateService } from '@ngx-translate/core';
 import { OrganisationService } from '../../services/organisation.service';
 
@@ -26,6 +27,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
 
   saving = this.organisationService.saving;
+  readonly locales = SUPPORTED_LOCALES as unknown as any[];
 
   orgForm!: FormGroup;
   currentStep = 0;
@@ -107,6 +109,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       dbUsername: ['', [Validators.required]],
       dbPassword: ['', [Validators.required]],
       adminEmail: ['', [Validators.required, Validators.email]],
+      adminLocale: ['en', Validators.required],
       // Security config
       maxLoginAttempts: [
         5,
