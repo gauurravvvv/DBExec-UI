@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CLI_AUTH_PAGE_OPTIONS } from 'src/app/constants/global';
+import { TranslateService } from '@ngx-translate/core';
 import { StorageType } from 'src/app/constants/storageType';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
@@ -26,7 +26,12 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
 
   @ViewChild('codeInput') codeInputRef!: ElementRef<HTMLInputElement>;
 
-  features = CLI_AUTH_PAGE_OPTIONS;
+  features = [
+    { icon: 'desktop', titleKey: 'AUTH_FEATURES.CLI_1_TITLE', descKey: 'AUTH_FEATURES.CLI_1_DESC' },
+    { icon: 'shield', titleKey: 'AUTH_FEATURES.CLI_2_TITLE', descKey: 'AUTH_FEATURES.CLI_2_DESC' },
+    { icon: 'bolt', titleKey: 'AUTH_FEATURES.CLI_3_TITLE', descKey: 'AUTH_FEATURES.CLI_3_DESC' },
+    { icon: 'lock', titleKey: 'AUTH_FEATURES.CLI_4_TITLE', descKey: 'AUTH_FEATURES.CLI_4_DESC' },
+  ];
 
   pageState = signal<
     'prompt' | 'authorizing' | 'success' | 'denied' | 'not-logged-in' | 'error'
@@ -40,7 +45,10 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
   code = '';
   codeError = '';
 
-  constructor(private loginService: LoginService) {}
+  constructor(
+    private loginService: LoginService,
+    private translate: TranslateService,
+  ) {}
 
   trackByIndex(index: number): number {
     return index;
@@ -50,7 +58,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
     if (!this.loginService.isLoggedIn()) {
       this.pageState.set('not-logged-in');
       this.message.set(
-        'You need to be logged in to DBExec to authorize CLI access.',
+        this.translate.instant('AUTH.NEED_LOGIN_FOR_CLI'),
       );
       return;
     }
@@ -93,7 +101,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
 
     const trimmed = this.code.trim();
     if (trimmed.length !== 8) {
-      this.codeError = 'Please enter the 8-character code from your terminal.';
+      this.codeError = this.translate.instant('AUTH.ENTER_8_CHAR_CODE');
       return;
     }
 
@@ -111,12 +119,12 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
             const d = response.data;
             this.message.set(
               d
-                ? `Signed in as ${d.name} (${d.role}) in ${d.organisation}`
-                : 'CLI access authorized successfully.',
+                ? this.translate.instant('AUTH.CLI_SIGNED_IN_AS', { name: d.name, role: d.role, org: d.organisation })
+                : this.translate.instant('AUTH.CLI_AUTHORIZED_MSG'),
             );
           } else {
             this.pageState.set('error');
-            this.message.set(response.message || 'Authorization failed.');
+            this.message.set(response.message || this.translate.instant('AUTH.CLI_AUTH_FAILED'));
           }
           this.loading.set(false);
         },
@@ -124,7 +132,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
           this.pageState.set('error');
           this.message.set(
             err?.error?.message ||
-              'Authorization failed. The code may be invalid or expired.',
+              this.translate.instant('AUTH.CLI_AUTH_FAILED_EXPIRED'),
           );
           this.loading.set(false);
         },
@@ -136,7 +144,7 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
 
     const trimmed = this.code.trim();
     if (trimmed.length !== 8) {
-      this.codeError = 'Please enter the 8-character code from your terminal.';
+      this.codeError = this.translate.instant('AUTH.ENTER_8_CHAR_CODE');
       return;
     }
 
@@ -150,14 +158,14 @@ export class CliAuthComponent implements OnInit, AfterViewInit {
         next: () => {
           this.pageState.set('denied');
           this.message.set(
-            'CLI access has been denied. You can close this tab.',
+            this.translate.instant('AUTH.CLI_DENIED_MSG'),
           );
           this.loading.set(false);
         },
         error: () => {
           this.pageState.set('denied');
           this.message.set(
-            'CLI access has been denied. You can close this tab.',
+            this.translate.instant('AUTH.CLI_DENIED_MSG'),
           );
           this.loading.set(false);
         },

@@ -9,7 +9,7 @@
   background-color: var(--background-color);
   overflow: hidden;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 // ===================================================================
@@ -193,15 +193,15 @@
     }
 
     .status-loaded {
-      color: #22c55e;
-      background-color: rgba(34, 197, 94, 0.1);
+      color: var(--success-color);
+      background-color: var(--success-bg);
       padding: 6px 12px;
       border-radius: 4px;
     }
 
     .status-error {
-      color: #ef4444;
-      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--error-color);
+      background-color: var(--error-bg);
       padding: 6px 12px;
       border-radius: 4px;
     }
@@ -372,7 +372,7 @@
 
     .visual-count-badge {
       background-color: var(--primary-color);
-      color: white;
+      color: var(--primary-text);
       font-size: 10px;
       font-weight: 600;
       padding: 2px 8px;
@@ -580,7 +580,7 @@
     flex-shrink: 0;
     color: var(--primary-color);
     opacity: 0.8;
-    background: rgba(var(--primary-rgb), 0.08);
+    background: var(--primary-color-transparent);
     border-radius: 50%;
     font-size: 12px;
   }
@@ -604,11 +604,11 @@
   }
 
   .field-card.analysis-field {
-    border-left: 3px solid var(--orange-500, #f59e0b);
+    border-left: 3px solid var(--orange-500, var(--warning-color));
   }
 
   .field-card.analysis-field.custom-field {
-    border-left: 3px solid var(--orange-500, #f59e0b);
+    border-left: 3px solid var(--orange-500, var(--warning-color));
   }
 
   .field-actions {
@@ -630,7 +630,7 @@
       color: var(--primary-color);
     }
     .delete-icon:hover {
-      color: #ef4444;
+      color: var(--error-color);
     }
   }
 
@@ -757,8 +757,8 @@
       transition: all 0.2s ease;
 
       &:hover {
-        color: #ff5252;
-        background-color: rgba(255, 82, 82, 0.1);
+        color: var(--error-color);
+        background-color: var(--error-bg);
       }
     }
   }
@@ -981,7 +981,7 @@
     }
 
     .badge-disabled {
-      background: rgba(0, 0, 0, 0.05);
+      background: var(--shadow-color);
       color: var(--secondary-color);
     }
   }
@@ -1388,7 +1388,7 @@
   animation: slideInRight 0.3s ease-out;
   overflow: hidden;
   z-index: 100;
-  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+  box-shadow: -4px 0 16px var(--shadow-color);
 
   .sidebar-content {
     display: flex;
@@ -1559,7 +1559,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 4px var(--shadow-color);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
@@ -1568,7 +1568,7 @@
 
   &:hover {
     border-color: rgba(var(--primary-color-rgb), 0.5);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 16px var(--shadow-color);
     .resize-handle-corner-br {
       opacity: 0.5;
     }
@@ -1836,7 +1836,7 @@
 
       &:hover {
         opacity: 1;
-        background: rgba(0, 0, 0, 0.06);
+        background: var(--shadow-color);
       }
     }
 
@@ -1844,11 +1844,11 @@
       color: var(--primary-color);
     }
     .change-chart-icon:hover {
-      color: #f59e0b;
+      color: var(--warning-color);
     }
     .remove-icon:hover {
-      color: #ef4444;
-      background: rgba(239, 68, 68, 0.08) !important;
+      color: var(--error-color);
+      background: var(--error-bg) !important;
     }
   }
 }
@@ -1884,8 +1884,8 @@
     }
 
     &:has(.pi-times):hover {
-      background-color: rgba(255, 0, 0, 0.1);
-      color: #ff0000;
+      background-color: var(--error-bg);
+      color: var(--error-color);
     }
 
     &:has(.pi-copy):hover {
@@ -2063,7 +2063,7 @@
 
     .error-icon {
       font-size: 22px;
-      color: #ef4444;
+      color: var(--error-color);
       opacity: 0.7;
     }
 
@@ -2172,7 +2172,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: var(--overlay-background);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -2192,7 +2192,7 @@
 .maximized-visual-container {
   background: var(--surface-card, #ffffff);
   border-radius: 12px;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 40px -10px var(--overlay-background);
   max-width: 92vw;
   max-height: 88vh;
   width: 1000px;
@@ -2232,7 +2232,7 @@
     height: 36px;
 
     &:hover {
-      background: var(--surface-hover, rgba(0, 0, 0, 0.08));
+      background: var(--surface-hover, var(--shadow-color));
       color: var(--text-color, #333);
     }
   }
@@ -2254,7 +2254,7 @@
     .p-dialog {
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 60px var(--overlay-background);
     }
 
     .p-dialog-header {
@@ -2399,7 +2399,7 @@
       background: var(--card-background);
       border: 1px solid var(--border-color);
       color: var(--text-color);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--shadow-sm);
 
       &:hover {
         background: var(--hover-background);
@@ -2408,13 +2408,13 @@
     }
 
     &.btn-primary {
-      background: linear-gradient(135deg, #2196f3, #1976d2);
-      color: white;
-      box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+      color: var(--primary-text);
+      box-shadow: 0 4px 10px var(--primary-color-transparent);
 
       &:hover:not(:disabled) {
         transform: translateY(-1px);
-        box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        box-shadow: var(--shadow-md);
       }
 
       &:disabled {
@@ -2440,7 +2440,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
@@ -2473,8 +2473,8 @@
       .popup-icon {
         width: 48px;
         height: 48px;
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--error-color, #ef4444);
+        background: var(--error-bg);
+        color: var(--error-color, var(--error-color));
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -2563,14 +2563,14 @@
         }
 
         &.btn-confirm {
-          background: var(--error-color, #ef4444);
-          color: white;
-          box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+          background: var(--error-color, var(--error-color));
+          color: var(--primary-text);
+          box-shadow: 0 4px 6px -1px var(--error-bg);
 
           &:hover {
-            background: #dc2626;
+            background: var(--error-color);
             transform: translateY(-1px);
-            box-shadow: 0 6px 8px -1px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 6px 8px -1px var(--error-bg);
           }
         }
       }

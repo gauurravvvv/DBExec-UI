@@ -1,13 +1,13 @@
 <div class="system-admin-home">
   <div class="home-header">
     <div class="header-left">
-      <h2>Overview and Analytics</h2>
-      <p class="subtitle">Visualize key insights and data metrics</p>
+      <h2>{{ 'HOME.OVERVIEW_TITLE' | translate }}</h2>
+      <p class="subtitle">{{ 'HOME.OVERVIEW_SUBTITLE' | translate }}</p>
     </div>
     <div class="organization-selector">
       <label for="organization">
         <i class="fas fa-building"></i>
-        Organisation:
+        {{ 'HOME.ORGANISATION_LABEL' | translate }}
       </label>
       <div class="custom-select">
         <select
@@ -62,13 +62,13 @@
           <div class="header-icon">
             <i class="fas fa-users"></i>
           </div>
-          <h3>Active Users Statistics</h3>
+          <h3>{{ 'HOME.ACTIVE_USERS_STATS' | translate }}</h3>
         </div>
         <div class="stats-content">
           <div class="current-stats">
             <div class="stat-value">
               <h4>{{ activeUsers24hrs }}</h4>
-              <p>Active Today</p>
+              <p>{{ 'HOME.ACTIVE_TODAY' | translate }}</p>
             </div>
             <div class="trend up">
               <i class="fas fa-arrow-up"></i>
@@ -100,15 +100,15 @@
       <div class="action-buttons">
         <button class="action-btn" (click)="addNewUser()">
           <i class="fas fa-user-plus"></i>
-          Add User
+          {{ 'HOME.ADD_USER' | translate }}
         </button>
         <button class="action-btn" (click)="manageDatasource()">
           <i class="fas fa-database"></i>
-          Manage Datasource
+          {{ 'HOME.MANAGE_DATASOURCE' | translate }}
         </button>
         <button class="action-btn" (click)="viewReports()">
           <i class="fas fa-chart-bar"></i>
-          View Reports
+          {{ 'HOME.VIEW_REPORTS' | translate }}
         </button>
       </div>
     </div>

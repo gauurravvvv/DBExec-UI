@@ -1,7 +1,7 @@
 <div class="org-home">
   <div class="home-header">
     <div class="header-left">
-      <h2>Welcome, {{ userName }}</h2>
+      <h2>{{ 'HOME.WELCOME' | translate: { name: userName } }}</h2>
       <p class="subtitle">{{ organisationName }}</p>
     </div>
   </div>
@@ -13,8 +13,8 @@
           <i class="ci ci-screen"></i>
         </div>
         <div class="nav-info">
-          <h4>Query Builders</h4>
-          <p>View and manage query builders</p>
+          <h4>{{ 'HOME.QUERY_BUILDERS' | translate }}</h4>
+          <p>{{ 'HOME.QUERY_BUILDERS_DESC' | translate }}</p>
         </div>
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
@@ -24,8 +24,8 @@
           <i class="ci ci-dataset"></i>
         </div>
         <div class="nav-info">
-          <h4>Datasets</h4>
-          <p>Manage your datasets</p>
+          <h4>{{ 'HOME.DATASETS' | translate }}</h4>
+          <p>{{ 'HOME.DATASETS_DESC' | translate }}</p>
         </div>
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
@@ -35,8 +35,8 @@
           <i class="ci ci-analyses"></i>
         </div>
         <div class="nav-info">
-          <h4>Analyses</h4>
-          <p>Visualize and analyze data</p>
+          <h4>{{ 'HOME.ANALYSES' | translate }}</h4>
+          <p>{{ 'HOME.ANALYSES_DESC' | translate }}</p>
         </div>
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
@@ -46,8 +46,8 @@
           <i class="pi pi-users"></i>
         </div>
         <div class="nav-info">
-          <h4>Users</h4>
-          <p>Manage organisation users</p>
+          <h4>{{ 'HOME.USERS' | translate }}</h4>
+          <p>{{ 'HOME.USERS_DESC' | translate }}</p>
         </div>
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
@@ -61,8 +61,8 @@
           <i class="pi pi-database"></i>
         </div>
         <div class="nav-info">
-          <h4>Datasources</h4>
-          <p>Configure datasource connections</p>
+          <h4>{{ 'HOME.DATASOURCES' | translate }}</h4>
+          <p>{{ 'HOME.DATASOURCES_DESC' | translate }}</p>
         </div>
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>
@@ -76,8 +76,8 @@
           <i class="pi pi-list"></i>
         </div>
         <div class="nav-info">
-          <h4>Audit Logs</h4>
-          <p>Review activity history</p>
+          <h4>{{ 'HOME.AUDIT_LOGS' | translate }}</h4>
+          <p>{{ 'HOME.AUDIT_LOGS_DESC' | translate }}</p>
         </div>
         <i class="pi pi-arrow-right nav-arrow"></i>
       </div>

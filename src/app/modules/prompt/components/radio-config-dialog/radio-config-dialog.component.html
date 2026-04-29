@@ -4,20 +4,20 @@
   [style]="{ width: '820px' }"
   [draggable]="false"
   [resizable]="false"
-  header="Customise Radio Group"
+  [header]="'PROMPT_MODULE.CUSTOMISE_RADIO_GROUP' | translate"
   styleClass="radio-config-dialog"
   (onHide)="onClose()"
 >
   <div class="dialog-content">
     <div class="config-panel">
       <div class="panel-header">
-        <i class="pi pi-cog"></i><span>Configuration Options</span>
+        <i class="pi pi-cog"></i><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
       </div>
       <div class="config-form">
-        <div class="section-label"><i class="pi pi-sliders-h"></i> Layout</div>
+        <div class="section-label"><i class="pi pi-sliders-h"></i> {{ 'PROMPT_MODULE.LAYOUT' | translate }}</div>
 
         <div class="config-group">
-          <label>Orientation</label>
+          <label>{{ 'PROMPT_MODULE.ORIENTATION' | translate }}</label>
           <p-dropdown
             [options]="layoutOptions"
             [(ngModel)]="config.layout"
@@ -29,7 +29,7 @@
           </p-dropdown>
         </div>
         <div class="config-group">
-          <label>Columns (grid mode)</label>
+          <label>{{ 'PROMPT_MODULE.COLUMNS_GRID' | translate }}</label>
           <p-dropdown
             [options]="columnOptions"
             [(ngModel)]="config.columns"
@@ -42,7 +42,7 @@
           <small class="hint">Only applies when orientation is Vertical</small>
         </div>
         <div class="config-group">
-          <label>Gap Between Items</label>
+          <label>{{ 'PROMPT_MODULE.GAP_BETWEEN_ITEMS' | translate }}</label>
           <p-dropdown
             [options]="gapOptions"
             [(ngModel)]="config.gap"
@@ -59,7 +59,7 @@
         </div>
 
         <div class="config-group">
-          <label>Label Position</label>
+          <label>{{ 'PROMPT_MODULE.LABEL_POSITION' | translate }}</label>
           <p-dropdown
             [options]="labelPositionOptions"
             [(ngModel)]="config.labelPosition"
@@ -74,17 +74,17 @@
       <div class="apply-preview-action">
         <button class="btn-primary" type="button" (click)="applyPreview()">
           <i class="pi pi-refresh"></i>
-          Apply Preview
+          {{ 'PROMPT_MODULE.APPLY_PREVIEW' | translate }}
         </button>
       </div>
     </div>
 
     <div class="preview-panel">
       <div class="panel-header">
-        <i class="pi pi-eye"></i><span>Preview</span>
+        <i class="pi pi-eye"></i><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
       </div>
       <div class="preview-content">
-        <div class="preview-label">Try it out:</div>
+        <div class="preview-label">{{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}</div>
 
         <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
           <div *ngIf="formattedOptions.length > 0; else noOptions">
@@ -102,7 +102,7 @@
               <button
                 pButton
                 type="button"
-                label="Set as Default"
+                [label]="'PROMPT_MODULE.SET_AS_DEFAULT' | translate"
                 class="p-button-text p-button-sm"
                 icon="pi pi-check"
                 (click)="setAsDefault()"
@@ -114,14 +114,14 @@
         <ng-template #noOptions>
           <div class="preview-hint">
             <i class="pi pi-info-circle"></i>
-            <span>Add prompt values to see the radio group preview</span>
+            <span>{{ 'PROMPT_MODULE.ADD_VALUES_RADIO' | translate }}</span>
           </div>
         </ng-template>
 
         <div class="default-indicator" *ngIf="config.defaultValue != null">
           <i class="pi pi-bookmark"></i>
           <span
-            >Default: <strong>{{ config.defaultValue }}</strong></span
+            >{{ 'PROMPT_MODULE.DEFAULT' | translate }}: <strong>{{ config.defaultValue }}</strong></span
           >
           <button
             pButton
@@ -129,19 +129,19 @@
             icon="pi pi-times"
             class="p-button-text p-button-rounded p-button-sm"
             (click)="clearDefault()"
-            pTooltip="Clear default"
+            [pTooltip]="'PROMPT_MODULE.CLEAR_DEFAULT' | translate"
           ></button>
         </div>
 
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> Active Settings
+            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span
               class="summary-chip"
               *ngIf="previewConfig.layout === 'horizontal'"
-              >Horizontal</span
+              >{{ 'PROMPT_MODULE.HORIZONTAL' | translate }}</span
             >
             <span
               class="summary-chip"
@@ -153,15 +153,15 @@
             <span
               class="summary-chip"
               *ngIf="previewConfig.labelPosition === 'left'"
-              >Label Left</span
+              >{{ 'PROMPT_MODULE.LABEL_LEFT' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.gap !== 'medium'"
-              >Gap: {{ previewConfig.gap }}</span
+              >{{ 'PROMPT_MODULE.GAP' | translate }}: {{ previewConfig.gap }}</span
             >
             <span
               class="summary-chip"
               *ngIf="previewConfig.defaultValue != null"
-              >Has Default</span
+              >{{ 'PROMPT_MODULE.HAS_DEFAULT' | translate }}</span
             >
             <span
               class="summary-empty"
@@ -173,7 +173,7 @@
                 previewConfig.defaultValue == null
               "
             >
-              Default configuration
+              {{ 'PROMPT_MODULE.DEFAULT_CONFIGURATION' | translate }}
             </span>
           </div>
         </div>
@@ -184,11 +184,11 @@
   <ng-template pTemplate="footer">
     <button class="btn-cancel" type="button" (click)="onClose()">
       <i class="pi pi-times"></i>
-      Cancel
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
     <button class="btn-primary" type="button" (click)="onSave()">
       <i class="pi pi-check"></i>
-      Apply
+      {{ 'PROMPT_MODULE.APPLY' | translate }}
     </button>
   </ng-template>
 </p-dialog>

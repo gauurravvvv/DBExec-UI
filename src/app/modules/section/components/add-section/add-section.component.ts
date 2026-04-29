@@ -18,6 +18,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TabService } from 'src/app/modules/tab/services/tab.service';
+import { TranslateService } from '@ngx-translate/core';
 import { SectionService } from '../../services/section.service';
 
 @Component({
@@ -57,6 +58,7 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     private globalService: GlobalService,
     private datasourceService: DatasourceService,
     private sectionService: SectionService,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -134,13 +136,13 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   }
 
   getNameError(control: any): string {
-    if (control?.errors?.['required']) return 'Section name is required';
+    if (control?.errors?.['required']) return this.translate.instant('SECTION_MODULE.NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Section name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('SECTION_MODULE.NAME_MIN', { min: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Section name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('SECTION_MODULE.NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Section name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('SECTION_MODULE.NAME_PATTERN');
     return '';
   }
 

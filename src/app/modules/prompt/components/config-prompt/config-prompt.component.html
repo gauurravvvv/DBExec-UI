@@ -9,7 +9,7 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h2>Configure Prompt</h2>
+        <h2>{{ 'PROMPT_MODULE.CONFIG_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
@@ -17,11 +17,11 @@
           type="button"
           *ngIf="isConfigurable()"
           (click)="openConfigDialog()"
-          pTooltip="Customise prompt display options"
+          [pTooltip]="'PROMPT_MODULE.CUSTOMISE_DISPLAY_OPTIONS' | translate"
           tooltipPosition="bottom"
         >
           <i class="pi pi-cog"></i>
-          Customise
+          {{ 'PROMPT_MODULE.CUSTOMISE' | translate }}
         </button>
         <button
           class="btn-cancel"
@@ -30,7 +30,7 @@
           (click)="onCancel()"
         >
           <i class="pi pi-times"></i>
-          Cancel
+          {{ 'COMMON.CANCEL' | translate }}
         </button>
         <button
           class="btn-primary"
@@ -39,7 +39,7 @@
           [disabled]="promptForm.invalid || !isFormDirty || saving()"
         >
           <i class="pi pi-save"></i>
-          Save
+          {{ 'COMMON.SAVE' | translate }}
         </button>
       </div>
     </div>
@@ -56,7 +56,7 @@
               <app-custom-input
                 [ngModel]="promptForm.get('name')?.value"
                 [ngModelOptions]="{ standalone: true }"
-                label="Name"
+                [label]="'COMMON.NAME' | translate"
                 icon="pi-tag"
                 [inputDisabled]="true"
               >
@@ -67,7 +67,7 @@
               <app-custom-input
                 [ngModel]="promptForm.get('type')?.value"
                 [ngModelOptions]="{ standalone: true }"
-                label="Type"
+                [label]="'COMMON.TYPE' | translate"
                 icon="pi-tag"
                 [inputDisabled]="true"
               >
@@ -79,8 +79,8 @@
               <app-custom-input
                 [ngModel]="selectedOrgName"
                 [ngModelOptions]="{ standalone: true }"
-                label="Organisation"
-                placeholder="Organisation"
+                [label]="'COMMON.ORGANISATION' | translate"
+                [placeholder]="'COMMON.ORGANISATION' | translate"
                 icon="pi-building"
                 [inputDisabled]="true"
               >
@@ -90,8 +90,8 @@
               <app-custom-input
                 [ngModel]="selectedDatasourceName"
                 [ngModelOptions]="{ standalone: true }"
-                label="Datasource"
-                placeholder="Datasource"
+                [label]="'COMMON.DATASOURCE' | translate"
+                [placeholder]="'COMMON.DATASOURCE' | translate"
                 icon="pi-database"
                 [inputDisabled]="true"
               >
@@ -103,8 +103,8 @@
               <app-custom-input
                 [ngModel]="selectedTabName"
                 [ngModelOptions]="{ standalone: true }"
-                label="Tab"
-                placeholder="Tab"
+                [label]="'COMMON.TAB' | translate"
+                [placeholder]="'COMMON.TAB' | translate"
                 icon="pi-box"
                 [inputDisabled]="true"
               >
@@ -114,8 +114,8 @@
               <app-custom-input
                 [ngModel]="selectedSectionName"
                 [ngModelOptions]="{ standalone: true }"
-                label="Section"
-                placeholder="Section"
+                [label]="'COMMON.SECTION' | translate"
+                [placeholder]="'COMMON.SECTION' | translate"
                 icon="pi-box"
                 [inputDisabled]="true"
               >
@@ -125,15 +125,15 @@
           <div class="section-header">
             <h3>
               <i class="pi pi-database mr-2"></i>
-              Query Configurations
+              {{ 'PROMPT_MODULE.QUERY_CONFIGURATIONS' | translate }}
             </h3>
           </div>
           <div class="form-row schema-table-row">
             <div class="form-field schema-field">
               <app-custom-dropdown
                 formControlName="schema"
-                label="Schema"
-                placeholder="Select Schema"
+                [label]="'PROMPT_MODULE.SCHEMA' | translate"
+                [placeholder]="'PROMPT_MODULE.SELECT_SCHEMA' | translate"
                 [options]="schemas"
                 optionLabel="name"
                 [optionValue]="null"
@@ -146,15 +146,15 @@
                     promptForm.get('schema')?.touched
                   )
                 "
-                errorMessage="Schema is required"
+                [errorMessage]="'PROMPT_MODULE.SCHEMA_REQUIRED' | translate"
               >
               </app-custom-dropdown>
             </div>
             <div class="form-field">
               <app-custom-multiselect
                 formControlName="tables"
-                label="Table(s)"
-                placeholder="Select Tables"
+                [label]="'PROMPT_MODULE.TABLES' | translate"
+                [placeholder]="'PROMPT_MODULE.SELECT_TABLES' | translate"
                 [options]="cachedAvailableTables"
                 optionLabel="name"
                 optionValue="value"
@@ -168,7 +168,7 @@
                     promptForm.get('tables')?.touched
                   )
                 "
-                errorMessage="At least one table is required"
+                [errorMessage]="'PROMPT_MODULE.TABLE_REQUIRED' | translate"
               >
               </app-custom-multiselect>
             </div>
@@ -180,8 +180,8 @@
             <div class="form-field full-width">
               <app-custom-multiselect
                 formControlName="columns"
-                label="Column(s)"
-                placeholder="Select Columns"
+                [label]="'PROMPT_MODULE.COLUMNS' | translate"
+                [placeholder]="'PROMPT_MODULE.SELECT_COLUMNS' | translate"
                 [options]="availableColumns"
                 optionLabel="displayName"
                 [filter]="true"
@@ -195,7 +195,7 @@
                     promptForm.get('columns')?.touched
                   )
                 "
-                errorMessage="At least one column is required"
+                [errorMessage]="'PROMPT_MODULE.COLUMN_REQUIRED' | translate"
               >
               </app-custom-multiselect>
             </div>
@@ -206,10 +206,10 @@
           >
             <div class="form-field full-width">
               <label for="promptJoin">
-                Prompt Join Condition<span class="required">*</span>
+                {{ 'PROMPT_MODULE.PROMPT_JOIN_CONDITION' | translate }}<span class="required">*</span>
                 <i
                   class="pi pi-info-circle info-icon"
-                  pTooltip="Type alias followed by '.' for column suggestions."
+                  [pTooltip]="'PROMPT_MODULE.JOIN_CONDITION_HINT' | translate"
                   tooltipPosition="right"
                 ></i>
               </label>
@@ -225,7 +225,7 @@
                     (keydown)="onJoinKeydown($event)"
                     (blur)="hideJoinSuggestionsDelayed()"
                     (focus)="onJoinFocus($event)"
-                    placeholder="Example: o.user_id = u.id"
+                    [placeholder]="'PROMPT_MODULE.JOIN_PLACEHOLDER' | translate"
                     autocomplete="off"
                     [ngClass]="{
                       'ng-invalid ng-dirty':
@@ -245,7 +245,7 @@
                       >{{ filteredJoinColumns.length }} column(s) found</span
                     >
                     <span class="keyboard-hint"
-                      >↑↓ Navigate • Enter Select • Esc Close</span
+                      >{{ 'PROMPT_MODULE.KEYBOARD_HINT' | translate }}</span
                     >
                   </div>
                   <div class="suggestions-list">
@@ -273,9 +273,7 @@
                     *ngIf="filteredJoinColumns.length > maxSuggestions"
                   >
                     <span
-                      >Showing {{ maxSuggestions }} of
-                      {{ filteredJoinColumns.length }} results. Type more to
-                      filter.</span
+                      >{{ 'PROMPT_MODULE.SHOWING_RESULTS' | translate: { shown: maxSuggestions, total: filteredJoinColumns.length } }}</span
                     >
                   </div>
                 </div>
@@ -291,7 +289,7 @@
                 >
                   <div class="no-results-content">
                     <i class="pi pi-search"></i>
-                    <span>No columns found for "{{ currentJoinAlias }}"</span>
+                    <span>{{ 'PROMPT_MODULE.NO_COLUMNS_FOUND' | translate: { alias: currentJoinAlias } }}</span>
                   </div>
                 </div>
               </div>
@@ -302,21 +300,21 @@
                   promptForm.get('promptJoin')?.touched
                 "
               >
-                Join condition is required
+                {{ 'PROMPT_MODULE.JOIN_CONDITION_REQUIRED' | translate }}
               </small>
               <small class="hint-text">
                 <i class="pi pi-lightbulb"></i>
-                Use <code>1=1</code> if no specific join condition is required.
+                {{ 'PROMPT_MODULE.JOIN_HINT_1_EQUALS_1' | translate }}
               </small>
             </div>
           </div>
           <div class="form-row">
             <div class="form-field full-width">
               <label for="promptWhere">
-                Prompt Where Condition<span class="required">*</span>
+                {{ 'PROMPT_MODULE.PROMPT_WHERE_CONDITION' | translate }}<span class="required">*</span>
                 <i
                   class="pi pi-info-circle info-icon"
-                  pTooltip="Specify the filter condition. Type alias.column followed by operator"
+                  [pTooltip]="'PROMPT_MODULE.WHERE_CONDITION_HINT' | translate"
                   tooltipPosition="right"
                 ></i>
               </label>
@@ -332,7 +330,7 @@
                     (keydown)="onWhereKeydown($event)"
                     (blur)="hideSuggestionsDelayed()"
                     (focus)="onWhereFocus($event)"
-                    placeholder="Enter where condition"
+                    [placeholder]="'PROMPT_MODULE.ENTER_WHERE_CONDITION' | translate"
                     autocomplete="off"
                     [ngClass]="{
                       'ng-invalid ng-dirty':
@@ -348,9 +346,9 @@
                   *ngIf="showSuggestions && filteredColumns.length > 0"
                 >
                   <div class="suggestions-header">
-                    <span>{{ filteredColumns.length }} column(s) found</span>
+                    <span>{{ filteredColumns.length }} {{ 'PROMPT_MODULE.COLUMNS_FOUND' | translate }}</span>
                     <span class="keyboard-hint"
-                      >↑↓ Navigate • Enter Select • Esc Close</span
+                      >{{ 'PROMPT_MODULE.KEYBOARD_HINT' | translate }}</span
                     >
                   </div>
                   <div class="suggestions-list">
@@ -375,9 +373,7 @@
                     *ngIf="filteredColumns.length > maxSuggestions"
                   >
                     <span
-                      >Showing {{ maxSuggestions }} of
-                      {{ filteredColumns.length }} results. Type more to
-                      filter.</span
+                      >{{ 'PROMPT_MODULE.SHOWING_RESULTS' | translate: { shown: maxSuggestions, total: filteredColumns.length } }}</span
                     >
                   </div>
                 </div>
@@ -393,7 +389,7 @@
                 >
                   <div class="no-results-content">
                     <i class="pi pi-search"></i>
-                    <span>No columns found for "{{ currentAlias }}"</span>
+                    <span>{{ 'PROMPT_MODULE.NO_COLUMNS_FOUND' | translate: { alias: currentAlias } }}</span>
                   </div>
                 </div>
               </div>
@@ -404,7 +400,7 @@
                   promptForm.get('promptWhere')?.touched
                 "
               >
-                Where condition is required
+                {{ 'PROMPT_MODULE.WHERE_CONDITION_REQUIRED' | translate }}
               </small>
               <small
                 class="hint-text"
@@ -412,10 +408,10 @@
               >
                 <i class="pi pi-lightbulb"></i>
                 <span *ngIf="isRangeType()">
-                  <strong>Range prompts:</strong> Use
+                  <strong>{{ 'PROMPT_MODULE.RANGE_PROMPTS' | translate }}:</strong> {{ 'PROMPT_MODULE.USE' | translate }}
                   <code>{{ '{' }}startValue{{ '}' }}</code> and
-                  <code>{{ '{' }}endValue{{ '}' }}</code> as placeholders.
-                  <br />Example:
+                  <code>{{ '{' }}endValue{{ '}' }}</code> {{ 'PROMPT_MODULE.AS_PLACEHOLDERS' | translate }}
+                  <br />{{ 'PROMPT_MODULE.EXAMPLE' | translate }}:
                   <code
                     >alias.column BETWEEN '{{ '{' }}startValue{{ '}' }}' AND '{{
                       '{'
@@ -423,15 +419,15 @@
                   >
                 </span>
                 <span *ngIf="isMultiValueType()">
-                  <strong>Multi-value prompts:</strong> Use
-                  <code>{{ '{' }}value{{ '}' }}</code> as placeholder.
-                  <br />Example:
+                  <strong>{{ 'PROMPT_MODULE.MULTI_VALUE_PROMPTS' | translate }}:</strong> {{ 'PROMPT_MODULE.USE' | translate }}
+                  <code>{{ '{' }}value{{ '}' }}</code> {{ 'PROMPT_MODULE.AS_PLACEHOLDER' | translate }}
+                  <br />{{ 'PROMPT_MODULE.EXAMPLE' | translate }}:
                   <code>alias.column IN ('{{ '{' }}value{{ '}' }}')</code>
                 </span>
                 <span *ngIf="!isRangeType() && !isMultiValueType()">
-                  <strong>Single-value prompts:</strong> Use
-                  <code>{{ '{' }}value{{ '}' }}</code> as placeholder.
-                  <br />Example:
+                  <strong>{{ 'PROMPT_MODULE.SINGLE_VALUE_PROMPTS' | translate }}:</strong> {{ 'PROMPT_MODULE.USE' | translate }}
+                  <code>{{ '{' }}value{{ '}' }}</code> {{ 'PROMPT_MODULE.AS_PLACEHOLDER' | translate }}
+                  <br />{{ 'PROMPT_MODULE.EXAMPLE' | translate }}:
                   <code>alias.column = '{{ '{' }}value{{ '}' }}'</code>
                 </span>
               </small>
@@ -447,14 +443,14 @@
               <div class="section-header sql-preview-header">
                 <h3>
                   <i class="pi pi-code mr-2"></i>
-                  SQL Preview
+                  {{ 'PROMPT_MODULE.SQL_PREVIEW' | translate }}
                 </h3>
                 <button
                   type="button"
                   pButton
                   class="p-button-text p-button-rounded p-button-sm"
                   icon="pi pi-copy"
-                  pTooltip="Copy SQL"
+                  [pTooltip]="'PROMPT_MODULE.COPY_SQL' | translate"
                   tooltipPosition="left"
                   (click)="copySqlToClipboard()"
                 ></button>
@@ -470,7 +466,7 @@
           <div class="section-header" *ngIf="showAddPromptValues">
             <h3>
               <i class="pi pi-list mr-2"></i>
-              Prompt Configuration
+              {{ 'PROMPT_MODULE.CONFIGURATION' | translate }}
             </h3>
           </div>
           <div class="form-row" *ngIf="showAddPromptValues">
@@ -484,10 +480,10 @@
                 "
               >
                 <label for="promptValues" style="margin-bottom: 0">
-                  Prompt Values<span class="required">*</span>
+                  {{ 'PROMPT_MODULE.PROMPT_VALUES' | translate }}<span class="required">*</span>
                   <i
                     class="pi pi-info-circle info-icon"
-                    pTooltip="Add selectable options. Press Enter or Comma to add each value"
+                    [pTooltip]="'PROMPT_MODULE.PROMPT_VALUES_HINT' | translate"
                     tooltipPosition="right"
                   ></i>
                 </label>
@@ -504,7 +500,7 @@
                     pButton
                     class="p-button-text p-button-rounded p-button-success"
                     icon="pi pi-refresh"
-                    pTooltip="Refresh prompt values"
+                    [pTooltip]="'PROMPT_MODULE.REFRESH_VALUES' | translate"
                     tooltipPosition="bottom"
                     (click)="refreshPromptValues()"
                   ></button>
@@ -513,7 +509,7 @@
                     pButton
                     class="p-button-text p-button-rounded p-button-warning"
                     icon="pi pi-bolt"
-                    pTooltip="Load values from SQL query"
+                    [pTooltip]="'PROMPT_MODULE.LOAD_VALUES_SQL' | translate"
                     tooltipPosition="bottom"
                     (click)="openSqlDialog()"
                   ></button>
@@ -522,7 +518,7 @@
                     pButton
                     class="p-button-text p-button-rounded p-button-info"
                     icon="pi pi-upload"
-                    pTooltip="Upload values from file (CSV/TXT)"
+                    [pTooltip]="'PROMPT_MODULE.UPLOAD_VALUES_FILE' | translate"
                     tooltipPosition="bottom"
                     (click)="fileInput.click()"
                   ></button>
@@ -538,7 +534,7 @@
                     pButton
                     class="p-button-text p-button-rounded p-button-danger"
                     icon="pi pi-trash"
-                    pTooltip="Clear all values"
+                    [pTooltip]="'PROMPT_MODULE.CLEAR_ALL_VALUES' | translate"
                     tooltipPosition="bottom"
                     (click)="clearPromptValues()"
                     [disabled]="!promptForm.get('promptValues')?.value?.length"
@@ -552,7 +548,7 @@
                 [addOnTab]="true"
                 [allowDuplicate]="false"
                 [separator]="separator"
-                placeholder="Enter values and press Enter or Comma"
+                [placeholder]="'PROMPT_MODULE.ENTER_VALUES_HINT' | translate"
                 (onAdd)="onChipAdd($event)"
                 [ngClass]="{
                   'ng-invalid ng-dirty':
@@ -591,7 +587,7 @@
                   promptForm.get('promptValues')?.touched
                 "
               >
-                Prompt values are required
+                {{ 'PROMPT_MODULE.PROMPT_VALUES_REQUIRED' | translate }}
               </small>
             </div>
           </div>

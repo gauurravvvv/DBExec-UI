@@ -22,6 +22,7 @@ import { TreeNode } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { QueryResult } from '../../../dataset/helpers/dummy-data.helper';
 import { DatasetService } from '../../../dataset/services/dataset.service';
@@ -160,6 +161,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
     private datasetService: DatasetService,
     private queryService: QueryService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     this.orgId = this.route.snapshot.params['orgId'];
     this.datasourceId = this.route.snapshot.params['dbId'];
@@ -239,12 +241,12 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             }
           }
         } else {
-          this.tabError.set(response.message || 'Failed to load tabs');
+          this.tabError.set(response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS'));
           this.loadingTabs.set(false);
         }
       })
       .catch(() => {
-        this.tabError.set('Failed to load tabs');
+        this.tabError.set(this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_TABS'));
         this.loadingTabs.set(false);
       });
   }
@@ -272,13 +274,13 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             this.loadPrompts(section, tab);
           });
         } else {
-          tab.error = response.message || 'Failed to load sections';
+          tab.error = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS');
           tab.loading = false;
         }
         this.cdr.markForCheck();
       })
       .catch(() => {
-        tab.error = 'Failed to load sections';
+        tab.error = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_SECTIONS');
         tab.loading = false;
         this.cdr.markForCheck();
       });
@@ -318,13 +320,13 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             this.checkAndLoadDatasetForEdit();
           }
         } else {
-          section.error = response.message || 'Failed to load prompts';
+          section.error = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS');
           section.loading = false;
         }
         this.cdr.markForCheck();
       })
       .catch(() => {
-        section.error = 'Failed to load prompts';
+        section.error = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_LOAD_PROMPTS');
         section.loading = false;
         this.cdr.markForCheck();
       });
@@ -438,13 +440,13 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
           this.showExecuteResult = false;
           this.showSqlResult = true;
         } else {
-          this.executeError = response.message || 'Failed to generate SQL';
+          this.executeError = response.message || this.translate.instant('QUERY_BUILDER_MODULE.FAILED_GENERATE_SQL');
           this.globalService.handleSuccessService(response, false);
         }
         this.cdr.markForCheck();
       })
       .catch(() => {
-        this.executeError = 'Failed to generate SQL';
+        this.executeError = this.translate.instant('QUERY_BUILDER_MODULE.FAILED_GENERATE_SQL');
         this.cdr.markForCheck();
       });
   }
@@ -500,7 +502,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
             rows: [],
             rowCount: 0,
             executionTime: `${Date.now() - startTime}ms`,
-            error: response.message || 'Query execution failed',
+            error: response.message || this.translate.instant('QUERY_BUILDER_MODULE.QUERY_FAILED'),
           };
           this.isExecutingQuery = false;
           this.showResultsPopup = true;
@@ -544,7 +546,7 @@ export class ExecuteQueryBuilderComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (error: any) => {
-        let errorMessage = 'Query execution failed';
+        let errorMessage = this.translate.instant('QUERY_BUILDER_MODULE.QUERY_FAILED');
         if (error.error?.message) {
           errorMessage = error.error.message;
         } else if (error.message) {

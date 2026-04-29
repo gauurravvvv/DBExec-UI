@@ -103,7 +103,7 @@ $radius-sm: 8px;
         &:focus {
           background: var(--card-background);
           border-color: var(--primary-color);
-          box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+          box-shadow: 0 0 0 2px var(--primary-color-transparent);
         }
 
         &::placeholder {
@@ -119,15 +119,15 @@ $radius-sm: 8px;
       padding: 0.65rem 1.25rem;
 
       &.p-button-primary {
-        background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
         border: none !important;
         color: white !important;
-        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        box-shadow: 0 4px 10px var(--primary-color-transparent);
         transition: all 0.2s ease;
 
         &:hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+          box-shadow: var(--shadow-md);
         }
       }
 
@@ -142,7 +142,7 @@ $radius-sm: 8px;
         }
 
         &:focus {
-          box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+          box-shadow: 0 0 0 2px var(--primary-color-transparent);
         }
       }
     }
@@ -339,7 +339,7 @@ $radius-sm: 8px;
         }
 
         &.locked {
-          color: #f59e0b;
+          color: var(--warning-color);
         }
       }
 
@@ -370,21 +370,21 @@ $radius-sm: 8px;
           }
 
           &.edit-btn:hover {
-            background: rgba(33, 150, 243, 0.1);
-            color: #2196f3;
+            background: var(--primary-color-transparent);
+            color: var(--primary-color);
           }
 
           &.delete-btn:hover {
-            background: rgba(244, 67, 54, 0.1);
+            background: var(--error-bg);
             color: var(--error-color);
           }
 
           &.unlock-btn {
-            color: #f59e0b;
+            color: var(--warning-color);
 
             &:hover {
-              background: rgba(245, 158, 11, 0.1);
-              color: #d97706;
+              background: var(--warning-bg);
+              color: var(--warning-color);
             }
           }
         }
@@ -416,7 +416,7 @@ $radius-sm: 8px;
 
           &.p-highlight {
             background: var(--primary-color);
-            color: #fff;
+            color: var(--primary-text);
           }
         }
       }
@@ -443,7 +443,7 @@ td.empty-message-cell {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -465,7 +465,7 @@ td.empty-message-cell {
     padding: 2rem;
     border-radius: $radius-lg;
     box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      var(--shadow-xl),
       0 0 0 1px var(--border-color);
     width: 100%;
     max-width: 420px;
@@ -494,7 +494,7 @@ td.empty-message-cell {
         align-items: center;
         justify-content: center;
         margin: 0 auto 1rem;
-        background: rgba(244, 67, 54, 0.1);
+        background: var(--error-bg);
 
         i {
           font-size: 1.5rem;
@@ -586,7 +586,7 @@ td.empty-message-cell {
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
           }
         }
 
@@ -633,12 +633,12 @@ td.empty-message-cell {
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, #f44336, #d32f2f);
-          color: white;
-          box-shadow: 0 4px 14px rgba(244, 67, 54, 0.35);
+          background: linear-gradient(135deg, var(--error-color), var(--error-color));
+          color: var(--primary-text);
+          box-shadow: 0 4px 14px var(--error-bg);
           &:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.45);
+            box-shadow: var(--shadow-md);
           }
           &:active {
             transform: translateY(0);

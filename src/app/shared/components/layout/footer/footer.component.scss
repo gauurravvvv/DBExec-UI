@@ -24,7 +24,7 @@
       90deg,
       transparent 0%,
       var(--primary-color) 30%,
-      rgba(33, 150, 243, 0.4) 70%,
+      var(--primary-color-transparent) 70%,
       transparent 100%
     );
     opacity: 0.6;
@@ -52,7 +52,7 @@
     letter-spacing: -0.3px;
 
     .highlight {
-      background: linear-gradient(135deg, var(--primary-color), #42a5f5);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;

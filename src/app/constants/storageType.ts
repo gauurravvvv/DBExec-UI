@@ -8,6 +8,7 @@ export enum StorageType {
   SAVED_CREDS = 'savedCredentials',
   SESSION_INACTIVITY_TIMEOUT = 'sessionInactivityTimeout',
   THEME = 'theme',
+  LOCALE = 'locale',
 }
 
 export enum SessionStorageType {

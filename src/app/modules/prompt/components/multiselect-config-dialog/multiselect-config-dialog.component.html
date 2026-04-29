@@ -4,7 +4,7 @@
   [style]="{ width: '800px' }"
   [draggable]="false"
   [resizable]="false"
-  header="Customise Multiselect"
+  [header]="'PROMPT_MODULE.CUSTOMISE_MULTISELECT' | translate"
   styleClass="multiselect-config-dialog"
   (onHide)="onClose()"
 >
@@ -13,7 +13,7 @@
     <div class="config-panel">
       <div class="panel-header">
         <i class="pi pi-cog"></i>
-        <span>Configuration Options</span>
+        <span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
       </div>
 
       <div class="config-form">
@@ -23,8 +23,8 @@
         <div class="config-group">
           <app-custom-input
             [(ngModel)]="config.placeholder"
-            label="Placeholder Text"
-            placeholder="e.g., Select options"
+            [label]="'PROMPT_MODULE.PLACEHOLDER_TEXT' | translate"
+            [placeholder]="'PROMPT_MODULE.PLACEHOLDER_OPTIONS_EXAMPLE' | translate"
           >
           </app-custom-input>
         </div>
@@ -33,7 +33,7 @@
         <div class="section-label"><i class="pi pi-eye"></i> Display</div>
 
         <div class="config-group">
-          <label>Display Mode</label>
+          <label>{{ 'PROMPT_MODULE.DISPLAY_MODE' | translate }}</label>
           <p-dropdown
             [options]="displayModes"
             [(ngModel)]="config.displayMode"
@@ -49,35 +49,35 @@
         <div class="config-group">
           <app-custom-input
             [(ngModel)]="config.maxSelectedLabels"
-            label="Max Labels Before Count"
+            [label]="'PROMPT_MODULE.MAX_LABELS_BEFORE_COUNT' | translate"
             placeholder="3"
             type="number"
           >
           </app-custom-input>
           <small class="hint"
-            >Show labels up to this count, then show "N items selected"</small
+            >{{ 'PROMPT_MODULE.MAX_LABELS_HINT' | translate }}</small
           >
         </div>
 
         <div class="config-group" *ngIf="config.displayMode === 'comma'">
           <app-custom-input
             [(ngModel)]="config.selectedItemsLabel"
-            label="Selected Items Label Template"
+            [label]="'PROMPT_MODULE.SELECTED_ITEMS_LABEL' | translate"
             [placeholder]="'{0} items selected'"
           >
           </app-custom-input>
           <small class="hint"
-            >Use <code>{{ '{0}' }}</code> as count placeholder</small
+            >{{ 'PROMPT_MODULE.SELECTED_ITEMS_HINT' | translate }} <code>{{ '{0}' }}</code></small
           >
         </div>
 
         <div class="config-row">
-          <label>Show Panel Header</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_PANEL_HEADER' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.showHeader"></p-inputSwitch>
         </div>
 
         <div class="config-row">
-          <label>Show Select All Checkbox</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_SELECT_ALL' | translate }}</label>
           <p-inputSwitch
             [(ngModel)]="config.showToggleAll"
             [disabled]="!config.showHeader"
@@ -94,7 +94,7 @@
           <div>
             <label style="display: block">Limit Max Selections</label>
             <small class="hint" style="margin: 0"
-              >Cap how many items can be selected</small
+              >{{ 'PROMPT_MODULE.LIMIT_SELECTIONS_HINT' | translate }}</small
             >
           </div>
           <p-inputSwitch
@@ -107,7 +107,7 @@
         <div class="config-group" *ngIf="limitEnabled">
           <app-custom-input
             [(ngModel)]="config.selectionLimit"
-            label="Selection Limit"
+            [label]="'PROMPT_MODULE.SELECTION_LIMIT' | translate"
             placeholder="5"
             type="number"
           >
@@ -118,13 +118,13 @@
         <div class="section-label"><i class="pi pi-search"></i> Filter</div>
 
         <div class="config-row">
-          <label>Enable Search Filter</label>
+          <label>{{ 'PROMPT_MODULE.ENABLE_SEARCH_FILTER' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.filter"></p-inputSwitch>
         </div>
 
         <ng-container *ngIf="config.filter">
           <div class="config-group">
-            <label>Filter Match Mode</label>
+            <label>{{ 'PROMPT_MODULE.FILTER_MATCH_MODE' | translate }}</label>
             <p-dropdown
               [options]="filterMatchModeOptions"
               [(ngModel)]="config.filterMatchMode"
@@ -137,7 +137,7 @@
           </div>
 
           <div class="config-row">
-            <label>Reset Filter on Close</label>
+            <label>{{ 'PROMPT_MODULE.RESET_FILTER_ON_CLOSE' | translate }}</label>
             <p-inputSwitch
               [(ngModel)]="config.resetFilterOnHide"
             ></p-inputSwitch>
@@ -148,7 +148,7 @@
         <div class="section-label"><i class="pi pi-list"></i> Panel</div>
 
         <div class="config-group">
-          <label>Panel Scroll Height</label>
+          <label>{{ 'PROMPT_MODULE.PANEL_SCROLL_HEIGHT' | translate }}</label>
           <p-dropdown
             [options]="scrollHeightOptions"
             [(ngModel)]="config.scrollHeight"
@@ -163,8 +163,8 @@
         <div class="config-group">
           <app-custom-input
             [(ngModel)]="config.emptyMessage"
-            label="Empty Message"
-            placeholder="e.g., No results found"
+            [label]="'PROMPT_MODULE.EMPTY_MESSAGE' | translate"
+            [placeholder]="'PROMPT_MODULE.EMPTY_MESSAGE_EXAMPLE' | translate"
           >
           </app-custom-input>
         </div>
@@ -172,8 +172,8 @@
         <div class="config-group" *ngIf="config.filter">
           <app-custom-input
             [(ngModel)]="config.emptyFilterMessage"
-            label="Empty Filter Message"
-            placeholder="e.g., No results found"
+            [label]="'PROMPT_MODULE.EMPTY_FILTER_MESSAGE' | translate"
+            [placeholder]="'PROMPT_MODULE.EMPTY_MESSAGE_EXAMPLE' | translate"
           >
           </app-custom-input>
         </div>
@@ -185,7 +185,7 @@
           <div>
             <label style="display: block">Virtual Scroll</label>
             <small class="hint" style="margin: 0"
-              >Recommended for 100+ options</small
+              >{{ 'PROMPT_MODULE.VIRTUAL_SCROLL_HINT' | translate }}</small
             >
           </div>
           <p-inputSwitch [(ngModel)]="config.virtualScroll"></p-inputSwitch>
@@ -194,7 +194,7 @@
         <div class="config-group" *ngIf="config.virtualScroll">
           <app-custom-input
             [(ngModel)]="config.virtualScrollItemSize"
-            label="Item Height (px)"
+            [label]="'PROMPT_MODULE.ITEM_HEIGHT' | translate"
             placeholder="38"
             type="number"
           >
@@ -204,7 +204,7 @@
       <div class="apply-preview-action">
         <button class="btn-primary" type="button" (click)="applyPreview()">
           <i class="pi pi-refresh"></i>
-          Apply Preview
+          {{ 'PROMPT_MODULE.APPLY_PREVIEW' | translate }}
         </button>
       </div>
     </div>
@@ -252,7 +252,7 @@
           <button
             pButton
             type="button"
-            label="Set as Defaults"
+            [label]="'PROMPT_MODULE.SET_AS_DEFAULTS' | translate"
             class="p-button-text p-button-sm"
             icon="pi pi-check"
             (click)="setAsDefaults()"
@@ -261,7 +261,7 @@
 
         <div class="preview-hint" *ngIf="formattedOptions.length === 0">
           <i class="pi pi-info-circle"></i>
-          <span>Add prompt values to see the multiselect preview</span>
+          <span>{{ 'PROMPT_MODULE.ADD_VALUES_MULTISELECT' | translate }}</span>
         </div>
 
         <div
@@ -270,7 +270,7 @@
         >
           <i class="pi pi-bookmark"></i>
           <div class="default-values">
-            <span>Default values:</span>
+            <span>{{ 'PROMPT_MODULE.DEFAULT_VALUES' | translate }}</span>
             <div class="default-chips">
               <span
                 class="default-chip"
@@ -285,30 +285,30 @@
             icon="pi pi-times"
             class="p-button-text p-button-rounded p-button-sm"
             (click)="clearDefaults()"
-            pTooltip="Clear defaults"
+            [pTooltip]="'PROMPT_MODULE.CLEAR_DEFAULTS' | translate"
           ></button>
         </div>
 
         <!-- Config Summary -->
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> Active Settings
+            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span class="summary-chip">{{
               previewConfig.displayMode === 'chip' ? 'Chips' : 'Comma'
             }}</span>
             <span class="summary-chip" *ngIf="previewConfig.filter"
-              >Filter ({{ previewConfig.filterMatchMode }})</span
+              >{{ 'PROMPT_MODULE.FILTER' | translate }} ({{ previewConfig.filterMatchMode }})</span
             >
             <span class="summary-chip" *ngIf="previewConfig.resetFilterOnHide"
-              >Auto-reset Filter</span
+              >{{ 'PROMPT_MODULE.AUTO_RESET_FILTER' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.showToggleAll"
               >Toggle All</span
             >
             <span class="summary-chip" *ngIf="!previewConfig.showHeader"
-              >No Header</span
+              >{{ 'PROMPT_MODULE.NO_HEADER' | translate }}</span
             >
             <span
               class="summary-chip"
@@ -316,7 +316,7 @@
               >Limit: {{ previewConfig.selectionLimit }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.virtualScroll"
-              >Virtual Scroll</span
+              >{{ 'PROMPT_MODULE.VIRTUAL_SCROLL' | translate }}</span
             >
             <span
               class="summary-chip"
@@ -332,11 +332,11 @@
   <ng-template pTemplate="footer">
     <button class="btn-cancel" type="button" (click)="onClose()">
       <i class="pi pi-times"></i>
-      Cancel
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
     <button class="btn-primary" type="button" (click)="onSave()">
       <i class="pi pi-check"></i>
-      Apply
+      {{ 'PROMPT_MODULE.APPLY' | translate }}
     </button>
   </ng-template>
 </p-dialog>

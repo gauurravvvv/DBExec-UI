@@ -5,13 +5,13 @@
         <button pButton class="p-button-text" routerLink="/app/query-builder">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Configure Query Builder</h2>
+        <h2>{{ 'QUERY_BUILDER_MODULE.CONFIG_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Clear Groups"
+          [label]="'QUERY_BUILDER_MODULE.CLEAR_GROUPS' | translate"
           class="p-button-outlined p-button-danger"
           (click)="clearAllGroups()"
           *ngIf="isFreeze && hasAnyGroups()"
@@ -21,7 +21,7 @@
         <button
           pButton
           type="button"
-          [label]="isFreeze ? 'Unlock' : 'Lock'"
+          [label]="isFreeze ? ('COMMON.UNLOCK' | translate) : ('COMMON.LOCK' | translate)"
           class="p-button-outlined"
           (click)="screenState()"
           *ngIf="hasSelectedPrompts()"
@@ -35,7 +35,7 @@
         <button
           pButton
           type="button"
-          [label]="hasExistingConfiguration() ? 'Cancel' : 'Clear'"
+          [label]="hasExistingConfiguration() ? ('COMMON.CANCEL' | translate) : ('COMMON.CLEAR' | translate)"
           class="p-button-outlined p-button-danger"
           (click)="handleCancelOrClear()"
           *ngIf="
@@ -53,7 +53,7 @@
           pButton
           class="p-button-outlined"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="saveQueryBuilderConfiguration()"
           *ngIf="hasSelectedPrompts() && isFreeze && hasChanges()"
         >
@@ -64,10 +64,10 @@
     <div class="screen-wrapper">
       <div class="sidebar" [class.collapsed]="isSidebarCollapsed">
         <div class="sidebar-content">
-          <div class="rotated-title" *ngIf="isSidebarCollapsed">T A B S</div>
+          <div class="rotated-title" *ngIf="isSidebarCollapsed">{{ 'QUERY_BUILDER_MODULE.TABS' | translate }}</div>
 
           <div class="sidebar-header" *ngIf="!isSidebarCollapsed">
-            <h3>Available Tabs</h3>
+            <h3>{{ 'QUERY_BUILDER_MODULE.AVAILABLE_TABS' | translate }}</h3>
           </div>
 
           <div class="tab-cards-container" *ngIf="!isSidebarCollapsed">
@@ -81,7 +81,7 @@
                 <div class="tab-info">
                   <span class="tab-name">{{ tab.name }}</span>
                   <span class="section-count"
-                    >- {{ tab?.sections?.length || 0 }} Section(s)</span
+                    >- {{ tab?.sections?.length || 0 }} {{ 'COMMON.SECTIONS' | translate }}</span
                   >
                 </div>
               </div>
@@ -91,7 +91,7 @@
           <div class="sidebar-footer" *ngIf="isFreeze && !isSidebarCollapsed">
             <div class="helper-note">
               <i class="pi pi-info-circle"></i>
-              <span>Unlock to modify</span>
+              <span>{{ 'QUERY_BUILDER_MODULE.UNLOCK_TO_MODIFY' | translate }}</span>
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@
 
       <div class="main-content" [class.expanded]="isSidebarCollapsed">
         <div class="helper-text-container" *ngIf="!openTabs.length">
-          <div class="helper-text">Click on tab to configure query builder</div>
+          <div class="helper-text">{{ 'QUERY_BUILDER_MODULE.CLICK_TAB_TO_CONFIGURE' | translate }}</div>
         </div>
 
         <div class="tab-container" *ngIf="openTabs.length">
@@ -245,7 +245,7 @@
                               [binary]="true"
                               (onChange)="toggleAllPrompts(section)"
                             ></p-checkbox>
-                            <span class="select-all-label">Include All</span>
+                            <span class="select-all-label">{{ 'COMMON.INCLUDE_ALL' | translate }}</span>
                           </div>
                         </div>
                       </div>
@@ -344,22 +344,22 @@
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">
-    <h3>Confirm</h3>
-    <p>Are you sure you want to revert to the previous configuration?</p>
+    <h3>{{ 'COMMON.CONFIRM' | translate }}</h3>
+    <p>{{ 'QUERY_BUILDER_MODULE.REVERT_CONFIRM' | translate }}</p>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeDialog()">No</button>
-      <button class="btn-confirm" (click)="clearSelected()">Yes</button>
+      <button class="btn-cancel" (click)="closeDialog()">{{ 'COMMON.NO' | translate }}</button>
+      <button class="btn-confirm" (click)="clearSelected()">{{ 'COMMON.YES' | translate }}</button>
     </div>
   </div>
 </div>
 
 <div class="confirmation-popup" *ngIf="showClearConfirm">
   <div class="popup-content">
-    <h3>Confirm</h3>
-    <p>Are you sure you want to clear all selections?</p>
+    <h3>{{ 'COMMON.CONFIRM' | translate }}</h3>
+    <p>{{ 'QUERY_BUILDER_MODULE.CLEAR_ALL_SELECTIONS' | translate }}</p>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="closeDialog()">No</button>
-      <button class="btn-confirm" (click)="clearAllSelections()">Yes</button>
+      <button class="btn-cancel" (click)="closeDialog()">{{ 'COMMON.NO' | translate }}</button>
+      <button class="btn-confirm" (click)="clearAllSelections()">{{ 'COMMON.YES' | translate }}</button>
     </div>
   </div>
 </div>

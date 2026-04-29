@@ -1,12 +1,11 @@
 <div class="login-container">
-  <!-- Left Section - Marketing Content -->
   <div class="marketing-section">
     <div class="brand mb-5">
       <i class="ci ci-app-icon mr-2"></i>
       <span>DBExec</span>
     </div>
-    <h1 class="headline">Authorize Your<br />CLI Access</h1>
-    <p class="subtitle">Powerful . Intuitive . Secure</p>
+    <h1 class="headline" [innerHTML]="'AUTH.HEADLINE_CLI' | translate"></h1>
+    <p class="subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
     <div class="features-grid">
       <div
         class="feature-item"
@@ -16,26 +15,23 @@
           <i class="pi pi-{{ feature.icon }}"></i>
         </div>
         <div class="feature-content">
-          <h3>{{ feature.title }}</h3>
-          <p>{{ feature.description }}</p>
+          <h3>{{ feature.titleKey | translate }}</h3>
+          <p>{{ feature.descKey | translate }}</p>
         </div>
       </div>
     </div>
-
     <div class="security-badge">
       <i class="pi pi-shield"></i>
-      Enterprise-Grade Security
+      {{ 'AUTH.SECURITY_BADGE' | translate }}
     </div>
   </div>
 
-  <!-- Right Section - Auth Content -->
   <div class="login-section">
     <div class="login-box">
-      <!-- Prompt State — Code Entry -->
       <ng-container *ngIf="pageState() === 'prompt'">
-        <h2>Authorize CLI</h2>
+        <h2>{{ 'AUTH.AUTHORIZE_CLI' | translate }}</h2>
         <p class="text-500 mb-4">
-          Enter the code from your terminal to grant access
+          {{ 'AUTH.ENTER_CODE_TERMINAL' | translate }}
         </p>
 
         <div class="code-input-wrapper">
@@ -60,15 +56,15 @@
 
         <div class="user-info" *ngIf="userName || userOrg">
           <div class="user-detail" *ngIf="userName">
-            <span class="label">User</span>
+            <span class="label">{{ 'AUTH.USER' | translate }}</span>
             <span class="value">{{ userName }}</span>
           </div>
           <div class="user-detail" *ngIf="userRole">
-            <span class="label">Role</span>
+            <span class="label">{{ 'AUTH.ROLE' | translate }}</span>
             <span class="value">{{ userRole }}</span>
           </div>
           <div class="user-detail" *ngIf="userOrg">
-            <span class="label">Organisation</span>
+            <span class="label">{{ 'AUTH.ORGANISATION' | translate }}</span>
             <span class="value">{{ userOrg }}</span>
           </div>
         </div>
@@ -77,7 +73,7 @@
           <button
             pButton
             type="button"
-            label="Authorize"
+            [label]="'AUTH.AUTHORIZE' | translate"
             icon="pi pi-check"
             class="p-button-lg authorize-btn"
             (click)="authorize()"
@@ -86,7 +82,7 @@
           <button
             pButton
             type="button"
-            label="Deny"
+            [label]="'AUTH.DENY' | translate"
             icon="pi pi-times"
             class="p-button-lg p-button-outlined deny-btn"
             (click)="deny()"
@@ -95,52 +91,47 @@
         </div>
       </ng-container>
 
-      <!-- Authorizing State -->
       <div *ngIf="pageState() === 'authorizing'" class="status-container">
         <i class="pi pi-spin pi-spinner status-icon status-icon-loading"></i>
-        <h2>Authorizing...</h2>
-        <p class="text-500">Transferring your session to the CLI</p>
+        <h2>{{ 'AUTH.AUTHORIZING' | translate }}</h2>
+        <p class="text-500">{{ 'AUTH.TRANSFERRING_SESSION' | translate }}</p>
       </div>
 
-      <!-- Success State -->
       <div *ngIf="pageState() === 'success'" class="status-container">
         <i class="pi pi-check-circle status-icon status-icon-success"></i>
-        <h2>Authorized</h2>
+        <h2>{{ 'AUTH.AUTHORIZED' | translate }}</h2>
         <p class="text-500">{{ message() }}</p>
         <p class="hint-text">
-          You can close this tab and return to your terminal.
+          {{ 'AUTH.CLOSE_TAB_HINT' | translate }}
         </p>
       </div>
 
-      <!-- Denied State -->
       <div *ngIf="pageState() === 'denied'" class="status-container">
         <i class="pi pi-ban status-icon status-icon-denied"></i>
-        <h2>Access Denied</h2>
+        <h2>{{ 'AUTH.ACCESS_DENIED' | translate }}</h2>
         <p class="text-500">{{ message() }}</p>
       </div>
 
-      <!-- Not Logged In State -->
       <div *ngIf="pageState() === 'not-logged-in'" class="status-container">
         <i class="pi pi-sign-in status-icon status-icon-expired"></i>
-        <h2>Not Logged In</h2>
+        <h2>{{ 'AUTH.NOT_LOGGED_IN' | translate }}</h2>
         <p class="text-500 mb-4">{{ message() }}</p>
         <button
           pButton
           type="button"
-          label="Go to Login"
+          [label]="'AUTH.GO_TO_LOGIN' | translate"
           [routerLink]="['/login']"
           [queryParams]="{ returnUrl: '/cli-auth' }"
           class="p-button-lg"
         ></button>
       </div>
 
-      <!-- Error State -->
       <div *ngIf="pageState() === 'error'" class="status-container">
         <i class="pi pi-exclamation-triangle status-icon status-icon-error"></i>
-        <h2>Something Went Wrong</h2>
+        <h2>{{ 'AUTH.SOMETHING_WENT_WRONG' | translate }}</h2>
         <p class="text-500">{{ message() }}</p>
         <a class="forgot-password status-link" routerLink="/login">
-          Back to Login
+          {{ 'AUTH.BACK_TO_LOGIN' | translate }}
         </a>
       </div>
     </div>

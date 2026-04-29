@@ -6,7 +6,7 @@
   .p-dialog {
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px var(--overlay-background);
   }
 
   .p-dialog-header {
@@ -62,7 +62,7 @@
         background: var(--card-background);
         border: 1px solid var(--border-color);
         color: var(--text-color);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-sm);
         &:hover {
           background: var(--hover-background);
           transform: translateY(-1px);
@@ -70,12 +70,12 @@
       }
 
       &.btn-primary {
-        background: linear-gradient(135deg, #2196f3, #1976d2);
-        color: white;
-        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        color: var(--primary-text);
+        box-shadow: 0 4px 10px var(--primary-color-transparent);
         &:hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+          box-shadow: var(--shadow-md);
         }
       }
     }
@@ -174,16 +174,16 @@
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    background: linear-gradient(135deg, #2196f3, #1976d2);
-    color: white;
-    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--primary-text);
+    box-shadow: 0 4px 10px var(--primary-color-transparent);
 
     i {
       font-size: 0.9rem;
     }
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+      box-shadow: var(--shadow-md);
     }
   }
 }
@@ -312,7 +312,7 @@
 
         .default-chip {
           background: var(--success-color, #22c55e);
-          color: white;
+          color: var(--primary-text);
           padding: 0.25rem 0.5rem;
           border-radius: 4px;
           font-size: 0.8125rem;
@@ -662,7 +662,7 @@
       &:hover {
         background: var(--primary-color);
         border-color: var(--primary-color);
-        color: white;
+        color: var(--primary-text);
       }
     }
   }

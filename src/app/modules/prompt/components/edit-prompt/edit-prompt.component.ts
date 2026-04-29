@@ -17,6 +17,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SectionService } from 'src/app/modules/section/services/section.service';
+import { TranslateService } from '@ngx-translate/core';
 import { PromptService } from '../../services/prompt.service';
 
 @Component({
@@ -52,6 +53,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
     private messageService: MessageService,
     private sectionService: SectionService,
     private promptService: PromptService,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -157,13 +159,13 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const control = this.promptForm.get('name');
-    if (control?.errors?.['required']) return 'Prompt name is required';
+    if (control?.errors?.['required']) return this.translate.instant('PROMPT_MODULE.NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Prompt name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('PROMPT_MODULE.NAME_MIN', { min: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Prompt name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('PROMPT_MODULE.NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Prompt name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('PROMPT_MODULE.NAME_PATTERN');
     return '';
   }
 

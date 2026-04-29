@@ -81,6 +81,7 @@ export class OrganisationService {
         sesAccessKeyId,
         sesSecretAccessKey,
         sesFrom,
+        adminLocale,
       } = orgForm.value;
 
       const payload: any = {
@@ -94,6 +95,7 @@ export class OrganisationService {
         dbUsername,
         dbPassword,
         adminEmail,
+        adminLocale,
         maxLoginAttempts,
         accountLockDurationHours,
         passwordHistoryLimit,

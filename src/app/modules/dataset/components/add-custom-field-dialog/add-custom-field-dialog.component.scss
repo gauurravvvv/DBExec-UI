@@ -9,7 +9,7 @@ $radius-sm: 8px;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -30,7 +30,7 @@ $radius-sm: 8px;
     background: var(--card-background);
     border-radius: $radius-lg;
     box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      var(--shadow-xl),
       0 0 0 1px var(--border-color);
     width: calc(100vw - 60px);
     height: calc(100vh - 60px);
@@ -163,7 +163,7 @@ $radius-sm: 8px;
             border-color: var(--primary-color);
             outline: none;
             background: var(--card-background);
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
           }
         }
       }
@@ -275,7 +275,7 @@ $radius-sm: 8px;
       &:hover,
       &.selected {
         border-color: var(--primary-color);
-        background: rgba(var(--primary-rgb), 0.05);
+        background: var(--primary-color-transparent);
       }
 
       &.custom-field {
@@ -344,7 +344,7 @@ $radius-sm: 8px;
           background: var(--card-background);
           border-color: var(--primary-color);
           outline: none;
-          box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+          box-shadow: 0 0 0 2px var(--primary-color-transparent);
         }
       }
 
@@ -377,7 +377,7 @@ $radius-sm: 8px;
 
           &:focus-within {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
           }
 
           .formula-editor {
@@ -431,7 +431,7 @@ $radius-sm: 8px;
             &:focus {
               border-color: var(--primary-color);
               outline: none;
-              box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+              box-shadow: 0 0 0 2px var(--primary-color-transparent);
             }
           }
         }
@@ -470,15 +470,15 @@ $radius-sm: 8px;
           }
 
           &.valid {
-            background: rgba(76, 175, 80, 0.1);
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            color: #4caf50;
+            background: var(--success-bg);
+            border: 1px solid var(--success-bg);
+            color: var(--success-color);
           }
 
           &.invalid {
-            background: rgba(244, 67, 54, 0.1);
-            border: 1px solid rgba(244, 67, 54, 0.3);
-            color: #f44336;
+            background: var(--error-bg);
+            border: 1px solid var(--error-bg);
+            color: var(--error-color);
           }
         }
       }
@@ -533,7 +533,7 @@ $radius-sm: 8px;
         color: var(--primary-color) !important;
 
         &:hover:not(:disabled) {
-          background: rgba(var(--primary-rgb), 0.08) !important;
+          background: var(--primary-color-transparent) !important;
         }
       }
 
@@ -541,11 +541,11 @@ $radius-sm: 8px;
         background: var(--primary-color) !important;
         color: white !important;
         border: none !important;
-        box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.3);
+        box-shadow: 0 4px 14px var(--primary-color-transparent);
 
         &:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.4);
+          box-shadow: 0 6px 20px var(--primary-color-transparent);
         }
 
         &:active:not(:disabled) {
@@ -649,7 +649,7 @@ $radius-sm: 8px;
       &:hover,
       &.selected {
         border-color: var(--primary-color);
-        background: rgba(var(--primary-rgb), 0.05);
+        background: var(--primary-color-transparent);
       }
 
       .function-name {

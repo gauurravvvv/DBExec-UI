@@ -9,7 +9,7 @@
   background-color: var(--background-color);
   overflow: hidden;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 // ===================================================================
@@ -492,7 +492,7 @@
 
       i.pi-folder {
         font-size: 14px;
-        color: #ff9800;
+        color: var(--warning-color);
       }
 
       .schema-name {
@@ -702,7 +702,7 @@
 
   &:not(:disabled):hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px var(--overlay-background);
   }
 
   &:not(:disabled):active {
@@ -977,7 +977,7 @@
 
       &.view-btn {
         background: var(--primary-color);
-        color: #fff;
+        color: var(--primary-text);
 
         &:hover {
           opacity: 0.9;
@@ -1012,7 +1012,7 @@ $radius-sm: 8px;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
@@ -1034,7 +1034,7 @@ $radius-sm: 8px;
   background: var(--card-background);
   border-radius: $radius-lg;
   box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    var(--shadow-xl),
     0 0 0 1px var(--border-color);
   width: 90vw;
   max-width: 1200px;
@@ -1145,7 +1145,7 @@ $radius-sm: 8px;
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: rgba(244, 67, 54, 0.1);
+      background: var(--error-bg);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1211,7 +1211,7 @@ $radius-sm: 8px;
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: rgba(76, 175, 80, 0.1);
+      background: var(--success-bg);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1288,7 +1288,7 @@ $radius-sm: 8px;
             opacity: 0.8;
             font-family: monospace;
             padding: 1px 6px;
-            background: rgba(var(--primary-rgb), 0.08);
+            background: var(--primary-color-transparent);
             border-radius: 3px;
             cursor: default;
             white-space: nowrap;
@@ -1375,7 +1375,7 @@ $radius-sm: 8px;
 
         &:focus {
           border-color: var(--primary-color);
-          box-shadow: 0 0 0 1px rgba(33, 150, 243, 0.15);
+          box-shadow: 0 0 0 1px var(--primary-color-transparent);
         }
 
         &::placeholder {
@@ -1410,7 +1410,7 @@ $radius-sm: 8px;
 
           &.p-highlight {
             background: var(--primary-color);
-            color: #fff;
+            color: var(--primary-text);
           }
         }
       }
@@ -1531,18 +1531,18 @@ td.empty-message-cell {
   }
 
   .query-editor-wrapper {
-    background-color: white;
+    background-color: var(--card-background);
   }
 
   .results-table {
     thead th {
-      background-color: #f5f5f5;
-      color: black;
+      background-color: var(--hover-background);
+      color: var(--text-color);
     }
 
     tbody td {
-      color: black;
-      border: 1px solid #ddd;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
     }
   }
 }
@@ -1626,11 +1626,11 @@ td.empty-message-cell {
       }
 
       &.error {
-        border-color: #ef4444;
+        border-color: var(--error-color);
         animation: shake 0.3s ease;
 
         &:focus {
-          box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+          box-shadow: 0 0 0 2px var(--error-bg);
         }
       }
     }
@@ -1712,7 +1712,7 @@ td.empty-message-cell {
   background-color: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px var(--shadow-color);
   z-index: 10000;
   min-width: 160px;
   padding: 4px 0;
@@ -1758,7 +1758,7 @@ td.empty-message-cell {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--overlay-background);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1769,7 +1769,7 @@ td.empty-message-cell {
     padding: 24px;
     border-radius: 8px;
     width: 500px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px var(--shadow-color);
 
     .popup-header {
       display: flex;
@@ -1779,7 +1779,7 @@ td.empty-message-cell {
 
       .warning-icon {
         font-size: 24px;
-        color: var(--warning-color, #f59e0b);
+        color: var(--warning-color, var(--warning-color));
       }
 
       h3 {
@@ -1819,11 +1819,11 @@ td.empty-message-cell {
         }
 
         &.p-button-danger {
-          color: var(--danger-color, #ef4444);
-          border-color: var(--danger-color, #ef4444);
+          color: var(--danger-color, var(--error-color));
+          border-color: var(--danger-color, var(--error-color));
 
           &:hover {
-            background: rgba(239, 68, 68, 0.1);
+            background: var(--error-bg);
           }
         }
       }
@@ -1849,7 +1849,7 @@ td.empty-message-cell {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -1871,7 +1871,7 @@ td.empty-message-cell {
     padding: 2rem;
     border-radius: $radius-lg;
     box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      var(--shadow-xl),
       0 0 0 1px var(--border-color);
     width: 100%;
     max-width: 420px;
@@ -1900,7 +1900,7 @@ td.empty-message-cell {
         align-items: center;
         justify-content: center;
         margin: 0 auto 1rem;
-        background: rgba(33, 150, 243, 0.1);
+        background: var(--primary-color-transparent);
 
         i {
           font-size: 1.5rem;
@@ -1964,7 +1964,7 @@ td.empty-message-cell {
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
           }
         }
 
@@ -2011,12 +2011,12 @@ td.empty-message-cell {
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, #2196f3, #1976d2);
-          color: white;
-          box-shadow: 0 4px 14px rgba(33, 150, 243, 0.35);
+          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+          color: var(--primary-text);
+          box-shadow: 0 4px 14px var(--primary-color-transparent);
           &:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.45);
+            box-shadow: var(--shadow-md);
           }
           &:active {
             transform: translateY(0);

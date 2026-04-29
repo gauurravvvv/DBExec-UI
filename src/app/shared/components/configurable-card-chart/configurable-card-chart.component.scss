@@ -40,12 +40,12 @@
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   min-height: 80px;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-md);
   }
 
   &.animated {
@@ -90,7 +90,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 40px;
-  color: var(--text-color-secondary, #999);
+  color: var(--secondary-color);
   font-size: 0.875rem;
 }
 

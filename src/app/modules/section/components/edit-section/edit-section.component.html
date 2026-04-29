@@ -10,13 +10,13 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h2>Edit Section</h2>
+        <h2>{{ 'SECTION_MODULE.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty || isCancelClicked"
           (click)="onCancel()"
@@ -25,7 +25,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="sectionForm.invalid || !isFormDirty || saving()"
         >
@@ -41,8 +41,8 @@
         <div class="form-field">
           <app-custom-input
             formControlName="name"
-            label="Name"
-            placeholder="Enter name"
+            [label]="'COMMON.NAME' | translate"
+            [placeholder]="'COMMON.ENTER_NAME' | translate"
             icon="pi-box"
             [required]="true"
             [showError]="
@@ -60,8 +60,8 @@
         <div class="form-field">
           <app-custom-input
             formControlName="description"
-            label="Description"
-            placeholder="Enter description"
+            [label]="'COMMON.DESCRIPTION' | translate"
+            [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
             icon="pi-align-left"
           >
           </app-custom-input>
@@ -72,8 +72,8 @@
           *ngIf="showOrganisationDropdown"
           [ngModel]="selectedOrgName"
           [ngModelOptions]="{ standalone: true }"
-          label="Organisation"
-          placeholder="Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
+          [placeholder]="'COMMON.ORGANISATION' | translate"
           icon="pi-building"
           [inputDisabled]="true"
         >
@@ -83,8 +83,8 @@
         <app-custom-input
           [ngModel]="selectedDatasourceName"
           [ngModelOptions]="{ standalone: true }"
-          label="Datasource"
-          placeholder="Datasource"
+          [label]="'COMMON.DATASOURCE' | translate"
+          [placeholder]="'COMMON.DATASOURCE' | translate"
           icon="pi-database"
           [inputDisabled]="true"
         >
@@ -94,8 +94,8 @@
         <div class="form-field">
           <app-custom-dropdown
             formControlName="tab"
-            label="Tab"
-            placeholder="Select Tab"
+            [label]="'COMMON.TAB' | translate"
+            [placeholder]="'COMMON.SELECT_TAB' | translate"
             [options]="tabs"
             optionLabel="name"
             optionValue="id"
@@ -108,7 +108,7 @@
                 sectionForm.get('tab')?.touched
               )
             "
-            errorMessage="Tab is required"
+            [errorMessage]="'COMMON.TAB_REQUIRED' | translate"
           >
           </app-custom-dropdown>
         </div>
@@ -116,11 +116,11 @@
         <!-- Status -->
         <app-custom-toggle
           formControlName="status"
-          label="Status"
+          [label]="'COMMON.STATUS' | translate"
           [trueValue]="1"
           [falseValue]="0"
-          trueLabel="Active"
-          falseLabel="Inactive"
+          [trueLabel]="'COMMON.ACTIVE' | translate"
+          [falseLabel]="'COMMON.INACTIVE' | translate"
         >
         </app-custom-toggle>
       </div>
@@ -134,20 +134,20 @@
       <div class="popup-icon">
         <i class="pi pi-save"></i>
       </div>
-      <h3>Confirm Update</h3>
+      <h3>{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
     </div>
 
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to update this section?</p>
+      <p class="delete-intro">{{ 'SECTION_MODULE.UPDATE_CONFIRM' | translate }}</p>
 
       <div class="justification-section">
         <label for="saveJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="saveJustification"
           [(ngModel)]="saveJustification"
-          placeholder="Provide a reason for this update"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -158,7 +158,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelSave()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -166,7 +166,7 @@
         [disabled]="!saveJustification.trim()"
       >
         <i class="pi pi-check"></i>
-        Update
+        {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>
   </div>

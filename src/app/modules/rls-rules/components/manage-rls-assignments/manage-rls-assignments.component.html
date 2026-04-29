@@ -5,7 +5,7 @@
       <div class="popup-icon">
         <i class="pi pi-users"></i>
       </div>
-      <h3>Manage Assignments</h3>
+      <h3>{{ 'RLS.MANAGE_ASSIGNMENTS' | translate }}</h3>
       <p class="popup-subtitle">{{ rule?.name }}</p>
     </div>
 
@@ -17,8 +17,8 @@
           [options]="scopeOptions"
           optionLabel="label"
           optionValue="value"
-          label="Scope"
-          placeholder="Select Scope"
+          [label]="'RLS.SCOPE' | translate"
+          [placeholder]="'RLS.SELECT_SCOPE' | translate"
           [autoDisplayFirst]="false"
           (onChangeEvent)="onScopeChange($event)"
         ></app-custom-dropdown>
@@ -28,8 +28,8 @@
           [options]="scopeTargets"
           optionLabel="label"
           optionValue="value"
-          [label]="newScope === 'user' ? 'User' : 'Group'"
-          [placeholder]="newScope === 'user' ? 'Select User' : 'Select Group'"
+          [label]="newScope === 'user' ? ('RLS.USER' | translate) : ('RLS.GROUP' | translate)"
+          [placeholder]="newScope === 'user' ? ('RLS.SELECT_USER' | translate) : ('RLS.SELECT_GROUP' | translate)"
           [filter]="true"
           [autoDisplayFirst]="false"
           [disabled]="!newScope || scopeTargetsLoading"
@@ -41,7 +41,7 @@
           [disabled]="!newScope || !newScopeId || saving()"
         >
           <i class="pi pi-plus"></i>
-          {{ saving() ? 'Adding...' : 'Add Assignment' }}
+          {{ saving() ? ('RLS.ADDING' | translate) : ('RLS.ADD_ASSIGNMENT' | translate) }}
         </button>
       </div>
     </div>
@@ -49,13 +49,13 @@
     <!-- Assignments List -->
     <div class="assignments-list-section">
       <div class="section-label">
-        Current Assignments
+        {{ 'RLS.CURRENT_ASSIGNMENTS' | translate }}
         <span class="count-badge">{{ assignments().length }}</span>
       </div>
 
       <div class="loading-state" *ngIf="isLoadingAssignments">
         <i class="pi pi-spin pi-spinner"></i>
-        <span>Loading assignments...</span>
+        <span>{{ 'RLS.LOADING_ASSIGNMENTS' | translate }}</span>
       </div>
 
       <div
@@ -63,7 +63,7 @@
         *ngIf="!isLoadingAssignments && assignments().length === 0"
       >
         <i class="pi pi-users"></i>
-        <p>No assignments yet. Add users or groups above.</p>
+        <p>{{ 'RLS.NO_ASSIGNMENTS_ADD_MSG' | translate }}</p>
       </div>
 
       <div
@@ -85,7 +85,7 @@
           <button
             class="btn-remove"
             (click)="removeAssignment(a)"
-            pTooltip="Remove assignment"
+            [pTooltip]="'RLS.REMOVE_ASSIGNMENT' | translate"
             tooltipPosition="left"
             [disabled]="saving()"
           >
@@ -98,7 +98,7 @@
     <!-- Actions -->
     <div class="popup-actions">
       <button class="btn-cancel" (click)="close()">
-        <i class="pi pi-times"></i> Close
+        <i class="pi pi-times"></i> {{ 'COMMON.CLOSE' | translate }}
       </button>
     </div>
   </div>

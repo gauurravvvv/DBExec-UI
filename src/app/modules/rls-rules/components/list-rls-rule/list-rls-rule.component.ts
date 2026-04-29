@@ -18,6 +18,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 @Component({
@@ -54,8 +55,8 @@ export class ListRlsRuleComponent implements OnInit {
   showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
 
   statusOptions = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 },
+    { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
+    { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
   ];
 
   filterValues: any = {
@@ -83,6 +84,7 @@ export class ListRlsRuleComponent implements OnInit {
     private organisationService: OrganisationService,
     private router: Router,
     private globalService: GlobalService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {

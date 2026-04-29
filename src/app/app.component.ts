@@ -55,6 +55,9 @@ export class AppComponent implements OnInit, OnDestroy {
         document.body.classList.remove('light-theme');
       }
     }
+
+    const savedLocale = StorageService.get(StorageType.LOCALE);
+    this.translate.use(savedLocale || 'en');
   }
 
   ngOnInit(): void {

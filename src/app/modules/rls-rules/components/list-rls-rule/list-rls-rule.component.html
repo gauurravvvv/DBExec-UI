@@ -3,9 +3,9 @@
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>Row-Level Security Rules</h2>
+        <h2>{{ 'RLS.TITLE' | translate }}</h2>
         <p class="subtitle">
-          Manage RLS rules to control data access at the row level
+          {{ 'RLS.SUBTITLE' | translate }}
         </p>
       </div>
     </div>
@@ -22,7 +22,7 @@
               optionLabel="name"
               optionValue="id"
               [filter]="true"
-              label="Organisation"
+              [label]="'COMMON.ORGANISATION' | translate"
               [floatingLabel]="true"
               filterBy="name"
               (onChangeEvent)="onOrgChange($event)"
@@ -38,11 +38,11 @@
               optionLabel="name"
               optionValue="id"
               [filter]="true"
-              label="Datasource"
+              [label]="'COMMON.DATASOURCE' | translate"
               [floatingLabel]="true"
               filterBy="name"
               [autoDisplayFirst]="false"
-              placeholder="Select Datasource"
+              [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
               (onChangeEvent)="onDatasourceChange($event)"
             >
             </app-custom-dropdown>
@@ -53,7 +53,7 @@
           <!-- Clear Filters Button -->
           <button
             pButton
-            label="Clear"
+            [label]="'COMMON.CLEAR' | translate"
             icon="pi pi-filter-slash"
             (click)="clearFilters()"
             [disabled]="!isFilterActive"
@@ -63,7 +63,7 @@
           <!-- Add Button -->
           <button
             pButton
-            label="Add Rule"
+            [label]="'RLS.ADD_RULE' | translate"
             icon="pi pi-plus"
             (click)="onAddNewRule()"
             class="p-button-raised p-button-primary modern-button"
@@ -93,19 +93,19 @@
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 22%" pFrozenColumn>
-                <div class="th-content">Name</div>
+                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
               </th>
               <th style="width: 18%">
-                <div class="th-content">Dataset</div>
+                <div class="th-content">{{ 'RLS.DATASET' | translate }}</div>
               </th>
               <th style="width: 32%">
-                <div class="th-content">Conditions</div>
+                <div class="th-content">{{ 'RLS.CONDITIONS' | translate }}</div>
               </th>
               <th style="width: 12%">
-                <div class="th-content">Status</div>
+                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
               <th style="width: 16%">
-                <div class="th-content">Actions</div>
+                <div class="th-content">{{ 'COMMON.ACTIONS' | translate }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -114,14 +114,14 @@
                 <app-custom-input
                   [(ngModel)]="filterValues.name"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search Name"
+                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
                 ></app-custom-input>
               </th>
               <th>
                 <app-custom-input
                   [(ngModel)]="filterValues.datasetName"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search Dataset"
+                  [placeholder]="'RLS.SEARCH_DATASET' | translate"
                 ></app-custom-input>
               </th>
               <th>
@@ -133,7 +133,7 @@
                   [options]="statusOptions"
                   optionLabel="label"
                   optionValue="value"
-                  placeholder="All"
+                  [placeholder]="'COMMON.ALL' | translate"
                   [showClear]="true"
                   [filter]="false"
                   [autoDisplayFirst]="false"
@@ -167,8 +167,7 @@
                   *ngIf="rule.conditions?.length; else noConds"
                 >
                   <span class="conditions-count-badge">
-                    {{ rule.conditions.length }}
-                    condition{{ rule.conditions.length !== 1 ? 's' : '' }}
+                    {{ 'RLS.CONDITION_COUNT' | translate: { count: rule.conditions.length } }}
                   </span>
                   <ng-container
                     *ngFor="
@@ -183,7 +182,7 @@
                     </span>
                   </ng-container>
                   <span class="more-conds" *ngIf="rule.conditions.length > 2">
-                    +{{ rule.conditions.length - 2 }} more
+                    {{ 'RLS.MORE_CONDITIONS' | translate: { count: rule.conditions.length - 2 } }}
                   </span>
                 </div>
                 <ng-template #noConds><span>-</span></ng-template>
@@ -197,7 +196,7 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{ rule.status === 1 ? 'Active' : 'Inactive' }}
+                  {{ rule.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
                 </span>
               </td>
               <td>
@@ -205,7 +204,7 @@
                   <button
                     class="icon-btn edit-btn"
                     [routerLink]="['/app/rls-rules/view', selectedOrg, rule.id]"
-                    pTooltip="View"
+                    [pTooltip]="'COMMON.VIEW' | translate"
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-eye"></i>
@@ -213,7 +212,7 @@
                   <button
                     class="icon-btn edit-btn"
                     (click)="onEdit(rule)"
-                    pTooltip="Edit"
+                    [pTooltip]="'COMMON.EDIT' | translate"
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-pencil"></i>
@@ -221,7 +220,7 @@
                   <button
                     class="icon-btn assign-btn"
                     (click)="onManageAssignments(rule)"
-                    pTooltip="Manage Assignments"
+                    [pTooltip]="'RLS.MANAGE_ASSIGNMENTS' | translate"
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-users"></i>
@@ -229,7 +228,7 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(rule.id)"
-                    pTooltip="Delete"
+                    [pTooltip]="'COMMON.DELETE' | translate"
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-trash"></i>
@@ -242,10 +241,10 @@
             <tr>
               <td colspan="5" class="empty-message-cell text-center">
                 <span *ngIf="!selectedDatasource"
-                  >Please select a datasource to view RLS rules</span
+                  >{{ 'RLS.SELECT_DATASOURCE_MSG' | translate }}</span
                 >
                 <span *ngIf="selectedDatasource"
-                  >No RLS rules found for this datasource</span
+                  >{{ 'RLS.NO_RULES_FOUND' | translate }}</span
                 >
               </td>
             </tr>
@@ -270,39 +269,36 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to delete this RLS rule?</p>
+      <p class="delete-intro">{{ 'RLS.DELETE_SINGLE' | translate }}</p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>Row-level security filtering will be removed</span>
+          <span>{{ 'RLS.DELETE_INFO_FILTERING' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span
-            >Affected users/groups will have unrestricted access to this
-            data</span
-          >
+          <span>{{ 'RLS.DELETE_INFO_UNRESTRICTED' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this action"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -314,7 +310,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -322,7 +318,7 @@
         [disabled]="!deleteJustification.trim()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

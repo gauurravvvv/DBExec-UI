@@ -14,8 +14,8 @@ $radius-sm: 8px;
   background: var(--card-background);
   border-radius: $radius-lg;
   box-shadow:
-    0 4px 20px -5px rgba(0, 0, 0, 0.08),
-    0 2px 8px -2px rgba(0, 0, 0, 0.04);
+    0 4px 20px -5px var(--shadow-color),
+    var(--shadow-sm);
   border: 1px solid var(--border-color);
   overflow: hidden;
   overflow-y: auto;
@@ -104,23 +104,23 @@ $radius-sm: 8px;
         background: var(--card-background);
         border: 1px solid var(--border-color);
         color: var(--text-color);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-sm);
 
         &:hover {
           background: var(--hover-background);
           transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+          box-shadow: var(--shadow-md);
         }
       }
 
       &.btn-primary {
-        background: linear-gradient(135deg, #2196f3, #1976d2);
-        color: white;
-        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        color: var(--primary-text);
+        box-shadow: 0 4px 10px var(--primary-color-transparent);
 
         &:hover:not(:disabled) {
           transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+          box-shadow: var(--shadow-md);
         }
 
         &:disabled {
@@ -132,13 +132,13 @@ $radius-sm: 8px;
       }
 
       &.btn-danger {
-        background: linear-gradient(135deg, #f44336, #d32f2f);
-        color: white;
-        box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+        background: linear-gradient(135deg, var(--error-color), var(--error-color));
+        color: var(--primary-text);
+        box-shadow: 0 4px 10px var(--error-bg);
 
         &:hover:not(:disabled) {
           transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+          box-shadow: var(--shadow-md);
         }
 
         &:disabled {
@@ -210,9 +210,9 @@ $radius-sm: 8px;
       align-items: center;
       justify-content: center;
       font-size: 3rem;
-      color: white;
+      color: var(--primary-text);
       margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 8px 24px var(--shadow-color);
       border: 4px solid var(--card-background);
       outline: 1px solid var(--border-color);
     }
@@ -245,15 +245,15 @@ $radius-sm: 8px;
       border: 1px solid var(--border-color);
 
       &.active {
-        background: rgba(76, 175, 80, 0.1);
+        background: var(--success-bg);
         color: var(--success-color);
-        border: 1px solid rgba(76, 175, 80, 0.2);
+        border: 1px solid var(--success-bg);
       }
 
       &.locked {
-        background: rgba(245, 158, 11, 0.1);
-        color: #f59e0b;
-        border: 1px solid rgba(245, 158, 11, 0.2);
+        background: var(--warning-bg);
+        color: var(--warning-color);
+        border: 1px solid var(--warning-bg);
       }
     }
 
@@ -270,17 +270,17 @@ $radius-sm: 8px;
       gap: 4px;
       padding: 6px 14px;
       border-radius: 99px;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      background: rgba(245, 158, 11, 0.1);
-      color: #f59e0b;
+      border: 1px solid var(--warning-bg);
+      background: var(--warning-bg);
+      color: var(--warning-color);
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
 
       &:hover {
-        background: rgba(245, 158, 11, 0.2);
-        color: #d97706;
+        background: var(--warning-bg);
+        color: var(--warning-color);
       }
 
       i {
@@ -400,7 +400,7 @@ $radius-sm: 8px;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -422,7 +422,7 @@ $radius-sm: 8px;
     padding: 2rem;
     border-radius: $radius-lg;
     box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      var(--shadow-xl),
       0 0 0 1px var(--border-color);
     width: 100%;
     max-width: 420px;
@@ -451,7 +451,7 @@ $radius-sm: 8px;
         align-items: center;
         justify-content: center;
         margin: 0 auto 1rem;
-        background: rgba(244, 67, 54, 0.1);
+        background: var(--error-bg);
 
         i {
           font-size: 1.5rem;
@@ -561,7 +561,7 @@ $radius-sm: 8px;
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
           }
         }
 
@@ -608,12 +608,12 @@ $radius-sm: 8px;
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, #f44336, #d32f2f);
-          color: white;
-          box-shadow: 0 4px 14px rgba(244, 67, 54, 0.35);
+          background: linear-gradient(135deg, var(--error-color), var(--error-color));
+          color: var(--primary-text);
+          box-shadow: 0 4px 14px var(--error-bg);
           &:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.45);
+            box-shadow: var(--shadow-md);
           }
           &:active {
             transform: translateY(0);
@@ -653,7 +653,7 @@ $radius-sm: 8px;
       color: var(--primary-color) !important;
 
       &:hover:not(:disabled) {
-        background: rgba(var(--primary-rgb), 0.04) !important;
+        background: var(--primary-color-transparent) !important;
       }
 
       &:disabled {

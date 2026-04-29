@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 
 @Injectable({
@@ -6,14 +6,14 @@ import { Subject } from 'rxjs';
 })
 export class UnsavedChangesService {
   private confirmSubject = new Subject<boolean>();
-  showDialog = false;
+  showDialog = signal(false);
 
   confirm(): Promise<boolean> {
-    this.showDialog = true;
+    this.showDialog.set(true);
     return new Promise<boolean>(resolve => {
       const sub = this.confirmSubject.subscribe(result => {
         sub.unsubscribe();
-        this.showDialog = false;
+        this.showDialog.set(false);
         resolve(result);
       });
     });

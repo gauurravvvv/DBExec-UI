@@ -3,8 +3,8 @@
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>Sections</h2>
-        <p class="subtitle">Group prompts logically within tabs</p>
+        <h2>{{ 'SECTION_MODULE.TITLE' | translate }}</h2>
+        <p class="subtitle">{{ 'SECTION_MODULE.SUBTITLE' | translate }}</p>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
               optionLabel="name"
               optionValue="id"
               [filter]="true"
-              label="Organisation"
+              [label]="'COMMON.ORGANISATION' | translate"
               [floatingLabel]="true"
               filterBy="name"
               (onChangeEvent)="onOrgChange($event)"
@@ -37,7 +37,7 @@
               optionValue="id"
               [filter]="true"
               [floatingLabel]="true"
-              label="Datasource"
+              [label]="'COMMON.DATASOURCE' | translate"
               filterBy="name"
               (onChangeEvent)="onDBChange($event)"
             >
@@ -50,7 +50,7 @@
           <button
             *ngIf="selectedCount > 0"
             pButton
-            [label]="'Delete (' + selectedCount + ')'"
+            [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
             icon="pi pi-trash"
             (click)="confirmBulkDelete()"
             class="p-button-raised p-button-danger modern-button mr-2"
@@ -59,7 +59,7 @@
           <!-- Clear Filters Button -->
           <button
             pButton
-            label="Clear"
+            [label]="'COMMON.CLEAR' | translate"
             icon="pi pi-filter-slash"
             (click)="clearFilters()"
             [disabled]="!isFilterActive"
@@ -69,7 +69,7 @@
           <!-- Add Button -->
           <button
             pButton
-            label="Add"
+            [label]="'COMMON.ADD' | translate"
             icon="pi pi-plus"
             (click)="onAddNewSection()"
             class="p-button-raised p-button-primary modern-button"
@@ -106,25 +106,25 @@
                 <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
               </th>
               <th style="width: 12rem" pFrozenColumn>
-                <div class="th-content">Name</div>
+                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
               </th>
               <th style="width: 16rem">
-                <div class="th-content">Description</div>
+                <div class="th-content">{{ 'COMMON.DESCRIPTION' | translate }}</div>
               </th>
               <th style="width: 10rem">
-                <div class="th-content">Tab</div>
+                <div class="th-content">{{ 'COMMON.TAB' | translate }}</div>
               </th>
               <th style="width: 7rem">
-                <div class="th-content">Prompts</div>
+                <div class="th-content">{{ 'COMMON.PROMPTS' | translate }}</div>
               </th>
               <th style="width: 7rem">
-                <div class="th-content">Status</div>
+                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
               <th style="width: 10rem">
-                <div class="th-content">Created On</div>
+                <div class="th-content">{{ 'COMMON.CREATED_ON' | translate }}</div>
               </th>
               <th style="width: 6rem">
-                <div class="th-content">Actions</div>
+                <div class="th-content">{{ 'COMMON.ACTIONS' | translate }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -134,21 +134,21 @@
                 <app-custom-input
                   [(ngModel)]="filterValues.name"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search Name"
+                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
                 ></app-custom-input>
               </th>
               <th>
                 <app-custom-input
                   [(ngModel)]="filterValues.description"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search Description"
+                  [placeholder]="'COMMON.SEARCH_DESCRIPTION' | translate"
                 ></app-custom-input>
               </th>
               <th>
                 <app-custom-input
                   [(ngModel)]="filterValues.tabName"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search Tab"
+                  [placeholder]="'COMMON.SEARCH_TAB' | translate"
                 ></app-custom-input>
               </th>
               <th>
@@ -160,7 +160,7 @@
                   [options]="statusOptions"
                   optionLabel="label"
                   optionValue="value"
-                  placeholder="All"
+                  [placeholder]="'COMMON.ALL' | translate"
                   [showClear]="true"
                   [filter]="false"
                   [autoDisplayFirst]="false"
@@ -171,7 +171,7 @@
               <th>
                 <app-custom-daterange
                   [(ngModel)]="filterValues.createdDateRange"
-                  placeholder="Select range"
+                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
                   [showButtonBar]="true"
                   [maxDate]="today"
                   (onChangeEvent)="onCreatedDateRangeChange($event)"
@@ -202,7 +202,7 @@
               </td>
               <td>
                 <span class="tab-badge">
-                  {{ section.tab?.name || 'N/A' }}
+                  {{ section.tab?.name || ('COMMON.NA' | translate) }}
                 </span>
               </td>
               <td>
@@ -211,7 +211,7 @@
                     class="pi pi-list"
                     style="font-size: 0.8rem; margin-right: 4px"
                   ></i>
-                  {{ section.prompts?.length || 0 }} prompts
+                  {{ 'SECTION_MODULE.PROMPTS_COUNT' | translate: { count: section.prompts?.length || 0 } }}
                 </span>
               </td>
               <td>
@@ -223,7 +223,7 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{ section.status === 1 ? 'Active' : 'Inactive' }}
+                  {{ section.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
                 </span>
               </td>
               <td>
@@ -236,7 +236,7 @@
                   <button
                     class="icon-btn edit-btn"
                     (click)="onEdit(section.id)"
-                    pTooltip="Edit"
+                    [pTooltip]="'COMMON.EDIT' | translate"
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-pencil"></i>
@@ -244,7 +244,7 @@
                   <button
                     class="icon-btn delete-btn"
                     (click)="confirmDelete(section.id)"
-                    pTooltip="Delete"
+                    [pTooltip]="'COMMON.DELETE' | translate"
                     tooltipPosition="bottom"
                   >
                     <i class="pi pi-trash"></i>
@@ -256,7 +256,7 @@
           <ng-template pTemplate="emptymessage">
             <tr>
               <td colspan="8" class="empty-message-cell text-center">
-                No such record found
+                {{ 'COMMON.NO_RECORD_FOUND' | translate }}
               </td>
             </tr>
           </ng-template>
@@ -273,38 +273,36 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
       <p class="delete-intro" *ngIf="!bulkDelete">
-        Are you sure you want to delete this section?
+        {{ 'SECTION_MODULE.DELETE_SINGLE' | translate }}
       </p>
-      <p class="delete-intro" *ngIf="bulkDelete">
-        Are you sure you want to delete
-        <strong>{{ selectedCount }}</strong> selected section(s)?
+      <p class="delete-intro" *ngIf="bulkDelete" [innerHTML]="'SECTION_MODULE.DELETE_BULK' | translate: { count: selectedCount }">
       </p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>All associated prompts will be removed</span>
+          <span>{{ 'SECTION_MODULE.DELETE_INFO_PROMPTS' | translate }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this action"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -316,7 +314,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -324,7 +322,7 @@
         [disabled]="!deleteJustification.trim()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

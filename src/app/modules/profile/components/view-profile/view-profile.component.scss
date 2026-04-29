@@ -11,8 +11,8 @@ $radius-sm: 8px;
   background: var(--card-background);
   border-radius: $radius-lg;
   box-shadow:
-    0 4px 20px -5px rgba(0, 0, 0, 0.08),
-    0 2px 8px -2px rgba(0, 0, 0, 0.04);
+    0 4px 20px -5px var(--shadow-color),
+    var(--shadow-sm);
   border: 1px solid var(--border-color);
   overflow: hidden;
   overflow-y: auto;
@@ -90,12 +90,12 @@ $radius-sm: 8px;
         background: var(--card-background);
         border: 1px solid var(--border-color);
         color: var(--text-color);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-sm);
 
         &:hover {
           background: var(--hover-background);
           transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+          box-shadow: var(--shadow-md);
         }
       }
     }
@@ -154,9 +154,9 @@ $radius-sm: 8px;
       align-items: center;
       justify-content: center;
       font-size: 3rem;
-      color: white;
+      color: var(--primary-text);
       margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 8px 24px var(--shadow-color);
       border: 4px solid var(--card-background);
       outline: 1px solid var(--border-color);
     }
@@ -189,15 +189,15 @@ $radius-sm: 8px;
       border: 1px solid var(--border-color);
 
       &.active {
-        background: rgba(76, 175, 80, 0.1);
+        background: var(--success-bg);
         color: var(--success-color);
-        border: 1px solid rgba(76, 175, 80, 0.2);
+        border: 1px solid var(--success-bg);
       }
 
       &.locked {
-        background: rgba(245, 158, 11, 0.1);
-        color: #f59e0b;
-        border: 1px solid rgba(245, 158, 11, 0.2);
+        background: var(--warning-bg);
+        color: var(--warning-color);
+        border: 1px solid var(--warning-bg);
       }
     }
 

@@ -21,6 +21,7 @@ import { RLS_RULE } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
+import { TranslateService } from '@ngx-translate/core';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 function nonEmptyArray(control: AbstractControl): ValidationErrors | null {
@@ -75,6 +76,7 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     private globalService: GlobalService,
     private rlsRulesService: RlsRulesService,
     private datasetService: DatasetService,
+    private translate: TranslateService,
   ) {}
 
   hasUnsavedChanges(): boolean {
@@ -338,13 +340,13 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const control = this.rlsForm.get('name');
-    if (control?.errors?.['required']) return 'Rule name is required';
+    if (control?.errors?.['required']) return this.translate.instant('RLS.NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('RLS.NAME_MIN', { min: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('RLS.NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('RLS.NAME_PATTERN');
     return '';
   }
 }

@@ -92,7 +92,7 @@ app-custom-daterange {
 .p-datepicker.custom-daterange-panel {
   background: var(--card-background) !important;
   border: 1px solid var(--border-color) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: var(--shadow-md) !important;
   padding: 0.5rem;
   font-size: 0.85rem;
 
@@ -161,7 +161,7 @@ app-custom-daterange {
 
         &.p-highlight {
           background: var(--primary-color) !important;
-          color: white !important;
+          color: var(--primary-text) !important;
         }
       }
 
@@ -172,7 +172,7 @@ app-custom-daterange {
 
           &.p-highlight {
             background: var(--primary-color) !important;
-            color: white !important;
+            color: var(--primary-text) !important;
           }
         }
       }
@@ -226,7 +226,7 @@ app-custom-daterange {
 
       &.p-highlight {
         background: var(--primary-color) !important;
-        color: white !important;
+        color: var(--primary-text) !important;
       }
     }
   }

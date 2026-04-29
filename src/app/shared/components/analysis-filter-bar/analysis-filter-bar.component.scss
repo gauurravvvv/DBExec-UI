@@ -70,13 +70,13 @@
   }
 
   .btn-apply {
-    background: linear-gradient(135deg, #2196f3, #1976d2);
-    color: white;
-    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--primary-text);
+    box-shadow: 0 4px 10px var(--primary-color-transparent);
 
     &:hover:not(:disabled) {
       transform: translateY(-1px);
-      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+      box-shadow: 0 6px 15px var(--primary-color-transparent);
     }
   }
 
@@ -84,12 +84,12 @@
     background: var(--card-background);
     border: 1px solid var(--border-color);
     color: var(--text-color);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 
     &:hover:not(:disabled) {
       background: var(--hover-background);
       transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: var(--shadow-md);
     }
   }
 }
