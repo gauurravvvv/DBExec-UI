@@ -222,19 +222,19 @@
     "SYSTEM": "Sistema",
     "LAST_LOGIN": "Último acceso",
     "LOADING_PROFILE": "Cargando perfil...",
-    "ROLE_SYSTEM_ADMIN": "Superadministrador",
+    "ROLE_SYSTEM_ADMIN": "Administrador del sistema",
     "ROLE_ORG_ADMIN": "Administrador de organización",
     "ROLE_ORG_USER": "Usuario"
   },
   "SYSTEM_ADMIN": {
-    "TITLE": "Superadministradores",
+    "TITLE": "Administradores del sistema",
     "SUBTITLE": "Gestionar propietarios del sistema con acceso completo a la plataforma y control de organizaciones",
-    "ADD_TITLE": "Agregar superadministrador",
-    "EDIT_TITLE": "Editar superadministrador",
-    "VIEW_TITLE": "Detalles del superadministrador",
-    "DELETE_SINGLE": "¿Está seguro de que desea eliminar este superadministrador?",
-    "DELETE_BULK": "¿Está seguro de que desea eliminar <strong>{{count}}</strong> superadministrador(es) seleccionado(s)?",
-    "UPDATE_CONFIRM": "¿Está seguro de que desea actualizar este superadministrador?"
+    "ADD_TITLE": "Agregar administrador del sistema",
+    "EDIT_TITLE": "Editar administrador del sistema",
+    "VIEW_TITLE": "Detalles del administrador del sistema",
+    "DELETE_SINGLE": "¿Está seguro de que desea eliminar este administrador del sistema?",
+    "DELETE_BULK": "¿Está seguro de que desea eliminar <strong>{{count}}</strong> administrador del sistema(es) seleccionado(s)?",
+    "UPDATE_CONFIRM": "¿Está seguro de que desea actualizar este administrador del sistema?"
   },
   "ORG": {
     "TITLE": "Organizaciones",

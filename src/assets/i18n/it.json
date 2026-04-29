@@ -222,19 +222,19 @@
     "SYSTEM": "Sistema",
     "LAST_LOGIN": "Ultimo accesso",
     "LOADING_PROFILE": "Caricamento profilo...",
-    "ROLE_SYSTEM_ADMIN": "Super amministratore",
+    "ROLE_SYSTEM_ADMIN": "Amministratore di sistema",
     "ROLE_ORG_ADMIN": "Amministratore organizzazione",
     "ROLE_ORG_USER": "Utente"
   },
   "SYSTEM_ADMIN": {
-    "TITLE": "Super amministratori",
+    "TITLE": "Amministratori di sistema",
     "SUBTITLE": "Gestisci i proprietari del sistema con accesso completo alla piattaforma e controllo delle organizzazioni",
-    "ADD_TITLE": "Aggiungi super amministratore",
-    "EDIT_TITLE": "Modifica super amministratore",
-    "VIEW_TITLE": "Dettagli super amministratore",
-    "DELETE_SINGLE": "Sei sicuro di voler eliminare questo super amministratore?",
-    "DELETE_BULK": "Sei sicuro di voler eliminare <strong>{{count}}</strong> super amministratore/i selezionato/i?",
-    "UPDATE_CONFIRM": "Sei sicuro di voler aggiornare questo super amministratore?"
+    "ADD_TITLE": "Aggiungi amministratore di sistema",
+    "EDIT_TITLE": "Modifica amministratore di sistema",
+    "VIEW_TITLE": "Dettagli amministratore di sistema",
+    "DELETE_SINGLE": "Sei sicuro di voler eliminare questo amministratore di sistema?",
+    "DELETE_BULK": "Sei sicuro di voler eliminare <strong>{{count}}</strong> amministratore di sistema/i selezionato/i?",
+    "UPDATE_CONFIRM": "Sei sicuro di voler aggiornare questo amministratore di sistema?"
   },
   "ORG": {
     "TITLE": "Organizzazioni",
