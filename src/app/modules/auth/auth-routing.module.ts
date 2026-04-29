@@ -11,28 +11,28 @@ export const AUTH_ROUTES: Routes = [
     path: 'login',
     component: LoginComponent,
     canActivate: [authGuard],
-    data: { title: 'Login' },
+    data: { title: 'PAGE_TITLES.LOGIN' },
   },
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
     canActivate: [authGuard],
-    data: { title: 'Forgot Password' },
+    data: { title: 'PAGE_TITLES.FORGOT_PASSWORD' },
   },
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
     canActivate: [authGuard],
-    data: { title: 'Reset Password' },
+    data: { title: 'PAGE_TITLES.RESET_PASSWORD' },
   },
   {
     path: 'set-password',
     component: SetPasswordComponent,
-    data: { title: 'Set Password' },
+    data: { title: 'PAGE_TITLES.SET_PASSWORD' },
   },
   {
     path: 'cli-auth',
     component: CliAuthComponent,
-    data: { title: 'CLI Authentication' },
+    data: { title: 'PAGE_TITLES.CLI_AUTH' },
   },
 ];

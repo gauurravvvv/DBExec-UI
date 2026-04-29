@@ -4,7 +4,7 @@
   [style]="{ width: '900px' }"
   [draggable]="false"
   [resizable]="false"
-  header="Customise Calendar"
+  [header]="'PROMPT_MODULE.CUSTOMISE_CALENDAR' | translate"
   styleClass="calendar-config-dialog"
   (onHide)="onClose()"
 >
@@ -13,24 +13,24 @@
     <div class="config-panel">
       <div class="panel-header">
         <i class="pi pi-cog"></i>
-        <span>Configuration Options</span>
+        <span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
       </div>
 
       <div class="config-form">
         <!-- ── BASIC ── -->
-        <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
+        <div class="section-label"><i class="pi pi-sliders-h"></i> {{ 'PROMPT_MODULE.BASIC' | translate }}</div>
 
         <div class="config-group">
           <app-custom-input
             [(ngModel)]="config.placeholder"
-            label="Placeholder Text"
-            placeholder="e.g., Select a date"
+            [label]="'PROMPT_MODULE.PLACEHOLDER_TEXT' | translate"
+            [placeholder]="'PROMPT_MODULE.PLACEHOLDER_DATE_EXAMPLE' | translate"
           >
           </app-custom-input>
         </div>
 
         <div class="config-group">
-          <label>Selection Mode</label>
+          <label>{{ 'PROMPT_MODULE.SELECTION_MODE' | translate }}</label>
           <p-dropdown
             [options]="selectionModeOptions"
             [(ngModel)]="config.selectionMode"
@@ -42,13 +42,12 @@
           >
           </p-dropdown>
           <small class="hint"
-            >Single selects one date; Multiple allows many; Range picks start
-            and end</small
+            >{{ 'PROMPT_MODULE.SELECTION_MODE_HINT' | translate }}</small
           >
         </div>
 
         <div class="config-group">
-          <label>Date Format</label>
+          <label>{{ 'PROMPT_MODULE.DATE_FORMAT' | translate }}</label>
           <p-dropdown
             [options]="dateFormatOptions"
             [(ngModel)]="config.dateFormat"
@@ -61,7 +60,7 @@
         </div>
 
         <div class="config-group">
-          <label>View Mode</label>
+          <label>{{ 'PROMPT_MODULE.VIEW_MODE' | translate }}</label>
           <p-dropdown
             [options]="viewOptions"
             [(ngModel)]="config.view"
@@ -72,45 +71,45 @@
           >
           </p-dropdown>
           <small class="hint"
-            >Determines which picker level opens by default</small
+            >{{ 'PROMPT_MODULE.VIEW_MODE_HINT' | translate }}</small
           >
         </div>
 
         <!-- ── DISPLAY ── -->
-        <div class="section-label"><i class="pi pi-eye"></i> Display</div>
+        <div class="section-label"><i class="pi pi-eye"></i> {{ 'PROMPT_MODULE.DISPLAY' | translate }}</div>
 
         <div class="config-row">
-          <label>Show Inline (no popup)</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_INLINE' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.inline"></p-inputSwitch>
         </div>
 
         <div class="config-row">
-          <label>Show Calendar Icon Button</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_CALENDAR_ICON' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.showIcon"></p-inputSwitch>
         </div>
 
         <div class="config-row">
-          <label>Show Today / Clear Buttons</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_TODAY_CLEAR' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.showButtonBar"></p-inputSwitch>
         </div>
 
         <div class="config-row">
-          <label>Show Week Numbers</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_WEEK_NUMBERS' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.showWeek"></p-inputSwitch>
         </div>
 
         <div class="config-row">
-          <label>Read-Only Input</label>
+          <label>{{ 'PROMPT_MODULE.READ_ONLY_INPUT' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.readonlyInput"></p-inputSwitch>
         </div>
 
         <div class="config-row">
-          <label>Keep Invalid Dates</label>
+          <label>{{ 'PROMPT_MODULE.KEEP_INVALID_DATES' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.keepInvalid"></p-inputSwitch>
         </div>
 
         <div class="config-group">
-          <label>Number of Months Visible</label>
+          <label>{{ 'PROMPT_MODULE.NUM_MONTHS_VISIBLE' | translate }}</label>
           <p-dropdown
             [options]="numberOfMonthsOptions"
             [(ngModel)]="config.numberOfMonths"
@@ -124,16 +123,16 @@
 
         <!-- ── NAVIGATION ── -->
         <div class="section-label">
-          <i class="pi pi-compass"></i> Navigation
+          <i class="pi pi-compass"></i> {{ 'PROMPT_MODULE.NAVIGATION' | translate }}
         </div>
 
         <div class="config-row">
-          <label>Show Other Month Days</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_OTHER_MONTH_DAYS' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.showOtherMonths"></p-inputSwitch>
         </div>
 
         <div class="config-row">
-          <label>Allow Selecting Other Month Days</label>
+          <label>{{ 'PROMPT_MODULE.ALLOW_SELECT_OTHER_MONTHS' | translate }}</label>
           <p-inputSwitch
             [(ngModel)]="config.selectOtherMonths"
             [disabled]="!config.showOtherMonths"
@@ -142,7 +141,7 @@
         </div>
 
         <div class="config-group">
-          <label>First Day of Week</label>
+          <label>{{ 'PROMPT_MODULE.FIRST_DAY_OF_WEEK' | translate }}</label>
           <p-dropdown
             [options]="firstDayOptions"
             [(ngModel)]="config.firstDayOfWeek"
@@ -155,10 +154,10 @@
         </div>
 
         <!-- ── TIME ── -->
-        <div class="section-label"><i class="pi pi-clock"></i> Time</div>
+        <div class="section-label"><i class="pi pi-clock"></i> {{ 'PROMPT_MODULE.TIME' | translate }}</div>
 
         <div class="config-row">
-          <label>Include Time Picker</label>
+          <label>{{ 'PROMPT_MODULE.INCLUDE_TIME_PICKER' | translate }}</label>
           <p-inputSwitch
             [(ngModel)]="config.showTime"
             (onChange)="onShowTimeChange($event.checked)"
@@ -168,7 +167,7 @@
 
         <ng-container *ngIf="config.showTime">
           <div class="config-row">
-            <label>Time Only (no date picker)</label>
+            <label>{{ 'PROMPT_MODULE.TIME_ONLY' | translate }}</label>
             <p-inputSwitch
               [(ngModel)]="config.timeOnly"
               (onChange)="onTimeOnlyChange($event.checked)"
@@ -177,7 +176,7 @@
           </div>
 
           <div class="config-group">
-            <label>Hour Format</label>
+            <label>{{ 'PROMPT_MODULE.HOUR_FORMAT' | translate }}</label>
             <p-dropdown
               [options]="hourFormatOptions"
               [(ngModel)]="config.hourFormat"
@@ -190,15 +189,15 @@
           </div>
 
           <div class="config-row">
-            <label>Show Seconds</label>
+            <label>{{ 'PROMPT_MODULE.SHOW_SECONDS' | translate }}</label>
             <p-inputSwitch [(ngModel)]="config.showSeconds"></p-inputSwitch>
           </div>
 
           <div class="config-group step-group">
-            <label>Time Step Increments</label>
+            <label>{{ 'PROMPT_MODULE.TIME_STEP_INCREMENTS' | translate }}</label>
             <div class="step-row">
               <div class="step-field">
-                <span class="step-label">Hour</span>
+                <span class="step-label">{{ 'PROMPT_MODULE.HOUR' | translate }}</span>
                 <p-dropdown
                   [options]="stepOptions"
                   [(ngModel)]="config.stepHour"
@@ -209,7 +208,7 @@
                 </p-dropdown>
               </div>
               <div class="step-field">
-                <span class="step-label">Minute</span>
+                <span class="step-label">{{ 'PROMPT_MODULE.MINUTE' | translate }}</span>
                 <p-dropdown
                   [options]="stepOptions"
                   [(ngModel)]="config.stepMinute"
@@ -220,7 +219,7 @@
                 </p-dropdown>
               </div>
               <div class="step-field" *ngIf="config.showSeconds">
-                <span class="step-label">Second</span>
+                <span class="step-label">{{ 'PROMPT_MODULE.SECOND' | translate }}</span>
                 <p-dropdown
                   [options]="stepOptions"
                   [(ngModel)]="config.stepSecond"
@@ -235,10 +234,10 @@
         </ng-container>
 
         <!-- ── CONSTRAINTS ── -->
-        <div class="section-label"><i class="pi pi-lock"></i> Constraints</div>
+        <div class="section-label"><i class="pi pi-lock"></i> {{ 'PROMPT_MODULE.CONSTRAINTS' | translate }}</div>
 
         <div class="config-group">
-          <label>Minimum Date</label>
+          <label>{{ 'PROMPT_MODULE.MINIMUM_DATE' | translate }}</label>
           <p-calendar
             [(ngModel)]="config.minDate"
             [dateFormat]="config.dateFormat"
@@ -246,13 +245,13 @@
             [showIcon]="true"
             [style]="{ width: '100%' }"
             appendTo="body"
-            placeholder="No minimum"
+            [placeholder]="'PROMPT_MODULE.NO_MINIMUM' | translate"
           >
           </p-calendar>
         </div>
 
         <div class="config-group">
-          <label>Maximum Date</label>
+          <label>{{ 'PROMPT_MODULE.MAXIMUM_DATE' | translate }}</label>
           <p-calendar
             [(ngModel)]="config.maxDate"
             [dateFormat]="config.dateFormat"
@@ -260,13 +259,13 @@
             [showIcon]="true"
             [style]="{ width: '100%' }"
             appendTo="body"
-            placeholder="No maximum"
+            [placeholder]="'PROMPT_MODULE.NO_MAXIMUM' | translate"
           >
           </p-calendar>
         </div>
 
         <div class="config-group">
-          <label>Disabled Days of Week</label>
+          <label>{{ 'PROMPT_MODULE.DISABLED_DAYS' | translate }}</label>
           <div class="day-toggle-group">
             <span
               *ngFor="let day of weekDays; trackBy: trackByIndex"
@@ -278,14 +277,14 @@
             </span>
           </div>
           <small class="hint"
-            >Selected days will be disabled in the calendar</small
+            >{{ 'PROMPT_MODULE.DISABLED_DAYS_HINT' | translate }}</small
           >
         </div>
       </div>
       <div class="apply-preview-action">
         <button class="btn-primary" type="button" (click)="applyPreview()">
           <i class="pi pi-refresh"></i>
-          Apply Preview
+          {{ 'PROMPT_MODULE.APPLY_PREVIEW' | translate }}
         </button>
       </div>
     </div>
@@ -294,11 +293,11 @@
     <div class="preview-panel">
       <div class="panel-header">
         <i class="pi pi-eye"></i>
-        <span>Preview</span>
+        <span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
       </div>
 
       <div class="preview-content">
-        <div class="preview-label">Try it out:</div>
+        <div class="preview-label">{{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}</div>
 
         <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
           <app-custom-calendar
@@ -338,7 +337,7 @@
           <button
             pButton
             type="button"
-            label="Set as Default"
+            [label]="'PROMPT_MODULE.SET_AS_DEFAULT' | translate"
             class="p-button-text p-button-sm"
             icon="pi pi-check"
             (click)="setAsDefault()"
@@ -348,7 +347,7 @@
         <div class="default-indicator" *ngIf="config.defaultValue != null">
           <i class="pi pi-bookmark"></i>
           <span
-            >Default: <strong>{{ defaultDisplayValue }}</strong></span
+            >{{ 'PROMPT_MODULE.DEFAULT' | translate }}: <strong>{{ defaultDisplayValue }}</strong></span
           >
           <button
             pButton
@@ -356,36 +355,36 @@
             icon="pi pi-times"
             class="p-button-text p-button-rounded p-button-sm"
             (click)="clearDefault()"
-            pTooltip="Clear default"
+            [pTooltip]="'PROMPT_MODULE.CLEAR_DEFAULT' | translate"
           ></button>
         </div>
 
         <!-- Config Summary -->
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> Active Settings
+            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span class="summary-chip" *ngIf="previewConfig.showTime"
-              >Time Picker</span
+              >{{ 'PROMPT_MODULE.TIME_PICKER' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.timeOnly"
-              >Time Only</span
+              >{{ 'PROMPT_MODULE.TIME_ONLY' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.showSeconds"
-              >Seconds</span
+              >{{ 'PROMPT_MODULE.SECONDS' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.inline"
-              >Inline</span
+              >{{ 'PROMPT_MODULE.INLINE' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.showButtonBar"
-              >Button Bar</span
+              >{{ 'PROMPT_MODULE.BUTTON_BAR' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.showWeek"
-              >Week Numbers</span
+              >{{ 'PROMPT_MODULE.WEEK_NUMBERS' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.readonlyInput"
-              >Read-only</span
+              >{{ 'PROMPT_MODULE.READ_ONLY' | translate }}</span
             >
             <span
               class="summary-chip"
@@ -393,18 +392,18 @@
               >{{ previewConfig.selectionMode | titlecase }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.numberOfMonths > 1"
-              >{{ previewConfig.numberOfMonths }} months</span
+              >{{ previewConfig.numberOfMonths }} {{ 'PROMPT_MODULE.MONTHS' | translate }}</span
             >
             <span
               class="summary-chip"
               *ngIf="previewConfig.disabledDays.length > 0"
-              >{{ previewConfig.disabledDays.length }} day(s) disabled</span
+              >{{ 'PROMPT_MODULE.DAYS_DISABLED' | translate: { count: previewConfig.disabledDays.length } }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.minDate"
-              >Min date set</span
+              >{{ 'PROMPT_MODULE.MIN_DATE_SET' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.maxDate"
-              >Max date set</span
+              >{{ 'PROMPT_MODULE.MAX_DATE_SET' | translate }}</span
             >
             <span
               class="summary-empty"
@@ -421,7 +420,7 @@
                 !previewConfig.maxDate
               "
             >
-              Default configuration
+              {{ 'PROMPT_MODULE.DEFAULT_CONFIGURATION' | translate }}
             </span>
           </div>
         </div>
@@ -432,11 +431,11 @@
   <ng-template pTemplate="footer">
     <button class="btn-cancel" type="button" (click)="onClose()">
       <i class="pi pi-times"></i>
-      Cancel
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
     <button class="btn-primary" type="button" (click)="onSave()">
       <i class="pi pi-check"></i>
-      Apply
+      {{ 'PROMPT_MODULE.APPLY' | translate }}
     </button>
   </ng-template>
 </p-dialog>

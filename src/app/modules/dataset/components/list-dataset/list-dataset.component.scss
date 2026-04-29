@@ -103,7 +103,7 @@ $radius-sm: 8px;
         &:focus {
           background: var(--card-background);
           border-color: var(--primary-color);
-          box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+          box-shadow: 0 0 0 2px var(--primary-color-transparent);
         }
 
         &::placeholder {
@@ -119,20 +119,20 @@ $radius-sm: 8px;
       padding: 0.65rem 1.25rem;
 
       &.p-button-primary {
-        background: linear-gradient(135deg, #2196f3, #1976d2);
-        color: white;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        color: var(--primary-text);
         border: none;
-        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        box-shadow: 0 4px 10px var(--primary-color-transparent);
         transition: all 0.2s ease;
 
         &:hover {
           opacity: 1;
           transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+          box-shadow: var(--shadow-md);
         }
 
         &:focus {
-          box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+          box-shadow: 0 0 0 2px var(--primary-color-transparent);
         }
       }
 
@@ -145,7 +145,7 @@ $radius-sm: 8px;
           color: var(--error-color);
 
           &:hover {
-            background: rgba(var(--error-rgb), 0.04);
+            background: var(--error-bg);
           }
         }
       }
@@ -155,7 +155,7 @@ $radius-sm: 8px;
     ::ng-deep .modern-split-button {
       .p-splitbutton-defaultbutton,
       .p-splitbutton-menubutton {
-        background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
         color: white !important;
         border: none !important;
         font-weight: 600;
@@ -164,22 +164,22 @@ $radius-sm: 8px;
         &:hover {
           opacity: 1;
           transform: translateY(-1px);
-          box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+          box-shadow: var(--shadow-md);
         }
 
         &:focus {
-          box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
+          box-shadow: 0 0 0 2px var(--primary-color-transparent) !important;
         }
       }
 
       .p-splitbutton-defaultbutton {
         border-radius: $radius-sm 0 0 $radius-sm !important;
-        box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        box-shadow: 0 4px 10px var(--primary-color-transparent);
       }
 
       .p-splitbutton-menubutton {
         border-radius: 0 $radius-sm $radius-sm 0 !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-left: 1px solid var(--border-strong) !important;
       }
     }
   }
@@ -405,12 +405,12 @@ $radius-sm: 8px;
           }
 
           &.edit-btn:hover {
-            background: rgba(33, 150, 243, 0.1);
-            color: #1976d2;
+            background: var(--primary-color-transparent);
+            color: var(--primary-hover);
           }
 
           &.delete-btn:hover {
-            background: rgba(244, 67, 54, 0.1);
+            background: var(--error-bg);
             color: var(--error-color);
           }
 
@@ -447,7 +447,7 @@ $radius-sm: 8px;
 
           &.p-highlight {
             background: var(--primary-color);
-            color: #fff;
+            color: var(--primary-text);
           }
         }
       }
@@ -474,7 +474,7 @@ td.empty-message-cell {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
@@ -508,7 +508,7 @@ td.empty-message-cell {
       .popup-icon {
         width: 48px;
         height: 48px;
-        background: rgba(239, 68, 68, 0.1);
+        background: var(--error-bg);
         color: var(--error-color);
         border-radius: 50%;
         display: flex;
@@ -603,7 +603,7 @@ td.empty-message-cell {
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
           }
         }
 
@@ -652,13 +652,13 @@ td.empty-message-cell {
 
         &.btn-confirm {
           background: var(--error-color);
-          color: white;
-          box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+          color: var(--primary-text);
+          box-shadow: 0 4px 6px -1px var(--error-bg);
 
           &:hover:not(:disabled) {
-            background: #dc2626; // Darker red
+            background: var(--error-color); // Darker red
             transform: translateY(-1px);
-            box-shadow: 0 6px 8px -1px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 6px 8px -1px var(--error-bg);
           }
 
           &:disabled {
@@ -700,7 +700,7 @@ td.empty-message-cell {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--overlay-background);
   backdrop-filter: blur(3px);
   display: flex;
   justify-content: center;
@@ -717,7 +717,7 @@ td.empty-message-cell {
   max-height: calc(88vh - 12vh);
   border-radius: $radius-md;
   box-shadow:
-    0 16px 70px rgba(0, 0, 0, 0.35),
+    var(--shadow-xl),
     0 0 0 1px var(--border-color);
   display: flex;
   flex-direction: column;
@@ -837,7 +837,7 @@ td.empty-message-cell {
     .cmd-row-icon {
       width: 30px;
       height: 30px;
-      background: rgba(33, 150, 243, 0.08);
+      background: var(--primary-color-transparent);
       color: var(--primary-color);
       border-radius: 6px;
       display: flex;
@@ -883,7 +883,7 @@ td.empty-message-cell {
       flex-shrink: 0;
 
       &.active {
-        background: rgba(76, 175, 80, 0.1);
+        background: var(--success-bg);
         color: var(--success-color);
       }
 
@@ -950,8 +950,8 @@ td.empty-message-cell {
     border: 1px solid var(--border-color);
     border-radius: $radius-sm;
     box-shadow:
-      0 4px 12px rgba(0, 0, 0, 0.12),
-      0 1px 3px rgba(0, 0, 0, 0.08);
+      0 4px 12px var(--shadow-color),
+      0 1px 3px var(--shadow-color);
     background: var(--card-background);
     padding: 0;
 

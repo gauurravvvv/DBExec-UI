@@ -14,6 +14,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { AuditService } from '../../services/audit.service';
 
 @Component({
@@ -72,18 +73,21 @@ export class ListAuditLogsComponent implements OnInit {
     { label: 'Delete', value: 'DELETE' },
   ];
 
-  statusOptions = [
-    { label: 'Success', value: true },
-    { label: 'Failed', value: false },
-  ];
+  statusOptions: { label: string; value: boolean }[] = [];
 
   constructor(
     private auditService: AuditService,
     private globalService: GlobalService,
     private organisationService: OrganisationService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
+    this.statusOptions = [
+      { label: this.translate.instant('AUDIT.SUCCESS'), value: true },
+      { label: this.translate.instant('AUDIT.FAILED'), value: false },
+    ];
+
     this.isSystemAdmin =
       this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
 

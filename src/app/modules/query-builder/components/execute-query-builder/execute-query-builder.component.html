@@ -6,7 +6,7 @@
         <button pButton class="p-button-text" (click)="onBack()">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Query Builder</h2>
+        <h2>{{ 'QUERY_BUILDER_MODULE.EXECUTE_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <div class="structure-nav-wrapper" #treeSearchInput>
@@ -14,7 +14,7 @@
             class="btn-icon"
             type="button"
             (click)="toggleStructureTree()"
-            title="Navigate to prompt"
+            [title]="'COMMON.NAVIGATE' | translate"
           >
             <i class="pi pi-sitemap"></i>
           </button>
@@ -29,7 +29,7 @@
                 [value]="structureTreeNodes"
                 [filter]="true"
                 [filterBy]="'label'"
-                [filterPlaceholder]="'Search tab, section or prompt...'"
+                [filterPlaceholder]="'COMMON.SEARCH' | translate"
                 filterMode="lenient"
                 selectionMode="single"
                 (onNodeSelect)="onStructureNodeSelect($event)"
@@ -41,14 +41,14 @@
             </div>
             <div class="tree-empty" *ngIf="loadingStructure">
               <i class="pi pi-spin pi-spinner"></i>
-              <span>Loading structure...</span>
+              <span>{{ 'COMMON.LOADING' | translate }}</span>
             </div>
             <div
               class="tree-empty"
               *ngIf="!loadingStructure && structureTreeNodes.length === 0"
             >
               <i class="pi pi-info-circle"></i>
-              <span>No structure available</span>
+              <span>{{ 'COMMON.NO_DATA_AVAILABLE' | translate }}</span>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@
           [disabled]="executing() || !hasAnyValue"
         >
           <i class="pi pi-refresh"></i>
-          Reset
+          {{ 'COMMON.RESET' | translate }}
         </button>
         <button
           class="btn-cancel"
@@ -68,7 +68,7 @@
           [disabled]="executing() || !hasAnyValue"
         >
           <i class="pi pi-play"></i>
-          Run
+          {{ 'COMMON.RUN' | translate }}
         </button>
         <button
           class="btn-primary"
@@ -77,7 +77,7 @@
           [disabled]="executing() || !hasAnyValue || !queryRanSuccessfully"
         >
           <i class="pi pi-save"></i>
-          {{ isEditMode ? 'Update' : 'Save' }}
+          {{ isEditMode ? ('COMMON.UPDATE' | translate) : ('COMMON.SAVE' | translate) }}
         </button>
       </div>
     </div>
@@ -102,7 +102,7 @@
         <span>{{ tabError() }}</span>
         <button
           pButton
-          label="Retry"
+          [label]="'COMMON.RETRY' | translate"
           class="p-button-outlined"
           (click)="loadTabs()"
         ></button>
@@ -114,7 +114,7 @@
         *ngIf="!loadingTabs() && !tabError() && tabs.length === 0"
       >
         <i class="pi pi-inbox"></i>
-        <span>No tabs configured for this query builder</span>
+        <span>{{ 'QUERY_BUILDER_MODULE.NO_TABS_CONFIGURED' | translate }}</span>
       </div>
 
       <!-- Tab View -->
@@ -153,7 +153,7 @@
               <span>{{ tab.error }}</span>
               <button
                 pButton
-                label="Retry"
+                [label]="'COMMON.RETRY' | translate"
                 class="p-button-outlined"
                 (click)="loadSections(tab)"
               ></button>
@@ -170,7 +170,7 @@
               "
             >
               <i class="pi pi-folder-open"></i>
-              <span>No sections in this tab</span>
+              <span>{{ 'QUERY_BUILDER_MODULE.NO_SECTIONS' | translate }}</span>
             </div>
 
             <!-- Accordion Sections -->
@@ -209,7 +209,7 @@
                   <span>{{ section.error }}</span>
                   <button
                     pButton
-                    label="Retry"
+                    [label]="'COMMON.RETRY' | translate"
                     class="p-button-outlined"
                     (click)="loadPrompts(section)"
                   ></button>
@@ -226,7 +226,7 @@
                   "
                 >
                   <i class="pi pi-info-circle"></i>
-                  <span>No prompts in this section</span>
+                  <span>{{ 'QUERY_BUILDER_MODULE.NO_PROMPTS' | translate }}</span>
                 </div>
 
                 <!-- Prompt Form Fields -->
@@ -720,7 +720,7 @@
                         class="p-error"
                         *ngIf="getPromptControl(prompt)?.hasError('required')"
                       >
-                        {{ prompt.name }} is required
+                        {{ 'QUERY_BUILDER_MODULE.PROMPT_REQUIRED' | translate: { name: prompt.name } }}
                       </small>
                     </div>
                   </div>
@@ -737,32 +737,32 @@
 <!-- Save Dialog -->
 <div class="save-screen-popup" *ngIf="showSaveDialog">
   <div class="popup-content">
-    <h3>{{ isEditMode ? 'Update Dataset' : 'Save as Dataset' }}</h3>
+    <h3>{{ isEditMode ? ('QUERY_BUILDER_MODULE.UPDATE_DATASET' | translate) : ('QUERY_BUILDER_MODULE.SAVE_AS_DATASET' | translate) }}</h3>
     <form [formGroup]="saveForm" class="save-form">
       <div class="form-field">
         <app-custom-input
           formControlName="name"
-          label="Name"
-          placeholder="Enter dataset name"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'QUERY_BUILDER_MODULE.ENTER_DATASET_NAME' | translate"
           icon="pi-bookmark"
           [required]="true"
           [showError]="
             !!(saveForm.get('name')?.invalid && saveForm.get('name')?.touched)
           "
-          errorMessage="Name is required"
+          [errorMessage]="'QUERY_BUILDER_MODULE.DATASET_NAME_REQUIRED' | translate"
         >
         </app-custom-input>
       </div>
       <div class="form-field">
         <app-custom-input
           formControlName="description"
-          label="Description"
-          placeholder="Enter description (optional)"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'QUERY_BUILDER_MODULE.ENTER_DESCRIPTION_OPTIONAL' | translate"
           icon="pi-align-left"
         >
         </app-custom-input>
         <small class="char-count">
-          {{ saveForm.get('description')?.value?.length || 0 }}/500 characters
+          {{ saveForm.get('description')?.value?.length || 0 }}/500 {{ 'QUERY_BUILDER_MODULE.CHARACTERS' | translate }}
         </small>
       </div>
 
@@ -770,14 +770,14 @@
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined p-button-danger"
           (click)="onSaveCancel()"
         ></button>
         <button
           pButton
           type="submit"
-          [label]="isEditMode ? 'Update' : 'Save'"
+          [label]="isEditMode ? ('COMMON.UPDATE' | translate) : ('COMMON.SAVE' | translate)"
           class="p-button-outlined"
           [disabled]="saveForm.invalid || isSaving()"
           (click)="onSaveConfirm()"
@@ -794,7 +794,7 @@
 <div class="execute-result-popup" *ngIf="showExecuteResult && executePayload">
   <div class="popup-content">
     <div class="popup-header-row">
-      <h3>Execution Config</h3>
+      <h3>{{ 'QUERY_BUILDER_MODULE.EXECUTION_CONFIG' | translate }}</h3>
       <button
         class="popup-close-btn"
         type="button"
@@ -833,7 +833,7 @@
 
     <div class="empty-state-inline" *ngIf="groupedValues.length === 0">
       <i class="pi pi-info-circle"></i>
-      <span>No values selected</span>
+      <span>{{ 'QUERY_BUILDER_MODULE.NO_VALUES_SELECTED' | translate }}</span>
     </div>
 
     <div class="execute-error" *ngIf="executeError">
@@ -844,7 +844,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" type="button" (click)="onCloseExecuteResult()">
         <i class="pi pi-times"></i>
-        Close
+        {{ 'COMMON.CLOSE' | translate }}
       </button>
       <button
         class="btn-primary"
@@ -854,7 +854,7 @@
       >
         <i class="pi pi-spin pi-spinner" *ngIf="executing()"></i>
         <i class="pi pi-cog" *ngIf="!executing()"></i>
-        {{ executing() ? 'Generating...' : 'Generate' }}
+        {{ executing() ? ('COMMON.GENERATING' | translate) : ('COMMON.GENERATE' | translate) }}
       </button>
     </div>
   </div>
@@ -864,7 +864,7 @@
 <div class="sql-result-popup" *ngIf="showSqlResult">
   <div class="popup-content">
     <div class="popup-header-row">
-      <h3>Generated SQL</h3>
+      <h3>{{ 'QUERY_BUILDER_MODULE.GENERATED_SQL' | translate }}</h3>
       <button
         class="popup-close-btn"
         type="button"
@@ -877,12 +877,12 @@
     <div class="sql-result-body">
       <div class="sql-block">
         <div class="sql-block-header">
-          <span class="sql-block-label">SQL Query</span>
+          <span class="sql-block-label">{{ 'QUERY_BUILDER_MODULE.SQL_QUERY' | translate }}</span>
           <button
             class="btn-copy"
             type="button"
             (click)="copySqlToClipboard()"
-            title="Copy to clipboard"
+            [title]="'COMMON.COPY_TO_CLIPBOARD' | translate"
           >
             <i class="pi pi-copy"></i>
           </button>
@@ -892,11 +892,11 @@
 
       <div class="sql-components" *ngIf="sqlComponents">
         <div class="sql-component-row" *ngIf="sqlComponents.schema">
-          <span class="component-label">Schema</span>
+          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.SCHEMA' | translate }}</span>
           <span class="component-value">{{ sqlComponents.schema }}</span>
         </div>
         <div class="sql-component-row" *ngIf="sqlComponents.tables?.length > 0">
-          <span class="component-label">Tables</span>
+          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.TABLES' | translate }}</span>
           <span class="component-value">
             <span
               class="component-tag"
@@ -910,13 +910,13 @@
           class="sql-component-row"
           *ngIf="sqlComponents.columns?.length > 0"
         >
-          <span class="component-label">Columns</span>
+          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.COLUMNS' | translate }}</span>
           <span class="component-value">{{
             sqlComponents.columns.join(', ')
           }}</span>
         </div>
         <div class="sql-component-row" *ngIf="sqlComponents.joins?.length > 0">
-          <span class="component-label">Joins</span>
+          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.JOINS' | translate }}</span>
           <span class="component-value">
             <span
               class="component-tag"
@@ -929,7 +929,7 @@
           class="sql-component-row"
           *ngIf="sqlComponents.whereConditions?.length > 0"
         >
-          <span class="component-label">Filters</span>
+          <span class="component-label">{{ 'QUERY_BUILDER_MODULE.FILTERS' | translate }}</span>
           <span class="component-value">
             <span
               class="component-tag"
@@ -947,7 +947,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" type="button" (click)="onCloseSqlResult()">
         <i class="pi pi-times"></i>
-        Close
+        {{ 'COMMON.CLOSE' | translate }}
       </button>
       <button
         class="btn-primary"
@@ -957,7 +957,7 @@
       >
         <i class="pi pi-spin pi-spinner" *ngIf="isExecutingQuery"></i>
         <i class="pi pi-play" *ngIf="!isExecutingQuery"></i>
-        {{ isExecutingQuery ? 'Running...' : 'Run Query' }}
+        {{ isExecutingQuery ? ('COMMON.RUNNING' | translate) : ('QUERY_BUILDER_MODULE.RUN_QUERY' | translate) }}
       </button>
     </div>
   </div>
@@ -982,7 +982,7 @@
     <div class="results-popup-header">
       <div class="popup-header-left">
         <i class="pi pi-table"></i>
-        <span class="popup-title">Query Results</span>
+        <span class="popup-title">{{ 'QUERY_BUILDER_MODULE.QUERY_RESULTS' | translate }}</span>
         <span
           class="popup-meta"
           *ngIf="!queryResult.error && queryResult.columns.length > 0"
@@ -993,7 +993,7 @@
       <div class="popup-header-right">
         <button
           pButton
-          label="Clear"
+          [label]="'COMMON.CLEAR' | translate"
           icon="pi pi-filter-slash"
           class="p-button-outlined p-button-danger p-button-sm clear-filters-btn"
           (click)="clearResultFilters()"
@@ -1005,7 +1005,7 @@
           class="p-button-text p-button-rounded p-button-sm"
           icon="pi pi-times"
           (click)="closeResultsPopup()"
-          pTooltip="Close"
+          [pTooltip]="'COMMON.CLOSE' | translate"
           tooltipPosition="bottom"
         ></button>
       </div>
@@ -1018,7 +1018,7 @@
         <div class="error-icon-wrapper">
           <i class="pi pi-times"></i>
         </div>
-        <h4>Query Execution Failed</h4>
+        <h4>{{ 'QUERY_BUILDER_MODULE.QUERY_EXEC_FAILED' | translate }}</h4>
         <div class="error-message-box">
           <code>{{ queryResult.error }}</code>
         </div>
@@ -1036,7 +1036,7 @@
         <div class="success-icon-wrapper">
           <i class="pi pi-check"></i>
         </div>
-        <h4>Query Executed Successfully</h4>
+        <h4>{{ 'QUERY_BUILDER_MODULE.QUERY_EXEC_SUCCESS' | translate }}</h4>
         <p class="success-message">{{ queryResult.message }}</p>
         <div class="success-meta" *ngIf="queryResult.executionTime">
           <i class="pi pi-clock"></i>
@@ -1057,8 +1057,8 @@
         <div class="empty-icon-wrapper">
           <i class="pi pi-inbox"></i>
         </div>
-        <h4>No Results</h4>
-        <p>The query returned 0 rows.</p>
+        <h4>{{ 'QUERY_BUILDER_MODULE.NO_RESULTS_TITLE' | translate }}</h4>
+        <p>{{ 'QUERY_BUILDER_MODULE.QUERY_RETURNED_ZERO' | translate }}</p>
       </div>
 
       <!-- Results Table -->
@@ -1137,7 +1137,7 @@
                 [attr.colspan]="queryResult.columns.length + 1"
                 class="empty-message-cell text-center"
               >
-                No matching records found
+                {{ 'QUERY_BUILDER_MODULE.NO_MATCHING_RECORDS' | translate }}
               </td>
             </tr>
           </ng-template>

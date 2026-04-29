@@ -4,22 +4,22 @@
   [style]="{ width: '900px' }"
   [draggable]="false"
   [resizable]="false"
-  header="Customise Range Slider"
+  [header]="'PROMPT_MODULE.CUSTOMISE_RANGE_SLIDER' | translate"
   styleClass="rangeslider-config-dialog"
   (onHide)="onClose()"
 >
   <div class="dialog-content">
     <div class="config-panel">
       <div class="panel-header">
-        <i class="pi pi-cog"></i><span>Configuration Options</span>
+        <i class="pi pi-cog"></i><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
       </div>
       <div class="config-form">
         <div class="section-label">
-          <i class="pi pi-arrows-h"></i> Range Bounds
+          <i class="pi pi-arrows-h"></i> {{ 'PROMPT_MODULE.RANGE_BOUNDS' | translate }}
         </div>
 
         <div class="config-group">
-          <label>Minimum Bound</label>
+          <label>{{ 'PROMPT_MODULE.MINIMUM_BOUND' | translate }}</label>
           <p-inputNumber
             [(ngModel)]="config.min"
             [showButtons]="true"
@@ -32,7 +32,7 @@
           </p-inputNumber>
         </div>
         <div class="config-group">
-          <label>Maximum Bound</label>
+          <label>{{ 'PROMPT_MODULE.MAXIMUM_BOUND' | translate }}</label>
           <p-inputNumber
             [(ngModel)]="config.max"
             [showButtons]="true"
@@ -45,7 +45,7 @@
           </p-inputNumber>
         </div>
         <div class="config-group">
-          <label>Step Increment</label>
+          <label>{{ 'PROMPT_MODULE.STEP_INCREMENT' | translate }}</label>
           <p-dropdown
             [options]="stepOptions"
             [(ngModel)]="config.step"
@@ -55,15 +55,15 @@
             appendTo="body"
           >
           </p-dropdown>
-          <small class="hint">Snap interval when dragging</small>
+          <small class="hint">{{ 'PROMPT_MODULE.SNAP_INTERVAL_WHEN_DRAGGING' | translate }}</small>
         </div>
 
         <div class="section-label">
-          <i class="pi pi-bookmark"></i> Default Selection
+          <i class="pi pi-bookmark"></i> {{ 'PROMPT_MODULE.DEFAULT_SELECTION' | translate }}
         </div>
 
         <div class="config-group">
-          <label>Default Min Value</label>
+          <label>{{ 'PROMPT_MODULE.DEFAULT_MIN_VALUE' | translate }}</label>
           <p-inputNumber
             [(ngModel)]="config.defaultMin"
             [showButtons]="true"
@@ -77,7 +77,7 @@
           </p-inputNumber>
         </div>
         <div class="config-group">
-          <label>Default Max Value</label>
+          <label>{{ 'PROMPT_MODULE.DEFAULT_MAX_VALUE' | translate }}</label>
           <p-inputNumber
             [(ngModel)]="config.defaultMax"
             [showButtons]="true"
@@ -91,10 +91,10 @@
           </p-inputNumber>
         </div>
 
-        <div class="section-label"><i class="pi pi-eye"></i> Display</div>
+        <div class="section-label"><i class="pi pi-eye"></i> {{ 'PROMPT_MODULE.DISPLAY' | translate }}</div>
 
         <div class="config-group">
-          <label>Orientation</label>
+          <label>{{ 'PROMPT_MODULE.ORIENTATION' | translate }}</label>
           <p-dropdown
             [options]="orientationOptions"
             [(ngModel)]="config.orientation"
@@ -106,39 +106,39 @@
           </p-dropdown>
         </div>
         <div class="config-row">
-          <label>Show Value Labels</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_VALUE_LABELS' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.showValueLabels"></p-inputSwitch>
         </div>
         <div class="config-row">
-          <label>Show Bound Labels</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_BOUND_LABELS' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.showBoundLabels"></p-inputSwitch>
         </div>
 
-        <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
+        <div class="section-label"><i class="pi pi-cog"></i> {{ 'PROMPT_MODULE.BEHAVIOUR' | translate }}</div>
 
         <div class="config-row">
-          <label>Animate on Click</label>
+          <label>{{ 'PROMPT_MODULE.ANIMATE_ON_CLICK' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.animate"></p-inputSwitch>
         </div>
         <div class="config-row">
-          <label>Disabled</label>
+          <label>{{ 'PROMPT_MODULE.DISABLED' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
         </div>
       </div>
       <div class="apply-preview-action">
         <button class="btn-primary" type="button" (click)="applyPreview()">
           <i class="pi pi-refresh"></i>
-          Apply Preview
+          {{ 'PROMPT_MODULE.APPLY_PREVIEW' | translate }}
         </button>
       </div>
     </div>
 
     <div class="preview-panel">
       <div class="panel-header">
-        <i class="pi pi-eye"></i><span>Preview</span>
+        <i class="pi pi-eye"></i><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
       </div>
       <div class="preview-content">
-        <div class="preview-label">Try it out:</div>
+        <div class="preview-label">{{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}</div>
 
         <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
           <app-custom-rangeslider
@@ -159,7 +159,7 @@
           <button
             pButton
             type="button"
-            label="Set as Default"
+            [label]="'PROMPT_MODULE.SET_AS_DEFAULT' | translate"
             class="p-button-text p-button-sm"
             icon="pi pi-bookmark"
             (click)="setAsDefault()"
@@ -167,7 +167,7 @@
           <button
             pButton
             type="button"
-            label="Reset to Bounds"
+            [label]="'PROMPT_MODULE.RESET_TO_BOUNDS' | translate"
             class="p-button-text p-button-sm p-button-secondary"
             icon="pi pi-refresh"
             (click)="resetToDefaults()"
@@ -177,38 +177,38 @@
         <div class="default-indicator">
           <i class="pi pi-bookmark"></i>
           <span
-            >Default Range: <strong>{{ config.defaultMin }}</strong> —
+            >{{ 'PROMPT_MODULE.DEFAULT_RANGE' | translate }} <strong>{{ config.defaultMin }}</strong> —
             <strong>{{ config.defaultMax }}</strong></span
           >
         </div>
 
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> Active Settings
+            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span class="summary-chip"
               >{{ previewConfig.min }} – {{ previewConfig.max }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.step !== 1"
-              >Step: {{ previewConfig.step }}</span
+              >{{ 'PROMPT_MODULE.STEP_LABEL' | translate }} {{ previewConfig.step }}</span
             >
             <span
               class="summary-chip"
               *ngIf="previewConfig.orientation === 'vertical'"
-              >Vertical</span
+              >{{ 'PROMPT_MODULE.VERTICAL' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.animate"
-              >Animated</span
+              >{{ 'PROMPT_MODULE.ANIMATED' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.disabled"
-              >Disabled</span
+              >{{ 'PROMPT_MODULE.DISABLED' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.showBoundLabels"
-              >Bound Labels</span
+              >{{ 'PROMPT_MODULE.BOUND_LABELS' | translate }}</span
             >
             <span class="summary-chip" *ngIf="!previewConfig.showValueLabels"
-              >No Value Labels</span
+              >{{ 'PROMPT_MODULE.NO_VALUE_LABELS' | translate }}</span
             >
           </div>
         </div>

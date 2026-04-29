@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { lastValueFrom } from 'rxjs';
 import { PROFILE } from 'src/app/constants/api';
+import { StorageService } from './storage.service';
+import { StorageType } from 'src/app/constants/storageType';
 import { HttpClientService } from './http-client.service';
 import { GlobalService } from './global.service';
 import { LoginService } from './login.service';
@@ -33,9 +35,11 @@ export class LocaleService {
     this.translate.setDefaultLang('en');
   }
 
-  /** Read locale from JWT and apply it. Call after login / token refresh. */
+  /** Read locale from JWT (primary) or localStorage fallback, then apply. */
   initFromToken(): void {
-    const locale = this.globalService.getTokenDetails('locale') || 'en';
+    const fromToken = this.globalService.getTokenDetails('locale');
+    const fromStorage = StorageService.get(StorageType.LOCALE);
+    const locale = fromToken || fromStorage || 'en';
     this.translate.use(locale);
   }
 
@@ -43,17 +47,16 @@ export class LocaleService {
     return this.translate.currentLang || 'en';
   }
 
-  /** Change language: apply immediately → persist via PATCH → refresh token */
+  /** Change language: apply immediately → persist to storage → persist via PATCH → refresh token */
   async changeLocale(locale: string): Promise<boolean> {
-    // Apply immediately so UI updates regardless of backend
     this.translate.use(locale);
+    StorageService.set(StorageType.LOCALE, locale);
 
     try {
       const res: any = await lastValueFrom(
         this.http.apiPatch(PROFILE.UPDATE_LOCALE, { locale }),
       );
       if (res?.status) {
-        // Refresh token to get new JWT with updated locale
         const refreshRes: any = await lastValueFrom(
           this.loginService.refreshAccessToken(),
         );
@@ -62,7 +65,7 @@ export class LocaleService {
         }
       }
     } catch {
-      // Persistence failed but UI already updated
+      // Persistence failed but UI and storage already updated
     }
 
     return true;

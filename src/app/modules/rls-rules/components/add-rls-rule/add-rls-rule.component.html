@@ -9,13 +9,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Add RLS Rule</h2>
+        <h2>{{ 'RLS.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           (click)="onCancel()"
         ></button>
@@ -23,7 +23,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
         >
           <i class="pi pi-save mr-2"></i>
@@ -35,8 +35,8 @@
       <div class="form-grid">
         <app-custom-input
           formControlName="name"
-          label="Rule Name"
-          placeholder="Enter rule name"
+          [label]="'RLS.RULE_NAME' | translate"
+          [placeholder]="'RLS.ENTER_RULE_NAME' | translate"
           [required]="true"
           [showError]="
             !!(rlsForm.get('name')?.invalid && rlsForm.get('name')?.touched)
@@ -47,16 +47,16 @@
 
         <app-custom-input
           formControlName="description"
-          label="Description"
-          placeholder="Enter description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
         >
         </app-custom-input>
 
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
-          label="Organisation"
-          placeholder="Select Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
+          [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
           [options]="organisations"
           optionLabel="name"
           optionValue="id"
@@ -70,15 +70,15 @@
               rlsForm.get('organisation')?.touched
             )
           "
-          errorMessage="Organisation is required"
+          [errorMessage]="'RLS.ORGANISATION_REQUIRED' | translate"
         >
         </app-custom-dropdown>
 
         <app-custom-dropdown
           [ngModel]="selectedDatasource"
           [ngModelOptions]="{ standalone: true }"
-          label="Datasource"
-          placeholder="Select Datasource"
+          [label]="'COMMON.DATASOURCE' | translate"
+          [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
           [options]="datasources"
           optionLabel="name"
           optionValue="id"
@@ -92,8 +92,8 @@
 
         <app-custom-dropdown
           formControlName="datasetId"
-          label="Dataset"
-          placeholder="Select Dataset"
+          [label]="'RLS.DATASET' | translate"
+          [placeholder]="'RLS.SELECT_DATASET' | translate"
           [options]="datasets"
           optionLabel="name"
           optionValue="id"
@@ -107,7 +107,7 @@
               rlsForm.get('datasetId')?.touched
             )
           "
-          errorMessage="Dataset is required"
+          [errorMessage]="'RLS.DATASET_REQUIRED' | translate"
         >
         </app-custom-dropdown>
 
@@ -115,19 +115,19 @@
         <div class="conditions-section" formArrayName="conditions">
           <div class="conditions-header">
             <span class="conditions-label">
-              Filter Conditions <span class="required">*</span>
+              {{ 'RLS.FILTER_CONDITIONS' | translate }} <span class="required">*</span>
             </span>
             <button
               type="button"
               class="btn-add-condition"
               (click)="addCondition()"
             >
-              <i class="pi pi-plus"></i> Add Condition
+              <i class="pi pi-plus"></i> {{ 'RLS.ADD_CONDITION' | translate }}
             </button>
           </div>
           <div class="conditions-hint">
             <i class="pi pi-info-circle"></i>
-            All conditions are AND-ed. Select values for each column condition.
+            {{ 'RLS.ALL_CONDITIONS_ANDED' | translate }}
           </div>
           <div
             class="condition-row"
@@ -145,7 +145,7 @@
                   [options]="datasetColumns"
                   optionLabel="columnToView"
                   optionValue="columnToUse"
-                  placeholder="Select column"
+                  [placeholder]="'RLS.SELECT_COLUMN' | translate"
                   [filter]="true"
                   filterBy="columnToView"
                   [autoDisplayFirst]="false"
@@ -156,7 +156,7 @@
                       conditions.at(i).get('columnName')?.touched
                     )
                   "
-                  errorMessage="Column is required"
+                  [errorMessage]="'RLS.COLUMN_REQUIRED' | translate"
                   (onChangeEvent)="onColumnChange(i, $event)"
                 ></app-custom-dropdown>
                 <app-custom-dropdown
@@ -172,7 +172,7 @@
                   class="btn-remove-condition"
                   (click)="removeCondition(i)"
                   [disabled]="conditions.length === 1"
-                  pTooltip="Remove condition"
+                  [pTooltip]="'RLS.REMOVE_CONDITION' | translate"
                   tooltipPosition="bottom"
                 >
                   <i class="pi pi-trash"></i>
@@ -184,13 +184,13 @@
                   [options]="getColumnValues(i)"
                   optionLabel="label"
                   optionValue="value"
-                  placeholder="Select values"
+                  [placeholder]="'RLS.SELECT_VALUES' | translate"
                   [filter]="true"
                   filterBy="label"
                   [showToggleAll]="true"
                   display="chip"
                   [maxSelectedLabels]="5"
-                  selectedItemsLabel="{0} values selected"
+                  [selectedItemsLabel]="'RLS.VALUES_SELECTED' | translate: { count: '{0}' }"
                   [required]="true"
                   [showError]="
                     !!(
@@ -198,7 +198,7 @@
                       conditions.at(i).get('values')?.touched
                     )
                   "
-                  errorMessage="At least one value is required"
+                  [errorMessage]="'RLS.VALUES_REQUIRED' | translate"
                 ></app-custom-multiselect>
               </div>
             </div>
@@ -207,11 +207,11 @@
 
         <app-custom-toggle
           formControlName="isEnabled"
-          label="Enabled"
+          [label]="'COMMON.ENABLED' | translate"
           [trueValue]="true"
           [falseValue]="false"
-          trueLabel="Enabled"
-          falseLabel="Disabled"
+          [trueLabel]="'COMMON.ENABLED' | translate"
+          [falseLabel]="'COMMON.DISABLED' | translate"
         >
         </app-custom-toggle>
       </div>

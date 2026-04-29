@@ -56,13 +56,13 @@ $radius-sm: 8px;
         }
 
         .btn-primary {
-          background: linear-gradient(135deg, #2196f3, #1976d2);
-          color: white;
-          box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+          color: var(--primary-text);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
 
           &:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+            box-shadow: var(--shadow-md);
           }
         }
       }
@@ -115,16 +115,16 @@ $radius-sm: 8px;
           width: 120px;
           height: 120px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #2196f3, #1976d2);
+          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: 16px;
-          box-shadow: 0 8px 24px rgba(33, 150, 243, 0.3);
+          box-shadow: 0 8px 24px var(--primary-color-transparent);
 
           i {
             font-size: 3rem;
-            color: white;
+            color: var(--primary-text);
           }
         }
 
@@ -138,7 +138,7 @@ $radius-sm: 8px;
         .default-badge {
           display: inline-block;
           padding: 0.2rem 0.6rem;
-          background: rgba(var(--primary-rgb), 0.1);
+          background: var(--primary-color-transparent);
           color: var(--primary-color);
           border-radius: 4px;
           font-size: 0.8rem;

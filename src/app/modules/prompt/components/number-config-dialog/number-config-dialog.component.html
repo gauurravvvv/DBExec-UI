@@ -4,31 +4,31 @@
   [style]="{ width: '900px' }"
   [draggable]="false"
   [resizable]="false"
-  header="Customise Number Input"
+  [header]="'PROMPT_MODULE.CUSTOMISE_NUMBER_INPUT' | translate"
   styleClass="number-config-dialog"
   (onHide)="onClose()"
 >
   <div class="dialog-content">
     <div class="config-panel">
       <div class="panel-header">
-        <i class="pi pi-cog"></i><span>Configuration Options</span>
+        <i class="pi pi-cog"></i><span>{{ 'PROMPT_MODULE.CONFIGURATION_OPTIONS' | translate }}</span>
       </div>
       <div class="config-form">
-        <div class="section-label"><i class="pi pi-sliders-h"></i> Basic</div>
+        <div class="section-label"><i class="pi pi-sliders-h"></i> {{ 'PROMPT_MODULE.BASIC' | translate }}</div>
 
         <div class="config-group">
           <app-custom-input
             [(ngModel)]="config.placeholder"
-            label="Placeholder Text"
-            placeholder="e.g., Enter number"
+            [label]="'PROMPT_MODULE.PLACEHOLDER_TEXT' | translate"
+            [placeholder]="'PROMPT_MODULE.PLACEHOLDER_NUMBER_EXAMPLE' | translate"
           >
           </app-custom-input>
         </div>
         <div class="config-group">
-          <label>Minimum Value (optional)</label>
+          <label>{{ 'PROMPT_MODULE.MIN_VALUE' | translate }}</label>
           <p-inputNumber
             [(ngModel)]="config.min"
-            placeholder="No minimum"
+            [placeholder]="'PROMPT_MODULE.NO_MINIMUM' | translate"
             [showButtons]="true"
             buttonLayout="horizontal"
             incrementButtonIcon="pi pi-plus"
@@ -38,10 +38,10 @@
           </p-inputNumber>
         </div>
         <div class="config-group">
-          <label>Maximum Value (optional)</label>
+          <label>{{ 'PROMPT_MODULE.MAX_VALUE' | translate }}</label>
           <p-inputNumber
             [(ngModel)]="config.max"
-            placeholder="No maximum"
+            [placeholder]="'PROMPT_MODULE.NO_MAXIMUM' | translate"
             [showButtons]="true"
             buttonLayout="horizontal"
             incrementButtonIcon="pi pi-plus"
@@ -51,7 +51,7 @@
           </p-inputNumber>
         </div>
         <div class="config-group">
-          <label>Step Increment</label>
+          <label>{{ 'PROMPT_MODULE.STEP_INCREMENT' | translate }}</label>
           <p-inputNumber
             [(ngModel)]="config.step"
             [min]="0.01"
@@ -65,20 +65,20 @@
         </div>
 
         <div class="section-label">
-          <i class="pi pi-sort-alt"></i> Spinner Buttons
+          <i class="pi pi-sort-alt"></i> {{ 'PROMPT_MODULE.SPINNER_BUTTONS' | translate }}
         </div>
 
         <div class="config-row">
-          <label>Show +/- Buttons</label>
+          <label>{{ 'PROMPT_MODULE.SHOW_BUTTONS' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.showButtons"></p-inputSwitch>
         </div>
 
-        <div class="section-label"><i class="pi pi-tag"></i> Format</div>
+        <div class="section-label"><i class="pi pi-tag"></i> {{ 'PROMPT_MODULE.FORMAT' | translate }}</div>
 
         <div class="config-group">
           <app-custom-input
             [(ngModel)]="config.prefix"
-            label="Prefix"
+            [label]="'PROMPT_MODULE.PREFIX' | translate"
             placeholder="e.g., $"
           >
           </app-custom-input>
@@ -86,37 +86,37 @@
         <div class="config-group">
           <app-custom-input
             [(ngModel)]="config.suffix"
-            label="Suffix"
+            [label]="'PROMPT_MODULE.SUFFIX' | translate"
             placeholder="e.g., kg"
           >
           </app-custom-input>
         </div>
 
-        <div class="section-label"><i class="pi pi-cog"></i> Behaviour</div>
+        <div class="section-label"><i class="pi pi-cog"></i> {{ 'PROMPT_MODULE.BEHAVIOUR' | translate }}</div>
 
         <div class="config-row">
-          <label>Disabled</label>
+          <label>{{ 'PROMPT_MODULE.DISABLED' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.disabled"></p-inputSwitch>
         </div>
         <div class="config-row">
-          <label>Read-Only</label>
+          <label>{{ 'PROMPT_MODULE.READ_ONLY' | translate }}</label>
           <p-inputSwitch [(ngModel)]="config.readonly"></p-inputSwitch>
         </div>
       </div>
       <div class="apply-preview-action">
         <button class="btn-primary" type="button" (click)="applyPreview()">
           <i class="pi pi-refresh"></i>
-          Apply Preview
+          {{ 'PROMPT_MODULE.APPLY_PREVIEW' | translate }}
         </button>
       </div>
     </div>
 
     <div class="preview-panel">
       <div class="panel-header">
-        <i class="pi pi-eye"></i><span>Preview</span>
+        <i class="pi pi-eye"></i><span>{{ 'PROMPT_MODULE.PREVIEW' | translate }}</span>
       </div>
       <div class="preview-content">
-        <div class="preview-label">Try it out:</div>
+        <div class="preview-label">{{ 'PROMPT_MODULE.TRY_IT_OUT' | translate }}</div>
 
         <ng-container *ngFor="let _ of _previewArr; trackBy: trackPreview">
           <app-custom-number
@@ -138,7 +138,7 @@
           <button
             pButton
             type="button"
-            label="Set as Default"
+            [label]="'PROMPT_MODULE.SET_AS_DEFAULT' | translate"
             class="p-button-text p-button-sm"
             icon="pi pi-check"
             (click)="setAsDefault()"
@@ -148,7 +148,7 @@
         <div class="default-indicator" *ngIf="config.defaultValue !== null">
           <i class="pi pi-bookmark"></i>
           <span
-            >Default: <strong>{{ config.defaultValue }}</strong></span
+            >{{ 'PROMPT_MODULE.DEFAULT' | translate }}: <strong>{{ config.defaultValue }}</strong></span
           >
           <button
             pButton
@@ -156,35 +156,35 @@
             icon="pi pi-times"
             class="p-button-text p-button-rounded p-button-sm"
             (click)="clearDefault()"
-            pTooltip="Clear default"
+            [pTooltip]="'PROMPT_MODULE.CLEAR_DEFAULT' | translate"
           ></button>
         </div>
 
         <div class="config-summary">
           <div class="summary-title">
-            <i class="pi pi-info-circle"></i> Active Settings
+            <i class="pi pi-info-circle"></i> {{ 'PROMPT_MODULE.ACTIVE_SETTINGS' | translate }}
           </div>
           <div class="summary-chips">
             <span class="summary-chip" *ngIf="previewConfig.showButtons"
-              >Buttons</span
+              >{{ 'PROMPT_MODULE.BUTTONS' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.min !== null"
-              >Min: {{ previewConfig.min }}</span
+              >{{ 'PROMPT_MODULE.MIN' | translate }}: {{ previewConfig.min }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.max !== null"
-              >Max: {{ previewConfig.max }}</span
+              >{{ 'PROMPT_MODULE.MAX' | translate }}: {{ previewConfig.max }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.prefix"
-              >Prefix</span
+              >{{ 'PROMPT_MODULE.PREFIX' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.suffix"
-              >Suffix</span
+              >{{ 'PROMPT_MODULE.SUFFIX' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.disabled"
-              >Disabled</span
+              >{{ 'PROMPT_MODULE.DISABLED' | translate }}</span
             >
             <span class="summary-chip" *ngIf="previewConfig.readonly"
-              >Read-only</span
+              >{{ 'PROMPT_MODULE.READ_ONLY' | translate }}</span
             >
             <span
               class="summary-empty"
@@ -198,7 +198,7 @@
                 !previewConfig.readonly
               "
             >
-              Default configuration
+              {{ 'PROMPT_MODULE.DEFAULT_CONFIGURATION' | translate }}
             </span>
           </div>
         </div>
@@ -209,11 +209,11 @@
   <ng-template pTemplate="footer">
     <button class="btn-cancel" type="button" (click)="onClose()">
       <i class="pi pi-times"></i>
-      Cancel
+      {{ 'COMMON.CANCEL' | translate }}
     </button>
     <button class="btn-primary" type="button" (click)="onSave()">
       <i class="pi pi-check"></i>
-      Apply
+      {{ 'PROMPT_MODULE.APPLY' | translate }}
     </button>
   </ng-template>
 </p-dialog>

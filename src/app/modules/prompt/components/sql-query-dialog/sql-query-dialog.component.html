@@ -4,21 +4,18 @@
   [style]="{ width: '800px' }"
   [draggable]="false"
   [resizable]="false"
-  header="Load Values from SQL Query"
+  [header]="'PROMPT_MODULE.LOAD_VALUES_SQL_TITLE' | translate"
   styleClass="sql-query-dialog"
   (onHide)="onCancel()"
 >
   <div class="dialog-content">
     <div class="info-message">
       <i class="pi pi-info-circle"></i>
-      <span
-        >Enter a SQL query that returns values in the first column. These values
-        will be added to your prompt options.</span
-      >
+      <span>{{ 'PROMPT_MODULE.SQL_QUERY_INFO' | translate }}</span>
     </div>
 
     <div class="form-field">
-      <label for="sqlQuery">SQL Query<span class="required">*</span></label>
+      <label for="sqlQuery">{{ 'PROMPT_MODULE.SQL_QUERY' | translate }}<span class="required">*</span></label>
 
       <!-- Monaco Editor Container -->
       <div
@@ -35,7 +32,7 @@
       <!-- Loading State -->
       <div class="editor-loading" *ngIf="isLoadingEditor && !monacoLoadFailed">
         <i class="pi pi-spin pi-spinner"></i>
-        <span>Loading editor...</span>
+        <span>{{ 'PROMPT_MODULE.LOADING_EDITOR' | translate }}</span>
       </div>
 
       <!-- Error Fallback -->
@@ -51,8 +48,7 @@
 
       <small class="hint">
         <i class="pi pi-lightbulb"></i>
-        Type schema/table names for suggestions, or table.column for column
-        suggestions
+        {{ 'PROMPT_MODULE.SQL_EDITOR_HINT' | translate }}
       </small>
     </div>
 
@@ -66,14 +62,14 @@
     <button
       pButton
       type="button"
-      label="Cancel"
+      [label]="'COMMON.CANCEL' | translate"
       class="p-button-outlined btn-cancel"
       (click)="onCancel()"
     ></button>
     <button
       pButton
       type="button"
-      label="Execute & Load"
+      [label]="'PROMPT_MODULE.EXECUTE_AND_LOAD' | translate"
       class="p-button-primary btn-save"
       (click)="onExecute()"
       [disabled]="!sqlQuery.trim()"

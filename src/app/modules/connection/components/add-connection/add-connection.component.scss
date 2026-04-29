@@ -63,12 +63,12 @@
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
           font-weight: 600;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+          box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
             background: var(--hover-background) !important;
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-md);
           }
 
           &:disabled {
@@ -78,19 +78,19 @@
         }
 
         .btn-save {
-          background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
           font-weight: 600;
-          box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
           &:hover:not(:disabled) {
             opacity: 1;
             transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+            box-shadow: var(--shadow-md);
           }
 
           &:disabled {
@@ -242,7 +242,7 @@
           }
 
           .error-message {
-            color: #ff3333 !important;
+            color: var(--error-color) !important;
             font-size: 12px;
             position: absolute;
             bottom: -20px;
@@ -389,7 +389,7 @@
                     }
 
                     .error-message {
-                      color: #ff3333 !important;
+                      color: var(--error-color) !important;
                       font-size: 12px;
                       position: absolute;
                       bottom: -20px;
@@ -469,7 +469,7 @@
       color: var(--primary-color) !important;
 
       &:hover:not(:disabled) {
-        background: rgba(var(--primary-rgb), 0.04) !important;
+        background: var(--primary-color-transparent) !important;
       }
 
       &:disabled {
@@ -857,7 +857,7 @@
 // Update the keyframes with yellow color
 @keyframes pulseGlow {
   0% {
-    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); // Yellow warning color
+    box-shadow: 0 0 0 0 var(--warning-bg); // Yellow warning color
   }
   70% {
     box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); // Fade out
@@ -881,7 +881,7 @@
     min-width: 24px;
     height: 24px;
     background: var(--primary-color);
-    color: white;
+    color: var(--primary-text);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -961,9 +961,9 @@
     border: none;
 
     .index-number {
-      background: #ffc107; // Warning yellow color
+      background: var(--warning-color); // Warning yellow color
       animation: pulseGlow 1.5s infinite;
-      color: #000; // Change text color to black for better contrast with yellow
+      color: var(--text-color); // Change text color to black for better contrast with yellow
     }
   }
 }
@@ -1037,7 +1037,7 @@
         min-width: 24px;
         height: 24px;
         background: var(--primary-color);
-        color: white;
+        color: var(--primary-text);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -1082,9 +1082,9 @@
 
       &.duplicate {
         .index-number {
-          background: #ffc107;
+          background: var(--warning-color);
           animation: pulseGlow 1.5s infinite;
-          color: #000;
+          color: var(--text-color);
         }
       }
 
@@ -1134,10 +1134,10 @@
 
 @keyframes highlightBackground {
   0% {
-    background-color: rgba(33, 150, 243, 0.1);
+    background-color: var(--primary-color-transparent);
   }
   50% {
-    background-color: rgba(33, 150, 243, 0.15);
+    background-color: var(--primary-color-transparent);
   }
   100% {
     background-color: var(--surface-card);

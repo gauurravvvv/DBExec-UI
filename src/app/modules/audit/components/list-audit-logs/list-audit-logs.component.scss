@@ -258,24 +258,24 @@ $radius-sm: 8px;
         letter-spacing: 0.03em;
         white-space: nowrap;
         &.action-create {
-          background: rgba(76, 175, 80, 0.1);
+          background: var(--success-bg);
           color: var(--success-color);
         }
         &.action-update {
-          background: rgba(33, 150, 243, 0.1);
+          background: var(--primary-color-transparent);
           color: var(--primary-color);
         }
         &.action-delete {
-          background: rgba(244, 67, 54, 0.1);
+          background: var(--error-bg);
           color: var(--error-color);
         }
         &.action-auth {
-          background: rgba(156, 39, 176, 0.1);
-          color: #9c27b0;
+          background: var(--primary-color-transparent);
+          color: var(--primary-color);
         }
         &.action-warning {
-          background: rgba(255, 152, 0, 0.1);
-          color: #f57c00;
+          background: var(--warning-bg);
+          color: var(--warning-hover);
         }
         &.action-default {
           background: var(--hover-background);
@@ -330,7 +330,7 @@ $radius-sm: 8px;
           }
           &.p-highlight {
             background: var(--primary-color);
-            color: #fff;
+            color: var(--primary-text);
           }
         }
       }
@@ -357,7 +357,7 @@ td.empty-message-cell {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -378,7 +378,7 @@ td.empty-message-cell {
     background: var(--card-background);
     border-radius: $radius-lg;
     box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      var(--shadow-xl),
       0 0 0 1px var(--border-color);
     width: 100%;
     max-width: 580px;
@@ -428,24 +428,24 @@ td.empty-message-cell {
       }
 
       &.action-create {
-        background: rgba(76, 175, 80, 0.1);
+        background: var(--success-bg);
         color: var(--success-color);
       }
       &.action-update {
-        background: rgba(33, 150, 243, 0.1);
+        background: var(--primary-color-transparent);
         color: var(--primary-color);
       }
       &.action-delete {
-        background: rgba(244, 67, 54, 0.1);
+        background: var(--error-bg);
         color: var(--error-color);
       }
       &.action-auth {
-        background: rgba(156, 39, 176, 0.1);
-        color: #9c27b0;
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
       }
       &.action-warning {
-        background: rgba(255, 152, 0, 0.1);
-        color: #f57c00;
+        background: var(--warning-bg);
+        color: var(--warning-hover);
       }
       &.action-default {
         background: var(--hover-background);

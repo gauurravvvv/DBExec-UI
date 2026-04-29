@@ -6,7 +6,7 @@
         <button pButton class="p-button-text" (click)="onBack()">
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>View Query Builder</h2>
+        <h2>{{ 'QUERY_BUILDER_MODULE.VIEW_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <div class="structure-nav-wrapper" #treeSearchInput>
@@ -14,7 +14,7 @@
             class="btn-icon"
             type="button"
             (click)="toggleStructureTree()"
-            title="Navigate to prompt"
+            [title]="'COMMON.NAVIGATE' | translate"
           >
             <i class="pi pi-sitemap"></i>
           </button>
@@ -29,7 +29,7 @@
                 [value]="structureTreeNodes"
                 [filter]="true"
                 [filterBy]="'label'"
-                [filterPlaceholder]="'Search tab, section or prompt...'"
+                [filterPlaceholder]="'COMMON.SEARCH' | translate"
                 filterMode="lenient"
                 selectionMode="single"
                 (onNodeSelect)="onStructureNodeSelect($event)"
@@ -41,28 +41,28 @@
             </div>
             <div class="tree-empty" *ngIf="loadingStructure">
               <i class="pi pi-spin pi-spinner"></i>
-              <span>Loading structure...</span>
+              <span>{{ 'COMMON.LOADING' | translate }}</span>
             </div>
             <div
               class="tree-empty"
               *ngIf="!loadingStructure && structureTreeNodes.length === 0"
             >
               <i class="pi pi-info-circle"></i>
-              <span>No structure available</span>
+              <span>{{ 'COMMON.NO_DATA_AVAILABLE' | translate }}</span>
             </div>
           </div>
         </div>
         <button class="btn-primary" type="button" (click)="onEdit()">
           <i class="pi pi-pencil"></i>
-          Edit
+          {{ 'COMMON.EDIT' | translate }}
         </button>
         <button class="btn-configure" type="button" (click)="onConfigure()">
           <i class="pi pi-cog"></i>
-          Configure
+          {{ 'QUERY_BUILDER_MODULE.CONFIGURE' | translate }}
         </button>
         <button class="btn-danger" type="button" (click)="confirmDelete()">
           <i class="pi pi-trash"></i>
-          Delete
+          {{ 'COMMON.DELETE' | translate }}
         </button>
       </div>
     </div>
@@ -87,7 +87,7 @@
         <span>{{ tabError }}</span>
         <button
           pButton
-          label="Retry"
+          [label]="'COMMON.RETRY' | translate"
           class="p-button-outlined"
           (click)="loadTabs()"
         ></button>
@@ -99,7 +99,7 @@
         *ngIf="!loadingTabs && !tabError && tabs.length === 0"
       >
         <i class="pi pi-inbox"></i>
-        <span>No tabs configured for this query builder</span>
+        <span>{{ 'QUERY_BUILDER_MODULE.NO_TABS_CONFIGURED' | translate }}</span>
       </div>
 
       <!-- Tab View -->
@@ -138,7 +138,7 @@
               <span>{{ tab.error }}</span>
               <button
                 pButton
-                label="Retry"
+                [label]="'COMMON.RETRY' | translate"
                 class="p-button-outlined"
                 (click)="loadSections(tab)"
               ></button>
@@ -155,7 +155,7 @@
               "
             >
               <i class="pi pi-folder-open"></i>
-              <span>No sections in this tab</span>
+              <span>{{ 'QUERY_BUILDER_MODULE.NO_SECTIONS' | translate }}</span>
             </div>
 
             <!-- Accordion Sections -->
@@ -194,7 +194,7 @@
                   <span>{{ section.error }}</span>
                   <button
                     pButton
-                    label="Retry"
+                    [label]="'COMMON.RETRY' | translate"
                     class="p-button-outlined"
                     (click)="loadPrompts(section)"
                   ></button>
@@ -211,7 +211,7 @@
                   "
                 >
                   <i class="pi pi-info-circle"></i>
-                  <span>No prompts in this section</span>
+                  <span>{{ 'QUERY_BUILDER_MODULE.NO_PROMPTS' | translate }}</span>
                 </div>
 
                 <!-- Prompt Form Fields -->
@@ -705,7 +705,7 @@
                         class="p-error"
                         *ngIf="getPromptControl(prompt)?.hasError('required')"
                       >
-                        {{ prompt.name }} is required
+                        {{ 'QUERY_BUILDER_MODULE.PROMPT_REQUIRED' | translate: { name: prompt.name } }}
                       </small>
                     </div>
                   </div>
@@ -726,36 +726,35 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3>Confirm Delete</h3>
+      <h3>{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
     </div>
 
     <div class="standard-delete-section">
       <p class="delete-intro">
-        Are you sure you want to delete this query builder?
+        {{ 'QUERY_BUILDER_MODULE.DELETE_SINGLE' | translate }}
       </p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
           <span
-            >This will permanently remove the query builder and its
-            configuration</span
+            >{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span
           >
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>This action cannot be undone</span>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
         </li>
       </ul>
 
       <div class="justification-section">
         <label for="deleteJustification"
-          >Justification <span class="required">*</span></label
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
         >
         <textarea
           id="deleteJustification"
           [(ngModel)]="deleteJustification"
-          placeholder="Provide a reason for this deletion"
+          [placeholder]="'COMMON.PROVIDE_REASON_DELETE' | translate"
           rows="3"
           maxlength="500"
         ></textarea>
@@ -766,7 +765,7 @@
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
@@ -774,7 +773,7 @@
         [disabled]="!deleteJustification.trim()"
       >
         <i class="pi pi-trash"></i>
-        Delete
+        {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>
   </div>

@@ -18,6 +18,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { AnnouncementService } from '../../services/announcement.service';
 
 @Component({
@@ -48,10 +49,7 @@ export class ListAnnouncementsComponent implements OnInit {
   toDeleteId: string | null = null;
   deleteJustification = '';
 
-  statusOptions = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 },
-  ];
+  statusOptions: any[] = [];
 
   filterValues: any = {
     name: '',
@@ -81,9 +79,15 @@ export class ListAnnouncementsComponent implements OnInit {
     private globalService: GlobalService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
+    this.statusOptions = [
+      { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
+      { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
+    ];
+
     this.filter$
       .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadAnnouncements());

@@ -86,23 +86,23 @@ $radius-sm: 8px;
             background: var(--card-background);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-sm);
 
             &:hover {
               background: var(--hover-background);
               transform: translateY(-1px);
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+              box-shadow: var(--shadow-md);
             }
           }
 
           &.btn-primary {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            color: white;
-            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: var(--primary-text);
+            box-shadow: 0 4px 10px var(--primary-color-transparent);
 
             &:hover:not(:disabled) {
               transform: translateY(-1px);
-              box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+              box-shadow: var(--shadow-md);
             }
 
             &:disabled {
@@ -114,13 +114,13 @@ $radius-sm: 8px;
           }
 
           &.btn-danger {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-            color: white;
-            box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+            background: linear-gradient(135deg, var(--error-color), var(--error-color));
+            color: var(--primary-text);
+            box-shadow: 0 4px 10px var(--error-bg);
 
             &:hover:not(:disabled) {
               transform: translateY(-1px);
-              box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+              box-shadow: var(--shadow-md);
             }
 
             &:disabled {
@@ -187,7 +187,7 @@ $radius-sm: 8px;
       align-items: center;
       justify-content: center;
       font-size: 2.5rem;
-      color: white;
+      color: var(--primary-text);
       margin-bottom: 16px;
     }
 
@@ -280,7 +280,7 @@ $radius-sm: 8px;
 
       &:hover:not(:disabled) {
         background: var(--primary-color);
-        color: white;
+        color: var(--primary-text);
       }
 
       &:disabled {
@@ -317,15 +317,15 @@ $radius-sm: 8px;
     }
 
     &.not-configured {
-      background: rgba(255, 152, 0, 0.08);
-      border: 1px solid rgba(255, 152, 0, 0.3);
-      color: #e68a00;
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-bg);
+      color: var(--warning-hover);
     }
 
     &.connection-failed {
-      background: rgba(244, 67, 54, 0.08);
-      border: 1px solid rgba(244, 67, 54, 0.3);
-      color: #d32f2f;
+      background: var(--error-bg);
+      border: 1px solid var(--error-bg);
+      color: var(--error-color);
     }
   }
 
@@ -385,7 +385,7 @@ $radius-sm: 8px;
     font-size: 0.9rem;
     font-weight: 500;
     background-color: var(--error-color);
-    color: white;
+    color: var(--primary-text);
 
     &.active {
       background-color: var(--success-color);
@@ -403,13 +403,13 @@ $radius-sm: 8px;
   letter-spacing: 0.3px;
 
   &.smtp {
-    background: rgba(33, 150, 243, 0.1);
-    color: #2196f3;
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
   }
 
   &.ses {
-    background: rgba(255, 152, 0, 0.1);
-    color: #e68a00;
+    background: var(--warning-bg);
+    color: var(--warning-hover);
   }
 
   &.none {
@@ -464,7 +464,7 @@ $radius-sm: 8px;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -486,7 +486,7 @@ $radius-sm: 8px;
     padding: 2rem;
     border-radius: $radius-lg;
     box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      var(--shadow-xl),
       0 0 0 1px var(--border-color);
     width: 100%;
     max-width: 420px;
@@ -515,7 +515,7 @@ $radius-sm: 8px;
         align-items: center;
         justify-content: center;
         margin: 0 auto 1rem;
-        background: rgba(244, 67, 54, 0.1);
+        background: var(--error-bg);
 
         i {
           font-size: 1.5rem;
@@ -625,7 +625,7 @@ $radius-sm: 8px;
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
           }
         }
 
@@ -672,12 +672,12 @@ $radius-sm: 8px;
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, #f44336, #d32f2f);
-          color: white;
-          box-shadow: 0 4px 14px rgba(244, 67, 54, 0.35);
+          background: linear-gradient(135deg, var(--error-color), var(--error-color));
+          color: var(--primary-text);
+          box-shadow: 0 4px 14px var(--error-bg);
           &:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.45);
+            box-shadow: var(--shadow-md);
           }
           &:active {
             transform: translateY(0);
@@ -715,7 +715,7 @@ $radius-sm: 8px;
       color: var(--primary-color) !important;
 
       &:hover:not(:disabled) {
-        background: rgba(var(--primary-rgb), 0.04) !important;
+        background: var(--primary-color-transparent) !important;
       }
 
       &:disabled {

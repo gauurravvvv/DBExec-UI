@@ -13,7 +13,7 @@
         type="text"
         [(ngModel)]="searchTerm"
         (input)="onSearch()"
-        placeholder="Search datasets, screens, tabs, analyses..."
+        [placeholder]="'SEARCH.PLACEHOLDER' | translate"
         class="search-input"
         autocomplete="off"
         spellcheck="false"
@@ -28,7 +28,7 @@
         [class.active]="activeFilter === 'ALL'"
         (click)="setFilter('ALL')"
       >
-        All
+        {{ 'SEARCH.ALL' | translate }}
         <span class="chip-count">{{ searchResults.length }}</span>
       </button>
       <button
@@ -70,22 +70,22 @@
     <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0">
       <i class="pi pi-search empty-icon"></i>
       <p class="empty-text">
-        No results for <strong>"{{ searchTerm }}"</strong>
+        {{ 'SEARCH.NO_RESULTS' | translate }} <strong>"{{ searchTerm }}"</strong>
       </p>
-      <p class="empty-sub">Try different keywords or check the spelling</p>
+      <p class="empty-sub">{{ 'SEARCH.TRY_DIFFERENT' | translate }}</p>
     </div>
 
     <!-- Idle State -->
     <div class="idle-state" *ngIf="!searchTerm">
       <i class="pi pi-search idle-icon"></i>
-      <p class="idle-text">Search across all your entities</p>
+      <p class="idle-text">{{ 'SEARCH.SEARCH_ACROSS' | translate }}</p>
     </div>
 
     <!-- Footer -->
     <div class="search-footer">
-      <div class="shortcut"><kbd>↑</kbd><kbd>↓</kbd><span>Navigate</span></div>
-      <div class="shortcut"><kbd>↵</kbd><span>Open</span></div>
-      <div class="shortcut"><kbd>ESC</kbd><span>Close</span></div>
+      <div class="shortcut"><kbd>↑</kbd><kbd>↓</kbd><span>{{ 'SEARCH.NAVIGATE' | translate }}</span></div>
+      <div class="shortcut"><kbd>↵</kbd><span>{{ 'SEARCH.OPEN' | translate }}</span></div>
+      <div class="shortcut"><kbd>ESC</kbd><span>{{ 'SEARCH.CLOSE' | translate }}</span></div>
     </div>
   </div>
 </div>

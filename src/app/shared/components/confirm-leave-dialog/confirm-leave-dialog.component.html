@@ -1,25 +1,25 @@
-<div class="confirmation-popup" *ngIf="unsavedChangesService.showDialog">
+<div class="confirmation-popup" *ngIf="unsavedChangesService.showDialog()">
   <div class="popup-content">
     <div class="popup-header">
       <div class="popup-icon">
         <i class="pi pi-exclamation-triangle"></i>
       </div>
-      <h3>Unsaved Changes</h3>
+      <h3>{{ 'UNSAVED_CHANGES.TITLE' | translate }}</h3>
     </div>
 
     <div class="popup-body">
-      <p class="popup-message">Your unsaved changes will be lost.</p>
-      <p class="popup-hint">Save your work before navigating away.</p>
+      <p class="popup-message">{{ 'UNSAVED_CHANGES.MESSAGE' | translate }}</p>
+      <p class="popup-hint">{{ 'UNSAVED_CHANGES.HINT' | translate }}</p>
     </div>
 
     <div class="popup-actions">
       <button class="btn-cancel" (click)="stay()">
         <i class="pi pi-times"></i>
-        Stay
+        {{ 'UNSAVED_CHANGES.STAY' | translate }}
       </button>
       <button class="btn-confirm" (click)="leave()">
         <i class="pi pi-sign-out"></i>
-        Discard & Leave
+        {{ 'UNSAVED_CHANGES.DISCARD_LEAVE' | translate }}
       </button>
     </div>
   </div>

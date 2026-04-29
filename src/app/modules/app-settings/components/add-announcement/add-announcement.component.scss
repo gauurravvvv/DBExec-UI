@@ -66,12 +66,12 @@
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
           font-weight: 600;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+          box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
             background: var(--hover-background) !important;
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-md);
           }
 
           &:disabled {
@@ -81,19 +81,19 @@
         }
 
         .btn-save {
-          background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
           font-weight: 600;
-          box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
           &:hover:not(:disabled) {
             opacity: 1;
             transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+            box-shadow: var(--shadow-md);
           }
 
           &:disabled {
@@ -220,7 +220,7 @@
 
         &:hover {
           border-color: var(--primary-color);
-          background: rgba(33, 150, 243, 0.06);
+          background: var(--primary-color-transparent);
           transform: translateY(-1px);
         }
       }
@@ -237,9 +237,9 @@
         align-items: center;
         padding: 0.5rem 0.75rem;
         border-radius: 4px;
-        background: rgba(244, 67, 54, 0.08);
-        border: 1px solid rgba(244, 67, 54, 0.3);
-        color: #c62828;
+        background: var(--error-bg);
+        border: 1px solid var(--error-bg);
+        color: var(--error-color);
         font-size: 0.78rem;
 
         i {
@@ -278,14 +278,14 @@
           font-family: monospace;
           padding: 2px 8px;
           border-radius: 10px;
-          background: rgba(0, 0, 0, 0.06);
+          background: var(--shadow-color);
           color: var(--secondary-color);
         }
 
         &__bar {
           height: 6px;
           border-radius: 3px;
-          background: rgba(0, 0, 0, 0.08);
+          background: var(--shadow-color);
           overflow: hidden;
           margin-bottom: 8px;
         }
@@ -307,57 +307,57 @@
 
         // Level: Poor
         &--poor {
-          border-color: rgba(244, 67, 54, 0.3);
-          background: rgba(244, 67, 54, 0.06);
+          border-color: var(--error-bg);
+          background: var(--error-bg);
 
           .contrast-meter__label {
-            color: #c62828;
+            color: var(--error-color);
           }
 
           .contrast-meter__fill {
-            background: linear-gradient(90deg, #f44336, #e53935);
+            background: linear-gradient(90deg, var(--error-color), var(--error-hover, #e53935));
           }
         }
 
         // Level: Needs work
         &--needs-work {
-          border-color: rgba(255, 152, 0, 0.3);
-          background: rgba(255, 152, 0, 0.06);
+          border-color: var(--warning-bg);
+          background: var(--warning-bg);
 
           .contrast-meter__label {
-            color: #e65100;
+            color: var(--warning-hover);
           }
 
           .contrast-meter__fill {
-            background: linear-gradient(90deg, #ff9800, #f57c00);
+            background: linear-gradient(90deg, var(--warning-color), var(--warning-hover));
           }
         }
 
         // Level: Good
         &--good {
-          border-color: rgba(76, 175, 80, 0.3);
-          background: rgba(76, 175, 80, 0.06);
+          border-color: var(--success-bg);
+          background: var(--success-bg);
 
           .contrast-meter__label {
-            color: #2e7d32;
+            color: var(--success-color);
           }
 
           .contrast-meter__fill {
-            background: linear-gradient(90deg, #66bb6a, #43a047);
+            background: linear-gradient(90deg, #66bb6a, var(--success-color));
           }
         }
 
         // Level: Excellent
         &--excellent {
-          border-color: rgba(33, 150, 243, 0.3);
-          background: rgba(33, 150, 243, 0.06);
+          border-color: var(--primary-color-transparent);
+          background: var(--primary-color-transparent);
 
           .contrast-meter__label {
-            color: #1565c0;
+            color: var(--primary-hover);
           }
 
           .contrast-meter__fill {
-            background: linear-gradient(90deg, #42a5f5, #1e88e5);
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
           }
         }
       }
@@ -369,7 +369,7 @@
 .preview-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(6px);
   display: flex;
   justify-content: center;
@@ -385,7 +385,7 @@
   max-width: 560px;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 60px -12px var(--overlay-background);
   animation: previewEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
   .preview-header {
@@ -460,7 +460,7 @@
         height: 22px;
         border-radius: 50%;
         background: var(--primary-color);
-        color: #fff;
+        color: var(--primary-text);
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -532,7 +532,7 @@
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 16px var(--shadow-color);
 
     &__accent {
       width: 4px;
@@ -676,7 +676,7 @@
       color: var(--primary-color) !important;
 
       &:hover:not(:disabled) {
-        background: rgba(var(--primary-rgb), 0.04) !important;
+        background: var(--primary-color-transparent) !important;
       }
 
       &:disabled {
@@ -710,11 +710,11 @@
 
       &:hover {
         transform: scale(1.05);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 8px var(--shadow-color);
       }
 
       &:focus {
-        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.25);
+        box-shadow: 0 0 0 3px var(--primary-color-transparent);
       }
     }
   }

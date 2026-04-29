@@ -223,7 +223,7 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
   z-index: 1000;
   pointer-events: none;
@@ -415,7 +415,7 @@ a {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
   z-index: 1000;
   pointer-events: none;

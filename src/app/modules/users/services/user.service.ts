@@ -50,7 +50,7 @@ export class UserService {
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {
-      const { firstName, lastName, username, email, organisation, groupIds } =
+      const { firstName, lastName, username, email, organisation, groupIds, locale } =
         form.value;
       return await lastValueFrom(
         this.http.apiPost(USER.ADD, {
@@ -60,6 +60,7 @@ export class UserService {
           email,
           organisation,
           groupIds,
+          locale,
         }),
       );
     } finally {

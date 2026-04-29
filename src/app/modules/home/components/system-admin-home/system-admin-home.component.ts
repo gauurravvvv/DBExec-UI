@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { HomeService } from '../../services/home.service';
 
@@ -52,41 +53,15 @@ export class SystemAdminHomeComponent implements OnInit {
   activeUsers15days = 0;
   activeUsers30days = 0;
 
-  stats = [
-    { title: 'Active Users (Last 24 hrs)', value: this.activeUsers24hrs },
-    { title: 'Active Users (Last 3 Days)', value: this.activeUsers3days },
-    { title: 'Active Users (Last 7 Days)', value: this.activeUsers7days },
-    { title: 'Active Users (Last 15 Days)', value: this.activeUsers15days },
-    { title: 'Active Users (Last 30 Days)', value: this.activeUsers30days },
-  ];
+  stats: any[] = [];
 
-  overviews = [
-    {
-      title: 'Total Datasources',
-      value: this.entitiesData.totalDatasources,
-      maxValue: this.entitiesData.maxDatasources,
-    },
-    {
-      title: 'Total Environments',
-      value: this.entitiesData.totalEnvironment,
-      maxValue: this.entitiesData.maxEnvironment,
-    },
-    {
-      title: 'Total Admins',
-      value: this.entitiesData.totalAdmins,
-      maxValue: this.entitiesData.maxAdmins,
-    },
-    {
-      title: 'Total Users',
-      value: this.entitiesData.totalUsers,
-      maxValue: this.entitiesData.maxUsers,
-    },
-  ];
+  overviews: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private globalService: GlobalService,
     private homeService: HomeService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -133,31 +108,31 @@ export class SystemAdminHomeComponent implements OnInit {
 
   updateStats() {
     this.stats = [
-      { title: 'Active Users (Last 24 hrs)', value: this.activeUsers24hrs },
-      { title: 'Active Users (Last 3 Days)', value: this.activeUsers3days },
-      { title: 'Active Users (Last 7 Days)', value: this.activeUsers7days },
-      { title: 'Active Users (Last 15 Days)', value: this.activeUsers15days },
-      { title: 'Active Users (Last 30 Days)', value: this.activeUsers30days },
+      { title: this.translate.instant('HOME.ACTIVE_USERS_24H'), value: this.activeUsers24hrs },
+      { title: this.translate.instant('HOME.ACTIVE_USERS_3D'), value: this.activeUsers3days },
+      { title: this.translate.instant('HOME.ACTIVE_USERS_7D'), value: this.activeUsers7days },
+      { title: this.translate.instant('HOME.ACTIVE_USERS_15D'), value: this.activeUsers15days },
+      { title: this.translate.instant('HOME.ACTIVE_USERS_30D'), value: this.activeUsers30days },
     ];
 
     this.overviews = [
       {
-        title: 'Total Datasources',
+        title: this.translate.instant('HOME.TOTAL_DATASOURCES'),
         value: this.entitiesData.totalDatasources,
         maxValue: this.entitiesData.maxDatasources,
       },
       {
-        title: 'Total Environments',
+        title: this.translate.instant('HOME.TOTAL_ENVIRONMENTS'),
         value: this.entitiesData.totalEnvironment,
         maxValue: this.entitiesData.maxEnvironment,
       },
       {
-        title: 'Total Admins',
+        title: this.translate.instant('HOME.TOTAL_ADMINS'),
         value: this.entitiesData.totalAdmins,
         maxValue: this.entitiesData.maxAdmins,
       },
       {
-        title: 'Total Users',
+        title: this.translate.instant('HOME.TOTAL_USERS'),
         value: this.entitiesData.totalUsers,
         maxValue: this.entitiesData.maxUsers,
       },
@@ -173,12 +148,11 @@ export class SystemAdminHomeComponent implements OnInit {
   }
 
   getOverviewIcon(title: string): string {
-    const icons: { [key: string]: string } = {
-      'Total Datasources': 'fas fa-database',
-      'Total Environments': 'fas fa-globe',
-      'Total Admins': 'fas fa-user-shield',
-      'Total Users': 'fas fa-users',
-    };
+    const icons: { [key: string]: string } = {};
+    icons[this.translate.instant('HOME.TOTAL_DATASOURCES')] = 'fas fa-database';
+    icons[this.translate.instant('HOME.TOTAL_ENVIRONMENTS')] = 'fas fa-globe';
+    icons[this.translate.instant('HOME.TOTAL_ADMINS')] = 'fas fa-user-shield';
+    icons[this.translate.instant('HOME.TOTAL_USERS')] = 'fas fa-users';
     return icons[title] || 'fas fa-chart-bar';
   }
 

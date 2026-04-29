@@ -3,10 +3,9 @@
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>Audit Logs</h2>
+        <h2>{{ 'AUDIT.TITLE' | translate }}</h2>
         <p class="subtitle">
-          Track all system actions across modules — creates, updates, deletes
-          and sensitive operations
+          {{ 'AUDIT.SUBTITLE' | translate }}
         </p>
       </div>
     </div>
@@ -23,11 +22,11 @@
               optionValue="value"
               [filter]="true"
               filterBy="label"
-              label="Organisation"
+              [label]="'COMMON.ORGANISATION' | translate"
               [floatingLabel]="true"
               [showClear]="true"
               [autoDisplayFirst]="false"
-              placeholder="Select Organisation"
+              [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
               (onChangeEvent)="onOrganisationChange()"
             ></app-custom-dropdown>
           </div>
@@ -38,11 +37,11 @@
               [options]="moduleOptions"
               optionLabel="label"
               optionValue="value"
-              label="Log Type"
+              [label]="'AUDIT.LOG_TYPE' | translate"
               [floatingLabel]="true"
               [showClear]="true"
               [autoDisplayFirst]="false"
-              placeholder="All Modules"
+              [placeholder]="'AUDIT.ALL_MODULES' | translate"
               (onChangeEvent)="onFilterChange()"
             ></app-custom-dropdown>
           </div>
@@ -52,7 +51,7 @@
           <button
             pButton
             icon="pi pi-file-pdf"
-            pTooltip="Export PDF"
+            [pTooltip]="'COMMON.EXPORT_PDF' | translate"
             tooltipPosition="top"
             (click)="exportLogs('pdf')"
             [disabled]="totalItems() === 0"
@@ -61,14 +60,14 @@
           <button
             pButton
             icon="pi pi-refresh"
-            pTooltip="Refresh"
+            [pTooltip]="'COMMON.REFRESH' | translate"
             tooltipPosition="top"
             (click)="refreshLogs()"
             class="p-button-outlined modern-button"
           ></button>
           <button
             pButton
-            label="Clear"
+            [label]="'COMMON.CLEAR' | translate"
             icon="pi pi-filter-slash"
             (click)="clearFilters()"
             [disabled]="!isFilterActive"
@@ -99,28 +98,28 @@
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 180px; min-width: 180px" pFrozenColumn>
-                <div class="th-content">Name</div>
+                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
               </th>
               <th style="width: 160px; min-width: 160px">
-                <div class="th-content">Performed By</div>
+                <div class="th-content">{{ 'AUDIT.PERFORMED_BY' | translate }}</div>
               </th>
               <th style="width: 130px; min-width: 130px">
-                <div class="th-content">Action</div>
+                <div class="th-content">{{ 'AUDIT.ACTION' | translate }}</div>
               </th>
               <th style="width: 80px; min-width: 80px">
-                <div class="th-content">Version</div>
+                <div class="th-content">{{ 'AUDIT.VERSION' | translate }}</div>
               </th>
               <th style="width: 120px; min-width: 120px">
-                <div class="th-content">Status</div>
+                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
               <th style="width: 220px; min-width: 220px">
-                <div class="th-content">Timestamp</div>
+                <div class="th-content">{{ 'AUDIT.TIMESTAMP' | translate }}</div>
               </th>
               <th style="width: 160px; min-width: 160px">
-                <div class="th-content">IP Address</div>
+                <div class="th-content">{{ 'AUDIT.IP_ADDRESS' | translate }}</div>
               </th>
               <th style="width: 240px; min-width: 240px">
-                <div class="th-content">Justification</div>
+                <div class="th-content">{{ 'AUDIT.JUSTIFICATION' | translate }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -129,14 +128,14 @@
                 <app-custom-input
                   [(ngModel)]="filterValues.entityName"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search name"
+                  [placeholder]="'AUDIT.SEARCH_NAME' | translate"
                 ></app-custom-input>
               </th>
               <th>
                 <app-custom-input
                   [(ngModel)]="filterValues.username"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search user"
+                  [placeholder]="'AUDIT.SEARCH_USER' | translate"
                 ></app-custom-input>
               </th>
               <th>
@@ -147,7 +146,7 @@
                   optionValue="value"
                   [showClear]="true"
                   [autoDisplayFirst]="false"
-                  placeholder="All"
+                  [placeholder]="'COMMON.ALL' | translate"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
                 ></app-custom-dropdown>
@@ -161,7 +160,7 @@
                   optionValue="value"
                   [showClear]="true"
                   [autoDisplayFirst]="false"
-                  placeholder="All"
+                  [placeholder]="'COMMON.ALL' | translate"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
                 ></app-custom-dropdown>
@@ -169,7 +168,7 @@
               <th>
                 <app-custom-daterange
                   [(ngModel)]="filterValues.dateRange"
-                  placeholder="Select range"
+                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
                   [showButtonBar]="true"
                   [maxDate]="today"
                   (onChangeEvent)="onDateRangeChange($event)"
@@ -179,14 +178,14 @@
                 <app-custom-input
                   [(ngModel)]="filterValues.ipAddress"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search IP"
+                  [placeholder]="'AUDIT.SEARCH_IP' | translate"
                 ></app-custom-input>
               </th>
               <th>
                 <app-custom-input
                   [(ngModel)]="filterValues.justification"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search"
+                  [placeholder]="'AUDIT.SEARCH_NAME' | translate"
                 ></app-custom-input>
               </th>
             </tr>
@@ -227,7 +226,7 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{ log.responseSuccess ? 'Success' : 'Failed' }}
+                  {{ log.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
                 </span>
               </td>
               <td>
@@ -250,7 +249,7 @@
           <ng-template pTemplate="emptymessage">
             <tr>
               <td colspan="8" class="empty-message-cell text-center">
-                No audit logs found
+                {{ 'AUDIT.NO_LOGS_FOUND' | translate }}
               </td>
             </tr>
           </ng-template>
@@ -317,23 +316,23 @@
     <!-- Key info -->
     <div class="popup-info-grid">
       <div class="info-item">
-        <span class="info-label">Performed By</span>
+        <span class="info-label">{{ 'AUDIT.PERFORMED_BY' | translate }}</span>
         <span class="info-value">{{ selectedLog.username || '-' }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">Role</span>
+        <span class="info-label">{{ 'AUDIT.ROLE' | translate }}</span>
         <span class="info-value capitalize">{{
           selectedLog.userRole || '-'
         }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">Timestamp</span>
+        <span class="info-label">{{ 'AUDIT.TIMESTAMP' | translate }}</span>
         <span class="info-value">{{
           selectedLog.createdOn | date: 'medium'
         }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">Status</span>
+        <span class="info-label">{{ 'COMMON.STATUS' | translate }}</span>
         <span
           class="info-value"
           [class.val-success]="selectedLog.responseSuccess"
@@ -344,15 +343,15 @@
             [class.success]="selectedLog.responseSuccess"
             [class.failed]="!selectedLog.responseSuccess"
           ></span>
-          {{ selectedLog.responseSuccess ? 'Success' : 'Failed' }}
+          {{ selectedLog.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
         </span>
       </div>
       <div class="info-item">
-        <span class="info-label">IP Address</span>
+        <span class="info-label">{{ 'AUDIT.IP_ADDRESS' | translate }}</span>
         <span class="info-value mono">{{ selectedLog.ipAddress || '-' }}</span>
       </div>
       <div class="info-item">
-        <span class="info-label">Version</span>
+        <span class="info-label">{{ 'AUDIT.VERSION' | translate }}</span>
         <span class="info-value">v{{ selectedLog.version || 1 }}</span>
       </div>
     </div>
@@ -361,7 +360,7 @@
     <div class="popup-section" *ngIf="selectedLog.justification">
       <div class="section-header">
         <i class="pi pi-align-left"></i>
-        <span class="section-title">Justification</span>
+        <span class="section-title">{{ 'AUDIT.JUSTIFICATION' | translate }}</span>
       </div>
       <p class="justification-detail">{{ selectedLog.justification }}</p>
     </div>
@@ -370,14 +369,14 @@
     <div class="popup-section" *ngIf="hasChangeComparison()">
       <div class="section-header">
         <i class="pi pi-arrows-h"></i>
-        <span class="section-title">Changes</span>
+        <span class="section-title">{{ 'AUDIT.CHANGES' | translate }}</span>
       </div>
       <table class="changes-table">
         <thead>
           <tr>
-            <th>Field</th>
-            <th>Old Value</th>
-            <th>New Value</th>
+            <th>{{ 'AUDIT.FIELD' | translate }}</th>
+            <th>{{ 'AUDIT.OLD_VALUE' | translate }}</th>
+            <th>{{ 'AUDIT.NEW_VALUE' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -400,7 +399,7 @@
     >
       <div class="section-header">
         <i class="pi pi-list"></i>
-        <span class="section-title">Entity Details</span>
+        <span class="section-title">{{ 'AUDIT.ENTITY_DETAILS' | translate }}</span>
       </div>
       <table class="details-table">
         <tbody>

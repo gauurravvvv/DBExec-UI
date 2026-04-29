@@ -9,13 +9,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Edit Announcement</h2>
+        <h2>{{ 'ANNOUNCEMENT.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -24,7 +24,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="!canSubmit()"
         >
@@ -37,7 +37,7 @@
       <div class="form-grid">
         <!-- Organisation (read-only) -->
         <div class="readonly-field" *ngIf="orgName">
-          <label>Organisation</label>
+          <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
           <div class="readonly-value">
             <i class="pi pi-building"></i>
             {{ orgName }}
@@ -47,8 +47,8 @@
         <!-- Title -->
         <app-custom-input
           formControlName="name"
-          label="Title"
-          placeholder="Enter announcement title"
+          [label]="'ANNOUNCEMENT.ANNOUNCEMENT_TITLE' | translate"
+          [placeholder]="'ANNOUNCEMENT.ENTER_TITLE' | translate"
           icon="pi-megaphone"
           [required]="true"
           [showError]="
@@ -64,8 +64,8 @@
         <div class="description-field">
           <app-custom-textarea
             formControlName="description"
-            label="Description"
-            placeholder="Enter announcement description"
+            [label]="'COMMON.DESCRIPTION' | translate"
+            [placeholder]="'ANNOUNCEMENT.ENTER_DESCRIPTION' | translate"
             [rows]="4"
             [required]="true"
             [showError]="
@@ -87,8 +87,8 @@
         <!-- Target Group -->
         <app-custom-dropdown
           formControlName="targetGroupId"
-          label="Target Group"
-          placeholder="Select Group"
+          [label]="'ANNOUNCEMENT.TARGET_GROUP' | translate"
+          [placeholder]="'ANNOUNCEMENT.SELECT_GROUP' | translate"
           [options]="groups"
           optionLabel="name"
           optionValue="id"
@@ -101,13 +101,13 @@
               announcementForm.get('targetGroupId')?.touched
             )
           "
-          errorMessage="Target group is required"
+          [errorMessage]="'ANNOUNCEMENT.TARGET_GROUP_REQUIRED' | translate"
         ></app-custom-dropdown>
 
         <!-- Colors + Status -->
         <div class="color-status-row">
           <div class="color-picker-field">
-            <label>Background</label>
+            <label>{{ 'ANNOUNCEMENT.BACKGROUND' | translate }}</label>
             <div class="color-picker-inline">
               <p-colorPicker
                 formControlName="bgColor"
@@ -119,7 +119,7 @@
             </div>
           </div>
           <div class="color-picker-field">
-            <label>Text</label>
+            <label>{{ 'ANNOUNCEMENT.TEXT' | translate }}</label>
             <div class="color-picker-inline">
               <p-colorPicker
                 formControlName="textColor"
@@ -132,11 +132,11 @@
           </div>
           <app-custom-toggle
             formControlName="status"
-            label="Status"
+            [label]="'COMMON.STATUS' | translate"
             [trueValue]="1"
             [falseValue]="0"
-            trueLabel="Active"
-            falseLabel="Inactive"
+            [trueLabel]="'COMMON.ACTIVE' | translate"
+            [falseLabel]="'COMMON.INACTIVE' | translate"
             (onChange)="onStatusToggle()"
           ></app-custom-toggle>
         </div>
@@ -148,7 +148,7 @@
           (click)="showPreview = true"
         >
           <i class="pi pi-eye"></i>
-          Preview how users will see this
+          {{ 'ANNOUNCEMENT.PREVIEW_HOW_USERS_SEE' | translate }}
         </button>
 
         <!-- Contrast Quality Meter -->
@@ -186,15 +186,15 @@
         <!-- Dates -->
         <div class="date-row">
           <app-custom-calendar
-            label="Start Date"
-            placeholder="Optional"
+            [label]="'ANNOUNCEMENT.START_DATE' | translate"
+            [placeholder]="'ANNOUNCEMENT.OPTIONAL' | translate"
             formControlName="startTime"
             [minDate]="startTimeMinDate"
             dateFormat="dd M yy"
           ></app-custom-calendar>
           <app-custom-calendar
-            label="End Date"
-            placeholder="Optional"
+            [label]="'ANNOUNCEMENT.END_DATE' | translate"
+            [placeholder]="'ANNOUNCEMENT.OPTIONAL' | translate"
             formControlName="endTime"
             [minDate]="endTimeMinDate"
             dateFormat="dd M yy"
@@ -206,14 +206,14 @@
           *ngIf="announcementForm.errors?.['dateRange']"
         >
           <i class="pi pi-exclamation-triangle"></i>
-          <span>End date must be after start date.</span>
+          <span>{{ 'ANNOUNCEMENT.END_DATE_AFTER_START' | translate }}</span>
         </div>
 
         <!-- Republish -->
         <app-custom-binary-checkbox
           formControlName="republish"
-          label="Re-publish"
-          description="Clear dismissals so users see this again. Auto-applied when flipping status Inactive → Active."
+          [label]="'ANNOUNCEMENT.REPUBLISH' | translate"
+          [description]="'ANNOUNCEMENT.REPUBLISH_DESC' | translate"
         ></app-custom-binary-checkbox>
       </div>
     </form>
@@ -224,9 +224,9 @@
 <div class="preview-overlay" *ngIf="showPreview" (click)="showPreview = false">
   <div class="preview-container" (click)="$event.stopPropagation()">
     <div class="preview-header">
-      <h3><i class="pi pi-eye"></i> Live Preview</h3>
+      <h3><i class="pi pi-eye"></i> {{ 'ANNOUNCEMENT.LIVE_PREVIEW' | translate }}</h3>
       <span class="preview-subtitle"
-        >This is exactly how users will see it</span
+        >{{ 'ANNOUNCEMENT.EXACTLY_HOW_USERS_SEE' | translate }}</span
       >
       <button class="preview-close" (click)="showPreview = false">
         <i class="pi pi-times"></i>
@@ -238,7 +238,7 @@
       <div class="preview-step">
         <span class="preview-step-label">
           <span class="step-number">1</span>
-          Banner appears at the top of the app
+          {{ 'ANNOUNCEMENT.BANNER_AT_TOP' | translate }}
         </span>
         <div
           class="preview-banner"
@@ -254,7 +254,7 @@
             >
             <span class="preview-banner__divider">|</span>
             <span class="preview-banner__message">{{
-              announcementForm.get('name')?.value || 'Your title here'
+              announcementForm.get('name')?.value || ('ANNOUNCEMENT.YOUR_TITLE_HERE' | translate)
             }}</span>
           </div>
         </div>
@@ -264,7 +264,7 @@
       <div class="preview-step">
         <span class="preview-step-label">
           <span class="step-number">2</span>
-          User clicks the banner and sees this
+          {{ 'ANNOUNCEMENT.USER_CLICKS_BANNER' | translate }}
         </span>
         <div class="preview-popup-mock">
           <div
@@ -278,19 +278,19 @@
               >ANNOUNCEMENT</span
             >
             <h4 class="preview-popup-mock__title">
-              {{ announcementForm.get('name')?.value || 'Your title here' }}
+              {{ announcementForm.get('name')?.value || ('ANNOUNCEMENT.YOUR_TITLE_HERE' | translate) }}
             </h4>
             <p class="preview-popup-mock__desc">
               {{
                 announcementForm.get('description')?.value ||
-                  'Your description will appear here...'
+                  ('ANNOUNCEMENT.YOUR_DESCRIPTION_HERE' | translate)
               }}
             </p>
             <div class="preview-popup-mock__footer">
               <span class="preview-popup-mock__checkbox">
-                <i class="pi pi-stop"></i> Do not show again
+                <i class="pi pi-stop"></i> {{ 'HEADER.DO_NOT_SHOW_AGAIN' | translate }}
               </span>
-              <span class="preview-popup-mock__btn">Dismiss</span>
+              <span class="preview-popup-mock__btn">{{ 'HEADER.DISMISS' | translate }}</span>
             </div>
           </div>
         </div>

@@ -18,6 +18,7 @@ import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { SectionService } from '../../services/section.service';
 
 @Component({
@@ -96,6 +97,7 @@ export class ListSectionComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private route: ActivatedRoute,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {

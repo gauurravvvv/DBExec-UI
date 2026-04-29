@@ -63,9 +63,11 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     const organisationId =
       StorageService.get(StorageType.ORGANISATION_ID) || '';
 
+    const locale = StorageService.get(StorageType.LOCALE) || 'en';
     let headers = req.headers
       .set('x-auth-token', accessToken)
-      .set('x-organization-id', organisationId);
+      .set('x-organization-id', organisationId)
+      .set('Accept-Language', locale);
     if (headers.has('X-Skip-Loader')) {
       headers = headers.delete('X-Skip-Loader');
     }

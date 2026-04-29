@@ -13,7 +13,7 @@
   background: var(--card-background);
   box-shadow:
     0 1px 0 var(--border-color),
-    0 4px 24px rgba(0, 0, 0, 0.06);
+    var(--shadow-overlay);
 
   // Gradient bottom border
   .header-border {
@@ -26,7 +26,7 @@
       90deg,
       transparent 0%,
       var(--primary-color) 30%,
-      rgba(33, 150, 243, 0.4) 70%,
+      var(--primary-color-transparent) 70%,
       transparent 100%
     );
     opacity: 0.6;
@@ -134,12 +134,12 @@
 
   kbd.shortcut {
     font-size: 10px;
-    background: rgba(0, 0, 0, 0.06);
+    background: var(--scrollbar-track);
     padding: 2px 6px;
     border-radius: 5px;
     color: var(--secondary-color);
     font-family: monospace;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
     line-height: 1.6;
     white-space: nowrap;
   }
@@ -181,7 +181,7 @@
       top: 5px;
       right: 5px;
       background: var(--error-color);
-      color: white;
+      color: var(--primary-text);
       border-radius: 50%;
       min-width: 16px;
       height: 16px;
@@ -220,15 +220,15 @@
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary-color), #42a5f5);
-      color: white;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+      color: var(--primary-text);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 0.7rem;
       font-weight: 600;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+      box-shadow: 0 2px 8px var(--primary-color-transparent);
     }
 
     .user-meta {
@@ -268,9 +268,7 @@
     background: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: 14px;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.12),
-      0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-lg);
     padding: 0.5rem;
     animation: menu-drop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 1001;
@@ -285,8 +283,8 @@
         width: 38px;
         height: 38px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-color), #42a5f5);
-        color: white;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        color: var(--primary-text);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -360,7 +358,7 @@
         }
 
         &:hover {
-          background: rgba(239, 68, 68, 0.08);
+          background: var(--error-bg);
         }
       }
     }
@@ -376,9 +374,7 @@
   background: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: 14px;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-lg);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px) scale(0.98);
@@ -722,7 +718,7 @@
 .announcement-popup-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.4);
+  background: var(--overlay-background);
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
@@ -736,7 +732,7 @@
   border-radius: 14px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-xl);
   display: flex;
   overflow: hidden;
   animation: popupEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -817,15 +813,6 @@
       }
     }
   }
-}
-
-// ── Theme Variables ───────────────────────────────────────────────
-:root {
-  --icon-filter: none;
-}
-
-.dark-theme {
-  --icon-filter: brightness(0) invert(1);
 }
 
 // ── Keyframes ─────────────────────────────────────────────────────

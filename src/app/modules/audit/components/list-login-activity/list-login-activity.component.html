@@ -3,10 +3,9 @@
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>Login Activity</h2>
+        <h2>{{ 'LOGIN_ACTIVITY.TITLE' | translate }}</h2>
         <p class="subtitle">
-          Monitor login attempts, logouts, token refreshes and authentication
-          events across all users
+          {{ 'LOGIN_ACTIVITY.SUBTITLE' | translate }}
         </p>
       </div>
     </div>
@@ -23,11 +22,11 @@
               optionValue="value"
               [filter]="true"
               filterBy="label"
-              label="Organisation"
+              [label]="'COMMON.ORGANISATION' | translate"
               [floatingLabel]="true"
               [showClear]="true"
               [autoDisplayFirst]="false"
-              placeholder="Select Organisation"
+              [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
               (onChangeEvent)="onOrganisationChange()"
             ></app-custom-dropdown>
           </div>
@@ -37,7 +36,7 @@
           <button
             pButton
             icon="pi pi-file-pdf"
-            pTooltip="Export PDF"
+            [pTooltip]="'COMMON.EXPORT_PDF' | translate"
             tooltipPosition="top"
             (click)="exportActivity('pdf')"
             [disabled]="totalItems() === 0"
@@ -46,14 +45,14 @@
           <button
             pButton
             icon="pi pi-refresh"
-            pTooltip="Refresh"
+            [pTooltip]="'COMMON.REFRESH' | translate"
             tooltipPosition="top"
             (click)="refreshActivities()"
             class="p-button-outlined modern-button"
           ></button>
           <button
             pButton
-            label="Clear"
+            [label]="'COMMON.CLEAR' | translate"
             icon="pi pi-filter-slash"
             (click)="clearFilters()"
             [disabled]="!isFilterActive"
@@ -84,25 +83,25 @@
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 180px; min-width: 180px" pFrozenColumn>
-                <div class="th-content">Username</div>
+                <div class="th-content">{{ 'COMMON.USERNAME' | translate }}</div>
               </th>
               <th style="width: 160px; min-width: 160px">
-                <div class="th-content">Event</div>
+                <div class="th-content">{{ 'LOGIN_ACTIVITY.EVENT' | translate }}</div>
               </th>
               <th style="width: 160px; min-width: 160px">
-                <div class="th-content">Organisation</div>
+                <div class="th-content">{{ 'COMMON.ORGANISATION' | translate }}</div>
               </th>
               <th style="width: 200px; min-width: 200px">
-                <div class="th-content">Failure Reason</div>
+                <div class="th-content">{{ 'LOGIN_ACTIVITY.FAILURE_REASON' | translate }}</div>
               </th>
               <th style="width: 220px; min-width: 220px">
-                <div class="th-content">Timestamp</div>
+                <div class="th-content">{{ 'LOGIN_ACTIVITY.TIMESTAMP' | translate }}</div>
               </th>
               <th style="width: 160px; min-width: 160px">
-                <div class="th-content">IP Address</div>
+                <div class="th-content">{{ 'LOGIN_ACTIVITY.IP_ADDRESS' | translate }}</div>
               </th>
               <th style="width: 240px; min-width: 240px">
-                <div class="th-content">User Agent</div>
+                <div class="th-content">{{ 'LOGIN_ACTIVITY.USER_AGENT' | translate }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -111,7 +110,7 @@
                 <app-custom-input
                   [(ngModel)]="filterValues.username"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search user"
+                  [placeholder]="'LOGIN_ACTIVITY.SEARCH_USER' | translate"
                 ></app-custom-input>
               </th>
               <th>
@@ -122,7 +121,7 @@
                   optionValue="value"
                   [showClear]="true"
                   [autoDisplayFirst]="false"
-                  placeholder="All"
+                  [placeholder]="'COMMON.ALL' | translate"
                   appendTo="body"
                   (onChangeEvent)="onFilterChange()"
                 ></app-custom-dropdown>
@@ -131,14 +130,14 @@
                 <app-custom-input
                   [(ngModel)]="filterValues.organisationName"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search org"
+                  [placeholder]="'LOGIN_ACTIVITY.SEARCH_ORG' | translate"
                 ></app-custom-input>
               </th>
               <th><!-- Failure Reason — no filter --></th>
               <th>
                 <app-custom-daterange
                   [(ngModel)]="filterValues.dateRange"
-                  placeholder="Select range"
+                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
                   [showButtonBar]="true"
                   [maxDate]="today"
                   (onChangeEvent)="onDateRangeChange($event)"
@@ -148,7 +147,7 @@
                 <app-custom-input
                   [(ngModel)]="filterValues.ipAddress"
                   (ngModelChange)="onFilterChange()"
-                  placeholder="Search IP"
+                  [placeholder]="'LOGIN_ACTIVITY.SEARCH_IP' | translate"
                 ></app-custom-input>
               </th>
               <th><!-- User Agent — no filter --></th>
@@ -208,7 +207,7 @@
           <ng-template pTemplate="emptymessage">
             <tr>
               <td colspan="7" class="empty-message-cell text-center">
-                No login activity found
+                {{ 'LOGIN_ACTIVITY.NO_ACTIVITY_FOUND' | translate }}
               </td>
             </tr>
           </ng-template>

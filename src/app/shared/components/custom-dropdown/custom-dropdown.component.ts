@@ -55,6 +55,8 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() showError = false;
   @Input() floatingLabel = false;
   @Input() appendTo: any = null;
+  @Input() style: { [key: string]: string } = {};
+  @Input() panelStyle: { [key: string]: string } | null = null;
   @Output() onChangeEvent = new EventEmitter<any>();
 
   value: any = null;

@@ -22,6 +22,7 @@ import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import {
   AnnouncementPayload,
   AnnouncementService,
@@ -56,6 +57,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     private organisationService: OrganisationService,
     private groupService: GroupService,
     private cdr: ChangeDetectorRef,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -208,31 +210,31 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     if (r < 3) {
       return {
         level: 'poor',
-        label: 'Hard to read',
-        hint: 'Most people will struggle to read this. Pick colors that are more different from each other.',
+        label: this.translate.instant('ANNOUNCEMENT.CONTRAST_HARD'),
+        hint: this.translate.instant('ANNOUNCEMENT.CONTRAST_HARD_DESC'),
         percent: 20,
       };
     }
     if (r < this.minContrastRatio) {
       return {
         level: 'needs-work',
-        label: 'Needs improvement',
-        hint: 'Almost there — try a darker background or lighter text to make it easier on the eyes.',
+        label: this.translate.instant('ANNOUNCEMENT.CONTRAST_NEEDS_IMPROVEMENT'),
+        hint: this.translate.instant('ANNOUNCEMENT.CONTRAST_NEEDS_IMPROVEMENT_DESC'),
         percent: 45,
       };
     }
     if (r < 7) {
       return {
         level: 'good',
-        label: 'Good readability',
-        hint: 'This works well for most users.',
+        label: this.translate.instant('ANNOUNCEMENT.CONTRAST_GOOD'),
+        hint: this.translate.instant('ANNOUNCEMENT.CONTRAST_GOOD_DESC'),
         percent: 75,
       };
     }
     return {
       level: 'excellent',
-      label: 'Excellent readability',
-      hint: 'Crystal clear — easy to read in any lighting.',
+      label: this.translate.instant('ANNOUNCEMENT.CONTRAST_EXCELLENT'),
+      hint: this.translate.instant('ANNOUNCEMENT.CONTRAST_EXCELLENT_DESC'),
       percent: 100,
     };
   }
@@ -288,16 +290,16 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   getNameError(): string {
     const c = this.announcementForm.get('name');
-    if (c?.errors?.['required']) return 'Title is required';
-    if (c?.errors?.['maxlength']) return 'Title must not exceed 255 characters';
+    if (c?.errors?.['required']) return this.translate.instant('ANNOUNCEMENT.TITLE_REQUIRED');
+    if (c?.errors?.['maxlength']) return this.translate.instant('ANNOUNCEMENT.TITLE_MAX', { max: 255 });
     return '';
   }
 
   getDescriptionError(): string {
     const c = this.announcementForm.get('description');
-    if (c?.errors?.['required']) return 'Description is required';
+    if (c?.errors?.['required']) return this.translate.instant('ANNOUNCEMENT.DESCRIPTION_REQUIRED');
     if (c?.errors?.['maxlength'])
-      return `Description must not exceed ${this.maxDescriptionLength} characters`;
+      return this.translate.instant('ANNOUNCEMENT.DESCRIPTION_MAX', { max: this.maxDescriptionLength });
     return '';
   }
 }

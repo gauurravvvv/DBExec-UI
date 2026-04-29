@@ -76,12 +76,12 @@
             background: var(--card-background);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-sm);
 
             &:hover {
               background: var(--hover-background);
               transform: translateY(-1px);
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+              box-shadow: var(--shadow-md);
             }
           }
 
@@ -89,12 +89,12 @@
             background: var(--card-background);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-sm);
 
             &:hover:not(:disabled) {
               background: var(--hover-background);
               transform: translateY(-1px);
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+              box-shadow: var(--shadow-md);
             }
 
             &:disabled {
@@ -104,13 +104,13 @@
           }
 
           &.btn-primary {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            color: white;
-            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: var(--primary-text);
+            box-shadow: 0 4px 10px var(--primary-color-transparent);
 
             &:hover:not(:disabled) {
               transform: translateY(-1px);
-              box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+              box-shadow: var(--shadow-md);
             }
 
             &:disabled {
@@ -255,7 +255,7 @@
               gap: 6px;
 
               i {
-                color: var(--warning-color, #f59e0b);
+                color: var(--warning-color, var(--warning-color));
                 font-size: 14px;
               }
 
@@ -367,10 +367,10 @@
 
       // Color variants for text buttons
       &.p-button-warning {
-        color: var(--warning-color, #f59e0b) !important;
+        color: var(--warning-color, var(--warning-color)) !important;
 
         i {
-          color: var(--warning-color, #f59e0b) !important;
+          color: var(--warning-color, var(--warning-color)) !important;
         }
 
         &:hover {
@@ -425,7 +425,7 @@
       color: var(--primary-color) !important;
 
       &:hover:not(:disabled) {
-        background: rgba(var(--primary-rgb), 0.04) !important;
+        background: var(--primary-color-transparent) !important;
       }
 
       &:disabled {
@@ -1140,7 +1140,7 @@
   background-color: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px var(--overlay-background);
   margin-top: 4px;
   max-height: 320px;
   overflow: hidden;
@@ -1195,7 +1195,7 @@
     &:hover,
     &.selected {
       background-color: var(--primary-color);
-      color: #fff;
+      color: var(--primary-text);
 
       .column-icon {
         color: rgba(255, 255, 255, 0.8);
@@ -1298,7 +1298,7 @@
 
     &:hover {
       background-color: var(--primary-color);
-      color: white;
+      color: var(--primary-text);
     }
   }
 }
@@ -1405,7 +1405,7 @@
       font-size: 14px;
 
       .required {
-        color: var(--danger-color, #ef4444);
+        color: var(--danger-color, var(--error-color));
         margin-left: 3px;
       }
     }
@@ -1488,10 +1488,10 @@
     align-items: center;
     gap: 0.5rem;
     padding: 10px 12px;
-    background: rgba(239, 68, 68, 0.1);
-    border-left: 3px solid var(--danger-color, #ef4444);
+    background: var(--error-bg);
+    border-left: 3px solid var(--danger-color, var(--error-color));
     border-radius: 4px;
-    color: var(--danger-color, #ef4444);
+    color: var(--danger-color, var(--error-color));
     font-size: 13px;
 
     i {

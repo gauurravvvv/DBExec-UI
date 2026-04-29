@@ -63,12 +63,12 @@
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
           font-weight: 600;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+          box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
             background: var(--hover-background) !important;
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-md);
           }
 
           &:disabled {
@@ -78,19 +78,19 @@
         }
 
         .btn-save {
-          background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
           font-weight: 600;
-          box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
           &:hover:not(:disabled) {
             opacity: 1;
             transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+            box-shadow: var(--shadow-md);
           }
 
           &:disabled {
@@ -331,7 +331,7 @@
       color: var(--primary-color) !important;
 
       &:hover:not(:disabled) {
-        background: rgba(var(--primary-rgb), 0.04) !important;
+        background: var(--primary-color-transparent) !important;
       }
 
       &:disabled {

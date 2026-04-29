@@ -7,18 +7,18 @@
   .home-header {
     padding: 1.5rem 2rem;
     flex-shrink: 0;
-    background: white;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
 
     h2 {
       margin: 0;
       font-size: 1.75rem;
-      color: #2c3e50;
+      color: var(--text-color);
       font-weight: 600;
     }
 
     .subtitle {
-      color: #6c757d;
+      color: var(--secondary-color);
       margin: 0.25rem 0 0;
       font-size: 0.95rem;
     }
@@ -39,15 +39,15 @@
         align-items: center;
         gap: 1rem;
         padding: 1.25rem;
-        background: white;
-        border: 1px solid #e9ecef;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
         border-radius: 10px;
         cursor: pointer;
         transition: all 0.2s ease;
 
         &:hover {
-          border-color: #0078d3;
-          box-shadow: 0 2px 8px rgba(0, 120, 211, 0.1);
+          border-color: var(--primary-color);
+          box-shadow: 0 2px 8px var(--primary-color-transparent);
 
           .nav-arrow {
             opacity: 1;
@@ -59,7 +59,7 @@
           width: 44px;
           height: 44px;
           border-radius: 10px;
-          background: rgba(0, 120, 211, 0.08);
+          background: var(--primary-color-transparent);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -67,7 +67,7 @@
 
           i {
             font-size: 1.2rem;
-            color: #0078d3;
+            color: var(--primary-color);
           }
         }
 
@@ -79,19 +79,19 @@
             margin: 0;
             font-size: 0.95rem;
             font-weight: 600;
-            color: #2c3e50;
+            color: var(--text-color);
           }
 
           p {
             margin: 0.15rem 0 0;
             font-size: 0.8rem;
-            color: #6c757d;
+            color: var(--secondary-color);
           }
         }
 
         .nav-arrow {
           font-size: 0.8rem;
-          color: #0078d3;
+          color: var(--primary-color);
           opacity: 0;
           transform: translateX(-4px);
           transition: all 0.2s ease;

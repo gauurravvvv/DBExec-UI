@@ -72,12 +72,12 @@ $radius-sm: 8px;
   background: var(--card-background);
   border-radius: 8px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
     transform: translateY(-2px);
   }
 }
@@ -168,23 +168,23 @@ $radius-sm: 8px;
             background: var(--card-background);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-sm);
 
             &:hover {
               background: var(--hover-background);
               transform: translateY(-1px);
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+              box-shadow: var(--shadow-md);
             }
           }
 
           &.btn-primary {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            color: white;
-            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: var(--primary-text);
+            box-shadow: 0 4px 10px var(--primary-color-transparent);
 
             &:hover:not(:disabled) {
               transform: translateY(-1px);
-              box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+              box-shadow: var(--shadow-md);
             }
 
             &:disabled {
@@ -196,13 +196,13 @@ $radius-sm: 8px;
           }
 
           &.btn-danger {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-            color: white;
-            box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+            background: linear-gradient(135deg, var(--error-color), var(--error-color));
+            color: var(--primary-text);
+            box-shadow: 0 4px 10px var(--error-bg);
 
             &:hover:not(:disabled) {
               transform: translateY(-1px);
-              box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+              box-shadow: var(--shadow-md);
             }
 
             &:disabled {
@@ -232,7 +232,7 @@ $radius-sm: 8px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         border: 1px solid var(--border-color);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-sm);
         @include fade-in;
 
         .db-identity-content {
@@ -252,23 +252,23 @@ $radius-sm: 8px;
             color: var(--primary-color);
 
             &.postgresql {
-              background: rgba(51, 103, 145, 0.2);
-              color: #336791;
+              background: var(--primary-color-transparent);
+              color: var(--primary-color);
             }
 
             &.mysql {
-              background: rgba(83, 130, 161, 0.2);
-              color: #5382a1;
+              background: var(--primary-color-transparent);
+              color: var(--primary-color);
             }
 
             &.sqlserver {
-              background: rgba(204, 0, 0, 0.2);
-              color: #cc0000;
+              background: var(--error-bg);
+              color: var(--error-color);
             }
 
             &.oracle {
-              background: rgba(255, 0, 0, 0.2);
-              color: #ff0000;
+              background: var(--error-bg);
+              color: var(--error-color);
             }
           }
 
@@ -652,7 +652,7 @@ $radius-sm: 8px;
 
             &:hover {
               transform: translateY(-3px);
-              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+              box-shadow: var(--shadow-md);
             }
 
             &.highlight {
@@ -1076,7 +1076,7 @@ $radius-sm: 8px;
                         border-radius: 4px;
                         font-size: 0.9rem;
                         font-weight: 500;
-                        background: rgba(var(--primary-rgb), 0.15);
+                        background: var(--primary-color-transparent);
                         color: var(--primary-color);
                       }
                     }
@@ -1251,11 +1251,11 @@ $radius-sm: 8px;
                 overflow: visible; // Allow expanded content to show
 
                 &:hover {
-                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                  box-shadow: var(--shadow-md);
                 }
 
                 &.expanded {
-                  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+                  box-shadow: var(--shadow-lg);
                   background: var(--card-background);
                 }
 
@@ -1576,7 +1576,7 @@ $radius-sm: 8px;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -1598,7 +1598,7 @@ $radius-sm: 8px;
     padding: 2rem;
     border-radius: $radius-lg;
     box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      var(--shadow-xl),
       0 0 0 1px var(--border-color);
     width: 100%;
     max-width: 420px;
@@ -1634,7 +1634,7 @@ $radius-sm: 8px;
         align-items: center;
         justify-content: center;
         margin: 0 auto 1rem;
-        background: rgba(244, 67, 54, 0.1);
+        background: var(--error-bg);
 
         i {
           font-size: 1.5rem;
@@ -1644,20 +1644,20 @@ $radius-sm: 8px;
         &.danger {
           background: linear-gradient(
             135deg,
-            rgba(255, 152, 0, 0.15),
-            rgba(244, 67, 54, 0.15)
+            var(--warning-bg),
+            var(--error-bg)
           );
           animation: pulse 2s infinite;
 
           i {
-            color: #ff9800;
+            color: var(--warning-color);
           }
         }
 
         @keyframes pulse {
           0%,
           100% {
-            box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+            box-shadow: 0 0 0 0 var(--warning-bg);
           }
           50% {
             box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
@@ -1769,7 +1769,7 @@ $radius-sm: 8px;
           &:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
           }
         }
 
@@ -1818,13 +1818,13 @@ $radius-sm: 8px;
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, #f44336, #d32f2f);
-          color: white;
-          box-shadow: 0 4px 14px rgba(244, 67, 54, 0.35);
+          background: linear-gradient(135deg, var(--error-color), var(--error-color));
+          color: var(--primary-text);
+          box-shadow: 0 4px 14px var(--error-bg);
 
           &:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.45);
+            box-shadow: var(--shadow-md);
           }
 
           &:active {
@@ -1877,7 +1877,7 @@ $radius-sm: 8px;
       color: var(--primary-color) !important;
 
       &:hover:not(:disabled) {
-        background: rgba(var(--primary-rgb), 0.04) !important;
+        background: var(--primary-color-transparent) !important;
       }
 
       &:disabled {

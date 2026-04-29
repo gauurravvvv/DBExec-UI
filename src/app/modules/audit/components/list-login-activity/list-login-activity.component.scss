@@ -244,24 +244,24 @@ $radius-sm: 8px;
         white-space: nowrap;
 
         &.event-success {
-          background: rgba(76, 175, 80, 0.1);
+          background: var(--success-bg);
           color: var(--success-color);
         }
         &.event-failed {
-          background: rgba(244, 67, 54, 0.1);
+          background: var(--error-bg);
           color: var(--error-color);
         }
         &.event-logout {
-          background: rgba(156, 39, 176, 0.1);
-          color: #9c27b0;
+          background: var(--primary-color-transparent);
+          color: var(--primary-color);
         }
         &.event-refresh {
-          background: rgba(33, 150, 243, 0.1);
+          background: var(--primary-color-transparent);
           color: var(--primary-color);
         }
         &.event-warning {
-          background: rgba(255, 152, 0, 0.1);
-          color: #f57c00;
+          background: var(--warning-bg);
+          color: var(--warning-hover);
         }
         &.event-default {
           background: var(--hover-background);
@@ -293,7 +293,7 @@ $radius-sm: 8px;
           }
           &.p-highlight {
             background: var(--primary-color);
-            color: #fff;
+            color: var(--primary-text);
           }
         }
       }

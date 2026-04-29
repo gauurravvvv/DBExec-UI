@@ -12,6 +12,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
+import { TranslateService } from '@ngx-translate/core';
 import { RlsRulesService } from '../../services/rls-rules.service';
 
 @Component({
@@ -40,8 +41,8 @@ export class ManageRlsAssignmentsComponent implements OnInit {
   scopeTargetsLoading = false;
 
   scopeOptions = [
-    { label: 'User', value: 'user' },
-    { label: 'Group', value: 'group' },
+    { label: this.translate.instant('RLS.USER'), value: 'user' },
+    { label: this.translate.instant('RLS.GROUP'), value: 'group' },
   ];
 
   constructor(
@@ -49,6 +50,7 @@ export class ManageRlsAssignmentsComponent implements OnInit {
     private userService: UserService,
     private groupService: GroupService,
     private globalService: GlobalService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {

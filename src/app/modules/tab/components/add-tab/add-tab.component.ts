@@ -17,6 +17,7 @@ import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { TabService } from '../../services/tab.service';
 
 @Component({
@@ -51,6 +52,7 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private datasourceService: DatasourceService,
+    private translate: TranslateService,
   ) {
     this.initForm();
   }
@@ -115,13 +117,13 @@ export class AddTabComponent implements OnInit, HasUnsavedChanges {
   }
 
   getNameError(control: any): string {
-    if (control?.errors?.['required']) return 'Tab name is required';
+    if (control?.errors?.['required']) return this.translate.instant('TAB.NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return `Tab name must be at least ${control.errors['minlength'].requiredLength} characters`;
+      return this.translate.instant('TAB.NAME_MIN', { min: control.errors['minlength'].requiredLength });
     if (control?.errors?.['maxlength'])
-      return `Tab name must not exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.translate.instant('TAB.NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
-      return 'Tab name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens';
+      return this.translate.instant('TAB.NAME_PATTERN');
     return '';
   }
 

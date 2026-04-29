@@ -10,14 +10,13 @@
         >
           <i class="pi pi-arrow-left text-xl"></i>
         </button>
-        <h2>Add Prompt</h2>
+        <h2>{{ 'PROMPT_MODULE.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="warning-section" *ngIf="hasDuplicates">
         <div class="duplicate-warning">
           <i class="pi pi-exclamation-triangle"></i>
           <span
-            >Duplicate prompt names found. Please remove duplicates to
-            continue.</span
+            >{{ 'PROMPT_MODULE.DUPLICATE_WARNING' | translate }}</span
           >
         </div>
       </div>
@@ -25,7 +24,7 @@
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -34,7 +33,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="
             sectionForm.invalid || hasDuplicates || hasEmptyPrompts || saving()
@@ -51,8 +50,8 @@
         <div class="form-field" *ngIf="showOrganisationDropdown">
           <app-custom-dropdown
             formControlName="organisation"
-            label="Organisation"
-            placeholder="Select Organisation"
+            [label]="'COMMON.ORGANISATION' | translate"
+            [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
             [options]="organisations"
             optionLabel="name"
             optionValue="id"
@@ -65,7 +64,7 @@
                 sectionForm.get('organisation')?.touched
               )
             "
-            errorMessage="Organisation is required"
+            [errorMessage]="'VALIDATION.ORGANISATION_REQUIRED' | translate"
             (ngModelChange)="
               onOrganisationChange({
                 value: sectionForm.get('organisation')?.value,
@@ -79,8 +78,8 @@
         <div class="form-field">
           <app-custom-dropdown
             formControlName="datasource"
-            label="Datasource"
-            placeholder="Select Datasource"
+            [label]="'COMMON.DATASOURCE' | translate"
+            [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
             [options]="datasources"
             optionLabel="name"
             optionValue="id"
@@ -93,7 +92,7 @@
                 sectionForm.get('datasource')?.touched
               )
             "
-            errorMessage="Datasource is required"
+            [errorMessage]="'VALIDATION.FIELD_REQUIRED' | translate"
             (ngModelChange)="
               onDatasourceChange({
                 value: sectionForm.get('datasource')?.value,
@@ -107,8 +106,8 @@
         <div class="form-field">
           <app-custom-dropdown
             formControlName="tab"
-            label="Tab"
-            placeholder="Select Tab"
+            [label]="'COMMON.TAB' | translate"
+            [placeholder]="'COMMON.SELECT_TAB' | translate"
             [options]="tabs"
             optionLabel="name"
             optionValue="id"
@@ -121,7 +120,7 @@
                 sectionForm.get('tab')?.touched
               )
             "
-            errorMessage="Tab is required"
+            [errorMessage]="'COMMON.TAB_REQUIRED' | translate"
             (ngModelChange)="
               onTabChange({ value: sectionForm.get('tab')?.value })
             "
@@ -135,7 +134,7 @@
           *ngIf="selectedTab && sectionForm.get('tab')?.value"
         >
           <div class="fields-header">
-            <label>Section Groups<span class="required">*</span></label>
+            <label>{{ 'PROMPT_MODULE.SECTION_GROUPS' | translate }}<span class="required">*</span></label>
             <div class="button-group">
               <button
                 pButton
@@ -147,7 +146,7 @@
                 "
                 class="p-button-rounded p-button-text expand-collapse-btn"
                 (click)="areAllExpanded ? collapseAll() : expandAll()"
-                [pTooltip]="areAllExpanded ? 'Collapse All' : 'Expand All'"
+                [pTooltip]="areAllExpanded ? ('COMMON.COLLAPSE_ALL' | translate) : ('COMMON.EXPAND_ALL' | translate)"
                 tooltipPosition="bottom"
                 *ngIf="sectionGroups.length > 0"
               ></button>
@@ -197,8 +196,8 @@
                 <div style="width: 300px">
                   <app-custom-dropdown
                     formControlName="sectionId"
-                    label="Section"
-                    placeholder="Select Section"
+                    [label]="'COMMON.SECTION' | translate"
+                    [placeholder]="'COMMON.SELECT_SECTION' | translate"
                     [options]="getAvailableSections(groupIndex)"
                     optionLabel="name"
                     optionValue="id"
@@ -211,7 +210,7 @@
                         sectionGroup.get('sectionId')?.touched
                       )
                     "
-                    errorMessage="Section is required"
+                    [errorMessage]="'COMMON.SECTION_REQUIRED' | translate"
                     (ngModelChange)="
                       onSectionChange(
                         { value: sectionGroup.get('sectionId')?.value },
@@ -225,9 +224,7 @@
                   class="section-count"
                   *ngIf="!isGroupExpanded(groupIndex)"
                 >
-                  {{ getPrompts(groupIndex).length }} prompt{{
-                    getPrompts(groupIndex).length !== 1 ? 's' : ''
-                  }}
+                  {{ 'PROMPT_MODULE.PROMPT_COUNT' | translate: { count: getPrompts(groupIndex).length } }}
                 </span>
                 <button
                   pButton
@@ -276,8 +273,8 @@
                     <div class="form-field">
                       <app-custom-input
                         formControlName="name"
-                        label="Name"
-                        placeholder="Enter prompt name"
+                        [label]="'COMMON.NAME' | translate"
+                        [placeholder]="'PROMPT_MODULE.ENTER_PROMPT_NAME' | translate"
                         icon="pi-box"
                         [required]="true"
                         [showError]="
@@ -295,8 +292,8 @@
                     <div class="form-field">
                       <app-custom-input
                         formControlName="description"
-                        label="Description"
-                        placeholder="Enter description"
+                        [label]="'COMMON.DESCRIPTION' | translate"
+                        [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
                         icon="pi-align-left"
                       >
                       </app-custom-input>
@@ -306,8 +303,8 @@
                     <div class="form-field">
                       <app-custom-dropdown
                         formControlName="type"
-                        label="Type"
-                        placeholder="Select Type"
+                        [label]="'COMMON.TYPE' | translate"
+                        [placeholder]="'PROMPT_MODULE.SELECT_TYPE' | translate"
                         [options]="promptTypes"
                         optionLabel="label"
                         optionValue="value"
@@ -320,7 +317,7 @@
                             prompt.get('type')?.touched
                           )
                         "
-                        errorMessage="Type is required"
+                        [errorMessage]="'COMMON.TYPE_REQUIRED' | translate"
                       >
                       </app-custom-dropdown>
                     </div>

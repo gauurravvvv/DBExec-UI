@@ -14,6 +14,7 @@ import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { TranslateService } from '@ngx-translate/core';
 import { AuditService } from '../../services/audit.service';
 
 @Component({
@@ -51,22 +52,25 @@ export class ListLoginActivityComponent implements OnInit {
     dateRange: null,
   };
 
-  eventTypeOptions = [
-    { label: 'Login Success', value: 'LOGIN_SUCCESS' },
-    { label: 'Login Failed', value: 'LOGIN_FAILED' },
-    { label: 'Logout', value: 'LOGOUT' },
-    { label: 'Token Refresh', value: 'TOKEN_REFRESH' },
-    { label: 'Password Reset', value: 'PASSWORD_RESET' },
-    { label: 'OTP Generated', value: 'OTP_GENERATED' },
-  ];
+  eventTypeOptions: any[] = [];
 
   constructor(
     private auditService: AuditService,
     private globalService: GlobalService,
     private organisationService: OrganisationService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
+    this.eventTypeOptions = [
+      { label: this.translate.instant('LOGIN_ACTIVITY.LOGIN_SUCCESS'), value: 'LOGIN_SUCCESS' },
+      { label: this.translate.instant('LOGIN_ACTIVITY.LOGIN_FAILED'), value: 'LOGIN_FAILED' },
+      { label: this.translate.instant('LOGIN_ACTIVITY.LOGOUT'), value: 'LOGOUT' },
+      { label: this.translate.instant('LOGIN_ACTIVITY.TOKEN_REFRESH'), value: 'TOKEN_REFRESH' },
+      { label: this.translate.instant('LOGIN_ACTIVITY.PASSWORD_RESET'), value: 'PASSWORD_RESET' },
+      { label: this.translate.instant('LOGIN_ACTIVITY.OTP_GENERATED'), value: 'OTP_GENERATED' },
+    ];
+
     this.isSystemAdmin =
       this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
 

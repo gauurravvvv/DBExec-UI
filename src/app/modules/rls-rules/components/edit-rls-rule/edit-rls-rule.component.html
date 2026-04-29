@@ -9,13 +9,13 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>Edit RLS Rule</h2>
+        <h2>{{ 'RLS.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
-          label="Cancel"
+          [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
           [disabled]="!isFormDirty"
           (click)="onCancel()"
@@ -24,7 +24,7 @@
           pButton
           class="p-button-primary btn-save"
           type="submit"
-          label="Save"
+          [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
           [disabled]="rlsForm.invalid || !isFormDirty"
         >
@@ -39,8 +39,8 @@
 
         <app-custom-input
           formControlName="name"
-          label="Rule Name"
-          placeholder="Enter rule name"
+          [label]="'RLS.RULE_NAME' | translate"
+          [placeholder]="'RLS.ENTER_RULE_NAME' | translate"
           [required]="true"
           [showError]="
             !!(rlsForm.get('name')?.invalid && rlsForm.get('name')?.touched)
@@ -51,8 +51,8 @@
 
         <app-custom-input
           formControlName="description"
-          label="Description"
-          placeholder="Enter description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
         >
         </app-custom-input>
 
@@ -60,7 +60,7 @@
         <app-custom-input
           [ngModel]="orgId"
           [ngModelOptions]="{ standalone: true }"
-          label="Organisation"
+          [label]="'COMMON.ORGANISATION' | translate"
           [inputDisabled]="true"
         ></app-custom-input>
         <input type="hidden" formControlName="organisation" />
@@ -71,19 +71,19 @@
         <div class="conditions-section" formArrayName="conditions">
           <div class="conditions-header">
             <span class="conditions-label">
-              Filter Conditions <span class="required">*</span>
+              {{ 'RLS.FILTER_CONDITIONS' | translate }} <span class="required">*</span>
             </span>
             <button
               type="button"
               class="btn-add-condition"
               (click)="addCondition()"
             >
-              <i class="pi pi-plus"></i> Add Condition
+              <i class="pi pi-plus"></i> {{ 'RLS.ADD_CONDITION' | translate }}
             </button>
           </div>
           <div class="conditions-hint">
             <i class="pi pi-info-circle"></i>
-            All conditions are AND-ed. Select values for each column condition.
+            {{ 'RLS.ALL_CONDITIONS_ANDED' | translate }}
           </div>
           <div
             class="condition-row"
@@ -101,7 +101,7 @@
                   [options]="datasetColumns"
                   optionLabel="columnToView"
                   optionValue="columnToUse"
-                  placeholder="Select column"
+                  [placeholder]="'RLS.SELECT_COLUMN' | translate"
                   [filter]="true"
                   filterBy="columnToView"
                   [autoDisplayFirst]="false"
@@ -112,7 +112,7 @@
                       conditions.at(i).get('columnName')?.touched
                     )
                   "
-                  errorMessage="Column is required"
+                  [errorMessage]="'RLS.COLUMN_REQUIRED' | translate"
                   (onChangeEvent)="onColumnChange(i, $event)"
                 ></app-custom-dropdown>
                 <app-custom-dropdown
@@ -128,7 +128,7 @@
                   class="btn-remove-condition"
                   (click)="removeCondition(i)"
                   [disabled]="conditions.length === 1"
-                  pTooltip="Remove condition"
+                  [pTooltip]="'RLS.REMOVE_CONDITION' | translate"
                   tooltipPosition="bottom"
                 >
                   <i class="pi pi-trash"></i>
@@ -140,13 +140,13 @@
                   [options]="getColumnValues(i)"
                   optionLabel="label"
                   optionValue="value"
-                  placeholder="Select values"
+                  [placeholder]="'RLS.SELECT_VALUES' | translate"
                   [filter]="true"
                   filterBy="label"
                   [showToggleAll]="true"
                   display="chip"
                   [maxSelectedLabels]="5"
-                  selectedItemsLabel="{0} values selected"
+                  [selectedItemsLabel]="'RLS.VALUES_SELECTED' | translate: { count: '{0}' }"
                   [required]="true"
                   [showError]="
                     !!(
@@ -154,7 +154,7 @@
                       conditions.at(i).get('values')?.touched
                     )
                   "
-                  errorMessage="At least one value is required"
+                  [errorMessage]="'RLS.VALUES_REQUIRED' | translate"
                 ></app-custom-multiselect>
               </div>
             </div>
@@ -163,11 +163,11 @@
 
         <app-custom-toggle
           formControlName="isEnabled"
-          label="Enabled"
+          [label]="'COMMON.ENABLED' | translate"
           [trueValue]="true"
           [falseValue]="false"
-          trueLabel="Enabled"
-          falseLabel="Disabled"
+          [trueLabel]="'COMMON.ENABLED' | translate"
+          [falseLabel]="'COMMON.DISABLED' | translate"
         >
         </app-custom-toggle>
       </div>
@@ -180,15 +180,15 @@
   <div class="popup-content">
     <div class="popup-header">
       <div class="popup-icon"><i class="pi pi-save"></i></div>
-      <h3>Confirm Update</h3>
+      <h3>{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
-      <p class="delete-intro">Are you sure you want to update this RLS rule?</p>
+      <p class="delete-intro">{{ 'RLS.UPDATE_CONFIRM' | translate }}</p>
       <div class="justification-section">
         <app-custom-input
           [(ngModel)]="saveJustification"
-          label="Justification"
-          placeholder="Provide a reason for this update"
+          [label]="'COMMON.JUSTIFICATION' | translate"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
           inputMode="textarea"
           [rows]="3"
           [maxLength]="500"
@@ -199,14 +199,14 @@
     </div>
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelSave()">
-        <i class="pi pi-times"></i> Cancel
+        <i class="pi pi-times"></i> {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         class="btn-confirm"
         (click)="proceedSave()"
         [disabled]="!saveJustification.trim()"
       >
-        <i class="pi pi-check"></i> Update
+        <i class="pi pi-check"></i> {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>
   </div>

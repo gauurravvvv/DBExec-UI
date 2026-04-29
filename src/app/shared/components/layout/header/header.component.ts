@@ -14,7 +14,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { auditTime, filter } from 'rxjs/operators';
-import { StorageType } from 'src/app/constants/storageType';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
@@ -46,7 +45,6 @@ export class HeaderComponent implements OnInit {
   userName: string = '';
   userRole: string = '';
   showProfileMenu: boolean = false;
-  isDarkMode = false;
   isAnimating = false;
   isFullscreen = false;
   locales = [...SUPPORTED_LOCALES];
@@ -125,9 +123,6 @@ export class HeaderComponent implements OnInit {
     private announcementService: AnnouncementService,
     private localeService: LocaleService,
   ) {
-    this.isDarkMode = false;
-    this.applyTheme();
-
     this.destroyRef.onDestroy(() => {
       if (this.typewriterTimer) clearTimeout(this.typewriterTimer);
       this.clearRotation();
@@ -294,27 +289,6 @@ export class HeaderComponent implements OnInit {
   viewProfile() {
     this.showProfileMenu = false;
     this.router.navigate(['/app/profile']);
-  }
-
-  toggleTheme() {
-    const icon = document.querySelector('.theme-toggle .pi');
-    if (icon) {
-      icon.classList.add('animate');
-      setTimeout(() => {
-        icon.classList.remove('animate');
-      }, 700);
-    }
-    this.isDarkMode = !this.isDarkMode;
-    StorageService.set(StorageType.THEME, this.isDarkMode ? 'dark' : 'light');
-    this.applyTheme();
-  }
-
-  private applyTheme() {
-    if (this.isDarkMode) {
-      document.body.classList.add('dark-theme');
-    } else {
-      document.body.classList.remove('dark-theme');
-    }
   }
 
   get hasNotifications(): boolean {
