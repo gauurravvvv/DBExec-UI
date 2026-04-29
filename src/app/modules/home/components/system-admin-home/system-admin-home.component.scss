@@ -1,4 +1,4 @@
-.add-super-admin-wrapper {
+.add-system-admin-wrapper {
   padding: 1.5rem;
   background-color: #ffffff;
   display: flex;
@@ -6,7 +6,7 @@
   height: calc(100vh - 110px);
   width: 100%;
 
-  .add-super-admin-container {
+  .add-system-admin-container {
     width: 100%;
     max-width: 100%;
     margin: 0;
@@ -320,11 +320,11 @@
 }
 
 @media (max-width: 640px) {
-  .add-super-admin-wrapper {
+  .add-system-admin-wrapper {
     padding: 1rem;
   }
 
-  .add-super-admin-container {
+  .add-system-admin-container {
     .page-header {
       padding: 1rem 1rem;
 
@@ -352,7 +352,7 @@
   }
 }
 
-.super-admin-home {
+.system-admin-home {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 64px);

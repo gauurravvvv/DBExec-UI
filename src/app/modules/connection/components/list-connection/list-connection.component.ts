@@ -238,7 +238,7 @@ export class ListConnectionComponent implements OnInit {
       limit: limit,
     };
 
-    // Build filter object like list-super-admin
+    // Build filter object like list-system-admin
     const filter: any = {};
     if (this.filterValues.name) {
       filter.name = this.filterValues.name;
