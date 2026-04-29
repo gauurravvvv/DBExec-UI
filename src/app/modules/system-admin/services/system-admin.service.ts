@@ -1,11 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
-import { SUPER_ADMIN } from 'src/app/constants/api';
+import { SYSTEM_ADMIN } from 'src/app/constants/api';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({ providedIn: 'root' })
-export class SuperAdminService {
+export class SystemAdminService {
   private _admins = signal<any[]>([]);
   private _total = signal(0);
   private _current = signal<any>(null);
@@ -24,7 +24,7 @@ export class SuperAdminService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(SUPER_ADMIN.LIST, { params }),
+        this.http.apiGet(SYSTEM_ADMIN.LIST, { params }),
       );
       if (res?.status) {
         this._admins.set(res.data.superAdmins ?? []);
@@ -39,7 +39,7 @@ export class SuperAdminService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http.apiGet(SUPER_ADMIN.VIEW + id),
+        this.http.apiGet(SYSTEM_ADMIN.VIEW + id),
       );
       if (res?.status) this._current.set(res.data);
     } finally {
@@ -52,7 +52,7 @@ export class SuperAdminService {
     try {
       const { firstName, lastName, username, email } = form.value;
       return await lastValueFrom(
-        this.http.apiPost(SUPER_ADMIN.ADD, {
+        this.http.apiPost(SYSTEM_ADMIN.ADD, {
           firstName,
           lastName,
           username,
@@ -70,7 +70,7 @@ export class SuperAdminService {
       const { id, firstName, lastName, username, email, status } =
         form.getRawValue();
       return await lastValueFrom(
-        this.http.apiPut(SUPER_ADMIN.UPDATE, {
+        this.http.apiPut(SYSTEM_ADMIN.UPDATE, {
           id,
           firstName,
           lastName,
@@ -87,25 +87,25 @@ export class SuperAdminService {
 
   async delete(id: string, justification?: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiDelete(SUPER_ADMIN.DELETE + id, { body: { justification } }),
+      this.http.apiDelete(SYSTEM_ADMIN.DELETE + id, { body: { justification } }),
     );
   }
 
   async bulkDelete(ids: string[], justification?: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiDelete(SUPER_ADMIN.BULK_DELETE, {
+      this.http.apiDelete(SYSTEM_ADMIN.BULK_DELETE, {
         body: { ids, justification },
       }),
     );
   }
 
   async unlock(id: string): Promise<any> {
-    return lastValueFrom(this.http.apiPut(SUPER_ADMIN.UNLOCK + id, {}));
+    return lastValueFrom(this.http.apiPut(SYSTEM_ADMIN.UNLOCK + id, {}));
   }
 
   async updatePassword(id: string, password: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiPut(SUPER_ADMIN.UPDATE_PASSWORD, {
+      this.http.apiPut(SYSTEM_ADMIN.UPDATE_PASSWORD, {
         id,
         newPassword: password,
       }),

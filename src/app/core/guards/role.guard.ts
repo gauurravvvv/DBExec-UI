@@ -8,8 +8,8 @@ import {
 import { GlobalService } from '../services/global.service';
 
 function getHomeByRole(role: string): string {
-  if (role === ROLES.SUPER_ADMIN) {
-    return HOME_ROUTES.SUPER_ADMIN;
+  if (role === ROLES.SYSTEM_ADMIN) {
+    return HOME_ROUTES.SYSTEM_ADMIN;
   }
   return HOME_ROUTES.ORG_ADMIN;
 }
@@ -31,7 +31,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
   }
 
   // Super admin bypasses all checks
-  if (userRole === ROLES.SUPER_ADMIN) {
+  if (userRole === ROLES.SYSTEM_ADMIN) {
     return true;
   }
 

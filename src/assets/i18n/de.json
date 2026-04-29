@@ -2,7 +2,7 @@
   "SIDEBAR": {
     "home": "Startseite",
     "systemManagement": "Systemverwaltung",
-    "superAdmin": "Super Admin",
+    "systemAdmin": "System Admin",
     "orgManagement": "Organisationen",
     "userMgmtSection": "Benutzerverwaltung",
     "roleManagement": "Rollen",
@@ -222,11 +222,11 @@
     "SYSTEM": "System",
     "LAST_LOGIN": "Letzte Anmeldung",
     "LOADING_PROFILE": "Profil wird geladen...",
-    "ROLE_SUPER_ADMIN": "Superadministrator",
+    "ROLE_SYSTEM_ADMIN": "Superadministrator",
     "ROLE_ORG_ADMIN": "Organisationsadministrator",
     "ROLE_ORG_USER": "Benutzer"
   },
-  "SUPER_ADMIN": {
+  "SYSTEM_ADMIN": {
     "TITLE": "Superadministratoren",
     "SUBTITLE": "Systembesitzer mit vollem Plattformzugriff und Organisationskontrolle verwalten",
     "ADD_TITLE": "Superadministrator hinzufügen",

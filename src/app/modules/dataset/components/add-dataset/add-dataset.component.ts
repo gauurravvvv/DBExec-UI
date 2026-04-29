@@ -223,7 +223,7 @@ export class AddDatasetComponent
     private translate: TranslateService,
   ) {
     this.userRole = this.globalService.getTokenDetails('role') || '';
-    this.showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+    this.showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   }
 
   ngOnInit(): void {

@@ -2,7 +2,7 @@
   "SIDEBAR": {
     "home": "ホーム",
     "systemManagement": "システム管理",
-    "superAdmin": "スーパー管理者",
+    "systemAdmin": "システム管理者",
     "orgManagement": "組織管理",
     "userMgmtSection": "ユーザー管理",
     "roleManagement": "ロール管理",
@@ -222,19 +222,19 @@
     "SYSTEM": "システム",
     "LAST_LOGIN": "最終ログイン",
     "LOADING_PROFILE": "プロフィールを読み込み中...",
-    "ROLE_SUPER_ADMIN": "スーパー管理者",
+    "ROLE_SYSTEM_ADMIN": "システム管理者",
     "ROLE_ORG_ADMIN": "組織管理者",
     "ROLE_ORG_USER": "ユーザー"
   },
-  "SUPER_ADMIN": {
-    "TITLE": "スーパー管理者",
+  "SYSTEM_ADMIN": {
+    "TITLE": "システム管理者",
     "SUBTITLE": "プラットフォーム全体へのアクセス権と組織管理権を持つシステムオーナーを管理します",
-    "ADD_TITLE": "スーパー管理者を追加",
-    "EDIT_TITLE": "スーパー管理者を編集",
-    "VIEW_TITLE": "スーパー管理者の詳細",
-    "DELETE_SINGLE": "このスーパー管理者を削除してもよろしいですか？",
-    "DELETE_BULK": "<strong>{{count}}</strong>件の選択されたスーパー管理者を削除してもよろしいですか？",
-    "UPDATE_CONFIRM": "このスーパー管理者を更新してもよろしいですか？"
+    "ADD_TITLE": "システム管理者を追加",
+    "EDIT_TITLE": "システム管理者を編集",
+    "VIEW_TITLE": "システム管理者の詳細",
+    "DELETE_SINGLE": "このシステム管理者を削除してもよろしいですか？",
+    "DELETE_BULK": "<strong>{{count}}</strong>件の選択されたシステム管理者を削除してもよろしいですか？",
+    "UPDATE_CONFIRM": "このシステム管理者を更新してもよろしいですか？"
   },
   "ORG": {
     "TITLE": "組織",

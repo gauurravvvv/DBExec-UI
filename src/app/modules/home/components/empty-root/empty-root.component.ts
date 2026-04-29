@@ -23,8 +23,8 @@ export class EmptyRootComponent implements OnInit {
       return;
     }
 
-    if (role === ROLES.SUPER_ADMIN) {
-      this.router.navigate(['/app/home/super-admin']);
+    if (role === ROLES.SYSTEM_ADMIN) {
+      this.router.navigate(['/app/home/system-admin']);
     } else {
       this.router.navigate(['/app/home/org']);
     }

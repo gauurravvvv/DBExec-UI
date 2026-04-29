@@ -5,11 +5,11 @@ export const AUTH = {
   SET_PASSWORD: '/set-password',
 };
 
-export const SUPER_ADMIN = {
-  ADD: '/app/super-admin/add',
-  LIST: '/app/super-admin',
-  EDIT: '/app/super-admin/edit',
-  VIEW: '/app/super-admin/view',
+export const SYSTEM_ADMIN = {
+  ADD: '/app/system-admin/add',
+  LIST: '/app/system-admin',
+  EDIT: '/app/system-admin/edit',
+  VIEW: '/app/system-admin/view',
 };
 
 export const ORGANISATION = {

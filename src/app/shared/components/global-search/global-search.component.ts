@@ -81,7 +81,7 @@ export class GlobalSearchComponent implements OnInit {
     // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
     if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
       event.preventDefault(); // Prevent default browser behavior
-      if (this.userRole !== 'SUPER-ADMIN') {
+      if (this.userRole !== 'SYSTEM-ADMIN') {
         this.openSearchModal();
       }
     }

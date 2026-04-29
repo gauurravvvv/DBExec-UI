@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
-import { DATASET, DATASOURCE, SUPER_ADMIN } from 'src/app/constants/api';
+import { DATASET, DATASOURCE, SYSTEM_ADMIN } from 'src/app/constants/api';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
@@ -91,17 +91,17 @@ export class DatasetService {
     }
   }
 
-  viewSuperAdmin(id: string) {
-    return lastValueFrom(this.http.apiGet(SUPER_ADMIN.VIEW + `${id}`));
+  viewSystemAdmin(id: string) {
+    return lastValueFrom(this.http.apiGet(SYSTEM_ADMIN.VIEW + `${id}`));
   }
 
-  async updateSuperAdmin(superAdminForm: FormGroup) {
+  async updateSystemAdmin(systemAdminForm: FormGroup) {
     const { id, firstName, lastName, username, email, mobile, status } =
-      superAdminForm.value;
+      systemAdminForm.value;
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPut(SUPER_ADMIN.UPDATE, {
+        this.http.apiPut(SYSTEM_ADMIN.UPDATE, {
           id,
           firstName,
           lastName,

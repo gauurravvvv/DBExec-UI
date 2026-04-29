@@ -2,7 +2,7 @@
   "SIDEBAR": {
     "home": "首页",
     "systemManagement": "系统管理",
-    "superAdmin": "超级管理员",
+    "systemAdmin": "系统管理员",
     "orgManagement": "组织管理",
     "userMgmtSection": "用户管理",
     "roleManagement": "角色管理",
@@ -222,19 +222,19 @@
     "SYSTEM": "系统",
     "LAST_LOGIN": "上次登录",
     "LOADING_PROFILE": "正在加载资料...",
-    "ROLE_SUPER_ADMIN": "超级管理员",
+    "ROLE_SYSTEM_ADMIN": "系统管理员",
     "ROLE_ORG_ADMIN": "组织管理员",
     "ROLE_ORG_USER": "用户"
   },
-  "SUPER_ADMIN": {
-    "TITLE": "超级管理员",
+  "SYSTEM_ADMIN": {
+    "TITLE": "系统管理员",
     "SUBTITLE": "管理拥有完整平台访问权限和组织控制权的系统所有者",
-    "ADD_TITLE": "添加超级管理员",
-    "EDIT_TITLE": "编辑超级管理员",
-    "VIEW_TITLE": "超级管理员详情",
-    "DELETE_SINGLE": "确定要删除此超级管理员吗？",
-    "DELETE_BULK": "确定要删除已选中的 <strong>{{count}}</strong> 位超级管理员吗？",
-    "UPDATE_CONFIRM": "确定要更新此超级管理员吗？"
+    "ADD_TITLE": "添加系统管理员",
+    "EDIT_TITLE": "编辑系统管理员",
+    "VIEW_TITLE": "系统管理员详情",
+    "DELETE_SINGLE": "确定要删除此系统管理员吗？",
+    "DELETE_BULK": "确定要删除已选中的 <strong>{{count}}</strong> 位系统管理员吗？",
+    "UPDATE_CONFIRM": "确定要更新此系统管理员吗？"
   },
   "ORG": {
     "TITLE": "组织",

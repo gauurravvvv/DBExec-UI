@@ -2,7 +2,7 @@
   "SIDEBAR": {
     "home": "홈",
     "systemManagement": "시스템 관리",
-    "superAdmin": "슈퍼 관리자",
+    "systemAdmin": "시스템 관리자",
     "orgManagement": "조직 관리",
     "userMgmtSection": "사용자 관리",
     "roleManagement": "역할 관리",
@@ -222,19 +222,19 @@
     "SYSTEM": "시스템",
     "LAST_LOGIN": "마지막 로그인",
     "LOADING_PROFILE": "프로필 로딩 중...",
-    "ROLE_SUPER_ADMIN": "슈퍼 관리자",
+    "ROLE_SYSTEM_ADMIN": "시스템 관리자",
     "ROLE_ORG_ADMIN": "조직 관리자",
     "ROLE_ORG_USER": "사용자"
   },
-  "SUPER_ADMIN": {
-    "TITLE": "슈퍼 관리자",
+  "SYSTEM_ADMIN": {
+    "TITLE": "시스템 관리자",
     "SUBTITLE": "전체 플랫폼 접근 권한과 조직 제어 권한을 가진 시스템 소유자를 관리합니다",
-    "ADD_TITLE": "슈퍼 관리자 추가",
-    "EDIT_TITLE": "슈퍼 관리자 편집",
-    "VIEW_TITLE": "슈퍼 관리자 상세 정보",
-    "DELETE_SINGLE": "이 슈퍼 관리자를 삭제하시겠습니까?",
-    "DELETE_BULK": "선택한 <strong>{{count}}</strong>명의 슈퍼 관리자를 삭제하시겠습니까?",
-    "UPDATE_CONFIRM": "이 슈퍼 관리자를 업데이트하시겠습니까?"
+    "ADD_TITLE": "시스템 관리자 추가",
+    "EDIT_TITLE": "시스템 관리자 편집",
+    "VIEW_TITLE": "시스템 관리자 상세 정보",
+    "DELETE_SINGLE": "이 시스템 관리자를 삭제하시겠습니까?",
+    "DELETE_BULK": "선택한 <strong>{{count}}</strong>명의 시스템 관리자를 삭제하시겠습니까?",
+    "UPDATE_CONFIRM": "이 시스템 관리자를 업데이트하시겠습니까?"
   },
   "ORG": {
     "TITLE": "조직",

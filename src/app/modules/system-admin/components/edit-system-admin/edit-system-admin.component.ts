@@ -1,22 +1,37 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
-import { SUPER_ADMIN } from 'src/app/constants/routes';
+import { SYSTEM_ADMIN } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { SuperAdminService } from '../../services/super-admin.service';
+import { SystemAdminService } from '../../services/system-admin.service';
 
 @Component({
-  selector: 'app-add-super-admin',
-  templateUrl: './add-super-admin.component.html',
-  styleUrls: ['./add-super-admin.component.scss'],
+  selector: 'app-edit-system-admin',
+  templateUrl: './edit-system-admin.component.html',
+  styleUrls: ['./edit-system-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
+export class EditSystemAdminComponent implements OnInit, HasUnsavedChanges {
+  private destroyRef = inject(DestroyRef);
+
   adminForm!: FormGroup;
-  saving = this.superAdminService.saving;
+  adminId: string = '';
+  adminData: any;
+  isCancelClicked: boolean = false;
+  isLocked: boolean = false;
+  showSaveConfirm = false;
+  saveJustification = '';
+  saving = this.systemAdminService.saving;
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
@@ -29,18 +44,29 @@ export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
 
   constructor(
     private fb: FormBuilder,
-    private superAdminService: SuperAdminService,
+    private systemAdminService: SystemAdminService,
     private router: Router,
+    private route: ActivatedRoute,
     private globalService: GlobalService,
     private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
     this.initForm();
+
+    // Subscribe to form value changes
+    this.adminForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isCancelClicked) {
+          this.isCancelClicked = false;
+        }
+      });
   }
 
   private initForm(): void {
     this.adminForm = this.fb.group({
+      id: [''],
       firstName: [
         '',
         [
@@ -69,31 +95,62 @@ export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
+      status: [false],
     });
+
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.adminId = params['id'];
+        if (this.adminId) {
+          this.patchFormValues();
+        }
+      });
   }
 
-  async onSubmit(): Promise<void> {
-    if (this.adminForm.valid) {
-      const response: any = await this.superAdminService.add(this.adminForm);
-      if (this.globalService.handleSuccessService(response)) {
-        this.adminForm.markAsPristine();
-        this.router.navigate([SUPER_ADMIN.LIST]);
+  async patchFormValues(): Promise<void> {
+    await this.systemAdminService.loadOne(this.adminId);
+    const data = this.systemAdminService.current();
+    if (data) {
+      this.adminData = data;
+      this.isLocked = !!this.adminData.isLocked;
+      this.adminForm.patchValue(this.adminData);
+      if (this.isLocked) {
+        this.adminForm.get('status')?.disable();
       }
-    } else {
-      // Mark all fields as touched to trigger validation messages
-      Object.keys(this.adminForm.controls).forEach(key => {
-        const control = this.adminForm.get(key);
-        control?.markAsTouched();
-      });
+    }
+  }
+
+  onSubmit(): void {
+    if (this.adminForm.valid) {
+      this.showSaveConfirm = true;
+    }
+  }
+
+  cancelSave(): void {
+    this.showSaveConfirm = false;
+    this.saveJustification = '';
+  }
+
+  async proceedSave(): Promise<void> {
+    if (this.saveJustification.trim()) {
+      const response: any = await this.systemAdminService.update(
+        this.adminForm,
+        this.saveJustification.trim(),
+      );
+      if (this.globalService.handleSuccessService(response)) {
+        this.showSaveConfirm = false;
+        this.saveJustification = '';
+        this.adminForm.markAsPristine();
+        this.router.navigate([SYSTEM_ADMIN.LIST]);
+      }
     }
   }
 
   onCancel(): void {
-    this.adminForm.reset();
-    // Reset specific form controls to empty strings
-    Object.keys(this.adminForm.controls).forEach(key => {
-      this.adminForm.get(key)?.setValue('');
-    });
+    this.adminForm.patchValue(this.adminData);
+    this.adminForm.markAsPristine();
+    this.isCancelClicked = true;
   }
 
   getFirstNameError(): string {
@@ -117,18 +174,6 @@ export class AddSuperAdminComponent implements OnInit, HasUnsavedChanges {
       return this.translate.instant('VALIDATION.LAST_NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.LAST_NAME_PATTERN');
-    return '';
-  }
-
-  getUsernameError(): string {
-    const control = this.adminForm.get('username');
-    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.USERNAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.USERNAME_MIN', { min: control.errors['minlength'].requiredLength });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.USERNAME_MAX', { max: control.errors['maxlength'].requiredLength });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.USERNAME_PATTERN');
     return '';
   }
 

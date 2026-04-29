@@ -30,13 +30,13 @@ const routes: Routes = [
         data: { title: 'Home' },
       },
       {
-        path: 'super-admin',
+        path: 'system-admin',
         loadChildren: () =>
-          import('./modules/super-admin/super-admin.module').then(
-            m => m.SuperAdminModule,
+          import('./modules/system-admin/system-admin.module').then(
+            m => m.SystemAdminModule,
           ),
         canActivate: [roleGuard],
-        data: { roles: ['SUPER-ADMIN'], title: 'Super Admins' },
+        data: { roles: ['SYSTEM-ADMIN'], title: 'System Admins' },
       },
       {
         path: 'organisation',
@@ -45,7 +45,7 @@ const routes: Routes = [
             m => m.OrganisationModule,
           ),
         canActivate: [roleGuard],
-        data: { roles: ['SUPER-ADMIN'], title: 'Organisations' },
+        data: { roles: ['SYSTEM-ADMIN'], title: 'Organisations' },
       },
       {
         path: 'users',

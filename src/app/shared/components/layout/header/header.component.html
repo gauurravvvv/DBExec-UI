@@ -21,7 +21,7 @@
       <div
         class="search-trigger"
         (click)="openSearchModal()"
-        *ngIf="userRole !== 'SUPER-ADMIN'"
+        *ngIf="userRole !== 'SYSTEM-ADMIN'"
       >
         <i class="pi pi-search"></i>
         <span class="placeholder">{{ 'HEADER.SEARCH_PLACEHOLDER' | translate }}</span>

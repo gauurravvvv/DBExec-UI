@@ -64,8 +64,8 @@ export class ViewProfileComponent implements OnInit {
   get roleLabel(): string {
     const p = this.profile();
     switch (p?.role) {
-      case 'SUPER-ADMIN':
-        return this.translate.instant('PROFILE.ROLE_SUPER_ADMIN');
+      case 'SYSTEM-ADMIN':
+        return this.translate.instant('PROFILE.ROLE_SYSTEM_ADMIN');
       case 'ORG-ADMIN':
         return this.translate.instant('PROFILE.ROLE_ORG_ADMIN');
       case 'ORG-USER':

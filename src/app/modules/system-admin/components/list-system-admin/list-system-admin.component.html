@@ -3,9 +3,9 @@
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>{{ 'SUPER_ADMIN.TITLE' | translate }}</h2>
+        <h2>{{ 'SYSTEM_ADMIN.TITLE' | translate }}</h2>
         <p class="subtitle">
-          {{ 'SUPER_ADMIN.SUBTITLE' | translate }}
+          {{ 'SYSTEM_ADMIN.SUBTITLE' | translate }}
         </p>
       </div>
     </div>
@@ -180,7 +180,7 @@
               <td pFrozenColumn>
                 <a
                   class="dataset-name-link"
-                  [routerLink]="['/app/super-admin/view', admin.id]"
+                  [routerLink]="['/app/system-admin/view', admin.id]"
                 >
                   {{ admin.username }}
                 </a>
@@ -290,9 +290,9 @@
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
       <p class="delete-intro" *ngIf="!bulkDelete">
-        {{ 'SUPER_ADMIN.DELETE_SINGLE' | translate }}
+        {{ 'SYSTEM_ADMIN.DELETE_SINGLE' | translate }}
       </p>
-      <p class="delete-intro" *ngIf="bulkDelete" [innerHTML]="'SUPER_ADMIN.DELETE_BULK' | translate:{ count: selectedCount }">
+      <p class="delete-intro" *ngIf="bulkDelete" [innerHTML]="'SYSTEM_ADMIN.DELETE_BULK' | translate:{ count: selectedCount }">
       </p>
 
       <ul class="delete-info-list">

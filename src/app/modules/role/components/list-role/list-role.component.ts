@@ -47,7 +47,7 @@ export class ListRoleComponent implements OnInit {
   organisations: any[] = [];
   selectedOrgId: any = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   today = new Date();
 
   statusOptions: { label: string; value: number }[] = [];

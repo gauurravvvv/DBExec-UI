@@ -148,7 +148,7 @@ export class GlobalService {
    */
   hasPermission(permissionValue: string): boolean {
     const userRole = this.getTokenDetails('role');
-    if (userRole === ROLES.SUPER_ADMIN) return true;
+    if (userRole === ROLES.SYSTEM_ADMIN) return true;
     const permissions = this.getTokenDetails('permission');
     if (!permissions || !Array.isArray(permissions)) return false;
     return this.checkPermissionTree(permissions, permissionValue);

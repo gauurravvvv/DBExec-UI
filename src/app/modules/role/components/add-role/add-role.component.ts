@@ -32,7 +32,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   organisations: any[] = [];
   permissions: any[] = [];
   showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
   selectedOrg: any = null;
   permissionControls: { [key: string]: FormControl } = {};
 
@@ -74,7 +74,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
       organisation: [
         {
           value:
-            this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
+            this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
               ? ''
               : this.globalService.getTokenDetails('organisationId'),
           disabled: false,
@@ -178,7 +178,7 @@ export class AddRoleComponent implements OnInit, HasUnsavedChanges {
   onCancel() {
     this.roleForm.reset({
       organisation:
-        this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
+        this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
           ? ''
           : this.globalService.getTokenDetails('organisationId'),
     });

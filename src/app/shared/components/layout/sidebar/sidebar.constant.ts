@@ -4,8 +4,8 @@ export const SIDEBAR_ITEMS_ROUTES = [
     route: '/app/home',
   },
   {
-    value: 'superAdmin',
-    route: '/app/super-admin',
+    value: 'systemAdmin',
+    route: '/app/system-admin',
   },
   {
     value: 'orgManagement',
@@ -99,7 +99,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
 ];
 
 export const HOME_ROUTES = {
-  SUPER_ADMIN: '/app/home/super-admin',
+  SYSTEM_ADMIN: '/app/home/super-admin',
   ORG_ADMIN: '/app/home/org',
   ORG_USER: '/app/home/org',
 };

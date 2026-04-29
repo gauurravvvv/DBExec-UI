@@ -35,7 +35,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   roles: any[] = [];
   users: any[] = [];
   showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
 
   saving = this.groupService.saving;
 
@@ -83,7 +83,7 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
+        this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
           ? ''
           : this.globalService.getTokenDetails('organisationId'),
         Validators.required,

@@ -36,7 +36,7 @@ export class GrantAccessComponent implements OnInit {
   connections: any[] = [];
   groups: any[] = [];
   showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
   users: any[] = [];
 
   constructor(
@@ -64,12 +64,12 @@ export class GrantAccessComponent implements OnInit {
   }
 
   initForm() {
-    const isSuperAdmin =
-      this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+    const isSystemAdmin =
+      this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
     const organisationId = this.globalService.getTokenDetails('organisationId');
 
     this.accessForm = this.fb.group({
-      organisation: [isSuperAdmin ? null : organisationId, Validators.required],
+      organisation: [isSystemAdmin ? null : organisationId, Validators.required],
       datasource: [null, Validators.required],
       connection: [null, Validators.required],
       users: [[]],
@@ -186,15 +186,15 @@ export class GrantAccessComponent implements OnInit {
     if (!this.accessForm) return;
 
     const role = this.globalService.getTokenDetails('role');
-    const isSuperAdmin = role === ROLES.SUPER_ADMIN;
+    const isSystemAdmin = role === ROLES.SYSTEM_ADMIN;
     const isOrgAdmin = role === ROLES.ORG_ADMIN;
     const organisationId = this.globalService.getTokenDetails('organisationId');
 
     // Reset the form
     this.accessForm.reset();
 
-    if (isSuperAdmin) {
-      // For SUPER_ADMIN: Keep organisations list, clear everything else
+    if (isSystemAdmin) {
+      // For SYSTEM_ADMIN: Keep organisations list, clear everything else
       this.accessForm.patchValue(
         {
           organisation: null,

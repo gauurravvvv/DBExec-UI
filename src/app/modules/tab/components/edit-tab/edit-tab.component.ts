@@ -30,7 +30,7 @@ export class EditTabComponent implements OnInit, HasUnsavedChanges {
 
   tabForm!: FormGroup;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   orgId: string = '';
   tabId: string = '';
   selectedOrgName: string = '';

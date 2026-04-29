@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { roleGuard } from 'src/app/core/guards/role.guard';
 import { EmptyRootComponent } from './components/empty-root/empty-root.component';
 import { OrgHomeComponent } from './components/org-home/org-home.component';
-import { SuperAdminHomeComponent } from './components/super-admin-home/super-admin-home.component';
+import { SystemAdminHomeComponent } from './components/system-admin-home/system-admin-home.component';
 
 const routes: Routes = [
   {
@@ -11,10 +11,10 @@ const routes: Routes = [
     component: EmptyRootComponent,
   },
   {
-    path: 'super-admin',
-    component: SuperAdminHomeComponent,
+    path: 'system-admin',
+    component: SystemAdminHomeComponent,
     canActivate: [roleGuard],
-    data: { roles: ['SUPER-ADMIN'] },
+    data: { roles: ['SYSTEM-ADMIN'] },
   },
   {
     path: 'org',
