@@ -222,19 +222,19 @@
     "SYSTEM": "Systeem",
     "LAST_LOGIN": "Laatste login",
     "LOADING_PROFILE": "Profiel laden...",
-    "ROLE_SYSTEM_ADMIN": "Superbeheerder",
+    "ROLE_SYSTEM_ADMIN": "Systeembeheerder",
     "ROLE_ORG_ADMIN": "Organisatiebeheerder",
     "ROLE_ORG_USER": "Gebruiker"
   },
   "SYSTEM_ADMIN": {
-    "TITLE": "Superbeheerders",
+    "TITLE": "Systeembeheerders",
     "SUBTITLE": "Beheer systeemeigenaren met volledige platformtoegang en organisatiebeheer",
-    "ADD_TITLE": "Superbeheerder toevoegen",
-    "EDIT_TITLE": "Superbeheerder bewerken",
-    "VIEW_TITLE": "Superbeheerder details",
-    "DELETE_SINGLE": "Weet u zeker dat u deze superbeheerder wilt verwijderen?",
-    "DELETE_BULK": "Weet u zeker dat u <strong>{{count}}</strong> geselecteerde superbeheerder(s) wilt verwijderen?",
-    "UPDATE_CONFIRM": "Weet u zeker dat u deze superbeheerder wilt bijwerken?"
+    "ADD_TITLE": "Systeembeheerder toevoegen",
+    "EDIT_TITLE": "Systeembeheerder bewerken",
+    "VIEW_TITLE": "Systeembeheerder details",
+    "DELETE_SINGLE": "Weet u zeker dat u deze systeembeheerder wilt verwijderen?",
+    "DELETE_BULK": "Weet u zeker dat u <strong>{{count}}</strong> geselecteerde systeembeheerder(s) wilt verwijderen?",
+    "UPDATE_CONFIRM": "Weet u zeker dat u deze systeembeheerder wilt bijwerken?"
   },
   "ORG": {
     "TITLE": "Organisaties",

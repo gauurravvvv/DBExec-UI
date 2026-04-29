@@ -232,9 +232,9 @@
     "ADD_TITLE": "Add System Admin",
     "EDIT_TITLE": "Edit System Admin",
     "VIEW_TITLE": "System Admin Details",
-    "DELETE_SINGLE": "Are you sure you want to delete this super admin?",
-    "DELETE_BULK": "Are you sure you want to delete <strong>{{count}}</strong> selected super admin(s)?",
-    "UPDATE_CONFIRM": "Are you sure you want to update this super admin?"
+    "DELETE_SINGLE": "Are you sure you want to delete this system admin?",
+    "DELETE_BULK": "Are you sure you want to delete <strong>{{count}}</strong> selected system admin(s)?",
+    "UPDATE_CONFIRM": "Are you sure you want to update this system admin?"
   },
   "ORG": {
     "TITLE": "Organisations",
