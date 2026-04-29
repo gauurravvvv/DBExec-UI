@@ -423,6 +423,8 @@
     "NO_GROUPS": "No groups",
     "NEVER_LOGGED_IN": "Never logged in",
     "ADD_TITLE": "Add User",
+    "LANGUAGE": "Language",
+    "SELECT_LANGUAGE": "Select Language",
     "EDIT_TITLE": "Edit User",
     "VIEW_TITLE": "User Details",
     "SELECT_ORGANISATION": "Select Organisation",

@@ -15,6 +15,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { TranslateService } from '@ngx-translate/core';
+import { SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -29,6 +30,8 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
   groups: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+
+  readonly locales = SUPPORTED_LOCALES as unknown as any[];
 
   saving = this.userService.saving;
 
@@ -98,6 +101,7 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
         Validators.required,
       ],
       groupIds: [[], Validators.required],
+      locale: ['en', Validators.required],
     });
   }
 
