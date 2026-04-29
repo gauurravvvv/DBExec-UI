@@ -12,8 +12,8 @@ const AUTH_ONLY_ROUTES = ['/login', '/forgot-password', '/reset-password'];
 
 function getDefaultRouteByRole(globalService: GlobalService): string {
   const role = globalService.getTokenDetails('role');
-  if (role === ROLES.SUPER_ADMIN) {
-    return HOME_ROUTES.SUPER_ADMIN;
+  if (role === ROLES.SYSTEM_ADMIN) {
+    return HOME_ROUTES.SYSTEM_ADMIN;
   }
   if (role) {
     return HOME_ROUTES.ORG_ADMIN;

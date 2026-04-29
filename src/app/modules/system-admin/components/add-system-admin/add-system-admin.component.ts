@@ -1,37 +1,22 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  inject,
-  OnInit,
-} from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { REGEX } from 'src/app/constants/regex.constant';
-import { SUPER_ADMIN } from 'src/app/constants/routes';
-import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { REGEX } from 'src/app/constants/regex.constant';
+import { SYSTEM_ADMIN } from 'src/app/constants/routes';
+import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { SuperAdminService } from '../../services/super-admin.service';
+import { SystemAdminService } from '../../services/system-admin.service';
 
 @Component({
-  selector: 'app-edit-super-admin',
-  templateUrl: './edit-super-admin.component.html',
-  styleUrls: ['./edit-super-admin.component.scss'],
+  selector: 'app-add-system-admin',
+  templateUrl: './add-system-admin.component.html',
+  styleUrls: ['./add-system-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
-  private destroyRef = inject(DestroyRef);
-
+export class AddSystemAdminComponent implements OnInit, HasUnsavedChanges {
   adminForm!: FormGroup;
-  adminId: string = '';
-  adminData: any;
-  isCancelClicked: boolean = false;
-  isLocked: boolean = false;
-  showSaveConfirm = false;
-  saveJustification = '';
-  saving = this.superAdminService.saving;
+  saving = this.systemAdminService.saving;
 
   // Add getter for form dirty state
   get isFormDirty(): boolean {
@@ -44,29 +29,18 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
 
   constructor(
     private fb: FormBuilder,
-    private superAdminService: SuperAdminService,
+    private systemAdminService: SystemAdminService,
     private router: Router,
-    private route: ActivatedRoute,
     private globalService: GlobalService,
     private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
     this.initForm();
-
-    // Subscribe to form value changes
-    this.adminForm.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.isCancelClicked) {
-          this.isCancelClicked = false;
-        }
-      });
   }
 
   private initForm(): void {
     this.adminForm = this.fb.group({
-      id: [''],
       firstName: [
         '',
         [
@@ -95,62 +69,31 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      status: [false],
     });
-
-    this.route.params
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(params => {
-        this.adminId = params['id'];
-        if (this.adminId) {
-          this.patchFormValues();
-        }
-      });
   }
 
-  async patchFormValues(): Promise<void> {
-    await this.superAdminService.loadOne(this.adminId);
-    const data = this.superAdminService.current();
-    if (data) {
-      this.adminData = data;
-      this.isLocked = !!this.adminData.isLocked;
-      this.adminForm.patchValue(this.adminData);
-      if (this.isLocked) {
-        this.adminForm.get('status')?.disable();
-      }
-    }
-  }
-
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.adminForm.valid) {
-      this.showSaveConfirm = true;
-    }
-  }
-
-  cancelSave(): void {
-    this.showSaveConfirm = false;
-    this.saveJustification = '';
-  }
-
-  async proceedSave(): Promise<void> {
-    if (this.saveJustification.trim()) {
-      const response: any = await this.superAdminService.update(
-        this.adminForm,
-        this.saveJustification.trim(),
-      );
+      const response: any = await this.systemAdminService.add(this.adminForm);
       if (this.globalService.handleSuccessService(response)) {
-        this.showSaveConfirm = false;
-        this.saveJustification = '';
         this.adminForm.markAsPristine();
-        this.router.navigate([SUPER_ADMIN.LIST]);
+        this.router.navigate([SYSTEM_ADMIN.LIST]);
       }
+    } else {
+      // Mark all fields as touched to trigger validation messages
+      Object.keys(this.adminForm.controls).forEach(key => {
+        const control = this.adminForm.get(key);
+        control?.markAsTouched();
+      });
     }
   }
 
   onCancel(): void {
-    this.adminForm.patchValue(this.adminData);
-    this.adminForm.markAsPristine();
-    this.isCancelClicked = true;
+    this.adminForm.reset();
+    // Reset specific form controls to empty strings
+    Object.keys(this.adminForm.controls).forEach(key => {
+      this.adminForm.get(key)?.setValue('');
+    });
   }
 
   getFirstNameError(): string {
@@ -174,6 +117,18 @@ export class EditSuperAdminComponent implements OnInit, HasUnsavedChanges {
       return this.translate.instant('VALIDATION.LAST_NAME_MAX', { max: control.errors['maxlength'].requiredLength });
     if (control?.errors?.['pattern'])
       return this.translate.instant('VALIDATION.LAST_NAME_PATTERN');
+    return '';
+  }
+
+  getUsernameError(): string {
+    const control = this.adminForm.get('username');
+    if (control?.errors?.['required']) return this.translate.instant('VALIDATION.USERNAME_REQUIRED');
+    if (control?.errors?.['minlength'])
+      return this.translate.instant('VALIDATION.USERNAME_MIN', { min: control.errors['minlength'].requiredLength });
+    if (control?.errors?.['maxlength'])
+      return this.translate.instant('VALIDATION.USERNAME_MAX', { max: control.errors['maxlength'].requiredLength });
+    if (control?.errors?.['pattern'])
+      return this.translate.instant('VALIDATION.USERNAME_PATTERN');
     return '';
   }
 

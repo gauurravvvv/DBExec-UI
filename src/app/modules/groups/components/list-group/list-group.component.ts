@@ -51,7 +51,7 @@ export class ListGroupComponent implements OnInit {
   selectedOrg: any = null;
   selectedRole: string | null = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   today = new Date();
 
   statusOptions: { label: string; value: number }[] = [];

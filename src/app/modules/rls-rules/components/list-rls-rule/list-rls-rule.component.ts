@@ -51,7 +51,7 @@ export class ListRlsRuleComponent implements OnInit {
 
   organisations: any[] = [];
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
 
   statusOptions = [
     { label: 'Active', value: 1 },

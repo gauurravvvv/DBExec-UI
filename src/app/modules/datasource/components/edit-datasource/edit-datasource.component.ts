@@ -110,7 +110,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit(): void {
     this.showOrganisationDropdown =
-      this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+      this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
 
     this.initForm();
 

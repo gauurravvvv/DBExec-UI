@@ -2,7 +2,7 @@
   "SIDEBAR": {
     "home": "Inicio",
     "systemManagement": "Gestión del sistema",
-    "superAdmin": "Super Admin",
+    "systemAdmin": "System Admin",
     "orgManagement": "Organizaciones",
     "userMgmtSection": "Gestión de usuarios",
     "roleManagement": "Roles",
@@ -222,11 +222,11 @@
     "SYSTEM": "Sistema",
     "LAST_LOGIN": "Último acceso",
     "LOADING_PROFILE": "Cargando perfil...",
-    "ROLE_SUPER_ADMIN": "Superadministrador",
+    "ROLE_SYSTEM_ADMIN": "Superadministrador",
     "ROLE_ORG_ADMIN": "Administrador de organización",
     "ROLE_ORG_USER": "Usuario"
   },
-  "SUPER_ADMIN": {
+  "SYSTEM_ADMIN": {
     "TITLE": "Superadministradores",
     "SUBTITLE": "Gestionar propietarios del sistema con acceso completo a la plataforma y control de organizaciones",
     "ADD_TITLE": "Agregar superadministrador",

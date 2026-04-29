@@ -50,7 +50,7 @@ export class ListConnectionComponent implements OnInit {
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
   today = new Date();

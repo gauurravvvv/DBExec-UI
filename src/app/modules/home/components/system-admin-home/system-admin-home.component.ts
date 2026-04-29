@@ -13,9 +13,9 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { HomeService } from '../../services/home.service';
 
 @Component({
-  selector: 'app-super-admin-home',
-  templateUrl: './super-admin-home.component.html',
-  styleUrls: ['./super-admin-home.component.scss'],
+  selector: 'app-system-admin-home',
+  templateUrl: './system-admin-home.component.html',
+  styleUrls: ['./system-admin-home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('fadeInUp', [
@@ -29,7 +29,7 @@ import { HomeService } from '../../services/home.service';
     ]),
   ],
 })
-export class SuperAdminHomeComponent implements OnInit {
+export class SystemAdminHomeComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -99,7 +99,7 @@ export class SuperAdminHomeComponent implements OnInit {
 
   loadOrganizationData(orgId: string) {
     this.homeService
-      .getSuperAdminDashboard(orgId)
+      .getSystemAdminDashboard(orgId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: any) => {

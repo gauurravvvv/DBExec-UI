@@ -8,9 +8,9 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SUPER_ADMIN } from 'src/app/constants/routes';
+import { SYSTEM_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { SuperAdminService } from '../../services/super-admin.service';
+import { SystemAdminService } from '../../services/system-admin.service';
 
 interface AdminData {
   id: string;
@@ -32,12 +32,12 @@ interface AdminData {
 }
 
 @Component({
-  selector: 'app-view-super-admin',
-  templateUrl: './view-super-admin.component.html',
-  styleUrls: ['./view-super-admin.component.scss'],
+  selector: 'app-view-system-admin',
+  templateUrl: './view-system-admin.component.html',
+  styleUrls: ['./view-system-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewSuperAdminComponent implements OnInit {
+export class ViewSystemAdminComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   adminId: string = '';
@@ -53,7 +53,7 @@ export class ViewSuperAdminComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private superAdminService: SuperAdminService,
+    private systemAdminService: SystemAdminService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -73,8 +73,8 @@ export class ViewSuperAdminComponent implements OnInit {
   }
 
   private async loadAdminDetails(): Promise<void> {
-    await this.superAdminService.loadOne(this.adminId);
-    const data = this.superAdminService.current();
+    await this.systemAdminService.loadOne(this.adminId);
+    const data = this.systemAdminService.current();
     if (data) {
       this.adminData = data;
       this.setAdminInitials();
@@ -136,18 +136,18 @@ export class ViewSuperAdminComponent implements OnInit {
   }
 
   onDelete(adminId: string) {
-    this.superAdminService
+    this.systemAdminService
       .delete(adminId, this.deleteJustification.trim())
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
-          this.router.navigate([SUPER_ADMIN.LIST]);
+          this.router.navigate([SYSTEM_ADMIN.LIST]);
         }
         this.cdr.markForCheck();
       });
   }
 
   onUnlock() {
-    this.superAdminService.unlock(this.adminId).then((res: any) => {
+    this.systemAdminService.unlock(this.adminId).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         this.loadAdminDetails();
       }
@@ -161,7 +161,7 @@ export class ViewSuperAdminComponent implements OnInit {
 
   onPasswordDialogClose(newPassword: string | null) {
     if (newPassword) {
-      this.superAdminService
+      this.systemAdminService
         .updatePassword(this.adminId, newPassword)
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response)) {

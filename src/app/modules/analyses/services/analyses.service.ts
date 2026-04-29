@@ -7,7 +7,7 @@ import {
   ANALYSIS_FILTER,
   DATASET,
   DATASOURCE,
-  SUPER_ADMIN,
+  SYSTEM_ADMIN,
 } from 'src/app/constants/api';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -157,15 +157,15 @@ export class AnalysesService {
     }
   }
 
-  viewSuperAdmin(id: string) {
-    return lastValueFrom(this.http.apiGet(SUPER_ADMIN.VIEW + `${id}`));
+  viewSystemAdmin(id: string) {
+    return lastValueFrom(this.http.apiGet(SYSTEM_ADMIN.VIEW + `${id}`));
   }
 
-  updateSuperAdmin(superAdminForm: FormGroup) {
+  updateSystemAdmin(systemAdminForm: FormGroup) {
     const { id, firstName, lastName, username, email, mobile, status } =
-      superAdminForm.value;
+      systemAdminForm.value;
     return lastValueFrom(
-      this.http.apiPut(SUPER_ADMIN.UPDATE, {
+      this.http.apiPut(SYSTEM_ADMIN.UPDATE, {
         id,
         firstName,
         lastName,

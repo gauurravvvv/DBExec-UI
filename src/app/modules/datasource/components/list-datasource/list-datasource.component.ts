@@ -47,7 +47,7 @@ export class ListDatasourceComponent implements OnInit {
   organisations: any[] = [];
   selectedOrg: any = {};
   userRole = this.globalService.getTokenDetails('role');
-  showOrganisationDropdown = this.userRole === ROLES.SUPER_ADMIN;
+  showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatasource: any = null;
   selectedDatasources: any[] = [];

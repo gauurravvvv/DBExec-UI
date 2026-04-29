@@ -15,7 +15,7 @@
     <div class="content-card">
       <div class="card-toolbar">
         <div class="toolbar-left">
-          <div class="dropdown-field" *ngIf="isSuperAdmin">
+          <div class="dropdown-field" *ngIf="isSystemAdmin">
             <app-custom-dropdown
               [(ngModel)]="filterValues.organisationId"
               [options]="organisationOptions"

@@ -40,7 +40,7 @@ export class ListAuditLogsComponent implements OnInit {
   showDetailDialog = false;
   selectedLog: any = null;
 
-  isSuperAdmin = false;
+  isSystemAdmin = false;
   organisations: any[] = [];
   organisationOptions: any[] = [];
   today = new Date();
@@ -84,10 +84,10 @@ export class ListAuditLogsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.isSuperAdmin =
-      this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+    this.isSystemAdmin =
+      this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
 
-    if (this.isSuperAdmin) {
+    if (this.isSystemAdmin) {
       this.loadOrganisations();
     }
 
@@ -156,7 +156,7 @@ export class ListAuditLogsComponent implements OnInit {
       module: null,
       action: null,
       entityName: '',
-      organisationId: this.isSuperAdmin ? orgId : null,
+      organisationId: this.isSystemAdmin ? orgId : null,
       status: null,
       ipAddress: '',
       justification: '',

@@ -7,11 +7,11 @@
           <button
             pButton
             class="p-button-text p-button-plain back-button"
-            routerLink="/app/super-admin"
+            routerLink="/app/system-admin"
           >
             <i class="pi pi-arrow-left text-xl"></i>
           </button>
-          <h2 class="m-0">{{ 'SUPER_ADMIN.VIEW_TITLE' | translate }}</h2>
+          <h2 class="m-0">{{ 'SYSTEM_ADMIN.VIEW_TITLE' | translate }}</h2>
         </div>
       </div>
 
@@ -19,7 +19,7 @@
         <button
           class="btn-primary"
           [disabled]="adminId == loggedInUserId"
-          [routerLink]="['/app/super-admin/edit', adminId]"
+          [routerLink]="['/app/system-admin/edit', adminId]"
         >
           <i class="pi pi-pencil"></i>
           {{ 'COMMON.EDIT' | translate }}
@@ -89,7 +89,7 @@
         <div class="identity-meta">
           <div class="meta-item">
             <span class="label">{{ 'COMMON.ROLE' | translate }}</span>
-            <span class="value">{{ 'PROFILE.ROLE_SUPER_ADMIN' | translate }}</span>
+            <span class="value">{{ 'PROFILE.ROLE_SYSTEM_ADMIN' | translate }}</span>
           </div>
           <div class="meta-item">
             <span class="label">{{ 'COMMON.MEMBER_SINCE' | translate }}</span>
@@ -187,7 +187,7 @@
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
       <p class="delete-intro">
-        {{ 'SUPER_ADMIN.DELETE_SINGLE' | translate }}
+        {{ 'SYSTEM_ADMIN.DELETE_SINGLE' | translate }}
       </p>
 
       <ul class="delete-info-list">

@@ -62,7 +62,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   selectedDatasource: string = '';
 
   showOrganisationDropdown =
-    this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN;
+    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
 
   operatorOptions = [
     { label: 'IN', value: 'IN' },
@@ -121,7 +121,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       organisation: [
-        this.globalService.getTokenDetails('role') === ROLES.SUPER_ADMIN
+        this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN
           ? ''
           : this.globalService.getTokenDetails('organisationId'),
         Validators.required,

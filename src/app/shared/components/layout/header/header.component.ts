@@ -148,7 +148,7 @@ export class HeaderComponent implements OnInit {
 
     this.updateUnreadCount();
 
-    if (this.userRole !== ROLES.SUPER_ADMIN) {
+    if (this.userRole !== ROLES.SYSTEM_ADMIN) {
       this.fetchAnnouncements();
       // Refetch on route change (debounced) — picks up new/expired/dismissed banners
       this.router.events

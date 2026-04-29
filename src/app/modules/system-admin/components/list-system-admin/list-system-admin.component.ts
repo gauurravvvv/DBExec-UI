@@ -13,17 +13,17 @@ import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { SUPER_ADMIN } from 'src/app/constants/routes';
+import { SYSTEM_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { SuperAdminService } from '../../services/super-admin.service';
+import { SystemAdminService } from '../../services/system-admin.service';
 
 @Component({
-  selector: 'app-list-super-admin',
-  templateUrl: './list-super-admin.component.html',
-  styleUrls: ['./list-super-admin.component.scss'],
+  selector: 'app-list-system-admin',
+  templateUrl: './list-system-admin.component.html',
+  styleUrls: ['./list-system-admin.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListSuperAdminComponent implements OnInit {
+export class ListSystemAdminComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   Math = Math;
@@ -32,9 +32,9 @@ export class ListSuperAdminComponent implements OnInit {
   @ViewChild('dt') dt!: Table;
   private searchSubject = new Subject<void>();
 
-  admins = this.superAdminService.admins;
-  total = this.superAdminService.total;
-  loading = this.superAdminService.loading;
+  admins = this.systemAdminService.admins;
+  total = this.systemAdminService.total;
+  loading = this.systemAdminService.loading;
 
   selectedAdmins: any[] = [];
 
@@ -59,7 +59,7 @@ export class ListSuperAdminComponent implements OnInit {
   };
 
   constructor(
-    private superAdminService: SuperAdminService,
+    private systemAdminService: SystemAdminService,
     private router: Router,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
@@ -142,7 +142,7 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   onEdit(adminId: string): void {
-    this.router.navigate([SUPER_ADMIN.EDIT + '/' + adminId]);
+    this.router.navigate([SYSTEM_ADMIN.EDIT + '/' + adminId]);
   }
 
   confirmDelete(adminId: string) {
@@ -175,7 +175,7 @@ export class ListSuperAdminComponent implements OnInit {
         this.cancelDelete();
         return;
       }
-      this.superAdminService
+      this.systemAdminService
         .bulkDelete(ids, reason)
         .then((res: any) => {
           if (this.globalService.handleSuccessService(res)) {
@@ -208,7 +208,7 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   onDelete(adminId: string) {
-    this.superAdminService
+    this.systemAdminService
       .delete(adminId, this.deleteJustification.trim())
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res)) {
@@ -222,7 +222,7 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   onUnlock(adminId: string) {
-    this.superAdminService.unlock(adminId).then((res: any) => {
+    this.systemAdminService.unlock(adminId).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {
         if (this.lastTableLazyLoadEvent) {
           this.loadSuperAdmins(this.lastTableLazyLoadEvent);
@@ -233,7 +233,7 @@ export class ListSuperAdminComponent implements OnInit {
   }
 
   onAddNewAdmin(): void {
-    this.router.navigate([SUPER_ADMIN.ADD]);
+    this.router.navigate([SYSTEM_ADMIN.ADD]);
   }
 
   loadSuperAdmins(event: any) {
@@ -302,6 +302,6 @@ export class ListSuperAdminComponent implements OnInit {
       params.filter = JSON.stringify(filter);
     }
 
-    this.superAdminService.load(params);
+    this.systemAdminService.load(params);
   }
 }

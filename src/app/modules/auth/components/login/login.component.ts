@@ -58,8 +58,8 @@ export class LoginComponent implements OnInit {
         if (this.globalService.handleSuccessService(res, true, false)) {
           const role = this.globalService.getTokenDetails('role');
           const homeRoute =
-            role === ROLES.SUPER_ADMIN
-              ? HOME_ROUTES.SUPER_ADMIN
+            role === ROLES.SYSTEM_ADMIN
+              ? HOME_ROUTES.SYSTEM_ADMIN
               : HOME_ROUTES.ORG_ADMIN;
           const target = this.returnUrl || homeRoute;
           this.router.navigateByUrl(target, {

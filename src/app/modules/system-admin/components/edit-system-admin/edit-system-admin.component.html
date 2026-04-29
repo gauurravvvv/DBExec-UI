@@ -6,11 +6,11 @@
         <button
           pButton
           class="p-button-text back-button"
-          routerLink="/app/super-admin"
+          routerLink="/app/system-admin"
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>{{ 'SUPER_ADMIN.ADD_TITLE' | translate }}</h2>
+        <h2>{{ 'SYSTEM_ADMIN.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <button
@@ -27,7 +27,7 @@
           type="submit"
           [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
-          [disabled]="adminForm.invalid || saving()"
+          [disabled]="adminForm.invalid || !isFormDirty || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -71,20 +71,14 @@
         >
         </app-custom-input>
 
-        <!-- Username -->
+        <!-- Username (disabled) -->
         <app-custom-input
           formControlName="username"
           [label]="'COMMON.USERNAME' | translate"
           [placeholder]="'COMMON.ENTER_USERNAME' | translate"
           icon="pi-user-edit"
           [required]="true"
-          [showError]="
-            !!(
-              adminForm.get('username')?.invalid &&
-              adminForm.get('username')?.touched
-            )
-          "
-          [errorMessage]="getUsernameError()"
+          [inputDisabled]="true"
         >
         </app-custom-input>
 
@@ -104,7 +98,70 @@
           [errorMessage]="getEmailError()"
         >
         </app-custom-input>
+
+        <!-- Status -->
+        <div>
+          <app-custom-toggle
+            formControlName="status"
+            [label]="'COMMON.STATUS' | translate"
+            [trueValue]="1"
+            [falseValue]="0"
+            [trueLabel]="'COMMON.ACTIVE' | translate"
+            [falseLabel]="'COMMON.INACTIVE' | translate"
+          >
+          </app-custom-toggle>
+          <small *ngIf="isLocked" class="locked-note">
+            <i class="pi pi-lock"></i>
+            {{ 'COMMON.LOCKED_NOTE' | translate }}
+          </small>
+        </div>
       </div>
     </form>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showSaveConfirm">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-save"></i>
+      </div>
+      <h3>{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
+    </div>
+
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'SYSTEM_ADMIN.UPDATE_CONFIRM' | translate }}
+      </p>
+
+      <div class="justification-section">
+        <label for="saveJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }} <span class="required">*</span></label
+        >
+        <textarea
+          id="saveJustification"
+          [(ngModel)]="saveJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+        <small class="char-count">{{ saveJustification.length }}/500</small>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSave()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim()"
+      >
+        <i class="pi pi-check"></i>
+        {{ 'COMMON.UPDATE' | translate }}
+      </button>
+    </div>
   </div>
 </div>

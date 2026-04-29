@@ -11,18 +11,18 @@ export const AUTH = {
 };
 
 export const HOME = {
-  SUPER_ADMIN: '/dashboard/super-admin/',
+  SYSTEM_ADMIN: '/dashboard/system-admin/',
 };
 
-export const SUPER_ADMIN = {
-  LIST: '/super-admin/list',
-  DELETE: '/super-admin/delete/',
-  BULK_DELETE: '/super-admin/delete/bulk',
-  ADD: '/super-admin/add',
-  VIEW: '/super-admin/get/',
-  UPDATE: '/super-admin/update',
-  UPDATE_PASSWORD: '/super-admin/update/password',
-  UNLOCK: '/super-admin/unlock/',
+export const SYSTEM_ADMIN = {
+  LIST: '/system-admin/list',
+  DELETE: '/system-admin/delete/',
+  BULK_DELETE: '/system-admin/delete/bulk',
+  ADD: '/system-admin/add',
+  VIEW: '/system-admin/get/',
+  UPDATE: '/system-admin/update',
+  UPDATE_PASSWORD: '/system-admin/update/password',
+  UNLOCK: '/system-admin/unlock/',
 };
 
 export const ORGANISATION = {

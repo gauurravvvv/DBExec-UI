@@ -2,7 +2,7 @@
   "SIDEBAR": {
     "home": "Home",
     "systemManagement": "Systeembeheer",
-    "superAdmin": "Super Admin",
+    "systemAdmin": "System Admin",
     "orgManagement": "Organisaties",
     "userMgmtSection": "Gebruikersbeheer",
     "roleManagement": "Rollen",
@@ -222,11 +222,11 @@
     "SYSTEM": "Systeem",
     "LAST_LOGIN": "Laatste login",
     "LOADING_PROFILE": "Profiel laden...",
-    "ROLE_SUPER_ADMIN": "Superbeheerder",
+    "ROLE_SYSTEM_ADMIN": "Superbeheerder",
     "ROLE_ORG_ADMIN": "Organisatiebeheerder",
     "ROLE_ORG_USER": "Gebruiker"
   },
-  "SUPER_ADMIN": {
+  "SYSTEM_ADMIN": {
     "TITLE": "Superbeheerders",
     "SUBTITLE": "Beheer systeemeigenaren met volledige platformtoegang en organisatiebeheer",
     "ADD_TITLE": "Superbeheerder toevoegen",

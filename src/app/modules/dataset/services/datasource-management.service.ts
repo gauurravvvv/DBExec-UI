@@ -171,6 +171,6 @@ export class DatasourceManagementService {
   shouldShowOrganisationDropdown(userRole: string): boolean {
     // This would typically come from a role/permission service
     // For now, we'll check against a constant
-    return userRole === 'SUPER_ADMIN';
+    return userRole === 'SYSTEM_ADMIN';
   }
 }
