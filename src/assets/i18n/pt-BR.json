@@ -2,7 +2,7 @@
   "SIDEBAR": {
     "home": "Início",
     "systemManagement": "Gerenciamento do sistema",
-    "systemAdmin": "System Admin",
+    "systemAdmin": "Administrador do sistema",
     "orgManagement": "Organizações",
     "userMgmtSection": "Gerenciamento de usuários",
     "roleManagement": "Funções",
