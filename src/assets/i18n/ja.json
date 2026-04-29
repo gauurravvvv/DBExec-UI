@@ -1063,5 +1063,33 @@
     "LOADING_VISUALIZATION": "ビジュアライゼーションを読み込み中...",
     "FAILED_TO_LOAD_DATA": "データの読み込みに失敗しました",
     "NO_CHART_CONFIGURED": "チャートが設定されていません"
+  },
+  "TOAST": {
+    "SUCCESS": "成功",
+    "ERROR": "エラー",
+    "ERROR_DEFAULT": "エラーが発生しました"
+  },
+  "PAGE_TITLES": {
+    "HOME": "ホーム",
+    "SYSTEM_ADMINS": "システム管理者",
+    "ORGANISATIONS": "組織",
+    "USERS": "ユーザー",
+    "GROUPS": "グループ",
+    "RLS_RULES": "RLSルール",
+    "ACCESS": "アクセス",
+    "DATASOURCES": "データソース",
+    "CONNECTIONS": "接続",
+    "ROLES": "ロール",
+    "DATASET": "データセット",
+    "ANALYSES": "分析",
+    "DASHBOARDS": "ダッシュボード",
+    "TABS": "タブ",
+    "SECTIONS": "セクション",
+    "PROMPTS": "プロンプト",
+    "QUERY_BUILDERS": "クエリビルダー",
+    "AUDIT_LOGS": "監査ログ",
+    "LOGIN_ACTIVITY": "ログインアクティビティ",
+    "APP_SETTINGS": "アプリ設定",
+    "MY_PROFILE": "マイプロフィール"
   }
 }

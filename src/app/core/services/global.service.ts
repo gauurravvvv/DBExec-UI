@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AbstractControl, UntypedFormControl } from '@angular/forms';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { BehaviorSubject } from 'rxjs';
 import { StorageType } from '../../constants/storageType';
@@ -31,6 +32,7 @@ export class GlobalService {
   constructor(
     private router: Router,
     private messageService: MessageService,
+    private translate: TranslateService,
   ) {}
 
   chipNameProvider(fullName: string | undefined | null) {
@@ -55,7 +57,7 @@ export class GlobalService {
       // Success toast
       this.messageService.add({
         severity: 'success',
-        summary: 'Success',
+        summary: this.translate.instant('TOAST.SUCCESS'),
         detail: response.message,
         life: 3000,
         styleClass: 'custom-toast',
@@ -66,8 +68,8 @@ export class GlobalService {
       // Error toast
       this.messageService.add({
         severity: 'error',
-        summary: 'Error',
-        detail: response.message || 'An error occurred',
+        summary: this.translate.instant('TOAST.ERROR'),
+        detail: response.message || this.translate.instant('TOAST.ERROR_DEFAULT'),
         life: 3000,
       });
     }
@@ -193,8 +195,8 @@ export class GlobalService {
       // Handle application errors (like invalid credentials)
       this.messageService.add({
         severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'An error occurred',
+        summary: this.translate.instant('TOAST.ERROR'),
+        detail: error.message || this.translate.instant('TOAST.ERROR_DEFAULT'),
       });
     }
   }
@@ -208,7 +210,7 @@ export class GlobalService {
       if (showToast)
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
+          summary: this.translate.instant('TOAST.SUCCESS'),
           detail: result.message,
           key: 'topRight',
           life: 3000,
@@ -219,7 +221,7 @@ export class GlobalService {
       if (showErrorToast)
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
+          summary: this.translate.instant('TOAST.ERROR'),
           detail: result.message,
           key: 'topRight',
           life: 3000,

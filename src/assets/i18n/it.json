@@ -1063,5 +1063,33 @@
     "LOADING_VISUALIZATION": "Caricamento visualizzazione...",
     "FAILED_TO_LOAD_DATA": "Impossibile caricare i dati",
     "NO_CHART_CONFIGURED": "Nessun grafico configurato"
+  },
+  "TOAST": {
+    "SUCCESS": "Successo",
+    "ERROR": "Errore",
+    "ERROR_DEFAULT": "Si è verificato un errore"
+  },
+  "PAGE_TITLES": {
+    "HOME": "Home",
+    "SYSTEM_ADMINS": "Amministratori di sistema",
+    "ORGANISATIONS": "Organizzazioni",
+    "USERS": "Utenti",
+    "GROUPS": "Gruppi",
+    "RLS_RULES": "Regole RLS",
+    "ACCESS": "Accesso",
+    "DATASOURCES": "Sorgenti dati",
+    "CONNECTIONS": "Connessioni",
+    "ROLES": "Ruoli",
+    "DATASET": "Dataset",
+    "ANALYSES": "Analisi",
+    "DASHBOARDS": "Dashboard",
+    "TABS": "Schede",
+    "SECTIONS": "Sezioni",
+    "PROMPTS": "Prompt",
+    "QUERY_BUILDERS": "Costruttori di query",
+    "AUDIT_LOGS": "Registri di audit",
+    "LOGIN_ACTIVITY": "Attività di accesso",
+    "APP_SETTINGS": "Impostazioni app",
+    "MY_PROFILE": "Il mio profilo"
   }
 }

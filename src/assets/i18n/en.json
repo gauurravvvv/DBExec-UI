@@ -1067,5 +1067,33 @@
     "LOADING_VISUALIZATION": "Loading visualization...",
     "FAILED_TO_LOAD_DATA": "Failed to load data",
     "NO_CHART_CONFIGURED": "No chart configured"
+  },
+  "TOAST": {
+    "SUCCESS": "Success",
+    "ERROR": "Error",
+    "ERROR_DEFAULT": "An error occurred"
+  },
+  "PAGE_TITLES": {
+    "HOME": "Home",
+    "SYSTEM_ADMINS": "System Admins",
+    "ORGANISATIONS": "Organisations",
+    "USERS": "Users",
+    "GROUPS": "Groups",
+    "RLS_RULES": "RLS Rules",
+    "ACCESS": "Access",
+    "DATASOURCES": "Datasources",
+    "CONNECTIONS": "Connections",
+    "ROLES": "Roles",
+    "DATASET": "Dataset",
+    "ANALYSES": "Analyses",
+    "DASHBOARDS": "Dashboards",
+    "TABS": "Tabs",
+    "SECTIONS": "Sections",
+    "PROMPTS": "Prompts",
+    "QUERY_BUILDERS": "Query Builders",
+    "AUDIT_LOGS": "Audit Logs",
+    "LOGIN_ACTIVITY": "Login Activity",
+    "APP_SETTINGS": "App Settings",
+    "MY_PROFILE": "My Profile"
   }
 }

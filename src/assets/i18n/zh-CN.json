@@ -1063,5 +1063,33 @@
     "LOADING_VISUALIZATION": "正在加载可视化...",
     "FAILED_TO_LOAD_DATA": "加载数据失败",
     "NO_CHART_CONFIGURED": "未配置图表"
+  },
+  "TOAST": {
+    "SUCCESS": "成功",
+    "ERROR": "错误",
+    "ERROR_DEFAULT": "发生了一个错误"
+  },
+  "PAGE_TITLES": {
+    "HOME": "首页",
+    "SYSTEM_ADMINS": "系统管理员",
+    "ORGANISATIONS": "组织",
+    "USERS": "用户",
+    "GROUPS": "组",
+    "RLS_RULES": "RLS规则",
+    "ACCESS": "访问",
+    "DATASOURCES": "数据源",
+    "CONNECTIONS": "连接",
+    "ROLES": "角色",
+    "DATASET": "数据集",
+    "ANALYSES": "分析",
+    "DASHBOARDS": "仪表板",
+    "TABS": "选项卡",
+    "SECTIONS": "部分",
+    "PROMPTS": "提示",
+    "QUERY_BUILDERS": "查询构建器",
+    "AUDIT_LOGS": "审计日志",
+    "LOGIN_ACTIVITY": "登录活动",
+    "APP_SETTINGS": "应用设置",
+    "MY_PROFILE": "我的资料"
   }
 }

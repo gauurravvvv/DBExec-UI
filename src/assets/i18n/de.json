@@ -1063,5 +1063,33 @@
     "LOADING_VISUALIZATION": "Visualisierung wird geladen...",
     "FAILED_TO_LOAD_DATA": "Daten konnten nicht geladen werden",
     "NO_CHART_CONFIGURED": "Kein Diagramm konfiguriert"
+  },
+  "TOAST": {
+    "SUCCESS": "Erfolg",
+    "ERROR": "Fehler",
+    "ERROR_DEFAULT": "Ein Fehler ist aufgetreten"
+  },
+  "PAGE_TITLES": {
+    "HOME": "Startseite",
+    "SYSTEM_ADMINS": "Systemadministratoren",
+    "ORGANISATIONS": "Organisationen",
+    "USERS": "Benutzer",
+    "GROUPS": "Gruppen",
+    "RLS_RULES": "RLS-Regeln",
+    "ACCESS": "Zugang",
+    "DATASOURCES": "Datenquellen",
+    "CONNECTIONS": "Verbindungen",
+    "ROLES": "Rollen",
+    "DATASET": "Datensatz",
+    "ANALYSES": "Analysen",
+    "DASHBOARDS": "Dashboards",
+    "TABS": "Registerkarten",
+    "SECTIONS": "Abschnitte",
+    "PROMPTS": "Eingaben",
+    "QUERY_BUILDERS": "Abfrage-Builder",
+    "AUDIT_LOGS": "Audit-Protokolle",
+    "LOGIN_ACTIVITY": "Anmeldeaktivität",
+    "APP_SETTINGS": "App-Einstellungen",
+    "MY_PROFILE": "Mein Profil"
   }
 }

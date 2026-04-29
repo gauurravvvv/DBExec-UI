@@ -1063,5 +1063,33 @@
     "LOADING_VISUALIZATION": "Visualisatie laden...",
     "FAILED_TO_LOAD_DATA": "Gegevens laden mislukt",
     "NO_CHART_CONFIGURED": "Geen grafiek geconfigureerd"
+  },
+  "TOAST": {
+    "SUCCESS": "Succes",
+    "ERROR": "Fout",
+    "ERROR_DEFAULT": "Er is een fout opgetreden"
+  },
+  "PAGE_TITLES": {
+    "HOME": "Home",
+    "SYSTEM_ADMINS": "Systeembeheerders",
+    "ORGANISATIONS": "Organisaties",
+    "USERS": "Gebruikers",
+    "GROUPS": "Groepen",
+    "RLS_RULES": "RLS-regels",
+    "ACCESS": "Toegang",
+    "DATASOURCES": "Gegevensbronnen",
+    "CONNECTIONS": "Verbindingen",
+    "ROLES": "Rollen",
+    "DATASET": "Dataset",
+    "ANALYSES": "Analyses",
+    "DASHBOARDS": "Dashboards",
+    "TABS": "Tabbladen",
+    "SECTIONS": "Secties",
+    "PROMPTS": "Prompts",
+    "QUERY_BUILDERS": "Query-bouwers",
+    "AUDIT_LOGS": "Auditlogboeken",
+    "LOGIN_ACTIVITY": "Inlogactiviteit",
+    "APP_SETTINGS": "App-instellingen",
+    "MY_PROFILE": "Mijn profiel"
   }
 }

@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
 import { filter } from 'rxjs/operators';
 import { StorageType } from './constants/storageType';
 import { IdleTimeoutService } from './core/services/idle-timeout.service';
@@ -41,6 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private titleService: Title,
+    private translate: TranslateService,
   ) {
     const savedTheme = StorageService.get(StorageType.THEME);
     if (!savedTheme) {
@@ -83,6 +85,11 @@ export class AppComponent implements OnInit, OnDestroy {
         this.performLogout();
       });
 
+    // Re-apply browser tab title when language changes
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.updateTitle());
+
     // Start/stop idle tracking based on route
     this.router.events
       .pipe(
@@ -93,12 +100,7 @@ export class AppComponent implements OnInit, OnDestroy {
       )
       .subscribe(event => {
         // Update browser tab title
-        let route = this.activatedRoute;
-        while (route.firstChild) route = route.firstChild;
-        const pageTitle = route.snapshot.data['title'];
-        this.titleService.setTitle(
-          pageTitle ? `DBExec - ${pageTitle}` : 'DBExec',
-        );
+        this.updateTitle();
 
         if (
           event.url === '/login' ||
@@ -141,6 +143,14 @@ export class AppComponent implements OnInit, OnDestroy {
   onIdleLogoutNow(): void {
     this.showIdleWarningDialog = false;
     this.performLogout();
+  }
+
+  private updateTitle(): void {
+    let route = this.activatedRoute;
+    while (route.firstChild) route = route.firstChild;
+    const titleKey = route.snapshot.data['title'];
+    const pageTitle = titleKey ? this.translate.instant(titleKey) : null;
+    this.titleService.setTitle(pageTitle ? `DBExec - ${pageTitle}` : 'DBExec');
   }
 
   private performLogout(): void {
