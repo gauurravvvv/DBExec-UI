@@ -390,7 +390,7 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     this.sectionForm.get('datasource')?.disable();
     this.sectionForm.get('tab')?.disable();
 
-    // Re-enable database for non-super-admin
+    // Re-enable database for non-system-admin
     if (!this.showOrganisationDropdown) {
       this.sectionForm.get('datasource')?.enable();
       this.loadDatasources();

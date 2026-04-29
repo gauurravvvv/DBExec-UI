@@ -99,7 +99,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
 ];
 
 export const HOME_ROUTES = {
-  SYSTEM_ADMIN: '/app/home/super-admin',
+  SYSTEM_ADMIN: '/app/home/system-admin',
   ORG_ADMIN: '/app/home/org',
   ORG_USER: '/app/home/org',
 };
