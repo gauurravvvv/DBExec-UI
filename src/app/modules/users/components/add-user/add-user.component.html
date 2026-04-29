@@ -155,6 +155,21 @@
             {{ 'USER.GROUP_REQUIRED' | translate }}
           </small>
         </div>
+
+        <!-- Language / Locale -->
+        <div class="form-field">
+          <label>{{ 'USER.LANGUAGE' | translate }} <span class="required">*</span></label>
+          <app-custom-dropdown
+            formControlName="locale"
+            [options]="locales"
+            optionLabel="label"
+            optionValue="code"
+            [placeholder]="'USER.SELECT_LANGUAGE' | translate"
+            [filter]="false"
+            [required]="true"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
       </div>
     </form>
   </div>
