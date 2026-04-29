@@ -30,7 +30,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  // Super admin bypasses all checks
+  // System admin bypasses all checks
   if (userRole === ROLES.SYSTEM_ADMIN) {
     return true;
   }

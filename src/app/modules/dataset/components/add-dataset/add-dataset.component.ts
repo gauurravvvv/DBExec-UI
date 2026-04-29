@@ -252,7 +252,7 @@ export class AddDatasetComponent
         );
       });
 
-    // Load organisations if super admin
+    // Load organisations if system admin
     if (this.showOrganisationDropdown) {
       this.loadOrganisations();
     } else {
