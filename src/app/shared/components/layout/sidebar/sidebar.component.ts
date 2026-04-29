@@ -6,7 +6,9 @@ import {
   inject,
   OnInit,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SIDEBAR_ITEMS_ROUTES } from './sidebar.constant';
 
@@ -37,6 +39,7 @@ export class SidebarComponent implements OnInit {
   constructor(
     private globalService: GlobalService,
     public router: Router,
+    private translate: TranslateService,
   ) {
     const permissions = this.globalService.getTokenDetails('permission');
     this.menuItems = this.processMenuItems(permissions);
@@ -44,6 +47,11 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     this.checkScreenSize();
+
+    // Re-run change detection when language changes (required for OnPush + translate pipe)
+    this.translate.onLangChange
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cdr.markForCheck());
     const resizeHandler = () => this.checkScreenSize();
     window.addEventListener('resize', resizeHandler);
     this.destroyRef.onDestroy(() =>
