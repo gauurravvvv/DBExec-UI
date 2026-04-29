@@ -1063,5 +1063,33 @@
     "LOADING_VISUALIZATION": "시각화 로딩 중...",
     "FAILED_TO_LOAD_DATA": "데이터 로드 실패",
     "NO_CHART_CONFIGURED": "설정된 차트가 없습니다"
+  },
+  "TOAST": {
+    "SUCCESS": "성공",
+    "ERROR": "오류",
+    "ERROR_DEFAULT": "오류가 발생했습니다"
+  },
+  "PAGE_TITLES": {
+    "HOME": "홈",
+    "SYSTEM_ADMINS": "시스템 관리자",
+    "ORGANISATIONS": "조직",
+    "USERS": "사용자",
+    "GROUPS": "그룹",
+    "RLS_RULES": "RLS 규칙",
+    "ACCESS": "접근",
+    "DATASOURCES": "데이터 소스",
+    "CONNECTIONS": "연결",
+    "ROLES": "역할",
+    "DATASET": "데이터셋",
+    "ANALYSES": "분석",
+    "DASHBOARDS": "대시보드",
+    "TABS": "탭",
+    "SECTIONS": "섹션",
+    "PROMPTS": "프롬프트",
+    "QUERY_BUILDERS": "쿼리 빌더",
+    "AUDIT_LOGS": "감사 로그",
+    "LOGIN_ACTIVITY": "로그인 활동",
+    "APP_SETTINGS": "앱 설정",
+    "MY_PROFILE": "내 프로필"
   }
 }
