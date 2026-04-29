@@ -47,14 +47,12 @@
           >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text" [class.hidden]="!isExpanded">{{
-                item.label
-              }}</span>
+              <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + item.value | translate }}</span>
             </div>
             <i class="pi pi-chevron-down submenu-arrow" *ngIf="isExpanded"></i>
             <!-- Add tooltip for collapsed state -->
             <div class="sidebar-tooltip" *ngIf="!isExpanded">
-              {{ item.label }}
+              {{ 'SIDEBAR.' + item.value | translate }}
               <span class="tooltip-arrow" *ngIf="item.subPermissions?.length"
                 >&rsaquo;</span
               >
@@ -70,9 +68,7 @@
           >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text" [class.hidden]="!isExpanded">{{
-                item.label
-              }}</span>
+              <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + item.value | translate }}</span>
             </div>
           </a>
 
@@ -96,9 +92,7 @@
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text" [class.hidden]="!isExpanded">{{
-                    subItem.label
-                  }}</span>
+                  <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
                 </div>
                 <i
                   class="pi pi-chevron-down submenu-arrow"
@@ -114,9 +108,7 @@
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text" [class.hidden]="!isExpanded">{{
-                    subItem.label
-                  }}</span>
+                  <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
                 </div>
               </a>
 
@@ -156,9 +148,7 @@
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text" [class.hidden]="!isExpanded">{{
-            nestedItem.label
-          }}</span>
+          <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
         </div>
         <i class="pi pi-chevron-down submenu-arrow" *ngIf="isExpanded"></i>
       </div>
@@ -171,9 +161,7 @@
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text" [class.hidden]="!isExpanded">{{
-            nestedItem.label
-          }}</span>
+          <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
         </div>
       </a>
 
