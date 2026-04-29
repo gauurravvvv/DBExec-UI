@@ -167,7 +167,7 @@ export class DatasourceManagementService {
     return this.getOrganisations().find(org => org.id === id) || null;
   }
 
-  // Check if user has super admin role (for organisation dropdown visibility)
+  // Check if user has system admin role (for organisation dropdown visibility)
   shouldShowOrganisationDropdown(userRole: string): boolean {
     // This would typically come from a role/permission service
     // For now, we'll check against a constant

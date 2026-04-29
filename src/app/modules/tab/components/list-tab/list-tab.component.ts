@@ -184,7 +184,7 @@ export class ListTabComponent implements OnInit {
         // If orgId was NOT requested, loadOrganisations() already triggered loadDatasources(), so we're done.
       });
     } else {
-      // For non-super admin, org is fixed
+      // For non-system admin, org is fixed
       this.selectedOrg = this.globalService.getTokenDetails('organisationId');
 
       if (datasourceId) {
