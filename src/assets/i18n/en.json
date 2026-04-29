@@ -283,6 +283,8 @@
     "ORG_ADMIN": "Organisation Admin",
     "ADMIN_EMAIL": "Admin Email",
     "ADMIN_EMAIL_PLACEHOLDER": "admin@example.com",
+    "ADMIN_LANGUAGE": "Admin Language",
+    "ADMIN_LANGUAGE_PLACEHOLDER": "Select language for welcome email",
     "ADMIN_SETUP_NOTE": "A setup email will be sent to this address. The admin will set their own password.",
     "DATASOURCE_ACK_TITLE": "Datasource Configuration Acknowledgments",
     "DB_ADMIN_PRIVILEGES": "Datasource Administrator Privileges",

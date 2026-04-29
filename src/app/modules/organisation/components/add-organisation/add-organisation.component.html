@@ -366,6 +366,19 @@
             >
             </app-custom-input>
 
+            <div class="form-field">
+              <label>{{ 'ORG.ADMIN_LANGUAGE' | translate }}</label>
+              <app-custom-dropdown
+                formControlName="adminLocale"
+                [options]="locales"
+                optionLabel="label"
+                optionValue="code"
+                [placeholder]="'ORG.ADMIN_LANGUAGE_PLACEHOLDER' | translate"
+                [filter]="false"
+                appendTo="body"
+              ></app-custom-dropdown>
+            </div>
+
             <p class="admin-setup-note">
               <i class="pi pi-info-circle"></i>
               {{ 'ORG.ADMIN_SETUP_NOTE' | translate }}
