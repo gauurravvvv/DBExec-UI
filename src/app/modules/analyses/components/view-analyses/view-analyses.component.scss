@@ -99,7 +99,7 @@ $radius-sm: 8px;
         }
 
         .btn-publish {
-          background: linear-gradient(135deg, var(--success-color), #388e3c);
+          background: linear-gradient(135deg, var(--success-color), var(--success-dark));
           color: var(--primary-text);
           box-shadow: 0 4px 10px var(--success-bg);
 
@@ -541,7 +541,7 @@ $radius-sm: 8px;
     }
 
     .btn-publish-confirm {
-      background: linear-gradient(135deg, var(--success-color), #388e3c) !important;
+      background: linear-gradient(135deg, var(--success-color), var(--success-dark)) !important;
       color: white !important;
       box-shadow: 0 4px 6px -1px var(--success-bg) !important;
 

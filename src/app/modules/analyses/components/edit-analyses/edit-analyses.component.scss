@@ -922,7 +922,7 @@
       }
 
       &.pi-trash:hover {
-        color: var(--danger-color, #e74c3c);
+        color: var(--error-color);
       }
     }
   }
@@ -2190,7 +2190,7 @@
 }
 
 .maximized-visual-container {
-  background: var(--surface-card, #ffffff);
+  background: var(--card-background);
   border-radius: 12px;
   box-shadow: 0 20px 40px -10px var(--overlay-background);
   max-width: 92vw;
@@ -2217,23 +2217,23 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--surface-border, #e0e0e0);
-  background: var(--surface-ground, #f8f9fa);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--secondary-background);
 
   .maximized-visual-title {
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-color, #333);
+    color: var(--text-color);
   }
 
   .close-maximize-btn {
-    color: var(--text-secondary-color, #666);
+    color: var(--text-muted);
     width: 36px;
     height: 36px;
 
     &:hover {
       background: var(--surface-hover, var(--shadow-color));
-      color: var(--text-color, #333);
+      color: var(--text-color);
     }
   }
 }
@@ -2245,7 +2245,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--surface-card, #ffffff);
+  background: var(--card-background);
 }
 
 // Filter Configuration Dialog — deep overrides for PrimeNG
@@ -2339,7 +2339,7 @@
     }
 
     .required {
-      color: var(--danger-color, #e74c3c);
+      color: var(--error-color);
       margin-left: -2px;
     }
   }

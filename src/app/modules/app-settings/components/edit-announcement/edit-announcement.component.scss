@@ -335,7 +335,7 @@
             color: var(--error-color);
           }
           .contrast-meter__fill {
-            background: linear-gradient(90deg, var(--error-color), var(--error-hover, #e53935));
+            background: linear-gradient(90deg, var(--error-color), var(--error-hover));
           }
         }
 
@@ -359,7 +359,7 @@
             color: var(--success-color);
           }
           .contrast-meter__fill {
-            background: linear-gradient(90deg, #66bb6a, var(--success-color));
+            background: linear-gradient(90deg, var(--success-color), var(--success-color));
           }
         }
 

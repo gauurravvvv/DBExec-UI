@@ -906,9 +906,9 @@
   .provider-btn {
     flex: 1;
     padding: 0.6rem 1rem;
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-    background: var(--surface-card, rgba(255, 255, 255, 0.03));
-    color: var(--text-color, #ccc);
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    color: var(--text-color);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
@@ -919,12 +919,12 @@
     font-size: 0.85rem;
 
     &:hover {
-      border-color: var(--primary-color, #3b82f6);
+      border-color: var(--primary-color);
     }
 
     &.active {
-      background: var(--primary-color, #3b82f6);
-      border-color: var(--primary-color, #3b82f6);
+      background: var(--primary-color);
+      border-color: var(--primary-color);
       color: var(--primary-text);
     }
   }
@@ -964,10 +964,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  background: var(--surface-card, rgba(255, 255, 255, 0.03));
+  background: var(--card-background);
   border-radius: 6px;
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  color: var(--text-secondary-color, #888);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 

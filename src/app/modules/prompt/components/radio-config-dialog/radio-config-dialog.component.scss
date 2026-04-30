@@ -258,10 +258,10 @@
     color: var(--text-color);
 
     i {
-      color: var(--success-color, #22c55e);
+      color: var(--success-color);
     }
     strong {
-      color: var(--success-color, #22c55e);
+      color: var(--success-color);
     }
   }
 }

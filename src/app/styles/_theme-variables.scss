@@ -24,6 +24,7 @@
   --primary-color: #2196f3;
   --primary-color-rgb: 33, 150, 243;
   --primary-color-transparent: rgba(33, 150, 243, 0.15);
+  --primary-light: #42a5f5;
   --primary-hover: #1976d2;
   --primary-text: #ffffff;
 
@@ -101,6 +102,47 @@
   --status-active-text: #2e7d32;
   --status-inactive-bg: rgba(244, 67, 54, 0.08);
   --status-inactive-text: #c62828;
+
+  // ── Extended semantic ─────────────────────────────────────────
+  --success-dark: #388e3c;
+  --error-hover: #e53935;
+
+  // ── Code editor (Monaco scrollbar — intentionally dark) ───────
+  --code-editor-bg: #1e1e1e;
+  --code-editor-scrollbar: #424242;
+  --code-editor-scrollbar-hover: #4e4e4e;
+
+  // ── Auth pages ────────────────────────────────────────────────
+  // Left panel (brand/marketing section) — intentionally dark regardless of app theme
+  --auth-panel-bg-start: #000000;
+  --auth-panel-bg-end: #1a1a1a;
+  // Right panel (form section)
+  --auth-form-bg-start: #f8fafc;
+  --auth-form-bg-end: #ffffff;
+  --auth-form-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+  // Form text colors (light panel — always light)
+  --auth-heading-color: #111827;
+  --auth-subtext-color: #6b7280;
+  --auth-input-text: #1f2937;
+  --auth-input-bg: #ffffff;
+  --auth-input-border: #e5e7eb;
+  --auth-input-border-focus: #111827;
+  --auth-input-border-hover: #4b5563;
+  --auth-placeholder-color: #9ca3af;
+  --auth-hint-color: #4b5563;
+  --auth-checkbox-border: #d1d5db;
+  --auth-checkbox-border-hover: #4b5563;
+  --auth-button-bg: #000000;
+  --auth-button-bg-hover: #1f2937;
+  --auth-button-disabled: #9ca3af;
+  --auth-link-color: #111827;
+  --auth-error-color: #dc2626;
+  --auth-error-border: #ef4444;
+  // Password strength indicator colors (set-password only)
+  --auth-strength-weak: #ef4444;
+  --auth-strength-fair: #f59e0b;
+  --auth-strength-good: #10b981;
+  --auth-strength-strong: #3b82f6;
 }
 
 

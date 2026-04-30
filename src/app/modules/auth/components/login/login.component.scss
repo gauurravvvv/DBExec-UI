@@ -2,13 +2,13 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: var(--auth-input-bg);
 }
 
 // Marketing Section Styles
 .marketing-section {
   flex: 1;
-  background: linear-gradient(90deg, #000000, #1a1a1a);
+  background: linear-gradient(90deg, var(--auth-panel-bg-start), var(--auth-panel-bg-end));
   color: white;
   padding: 3rem 4rem;
   display: flex;
@@ -265,7 +265,7 @@
 
       i {
         font-size: 1.3rem;
-        color: #fff;
+        color: var(--primary-text);
       }
     }
 
@@ -276,7 +276,7 @@
         font-size: 1.25rem;
         font-weight: 500;
         margin: 0 0 0.5rem;
-        color: #fff;
+        color: var(--primary-text);
       }
 
       p {
@@ -310,7 +310,7 @@
   white-space: nowrap;
 
   i {
-    color: #fff;
+    color: var(--primary-text);
     font-size: 1.1rem;
     margin-right: 0.5rem;
   }
@@ -319,8 +319,8 @@
 // Login Section Styles
 .login-section {
   flex: 1;
-  background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, var(--auth-form-bg-start) 0%, var(--auth-form-bg-end) 100%);
+  box-shadow: var(--auth-form-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -338,7 +338,7 @@
   h2 {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--auth-heading-color);
     margin-bottom: 0.5rem;
     background: none;
     -webkit-text-fill-color: initial;
@@ -346,7 +346,7 @@
 
   p.text-500 {
     font-size: 1.2rem;
-    color: #6b7280;
+    color: var(--auth-subtext-color);
     margin-bottom: 2rem !important;
     line-height: 1.5;
   }
@@ -358,8 +358,8 @@
 
 :host ::ng-deep {
   .p-inputtext {
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: var(--auth-input-bg);
+    border: 1px solid var(--auth-input-border);
     border-radius: 8px;
     padding: 1rem 1rem 1rem 3rem;
     font-size: 1rem;
@@ -367,21 +367,21 @@
     min-width: 440px;
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    color: #1f2937;
+    color: var(--auth-input-text);
 
     &:enabled:focus {
-      border-color: #111827;
+      border-color: var(--auth-heading-color);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       transform: none;
     }
 
     &:hover {
-      border-color: #4b5563;
+      border-color: var(--auth-input-border-hover);
       transform: none;
     }
 
     &::placeholder {
-      color: #9ca3af;
+      color: var(--auth-placeholder-color);
       font-weight: normal;
     }
   }
@@ -404,26 +404,26 @@
     height: 1.3rem;
 
     .p-checkbox-box {
-      border: 2px solid #d1d5db;
+      border: 2px solid var(--auth-checkbox-border);
       border-radius: 4px;
-      background: white;
+      background: var(--auth-input-bg);
       transition: all 0.2s ease;
 
       &:hover {
-        border-color: #4b5563;
+        border-color: var(--auth-input-border-hover);
       }
 
       &.p-highlight {
-        background: #000 !important;
-        border-color: #000 !important;
+        background: var(--auth-button-bg) !important;
+        border-color: var(--auth-button-bg) !important;
 
         &:hover {
-          background: #1f2937 !important;
-          border-color: #1f2937 !important;
+          background: var(--auth-button-bg-hover) !important;
+          border-color: var(--auth-button-bg-hover) !important;
         }
 
         .p-checkbox-icon {
-          color: white !important;
+          color: var(--primary-text) !important;
         }
       }
     }
@@ -431,14 +431,14 @@
     &:not(.p-checkbox-disabled) {
       &:hover {
         .p-checkbox-box {
-          border-color: #4b5563;
+          border-color: var(--auth-input-border-hover);
         }
       }
     }
   }
 
   .p-button {
-    background: #000;
+    background: var(--auth-button-bg);
     border: none;
     padding: 1rem;
     border-radius: 8px;
@@ -453,14 +453,14 @@
 
     &:not(:disabled) {
       &:hover {
-        background: #1f2937;
+        background: var(--auth-button-bg-hover);
         transform: none;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       }
     }
 
     &:disabled {
-      background: #9ca3af;
+      background: var(--auth-button-disabled);
       opacity: 1;
     }
 
@@ -503,14 +503,14 @@
 
     label {
       font-size: 1rem;
-      color: #4b5563;
+      color: var(--auth-hint-color);
       font-weight: 500;
     }
   }
 }
 
 .forgot-password {
-  color: #111827;
+  color: var(--auth-heading-color);
   font-weight: 500;
   font-size: 1rem;
   text-decoration: none;
@@ -524,13 +524,13 @@
     height: 1px;
     bottom: -2px;
     left: 50%;
-    background-color: #111827;
+    background-color: var(--auth-heading-color);
     transition: width 0.3s ease;
     transform: translateX(-50%);
   }
 
   &:hover {
-    color: #111827;
+    color: var(--auth-heading-color);
     text-decoration: none;
 
     &::after {
@@ -618,7 +618,7 @@
   justify-content: center;
   gap: 0.5rem;
   margin-top: 1rem;
-  color: #dc2626;
+  color: var(--auth-error-color);
   font-size: 0.9rem;
   font-weight: 500;
 
@@ -637,24 +637,24 @@
   // Force light theme colors for login components
   ::ng-deep {
     .p-inputtext {
-      background: #fff !important;
-      color: #1f2937 !important;
+      background: var(--auth-input-bg) !important;
+      color: var(--auth-input-text) !important;
     }
 
     .p-checkbox .p-checkbox-box {
-      background: #fff !important;
+      background: var(--auth-input-bg) !important;
     }
 
     .p-button {
-      background: #000 !important;
-      color: #fff !important;
+      background: var(--auth-button-bg) !important;
+      color: var(--primary-text) !important;
 
       &:not(:disabled):hover {
-        background: #1f2937 !important;
+        background: var(--auth-button-bg-hover) !important;
       }
 
       &:disabled {
-        background: #9ca3af !important;
+        background: var(--auth-button-disabled) !important;
       }
     }
   }
