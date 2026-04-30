@@ -341,11 +341,11 @@
     color: var(--text-color);
 
     i {
-      color: var(--success-color, #22c55e);
+      color: var(--success-color);
     }
 
     strong {
-      color: var(--success-color, #22c55e);
+      color: var(--success-color);
     }
   }
 }
@@ -489,7 +489,7 @@
 
     &.p-inputswitch-checked {
       .p-inputswitch-slider {
-        background: var(--success-color, #22c55e) !important;
+        background: var(--success-color) !important;
       }
     }
 
@@ -504,7 +504,7 @@
 
       &.p-inputswitch-checked {
         .p-inputswitch-slider {
-          background: var(--success-color, #22c55e) !important;
+          background: var(--success-color) !important;
           opacity: 0.9;
         }
       }

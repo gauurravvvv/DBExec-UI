@@ -939,7 +939,7 @@
       }
 
       &.success i {
-        color: var(--success-color, #28a745);
+        color: var(--success-color);
       }
 
       &.error i {
@@ -1219,7 +1219,7 @@ $radius-sm: 8px;
 
       i {
         font-size: 1.75rem;
-        color: var(--success-color, #28a745);
+        color: var(--success-color);
       }
     }
 
@@ -1490,15 +1490,15 @@ td.empty-message-cell {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background: var(--code-editor-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #424242;
+  background: var(--code-editor-scrollbar);
   border-radius: 5px;
 
   &:hover {
-    background: #4e4e4e;
+    background: var(--code-editor-scrollbar-hover);
   }
 }
 
