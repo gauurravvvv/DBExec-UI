@@ -19,7 +19,11 @@
           <div class="dropdown-field" *ngIf="showOrganisationDropdown">
             <app-custom-dropdown
               [(ngModel)]="selectedOrg"
-              [options]="organisations"
+              [serverMode]="true"
+              [fetcher]="loadOrgsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedOrgs"
+              [preloadedTotal]="preloadedOrgsTotal"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
@@ -31,11 +35,15 @@
             </app-custom-dropdown>
           </div>
 
-          <!-- Datasource Dropdown -->
+          <!-- Datasource Dropdown — server-driven -->
           <div class="dropdown-field">
             <app-custom-dropdown
               [(ngModel)]="selectedDatasource"
-              [options]="datasources"
+              [serverMode]="true"
+              [fetcher]="loadDatasourcesPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedDatasources"
+              [preloadedTotal]="preloadedDatasourcesTotal"
               optionLabel="name"
               optionValue="id"
               [filter]="true"

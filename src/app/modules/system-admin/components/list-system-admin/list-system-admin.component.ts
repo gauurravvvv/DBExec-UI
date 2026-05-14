@@ -15,7 +15,17 @@ import { debounceTime } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { SYSTEM_ADMIN } from 'src/app/constants/routes';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { SystemAdminService } from '../../services/system-admin.service';
+
+type SystemAdminSortField =
+  | 'username'
+  | 'firstName'
+  | 'lastName'
+  | 'email'
+  | 'lastLogin'
+  | 'status'
+  | 'createdOn';
 
 @Component({
   selector: 'app-list-system-admin',
@@ -37,6 +47,7 @@ export class ListSystemAdminComponent implements OnInit {
   loading = this.systemAdminService.loading;
 
   selectedAdmins: any[] = [];
+  sortHelper = new ListSortHelper<SystemAdminSortField>();
 
   showDeleteConfirm = false;
   adminIdToDelete: string | null = null;
@@ -236,16 +247,18 @@ export class ListSystemAdminComponent implements OnInit {
     this.router.navigate([SYSTEM_ADMIN.ADD]);
   }
 
+  toggleSort(field: SystemAdminSortField) {
+    this.sortHelper.toggle(field);
+    this.selectedAdmins = [];
+    if (this.lastTableLazyLoadEvent) {
+      this.lastTableLazyLoadEvent.first = 0;
+      this.loadSuperAdmins(this.lastTableLazyLoadEvent);
+    }
+  }
+
   loadSuperAdmins(event: any) {
-    // Clear selection when page/sort changes (not on same-page re-fetch after delete)
     const prev = this.lastTableLazyLoadEvent;
-    if (
-      prev &&
-      (prev.first !== event.first ||
-        prev.rows !== event.rows ||
-        prev.sortField !== event.sortField ||
-        prev.sortOrder !== event.sortOrder)
-    ) {
+    if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
       this.selectedAdmins = [];
     }
     this.lastTableLazyLoadEvent = event;
@@ -301,6 +314,9 @@ export class ListSystemAdminComponent implements OnInit {
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
     }
+
+    const sortParam = this.sortHelper.serialize();
+    if (sortParam) params.sort = sortParam;
 
     this.systemAdminService.load(params);
   }

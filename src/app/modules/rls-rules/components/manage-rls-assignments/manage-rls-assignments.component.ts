@@ -8,7 +8,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
@@ -36,6 +36,14 @@ export class ManageRlsAssignmentsComponent implements OnInit {
 
   newScope: string = '';
   newScopeId: string = '';
+
+  // Server-mode preload for the scope-target dropdown. Cleared whenever the
+  // scope flips between 'user' and 'group' so the dropdown re-fetches the
+  // right entity. The dropdown's optionLabel/optionValue are also re-bound
+  // (see template) since users render as firstName+lastName via a mapped
+  // `displayLabel` field and groups render as their `name` field.
+  preloadedScopeTargets: any[] | null = null;
+  preloadedScopeTargetsTotal: number | null = null;
 
   isLoadingAssignments = false;
   scopeTargetsLoading = false;
@@ -78,12 +86,57 @@ export class ManageRlsAssignmentsComponent implements OnInit {
   onScopeChange(scope: string): void {
     this.newScopeId = '';
     this.scopeTargets = [];
+    // Drop the dropdown's seed so it re-fetches against the new entity type
+    // (user vs. group) on next open.
+    this.preloadedScopeTargets = null;
+    this.preloadedScopeTargetsTotal = null;
     if (!scope) return;
     this.loadScopeTargets(scope);
   }
 
+  /**
+   * Fetcher for the server-mode scope-target dropdown. Routes to user or
+   * group service based on the currently selected scope. Returns items with
+   * an injected `displayLabel` for users so a single optionLabel binding in
+   * the template renders both entity types cleanly.
+   */
+  loadScopeTargetsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.newScope || !this.orgId) return { items: [], total: 0 };
+    const params: any = { orgId: this.orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      if (this.newScope === 'user') {
+        const res: any = await this.userService.listUser(params);
+        if (this.globalService.handleSuccessService(res, false)) {
+          const users = (res?.data?.users ?? []).map((u: any) => ({
+            ...u,
+            displayLabel: `${u.firstName} ${u.lastName}`,
+          }));
+          return { items: users, total: res?.data?.count ?? users.length };
+        }
+      } else if (this.newScope === 'group') {
+        const res: any = await this.groupService.listGroups(params);
+        if (this.globalService.handleSuccessService(res, false)) {
+          const groups = res?.data?.groups ?? [];
+          return { items: groups, total: res?.data?.count ?? groups.length };
+        }
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadScopeTargets(scope: string): void {
-    const params = { orgId: this.orgId, page: DEFAULT_PAGE, limit: MAX_LIMIT };
+    const params = { orgId: this.orgId, page: DEFAULT_PAGE, limit: 10 };
     this.scopeTargetsLoading = true;
 
     if (scope === 'user') {
@@ -91,10 +144,19 @@ export class ManageRlsAssignmentsComponent implements OnInit {
         .listUser(params)
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.scopeTargets = (response.data.users || []).map((u: any) => ({
-              label: `${u.firstName} ${u.lastName}`,
+            const users = (response?.data?.users ?? []).map((u: any) => ({
+              ...u,
+              displayLabel: `${u.firstName} ${u.lastName}`,
+            }));
+            // Keep the legacy {label, value} array populated for any consumers
+            // outside this dropdown.
+            this.scopeTargets = users.map((u: any) => ({
+              label: u.displayLabel,
               value: u.id,
             }));
+            this.preloadedScopeTargets = users;
+            this.preloadedScopeTargetsTotal =
+              response?.data?.count ?? users.length;
           }
         })
         .catch(() => {
@@ -109,10 +171,14 @@ export class ManageRlsAssignmentsComponent implements OnInit {
         .listGroups(params)
         .then((response: any) => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.scopeTargets = (response.data.groups || []).map((g: any) => ({
+            const groups = response?.data?.groups ?? [];
+            this.scopeTargets = groups.map((g: any) => ({
               label: g.name,
               value: g.id,
             }));
+            this.preloadedScopeTargets = groups;
+            this.preloadedScopeTargetsTotal =
+              response?.data?.count ?? groups.length;
           }
         })
         .catch(() => {

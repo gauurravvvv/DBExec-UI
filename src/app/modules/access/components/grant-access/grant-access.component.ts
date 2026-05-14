@@ -32,7 +32,11 @@ export class GrantAccessComponent implements OnInit {
   accessForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
+  preloadedDatasources: any[] | null = null;
+  preloadedDatasourcesTotal: number | null = null;
   connections: any[] = [];
   groups: any[] = [];
   showOrganisationDropdown =
@@ -92,17 +96,46 @@ export class GrantAccessComponent implements OnInit {
       });
   }
 
+  /**
+   * Fetcher for the server-mode organisation dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations() {
     const params = {
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.organisationService
       .listOrganisation(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = response.data.orgs || [];
+          const orgs = response?.data?.orgs ?? [];
+          this.organisations = orgs;
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
         } else {
           this.organisations = [];
         }
@@ -145,17 +178,24 @@ export class GrantAccessComponent implements OnInit {
     const orgId = this.accessForm.get('organisation')?.value;
     if (!orgId) return;
 
+    // Clear preload so the server-mode dropdown re-fetches for the new org
+    this.preloadedDatasources = null;
+    this.preloadedDatasourcesTotal = null;
+
     const params = {
       orgId,
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.datasourceService
       .listDatasource(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.datasources = [...(response.data.datasources || [])];
+          const items = response?.data?.datasources ?? [];
+          this.preloadedDatasources = items;
+          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
+          this.datasources = [...items];
         } else {
           this.datasources = [];
         }
@@ -166,6 +206,37 @@ export class GrantAccessComponent implements OnInit {
         this.cdr.markForCheck();
       });
   }
+
+  /**
+   * Fetcher for the server-mode datasource dropdown. Pulls orgId from the
+   * organisation form control.
+   */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId = this.accessForm.get('organisation')?.value;
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
 
   async onSubmit() {
     if (this.accessForm.valid) {
@@ -208,6 +279,8 @@ export class GrantAccessComponent implements OnInit {
 
       // Clear datasources, groups, and users arrays
       this.datasources = [];
+      this.preloadedDatasources = null;
+      this.preloadedDatasourcesTotal = null;
       this.connections = [];
       this.groups = [];
       this.users = [];
@@ -227,6 +300,8 @@ export class GrantAccessComponent implements OnInit {
 
       // Clear datasources, connections, groups, and users arrays
       this.datasources = [];
+      this.preloadedDatasources = null;
+      this.preloadedDatasourcesTotal = null;
       this.connections = [];
       this.groups = [];
       this.users = [];

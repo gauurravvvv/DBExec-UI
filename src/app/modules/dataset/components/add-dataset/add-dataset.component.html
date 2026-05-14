@@ -8,7 +8,11 @@
           [(ngModel)]="selectedOrg"
           [label]="'COMMON.SELECT_ORGANISATION' | translate"
           [floatingLabel]="true"
-          [options]="organisations"
+          [serverMode]="true"
+          [fetcher]="loadOrgsPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedOrgs"
+          [preloadedTotal]="preloadedOrgsTotal"
           optionLabel="name"
           [optionValue]="null"
           [filter]="true"
@@ -19,13 +23,17 @@
         </app-custom-dropdown>
       </div>
 
-      <!-- Datasource Dropdown -->
+      <!-- Datasource Dropdown — server-driven -->
       <div class="dropdown-field">
         <app-custom-dropdown
           [(ngModel)]="selectedDatasourceObj"
           [label]="'COMMON.SELECT_DATASOURCE' | translate"
           [floatingLabel]="true"
-          [options]="availableDatasources"
+          [serverMode]="true"
+          [fetcher]="loadDatasourcesPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedDatasources"
+          [preloadedTotal]="preloadedDatasourcesTotal"
           optionLabel="name"
           [optionValue]="null"
           [filter]="true"

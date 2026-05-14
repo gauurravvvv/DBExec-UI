@@ -52,7 +52,11 @@
             formControlName="organisation"
             [label]="'COMMON.ORGANISATION' | translate"
             [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
-            [options]="organisations"
+            [serverMode]="true"
+            [fetcher]="loadOrgsPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedOrgs"
+            [preloadedTotal]="preloadedOrgsTotal"
             optionLabel="name"
             optionValue="id"
             [filter]="true"
@@ -74,13 +78,17 @@
           </app-custom-dropdown>
         </div>
 
-        <!-- Datasource dropdown -->
+        <!-- Datasource dropdown — server-driven -->
         <div class="form-field">
           <app-custom-dropdown
             formControlName="datasource"
             [label]="'COMMON.DATASOURCE' | translate"
             [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
-            [options]="datasources"
+            [serverMode]="true"
+            [fetcher]="loadDatasourcesPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedDatasources"
+            [preloadedTotal]="preloadedDatasourcesTotal"
             optionLabel="name"
             optionValue="id"
             [filter]="true"
@@ -102,13 +110,17 @@
           </app-custom-dropdown>
         </div>
 
-        <!-- Tab dropdown -->
+        <!-- Tab dropdown — server-driven -->
         <div class="form-field">
           <app-custom-dropdown
             formControlName="tab"
             [label]="'COMMON.TAB' | translate"
             [placeholder]="'COMMON.SELECT_TAB' | translate"
-            [options]="tabs"
+            [serverMode]="true"
+            [fetcher]="loadTabsPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedTabs"
+            [preloadedTotal]="preloadedTabsTotal"
             optionLabel="name"
             optionValue="id"
             [filter]="true"

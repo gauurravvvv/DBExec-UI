@@ -109,13 +109,17 @@
         >
         </app-custom-input>
 
-        <!-- Organisation Dropdown -->
+        <!-- Organisation Dropdown — server-driven -->
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
           [label]="'COMMON.ORGANISATION' | translate"
           [placeholder]="'USER.SELECT_ORGANISATION' | translate"
-          [options]="organisations"
+          [serverMode]="true"
+          [fetcher]="loadOrgsPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedOrgs"
+          [preloadedTotal]="preloadedOrgsTotal"
           optionLabel="name"
           optionValue="id"
           [filter]="true"

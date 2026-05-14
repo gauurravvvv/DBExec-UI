@@ -14,7 +14,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { ANNOUNCEMENT } from 'src/app/constants/routes';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -34,6 +34,10 @@ import {
 export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
   announcementForm!: FormGroup;
   groups: any[] = [];
+  // Server-mode preload for the Target Group dropdown. The orgId here is
+  // fixed (route param), so this is seeded once on init.
+  preloadedGroups: any[] | null = null;
+  preloadedGroupsTotal: number | null = null;
   orgId = '';
   announcementId = '';
   orgName = '';
@@ -112,12 +116,62 @@ export class EditAnnouncementComponent implements OnInit, HasUnsavedChanges {
     return null;
   }
 
+  /**
+   * Server-mode fetcher for the Target Group dropdown.
+   */
+  loadGroupsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.orgId) return { items: [], total: 0 };
+    const params: any = { orgId: this.orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.groupService.listGroups(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.groups ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Resolver for an existing targetGroupId stored on the announcement. Used
+   * by the dropdown when the persisted value isn't on the first preload page
+   * — keeps the label visible without forcing the user to scroll/filter.
+   */
+  resolveSelectedGroup = async (id: string): Promise<any> => {
+    if (!id || !this.orgId) return null;
+    try {
+      const res: any = await this.groupService.viewGroup(this.orgId, id);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return res?.data ?? null;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
   loadGroups(): void {
     this.groupService
-      .listGroups({ orgId: this.orgId, page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .listGroups({ orgId: this.orgId, page: DEFAULT_PAGE, limit: 10 })
       .then(res => {
         if (this.globalService.handleSuccessService(res, false)) {
-          this.groups = res.data.groups || [];
+          const groups = res?.data?.groups ?? [];
+          this.groups = groups;
+          this.preloadedGroups = groups;
+          this.preloadedGroupsTotal = res?.data?.count ?? groups.length;
         }
         this.cdr.markForCheck();
       })

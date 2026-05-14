@@ -17,8 +17,11 @@ import { DATASOURCE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { TranslateService } from '@ngx-translate/core';
 import { DatasourceService } from '../../services/datasource.service';
+
+type DatasourceSortField = 'name' | 'type' | 'status' | 'createdOn';
 
 @Component({
   selector: 'app-list-datasource',
@@ -45,12 +48,15 @@ export class ListDatasourceComponent implements OnInit {
   lastTableLazyLoadEvent: any;
 
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   selectedOrg: any = {};
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
   selectedDatasource: any = null;
   selectedDatasources: any[] = [];
+  sortHelper = new ListSortHelper<DatasourceSortField>();
   showDeleteConfirm = false;
   bulkDelete = false;
   deleteJustification = '';
@@ -86,28 +92,50 @@ export class ListDatasourceComponent implements OnInit {
     }
   }
 
-  loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
-
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = [...response.data.orgs];
-        if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0].id;
-          if (this.dt) {
-            this.dt.reset();
-          } else {
-            this.listDatasourceAPI(this.selectedOrg);
-          }
-        } else {
-          this.selectedOrg = null;
-        }
-        this.cdr.markForCheck();
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
-    });
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  loadOrganisations() {
+    this.organisationService
+      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const orgs = response?.data?.orgs ?? [];
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
+          if (orgs.length > 0) {
+            this.selectedOrg = orgs[0].id;
+            if (this.dt) {
+              this.dt.reset();
+            } else {
+              this.listDatasourceAPI(this.selectedOrg);
+            }
+          } else {
+            this.selectedOrg = null;
+          }
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   onOrgChange(orgId: any) {
@@ -165,16 +193,19 @@ export class ListDatasourceComponent implements OnInit {
     }
   }
 
+  toggleSort(field: DatasourceSortField) {
+    this.sortHelper.toggle(field);
+    this.selectedDatasources = [];
+    if (this.lastTableLazyLoadEvent) {
+      this.lastTableLazyLoadEvent.first = 0;
+      this.loadDatasources(this.lastTableLazyLoadEvent);
+    }
+  }
+
   loadDatasources(event: any) {
     if (!event) return;
     const prev = this.lastTableLazyLoadEvent;
-    if (
-      prev &&
-      (prev.first !== event.first ||
-        prev.rows !== event.rows ||
-        prev.sortField !== event.sortField ||
-        prev.sortOrder !== event.sortOrder)
-    ) {
+    if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
       this.selectedDatasources = [];
     }
     this.lastTableLazyLoadEvent = event;
@@ -223,6 +254,9 @@ export class ListDatasourceComponent implements OnInit {
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
     }
+
+    const sortParam = this.sortHelper.serialize();
+    if (sortParam) params.sort = sortParam;
 
     this.datasourceService.load(params);
   }

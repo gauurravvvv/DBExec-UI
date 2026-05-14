@@ -69,37 +69,157 @@
           [rowsPerPageOptions]="[10, 25, 50, 100]"
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
-          scrollHeight="calc(100vh - 440px)"
-          [tableStyle]="{ 'min-width': '78rem' }"
+          scrollHeight="flex"
+          [tableStyle]="{ 'min-width': '96rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 3rem" pFrozenColumn>
+              <th style="width: 3.5rem; min-width: 3.5rem" pFrozenColumn>
                 <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
               </th>
-              <th style="width: 10rem" pFrozenColumn>
-                <div class="th-content">{{ 'COMMON.USERNAME' | translate }}</div>
+              <th
+                style="min-width: 11rem"
+                pFrozenColumn
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('username')"
+                (click)="toggleSort('username')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.USERNAME' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('username'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('username') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('username') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('username') > 0 && sortHelper.size > 1">
+                      {{ sortHelper.index('username') }}
+                    </span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 9rem">
-                <div class="th-content">{{ 'COMMON.FIRST_NAME' | translate }}</div>
+              <th
+                style="min-width: 10rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('firstName')"
+                (click)="toggleSort('firstName')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.FIRST_NAME' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('firstName'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('firstName') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('firstName') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('firstName') > 0 && sortHelper.size > 1">
+                      {{ sortHelper.index('firstName') }}
+                    </span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 9rem">
-                <div class="th-content">{{ 'COMMON.LAST_NAME' | translate }}</div>
+              <th
+                style="min-width: 10rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('lastName')"
+                (click)="toggleSort('lastName')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.LAST_NAME' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('lastName'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('lastName') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('lastName') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('lastName') > 0 && sortHelper.size > 1">
+                      {{ sortHelper.index('lastName') }}
+                    </span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 14rem">
-                <div class="th-content">{{ 'COMMON.EMAIL' | translate }}</div>
+              <th
+                style="min-width: 16rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('email')"
+                (click)="toggleSort('email')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.EMAIL' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('email'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('email') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('email') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('email') > 0 && sortHelper.size > 1">
+                      {{ sortHelper.index('email') }}
+                    </span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 7rem">
-                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
+              <th
+                style="min-width: 9rem; width: 9rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('status')"
+                (click)="toggleSort('status')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.STATUS' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('status'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('status') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('status') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">
+                      {{ sortHelper.index('status') }}
+                    </span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 10rem">
-                <div class="th-content">{{ 'COMMON.LAST_LOGIN' | translate }}</div>
+              <th
+                style="min-width: 12rem; width: 12rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('lastLogin')"
+                (click)="toggleSort('lastLogin')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.LAST_LOGIN' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('lastLogin'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('lastLogin') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('lastLogin') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('lastLogin') > 0 && sortHelper.size > 1">
+                      {{ sortHelper.index('lastLogin') }}
+                    </span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 10rem">
-                <div class="th-content">{{ 'COMMON.CREATED_ON' | translate }}</div>
+              <th
+                style="min-width: 12rem; width: 12rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                (click)="toggleSort('createdOn')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('createdOn'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('createdOn') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('createdOn') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">
+                      {{ sortHelper.index('createdOn') }}
+                    </span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 6rem">
-                <div class="th-content">{{ 'COMMON.ACTIONS' | translate }}</div>
+              <th style="width: 7rem; min-width: 7rem">
+                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -198,7 +318,7 @@
               </td>
               <td>
                 <span
-                  class="status-indicator"
+                  class="status-pill"
                   [ngClass]="{
                     locked: admin.isLocked,
                     active: !admin.isLocked && admin.status === 1,
@@ -206,24 +326,32 @@
                   }"
                 >
                   <span class="dot"></span>
-                  {{
-                    admin.isLocked
-                      ? ('COMMON.LOCKED' | translate)
-                      : admin.status === 1
-                        ? ('COMMON.ACTIVE' | translate)
-                        : ('COMMON.INACTIVE' | translate)
-                  }}
+                  <span class="label">
+                    {{
+                      admin.isLocked
+                        ? ('COMMON.LOCKED' | translate)
+                        : admin.status === 1
+                          ? ('COMMON.ACTIVE' | translate)
+                          : ('COMMON.INACTIVE' | translate)
+                    }}
+                  </span>
                 </span>
               </td>
               <td>
-                <span class="date-text">{{
-                  admin.lastLogin ? (admin.lastLogin | date: 'medium') : ('COMMON.NEVER' | translate)
-                }}</span>
+                <span
+                  class="date-text"
+                  [title]="admin.lastLogin ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm:ss') : ''"
+                >
+                  {{ admin.lastLogin ? (admin.lastLogin | date: 'dd MMM yyyy, HH:mm') : ('COMMON.NEVER' | translate) }}
+                </span>
               </td>
               <td>
-                <span class="date-text">{{
-                  admin.createdOn | date: 'medium'
-                }}</span>
+                <span
+                  class="date-text"
+                  [title]="admin.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
+                >
+                  {{ admin.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                </span>
               </td>
               <td>
                 <div class="row-actions">
@@ -265,9 +393,19 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="9" class="empty-message-cell text-center">
-                {{ 'COMMON.NO_RECORD_FOUND' | translate }}
+            <tr class="empty-row">
+              <td colspan="9" class="empty-message-cell">
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <i class="pi pi-inbox"></i>
+                  </div>
+                  <div class="empty-title">
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}
+                  </div>
+                  <div class="empty-subtitle" *ngIf="isFilterActive">
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                  </div>
+                </div>
               </td>
             </tr>
           </ng-template>

@@ -17,11 +17,15 @@
           <div class="dropdown-field" *ngIf="isSystemAdmin">
             <app-custom-dropdown
               [(ngModel)]="filterValues.organisationId"
-              [options]="organisationOptions"
-              optionLabel="label"
-              optionValue="value"
+              [serverMode]="true"
+              [fetcher]="loadOrgsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedOrgs"
+              [preloadedTotal]="preloadedOrgsTotal"
+              optionLabel="name"
+              optionValue="id"
               [filter]="true"
-              filterBy="label"
+              filterBy="name"
               [label]="'COMMON.ORGANISATION' | translate"
               [floatingLabel]="true"
               [showClear]="true"
@@ -93,7 +97,7 @@
           [rowsPerPageOptions]="[25, 50, 100]"
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
-          scrollHeight="calc(100vh - 440px)"
+          scrollHeight="flex"
         >
           <ng-template pTemplate="header">
             <tr>
@@ -103,8 +107,23 @@
               <th style="width: 160px; min-width: 160px">
                 <div class="th-content">{{ 'AUDIT.PERFORMED_BY' | translate }}</div>
               </th>
-              <th style="width: 130px; min-width: 130px">
-                <div class="th-content">{{ 'AUDIT.ACTION' | translate }}</div>
+              <th
+                style="width: 140px; min-width: 140px"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('action')"
+                (click)="toggleSort('action')"
+              >
+                <div class="th-content">
+                  <span>{{ 'AUDIT.ACTION' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('action'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('action') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('action') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('action') > 0 && sortHelper.size > 1">{{ sortHelper.index('action') }}</span>
+                  </span>
+                </div>
               </th>
               <th style="width: 80px; min-width: 80px">
                 <div class="th-content">{{ 'AUDIT.VERSION' | translate }}</div>
@@ -112,8 +131,23 @@
               <th style="width: 120px; min-width: 120px">
                 <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
-              <th style="width: 220px; min-width: 220px">
-                <div class="th-content">{{ 'AUDIT.TIMESTAMP' | translate }}</div>
+              <th
+                style="width: 220px; min-width: 220px"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                (click)="toggleSort('createdOn')"
+              >
+                <div class="th-content">
+                  <span>{{ 'AUDIT.TIMESTAMP' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('createdOn'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('createdOn') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('createdOn') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
+                  </span>
+                </div>
               </th>
               <th style="width: 160px; min-width: 160px">
                 <div class="th-content">{{ 'AUDIT.IP_ADDRESS' | translate }}</div>
@@ -219,20 +253,25 @@
               </td>
               <td>
                 <span
-                  class="status-indicator"
+                  class="status-pill"
                   [ngClass]="{
                     active: log.responseSuccess,
                     inactive: !log.responseSuccess,
                   }"
                 >
                   <span class="dot"></span>
-                  {{ log.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
+                  <span class="label">
+                    {{ log.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
+                  </span>
                 </span>
               </td>
               <td>
-                <span class="date-text">{{
-                  log.createdOn | date: 'medium'
-                }}</span>
+                <span
+                  class="date-text"
+                  [title]="log.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
+                >
+                  {{ log.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                </span>
               </td>
               <td>
                 <span class="description-text">{{ log.ipAddress || '-' }}</span>
@@ -247,9 +286,16 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="8" class="empty-message-cell text-center">
-                {{ 'AUDIT.NO_LOGS_FOUND' | translate }}
+            <tr class="empty-row">
+              <td colspan="8" class="empty-message-cell">
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <i class="pi pi-inbox"></i>
+                  </div>
+                  <div class="empty-title">
+                    {{ 'AUDIT.NO_LOGS_FOUND' | translate }}
+                  </div>
+                </div>
               </td>
             </tr>
           </ng-template>

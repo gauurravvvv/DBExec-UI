@@ -27,6 +27,8 @@ import { UserService } from '../../services/user.service';
 export class AddUserComponent implements OnInit, HasUnsavedChanges {
   userForm!: FormGroup;
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   groups: any[] = [];
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
@@ -105,15 +107,44 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
+  /**
+   * Fetcher for the server-mode organisation dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations() {
     const params = {
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs;
+        const orgs = response?.data?.orgs ?? [];
+        this.organisations = orgs;
+        this.preloadedOrgs = orgs;
+        this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
       }
       this.cdr.markForCheck();
     });

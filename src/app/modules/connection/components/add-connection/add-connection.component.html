@@ -63,13 +63,17 @@
         >
         </app-custom-input>
 
-        <!-- Organisation Dropdown -->
+        <!-- Organisation Dropdown — server-driven -->
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
           [label]="'COMMON.ORGANISATION' | translate"
           [placeholder]="'CONNECTION.SELECT_ORGANISATION' | translate"
-          [options]="organisations"
+          [serverMode]="true"
+          [fetcher]="loadOrgsPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedOrgs"
+          [preloadedTotal]="preloadedOrgsTotal"
           optionLabel="name"
           optionValue="id"
           [filter]="true"
@@ -86,12 +90,16 @@
         >
         </app-custom-dropdown>
 
-        <!-- Datasource Dropdown -->
+        <!-- Datasource Dropdown — server-driven -->
         <app-custom-dropdown
           formControlName="datasource"
           [label]="'CONNECTION.DATASOURCE' | translate"
           [placeholder]="'CONNECTION.SELECT_DATASOURCE' | translate"
-          [options]="datasources"
+          [serverMode]="true"
+          [fetcher]="loadDatasourcesPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedDatasources"
+          [preloadedTotal]="preloadedDatasourcesTotal"
           optionLabel="name"
           optionValue="id"
           [filter]="true"

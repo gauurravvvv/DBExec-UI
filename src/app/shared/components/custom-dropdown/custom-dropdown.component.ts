@@ -1,12 +1,29 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   forwardRef,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+
+/**
+ * Server-driven fetcher contract. Each call returns one page of items and the
+ * total row count so the dropdown knows when to stop loading more.
+ *
+ * The component invokes this on three events: panel open (initial page),
+ * filter-text change (debounced; replaces options with page 1), and near-end
+ * scroll (appends the next page).
+ */
+export type DropdownFetcher = (args: {
+  search: string;
+  page: number;
+  limit: number;
+}) => Promise<{ items: any[]; total: number }>;
 
 @Component({
   selector: 'app-custom-dropdown',
@@ -21,7 +38,9 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CustomDropdownComponent implements ControlValueAccessor {
+export class CustomDropdownComponent
+  implements ControlValueAccessor, OnChanges
+{
   @Input() label = '';
   @Input() placeholder = '';
   @Input() options: any[] = [];
@@ -57,17 +76,111 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() appendTo: any = null;
   @Input() style: { [key: string]: string } = {};
   @Input() panelStyle: { [key: string]: string } | null = null;
+
+  // ── Server-driven mode ──────────────────────────────────────────────────
+  // When serverMode=true, the dropdown ignores [options] and instead calls
+  // [fetcher] to paginate from the BE. The parent passes a fetcher closure
+  // (typically wrapping a service.list({page, limit, filter}) call). Keeps
+  // the dropdown's API surface identical for static-data callers — they just
+  // don't set serverMode.
+  @Input() serverMode = false;
+  @Input() fetcher: DropdownFetcher | null = null;
+  @Input() pageSize = 10;
+  @Input() searchDebounceMs = 300;
+
+  /**
+   * Optional pre-loaded items + total. When the parent has already fetched
+   * page 1 (typically to discover the selected entity's label before the panel
+   * is opened), it passes the result here. The dropdown seeds its server state
+   * from this, so:
+   *   - the selected value renders its label immediately, before any open
+   *   - opening the panel does NOT re-fetch page 1 (no duplicate request)
+   *   - scroll-to-load and filter still work normally from page 2 onward
+   */
+  @Input() preloadedItems: any[] | null = null;
+  @Input() preloadedTotal: number | null = null;
+
+  /**
+   * Optional async resolver for edit screens. When the dropdown has a value
+   * (e.g. roleId stored on an existing record) but no matching item in either
+   * preloadedItems or the cache, this fetches just that one item so the label
+   * can render. Single network call, called once per writeValue+missing combo.
+   *
+   * Typical implementation: `(id) => roleService.getRole(id).then(r => r.data)`.
+   */
+  @Input() resolveSelected: ((value: any) => Promise<any>) | null = null;
+
   @Output() onChangeEvent = new EventEmitter<any>();
 
   value: any = null;
   disabled = false;
   inputId = `dropdown-${Math.random().toString(36).substring(2, 11)}`;
 
+  // Server-mode internal state
+  serverOptions: any[] = [];
+  serverLoading = false;
+  private serverTotal = 0;
+  private serverPage = 0;
+  private serverSearch = '';
+  private searchDebounceHandle: any = null;
+
+  // Cached reference to the currently-selected item, kept independent of
+  // serverOptions. Server-mode dropdowns replace serverOptions on every
+  // filter (and a filter that returns nothing leaves the list empty). Without
+  // this cache, PrimeNG would lose the label for an existing selection any
+  // time the user types a non-matching filter and closes the panel.
+  private selectedItem: any = null;
+
+  constructor(private cdr: ChangeDetectorRef) {}
+
   private onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // If the parent toggles into serverMode after init, reset internal state.
+    if (changes['serverMode'] && this.serverMode) {
+      this.resetServerState();
+    }
+
+    // When preloaded items arrive (typically async after the parent's first
+    // page fetch resolves), seed the server state so the selected label
+    // renders without waiting for the user to open the panel.
+    if (
+      this.serverMode &&
+      (changes['preloadedItems'] || changes['preloadedTotal']) &&
+      this.preloadedItems &&
+      this.preloadedItems.length > 0 &&
+      // Only seed once — if the user has already paginated, don't clobber.
+      this.serverPage === 0
+    ) {
+      this.serverOptions = [...this.preloadedItems];
+      this.serverTotal = this.preloadedTotal ?? this.preloadedItems.length;
+      this.serverPage = 1;
+      // Resolve selectedItem now that we have options to look in.
+      this.refreshSelectedItem();
+      this.ensureSelectedInOptions();
+    }
+  }
+
   writeValue(value: any): void {
+    const prev = this.value;
     this.value = value;
+    if (this.serverMode) {
+      this.refreshSelectedItem();
+      this.ensureSelectedInOptions();
+      // If we have a value but no matching item, try the parent's resolver.
+      // Guarded so we only call once per (new value, missing match) pair.
+      if (
+        value !== null &&
+        value !== undefined &&
+        value !== '' &&
+        value !== prev &&
+        !this.selectedItem &&
+        this.resolveSelected
+      ) {
+        this.resolveSelectedItem(value);
+      }
+    }
   }
 
   registerOnChange(fn: (value: any) => void): void {
@@ -84,11 +197,173 @@ export class CustomDropdownComponent implements ControlValueAccessor {
 
   onValueChange(value: any): void {
     this.value = value;
+    if (this.serverMode) {
+      // Cache the selected item from the currently-rendered options so it
+      // survives a later filter that wipes serverOptions.
+      this.refreshSelectedItem();
+    }
     this.onChange(this.value);
     this.onChangeEvent.emit(value);
   }
 
   onBlur(): void {
     this.onTouched();
+  }
+
+  // ── Server-mode handlers ───────────────────────────────────────────────
+
+  onPanelShow(): void {
+    if (!this.serverMode || !this.fetcher) return;
+    // Load only on first open or when prior load was cleared.
+    if (this.serverOptions.length === 0) {
+      this.fetchPage(1, this.serverSearch, false);
+    }
+  }
+
+  onServerFilter(event: { originalEvent: Event; filter: string }): void {
+    if (!this.serverMode || !this.fetcher) return;
+    const term = (event?.filter ?? '').toString();
+    if (this.searchDebounceHandle) clearTimeout(this.searchDebounceHandle);
+    this.searchDebounceHandle = setTimeout(() => {
+      this.serverSearch = term;
+      this.fetchPage(1, term, false);
+    }, this.searchDebounceMs);
+  }
+
+  /**
+   * PrimeNG's p-dropdown emits (onScrollIndexChange) on virtual scroll OR
+   * (onLazyLoad) on the cdk-scroller it wraps. We listen on (onScroll) which
+   * fires plain scroll events with the scroll position. Trigger next page
+   * when the user is within 5 items of the end of the loaded set and more
+   * remain server-side.
+   */
+  onServerScroll(event: any): void {
+    if (!this.serverMode || !this.fetcher) return;
+    if (this.serverLoading) return;
+    if (this.serverOptions.length >= this.serverTotal) return;
+
+    const target = event?.target as HTMLElement | undefined;
+    if (!target) return;
+    const remaining =
+      target.scrollHeight - (target.scrollTop + target.clientHeight);
+    if (remaining < 80) {
+      this.fetchPage(this.serverPage + 1, this.serverSearch, true);
+    }
+  }
+
+  private resetServerState(): void {
+    this.serverOptions = [];
+    this.serverTotal = 0;
+    this.serverPage = 0;
+    this.serverSearch = '';
+    this.serverLoading = false;
+    this.selectedItem = null;
+  }
+
+  private async fetchPage(
+    page: number,
+    search: string,
+    append: boolean,
+  ): Promise<void> {
+    if (!this.fetcher) return;
+    this.serverLoading = true;
+    this.cdr.markForCheck();
+    try {
+      const res = await this.fetcher({
+        search,
+        page,
+        limit: this.pageSize,
+      });
+      const incoming = res?.items ?? [];
+      this.serverTotal = res?.total ?? incoming.length;
+      this.serverPage = page;
+      this.serverOptions = append
+        ? [...this.serverOptions, ...incoming]
+        : incoming;
+      // After any fetch (especially filter-replace), make sure the currently-
+      // selected item is still present so its label renders. If a filter wipes
+      // it from the list, we add it back invisibly to the option array.
+      this.ensureSelectedInOptions();
+    } catch (err) {
+      // Swallow: the dropdown shouldn't crash the host page on a transient
+      // server error. The empty list + "no results" template is the visible
+      // fallback. Real diagnostics live in the network panel.
+    } finally {
+      this.serverLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Fetch a single item by value via the parent's resolveSelected callback.
+   * Used by edit screens where a value is set (e.g. existing roleId) but
+   * the matching item isn't in the panel's preload. Cached on success and
+   * inserted into serverOptions so PrimeNG renders the label.
+   */
+  private async resolveSelectedItem(value: any): Promise<void> {
+    if (!this.resolveSelected) return;
+    try {
+      const item = await this.resolveSelected(value);
+      // Stale guard: only apply if the dropdown's value hasn't changed since.
+      if (item && this.value === value) {
+        this.selectedItem = item;
+        this.ensureSelectedInOptions();
+        this.cdr.markForCheck();
+      }
+    } catch {
+      // Same swallow rationale as fetchPage — a failed resolver shouldn't
+      // crash the host page. The dropdown will fall back to showing the raw
+      // value or blank, but the rest of the form remains usable.
+    }
+  }
+
+  /**
+   * Re-resolve selectedItem from the current options. Called whenever the
+   * value changes (writeValue / onValueChange) so we capture the item object
+   * while it's still in serverOptions.
+   */
+  private refreshSelectedItem(): void {
+    if (this.value === null || this.value === undefined) {
+      this.selectedItem = null;
+      return;
+    }
+    const match = this.serverOptions.find(opt =>
+      this.matchesValue(opt, this.value),
+    );
+    // Only update the cache if we found a match — otherwise keep whatever we
+    // had before (the value was likely set before options loaded, or the
+    // current options are filtered).
+    if (match) this.selectedItem = match;
+  }
+
+  /**
+   * Ensure the cached selectedItem is present in serverOptions so PrimeNG can
+   * resolve its label. If a filter result excluded it, prepend it back. The
+   * user won't visually notice — the dropdown shows the label in the input,
+   * and the panel shows the filtered results plus the selected item at the
+   * top (which is the correct UX for "your current selection").
+   */
+  private ensureSelectedInOptions(): void {
+    if (!this.selectedItem) return;
+    const exists = this.serverOptions.some(opt =>
+      this.matchesValue(opt, this.value),
+    );
+    if (!exists) {
+      this.serverOptions = [this.selectedItem, ...this.serverOptions];
+    }
+  }
+
+  /**
+   * Compare an option object against the current ngModel value. When
+   * optionValue is set (e.g. 'id'), we compare option[optionValue] === value.
+   * When optionValue is null/empty, PrimeNG treats the whole option as the
+   * value — we compare by reference.
+   */
+  private matchesValue(option: any, value: any): boolean {
+    if (option === null || option === undefined) return false;
+    if (this.optionValue) {
+      return option[this.optionValue] === value;
+    }
+    return option === value;
   }
 }

@@ -25,9 +25,13 @@
 
         <app-custom-dropdown
           [(ngModel)]="newScopeId"
-          [options]="scopeTargets"
-          optionLabel="label"
-          optionValue="value"
+          [serverMode]="true"
+          [fetcher]="loadScopeTargetsPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedScopeTargets"
+          [preloadedTotal]="preloadedScopeTargetsTotal"
+          [optionLabel]="newScope === 'user' ? 'displayLabel' : 'name'"
+          optionValue="id"
           [label]="newScope === 'user' ? ('RLS.USER' | translate) : ('RLS.GROUP' | translate)"
           [placeholder]="newScope === 'user' ? ('RLS.SELECT_USER' | translate) : ('RLS.SELECT_GROUP' | translate)"
           [filter]="true"

@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { SECTION } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -45,7 +45,11 @@ export class ListSectionComponent implements OnInit {
   deleteJustification = '';
   Math = Math;
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
+  preloadedDatasources: any[] | null = null;
+  preloadedDatasourcesTotal: number | null = null;
   sections = this.sectionService.sections;
   total = this.sectionService.total;
   loading = this.sectionService.loading;
@@ -159,25 +163,50 @@ export class ListSectionComponent implements OnInit {
     }
   }
 
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations(preSelectedOrgId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
         page: DEFAULT_PAGE,
-        limit: MAX_LIMIT,
+        limit: 10,
       };
       this.organisationService
         .listOrganisation(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.organisations = [...response.data.orgs];
-            if (this.organisations.length > 0) {
+            const orgs = response?.data?.orgs ?? [];
+            this.preloadedOrgs = orgs;
+            this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
+            if (orgs.length > 0) {
               if (
                 preSelectedOrgId &&
-                this.organisations.find(o => o.id === preSelectedOrgId)
+                orgs.find((o: any) => o.id === preSelectedOrgId)
               ) {
                 this.selectedOrg = preSelectedOrgId;
               } else {
-                this.selectedOrg = this.organisations[0].id;
+                this.selectedOrg = orgs[0].id;
               }
 
               if (!preSelectedOrgId) {
@@ -200,8 +229,40 @@ export class ListSectionComponent implements OnInit {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
+    this.preloadedDatasources = null;
+    this.preloadedDatasourcesTotal = null;
     this.loadDatasources();
   }
+
+  /**
+   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
+   * gracefully if no org is selected.
+   */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.selectedOrg) return { items: [], total: 0 };
+    const params: any = { orgId: this.selectedOrg, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
 
   onDBChange(datasourceId: any) {
     this.selectedDatasource = datasourceId;
@@ -242,14 +303,18 @@ export class ListSectionComponent implements OnInit {
       const params = {
         orgId: this.selectedOrg,
         page: DEFAULT_PAGE,
-        limit: MAX_LIMIT,
+        limit: 10,
       };
 
       this.datasourceService
         .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.datasources = [...(response.data.datasources || [])];
+            const items = response?.data?.datasources ?? [];
+            this.preloadedDatasources = items;
+            this.preloadedDatasourcesTotal =
+              response?.data?.count ?? items.length;
+            this.datasources = [...items];
             if (this.datasources.length > 0) {
               if (
                 preSelectedDbId &&

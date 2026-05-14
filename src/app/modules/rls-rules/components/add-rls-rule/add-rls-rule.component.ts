@@ -52,7 +52,11 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   rlsForm!: FormGroup;
 
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
+  preloadedDatasources: any[] | null = null;
+  preloadedDatasourcesTotal: number | null = null;
   datasets: any[] = [];
   datasetColumns: any[] = [];
   columnValuesCache: {
@@ -141,6 +145,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         if (value) {
           this.selectedDatasource = '';
           this.datasources = [];
+          this.preloadedDatasources = null;
+          this.preloadedDatasourcesTotal = null;
           this.datasets = [];
           this.datasetColumns = [];
           this.columnValuesCache = {};
@@ -191,13 +197,42 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.conditions.push(this.createCondition());
   }
 
+  /**
+   * Fetcher for the server-mode organisation dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations() {
-    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
+    const params = { page: DEFAULT_PAGE, limit: 10 };
     this.organisationService
       .listOrganisation(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = response.data.orgs || [];
+          const orgs = response?.data?.orgs ?? [];
+          this.organisations = orgs;
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
           this.cdr.markForCheck();
         }
       })
@@ -210,12 +245,15 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     const orgId = this.rlsForm.get('organisation')?.value;
     if (!orgId) return;
 
-    const params = { orgId, pageNumber: DEFAULT_PAGE, limit: MAX_LIMIT };
+    const params = { orgId, page: DEFAULT_PAGE, limit: 10 };
     this.datasourceService
       .listDatasource(params)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.datasources = response.data.datasources || [];
+          const items = response?.data?.datasources ?? [];
+          this.preloadedDatasources = items;
+          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
+          this.datasources = items;
           this.selectedDatasource = '';
           this.datasets = [];
           this.rlsForm.patchValue({ datasetId: '' }, { emitEvent: false });
@@ -228,6 +266,37 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
         this.cdr.markForCheck();
       });
   }
+
+  /**
+   * Fetcher for the server-mode datasource dropdown. Pulls orgId from the
+   * organisation form control.
+   */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId = this.rlsForm.get('organisation')?.value;
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
 
   onDatasourceChange(datasourceId: string) {
     this.selectedDatasource = datasourceId;
