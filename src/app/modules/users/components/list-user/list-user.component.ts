@@ -12,14 +12,24 @@ import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { TranslateService } from '@ngx-translate/core';
 import { UserService } from '../../services/user.service';
+
+type UserSortField =
+  | 'username'
+  | 'firstName'
+  | 'lastName'
+  | 'email'
+  | 'lastLogin'
+  | 'status'
+  | 'createdOn';
 
 @Component({
   selector: 'app-list-user',
@@ -39,6 +49,7 @@ export class ListUserComponent implements OnInit {
   lastTableLazyLoadEvent: any;
 
   selectedUsers: any[] = [];
+  sortHelper = new ListSortHelper<UserSortField>();
 
   showDeleteConfirm = false;
   userToDelete: string | null = null;
@@ -46,7 +57,13 @@ export class ListUserComponent implements OnInit {
   deleteJustification = '';
 
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   groups: any[] = [];
+  // Mirror of preloadedOrgs but for the server-mode Group filter. Cleared and
+  // refilled whenever selectedOrg changes (groups are org-scoped).
+  preloadedGroups: any[] | null = null;
+  preloadedGroupsTotal: number | null = null;
   selectedOrg: any = null;
   selectedGroup: string | null = null;
   userRole = this.globalService.getTokenDetails('role');
@@ -115,39 +132,107 @@ export class ListUserComponent implements OnInit {
     }
   }
 
-  loadOrganisations() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
-
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs;
-        if (this.organisations.length > 0) {
-          this.selectedOrg = this.organisations[0].id;
-          this.loadGroupOptions();
-          // Trigger load after org is selected
-          this.loadUsers();
-        } else {
-          this.selectedOrg = null;
-        }
+  /**
+   * Fetcher for the server-mode org dropdown. Called by the dropdown on open,
+   * on filter keystroke (debounced), and on near-end scroll.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
-      this.cdr.markForCheck();
-    });
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Initial bootstrap — fetch the first page of orgs, auto-select the first
+   * and pass the same page to the dropdown as a preload so it doesn't refetch
+   * on first open.
+   */
+  loadOrganisations() {
+    this.organisationService
+      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const orgs = response?.data?.orgs ?? [];
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
+          if (orgs.length > 0) {
+            this.selectedOrg = orgs[0].id;
+            this.loadGroupOptions();
+            this.loadUsers();
+          } else {
+            this.selectedOrg = null;
+          }
+        }
+        this.cdr.markForCheck();
+      });
   }
 
+  /**
+   * Fetcher for the server-mode Group filter dropdown. Gates on selectedOrg
+   * because groups are org-scoped; an open with no org would otherwise pull
+   * groups across the entire fleet.
+   */
+  loadGroupsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId =
+      this.selectedOrg || this.globalService.getTokenDetails('organisationId');
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.groupService.listGroups(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.groups ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Initial load: page 1 of groups so the dropdown's preload is ready and the
+   * legacy `groups[]` array stays populated for other code paths.
+   */
   loadGroupOptions() {
     const orgId =
       this.selectedOrg || this.globalService.getTokenDetails('organisationId');
     if (!orgId) return;
     this.groupService
-      .listGroups({ orgId, page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .listGroups({ orgId, page: DEFAULT_PAGE, limit: 10 })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.groups = (response.data.groups || []).filter(
-            (g: any) => g.status === 1,
-          );
+          const groups = response?.data?.groups ?? [];
+          this.groups = groups.filter((g: any) => g.status === 1);
+          this.preloadedGroups = groups;
+          this.preloadedGroupsTotal = response?.data?.count ?? groups.length;
         }
         this.cdr.markForCheck();
       });
@@ -164,6 +249,10 @@ export class ListUserComponent implements OnInit {
     this.selectedGroup = null;
     this.selectedUsers = [];
     this.groups = [];
+    // Drop the group dropdown's seed so the next open re-fetches against the
+    // newly selected org instead of showing stale options.
+    this.preloadedGroups = null;
+    this.preloadedGroupsTotal = null;
     this.loadGroupOptions();
     this.loadUsers();
   }
@@ -208,19 +297,21 @@ export class ListUserComponent implements OnInit {
     }
   }
 
+  toggleSort(field: UserSortField) {
+    this.sortHelper.toggle(field);
+    this.selectedUsers = [];
+    if (this.lastTableLazyLoadEvent) {
+      this.lastTableLazyLoadEvent.first = 0;
+    }
+    this.loadUsers(this.lastTableLazyLoadEvent);
+  }
+
   loadUsers(event?: any) {
     if (!this.selectedOrg) return;
 
-    // Store the event for future reloads
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
-      if (
-        prev &&
-        (prev.first !== event.first ||
-          prev.rows !== event.rows ||
-          prev.sortField !== event.sortField ||
-          prev.sortOrder !== event.sortOrder)
-      ) {
+      if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
         this.selectedUsers = [];
       }
       this.lastTableLazyLoadEvent = event;
@@ -278,10 +369,12 @@ export class ListUserComponent implements OnInit {
       filter.createdDateTo = dateTo.toISOString();
     }
 
-    // Add JSON stringified filter if any filter is set
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
     }
+
+    const sortParam = this.sortHelper.serialize();
+    if (sortParam) params.sort = sortParam;
 
     this.userService
       .load(params)

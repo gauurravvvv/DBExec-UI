@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { ROLE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -45,6 +45,8 @@ export class ListRoleComponent implements OnInit {
   deleteJustification = '';
 
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   selectedOrgId: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
@@ -98,20 +100,46 @@ export class ListRoleComponent implements OnInit {
     }
   }
 
-  loadOrganisations() {
-    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
-    this.organisationService.listOrganisation(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs;
-        if (this.organisations.length > 0) {
-          this.selectedOrgId = this.organisations[0].id;
-          this.loadRoles();
-        } else {
-          this.selectedOrgId = null;
-        }
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
-      this.cdr.markForCheck();
-    });
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  loadOrganisations() {
+    this.organisationService
+      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const orgs = response?.data?.orgs ?? [];
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
+          if (orgs.length > 0) {
+            this.selectedOrgId = orgs[0].id;
+            this.loadRoles();
+          } else {
+            this.selectedOrgId = null;
+          }
+        }
+        this.cdr.markForCheck();
+      });
   }
 
   get selectedCount(): number {

@@ -74,13 +74,17 @@
           </span>
         </div>
 
-        <!-- Organisation (SA only) -->
+        <!-- Organisation (SA only) — server-driven -->
         <app-custom-dropdown
           *ngIf="showOrganisationDropdown"
           formControlName="organisation"
           [label]="'COMMON.ORGANISATION' | translate"
           [placeholder]="'COMMON.SELECT_ORGANISATION' | translate"
-          [options]="organisations"
+          [serverMode]="true"
+          [fetcher]="loadOrgsPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedOrgs"
+          [preloadedTotal]="preloadedOrgsTotal"
           optionLabel="name"
           optionValue="id"
           [filter]="true"
@@ -95,12 +99,16 @@
           [errorMessage]="'ANNOUNCEMENT.ORGANISATION_REQUIRED' | translate"
         ></app-custom-dropdown>
 
-        <!-- Target Group -->
+        <!-- Target Group — server-mode, scoped to selected organisation -->
         <app-custom-dropdown
           formControlName="targetGroupId"
           [label]="'ANNOUNCEMENT.TARGET_GROUP' | translate"
           [placeholder]="'ANNOUNCEMENT.SELECT_GROUP' | translate"
-          [options]="groups"
+          [serverMode]="true"
+          [fetcher]="loadGroupsPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedGroups"
+          [preloadedTotal]="preloadedGroupsTotal"
           optionLabel="name"
           optionValue="id"
           [filter]="true"

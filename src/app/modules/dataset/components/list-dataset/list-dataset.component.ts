@@ -23,9 +23,12 @@ import { AnalysesService } from 'src/app/modules/analyses/services/analyses.serv
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
 import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';
+import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { TranslateService } from '@ngx-translate/core';
 import { DatasetService } from '../../services/dataset.service';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
+
+type DatasetSortField = 'name' | 'status' | 'createdOn';
 
 @Component({
   selector: 'app-list-dataset',
@@ -45,6 +48,7 @@ export class ListDatasetComponent implements OnInit {
   filteredDatasets: any[] = [];
 
   selectedDatasets: any[] = [];
+  sortHelper = new ListSortHelper<DatasetSortField>();
   showDeleteConfirm = false;
   bulkDelete = false;
   deleteJustification = '';
@@ -59,7 +63,11 @@ export class ListDatasetComponent implements OnInit {
   qbTotalRecords = 0;
   qbActiveIndex = -1;
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   datasources: any[] = [];
+  preloadedDatasources: any[] | null = null;
+  preloadedDatasourcesTotal: number | null = null;
   selectedOrg: any = null;
   selectedDatasource: any = null;
   userRole = this.globalService.getTokenDetails('role');
@@ -203,26 +211,51 @@ export class ListDatasetComponent implements OnInit {
     }
   }
 
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations(preSelectedOrgId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
         page: DEFAULT_PAGE,
-        limit: MAX_LIMIT,
+        limit: 10,
       };
 
       this.organisationService
         .listOrganisation(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.organisations = response.data.orgs || [];
-            if (this.organisations.length > 0) {
+            const orgs = response?.data?.orgs ?? [];
+            this.preloadedOrgs = orgs;
+            this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
+            if (orgs.length > 0) {
               if (
                 preSelectedOrgId &&
-                this.organisations.find(o => o.id === preSelectedOrgId)
+                orgs.find((o: any) => o.id === preSelectedOrgId)
               ) {
                 this.selectedOrg = preSelectedOrgId;
               } else {
-                this.selectedOrg = this.organisations[0].id;
+                this.selectedOrg = orgs[0].id;
               }
 
               if (!preSelectedOrgId) {
@@ -248,8 +281,40 @@ export class ListDatasetComponent implements OnInit {
 
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
+    this.preloadedDatasources = null;
+    this.preloadedDatasourcesTotal = null;
     this.loadDatasources();
   }
+
+  /**
+   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
+   * gracefully if no org is selected.
+   */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.selectedOrg) return { items: [], total: 0 };
+    const params: any = { orgId: this.selectedOrg, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
 
   onDBChange(datasourceId: any) {
     this.selectedDatasource = datasourceId;
@@ -288,15 +353,19 @@ export class ListDatasetComponent implements OnInit {
       }
       const params = {
         orgId: this.selectedOrg,
-        pageNumber: DEFAULT_PAGE,
-        limit: MAX_LIMIT,
+        page: DEFAULT_PAGE,
+        limit: 10,
       };
 
       this.datasourceService
         .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.datasources = response.data.datasources || [];
+            const items = response?.data?.datasources ?? [];
+            this.preloadedDatasources = items;
+            this.preloadedDatasourcesTotal =
+              response?.data?.count ?? items.length;
+            this.datasources = items;
             if (this.datasources.length > 0) {
               if (
                 preSelectedDbId &&
@@ -337,19 +406,21 @@ export class ListDatasetComponent implements OnInit {
     });
   }
 
+  toggleSort(field: DatasetSortField) {
+    this.sortHelper.toggle(field);
+    this.selectedDatasets = [];
+    if (this.lastTableLazyLoadEvent) {
+      this.lastTableLazyLoadEvent.first = 0;
+    }
+    this.loadDatasets(this.lastTableLazyLoadEvent);
+  }
+
   loadDatasets(event?: any) {
     if (!this.selectedOrg || !this.selectedDatasource) return;
 
-    // Clear selection when page/sort changes
     if (event) {
       const prev = this.lastTableLazyLoadEvent;
-      if (
-        prev &&
-        (prev.first !== event.first ||
-          prev.rows !== event.rows ||
-          prev.sortField !== event.sortField ||
-          prev.sortOrder !== event.sortOrder)
-      ) {
+      if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
         this.selectedDatasets = [];
       }
       this.lastTableLazyLoadEvent = event;
@@ -389,10 +460,12 @@ export class ListDatasetComponent implements OnInit {
       filter.createdDateTo = dateTo.toISOString();
     }
 
-    // Add JSON stringified filter if any filter is set
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
     }
+
+    const sortParam = this.sortHelper.serialize();
+    if (sortParam) params.sort = sortParam;
 
     this.datasetService
       .listDatasets(params)

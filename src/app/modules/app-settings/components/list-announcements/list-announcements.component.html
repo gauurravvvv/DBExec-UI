@@ -15,7 +15,11 @@
           <div class="dropdown-field" *ngIf="showOrganisationDropdown">
             <app-custom-dropdown
               [(ngModel)]="selectedOrg"
-              [options]="organisations"
+              [serverMode]="true"
+              [fetcher]="loadOrgsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedOrgs"
+              [preloadedTotal]="preloadedOrgsTotal"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
@@ -114,7 +118,11 @@
               <th>
                 <app-custom-dropdown
                   [(ngModel)]="filterValues.targetGroupId"
-                  [options]="groups"
+                  [serverMode]="true"
+                  [fetcher]="loadGroupsPage"
+                  [pageSize]="10"
+                  [preloadedItems]="preloadedGroups"
+                  [preloadedTotal]="preloadedGroupsTotal"
                   optionLabel="name"
                   optionValue="id"
                   [placeholder]="'COMMON.ALL' | translate"

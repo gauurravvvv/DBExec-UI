@@ -15,7 +15,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { ANNOUNCEMENT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
@@ -39,7 +39,13 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
 
   announcementForm!: FormGroup;
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   groups: any[] = [];
+  // Server-mode preload for the Target Group dropdown. Refilled when the
+  // organisation field changes.
+  preloadedGroups: any[] | null = null;
+  preloadedGroupsTotal: number | null = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
   maxDescriptionLength = 1000;
@@ -120,9 +126,43 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
           { emitEvent: false },
         );
         this.groups = [];
+        // Clear the seed so the next dropdown open fetches against the new org.
+        this.preloadedGroups = null;
+        this.preloadedGroupsTotal = null;
         if (value) this.loadGroups();
       });
   }
+
+  /**
+   * Server-mode fetcher for the Target Group dropdown. Pulls the org from
+   * the form so it stays in sync if the user picks a different org first.
+   */
+  loadGroupsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId = this.announcementForm.get('organisation')?.value;
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.groupService.listGroups(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.groups ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
 
   dateRangeValidator(group: AbstractControl): ValidationErrors | null {
     const start = group.get('startTime')?.value;
@@ -133,13 +173,42 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     return null;
   }
 
+  /**
+   * Fetcher for the server-mode organisation dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations(): void {
-    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
+    const params = { page: DEFAULT_PAGE, limit: 10 };
     this.organisationService
       .listOrganisation(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = response.data.orgs || [];
+          const orgs = response?.data?.orgs ?? [];
+          this.organisations = orgs;
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
         }
         this.cdr.markForCheck();
       })
@@ -152,10 +221,13 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     const orgId = this.announcementForm.get('organisation')?.value;
     if (!orgId) return;
     this.groupService
-      .listGroups({ orgId, page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .listGroups({ orgId, page: DEFAULT_PAGE, limit: 10 })
       .then(res => {
         if (this.globalService.handleSuccessService(res, false)) {
-          this.groups = res.data.groups || [];
+          const groups = res?.data?.groups ?? [];
+          this.groups = groups;
+          this.preloadedGroups = groups;
+          this.preloadedGroupsTotal = res?.data?.count ?? groups.length;
         }
         this.cdr.markForCheck();
       })

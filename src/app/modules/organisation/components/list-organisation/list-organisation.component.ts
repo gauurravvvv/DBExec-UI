@@ -15,8 +15,11 @@ import { debounceTime } from 'rxjs/operators';
 import { ORGANISATION } from 'src/app/constants/routes';
 import { IParams } from 'src/app/core/interfaces/global.interface';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { TranslateService } from '@ngx-translate/core';
 import { OrganisationService } from '../../services/organisation.service';
+
+type OrgSortField = 'name' | 'status' | 'createdOn';
 
 @Component({
   selector: 'app-list-organisation',
@@ -44,6 +47,10 @@ export class ListOrganisationComponent implements OnInit {
   loading = this.organisationService.loading;
 
   selectedOrgs: any[] = [];
+
+  // Multi-column sort helper — click order is precedence. Default (empty chain)
+  // lets BE apply its own default (createdOn DESC). See list-sort.helper.ts.
+  sortHelper = new ListSortHelper<OrgSortField>();
 
   showDeleteConfirm = false;
   orgIdToDelete: string | null = null;
@@ -122,15 +129,23 @@ export class ListOrganisationComponent implements OnInit {
     }
   }
 
+  // Click a sortable header — delegates to the helper, then re-loads page 1
+  // because re-ordering shifts which rows live on which page.
+  toggleSort(field: OrgSortField) {
+    this.sortHelper.toggle(field);
+    this.selectedOrgs = [];
+    if (this.lastTableLazyLoadEvent) {
+      this.lastTableLazyLoadEvent.first = 0;
+      this.loadOrganisations(this.lastTableLazyLoadEvent);
+    }
+  }
+
   loadOrganisations(event: any) {
     const prev = this.lastTableLazyLoadEvent;
-    if (
-      prev &&
-      (prev.first !== event.first ||
-        prev.rows !== event.rows ||
-        prev.sortField !== event.sortField ||
-        prev.sortOrder !== event.sortOrder)
-    ) {
+    if (prev && (prev.first !== event.first || prev.rows !== event.rows)) {
+      // Page or page-size change wipes the cross-page selection — selections aren't
+      // preserved across server-paginated boundaries. Sort changes clear selection
+      // separately in toggleSort().
       this.selectedOrgs = [];
     }
     this.lastTableLazyLoadEvent = event;
@@ -141,6 +156,9 @@ export class ListOrganisationComponent implements OnInit {
       page,
       limit,
     };
+
+    const sortParam = this.sortHelper.serialize();
+    if (sortParam) params.sort = sortParam;
 
     const filter: any = {};
 

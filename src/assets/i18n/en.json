@@ -61,6 +61,7 @@
     "TYPE": "Type",
     "SELECT_RANGE": "Select range",
     "NO_RECORD_FOUND": "No such record found",
+    "TRY_ADJUST_FILTERS": "Try adjusting your filters or clearing them to see all records.",
     "CONFIRM_DELETE": "Confirm Delete",
     "CONFIRM_UPDATE": "Confirm Update",
     "JUSTIFICATION": "Justification",

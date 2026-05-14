@@ -16,7 +16,11 @@
           <div class="dropdown-field" *ngIf="showOrganisationDropdown">
             <app-custom-dropdown
               [(ngModel)]="selectedOrg"
-              [options]="organisations"
+              [serverMode]="true"
+              [fetcher]="loadOrgsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedOrgs"
+              [preloadedTotal]="preloadedOrgsTotal"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
@@ -28,11 +32,15 @@
             </app-custom-dropdown>
           </div>
 
-          <!-- Datasource Dropdown -->
+          <!-- Datasource Dropdown — server-driven -->
           <div class="dropdown-field">
             <app-custom-dropdown
               [(ngModel)]="selectedDatasource"
-              [options]="datasources"
+              [serverMode]="true"
+              [fetcher]="loadDatasourcesPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedDatasources"
+              [preloadedTotal]="preloadedDatasourcesTotal"
               optionLabel="name"
               optionValue="id"
               [filter]="true"
@@ -87,34 +95,80 @@
           [rowsPerPageOptions]="[10, 25, 50, 100]"
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
-          scrollHeight="calc(100vh - 440px)"
-          [tableStyle]="{ 'min-width': '68rem' }"
+          scrollHeight="flex"
+          [tableStyle]="{ 'min-width': '84rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 3rem" pFrozenColumn>
+              <th style="width: 3.5rem; min-width: 3.5rem" pFrozenColumn>
                 <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
               </th>
-              <th style="width: 12rem" pFrozenColumn>
-                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
+              <th
+                style="min-width: 14rem"
+                pFrozenColumn
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('name')"
+                (click)="toggleSort('name')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.NAME' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('name'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('name') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('name') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('name') > 0 && sortHelper.size > 1">{{ sortHelper.index('name') }}</span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 10rem">
+              <th style="min-width: 11rem; width: 11rem">
                 <div class="th-content">{{ 'DASHBOARD.ANALYSIS' | translate }}</div>
               </th>
-              <th style="width: 10rem">
+              <th style="min-width: 11rem; width: 11rem">
                 <div class="th-content">{{ 'DASHBOARD.DATASET' | translate }}</div>
               </th>
-              <th style="width: 10rem">
+              <th style="min-width: 11rem; width: 11rem">
                 <div class="th-content">{{ 'COMMON.DATASOURCE' | translate }}</div>
               </th>
-              <th style="width: 7rem">
-                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
+              <th
+                style="min-width: 9rem; width: 9rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('status')"
+                (click)="toggleSort('status')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.STATUS' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('status'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('status') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('status') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">{{ sortHelper.index('status') }}</span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 10rem">
-                <div class="th-content">{{ 'COMMON.CREATED_ON' | translate }}</div>
+              <th
+                style="min-width: 12rem; width: 12rem"
+                class="sortable-th"
+                [class.is-sorted]="!!sortHelper.direction('createdOn')"
+                (click)="toggleSort('createdOn')"
+              >
+                <div class="th-content">
+                  <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
+                  <span class="sort-indicator">
+                    <i class="pi" [ngClass]="{
+                      'pi-sort-alt': !sortHelper.direction('createdOn'),
+                      'pi-sort-amount-up-alt': sortHelper.direction('createdOn') === 'asc',
+                      'pi-sort-amount-down': sortHelper.direction('createdOn') === 'desc',
+                    }"></i>
+                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
+                  </span>
+                </div>
               </th>
-              <th style="width: 6rem">
-                <div class="th-content">{{ 'COMMON.ACTIONS' | translate }}</div>
+              <th style="width: 7rem; min-width: 7rem">
+                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -219,20 +273,25 @@
               </td>
               <td>
                 <span
-                  class="status-indicator"
+                  class="status-pill"
                   [ngClass]="{
                     active: dashboard.status === 1,
                     inactive: dashboard.status !== 1,
                   }"
                 >
                   <span class="dot"></span>
-                  {{ dashboard.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                  <span class="label">
+                    {{ dashboard.status === 1 ? ('COMMON.ACTIVE' | translate) : ('COMMON.INACTIVE' | translate) }}
+                  </span>
                 </span>
               </td>
               <td>
-                <span class="date-text">{{
-                  dashboard.createdOn | date: 'medium'
-                }}</span>
+                <span
+                  class="date-text"
+                  [title]="dashboard.createdOn | date: 'dd MMM yyyy, HH:mm:ss'"
+                >
+                  {{ dashboard.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+                </span>
               </td>
               <td>
                 <div class="row-actions">
@@ -249,9 +308,19 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="8" class="empty-message-cell text-center">
-                {{ 'DASHBOARD.NO_DASHBOARDS_FOUND' | translate }}
+            <tr class="empty-row">
+              <td colspan="8" class="empty-message-cell">
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <i class="pi pi-inbox"></i>
+                  </div>
+                  <div class="empty-title">
+                    {{ 'DASHBOARD.NO_DASHBOARDS_FOUND' | translate }}
+                  </div>
+                  <div class="empty-subtitle" *ngIf="isFilterActive">
+                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                  </div>
+                </div>
               </td>
             </tr>
           </ng-template>

@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { DATASOURCE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -30,6 +30,8 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
 
   datasourceForm!: FormGroup;
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   private _showOrganisationDropdown = false;
   showPassword: boolean = false;
 
@@ -122,15 +124,44 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  /**
+   * Fetcher for the server-mode organisation dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations(): void {
     if (this.showOrganisationDropdown) {
       const params = {
         page: DEFAULT_PAGE,
-        limit: MAX_LIMIT,
+        limit: 10,
       };
       this.organisationService.listOrganisation(params).then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = [...response.data.orgs];
+          const orgs = response?.data?.orgs ?? [];
+          this.organisations = [...orgs];
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
           this.cdr.markForCheck();
         }
       });

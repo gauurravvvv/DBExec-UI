@@ -19,7 +19,7 @@ import { Store } from '@ngrx/store';
 import { MessageService } from 'primeng/api';
 import { Observable, Subject } from 'rxjs';
 import { debounceTime, first } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
@@ -131,10 +131,14 @@ export class AddDatasetComponent
 
   // Organisation Management
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   selectedOrg: any = {};
   userRole: string = '';
   showOrganisationDropdown: boolean = false;
   availableDatasources: any[] = [];
+  preloadedDatasources: any[] | null = null;
+  preloadedDatasourcesTotal: number | null = null;
   selectedDatasourceObj: any = null;
 
   // Database Schema Management
@@ -272,17 +276,46 @@ export class AddDatasetComponent
     document.addEventListener('click', this.boundCloseContextMenu);
   }
 
+  /**
+   * Fetcher for the server-mode organisation dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations(): void {
     const params = {
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.organisationService
       .listOrganisation(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = [...response.data.orgs];
+          const orgs = response?.data?.orgs ?? [];
+          this.organisations = [...orgs];
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
           if (this.organisations.length > 0) {
             this.selectedOrg = this.organisations[0];
             this.loadDatasources();
@@ -345,7 +378,7 @@ export class AddDatasetComponent
     const params = {
       orgId: this.selectedOrg.id,
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.datasourceService
@@ -353,7 +386,10 @@ export class AddDatasetComponent
       .then(response => {
         this.isLoadingDatasources = false;
         if (this.globalService.handleSuccessService(response, false)) {
-          this.availableDatasources = response.data.datasources || [];
+          const items = response?.data?.datasources ?? [];
+          this.preloadedDatasources = items;
+          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
+          this.availableDatasources = items;
 
           // Auto-select the first database and load its schema
           if (this.availableDatasources.length > 0) {
@@ -369,6 +405,36 @@ export class AddDatasetComponent
       });
   }
 
+  /**
+   * Fetcher for the server-mode datasource dropdown. Pulls orgId from
+   * selectedOrg (which is the full object in this component).
+   */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.selectedOrg?.id) return { items: [], total: 0 };
+    const params: any = { orgId: this.selectedOrg.id, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   refreshDatasources(): void {
     // Collapse all expanded datasources
     this.expandedDatasources = {};
@@ -381,6 +447,8 @@ export class AddDatasetComponent
 
     // Clear the datasources array for IntelliSense
     this.datasources = [];
+    this.preloadedDatasources = null;
+    this.preloadedDatasourcesTotal = null;
 
     // Reload the database list
     this.loadDatasources();
@@ -466,6 +534,8 @@ export class AddDatasetComponent
 
     // Clear existing data
     this.availableDatasources = [];
+    this.preloadedDatasources = null;
+    this.preloadedDatasourcesTotal = null;
     this.selectedDatasourceObj = null;
     this.datasourceSchemas = {};
     this.expandedDatasources = {};

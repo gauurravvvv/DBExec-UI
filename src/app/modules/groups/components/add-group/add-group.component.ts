@@ -32,8 +32,13 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
 
   userGroupForm!: FormGroup;
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   roles: any[] = [];
   users: any[] = [];
+  // Server-mode preload for the Role dropdown. Refilled on org change.
+  preloadedRoles: any[] | null = null;
+  preloadedRolesTotal: number | null = null;
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
 
@@ -102,6 +107,10 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
         );
         this.roles = [];
         this.users = [];
+        // Clear the role dropdown's seed so the next open re-fetches roles for
+        // the newly selected org rather than serving stale options.
+        this.preloadedRoles = null;
+        this.preloadedRolesTotal = null;
         if (value) {
           this.loadRoles();
           this.loadUsers();
@@ -109,11 +118,71 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
+  /**
+   * Server-mode fetcher for the Role dropdown. Reads the currently selected
+   * org from the form so it stays in sync if the user changes it.
+   */
+  loadRolesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId = this.userGroupForm.get('organisation')?.value;
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { page, limit };
+    if (search) params.filter = { name: search };
+    try {
+      const res: any = await this.roleService.listRoles(orgId, params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        // Active roles only — matches the original loadRoles() filter.
+        const all = res?.data?.roles ?? [];
+        const active = all.filter((r: any) => r.status === 1);
+        return { items: active, total: res?.data?.count ?? active.length };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Fetcher for the server-mode organisation dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations() {
-    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
+    const params = { page: DEFAULT_PAGE, limit: 10 };
     this.organisationService.listOrganisation(params).then(response => {
       if (this.globalService.handleSuccessService(response, false)) {
-        this.organisations = response.data.orgs || [];
+        const orgs = response?.data?.orgs ?? [];
+        this.organisations = orgs;
+        this.preloadedOrgs = orgs;
+        this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
       }
       this.cdr.markForCheck();
     });
@@ -124,12 +193,14 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     if (!orgId) return;
 
     this.roleService
-      .listRoles(orgId, { page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .listRoles(orgId, { page: DEFAULT_PAGE, limit: 10 })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.roles = (response.data.roles || []).filter(
-            (r: any) => r.status === 1,
-          );
+          const all = response?.data?.roles ?? [];
+          const active = all.filter((r: any) => r.status === 1);
+          this.roles = active;
+          this.preloadedRoles = active;
+          this.preloadedRolesTotal = response?.data?.count ?? active.length;
         }
         this.cdr.markForCheck();
       });

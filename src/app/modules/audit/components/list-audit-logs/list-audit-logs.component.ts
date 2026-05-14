@@ -10,12 +10,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants/global';
+import { DEFAULT_PAGE } from 'src/app/constants/global';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
+import { ListSortHelper } from 'src/app/shared/helpers/list-sort.helper';
 import { TranslateService } from '@ngx-translate/core';
 import { AuditService } from '../../services/audit.service';
+
+type AuditLogSortField = 'action' | 'createdOn';
 
 @Component({
   selector: 'app-list-audit-logs',
@@ -37,6 +40,7 @@ export class ListAuditLogsComponent implements OnInit {
   loading = this.auditService.logsLoading;
 
   lastTableLazyLoadEvent: any;
+  sortHelper = new ListSortHelper<AuditLogSortField>();
 
   showDetailDialog = false;
   selectedLog: any = null;
@@ -44,6 +48,8 @@ export class ListAuditLogsComponent implements OnInit {
   isSystemAdmin = false;
   organisations: any[] = [];
   organisationOptions: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   today = new Date();
 
   filterValues: any = {
@@ -104,19 +110,48 @@ export class ListAuditLogsComponent implements OnInit {
       });
   }
 
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        const orgs = (res?.data?.orgs ?? []).filter(
+          (o: any) => o.isDefault !== 1,
+        );
+        return { items: orgs, total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations() {
     this.organisationService
-      .listOrganisation({ page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
       .then((res: any) => {
         if (this.globalService.handleSuccessService(res, false)) {
-          this.organisations = res.data.orgs || [];
+          this.organisations = res?.data?.orgs ?? [];
           // Only show non-default organisations (exclude super org)
-          this.organisationOptions = this.organisations
-            .filter((org: any) => org.isDefault !== 1)
-            .map((org: any) => ({
-              label: org.name,
-              value: org.id,
-            }));
+          const filtered = this.organisations.filter(
+            (org: any) => org.isDefault !== 1,
+          );
+          this.organisationOptions = filtered.map((org: any) => ({
+            label: org.name,
+            value: org.id,
+          }));
+          this.preloadedOrgs = filtered;
+          this.preloadedOrgsTotal = res?.data?.count ?? filtered.length;
           // Do not auto-select — let user pick an organisation
         }
       })
@@ -391,6 +426,14 @@ export class ListAuditLogsComponent implements OnInit {
       });
   }
 
+  toggleSort(field: AuditLogSortField) {
+    this.sortHelper.toggle(field);
+    if (this.lastTableLazyLoadEvent) {
+      this.lastTableLazyLoadEvent.first = 0;
+      this.loadLogs(this.lastTableLazyLoadEvent);
+    }
+  }
+
   loadLogs(event: any) {
     this.lastTableLazyLoadEvent = event;
     const page = event.first / event.rows + 1;
@@ -400,6 +443,10 @@ export class ListAuditLogsComponent implements OnInit {
     if (Object.keys(filter).length > 0) {
       params.filter = JSON.stringify(filter);
     }
+
+    const sortParam = this.sortHelper.serialize();
+    if (sortParam) params.sort = sortParam;
+
     this.auditService.loadAuditLogs(params);
   }
 }

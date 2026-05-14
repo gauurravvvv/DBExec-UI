@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { ANNOUNCEMENT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -39,7 +39,14 @@ export class ListAnnouncementsComponent implements OnInit {
   saving = this.announcementService.saving;
 
   organisations: any[] = [];
+  // Server-mode preload for the Organisation toolbar dropdown.
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   groups: any[] = [];
+  // Server-mode preload for the Group filter dropdown. Cleared whenever
+  // selectedOrg changes since groups are org-scoped.
+  preloadedGroups: any[] | null = null;
+  preloadedGroupsTotal: number | null = null;
   selectedOrg: any = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
@@ -101,13 +108,42 @@ export class ListAnnouncementsComponent implements OnInit {
     }
   }
 
+  /**
+   * Fetcher for the server-mode organisation toolbar dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations(): void {
-    const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
+    const params = { page: DEFAULT_PAGE, limit: 10 };
     this.organisationService
       .listOrganisation(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = [...response.data.orgs];
+          const orgs = response?.data?.orgs ?? [];
+          this.organisations = [...orgs];
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
           if (this.organisations.length > 0) {
             this.selectedOrg = this.organisations[0].id;
             this.loadGroups();
@@ -123,17 +159,50 @@ export class ListAnnouncementsComponent implements OnInit {
       });
   }
 
+  /**
+   * Server-mode fetcher for the Group filter dropdown. Gated on selectedOrg
+   * — without it, the BE call would 4xx or return cross-org noise.
+   */
+  loadGroupsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.selectedOrg) return { items: [], total: 0 };
+    const params: any = { orgId: this.selectedOrg, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.groupService.listGroups(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.groups ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadGroups(): void {
     if (!this.selectedOrg) return;
     this.groupService
       .listGroups({
         orgId: this.selectedOrg,
         page: DEFAULT_PAGE,
-        limit: MAX_LIMIT,
+        limit: 10,
       })
       .then(res => {
         if (this.globalService.handleSuccessService(res, false)) {
-          this.groups = res.data.groups || [];
+          const groups = res?.data?.groups ?? [];
+          this.groups = groups;
+          this.preloadedGroups = groups;
+          this.preloadedGroupsTotal = res?.data?.count ?? groups.length;
         }
         this.cdr.markForCheck();
       })
@@ -146,6 +215,10 @@ export class ListAnnouncementsComponent implements OnInit {
     this.selectedOrg = orgId;
     this.filterValues.targetGroupId = null;
     this.groups = [];
+    // Force the next dropdown open to re-fetch against the new org rather
+    // than serving the previous org's seed.
+    this.preloadedGroups = null;
+    this.preloadedGroupsTotal = null;
     this.loadGroups();
     this.loadAnnouncements();
   }

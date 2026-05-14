@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { RLS_RULE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -43,6 +43,8 @@ export class ListRlsRuleComponent implements OnInit {
   saving = this.rlsRulesService.saving;
 
   datasources: any[] = [];
+  preloadedDatasources: any[] | null = null;
+  preloadedDatasourcesTotal: number | null = null;
   selectedDatasource: any = null;
   selectedOrg: any = null;
 
@@ -51,6 +53,8 @@ export class ListRlsRuleComponent implements OnInit {
   deleteJustification = '';
 
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   userRole = this.globalService.getTokenDetails('role');
   showOrganisationDropdown = this.userRole === ROLES.SYSTEM_ADMIN;
 
@@ -102,16 +106,40 @@ export class ListRlsRuleComponent implements OnInit {
     }
   }
 
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations(): Promise<void> {
     return new Promise(resolve => {
-      const params = { page: DEFAULT_PAGE, limit: MAX_LIMIT };
       this.organisationService
-        .listOrganisation(params)
+        .listOrganisation({ page: DEFAULT_PAGE, limit: 10 })
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.organisations = response.data.orgs || [];
-            if (this.organisations.length > 0) {
-              this.selectedOrg = this.organisations[0].id;
+            const orgs = response?.data?.orgs ?? [];
+            this.preloadedOrgs = orgs;
+            this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
+            if (orgs.length > 0) {
+              this.selectedOrg = orgs[0].id;
               this.loadDatasources();
             } else {
               this.selectedOrg = null;
@@ -132,8 +160,40 @@ export class ListRlsRuleComponent implements OnInit {
   onOrgChange(orgId: any) {
     this.selectedOrg = orgId;
     this.selectedDatasource = null;
+    this.preloadedDatasources = null;
+    this.preloadedDatasourcesTotal = null;
     this.loadDatasources();
   }
+
+  /**
+   * Fetcher for the server-mode datasource dropdown. Org-scoped — no-ops
+   * gracefully if no org is selected.
+   */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.selectedOrg) return { items: [], total: 0 };
+    const params: any = { orgId: this.selectedOrg, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
 
   loadDatasources(): Promise<void> {
     return new Promise(resolve => {
@@ -143,14 +203,18 @@ export class ListRlsRuleComponent implements OnInit {
       }
       const params = {
         orgId: this.selectedOrg,
-        pageNumber: DEFAULT_PAGE,
-        limit: MAX_LIMIT,
+        page: DEFAULT_PAGE,
+        limit: 10,
       };
       this.datasourceService
         .listDatasource(params)
         .then(response => {
           if (this.globalService.handleSuccessService(response, false)) {
-            this.datasources = response.data.datasources || [];
+            const items = response?.data?.datasources ?? [];
+            this.preloadedDatasources = items;
+            this.preloadedDatasourcesTotal =
+              response?.data?.count ?? items.length;
+            this.datasources = items;
             if (this.datasources.length > 0) {
               this.selectedDatasource = this.datasources[0].id;
               this.loadRules();

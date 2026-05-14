@@ -36,11 +36,15 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
   sectionForm!: FormGroup;
   showPassword = false;
   organisations: any[] = [];
+  preloadedOrgs: any[] | null = null;
+  preloadedOrgsTotal: number | null = null;
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
   selectedOrg: any = null;
   selectedDatasource: any = null;
   datasources: any[] = [];
+  preloadedDatasources: any[] | null = null;
+  preloadedDatasourcesTotal: number | null = null;
   tabs: any[] = [];
   hasDuplicates: boolean = false;
   duplicateRows: { [key: string]: Array<[number, number]> } = {};
@@ -308,17 +312,46 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     );
   }
 
+  /**
+   * Fetcher for the server-mode organisation dropdown.
+   */
+  loadOrgsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any =
+        await this.organisationService.listOrganisation(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadOrganisations() {
     const params = {
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.organisationService
       .listOrganisation(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.organisations = [...response.data.orgs];
+          const orgs = response?.data?.orgs ?? [];
+          this.organisations = [...orgs];
+          this.preloadedOrgs = orgs;
+          this.preloadedOrgsTotal = response?.data?.count ?? orgs.length;
         }
         this.cdr.markForCheck();
       })
@@ -388,6 +421,8 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
       id: event.value,
     };
     this.selectedDatasource = null;
+    this.preloadedDatasources = null;
+    this.preloadedDatasourcesTotal = null;
 
     this.sectionForm.get('datasource')?.setValue('');
 
@@ -400,14 +435,17 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
     const params = {
       orgId: this.selectedOrg.id,
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.datasourceService
       .listDatasource(params)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.datasources = [...(response.data.datasources || [])];
+          const items = response?.data?.datasources ?? [];
+          this.preloadedDatasources = items;
+          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
+          this.datasources = [...items];
         }
         this.cdr.markForCheck();
       })
@@ -415,6 +453,36 @@ export class AddSectionComponent implements OnInit, HasUnsavedChanges {
         this.cdr.markForCheck();
       });
   }
+
+  /**
+   * Fetcher for the server-mode datasource dropdown. Pulls orgId from
+   * selectedOrg (object-wrapped in this component).
+   */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    if (!this.selectedOrg?.id) return { items: [], total: 0 };
+    const params: any = { orgId: this.selectedOrg.id, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
 
   onDatasourceChange(event: any) {
     if (event.value) {

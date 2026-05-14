@@ -161,42 +161,50 @@ $radius-sm: 8px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.04em;
-        padding: 0.75rem 1rem;
+        padding: 0.85rem 1rem;
+        height: 48px;
         border-bottom: 1px solid var(--border-color);
+        white-space: nowrap;
 
         .th-content {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-
-          &.centered-header {
-            justify-content: center;
-          }
+          gap: 0.4rem;
+          line-height: 1;
+          &.centered-header { justify-content: center; }
+          &.actions-th { justify-content: flex-end; }
         }
 
-        &:first-child {
-          padding-left: 2rem;
-        }
-        &:last-child {
-          padding-right: 2rem;
-        }
+        &:first-child { padding-left: 2rem; }
+        &:last-child { padding-right: 2rem; }
+        &:focus { box-shadow: none; }
 
-        &:focus {
-          box-shadow: none;
-        }
+        &.sortable-th {
+          cursor: pointer;
+          user-select: none;
+          transition: background-color 0.15s ease, color 0.15s ease;
 
-        &.p-highlight {
-          color: var(--primary-color);
-          opacity: 1;
-          .p-sortable-column-icon {
-            color: var(--primary-color);
+          &:hover { background: var(--border-color); .sort-indicator .pi { color: var(--primary-color); } }
+          &.is-sorted { color: var(--primary-color); background: var(--primary-color-transparent); .sort-indicator .pi { color: var(--primary-color); } }
+          &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: -2px; }
+
+          .sort-indicator {
+            display: inline-flex; align-items: center; gap: 0.25rem; margin-left: 0.35rem;
+            .pi { font-size: 0.75rem; color: var(--secondary-color); transition: color 0.15s ease; }
+            .sort-badge {
+              display: inline-flex; align-items: center; justify-content: center;
+              min-width: 1rem; height: 1rem; padding: 0 0.25rem; border-radius: 999px;
+              background: var(--primary-color); color: var(--primary-text);
+              font-size: 0.65rem; font-weight: 700; line-height: 1;
+            }
           }
         }
       }
 
       // Filter row
       .p-datatable-thead > tr:last-child > th {
-        padding: 0.5rem 0.75rem;
+        padding: 0.6rem 0.75rem;
+        height: 56px;
         background: var(--card-background);
         border-bottom: 1px solid var(--border-color);
 
@@ -228,59 +236,53 @@ $radius-sm: 8px;
       // Body Rows
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: all 0.15s ease;
+        transition: background-color 0.15s ease, box-shadow 0.15s ease;
         border-bottom: 1px solid var(--border-color);
+        position: relative;
 
         td {
-          padding: 0.75rem 1rem;
+          padding: 0.875rem 1rem;
+          height: 56px;
           vertical-align: middle;
           color: var(--text-color);
-          font-size: 0.9rem;
+          font-size: 0.925rem;
+          line-height: 1.45;
 
-          &:first-child {
-            padding-left: 2rem;
-          }
-          &:last-child {
-            padding-right: 2rem;
-          }
+          &:first-child { padding-left: 2rem; }
+          &:last-child { padding-right: 2rem; }
         }
 
-        // Row Hover Effect
         &:hover {
           background-color: var(--hover-background) !important;
+          td:first-child { box-shadow: inset 3px 0 0 0 var(--primary-color); }
+          .row-actions { opacity: 1; }
+        }
+      }
 
-          // Show actions on hover (optional, here we keep them visible but highlighted)
-          .row-actions {
-            opacity: 1;
-          }
+      .p-frozen-column {
+        background: inherit;
+        &.p-frozen-column-end,
+        &:has(+ :not(.p-frozen-column)) {
+          box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.08);
         }
       }
 
       // Link Style
       .dataset-name-link {
-        color: var(--text-color);
-        font-weight: 600;
-        font-size: 0.95rem;
-        text-decoration: none;
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
+        color: var(--text-color); font-weight: 600; font-size: 0.95rem;
+        text-decoration: none; display: block; white-space: nowrap;
+        overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+        border-radius: 4px; padding: 2px 0;
 
-        &:hover {
-          color: var(--primary-color);
-        }
+        &:hover { color: var(--primary-color); }
+        &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
       }
 
       // Description
       .description-text {
-        color: var(--secondary-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        max-width: 100%;
+        color: var(--secondary-color); white-space: nowrap;
+        overflow: hidden; text-overflow: ellipsis; display: block; max-width: 100%;
+        &.is-truncatable { cursor: help; }
       }
 
       .date-text {
@@ -305,28 +307,17 @@ $radius-sm: 8px;
         white-space: nowrap;
       }
 
-      .status-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-        font-weight: 500;
-        white-space: nowrap;
+      .status-pill {
+        display: inline-flex; align-items: center; gap: 0.45rem;
+        padding: 0.25rem 0.65rem; border-radius: 999px;
+        font-size: 0.8rem; font-weight: 600; line-height: 1.2;
+        white-space: nowrap; border: 1px solid transparent;
 
-        .dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: currentColor;
-        }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+        .label { letter-spacing: 0.01em; }
 
-        &.active {
-          color: var(--success-color);
-        }
-
-        &.inactive {
-          color: var(--secondary-color);
-        }
+        &.active { color: var(--success-color); background: var(--success-bg, rgba(34, 197, 94, 0.08)); border-color: var(--success-color); }
+        &.inactive { color: var(--secondary-color); background: var(--hover-background); border-color: var(--border-color); }
       }
 
       // Row Actions
@@ -372,7 +363,10 @@ $radius-sm: 8px;
         background: var(--card-background);
         border-top: 1px solid var(--border-color);
         justify-content: flex-end;
-        padding: 1rem 1.5rem;
+        padding: 0.85rem 1.5rem;
+        gap: 0.25rem;
+
+        .p-paginator-current { color: var(--secondary-color); font-size: 0.85rem; font-weight: 500; margin-right: 0.75rem; }
 
         .p-paginator-page,
         .p-paginator-next,
@@ -381,36 +375,48 @@ $radius-sm: 8px;
         .p-paginator-last {
           border-radius: 6px;
           color: var(--secondary-color);
-          min-width: 2rem;
-          height: 2rem;
+          min-width: 2.25rem;
+          height: 2.25rem;
           margin: 0 0.125rem;
           font-weight: 500;
+          transition: background-color 0.15s ease, color 0.15s ease;
 
-          &:hover {
-            background: var(--hover-background);
-            color: var(--text-color);
-          }
-
-          &.p-highlight {
-            background: var(--primary-color);
-            color: var(--primary-text);
-          }
+          &:hover { background: var(--hover-background); color: var(--text-color); }
+          &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+          &.p-highlight { background: var(--primary-color); color: var(--primary-text); }
         }
+
+        .p-dropdown { height: 2.25rem; border-radius: 6px; }
       }
     }
   }
 }
 
 // 4. Empty State
-td.text-center {
-  text-align: center;
-}
+td.text-center { text-align: center; }
 
 td.empty-message-cell {
   text-align: center;
-  padding: 2rem !important;
+  padding: 3.5rem 2rem !important;
   color: var(--secondary-color);
   font-size: 0.95rem;
+  background: var(--card-background) !important;
+
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0.65rem; max-width: 28rem; margin: 0 auto;
+
+    .empty-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--hover-background);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 0.5rem;
+      i { font-size: 1.5rem; color: var(--secondary-color); opacity: 0.7; }
+    }
+
+    .empty-title { font-size: 1rem; font-weight: 600; color: var(--text-color); }
+    .empty-subtitle { font-size: 0.875rem; color: var(--secondary-color); line-height: 1.5; }
+  }
 }
 
 // 5. Popups & Modals
