@@ -101,13 +101,18 @@
           >
           </app-custom-input>
 
-          <!-- Section dropdown -->
+          <!-- Section dropdown — server-driven -->
           <div class="form-field">
             <app-custom-dropdown
               formControlName="section"
               [label]="'COMMON.SECTION' | translate"
               [placeholder]="'COMMON.SELECT_SECTION' | translate"
-              [options]="sections"
+              [serverMode]="true"
+              [fetcher]="loadSectionsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedSections"
+              [preloadedTotal]="preloadedSectionsTotal"
+              [resolveSelected]="resolveSelectedSection"
               optionLabel="name"
               optionValue="id"
               [filter]="true"

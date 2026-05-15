@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { PROMPT } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -40,6 +40,8 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   selectedTabName: string = '';
   sectionData: any = null;
   sections: any[] = [];
+  preloadedSections: any[] | null = null;
+  preloadedSectionsTotal: number | null = null;
   isCancelClicked = false;
   showSaveConfirm = false;
   saveJustification = '';
@@ -138,19 +140,74 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
+  /**
+   * Fetcher for the server-mode section dropdown. Gated on the prompt's
+   * orgId + tabId (loaded via loadPromptData).
+   */
+  loadSectionsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const tabId = this.sectionData?.section?.tab?.id;
+    const orgId = this.sectionData?.organisationId;
+    if (!orgId || !tabId) return { items: [], total: 0 };
+    const params: any = {
+      orgId,
+      tabId,
+      page,
+      limit,
+    };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.sectionService.listSection(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.sections ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Resolves the prompt's currently-stored sectionId for label rendering when
+   * the value isn't in the first page of fetched sections.
+   */
+  resolveSelectedSection = async (id: string): Promise<any> => {
+    try {
+      const orgId = this.sectionData?.organisationId || this.orgId;
+      const res: any = await this.sectionService.viewSection(orgId, id);
+      return res?.data ?? null;
+    } catch {
+      return null;
+    }
+  };
+
   loadSectionData() {
     const param = {
       orgId: this.sectionData.organisationId,
       tabId: this.sectionData.section.tab.id,
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
     this.sectionService
       .listSection(param)
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.sections = response.data.sections ?? response.data ?? [];
+          const items = response?.data?.sections ?? [];
+          this.sections = items;
+          this.preloadedSections = items;
+          this.preloadedSectionsTotal = response?.data?.count ?? items.length;
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.cdr.markForCheck();

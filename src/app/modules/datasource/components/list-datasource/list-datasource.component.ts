@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { DATASOURCE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
 import { GlobalService } from 'src/app/core/services/global.service';

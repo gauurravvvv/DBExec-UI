@@ -16,7 +16,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { RLS_RULE } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -58,6 +58,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   datasets: any[] = [];
+  preloadedDatasets: any[] | null = null;
+  preloadedDatasetsTotal: number | null = null;
   datasetColumns: any[] = [];
   columnValuesCache: {
     [columnName: string]: { label: string; value: string }[];
@@ -148,6 +150,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
           this.preloadedDatasources = null;
           this.preloadedDatasourcesTotal = null;
           this.datasets = [];
+          this.preloadedDatasets = null;
+          this.preloadedDatasetsTotal = null;
           this.datasetColumns = [];
           this.columnValuesCache = {};
           this.isLoadingColumnValues = {};
@@ -301,6 +305,10 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   onDatasourceChange(datasourceId: string) {
     this.selectedDatasource = datasourceId;
     this.datasets = [];
+    // Dataset dropdown is datasource-scoped — clear preload so the next open
+    // re-fetches under the new datasource.
+    this.preloadedDatasets = null;
+    this.preloadedDatasetsTotal = null;
     this.datasetColumns = [];
     this.columnValuesCache = {};
     this.isLoadingColumnValues = {};
@@ -311,6 +319,41 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  /**
+   * Fetcher for the server-mode dataset dropdown. Gated on org + datasource.
+   */
+  loadDatasetsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId = this.rlsForm.get('organisation')?.value;
+    if (!orgId || !this.selectedDatasource) return { items: [], total: 0 };
+    const params: any = {
+      orgId,
+      datasourceId: this.selectedDatasource,
+      page,
+      limit,
+    };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasetService.listDatasets(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        return {
+          items: res?.data?.datasets ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadDatasets() {
     const orgId = this.rlsForm.get('organisation')?.value;
     if (!orgId || !this.selectedDatasource) return;
@@ -319,14 +362,17 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       orgId,
       datasourceId: this.selectedDatasource,
       page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
+      limit: 10,
     };
 
     this.datasetService
       .listDatasets(params)
       .then((response: any) => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.datasets = response.data.datasets || [];
+          const items = response?.data?.datasets ?? [];
+          this.datasets = items;
+          this.preloadedDatasets = items;
+          this.preloadedDatasetsTotal = response?.data?.count ?? items.length;
         } else {
           this.datasets = [];
         }

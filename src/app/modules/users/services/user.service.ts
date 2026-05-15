@@ -47,6 +47,31 @@ export class UserService {
     }
   }
 
+  /**
+   * Bulk-add validate — uploads a CSV and gets back a split of valid + invalid
+   * rows. No users are created at this stage. The FE shows the breakdown to
+   * the admin and then calls bulkAddCommit() with the valid rows.
+   */
+  async bulkAddValidate(file: File, orgId: string): Promise<any> {
+    const form = new FormData();
+    form.append('file', file);
+    form.append('orgId', orgId);
+    return lastValueFrom(this.http.apiPost(USER.BULK_ADD_VALIDATE, form));
+  }
+
+  /**
+   * Bulk-add commit — creates the previously-validated users. Pass the
+   * `valid[]` array from the validate response verbatim.
+   */
+  async bulkAddCommit(orgId: string, users: any[]): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(USER.BULK_ADD_COMMIT, {
+        organisation: orgId,
+        users,
+      }),
+    );
+  }
+
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {

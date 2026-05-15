@@ -390,6 +390,10 @@ export class ListUserComponent implements OnInit {
     this.router.navigate([USER.ADD]);
   }
 
+  onOpenBulkAdd() {
+    this.router.navigate([USER.BULK_ADD]);
+  }
+
   onUnlock(id: string) {
     this.userService.unlock(this.selectedOrg, id).then((res: any) => {
       if (this.globalService.handleSuccessService(res)) {

@@ -1,0 +1,304 @@
+<div class="bulk-add-wrapper">
+  <div class="bulk-add-container">
+    <!-- Header Section — matches add-user exactly -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/users"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'USER.BULK_ADD_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <!-- Stage: idle — Cancel + Validate -->
+        <ng-container *ngIf="stage === 'idle'">
+          <button
+            pButton
+            type="button"
+            [label]="'COMMON.CANCEL' | translate"
+            class="p-button-outlined btn-cancel"
+            (click)="onCancel()"
+          ></button>
+          <button
+            pButton
+            class="p-button-primary btn-save"
+            type="button"
+            [label]="'USER.BULK_ADD_VALIDATE_BTN' | translate"
+            (click)="onValidateAndUpload()"
+          >
+            <i class="pi pi-check mr-2"></i>
+          </button>
+        </ng-container>
+
+        <!-- Stage: confirming — Back + Proceed -->
+        <ng-container *ngIf="stage === 'confirming' && validateRes">
+          <button
+            pButton
+            type="button"
+            [label]="'USER.BULK_ADD_BACK' | translate"
+            class="p-button-outlined btn-cancel"
+            (click)="onResetForAnother()"
+          ></button>
+          <button
+            pButton
+            class="p-button-primary btn-save"
+            type="button"
+            [label]="'USER.BULK_ADD_PROCEED' | translate"
+            [disabled]="validateRes.summary.valid === 0"
+            (click)="onConfirmProceed()"
+          >
+            <i class="pi pi-arrow-right mr-2"></i>
+          </button>
+        </ng-container>
+
+        <!-- Stage: done — Add more + Back to users -->
+        <ng-container *ngIf="stage === 'done' && commitRes">
+          <button
+            pButton
+            type="button"
+            [label]="'USER.BULK_ADD_ADD_MORE' | translate"
+            class="p-button-outlined btn-cancel"
+            (click)="onResetForAnother()"
+          ></button>
+          <button
+            pButton
+            class="p-button-primary btn-save"
+            type="button"
+            [label]="'USER.BULK_ADD_BACK_TO_USERS' | translate"
+            (click)="onClose()"
+          >
+            <i class="pi pi-check mr-2"></i>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Scrolling form column — matches add-user .admin-form pattern -->
+    <div class="bulk-form">
+      <!-- Stage: idle -->
+      <ng-container *ngIf="stage === 'idle'">
+        <div class="form-grid">
+          <!-- Org dropdown — sys-admin only -->
+          <div class="form-field" *ngIf="showOrgDropdown">
+            <label>
+              {{ 'COMMON.ORGANISATION' | translate }}
+              <span class="required">*</span>
+            </label>
+            <app-custom-dropdown
+              [(ngModel)]="selectedOrgId"
+              [serverMode]="true"
+              [fetcher]="loadOrgsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedOrgs"
+              [preloadedTotal]="preloadedOrgsTotal"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              filterBy="name"
+              [placeholder]="'USER.SELECT_ORGANISATION' | translate"
+              [showError]="validationAttempted && !selectedOrgId"
+              [errorMessage]="'USER.ORGANISATION_REQUIRED' | translate"
+              (onChangeEvent)="onOrgChange($event)"
+            ></app-custom-dropdown>
+          </div>
+
+          <!-- Template download -->
+          <div class="form-field">
+            <div class="template-row">
+              <div class="template-text">
+                <strong>{{ 'USER.BULK_ADD_NEED_TEMPLATE' | translate }}</strong>
+                <small>{{ 'USER.BULK_ADD_TEMPLATE_HINT' | translate }}</small>
+              </div>
+              <button
+                class="link-btn"
+                type="button"
+                (click)="downloadTemplate()"
+              >
+                <i class="pi pi-download"></i>
+                {{ 'USER.BULK_ADD_DOWNLOAD_TEMPLATE' | translate }}
+              </button>
+            </div>
+          </div>
+
+          <!-- File picker -->
+          <div class="form-field">
+            <label>
+              {{ 'USER.BULK_ADD_CSV_FILE' | translate }}
+              <span class="required">*</span>
+            </label>
+            <div class="file-picker" [class.disabled]="!selectedOrgId">
+              <label
+                class="file-picker-label"
+                [class.is-disabled]="!selectedOrgId"
+              >
+                <i class="pi pi-file-import"></i>
+                <span *ngIf="!selectedOrgId">
+                  {{ 'USER.BULK_ADD_PICK_ORG_FIRST' | translate }}
+                </span>
+                <span *ngIf="selectedOrgId && !pickedFile">
+                  {{ 'USER.BULK_ADD_PICK_FILE' | translate }}
+                  <span class="browse-link">
+                    {{ 'USER.BULK_ADD_BROWSE' | translate }}
+                  </span>
+                </span>
+                <span *ngIf="selectedOrgId && pickedFile" class="file-name">
+                  {{ pickedFile.name }}
+                </span>
+                <input
+                  #fileInput
+                  type="file"
+                  accept=".csv,text/csv"
+                  (change)="onFilePicked($event)"
+                  [disabled]="!selectedOrgId"
+                  hidden
+                />
+              </label>
+              <small class="file-error" *ngIf="fileError">{{ fileError }}</small>
+              <small
+                class="error-text"
+                *ngIf="
+                  !fileError &&
+                  validationAttempted &&
+                  selectedOrgId &&
+                  !pickedFile
+                "
+              >
+                {{ 'USER.BULK_ADD_FILE_REQUIRED' | translate }}
+              </small>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <ul class="info-list">
+            <li>
+              <i class="pi pi-info-circle"></i>
+              <span>{{ 'USER.BULK_ADD_LIMIT_HINT' | translate }}</span>
+            </li>
+            <li>
+              <i class="pi pi-info-circle"></i>
+              <span>{{ 'USER.BULK_ADD_GROUP_HINT' | translate }}</span>
+            </li>
+          </ul>
+        </div>
+      </ng-container>
+
+      <!-- Stage: validating -->
+      <ng-container *ngIf="stage === 'validating'">
+        <div class="busy-state">
+          <div class="spinner">
+            <i class="pi pi-spin pi-spinner"></i>
+          </div>
+          <p>{{ 'USER.BULK_ADD_VALIDATING' | translate }}</p>
+        </div>
+      </ng-container>
+
+      <!-- Stage: confirming -->
+      <ng-container *ngIf="stage === 'confirming' && validateRes">
+        <div class="form-grid">
+          <div class="summary-cards">
+            <div class="summary-tile total">
+              <span class="num">{{ validateRes.summary.total }}</span>
+              <span class="lbl">{{ 'USER.BULK_ADD_TOTAL_ROWS' | translate }}</span>
+            </div>
+            <div class="summary-tile success" *ngIf="validateRes.summary.valid > 0">
+              <span class="num">{{ validateRes.summary.valid }}</span>
+              <span class="lbl">{{ 'USER.BULK_ADD_VALID' | translate }}</span>
+            </div>
+            <div class="summary-tile warning" *ngIf="validateRes.summary.invalid > 0">
+              <span class="num">{{ validateRes.summary.invalid }}</span>
+              <span class="lbl">{{ 'USER.BULK_ADD_INVALID' | translate }}</span>
+            </div>
+          </div>
+
+          <div class="invalid-list" *ngIf="validateRes.invalid.length > 0">
+            <div class="list-header">
+              <span>{{ 'USER.BULK_ADD_INVALID_ROWS' | translate }}</span>
+              <button class="link-btn" type="button" (click)="downloadInvalid()">
+                <i class="pi pi-download"></i>
+                {{ 'USER.BULK_ADD_DOWNLOAD_INVALID' | translate }}
+              </button>
+            </div>
+            <div class="rows-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{{ 'USER.BULK_ADD_ROW' | translate }}</th>
+                    <th>{{ 'COMMON.EMAIL' | translate }}</th>
+                    <th>{{ 'USER.BULK_ADD_REASON' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let r of validateRes.invalid">
+                    <td class="num">{{ r.row }}</td>
+                    <td>{{ r.email || '—' }}</td>
+                    <td class="reason">{{ r.reason }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <p class="proceed-prompt" *ngIf="validateRes.summary.valid > 0">
+            {{ 'USER.BULK_ADD_PROCEED_PROMPT' | translate }}
+          </p>
+          <p class="proceed-prompt error" *ngIf="validateRes.summary.valid === 0">
+            {{ 'USER.BULK_ADD_NO_VALID_ROWS' | translate }}
+          </p>
+        </div>
+      </ng-container>
+
+      <!-- Stage: committing -->
+      <ng-container *ngIf="stage === 'committing'">
+        <div class="busy-state">
+          <div class="spinner">
+            <i class="pi pi-spin pi-spinner"></i>
+          </div>
+          <p>{{ 'USER.BULK_ADD_CREATING' | translate }}</p>
+        </div>
+      </ng-container>
+
+      <!-- Stage: done -->
+      <ng-container *ngIf="stage === 'done' && commitRes">
+        <div class="form-grid">
+          <div class="summary-cards">
+            <div class="summary-tile success">
+              <span class="num">{{ commitRes.summary.successful }}</span>
+              <span class="lbl">{{ 'USER.BULK_ADD_CREATED_SUCCESS' | translate }}</span>
+            </div>
+            <div class="summary-tile warning" *ngIf="commitRes.summary.failed > 0">
+              <span class="num">{{ commitRes.summary.failed }}</span>
+              <span class="lbl">{{ 'USER.BULK_ADD_CREATED_FAILED' | translate }}</span>
+            </div>
+          </div>
+
+          <div class="invalid-list" *ngIf="commitRes.failed.length > 0">
+            <div class="list-header">
+              <span>{{ 'USER.BULK_ADD_RACE_FAILURES' | translate }}</span>
+            </div>
+            <div class="rows-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{{ 'USER.BULK_ADD_ROW' | translate }}</th>
+                    <th>{{ 'COMMON.EMAIL' | translate }}</th>
+                    <th>{{ 'USER.BULK_ADD_REASON' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let r of commitRes.failed">
+                    <td class="num">{{ r.row }}</td>
+                    <td>{{ r.email }}</td>
+                    <td class="reason">{{ r.reason }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

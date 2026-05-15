@@ -42,6 +42,7 @@ export const GROUP = {
 
 export const USER = {
   ADD: '/app/users/add',
+  BULK_ADD: '/app/users/bulk-add',
   LIST: '/app/users',
   EDIT: '/app/users/edit',
   VIEW: '/app/users/view',

@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { GROUP } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -36,6 +36,8 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
   preloadedOrgsTotal: number | null = null;
   roles: any[] = [];
   users: any[] = [];
+  preloadedUsers: any[] | null = null;
+  preloadedUsersTotal: number | null = null;
   // Server-mode preload for the Role dropdown. Refilled on org change.
   preloadedRoles: any[] | null = null;
   preloadedRolesTotal: number | null = null;
@@ -107,10 +109,12 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
         );
         this.roles = [];
         this.users = [];
-        // Clear the role dropdown's seed so the next open re-fetches roles for
-        // the newly selected org rather than serving stale options.
+        // Clear seeds so the dropdowns re-fetch for the new org rather than
+        // serving stale options.
         this.preloadedRoles = null;
         this.preloadedRolesTotal = null;
+        this.preloadedUsers = null;
+        this.preloadedUsersTotal = null;
         if (value) {
           this.loadRoles();
           this.loadUsers();
@@ -206,24 +210,53 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
+  /**
+   * Fetcher for server-mode users multiselect. Org-scoped via form control.
+   * Filters to active users only — matches legacy behavior.
+   */
+  loadUsersPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId = this.userGroupForm.get('organisation')?.value;
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ username: search });
+    try {
+      const res: any = await this.userService.listUser(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        const users = (res?.data?.users || []).filter(
+          (u: any) => u.status === 1,
+        );
+        return { items: users, total: res?.data?.count ?? users.length };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
   loadUsers() {
     const orgId = this.userGroupForm.get('organisation')?.value;
     if (!orgId) return;
 
-    const params = {
-      orgId,
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
-
-    this.userService.listUser(params).then(response => {
-      if (this.globalService.handleSuccessService(response, false)) {
-        this.users = (response.data.users || []).filter(
-          (u: any) => u.status === 1,
-        );
-      }
-      this.cdr.markForCheck();
-    });
+    this.userService
+      .listUser({ orgId, page: DEFAULT_PAGE, limit: 10 })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const all = response?.data?.users || [];
+          const active = all.filter((u: any) => u.status === 1);
+          this.users = active;
+          this.preloadedUsers = active;
+          this.preloadedUsersTotal = response?.data?.count ?? active.length;
+        }
+        this.cdr.markForCheck();
+      });
   }
 
   async onSubmit() {

@@ -3,7 +3,7 @@
     <!-- Floating Label -->
     <span class="p-float-label" *ngIf="floatingLabel">
       <p-multiSelect
-        [options]="options"
+        [options]="serverMode ? serverOptions : options"
         [optionLabel]="optionLabel"
         [optionValue]="$any(optionValue)"
         [(ngModel)]="value"
@@ -18,7 +18,7 @@
         [selectionLimit]="selectionLimit"
         [scrollHeight]="scrollHeight"
         [emptyMessage]="emptyMessage"
-        [emptyFilterMessage]="emptyFilterMessage"
+        [emptyFilterMessage]="serverLoading ? 'Loading…' : emptyFilterMessage"
         [virtualScroll]="virtualScroll"
         [virtualScrollItemSize]="virtualScrollItemSize"
         [style]="{ width: '100%' }"
@@ -29,6 +29,8 @@
         [ngClass]="{ 'ng-invalid ng-dirty': showError }"
         (onChange)="onValueChange($event.value)"
         (onBlur)="onBlur()"
+        (onPanelShow)="onPanelShow()"
+        (onFilter)="onServerFilter($event)"
         [inputId]="inputId"
         [appendTo]="appendTo"
       >
@@ -45,7 +47,7 @@
         <span class="required" *ngIf="required">*</span>
       </label>
       <p-multiSelect
-        [options]="options"
+        [options]="serverMode ? serverOptions : options"
         [optionLabel]="optionLabel"
         [optionValue]="$any(optionValue)"
         [(ngModel)]="value"
@@ -60,7 +62,7 @@
         [selectionLimit]="selectionLimit"
         [scrollHeight]="scrollHeight"
         [emptyMessage]="emptyMessage"
-        [emptyFilterMessage]="emptyFilterMessage"
+        [emptyFilterMessage]="serverLoading ? 'Loading…' : emptyFilterMessage"
         [virtualScroll]="virtualScroll"
         [virtualScrollItemSize]="virtualScrollItemSize"
         [style]="{ width: '100%' }"
@@ -71,6 +73,8 @@
         [ngClass]="{ 'ng-invalid ng-dirty': showError }"
         (onChange)="onValueChange($event.value)"
         (onBlur)="onBlur()"
+        (onPanelShow)="onPanelShow()"
+        (onFilter)="onServerFilter($event)"
         [appendTo]="appendTo"
       >
       </p-multiSelect>

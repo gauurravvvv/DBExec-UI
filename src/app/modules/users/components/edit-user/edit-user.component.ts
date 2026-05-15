@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/constants';
+import { DEFAULT_PAGE } from 'src/app/constants';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { USER } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -27,6 +27,8 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
   isCancelClicked = false;
   organisations: any[] = [];
   groups: any[] = [];
+  preloadedGroups: any[] | null = null;
+  preloadedGroupsTotal: number | null = null;
   userId: string = '';
   showOrganisationDropdown =
     this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
@@ -59,16 +61,69 @@ export class EditUserComponent implements OnInit, HasUnsavedChanges {
     this.loadAdminData();
   }
 
+  /**
+   * Fetcher for server-mode group multiselect. Org-scoped via this.orgId
+   * (route param) or token fallback.
+   */
+  loadGroupsPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const orgId =
+      this.orgId || this.globalService.getTokenDetails('organisationId');
+    if (!orgId) return { items: [], total: 0 };
+    const params: any = { orgId, page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.groupService.listGroups(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        const groups = (res?.data?.groups || []).filter(
+          (g: any) => g.status === 1,
+        );
+        return { items: groups, total: res?.data?.count ?? groups.length };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Single-group resolver — for stored groupIds on the existing user that may
+   * not be in the dropdown's first page. The custom-multiselect calls this
+   * once per missing ID to fetch its display label.
+   */
+  resolveSelectedGroup = async (id: string): Promise<any> => {
+    const orgId =
+      this.orgId || this.globalService.getTokenDetails('organisationId');
+    if (!orgId) return null;
+    try {
+      const res: any = await this.groupService.viewGroup(orgId, id);
+      return res?.data ?? null;
+    } catch {
+      return null;
+    }
+  };
+
   loadGroups() {
     const orgId =
       this.orgId || this.globalService.getTokenDetails('organisationId');
+    if (!orgId) return;
     this.groupService
-      .listGroups({ orgId, page: DEFAULT_PAGE, limit: MAX_LIMIT })
+      .listGroups({ orgId, page: DEFAULT_PAGE, limit: 10 })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
-          this.groups = (response.data.groups || []).filter(
-            (g: any) => g.status === 1,
-          );
+          const all = response?.data?.groups || [];
+          const active = all.filter((g: any) => g.status === 1);
+          this.groups = active;
+          this.preloadedGroups = active;
+          this.preloadedGroupsTotal =
+            response?.data?.count ?? active.length;
         }
         this.cdr.markForCheck();
       });
