@@ -35,8 +35,8 @@
 
           h2 {
             margin: 0;
-            font-size: 20px;
-            font-weight: 600;
+            font-size: var(--fs-h1);
+            font-weight: var(--fw-semibold);
             color: var(--text-color);
           }
         }
@@ -52,14 +52,14 @@
             gap: 8px;
             padding: 0.6rem 1.25rem;
             border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: var(--fw-semibold);
+            font-size: var(--fs-body);
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
 
             i {
-              font-size: 0.9rem;
+              font-size: var(--fs-body);
             }
 
             &.btn-icon {
@@ -81,7 +81,7 @@
               }
 
               i {
-                font-size: 1rem;
+                font-size: var(--fs-h3);
               }
             }
 
@@ -189,10 +189,10 @@
                 padding: 24px 16px;
                 color: var(--text-color);
                 opacity: 0.5;
-                font-size: 13px;
+                font-size: var(--fs-control);
 
                 i {
-                  font-size: 14px;
+                  font-size: var(--fs-body);
                 }
               }
             }
@@ -263,14 +263,14 @@
           flex: 1;
 
           i {
-            font-size: 48px;
+            font-size: var(--fs-h1);
             margin-bottom: 16px;
             opacity: 0.5;
             color: var(--secondary-color);
           }
 
           span {
-            font-size: 14px;
+            font-size: var(--fs-body);
             color: var(--text-color);
             opacity: 0.7;
             margin-bottom: 16px;
@@ -406,8 +406,8 @@
             border: none;
             border-radius: 4px 4px 4px 4px;
             padding: 8px 12px 8px 16px;
-            font-weight: 500;
-            font-size: 14px;
+            font-weight: var(--fw-medium);
+            font-size: var(--fs-body);
             color: var(--text-color);
             transition: all 0.2s;
             position: relative;
@@ -431,7 +431,7 @@
           &.p-highlight .p-tabview-nav-link {
             background: var(--hover-background);
             color: var(--text-color);
-            font-weight: 600;
+            font-weight: var(--fw-semibold);
           }
 
           &:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
@@ -603,7 +603,7 @@
         border: 1px solid var(--border-color) !important;
         color: var(--text-color) !important;
         padding: 1rem !important;
-        font-weight: 500 !important;
+        font-weight: var(--fw-medium) !important;
         border-radius: 4px !important;
         transition: all 0.2s !important;
         gap: 8px !important;
@@ -622,7 +622,7 @@
 
         .p-accordion-toggle-icon {
           order: 1 !important;
-          font-size: 1rem !important;
+          font-size: var(--fs-h3) !important;
           color: var(--text-color) !important;
           margin: 0 !important;
           transition: transform 0.2s !important;
@@ -631,8 +631,8 @@
         // Header text styling
         .p-accordion-header-text {
           color: var(--text-color) !important;
-          font-weight: 500 !important;
-          font-size: 14px !important;
+          font-weight: var(--fw-medium) !important;
+          font-size: var(--fs-body) !important;
         }
       }
 
@@ -770,7 +770,7 @@
         position: absolute;
         top: 2px;
         right: 2px;
-        font-size: 12px;
+        font-size: var(--fs-label);
         color: var(--primary-color);
         z-index: 1;
         opacity: 0.7;
@@ -827,7 +827,7 @@
       margin-top: 4px;
 
       .p-error {
-        font-size: 12px;
+        font-size: var(--fs-label);
       }
     }
   }
@@ -869,7 +869,7 @@
           border-radius: 6px !important;
           background: var(--surface-ground) !important;
           color: var(--text-color) !important;
-          font-size: 13px !important;
+          font-size: var(--fs-control) !important;
           outline: none !important;
           transition: border-color 0.2s !important;
           box-sizing: border-box;
@@ -923,21 +923,21 @@
               }
 
               .p-tree-toggler-icon {
-                font-size: 10px;
+                font-size: var(--fs-micro);
               }
             }
 
             .p-treenode-icon {
               color: var(--text-color) !important;
               opacity: 0.5;
-              font-size: 13px;
+              font-size: var(--fs-control);
               margin-right: 6px;
             }
 
             .p-treenode-label {
-              font-size: 13px;
+              font-size: var(--fs-control);
               color: var(--text-color);
-              font-weight: 400;
+              font-weight: var(--fw-regular);
             }
 
             &.p-treenode-selectable {
@@ -949,7 +949,7 @@
 
               .p-treenode-label {
                 color: var(--primary-color);
-                font-weight: 500;
+                font-weight: var(--fw-medium);
               }
 
               .p-treenode-icon {
@@ -962,8 +962,8 @@
           // Tab nodes (level 0)
           &:not(.p-treenode-leaf) > .p-treenode-content {
             .p-treenode-label {
-              font-weight: 500;
-              font-size: 13px;
+              font-weight: var(--fw-medium);
+              font-size: var(--fs-control);
             }
           }
 
@@ -1007,8 +1007,8 @@
       h3 {
         color: var(--text-color);
         margin: 0;
-        font-size: 1.15rem;
-        font-weight: 600;
+        font-size: var(--fs-h2);
+        font-weight: var(--fw-semibold);
       }
 
       .popup-close-btn {
@@ -1031,7 +1031,7 @@
         }
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
       }
     }
@@ -1043,11 +1043,11 @@
       padding: 32px 16px;
       color: var(--text-color);
       opacity: 0.6;
-      font-size: 13px;
+      font-size: var(--fs-control);
       justify-content: center;
 
       i {
-        font-size: 16px;
+        font-size: var(--fs-h3);
       }
     }
 
@@ -1064,14 +1064,14 @@
         gap: 8px;
         padding: 0.6rem 1.25rem;
         border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-body);
         border: none;
         cursor: pointer;
         transition: all 0.2s ease;
 
         i {
-          font-size: 0.9rem;
+          font-size: var(--fs-body);
         }
 
         &.btn-cancel {
@@ -1109,7 +1109,7 @@
       // Legacy pButton support for save dialog
       .p-button {
         min-width: 6rem;
-        font-weight: 500;
+        font-weight: var(--fw-medium);
 
         &.p-button-outlined {
           background: transparent !important;
@@ -1164,7 +1164,7 @@
         .char-count {
           color: var(--text-color);
           opacity: 0.6;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           margin-top: 4px;
           display: block;
           text-align: right;
@@ -1180,8 +1180,8 @@
 
       h4 {
         color: var(--text-color);
-        font-size: 0.875rem;
-        font-weight: 600;
+        font-size: var(--fs-body);
+        font-weight: var(--fw-semibold);
         margin: 0 0 12px 0;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -1210,22 +1210,22 @@
             min-width: 0;
 
             .value-prompt-name {
-              font-weight: 500;
-              font-size: 13px;
+              font-weight: var(--fw-medium);
+              font-size: var(--fs-control);
               color: var(--text-color);
             }
 
             .value-meta {
-              font-size: 11px;
+              font-size: var(--fs-micro);
               color: var(--text-color);
               opacity: 0.5;
             }
           }
 
           .value-content {
-            font-size: 13px;
+            font-size: var(--fs-control);
             color: var(--text-color);
-            font-weight: 600;
+            font-weight: var(--fw-semibold);
             text-align: right;
             word-break: break-word;
             max-width: 60%;
@@ -1246,10 +1246,10 @@
     gap: 8px;
     padding: 10px 24px;
     color: var(--error-color);
-    font-size: 13px;
+    font-size: var(--fs-control);
 
     i {
-      font-size: 14px;
+      font-size: var(--fs-body);
     }
   }
 
@@ -1309,15 +1309,15 @@
 
         .result-name {
           flex: 0 0 40%;
-          font-size: 13px;
+          font-size: var(--fs-control);
           color: var(--text-color);
           opacity: 0.6;
         }
 
         .result-value {
           flex: 1;
-          font-size: 13px;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
           word-break: break-word;
         }
@@ -1362,8 +1362,8 @@
       h3 {
         color: var(--text-color);
         margin: 0;
-        font-size: 1.15rem;
-        font-weight: 600;
+        font-size: var(--fs-h2);
+        font-weight: var(--fw-semibold);
       }
 
       .popup-close-btn {
@@ -1386,7 +1386,7 @@
         }
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
       }
     }
@@ -1407,8 +1407,8 @@
           margin-bottom: 10px;
 
           .sql-block-label {
-            font-size: 12px;
-            font-weight: 600;
+            font-size: var(--fs-label);
+            font-weight: var(--fw-semibold);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--text-color);
@@ -1424,8 +1424,8 @@
             border: 1px solid var(--border-color);
             background: var(--card-background);
             color: var(--text-color);
-            font-size: 12px;
-            font-weight: 500;
+            font-size: var(--fs-label);
+            font-weight: var(--fw-medium);
             cursor: pointer;
             transition: all 0.2s;
 
@@ -1436,7 +1436,7 @@
             }
 
             i {
-              font-size: 12px;
+              font-size: var(--fs-label);
             }
           }
         }
@@ -1446,8 +1446,8 @@
           border: 1px solid var(--border-color);
           border-radius: 8px;
           padding: 16px;
-          font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-          font-size: 13px;
+          font-family: var(--font-mono);
+          font-size: var(--fs-control);
           line-height: 1.6;
           color: var(--text-color);
           overflow-x: auto;
@@ -1488,8 +1488,8 @@
 
           .component-label {
             flex: 0 0 80px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: var(--fs-label);
+            font-weight: var(--fw-semibold);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--text-color);
@@ -1499,7 +1499,7 @@
 
           .component-value {
             flex: 1;
-            font-size: 13px;
+            font-size: var(--fs-control);
             color: var(--text-color);
             display: flex;
             flex-wrap: wrap;
@@ -1512,8 +1512,8 @@
               background: var(--surface-ground);
               border: 1px solid var(--border-color);
               border-radius: 4px;
-              font-size: 12px;
-              font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+              font-size: var(--fs-label);
+              font-family: var(--font-mono);
             }
           }
         }
@@ -1533,14 +1533,14 @@
         gap: 8px;
         padding: 0.6rem 1.25rem;
         border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-body);
         border: none;
         cursor: pointer;
         transition: all 0.2s ease;
 
         i {
-          font-size: 0.9rem;
+          font-size: var(--fs-body);
         }
 
         &.btn-cancel {
@@ -1651,24 +1651,24 @@
     gap: 12px;
 
     > i {
-      font-size: 18px;
+      font-size: var(--fs-h2);
       color: var(--primary-color);
     }
 
     .popup-title {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: var(--fs-h3);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
     }
 
     .popup-meta {
-      font-size: 12px;
+      font-size: var(--fs-label);
       color: var(--secondary-color);
       padding: 4px 10px;
       background-color: var(--card-background);
       border: 1px solid var(--border-color);
       border-radius: 99px;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
   }
 
@@ -1678,7 +1678,7 @@
     gap: 8px;
 
     .clear-filters-btn {
-      font-size: 0.8rem;
+      font-size: var(--fs-control);
       padding: 0.4rem 0.8rem;
       border-radius: 6px;
     }
@@ -1719,7 +1719,7 @@
       margin-bottom: 20px;
 
       i {
-        font-size: 1.75rem;
+        font-size: var(--fs-h1);
         color: var(--error-color);
       }
     }
@@ -1727,8 +1727,8 @@
     h4 {
       margin: 0 0 16px 0;
       color: var(--text-color);
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
     }
 
     .error-message-box {
@@ -1744,8 +1744,8 @@
 
       code {
         color: var(--error-color);
-        font-size: 0.9rem;
-        font-family: 'Courier New', Courier, monospace;
+        font-size: var(--fs-body);
+        font-family: var(--font-mono);
         line-height: 1.6;
         word-break: break-word;
         white-space: pre-wrap;
@@ -1757,10 +1757,10 @@
       align-items: center;
       gap: 6px;
       color: var(--secondary-color);
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
 
       i {
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
       }
     }
   }
@@ -1784,7 +1784,7 @@
       margin-bottom: 20px;
 
       i {
-        font-size: 1.75rem;
+        font-size: var(--fs-h1);
         color: var(--success-color);
       }
     }
@@ -1792,14 +1792,14 @@
     h4 {
       margin: 0 0 12px 0;
       color: var(--text-color);
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
     }
 
     .success-message {
       margin: 0 0 16px 0;
       color: var(--secondary-color);
-      font-size: 0.95rem;
+      font-size: var(--fs-h3);
       max-width: 400px;
       line-height: 1.6;
     }
@@ -1809,10 +1809,10 @@
       align-items: center;
       gap: 6px;
       color: var(--secondary-color);
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
 
       i {
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
       }
     }
   }
@@ -1836,7 +1836,7 @@
       margin-bottom: 20px;
 
       i {
-        font-size: 1.75rem;
+        font-size: var(--fs-h1);
         color: var(--secondary-color);
       }
     }
@@ -1844,14 +1844,14 @@
     h4 {
       margin: 0 0 8px 0;
       color: var(--text-color);
-      font-size: 1.15rem;
-      font-weight: 600;
+      font-size: var(--fs-h2);
+      font-weight: var(--fw-semibold);
     }
 
     p {
       margin: 0 0 16px 0;
       color: var(--secondary-color);
-      font-size: 0.9rem;
+      font-size: var(--fs-body);
     }
   }
 
@@ -1877,8 +1877,8 @@
     .p-datatable-thead > tr > th {
       background: var(--hover-background);
       color: var(--text-color);
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
       padding: 0.75rem 1rem;
       border-bottom: 1px solid var(--border-color);
 
@@ -1910,8 +1910,8 @@
         padding: 0.6rem 1rem;
         vertical-align: middle;
         color: var(--text-color);
-        font-size: 0.95rem;
-        font-family: 'Courier New', Courier, monospace;
+        font-size: var(--fs-h3);
+        font-family: var(--font-mono);
         max-width: 300px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1933,8 +1933,8 @@
 
     .row-number-cell {
       color: var(--secondary-color);
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
       text-align: center;
       background: var(--hover-background);
     }
@@ -1946,7 +1946,7 @@
     }
 
     .p-column-filter {
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
       padding: 0.4rem 0.6rem;
       border-radius: 4px;
       border: 1px solid var(--border-color);
@@ -1961,7 +1961,7 @@
 
       &::placeholder {
         color: var(--secondary-color);
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
       }
     }
 

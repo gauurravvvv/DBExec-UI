@@ -4,8 +4,8 @@
   gap: 6px;
 
   .normal-label {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
     color: var(--text-color);
 
     .required {
@@ -16,7 +16,7 @@
 
   .error-message {
     color: var(--error-color);
-    font-size: 12px;
+    font-size: var(--fs-label);
   }
 }
 

@@ -43,14 +43,14 @@
           }
 
           i {
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
           }
         }
 
         h2 {
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
         }
       }
@@ -65,7 +65,7 @@
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
@@ -86,7 +86,7 @@
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
@@ -104,7 +104,7 @@
           }
 
           i {
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
         }
       }
@@ -167,9 +167,9 @@
     margin-bottom: 8px;
 
     .conditions-label {
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       color: var(--text-color);
-      font-size: 0.9rem;
+      font-size: var(--fs-body);
 
       .required {
         color: var(--error-color);
@@ -186,8 +186,8 @@
       border: 1px solid var(--primary-color);
       color: var(--primary-color);
       border-radius: 6px;
-      font-size: 0.82rem;
-      font-weight: 600;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
       cursor: pointer;
       transition: all 0.2s ease;
 
@@ -196,13 +196,13 @@
       }
 
       i {
-        font-size: 0.75rem;
+        font-size: var(--fs-label);
       }
     }
   }
 
   .conditions-hint {
-    font-size: 0.78rem;
+    font-size: var(--fs-control);
     color: var(--text-color);
     opacity: 0.55;
     margin-bottom: 10px;
@@ -272,7 +272,7 @@
     }
 
     i {
-      font-size: 0.8rem;
+      font-size: var(--fs-control);
     }
   }
 }

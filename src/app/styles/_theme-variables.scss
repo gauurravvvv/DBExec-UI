@@ -119,6 +119,9 @@
   // Right panel (form section)
   --auth-form-bg-start: #f8fafc;
   --auth-form-bg-end: #ffffff;
+  // Metallic-effect heading gradient on the dark left panel — used with
+  // background-clip: text to give the brand line a subtle two-tone fill.
+  --auth-heading-gradient: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
   --auth-form-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
   // Form text colors (light panel — always light)
   --auth-heading-color: #111827;
@@ -143,6 +146,61 @@
   --auth-strength-fair: #f59e0b;
   --auth-strength-good: #10b981;
   --auth-strength-strong: #3b82f6;
+
+  // ================================================================
+  // Typography system
+  // Single source of truth. Inter for UI, JetBrains Mono for code/IDs,
+  // Poppins reserved for the brand wordmark only. Every component
+  // inherits from these — no hard-coded font-family elsewhere.
+  // ================================================================
+
+  // Font families
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+  --font-brand: 'Poppins', var(--font-ui);
+
+  // Type scale — calibrated for an analytics product. Comfortable, never
+  // tiny, never marketing-sized. No token below 11px exists; do not bypass.
+  --fs-h1: 1.25rem;        // 20px — page titles (one per page)
+  --fs-h2: 1.0625rem;      // 17px — section / dialog titles
+  --fs-h3: 0.9375rem;      // 15px — sub-section titles
+  --fs-card-title: 0.875rem; // 14px — card / panel titles
+  --fs-body: 0.875rem;     // 14px — body text, paragraphs, inputs, table cells
+  --fs-table: 0.875rem;    // 14px — table cells (alias of body, for clarity)
+  --fs-control: 0.8125rem; // 13px — sidebar nav rows, buttons, chips, header controls
+  --fs-label: 0.75rem;     // 12px — form labels, captions
+  --fs-micro: 0.6875rem;   // 11px — uppercase section headers, footer
+
+  // Weights
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  // Line heights
+  --lh-tight: 1.25;        // headings
+  --lh-snug: 1.4;          // ui rows, buttons
+  --lh-normal: 1.55;       // body paragraphs
+
+  // Letter spacing (only where it earns its keep)
+  --ls-tight: -0.01em;     // large headings
+  --ls-snug: -0.005em;     // medium headings
+  --ls-normal: 0;
+  --ls-wide: 0.04em;       // uppercase section labels
+  --ls-wider: 0.06em;      // smallest uppercase
+
+  // Icon-size scale — separate from text. PrimeIcons render via font-size,
+  // and decorative icons (empty-state heros, spinners, illustrations) often
+  // need to be visibly larger than any text token. Keep them on their own
+  // axis so text and icon scales evolve independently.
+  --icon-xs: 0.75rem;      // 12px — inline next to small text
+  --icon-sm: 0.875rem;     // 14px — inline next to body text, button icons
+  --icon-md: 1rem;         // 16px — toolbar icons, inputs
+  --icon-lg: 1.5rem;       // 24px — section icons, empty-state secondary
+  --icon-xl: 2.25rem;      // 36px — empty-state hero, loading spinners
+  --icon-2xl: 3rem;        // 48px — splash / onboarding heros
 }
 
 
@@ -224,7 +282,7 @@
         opacity: 1 !important;
 
         .p-toast-message-icon {
-          font-size: 1.5rem;
+          font-size: var(--fs-h1);
           margin-right: 0.75rem;
           display: flex;
           align-items: center;
@@ -237,13 +295,13 @@
           padding: 0.25rem 0;
 
           .p-toast-summary {
-            font-weight: 600;
-            font-size: 1rem;
+            font-weight: var(--fw-semibold);
+            font-size: var(--fs-h3);
             margin-bottom: 0.25rem;
           }
 
           .p-toast-detail {
-            font-size: 0.875rem;
+            font-size: var(--fs-body);
             opacity: 0.9;
           }
         }

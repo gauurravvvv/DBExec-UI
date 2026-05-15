@@ -152,7 +152,7 @@
             class="empty-state"
             *ngIf="!selectedDatasourceObj && !isLoadingDataset"
           >
-            <i class="pi pi-database" style="font-size: 3rem; opacity: 0.3"></i>
+            <i class="pi pi-database"></i>
             <p>{{ 'DATASET.LOADING_DATASET_INFO' | translate }}</p>
           </div>
 
@@ -164,7 +164,7 @@
               loadingDatasources[selectedDatasourceObj.id]
             "
           >
-            <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
+            <i class="pi pi-spin pi-spinner"></i>
             <p>{{ 'DATASET.LOADING_SCHEMA' | translate }}</p>
           </div>
 
@@ -660,7 +660,7 @@
 <input
   type="file"
   #fileInput
-  style="display: none"
+  hidden
   (change)="onFileSelected($event)"
 />
 

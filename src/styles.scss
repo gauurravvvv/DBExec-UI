@@ -4,6 +4,115 @@
 @import 'primeicons/primeicons.css';
 @import './app/styles/theme-variables';
 
+// ================================================================
+// Global typography — single source of truth.
+// Inter for UI, JetBrains Mono for code/IDs, Poppins reserved for the
+// brand wordmark. Everything inherits these unless a component overrides
+// for a deliberate reason (e.g. code editor, monospace value chips).
+// ================================================================
+html,
+body {
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  color: var(--text-color);
+  // Inter feature settings: 'cv11' enables a single-storey alternate 'a'
+  // (cleaner at small sizes), 'ss03' is the curved-leg 'l' (resolves the
+  // I/l/1 ambiguity in tables). Both are subtle but pay off across the
+  // whole app.
+  font-feature-settings: 'cv11', 'ss03';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+// Tabular numerals everywhere a column of numbers shows up — table cells,
+// KPI tiles, sort badges, monospace chips. Digits line up vertically and
+// values become scannable at a glance.
+.p-datatable .p-datatable-tbody > tr > td,
+.p-datatable .p-datatable-thead > tr > th,
+.tabular-nums,
+[data-tabular],
+.summary-tile .num,
+.version-chip,
+kbd {
+  font-variant-numeric: tabular-nums;
+}
+
+// Monospace family — code, SQL, IDs, keyboard hints. Centralised so the
+// stack stays consistent across the app.
+code,
+pre,
+kbd,
+samp,
+.font-mono,
+.version-chip {
+  font-family: var(--font-mono);
+}
+
+// Headings — quiet, analytics-product hierarchy. Marketing-sized headings
+// drown the data; these stay restrained so KPIs and tables are the focal
+// point of a page.
+h1 {
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  margin: 0 0 0.5rem;
+}
+h2 {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-snug);
+  margin: 0 0 0.5rem;
+}
+h3 {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  margin: 0 0 0.5rem;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+// PrimeNG theme bundles ship their own --font-family (Roboto stack). Take
+// it over with our UI family so every PrimeNG primitive matches the rest
+// of the app without needing per-component overrides.
+:root {
+  --font-family: var(--font-ui);
+}
+
+// PrimeNG component baseline — overrides the theme's hard-coded
+// "font-family: Roboto, …" on .p-component so every PrimeNG widget
+// (dropdown, datatable, button) inherits Inter.
+.p-component {
+  font-family: var(--font-ui) !important;
+}
+
+// Native form controls and PrimeNG inputs. PrimeNG's theme also sets
+// font-family directly on .p-inputtext and on bare input/select/textarea,
+// neither of which always carries .p-component. We force them all to the
+// UI family so SQL editors, search boxes, and text areas don't render in
+// Roboto.
+input,
+select,
+textarea,
+.p-inputtext,
+.p-dropdown,
+.p-multiselect,
+.p-chips,
+.p-calendar,
+.p-autocomplete {
+  font-family: var(--font-ui) !important;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

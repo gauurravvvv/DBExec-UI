@@ -50,7 +50,7 @@ $radius-sm: 8px;
             }
 
             i {
-              font-size: 1.1rem;
+              font-size: var(--fs-h2);
               color: var(--text-color) !important;
             }
           }
@@ -58,8 +58,8 @@ $radius-sm: 8px;
 
         h2 {
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
         }
       }
@@ -74,8 +74,8 @@ $radius-sm: 8px;
           gap: 8px;
           padding: 0.6rem 1.25rem;
           border-radius: 6px;
-          font-weight: 600;
-          font-size: 0.9rem;
+          font-weight: var(--fw-semibold);
+          font-size: var(--fs-body);
           cursor: pointer;
           transition: all 0.2s ease;
           border: none;
@@ -147,8 +147,8 @@ $radius-sm: 8px;
 
           h3 {
             margin: 0 0 16px;
-            font-size: 18px;
-            font-weight: 500;
+            font-size: var(--fs-h2);
+            font-weight: var(--fw-medium);
             color: var(--text-color);
             display: flex;
             align-items: center;
@@ -167,7 +167,7 @@ $radius-sm: 8px;
             .info-item {
               label {
                 display: block;
-                font-size: 14px;
+                font-size: var(--fs-body);
                 color: var(--text-color);
                 opacity: 0.7;
                 margin-bottom: 8px;
@@ -175,7 +175,7 @@ $radius-sm: 8px;
 
               p {
                 margin: 0;
-                font-size: 15px;
+                font-size: var(--fs-h3);
                 color: var(--text-color);
                 word-break: break-word;
               }
@@ -201,8 +201,8 @@ $radius-sm: 8px;
               }
 
               .color-value {
-                font-family: monospace;
-                font-size: 0.9rem;
+                font-family: var(--font-mono);
+                font-size: var(--fs-body);
               }
 
               &.full-width {
@@ -217,15 +217,15 @@ $radius-sm: 8px;
             gap: 10px;
             padding: 14px 18px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: var(--fs-body);
 
             .preview-label {
-              font-weight: 700;
+              font-weight: var(--fw-semibold);
               letter-spacing: 1.2px;
               background: rgba(255, 255, 255, 0.18);
               padding: 3px 8px;
               border-radius: 3px;
-              font-size: 11px;
+              font-size: var(--fs-micro);
             }
 
             .preview-divider {
@@ -246,8 +246,8 @@ $radius-sm: 8px;
 .status-badge {
   padding: 4px 10px;
   border-radius: 12px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -330,13 +330,13 @@ $radius-sm: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: var(--fs-h1);
       }
 
       h3 {
         margin: 0;
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
     }
@@ -347,7 +347,7 @@ $radius-sm: 8px;
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -366,7 +366,7 @@ $radius-sm: 8px;
           gap: 10px;
           padding: 0.5rem 0;
           color: var(--secondary-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           border-bottom: 1px dashed var(--border-color);
 
           &:last-child {
@@ -375,7 +375,7 @@ $radius-sm: 8px;
 
           i {
             color: var(--primary-color);
-            font-size: 0.75rem;
+            font-size: var(--fs-label);
             flex-shrink: 0;
           }
         }
@@ -395,13 +395,13 @@ $radius-sm: 8px;
         padding: 0.75rem 1.5rem;
         border-radius: $radius-md;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {

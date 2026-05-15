@@ -48,8 +48,8 @@ $radius-sm: 8px;
           gap: 8px;
           padding: 0.6rem 1.25rem;
           border-radius: 6px;
-          font-weight: 600;
-          font-size: 0.9rem;
+          font-weight: var(--fw-semibold);
+          font-size: var(--fs-body);
           cursor: pointer;
           transition: all 0.2s ease;
           border: none;
@@ -123,14 +123,14 @@ $radius-sm: 8px;
           box-shadow: 0 8px 24px var(--primary-color-transparent);
 
           i {
-            font-size: 3rem;
+            font-size: var(--fs-h1);
             color: var(--primary-text);
           }
         }
 
         .role-name {
           margin: 10px 0 5px;
-          font-size: 1.5rem;
+          font-size: var(--fs-h1);
           text-align: center;
           color: var(--text-color);
         }
@@ -141,8 +141,8 @@ $radius-sm: 8px;
           background: var(--primary-color-transparent);
           color: var(--primary-color);
           border-radius: 4px;
-          font-size: 0.8rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           margin-top: 4px;
         }
       }
@@ -175,14 +175,14 @@ $radius-sm: 8px;
             margin-bottom: 5px;
 
             i {
-              font-size: 1rem;
+              font-size: var(--fs-h3);
               color: var(--text-color);
             }
           }
 
           .value {
             display: block;
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
             color: var(--text-color);
             padding: 4px 0;
 
@@ -190,8 +190,8 @@ $radius-sm: 8px;
               display: inline-block;
               padding: 0.3rem 0.6rem;
               border-radius: 4px;
-              font-size: 0.9rem;
-              font-weight: 500;
+              font-size: var(--fs-body);
+              font-weight: var(--fw-medium);
               background: rgba(var(--error-rgb), 0.15);
               color: var(--error-color);
 
@@ -208,8 +208,8 @@ $radius-sm: 8px;
         margin-top: 30px;
 
         .section-title {
-          font-size: 1.1rem;
-          font-weight: 600;
+          font-size: var(--fs-h2);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
           margin-bottom: 20px;
           padding-bottom: 10px;
@@ -231,8 +231,8 @@ $radius-sm: 8px;
             .column-header {
               background: var(--hover-background);
               padding: 10px 15px;
-              font-weight: 600;
-              font-size: 0.9rem;
+              font-weight: var(--fw-semibold);
+              font-size: var(--fs-body);
               color: var(--text-color);
               border-bottom: 1px solid var(--border-color);
             }
@@ -252,13 +252,13 @@ $radius-sm: 8px;
                 }
 
                 .item-label {
-                  font-size: 0.85rem;
+                  font-size: var(--fs-control);
                   color: var(--text-color);
                 }
 
                 .perm-enabled {
                   color: var(--success-color);
-                  font-size: 1rem;
+                  font-size: var(--fs-h3);
                 }
               }
             }

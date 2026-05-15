@@ -6,7 +6,7 @@
   margin-bottom: 0;
 
   label {
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--text-color);
   }
 
@@ -18,7 +18,7 @@
 
     .status-label {
       color: var(--text-color);
-      font-size: 1rem;
+      font-size: var(--fs-h3);
       line-height: 1;
     }
   }

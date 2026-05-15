@@ -43,14 +43,14 @@
           }
 
           i {
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
           }
         }
 
         h2 {
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
         }
       }
@@ -65,7 +65,7 @@
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
@@ -86,7 +86,7 @@
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
@@ -104,7 +104,7 @@
           }
 
           i {
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
         }
       }
@@ -161,13 +161,13 @@
         .char-counter {
           display: block;
           text-align: right;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           margin-top: 4px;
 
           &.limit-reached {
             color: var(--error-color);
-            font-weight: 600;
+            font-weight: var(--fw-semibold);
           }
         }
       }
@@ -181,8 +181,8 @@
       .color-picker-field {
         label {
           display: block;
-          font-size: 0.875rem;
-          font-weight: 500;
+          font-size: var(--fs-body);
+          font-weight: var(--fw-medium);
           color: var(--text-color);
           margin-bottom: 8px;
         }
@@ -193,9 +193,9 @@
           gap: 10px;
 
           .color-value {
-            font-size: 0.85rem;
+            font-size: var(--fs-control);
             color: var(--secondary-color);
-            font-family: monospace;
+            font-family: var(--font-mono);
           }
         }
       }
@@ -209,13 +209,13 @@
         border: 1px dashed var(--border-color);
         background: var(--hover-background);
         color: var(--primary-color);
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
 
         i {
-          font-size: 1rem;
+          font-size: var(--fs-h3);
         }
 
         &:hover {
@@ -240,10 +240,10 @@
         background: var(--error-bg);
         border: 1px solid var(--error-bg);
         color: var(--error-color);
-        font-size: 0.78rem;
+        font-size: var(--fs-control);
 
         i {
-          font-size: 0.95rem;
+          font-size: var(--fs-h3);
         }
       }
 
@@ -265,17 +265,17 @@
           display: flex;
           align-items: center;
           gap: 6px;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
 
           i {
-            font-size: 1rem;
+            font-size: var(--fs-h3);
           }
         }
 
         &__badge {
-          font-size: 0.7rem;
-          font-family: monospace;
+          font-size: var(--fs-micro);
+          font-family: var(--font-mono);
           padding: 2px 8px;
           border-radius: 10px;
           background: var(--shadow-color);
@@ -300,7 +300,7 @@
 
         &__hint {
           margin: 0;
-          font-size: 0.78rem;
+          font-size: var(--fs-control);
           line-height: 1.4;
           color: var(--secondary-color);
         }
@@ -395,8 +395,8 @@
 
     h3 {
       margin: 0 0 4px;
-      font-size: 1.05rem;
-      font-weight: 600;
+      font-size: var(--fs-h2);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       display: flex;
       align-items: center;
@@ -408,7 +408,7 @@
     }
 
     .preview-subtitle {
-      font-size: 0.8rem;
+      font-size: var(--fs-control);
       color: var(--secondary-color);
     }
 
@@ -451,8 +451,8 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 0.82rem;
-      font-weight: 500;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
       color: var(--secondary-color);
 
       .step-number {
@@ -464,8 +464,8 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.7rem;
-        font-weight: 700;
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
         flex-shrink: 0;
       }
     }
@@ -479,7 +479,7 @@
     justify-content: center;
     padding: 12px 20px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: var(--fs-control);
     overflow: hidden;
 
     &__shimmer {
@@ -507,8 +507,8 @@
     }
 
     &__label {
-      font-size: 10px;
-      font-weight: 700;
+      font-size: var(--fs-micro);
+      font-weight: var(--fw-semibold);
       letter-spacing: 1.5px;
       background: rgba(255, 255, 255, 0.18);
       padding: 3px 8px;
@@ -545,8 +545,8 @@
     }
 
     &__tag {
-      font-size: 11px;
-      font-weight: 700;
+      font-size: var(--fs-micro);
+      font-weight: var(--fw-semibold);
       letter-spacing: 0.5px;
       text-transform: uppercase;
       display: block;
@@ -555,15 +555,15 @@
 
     &__title {
       margin: 0 0 8px;
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: var(--fs-h3);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       line-height: 1.4;
     }
 
     &__desc {
       margin: 0 0 18px;
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
       line-height: 1.7;
       color: var(--secondary-color);
       white-space: pre-line;
@@ -578,20 +578,20 @@
     }
 
     &__checkbox {
-      font-size: 0.78rem;
+      font-size: var(--fs-control);
       color: var(--secondary-color);
       display: flex;
       align-items: center;
       gap: 6px;
 
       i {
-        font-size: 0.85rem;
+        font-size: var(--fs-control);
       }
     }
 
     &__btn {
-      font-size: 0.78rem;
-      font-weight: 500;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
       color: var(--secondary-color);
       border: 1px solid var(--border-color);
       padding: 5px 16px;

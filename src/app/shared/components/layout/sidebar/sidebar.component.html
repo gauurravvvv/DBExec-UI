@@ -5,8 +5,16 @@
   role="navigation"
   aria-label="Main Navigation"
 >
-  <div class="sidebar-header" *ngIf="!isExpanded">
-    <button class="toggle-btn" (click)="toggleSidebar()">
+  <!-- Header slot: just the collapse toggle. The slot is rendered in both
+       modes so the first nav item never tucks under the toggle. -->
+  <div class="sidebar-header">
+    <button
+      class="toggle-btn"
+      [class.outside]="isExpanded"
+      (click)="toggleSidebar()"
+      [pTooltip]="isExpanded ? 'Collapse' : 'Expand'"
+      tooltipPosition="right"
+    >
       <i
         class="pi"
         [ngClass]="{
@@ -16,20 +24,6 @@
       ></i>
     </button>
   </div>
-
-  <button
-    *ngIf="isExpanded"
-    class="toggle-btn outside"
-    (click)="collapseAllAndToggle()"
-  >
-    <i
-      class="pi"
-      [ngClass]="{
-        'pi-chevron-right': !isExpanded,
-        'pi-chevron-left': isExpanded,
-      }"
-    ></i>
-  </button>
 
   <div class="sidebar-content">
     <nav class="sidebar-nav">
@@ -44,19 +38,16 @@
             class="nav-link expandable"
             (click)="toggleSubmenuAndExpand(item)"
             [class.expanded]="item.isExpanded"
+            [pTooltip]="!isExpanded ? ('SIDEBAR.' + item.value | translate) : null"
+            tooltipPosition="right"
           >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + item.value | translate }}</span>
+              <span class="nav-text" *ngIf="isExpanded">{{ 'SIDEBAR.' + item.value | translate }}</span>
             </div>
-            <i class="pi pi-chevron-down submenu-arrow" *ngIf="isExpanded"></i>
-            <!-- Add tooltip for collapsed state -->
-            <div class="sidebar-tooltip" *ngIf="!isExpanded">
-              {{ 'SIDEBAR.' + item.value | translate }}
-              <span class="tooltip-arrow" *ngIf="item.subPermissions?.length"
-                >&rsaquo;</span
-              >
-            </div>
+            <i class="pi pi-chevron-down submenu-arrow"
+               [class.expanded]="item.isExpanded"
+               *ngIf="isExpanded"></i>
           </div>
 
           <!-- Menu item without subPermissions -->
@@ -64,11 +55,15 @@
             *ngIf="!item.subPermissions?.length"
             [routerLink]="item.route"
             routerLinkActive="active"
+            #rla="routerLinkActive"
+            [attr.aria-current]="rla.isActive ? 'page' : null"
             class="nav-link"
+            [pTooltip]="!isExpanded ? ('SIDEBAR.' + item.value | translate) : null"
+            tooltipPosition="right"
           >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + item.value | translate }}</span>
+              <span class="nav-text" *ngIf="isExpanded">{{ 'SIDEBAR.' + item.value | translate }}</span>
             </div>
           </a>
 
@@ -81,7 +76,6 @@
             <li
               *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex"
               class="submenu-item"
-              [class.visible]="item.isExpanded"
             >
               <!-- Submenu item with children -->
               <div
@@ -92,12 +86,11 @@
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
+                  <span class="nav-text" *ngIf="isExpanded">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
                 </div>
-                <i
-                  class="pi pi-chevron-down submenu-arrow"
-                  *ngIf="isExpanded"
-                ></i>
+                <i class="pi pi-chevron-down submenu-arrow"
+                   [class.expanded]="subItem.isExpanded"
+                   *ngIf="isExpanded"></i>
               </div>
 
               <!-- Submenu item without children -->
@@ -105,10 +98,12 @@
                 *ngIf="!subItem.subPermissions?.length"
                 [routerLink]="subItem.route"
                 routerLinkActive="active"
+                #rlaSub="routerLinkActive"
+                [attr.aria-current]="rlaSub.isActive ? 'page' : null"
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
+                  <span class="nav-text" *ngIf="isExpanded">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
                 </div>
               </a>
 
@@ -137,7 +132,6 @@
     <li
       *ngFor="let nestedItem of item.subPermissions; trackBy: trackByIndex"
       class="nested-submenu-item"
-      [class.visible]="item.isExpanded"
     >
       <!-- Nested item with children -->
       <div
@@ -148,9 +142,11 @@
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
+          <span class="nav-text" *ngIf="isExpanded">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
         </div>
-        <i class="pi pi-chevron-down submenu-arrow" *ngIf="isExpanded"></i>
+        <i class="pi pi-chevron-down submenu-arrow"
+           [class.expanded]="nestedItem.isExpanded"
+           *ngIf="isExpanded"></i>
       </div>
 
       <!-- Nested item without children -->
@@ -158,10 +154,12 @@
         *ngIf="!nestedItem.subPermissions?.length"
         [routerLink]="nestedItem.route"
         routerLinkActive="active"
+        #rlaNested="routerLinkActive"
+        [attr.aria-current]="rlaNested.isActive ? 'page' : null"
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text" [class.hidden]="!isExpanded">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
+          <span class="nav-text" *ngIf="isExpanded">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
         </div>
       </a>
 

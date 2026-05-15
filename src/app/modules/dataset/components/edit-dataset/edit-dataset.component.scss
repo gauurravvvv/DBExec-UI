@@ -44,7 +44,7 @@
       gap: 8px;
 
       label {
-        font-weight: 500;
+        font-weight: var(--fw-medium);
         color: var(--text-color);
 
         .required {
@@ -132,8 +132,8 @@
 
     .toolbar-title {
       margin: 0;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: var(--fs-h3);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       display: flex;
       align-items: center;
@@ -145,7 +145,7 @@
     }
 
     .toolbar-hint {
-      font-size: 12px;
+      font-size: var(--fs-label);
       color: var(--secondary-color);
       display: flex;
       align-items: center;
@@ -156,8 +156,8 @@
         color: var(--text-color);
         padding: 2px 6px;
         border-radius: 3px;
-        font-size: 11px;
-        font-family: monospace;
+        font-size: var(--fs-micro);
+        font-family: var(--font-mono);
         border: 1px solid var(--border-color);
       }
     }
@@ -317,8 +317,8 @@
         transform: translate(-50%, -50%) rotate(-90deg);
         white-space: nowrap;
         color: var(--text-color);
-        font-weight: 600;
-        font-size: 14px;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-body);
         letter-spacing: 2px;
       }
     }
@@ -341,8 +341,8 @@
 
     h4 {
       margin: 0;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: var(--fs-body);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       display: flex;
       align-items: center;
@@ -406,7 +406,7 @@
       border: 1px solid var(--border-color);
       border-radius: 4px;
       color: var(--text-color);
-      font-size: 13px;
+      font-size: var(--fs-control);
 
       &:focus {
         outline: none;
@@ -432,7 +432,7 @@
       padding: 10px 12px;
       cursor: pointer;
       transition: background-color 0.15s ease;
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       background-color: var(--hover-background);
       border-bottom: 1px solid var(--border-color);
 
@@ -442,25 +442,25 @@
 
       i.pi-chevron-right,
       i.pi-chevron-down {
-        font-size: 10px;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
         width: 12px;
       }
 
       i.pi-database {
-        font-size: 16px;
+        font-size: var(--fs-h3);
         color: var(--primary-color);
       }
 
       .datasource-name {
         flex: 1;
-        font-size: 14px;
+        font-size: var(--fs-body);
         color: var(--text-color);
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
       }
 
       .schema-count {
-        font-size: 11px;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
       }
     }
@@ -485,25 +485,25 @@
 
       i.pi-chevron-right,
       i.pi-chevron-down {
-        font-size: 10px;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
         width: 12px;
       }
 
       i.pi-folder {
-        font-size: 14px;
+        font-size: var(--fs-body);
         color: var(--warning-color);
       }
 
       .schema-name {
         flex: 1;
-        font-size: 13px;
+        font-size: var(--fs-control);
         color: var(--text-color);
-        font-weight: 500;
+        font-weight: var(--fw-medium);
       }
 
       .table-count {
-        font-size: 11px;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
       }
     }
@@ -528,25 +528,25 @@
 
       i.pi-chevron-right,
       i.pi-chevron-down {
-        font-size: 10px;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
         width: 12px;
       }
 
       i.pi-table {
-        font-size: 14px;
+        font-size: var(--fs-body);
         color: var(--primary-color);
       }
 
       .table-name {
         flex: 1;
-        font-size: 13px;
+        font-size: var(--fs-control);
         color: var(--text-color);
-        font-weight: 500;
+        font-weight: var(--fw-medium);
       }
 
       .column-count {
-        font-size: 11px;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
       }
     }
@@ -578,25 +578,25 @@
     }
 
     i {
-      font-size: 12px;
+      font-size: var(--fs-label);
       width: 14px;
       flex-shrink: 0;
     }
 
     .column-name {
       flex-shrink: 0;
-      font-size: 12px;
+      font-size: var(--fs-label);
       color: var(--text-color);
-      font-family: 'Courier New', monospace;
-      font-weight: 600;
+      font-family: var(--font-mono);
+      font-weight: var(--fw-semibold);
       white-space: nowrap;
     }
 
     .column-type {
       flex: 1;
-      font-size: 11px;
+      font-size: var(--fs-micro);
       color: var(--secondary-color);
-      font-family: 'Courier New', monospace;
+      font-family: var(--font-mono);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -614,20 +614,20 @@
     color: var(--secondary-color);
 
     i {
-      font-size: 48px;
+      font-size: var(--fs-h1);
       margin-bottom: 16px;
       color: var(--primary-color);
       opacity: 0.5;
     }
 
     p {
-      font-size: 13px;
+      font-size: var(--fs-control);
       margin: 0 0 16px 0;
     }
 
     .btn-small {
       padding: 6px 12px;
-      font-size: 12px;
+      font-size: var(--fs-label);
     }
   }
 }
@@ -661,7 +661,7 @@
     }
 
     i {
-      font-size: 14px;
+      font-size: var(--fs-body);
     }
   }
 }
@@ -683,8 +683,8 @@
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -692,7 +692,7 @@
   transition: all 0.2s ease;
 
   i {
-    font-size: 14px;
+    font-size: var(--fs-body);
   }
 
   &:disabled {
@@ -798,18 +798,18 @@
   z-index: 10;
 
   i {
-    font-size: 48px;
+    font-size: var(--fs-h1);
     margin-bottom: 16px;
     color: var(--primary-color);
   }
 
   p {
-    font-size: 16px;
+    font-size: var(--fs-h3);
     margin: 0;
   }
 
   .loading-hint {
-    font-size: 13px;
+    font-size: var(--fs-control);
     color: var(--secondary-color);
     margin-top: 8px;
   }
@@ -834,20 +834,20 @@
   text-align: center;
 
   i {
-    font-size: 64px;
+    font-size: var(--fs-h1);
     margin-bottom: 24px;
     color: var(--error-color);
   }
 
   h4 {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-semibold);
     margin: 0 0 12px 0;
     color: var(--error-color);
   }
 
   p {
-    font-size: 14px;
+    font-size: var(--fs-body);
     margin: 0 0 16px 0;
     color: var(--text-color);
   }
@@ -861,14 +861,14 @@
 
     li {
       padding: 6px 0;
-      font-size: 13px;
+      font-size: var(--fs-control);
       color: var(--secondary-color);
 
       &:before {
         content: '•';
         color: var(--error-color);
         margin-right: 8px;
-        font-weight: bold;
+        font-weight: var(--fw-semibold);
       }
     }
   }
@@ -889,22 +889,22 @@
   padding: 48px 32px;
   text-align: center;
 
-  i {
-    font-size: 72px;
+  > i {
+    font-size: var(--icon-2xl);
     margin-bottom: 24px;
     color: var(--primary-color);
     opacity: 0.5;
   }
 
   h3 {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-semibold);
     margin: 0 0 12px 0;
     color: var(--text-color);
   }
 
   p {
-    font-size: 14px;
+    font-size: var(--fs-body);
     margin: 0;
     color: var(--secondary-color);
     max-width: 400px;
@@ -935,7 +935,7 @@
       align-items: center;
 
       i {
-        font-size: 16px;
+        font-size: var(--fs-h3);
       }
 
       &.success i {
@@ -948,9 +948,9 @@
     }
 
     .status-text {
-      font-size: 13px;
+      font-size: var(--fs-control);
       color: var(--text-color);
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
   }
 
@@ -966,13 +966,13 @@
       padding: 5px 12px;
       border: none;
       border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
       cursor: pointer;
       transition: all 0.2s ease;
 
       i {
-        font-size: 12px;
+        font-size: var(--fs-label);
       }
 
       &.view-btn {
@@ -1077,24 +1077,24 @@ $radius-sm: 8px;
     gap: 12px;
 
     > i {
-      font-size: 18px;
+      font-size: var(--fs-h2);
       color: var(--primary-color);
     }
 
     .popup-title {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: var(--fs-h3);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
     }
 
     .popup-meta {
-      font-size: 12px;
+      font-size: var(--fs-label);
       color: var(--secondary-color);
       padding: 4px 10px;
       background-color: var(--card-background);
       border: 1px solid var(--border-color);
       border-radius: 99px;
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
   }
 
@@ -1104,13 +1104,13 @@ $radius-sm: 8px;
     gap: 8px;
 
     .export-csv-btn {
-      font-size: 0.8rem;
+      font-size: var(--fs-control);
       padding: 0.4rem 0.8rem;
       border-radius: 6px;
     }
 
     .clear-filters-btn {
-      font-size: 0.8rem;
+      font-size: var(--fs-control);
       padding: 0.4rem 0.8rem;
       border-radius: 6px;
     }
@@ -1152,7 +1152,7 @@ $radius-sm: 8px;
       margin-bottom: 20px;
 
       i {
-        font-size: 1.75rem;
+        font-size: var(--fs-h1);
         color: var(--error-color);
       }
     }
@@ -1160,8 +1160,8 @@ $radius-sm: 8px;
     h4 {
       margin: 0 0 16px 0;
       color: var(--text-color);
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
     }
 
     .error-message-box {
@@ -1177,8 +1177,8 @@ $radius-sm: 8px;
 
       code {
         color: var(--error-color);
-        font-size: 0.9rem;
-        font-family: 'Courier New', Courier, monospace;
+        font-size: var(--fs-body);
+        font-family: var(--font-mono);
         line-height: 1.6;
         word-break: break-word;
         white-space: pre-wrap;
@@ -1190,10 +1190,10 @@ $radius-sm: 8px;
       align-items: center;
       gap: 6px;
       color: var(--secondary-color);
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
 
       i {
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
       }
     }
   }
@@ -1218,7 +1218,7 @@ $radius-sm: 8px;
       margin-bottom: 20px;
 
       i {
-        font-size: 1.75rem;
+        font-size: var(--fs-h1);
         color: var(--success-color);
       }
     }
@@ -1226,14 +1226,14 @@ $radius-sm: 8px;
     h4 {
       margin: 0 0 12px 0;
       color: var(--text-color);
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
     }
 
     .success-message {
       margin: 0 0 16px 0;
       color: var(--secondary-color);
-      font-size: 0.95rem;
+      font-size: var(--fs-h3);
       max-width: 400px;
       line-height: 1.6;
     }
@@ -1243,10 +1243,10 @@ $radius-sm: 8px;
       align-items: center;
       gap: 6px;
       color: var(--secondary-color);
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
 
       i {
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
       }
     }
   }
@@ -1270,8 +1270,8 @@ $radius-sm: 8px;
       .p-datatable-thead > tr > th {
         background: var(--hover-background);
         color: var(--text-color);
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         padding: 0.75rem 1rem;
         border-bottom: 1px solid var(--border-color);
 
@@ -1282,11 +1282,11 @@ $radius-sm: 8px;
           gap: 2px;
 
           .column-datatype {
-            font-size: 0.7rem;
-            font-weight: 400;
+            font-size: var(--fs-micro);
+            font-weight: var(--fw-regular);
             color: var(--primary-color);
             opacity: 0.8;
-            font-family: monospace;
+            font-family: var(--font-mono);
             padding: 1px 6px;
             background: var(--primary-color-transparent);
             border-radius: 3px;
@@ -1329,8 +1329,8 @@ $radius-sm: 8px;
           padding: 0.6rem 1rem;
           vertical-align: middle;
           color: var(--text-color);
-          font-size: 0.95rem;
-          font-family: 'Courier New', Courier, monospace;
+          font-size: var(--fs-h3);
+          font-family: var(--font-mono);
           max-width: 300px;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1352,8 +1352,8 @@ $radius-sm: 8px;
 
       .row-number-cell {
         color: var(--secondary-color);
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         text-align: center;
         background: var(--hover-background);
       }
@@ -1366,7 +1366,7 @@ $radius-sm: 8px;
 
       // Column filter inputs
       .p-column-filter {
-        font-size: 0.85rem;
+        font-size: var(--fs-control);
         padding: 0.4rem 0.6rem;
         border-radius: 4px;
         border: 1px solid var(--border-color);
@@ -1380,7 +1380,7 @@ $radius-sm: 8px;
 
         &::placeholder {
           color: var(--secondary-color);
-          font-size: 0.8rem;
+          font-size: var(--fs-control);
         }
       }
 
@@ -1401,7 +1401,7 @@ $radius-sm: 8px;
           min-width: 2rem;
           height: 2rem;
           margin: 0 0.125rem;
-          font-weight: 500;
+          font-weight: var(--fw-medium);
 
           &:hover {
             background: var(--hover-background);
@@ -1426,7 +1426,7 @@ td.empty-message-cell {
   text-align: center;
   padding: 2rem !important;
   color: var(--secondary-color);
-  font-size: 0.95rem;
+  font-size: var(--fs-h3);
 }
 
 // ===================================================================
@@ -1467,7 +1467,7 @@ td.empty-message-cell {
   }
 
   .results-table {
-    font-size: 11px;
+    font-size: var(--fs-micro);
 
     thead th,
     tbody td {
@@ -1589,17 +1589,17 @@ td.empty-message-cell {
     transition: all 0.2s ease;
     white-space: nowrap;
     color: var(--text-secondary-color);
-    font-size: 13px;
+    font-size: var(--fs-control);
     min-width: fit-content;
 
     .tab-icon {
-      font-size: 14px;
+      font-size: var(--fs-body);
       display: flex;
       align-items: center;
     }
 
     .tab-title {
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       max-width: 150px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1611,14 +1611,14 @@ td.empty-message-cell {
     }
 
     .tab-title-input {
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       max-width: 150px;
       border: 1px solid var(--primary-color);
       border-radius: 3px;
       padding: 2px 6px;
       background-color: var(--background-color);
       color: var(--text-color);
-      font-size: 13px;
+      font-size: var(--fs-control);
       outline: none;
 
       &:focus {
@@ -1662,7 +1662,7 @@ td.empty-message-cell {
       color: var(--text-secondary-color);
 
       i {
-        font-size: 12px;
+        font-size: var(--fs-label);
       }
 
       &:hover {
@@ -1699,7 +1699,7 @@ td.empty-message-cell {
     flex-shrink: 0;
 
     i {
-      font-size: 14px;
+      font-size: var(--fs-body);
     }
   }
 }
@@ -1726,10 +1726,10 @@ td.empty-message-cell {
     cursor: pointer;
     transition: all 0.2s ease;
     color: var(--text-color);
-    font-size: 13px;
+    font-size: var(--fs-control);
 
     i {
-      font-size: 14px;
+      font-size: var(--fs-body);
       color: var(--text-secondary-color);
       width: 16px;
       text-align: center;
@@ -1778,14 +1778,14 @@ td.empty-message-cell {
       margin-bottom: 20px;
 
       .warning-icon {
-        font-size: 24px;
+        font-size: var(--fs-h1);
         color: var(--warning-color, var(--warning-color));
       }
 
       h3 {
         margin: 0;
-        font-size: 18px;
-        font-weight: 600;
+        font-size: var(--fs-h2);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
     }
@@ -1903,7 +1903,7 @@ td.empty-message-cell {
         background: var(--primary-color-transparent);
 
         i {
-          font-size: 1.5rem;
+          font-size: var(--fs-h1);
           color: var(--primary-color);
         }
       }
@@ -1911,8 +1911,8 @@ td.empty-message-cell {
       h3 {
         margin: 0;
         color: var(--text-color);
-        font-size: 1.35rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
       }
     }
 
@@ -1922,7 +1922,7 @@ td.empty-message-cell {
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -1934,8 +1934,8 @@ td.empty-message-cell {
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -1951,7 +1951,7 @@ td.empty-message-cell {
           border-radius: $radius-sm;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -1972,7 +1972,7 @@ td.empty-message-cell {
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -1992,13 +1992,13 @@ td.empty-message-cell {
         padding: 0.75rem 1.5rem;
         border-radius: $radius-sm;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -7,12 +7,10 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./footer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FooterComponent implements OnInit {
-  year: number = new Date().getFullYear();
-  version: string = environment.appVersion;
-  appName: string = 'DBExec';
+export class FooterComponent {
+  /** Current year for the copyright line. */
+  readonly year = new Date().getFullYear();
 
-  constructor() {}
-
-  ngOnInit() {}
+  /** App version pulled from environment at build time. */
+  readonly version = environment.appVersion;
 }

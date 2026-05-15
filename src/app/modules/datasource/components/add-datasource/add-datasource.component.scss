@@ -41,15 +41,15 @@
           }
 
           i {
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
           }
         }
 
         h2 {
           color: var(--text-color);
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
         }
       }
 
@@ -63,7 +63,7 @@
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
@@ -84,7 +84,7 @@
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
@@ -102,7 +102,7 @@
           }
 
           i {
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
         }
       }
@@ -160,7 +160,7 @@
             width: 100%;
 
             label {
-              font-weight: 500;
+              font-weight: var(--fw-medium);
               color: var(--text-color);
 
               .required {
@@ -171,7 +171,7 @@
 
             .error-message {
               color: var(--error-color);
-              font-size: 0.8rem;
+              font-size: var(--fs-control);
             }
 
             .p-input-icon-left {
@@ -210,7 +210,7 @@
                 margin-left: 0.75rem;
                 color: var(--text-color);
                 opacity: 0.7;
-                font-size: 0.875rem;
+                font-size: var(--fs-body);
               }
             }
           }
@@ -221,11 +221,11 @@
           margin-top: 1rem;
 
           .acknowledgments-title {
-            font-size: 0.875rem;
+            font-size: var(--fs-body);
             color: var(--text-color);
             opacity: 0.7;
             margin-bottom: 1rem;
-            font-weight: 500;
+            font-weight: var(--fw-medium);
             display: flex;
             align-items: center;
           }
@@ -251,16 +251,16 @@
 
                 .acknowledgment-label {
                   display: block;
-                  font-weight: 500;
+                  font-weight: var(--fw-medium);
                   color: var(--text-color);
                   margin-bottom: 0.5rem;
-                  font-size: 0.875rem;
+                  font-size: var(--fs-body);
                 }
 
                 .acknowledgment-text {
                   color: var(--text-color);
                   opacity: 0.7;
-                  font-size: 0.8125rem;
+                  font-size: var(--fs-control);
                   line-height: 1.6;
                   margin: 0;
                 }
@@ -269,7 +269,7 @@
 
             .error-message {
               color: var(--error-color);
-              font-size: 0.75rem;
+              font-size: var(--fs-label);
               margin-top: 0.5rem;
               margin-left: 2.25rem;
               display: block;
@@ -287,18 +287,18 @@
         gap: 20px;
 
         .section-title {
-          font-size: 1.1rem;
+          font-size: var(--fs-h2);
           color: var(--text-color);
           margin-bottom: 1.5rem;
           padding-bottom: 0.5rem;
           border-bottom: 1px solid var(--border-color);
-          font-weight: 500;
+          font-weight: var(--fw-medium);
         }
 
         .admin-setup-note {
           color: var(--text-color);
           opacity: 0.6;
-          font-size: 0.8125rem;
+          font-size: var(--fs-control);
           line-height: 1.5;
           margin: 0;
           padding: 0.75rem 1rem;
@@ -314,7 +314,7 @@
           gap: 8px;
 
           label {
-            font-weight: 500;
+            font-weight: var(--fw-medium);
             color: var(--text-color);
 
             .required {
@@ -370,7 +370,7 @@
 
           .error-message {
             color: var(--error-color);
-            font-size: 12px;
+            font-size: var(--fs-label);
           }
         }
       }
@@ -389,8 +389,8 @@
     gap: 0.5rem;
     color: var(--primary-color);
     cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-medium);
     text-decoration: none;
     transition: opacity 0.2s ease;
 
@@ -404,7 +404,7 @@
     }
 
     i {
-      font-size: 0.875rem;
+      font-size: var(--fs-body);
 
       &.pi-check-circle {
         color: var(--success-color);
@@ -419,7 +419,7 @@
   .connection-hint {
     color: var(--text-color);
     opacity: 0.6;
-    font-size: 0.75rem;
+    font-size: var(--fs-label);
   }
 }
 
@@ -446,7 +446,7 @@
       }
 
       .p-checkbox-icon {
-        font-size: 12px;
+        font-size: var(--fs-label);
       }
     }
   }

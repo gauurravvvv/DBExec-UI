@@ -6,7 +6,7 @@
   margin-bottom: 0;
 
   label {
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--text-color);
 
     .required {
@@ -22,7 +22,7 @@
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
+    font-size: var(--fs-body);
     font-family: inherit;
     resize: vertical;
     line-height: 1.5;
@@ -55,6 +55,6 @@
 
   .error-message {
     color: var(--error-color);
-    font-size: 12px;
+    font-size: var(--fs-label);
   }
 }

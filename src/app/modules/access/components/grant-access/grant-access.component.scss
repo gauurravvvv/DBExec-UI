@@ -40,15 +40,15 @@
           }
 
           i {
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
           }
         }
 
         h2 {
           color: var(--text-color);
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
         }
       }
 
@@ -62,7 +62,7 @@
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
@@ -83,7 +83,7 @@
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
@@ -101,7 +101,7 @@
           }
 
           i {
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
         }
       }
@@ -160,7 +160,7 @@
           margin-bottom: 0;
 
           label {
-            font-weight: 500;
+            font-weight: var(--fw-medium);
             color: var(--text-color);
 
             .required {
@@ -218,7 +218,7 @@
 
           .error-message {
             color: var(--error-color);
-            font-size: 12px;
+            font-size: var(--fs-label);
           }
         }
       }
@@ -257,7 +257,7 @@
     margin-bottom: 6px;
 
     label {
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       color: var(--text-color);
 
       .required {
@@ -300,7 +300,7 @@
         bottom: -22px;
         left: 0;
         color: var(--error-color);
-        font-size: 12px;
+        font-size: var(--fs-label);
         white-space: nowrap;
       }
     }
@@ -515,7 +515,7 @@
 
       .p-multiselect-token-icon {
         color: var(--text-color);
-        font-size: 12px;
+        font-size: var(--fs-label);
         cursor: pointer;
         border-radius: 50%;
         transition: all 0.2s;
@@ -570,7 +570,7 @@
           &.p-highlight {
             .p-checkbox-icon {
               color: var(--text-color);
-              font-size: 12px;
+              font-size: var(--fs-label);
             }
           }
         }
@@ -650,7 +650,7 @@
             &.p-highlight {
               .p-checkbox-icon {
                 color: var(--text-color);
-                font-size: 12px;
+                font-size: var(--fs-label);
               }
             }
           }
@@ -661,7 +661,7 @@
         color: var(--text-color) !important;
         opacity: 0.7;
         padding: 0.75rem 1rem;
-        font-size: 0.875rem;
+        font-size: var(--fs-body);
       }
     }
 

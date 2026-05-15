@@ -46,15 +46,15 @@
           }
 
           i {
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
           }
         }
 
         h2 {
           color: var(--text-color);
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
         }
       }
 
@@ -68,7 +68,7 @@
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
@@ -89,7 +89,7 @@
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
@@ -107,7 +107,7 @@
           }
 
           i {
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
         }
       }
@@ -156,7 +156,7 @@
           display: block;
           margin-bottom: 0.5rem;
           color: var(--text-color);
-          font-weight: 500;
+          font-weight: var(--fw-medium);
 
           .required {
             color: var(--error-color);
@@ -203,7 +203,7 @@
 
         .error-message {
           color: var(--error-color);
-          font-size: 0.875rem;
+          font-size: var(--fs-body);
           margin-top: 0.25rem;
           display: block;
         }
@@ -230,7 +230,7 @@
 
   i.pi-lock {
     left: 12px;
-    font-size: 1.1rem;
+    font-size: var(--fs-h2);
   }
 }
 
@@ -421,7 +421,7 @@
     .p-dropdown.p-focus ~ label,
     .p-dropdown.p-filled ~ label {
       top: -0.75rem;
-      font-size: 12px;
+      font-size: var(--fs-label);
       color: var(--primary-color);
       background: var(--card-background);
       padding: 0 4px;
