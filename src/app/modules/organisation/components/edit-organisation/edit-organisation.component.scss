@@ -85,7 +85,11 @@
         }
 
         .btn-save {
-          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
@@ -140,8 +144,6 @@
 
       // Hide number input spinners
       input[type='number'] {
-        -moz-appearance: textfield;
-
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
           -webkit-appearance: none;
@@ -469,6 +471,7 @@
       color: var(--secondary-color);
       cursor: not-allowed;
       opacity: 0.5;
+      pointer-events: none;
     }
 
     i {
@@ -482,6 +485,10 @@
     gap: 0.35rem;
     font-size: var(--fs-control);
     font-weight: var(--fw-medium);
+    // Long BE error messages shouldn't overflow the row or break mid-word.
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 
     &.success {
       color: var(--success-color);
@@ -493,6 +500,7 @@
 
     i {
       font-size: var(--fs-body);
+      flex-shrink: 0;
     }
   }
 }
@@ -849,7 +857,11 @@
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          );
           color: var(--primary-text);
           box-shadow: 0 4px 14px var(--primary-color-transparent);
           &:hover:not(:disabled) {

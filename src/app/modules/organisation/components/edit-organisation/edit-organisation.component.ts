@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
@@ -49,6 +50,10 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
   connectionTested = false;
   connectionTestLoading = false;
   connectionTestResult: 'success' | 'failed' | null = null;
+  connectionTestError: string | null = null;
+  // Sequence counter so in-flight responses that arrive after field edits
+  // (or another newer test) are ignored — prevents a stale "Connected" state.
+  private testRequestId = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -57,6 +62,7 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     private organisationService: OrganisationService,
     private globalService: GlobalService,
     private translate: TranslateService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
   }
@@ -184,7 +190,8 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
         );
       });
 
-    // Reset connection test when DB fields change
+    // Reset connection test when DB fields change. Bumping the request id
+    // invalidates any in-flight response so it can't apply stale state.
     ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
       field => {
         this.orgForm
@@ -193,6 +200,9 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
           .subscribe(() => {
             this.connectionTested = false;
             this.connectionTestResult = null;
+            this.connectionTestError = null;
+            this.testRequestId++;
+            this.cdr.markForCheck();
           });
       },
     );
@@ -416,12 +426,32 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
 
   // Connection test
   testConnection() {
-    if (!this.isDbConnectionFieldsValid()) return;
+    // Re-entry guard: ignore clicks when the test is in flight or already
+    // succeeded for the current set of credentials. The valueChanges hook
+    // unlocks the button by resetting connectionTested when fields change.
+    if (
+      !this.isDbConnectionFieldsValid() ||
+      this.connectionTestLoading ||
+      this.connectionTested
+    )
+      return;
+
+    const formValue = this.orgForm.value;
+    if (!formValue.dbPassword) {
+      this.connectionTested = false;
+      this.connectionTestResult = 'failed';
+      this.connectionTestError = this.translate.instant(
+        'ORG.DB_PASSWORD_REQUIRED',
+      );
+      this.cdr.markForCheck();
+      return;
+    }
 
     this.connectionTestLoading = true;
     this.connectionTestResult = null;
+    this.connectionTestError = null;
+    const reqId = ++this.testRequestId;
 
-    const formValue = this.orgForm.value;
     this.organisationService
       .validateDatasource({
         type: 'postgres',
@@ -432,19 +462,30 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
         password: formValue.dbPassword,
       })
       .then((response: any) => {
+        if (reqId !== this.testRequestId) return;
         this.connectionTestLoading = false;
-        if (response?.isConnected) {
+        if (response?.code !== 200) {
+          this.connectionTested = false;
+          this.connectionTestResult = 'failed';
+          this.connectionTestError = response?.message || null;
+          this.cdr.markForCheck();
+          return;
+        }
+        if (response?.data?.isConnected) {
           this.connectionTested = true;
           this.connectionTestResult = 'success';
         } else {
           this.connectionTested = false;
           this.connectionTestResult = 'failed';
         }
+        this.cdr.markForCheck();
       })
       .catch(() => {
+        if (reqId !== this.testRequestId) return;
         this.connectionTestLoading = false;
         this.connectionTested = false;
         this.connectionTestResult = 'failed';
+        this.cdr.markForCheck();
       });
   }
 
@@ -532,6 +573,9 @@ export class EditOrganisationComponent implements OnInit, HasUnsavedChanges {
     this.currentStep = 0;
     this.connectionTested = false;
     this.connectionTestResult = null;
+    this.connectionTestError = null;
+    this.connectionTestLoading = false;
+    this.testRequestId++;
   }
 
   isFormValid(): boolean {

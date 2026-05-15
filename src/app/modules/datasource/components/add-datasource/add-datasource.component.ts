@@ -39,6 +39,10 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   connectionTested = false;
   connectionTestLoading = false;
   connectionTestResult: 'success' | 'failed' | null = null;
+  connectionTestError: string | null = null;
+  // Sequence counter so in-flight responses that arrive after field edits
+  // (or another newer test) are ignored — prevents a stale "Connected" state.
+  private testRequestId = 0;
 
   saving = this.datasourceService.saving;
 
@@ -69,7 +73,8 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       this.loadOrganisations();
     }
 
-    // Reset connection test when connection fields change
+    // Reset connection test when connection fields change. Bumping the request
+    // id invalidates any in-flight response so it can't apply stale state.
     ['host', 'port', 'database', 'username', 'password'].forEach(field => {
       this.datasourceForm
         .get(field)
@@ -77,6 +82,8 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         .subscribe(() => {
           this.connectionTested = false;
           this.connectionTestResult = null;
+          this.connectionTestError = null;
+          this.testRequestId++;
         });
     });
   }
@@ -201,17 +208,24 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
       this.connectionTested = false;
       this.connectionTestLoading = false;
       this.connectionTestResult = null;
+      this.connectionTestError = null;
+      this.testRequestId++;
     }
   }
 
   getErrorMessage(fieldName: string): string {
     const control = this.datasourceForm.get(fieldName);
     if (control?.errors) {
-      if (control.errors['required']) return this.translate.instant('VALIDATION.FIELD_REQUIRED');
+      if (control.errors['required'])
+        return this.translate.instant('VALIDATION.FIELD_REQUIRED');
       if (control.errors['minlength'])
-        return this.translate.instant('VALIDATION.MIN_LENGTH', { length: control.errors['minlength'].requiredLength });
+        return this.translate.instant('VALIDATION.MIN_LENGTH', {
+          length: control.errors['minlength'].requiredLength,
+        });
       if (control.errors['maxlength'])
-        return this.translate.instant('VALIDATION.MAX_LENGTH', { length: control.errors['maxlength'].requiredLength });
+        return this.translate.instant('VALIDATION.MAX_LENGTH', {
+          length: control.errors['maxlength'].requiredLength,
+        });
       if (control.errors['pattern']) {
         switch (fieldName) {
           case 'name':
@@ -246,15 +260,35 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   }
 
   testConnection(): void {
-    if (!this.isConnectionFieldsValid()) return;
+    // Re-entry guard: ignore clicks when the test is in flight or already
+    // succeeded for the current set of credentials. The valueChanges hook
+    // unlocks the button by resetting connectionTested when fields change.
+    if (
+      !this.isConnectionFieldsValid() ||
+      this.connectionTestLoading ||
+      this.connectionTested
+    )
+      return;
+
+    const formValue = this.datasourceForm.getRawValue();
+    if (!formValue.password) {
+      this.connectionTested = false;
+      this.connectionTestResult = 'failed';
+      this.connectionTestError = this.translate.instant(
+        'ORG.DB_PASSWORD_REQUIRED',
+      );
+      this.cdr.markForCheck();
+      return;
+    }
 
     this.connectionTestLoading = true;
     this.connectionTestResult = null;
+    this.connectionTestError = null;
+    const reqId = ++this.testRequestId;
 
-    const formValue = this.datasourceForm.getRawValue();
     this.organisationService
       .validateDatasource({
-        type: 'postgres',
+        type: formValue.type,
         host: formValue.host,
         port: formValue.port,
         database: formValue.database,
@@ -262,8 +296,17 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         password: formValue.password,
       })
       .then((response: any) => {
+        // Discard if user has edited a field or started a newer test
+        if (reqId !== this.testRequestId) return;
         this.connectionTestLoading = false;
-        if (response?.isConnected) {
+        if (response?.code !== 200) {
+          this.connectionTested = false;
+          this.connectionTestResult = 'failed';
+          this.connectionTestError = response?.message || null;
+          this.cdr.markForCheck();
+          return;
+        }
+        if (response?.data?.isConnected) {
           this.connectionTested = true;
           this.connectionTestResult = 'success';
         } else {
@@ -273,6 +316,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         this.cdr.markForCheck();
       })
       .catch(() => {
+        if (reqId !== this.testRequestId) return;
         this.connectionTestLoading = false;
         this.connectionTested = false;
         this.connectionTestResult = 'failed';

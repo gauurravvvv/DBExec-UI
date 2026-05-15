@@ -1,4 +1,9 @@
-<div class="config-sidebar" (change)="configChanged.emit()">
+<!--
+  configChanged is no longer wired via a root-level (change) listener —
+  PrimeNG synthetic events don't bubble as native DOM change. The parent
+  picks up changes via ngDoCheck JSON-snapshot diff in the component class.
+-->
+<div class="config-sidebar">
   <div class="sidebar-content">
     <div class="sidebar-header-info">
       <div class="dataset-label">{{ 'ANALYSES.PROPERTIES' | translate }}</div>

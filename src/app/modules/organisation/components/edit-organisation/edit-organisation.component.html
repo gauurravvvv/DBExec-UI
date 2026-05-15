@@ -257,7 +257,9 @@
               <span
                 class="test-connection-link"
                 [class.disabled]="
-                  !isDbConnectionFieldsValid() || connectionTestLoading
+                  !isDbConnectionFieldsValid() ||
+                  connectionTestLoading ||
+                  connectionTested
                 "
                 (click)="testConnection()"
               >
@@ -284,7 +286,8 @@
                 class="connection-status failed"
                 *ngIf="connectionTestResult === 'failed'"
               >
-                <i class="pi pi-times-circle"></i> {{ 'ORG.CONNECTION_FAILED' | translate }}
+                <i class="pi pi-times-circle"></i>
+                {{ connectionTestError || ('ORG.CONNECTION_FAILED' | translate) }}
               </span>
             </div>
           </div>

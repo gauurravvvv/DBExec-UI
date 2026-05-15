@@ -804,6 +804,22 @@ textarea,
   border-color: var(--primary-color) !important;
   box-shadow: 0 0 0 1px
     var(--primary-color-transparent, rgba(33, 150, 243, 0.2)) !important;
+  outline: none !important;
+}
+.p-dropdown,
+.p-dropdown:focus,
+.p-dropdown:focus-visible,
+.p-dropdown *,
+.p-dropdown *:focus,
+.p-dropdown *:focus-visible,
+.p-dropdown .p-hidden-accessible input {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+.p-dropdown .p-dropdown-trigger,
+.p-dropdown .p-dropdown-label {
+  border: none !important;
+  box-shadow: none !important;
 }
 .p-dropdown .p-ink {
   background-color: rgba(33, 150, 243, 0.16) !important;

@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DoCheck,
   EventEmitter,
   Input,
+  NgZone,
   Output,
 } from '@angular/core';
 import {
@@ -98,12 +100,66 @@ import { Visual } from '../../models';
 @Component({
   selector: 'app-visual-config-sidebar',
   templateUrl: './visual-config-sidebar.component.html',
+  // No styleUrls — see visuals-chart-sidebar for context. Parent
+  // edit-analyses owns the styling and skipping the stylesheet here
+  // keeps the child encapsulation-free so parent selectors match.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VisualConfigSidebarComponent {
+export class VisualConfigSidebarComponent implements DoCheck {
   @Input() focusedVisual!: Visual;
   @Output() close = new EventEmitter<void>();
   @Output() configChanged = new EventEmitter<void>();
+
+  /**
+   * JSON snapshot of focusedVisual + config used to detect ANY mutation —
+   * including the synthetic events PrimeNG widgets fire (slider drags,
+   * dropdowns, toggle buttons) that don't bubble as DOM `change` events.
+   *
+   * The previous `(change)="configChanged.emit()"` listener at the template
+   * root only caught native DOM change events — checkboxes and native selects
+   * worked, but PrimeNG sliders / inputNumber / dropdown / colorPicker /
+   * toggleButton mutated state silently. Result: many property tweaks didn't
+   * propagate to the chart. ngDoCheck runs on every CD cycle the parent
+   * triggers (typing, clicking, focus, etc.); diffing the JSON snapshot is
+   * the same trick EchartVisual uses internally.
+   */
+  private configSnapshot = '';
+
+  constructor(private ngZone: NgZone) {}
+
+  ngDoCheck(): void {
+    if (!this.focusedVisual) return;
+    const snapshot = JSON.stringify({
+      // Stringify the slice we actually care about. Including the field
+      // assignments (xAxisColumn, etc.) catches axis remaps too.
+      cfg: this.focusedVisual.config,
+      x: this.focusedVisual.xAxisColumn,
+      y: this.focusedVisual.yAxisColumn,
+      z: this.focusedVisual.zAxisColumn,
+      title: this.focusedVisual.title,
+      chartType: this.focusedVisual.chartType,
+    });
+    if (snapshot !== this.configSnapshot) {
+      // Skip the very first call — we don't want to fire configChanged just
+      // because the component initialized.
+      const isFirstCall = this.configSnapshot === '';
+      this.configSnapshot = snapshot;
+      if (!isFirstCall) {
+        // Defer the emit to a microtask so the parent's `markDirty` (which
+        // bumps `chartConfigVersion`) runs in a fresh CD pass. Emitting
+        // synchronously here lands inside the current CD cycle; if the
+        // chart-renderer was already visited by CD on this pass, the
+        // bumped Input wouldn't be picked up until the NEXT user
+        // interaction — which is why property tweaks were only applying
+        // after a click somewhere else.
+        this.ngZone.runOutsideAngular(() => {
+          Promise.resolve().then(() =>
+            this.ngZone.run(() => this.configChanged.emit()),
+          );
+        });
+      }
+    }
+  }
 
   // Chart type checkers
   isBarChartType = isBarChartType;

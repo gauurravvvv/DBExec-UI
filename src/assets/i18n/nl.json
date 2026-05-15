@@ -326,6 +326,7 @@
     "TESTING_CONNECTION": "Verbinding testen...",
     "CONNECTED": "Verbonden",
     "CONNECTION_FAILED": "Verbinding mislukt",
+    "DB_PASSWORD_REQUIRED": "Databasewachtwoord is vereist",
     "ORG_ADMIN": "Organisatiebeheerder",
     "ADMIN_EMAIL": "Beheerder e-mail",
     "ADMIN_EMAIL_PLACEHOLDER": "admin@voorbeeld.com",
@@ -410,7 +411,9 @@
     "MAX_ENVIRONMENTS": "Max. omgevingen",
     "MAX_CATEGORIES": "Max. categorieen",
     "ADMIN_LANGUAGE": "Beheerdertaal",
-    "ADMIN_LANGUAGE_PLACEHOLDER": "Taal selecteren voor welkomstmail"
+    "ADMIN_LANGUAGE_PLACEHOLDER": "Taal selecteren voor welkomstmail",
+    "ADMIN_LOCALE": "Beheerdertaal",
+    "ADMIN_LOCALE_PLACEHOLDER": "Taal selecteren voor welkomstmail"
   },
   "ROLE": {
     "TITLE": "Rollen",

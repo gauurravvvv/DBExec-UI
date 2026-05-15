@@ -41,6 +41,10 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   connectionTested = signal(false);
   connectionTestLoading = signal(false);
   connectionTestResult = signal<'success' | 'failed' | null>(null);
+  connectionTestError = signal<string | null>(null);
+  // Sequence counter so in-flight responses that arrive after field edits
+  // (or another newer test) are ignored — prevents a stale "Connected" state.
+  private testRequestId = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -152,7 +156,8 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
         this.updateEmailValidators(provider);
       });
 
-    // Reset connection test when DB fields change
+    // Reset connection test when DB fields change. Bumping the request id
+    // invalidates any in-flight response so it can't apply stale state.
     ['dbHost', 'dbPort', 'dbName', 'dbUsername', 'dbPassword'].forEach(
       field => {
         this.orgForm
@@ -161,6 +166,8 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
           .subscribe(() => {
             this.connectionTested.set(false);
             this.connectionTestResult.set(null);
+            this.connectionTestError.set(null);
+            this.testRequestId++;
           });
       },
     );
@@ -317,12 +324,31 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
   }
 
   testConnection() {
-    if (!this.isDbConnectionFieldsValid()) return;
+    // Re-entry guard: ignore clicks when the test is in flight or already
+    // succeeded for the current set of credentials. The valueChanges hook
+    // unlocks the button by resetting connectionTested when fields change.
+    if (
+      !this.isDbConnectionFieldsValid() ||
+      this.connectionTestLoading() ||
+      this.connectionTested()
+    )
+      return;
+
+    const formValue = this.orgForm.value;
+    if (!formValue.dbPassword) {
+      this.connectionTested.set(false);
+      this.connectionTestResult.set('failed');
+      this.connectionTestError.set(
+        this.translate.instant('ORG.DB_PASSWORD_REQUIRED'),
+      );
+      return;
+    }
 
     this.connectionTestLoading.set(true);
     this.connectionTestResult.set(null);
+    this.connectionTestError.set(null);
+    const reqId = ++this.testRequestId;
 
-    const formValue = this.orgForm.value;
     this.organisationService
       .validateDatasource({
         type: 'postgres',
@@ -333,8 +359,15 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
         password: formValue.dbPassword,
       })
       .then((response: any) => {
+        if (reqId !== this.testRequestId) return;
         this.connectionTestLoading.set(false);
-        if (response?.isConnected) {
+        if (response?.code !== 200) {
+          this.connectionTested.set(false);
+          this.connectionTestResult.set('failed');
+          this.connectionTestError.set(response?.message || null);
+          return;
+        }
+        if (response?.data?.isConnected) {
           this.connectionTested.set(true);
           this.connectionTestResult.set('success');
         } else {
@@ -343,6 +376,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
         }
       })
       .catch(() => {
+        if (reqId !== this.testRequestId) return;
         this.connectionTestLoading.set(false);
         this.connectionTested.set(false);
         this.connectionTestResult.set('failed');
@@ -366,6 +400,9 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     this.isFormDirty = false;
     this.connectionTested.set(false);
     this.connectionTestResult.set(null);
+    this.connectionTestError.set(null);
+    this.connectionTestLoading.set(false);
+    this.testRequestId++;
     this.orgForm.markAsPristine();
     Object.keys(this.orgForm.controls).forEach(key => {
       this.orgForm.get(key)?.setValue('');

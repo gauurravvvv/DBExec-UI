@@ -94,6 +94,10 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
   connectionTested = false;
   connectionTestLoading = false;
   connectionTestResult: 'success' | 'failed' | null = null;
+  connectionTestError: string | null = null;
+  // Sequence counter so in-flight responses that arrive after field edits
+  // (or another newer test) are ignored — prevents a stale "Connected" state.
+  private testRequestId = 0;
 
   saving = this.datasourceService.saving;
 
@@ -130,7 +134,8 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         }
       });
 
-    // Reset connection test when connection fields change
+    // Reset connection test when connection fields change. Bumping the request
+    // id invalidates any in-flight response so it can't apply stale state.
     ['host', 'port', 'database', 'username', 'password'].forEach(field => {
       this.datasourceForm
         .get(field)
@@ -138,6 +143,8 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         .subscribe(() => {
           this.connectionTested = false;
           this.connectionTestResult = null;
+          this.connectionTestError = null;
+          this.testRequestId++;
         });
     });
   }
@@ -180,7 +187,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
     await this.datasourceService.loadOne(this.orgId, this.datasourceId);
     const data = this.datasourceService.current();
     if (data) {
-      this.organisationName = data.organisationId;
+      this.organisationName = data.organisationName || '';
 
       const formData = {
         name: data.name,
@@ -223,12 +230,32 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
   }
 
   testConnection(): void {
-    if (!this.isConnectionFieldsValid()) return;
+    // Re-entry guard: ignore clicks when the test is in flight or already
+    // succeeded for the current set of credentials. The valueChanges hook
+    // unlocks the button by resetting connectionTested when fields change.
+    if (
+      !this.isConnectionFieldsValid() ||
+      this.connectionTestLoading ||
+      this.connectionTested
+    )
+      return;
+
+    const formValue = this.datasourceForm.getRawValue();
+    if (!formValue.password) {
+      this.connectionTested = false;
+      this.connectionTestResult = 'failed';
+      this.connectionTestError = this.translate.instant(
+        'ORG.DB_PASSWORD_REQUIRED',
+      );
+      this.cdr.markForCheck();
+      return;
+    }
 
     this.connectionTestLoading = true;
     this.connectionTestResult = null;
+    this.connectionTestError = null;
+    const reqId = ++this.testRequestId;
 
-    const formValue = this.datasourceForm.getRawValue();
     this.organisationService
       .validateDatasource({
         type: 'postgres',
@@ -239,8 +266,16 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         password: formValue.password,
       })
       .then((response: any) => {
+        if (reqId !== this.testRequestId) return;
         this.connectionTestLoading = false;
-        if (response?.isConnected) {
+        if (response?.code !== 200) {
+          this.connectionTested = false;
+          this.connectionTestResult = 'failed';
+          this.connectionTestError = response?.message || null;
+          this.cdr.markForCheck();
+          return;
+        }
+        if (response?.data?.isConnected) {
           this.connectionTested = true;
           this.connectionTestResult = 'success';
         } else {
@@ -250,6 +285,7 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
         this.cdr.markForCheck();
       })
       .catch(() => {
+        if (reqId !== this.testRequestId) return;
         this.connectionTestLoading = false;
         this.connectionTested = false;
         this.connectionTestResult = 'failed';
@@ -302,11 +338,16 @@ export class EditDatasourceComponent implements OnInit, HasUnsavedChanges {
 
   onCancel(): void {
     if (this.isFormDirty) {
+      // Bump first so any in-flight test response is discarded; valueChanges
+      // from patchValue will clear state and bump again — both safe.
+      this.testRequestId++;
       this.datasourceForm.patchValue(this.initialFormValues);
       this.isFormDirty = false;
       // Restore connection test state since we reset to original values
       this.connectionTested = true;
       this.connectionTestResult = 'success';
+      this.connectionTestError = null;
+      this.connectionTestLoading = false;
     } else {
       this.router.navigate([DATASOURCE.LIST]);
     }

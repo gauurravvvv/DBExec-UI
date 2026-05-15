@@ -326,6 +326,7 @@
     "TESTING_CONNECTION": "연결 테스트 중...",
     "CONNECTED": "연결됨",
     "CONNECTION_FAILED": "연결 실패",
+    "DB_PASSWORD_REQUIRED": "데이터베이스 비밀번호가 필요합니다",
     "ORG_ADMIN": "조직 관리자",
     "ADMIN_EMAIL": "관리자 이메일",
     "ADMIN_EMAIL_PLACEHOLDER": "admin@example.com",
@@ -410,7 +411,9 @@
     "MAX_ENVIRONMENTS": "최대 환경 수",
     "MAX_CATEGORIES": "최대 카테고리 수",
     "ADMIN_LANGUAGE": "관리자 언어",
-    "ADMIN_LANGUAGE_PLACEHOLDER": "환영 이메일 언어 선택"
+    "ADMIN_LANGUAGE_PLACEHOLDER": "환영 이메일 언어 선택",
+    "ADMIN_LOCALE": "관리자 언어",
+    "ADMIN_LOCALE_PLACEHOLDER": "환영 이메일 언어 선택"
   },
   "ROLE": {
     "TITLE": "역할",

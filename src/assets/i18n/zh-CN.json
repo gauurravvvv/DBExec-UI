@@ -326,6 +326,7 @@
     "TESTING_CONNECTION": "正在测试连接...",
     "CONNECTED": "已连接",
     "CONNECTION_FAILED": "连接失败",
+    "DB_PASSWORD_REQUIRED": "需要数据库密码",
     "ORG_ADMIN": "组织管理员",
     "ADMIN_EMAIL": "管理员邮箱",
     "ADMIN_EMAIL_PLACEHOLDER": "admin@example.com",
@@ -410,7 +411,9 @@
     "MAX_ENVIRONMENTS": "最大环境数",
     "MAX_CATEGORIES": "最大分类数",
     "ADMIN_LANGUAGE": "管理员语言",
-    "ADMIN_LANGUAGE_PLACEHOLDER": "选择欢迎邮件的语言"
+    "ADMIN_LANGUAGE_PLACEHOLDER": "选择欢迎邮件的语言",
+    "ADMIN_LOCALE": "管理员语言",
+    "ADMIN_LOCALE_PLACEHOLDER": "选择欢迎邮件的语言"
   },
   "ROLE": {
     "TITLE": "角色",

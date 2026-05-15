@@ -21,6 +21,10 @@ import { Visual } from '../../models';
 @Component({
   selector: 'app-visuals-chart-sidebar',
   templateUrl: './visuals-chart-sidebar.component.html',
+  // Intentionally no styleUrls. Parent edit-analyses owns the styling
+  // for `.visuals-sidebar .sidebar-content { ... }` etc., and a child
+  // with no stylesheet skips emulated encapsulation tagging on its DOM
+  // so the parent's selectors match naturally.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VisualsChartSidebarComponent {

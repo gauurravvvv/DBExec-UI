@@ -13,6 +13,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { REGEX } from 'src/app/constants/regex.constant';
 import { ROLE } from 'src/app/constants/routes';
+import { ROLES } from 'src/app/constants/user.constant';
 import { HasUnsavedChanges } from 'src/app/core/interfaces/has-unsaved-changes';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -31,6 +32,9 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
   roleId: string = '';
   orgId: string = '';
   roleData: any;
+  organisationName: string = '';
+  showOrganisationField =
+    this.globalService.getTokenDetails('role') === ROLES.SYSTEM_ADMIN;
   showSaveConfirm = false;
   saveJustification = '';
 
@@ -81,6 +85,7 @@ export class EditRoleComponent implements OnInit, HasUnsavedChanges {
     const roleData = this.roleService.current();
     if (roleData) {
       this.roleData = roleData;
+      this.organisationName = this.roleData.organisationName || '';
 
       this.roleForm.patchValue({
         id: this.roleData.id,

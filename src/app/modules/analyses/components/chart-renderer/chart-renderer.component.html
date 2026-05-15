@@ -6,14 +6,14 @@
     [showConfigPanel]="false"
     [chartWidth]="chartWidth"
     [chartHeight]="chartHeight"
-    [chartConfig]="visual.config"
+    [chartConfig]="chartConfigRef"
     [data]="visual.chartData"
   ></app-configurable-card-chart>
 
   <ng-template #echartBlock>
     <app-echart-visual
       [chartType]="visual.chartType!"
-      [chartConfig]="visual.config"
+      [chartConfig]="chartConfigRef"
       [chartWidth]="chartWidth"
       [chartHeight]="chartHeight"
       [data]="getDisplayData(visual)"
@@ -31,7 +31,7 @@
 >
   <app-echart-visual
     [chartType]="visual.chartType!"
-    [chartConfig]="visual.config"
+    [chartConfig]="chartConfigRef"
     [chartWidth]="chartWidth"
     [chartHeight]="chartHeight"
     [data]="getDisplayData(visual)"

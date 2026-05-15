@@ -232,7 +232,12 @@
                   [class.selectable]="activeAxisSelection !== null"
                   (click)="onFieldClick(field)"
                 >
-                  <div class="field-icon">
+                  <div
+                    class="field-icon"
+                    [ngClass]="
+                      'type-' + getDataTypeCategory(field.dataType)
+                    "
+                  >
                     <i
                       class="pi"
                       [ngClass]="getDataTypeIcon(field.dataType)"
@@ -263,7 +268,12 @@
                   [class.selectable]="activeAxisSelection !== null"
                   (click)="onFieldClick(field)"
                 >
-                  <div class="field-icon">
+                  <div
+                    class="field-icon"
+                    [ngClass]="
+                      'type-' + getDataTypeCategory(field.dataType)
+                    "
+                  >
                     <i
                       class="pi"
                       [ngClass]="getDataTypeIcon(field.dataType)"
@@ -556,25 +566,26 @@
                 <i class="pi pi-database"></i>
               </div>
               <p>{{ 'ANALYSES.MAP_DATA_FIELDS' | translate }}</p>
-              <small
-                >{{ 'ANALYSES.ASSIGN' | translate }}
-                {{
-                  isHeatMapChartType(visual.chartType)
-                    ? ('ANALYSES.ROW_COLUMN_VALUE' | translate)
-                    : isSankeyChartType(visual.chartType) ||
-                        isGraphChartType(visual.chartType) ||
-                        isFlowLinesChartType(visual.chartType)
-                      ? ('ANALYSES.SOURCE_TARGET_VALUE' | translate)
-                      : isWorldMapChartType(visual.chartType)
-                        ? ('ANALYSES.REGION_AND_VALUE' | translate)
-                        : isLines3dChartType(visual.chartType)
-                          ? ('ANALYSES.LONGITUDE_AND_LATITUDE' | translate)
-                          : isPolygons3dChartType(visual.chartType)
-                            ? ('ANALYSES.NAME_LONGITUDE_LATITUDE' | translate)
-                            : ('ANALYSES.X_AXIS_AND_Y_AXIS' | translate)
-                }}
-                {{ 'ANALYSES.IN_THE_SIDEBAR' | translate }}</small
-              >
+              <small>{{
+                'ANALYSES.ASSIGN_AXES_HINT'
+                  | translate
+                    : {
+                        axes:
+                          isHeatMapChartType(visual.chartType)
+                            ? ('ANALYSES.ROW_COLUMN_VALUE' | translate)
+                            : isSankeyChartType(visual.chartType) ||
+                                isGraphChartType(visual.chartType) ||
+                                isFlowLinesChartType(visual.chartType)
+                              ? ('ANALYSES.SOURCE_TARGET_VALUE' | translate)
+                              : isWorldMapChartType(visual.chartType)
+                                ? ('ANALYSES.REGION_AND_VALUE' | translate)
+                                : isLines3dChartType(visual.chartType)
+                                  ? ('ANALYSES.LONGITUDE_AND_LATITUDE' | translate)
+                                  : isPolygons3dChartType(visual.chartType)
+                                    ? ('ANALYSES.NAME_LONGITUDE_LATITUDE' | translate)
+                                    : ('ANALYSES.X_AXIS_AND_Y_AXIS' | translate)
+                      }
+              }}</small>
             </div>
 
             <!-- Chart Components (only show when loaded, not loading/error, and has chart type) -->
@@ -586,6 +597,7 @@
                   [visual]="visual"
                   [chartWidth]="visual.width"
                   [chartHeight]="visual.height - 35"
+                  [configVersion]="chartConfigVersion"
                 ></app-chart-renderer>
               </div>
             </ng-container>
@@ -660,6 +672,7 @@
         [visual]="maximizedVisual"
         [chartWidth]="950"
         [chartHeight]="560"
+        [configVersion]="chartConfigVersion"
       ></app-chart-renderer>
     </div>
   </div>

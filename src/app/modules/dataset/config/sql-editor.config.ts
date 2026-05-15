@@ -4,6 +4,18 @@
  */
 
 /**
+ * "Empty" content for the SQL editor. Originally a comment placeholder
+ * ("-- Write your SQL query here") but that confused users — many treated it
+ * as real content and started typing over the comment markers, while the
+ * Save/Run buttons stayed disabled because isQueryEmpty matched the literal.
+ *
+ * Now an empty string. Monaco shows its own ghost-text affordances; the
+ * downstream `value === SQL_EDITOR_PLACEHOLDER` checks all still hold because
+ * `'' === ''` is true and `!query || query === ''` is the same predicate.
+ */
+export const SQL_EDITOR_PLACEHOLDER = '';
+
+/**
  * Monaco Editor configuration options
  */
 export const MONACO_EDITOR_OPTIONS = {
@@ -22,7 +34,12 @@ export const MONACO_EDITOR_OPTIONS = {
   wordBasedSuggestions: false,
   tabCompletion: 'on' as const,
   suggest: {
-    showKeywords: false,
+    // showKeywords gates ALL items with kind === Keyword in the suggest
+    // widget — including ones our own provider emits. Was previously false
+    // (intent: silence Monaco's built-in SQL keyword list), but that also
+    // dropped DISTINCT, ASC, DESC, IS NULL, etc. that we explicitly add.
+    // wordBasedSuggestions: false below already handles the built-in noise.
+    showKeywords: true,
     showSnippets: true,
     showFunctions: true,
     showWords: false,
@@ -882,6 +899,14 @@ export const EDITOR_LOADING_CONFIG = {
   CHECK_INTERVAL_MS: 50,
   TIMEOUT_MS: 20000,
 };
+
+/**
+ * Maximum time the FE will wait for a single query/execute or export response
+ * before surfacing a timeout error. The BE has its own DB-level timeouts; this
+ * is a safety net so the editor never appears to hang forever on a runaway
+ * query or a stalled connection.
+ */
+export const QUERY_EXECUTION_TIMEOUT_MS = 60_000;
 
 /**
  * SQL Editor Context Menu Actions Configuration

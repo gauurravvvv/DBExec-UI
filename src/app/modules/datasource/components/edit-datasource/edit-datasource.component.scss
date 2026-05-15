@@ -176,6 +176,11 @@
     font-weight: var(--fw-medium);
     text-decoration: none;
     transition: opacity var(--motion-base) ease;
+    // Long BE error messages ("Connection refused at host..." etc.) shouldn't
+    // overflow the row or break mid-word into a single column.
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 
     &:hover:not(.disabled) {
       opacity: 0.8;
@@ -184,10 +189,12 @@
     &.disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      pointer-events: none;
     }
 
     i {
       font-size: var(--fs-body);
+      flex-shrink: 0;
 
       &.pi-check-circle {
         color: var(--success-color);
@@ -336,8 +343,6 @@
 
 .p-input-icon-left {
   input[type='number'] {
-    -moz-appearance: textfield;
-
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -520,7 +525,11 @@
         }
 
         &.btn-confirm {
-          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          );
           color: var(--primary-text);
           box-shadow: 0 4px 14px var(--primary-color-transparent);
           &:hover:not(:disabled) {
