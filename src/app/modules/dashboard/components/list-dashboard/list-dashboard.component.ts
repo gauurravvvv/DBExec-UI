@@ -31,6 +31,12 @@ type DashboardSortField = 'name' | 'status' | 'createdOn';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListDashboardComponent implements OnInit {
+  refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadDashboards();
+    }
+  }
+
   @ViewChild('dt') dt!: Table;
 
   private destroyRef = inject(DestroyRef);

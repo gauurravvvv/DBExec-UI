@@ -334,7 +334,7 @@ export class ListAnnouncementsComponent implements OnInit {
       });
   }
 
-  private refreshList(): void {
+  refreshList(): void {
     if (this.lastTableLazyLoadEvent) {
       this.loadAnnouncements(this.lastTableLazyLoadEvent);
     } else {

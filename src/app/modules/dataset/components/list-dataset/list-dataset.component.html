@@ -6,6 +6,39 @@
         <h2>{{ 'DATASET.TITLE' | translate }}</h2>
         <p class="subtitle">{{ 'DATASET.SUBTITLE' | translate }}</p>
       </div>
+
+      <div class="header-actions">
+          <!-- Bulk Delete Button -->
+          <button
+            *ngIf="selectedCount > 0"
+            pButton
+            [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
+            icon="pi pi-trash"
+            (click)="confirmBulkDelete()"
+            class="p-button-raised p-button-danger modern-button"
+          ></button>
+
+          <!-- Clear Filters Button -->
+          <button
+            pButton
+            [label]="'COMMON.CLEAR' | translate"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+
+          <!-- Add Button -->
+          <p-splitButton
+            [label]="'COMMON.ADD' | translate"
+            icon="pi pi-plus"
+            (onClick)="onAddNewAdmin()"
+            [model]="addDatasetItems"
+            styleClass="p-button-raised p-button-primary modern-split-button"
+            appendTo="body"
+          >
+          </p-splitButton>
+              </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -52,39 +85,6 @@
             </app-custom-dropdown>
           </div>
         </div>
-
-        <div class="toolbar-right">
-          <!-- Bulk Delete Button -->
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="('COMMON.DELETE' | translate) + ' (' + selectedCount + ')'"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button mr-2"
-          ></button>
-
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button mr-2"
-          ></button>
-
-          <!-- Add Button -->
-          <p-splitButton
-            [label]="'COMMON.ADD' | translate"
-            icon="pi pi-plus"
-            (onClick)="onAddNewAdmin()"
-            [model]="addDatasetItems"
-            styleClass="p-button-raised p-button-primary modern-split-button"
-            appendTo="body"
-          >
-          </p-splitButton>
-        </div>
       </div>
 
       <!-- Table -->
@@ -108,15 +108,15 @@
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
           scrollHeight="flex"
-          [tableStyle]="{ 'min-width': '72rem' }"
+          [tableStyle]="{ 'min-width': '65rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 3.5rem; min-width: 3.5rem" pFrozenColumn>
+              <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
                 <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
               </th>
               <th
-                style="min-width: 14rem"
+                style="width: 14rem; min-width: 14rem"
                 pFrozenColumn
                 class="sortable-th"
                 [class.is-sorted]="!!sortHelper.direction('name')"
@@ -124,58 +124,52 @@
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.NAME' | translate }}</span>
-                  <span class="sort-indicator">
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('name')">
                     <i class="pi" [ngClass]="{
-                      'pi-sort-alt': !sortHelper.direction('name'),
-                      'pi-sort-amount-up-alt': sortHelper.direction('name') === 'asc',
-                      'pi-sort-amount-down': sortHelper.direction('name') === 'desc',
+                      'pi-arrow-up': sortHelper.direction('name') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('name') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('name'),
                     }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('name') > 0 && sortHelper.size > 1">
-                      {{ sortHelper.index('name') }}
-                    </span>
+                    <span class="sort-badge" *ngIf="sortHelper.index('name') > 0 && sortHelper.size > 1">{{ sortHelper.index('name') }}</span>
                   </span>
                 </div>
               </th>
-              <th style="min-width: 18rem">
+              <th style="min-width: 20rem">
                 <div class="th-content">{{ 'COMMON.DESCRIPTION' | translate }}</div>
               </th>
               <th
-                style="min-width: 9rem; width: 9rem"
+                style="width: 9rem; min-width: 9rem"
                 class="sortable-th"
                 [class.is-sorted]="!!sortHelper.direction('status')"
                 (click)="toggleSort('status')"
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.STATUS' | translate }}</span>
-                  <span class="sort-indicator">
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('status')">
                     <i class="pi" [ngClass]="{
-                      'pi-sort-alt': !sortHelper.direction('status'),
-                      'pi-sort-amount-up-alt': sortHelper.direction('status') === 'asc',
-                      'pi-sort-amount-down': sortHelper.direction('status') === 'desc',
+                      'pi-arrow-up': sortHelper.direction('status') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('status') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('status'),
                     }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">
-                      {{ sortHelper.index('status') }}
-                    </span>
+                    <span class="sort-badge" *ngIf="sortHelper.index('status') > 0 && sortHelper.size > 1">{{ sortHelper.index('status') }}</span>
                   </span>
                 </div>
               </th>
               <th
-                style="min-width: 12rem; width: 12rem"
+                style="width: 12rem; min-width: 12rem"
                 class="sortable-th"
                 [class.is-sorted]="!!sortHelper.direction('createdOn')"
                 (click)="toggleSort('createdOn')"
               >
                 <div class="th-content">
                   <span>{{ 'COMMON.CREATED_ON' | translate }}</span>
-                  <span class="sort-indicator">
+                  <span class="sort-indicator" [class.is-sorted]="!!sortHelper.direction('createdOn')">
                     <i class="pi" [ngClass]="{
-                      'pi-sort-alt': !sortHelper.direction('createdOn'),
-                      'pi-sort-amount-up-alt': sortHelper.direction('createdOn') === 'asc',
-                      'pi-sort-amount-down': sortHelper.direction('createdOn') === 'desc',
+                      'pi-arrow-up': sortHelper.direction('createdOn') === 'asc',
+                      'pi-arrow-down': sortHelper.direction('createdOn') === 'desc',
+                      'pi-arrows-v': !sortHelper.direction('createdOn'),
                     }"></i>
-                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">
-                      {{ sortHelper.index('createdOn') }}
-                    </span>
+                    <span class="sort-badge" *ngIf="sortHelper.index('createdOn') > 0 && sortHelper.size > 1">{{ sortHelper.index('createdOn') }}</span>
                   </span>
                 </div>
               </th>
@@ -305,19 +299,25 @@
           <ng-template pTemplate="emptymessage">
             <tr class="empty-row">
               <td colspan="6" class="empty-message-cell">
-                <div class="empty-state">
-                  <div class="empty-icon">
-                    <i class="pi pi-inbox"></i>
-                  </div>
-                  <div class="empty-title">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}
-                  </div>
-                  <div class="empty-subtitle" *ngIf="isFilterActive">
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </div>
+                <div class="empty-state-inline">
+                  <i class="pi pi-inbox empty-state-icon"></i>
+                  <span class="empty-state-text">
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                  </span>
                 </div>
               </td>
             </tr>
+          </ng-template>
+        
+          <ng-template pTemplate="paginatorright">
+            <button
+              type="button"
+              class="paginator-refresh-btn"
+              (click)="refreshList()"
+              [attr.aria-label]="'COMMON.REFRESH' | translate"
+            >
+              <i class="pi pi-refresh"></i>
+            </button>
           </ng-template>
         </p-table>
       </div>

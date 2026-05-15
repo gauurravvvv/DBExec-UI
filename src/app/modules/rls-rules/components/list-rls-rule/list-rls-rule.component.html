@@ -8,6 +8,27 @@
           {{ 'RLS.SUBTITLE' | translate }}
         </p>
       </div>
+
+      <div class="header-actions">
+          <!-- Clear Filters Button -->
+          <button
+            pButton
+            [label]="'COMMON.CLEAR' | translate"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+
+          <!-- Add Button -->
+          <button
+            pButton
+            [label]="'RLS.ADD_RULE' | translate"
+            icon="pi pi-plus"
+            (click)="onAddNewRule()"
+            class="p-button-raised p-button-primary modern-button"
+          ></button>
+              </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -56,27 +77,6 @@
             </app-custom-dropdown>
           </div>
         </div>
-
-        <div class="toolbar-right">
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button mr-2"
-          ></button>
-
-          <!-- Add Button -->
-          <button
-            pButton
-            [label]="'RLS.ADD_RULE' | translate"
-            icon="pi pi-plus"
-            (click)="onAddNewRule()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
-        </div>
       </div>
 
       <!-- Table -->
@@ -109,7 +109,7 @@
               <th style="width: 32%">
                 <div class="th-content">{{ 'RLS.CONDITIONS' | translate }}</div>
               </th>
-              <th style="width: 12%">
+              <th  style="width: 8rem; min-width: 8rem">
                 <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
               <th style="width: 16%">
@@ -197,7 +197,7 @@
               </td>
               <td>
                 <span
-                  class="status-indicator"
+                  class="status-pill"
                   [ngClass]="{
                     active: rule.status === 1,
                     inactive: rule.status !== 1,
@@ -256,6 +256,17 @@
                 >
               </td>
             </tr>
+          </ng-template>
+        
+          <ng-template pTemplate="paginatorright">
+            <button
+              type="button"
+              class="paginator-refresh-btn"
+              (click)="refreshList()"
+              [attr.aria-label]="'COMMON.REFRESH' | translate"
+            >
+              <i class="pi pi-refresh"></i>
+            </button>
           </ng-template>
         </p-table>
       </div>

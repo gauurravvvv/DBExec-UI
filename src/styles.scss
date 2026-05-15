@@ -375,6 +375,375 @@ textarea,
   z-index: 0;
 }
 
+// Modern table layout. PrimeNG's flex-scrollable mode lays out
+// .p-datatable as a flex column with height: 100%, and gives
+// .p-datatable-wrapper { flex: 1; height: 100% } — but does NOT set
+// overflow on the wrapper. So we have to:
+//   1. min-width: 0 on every flex ancestor (so the 96rem inner <table>
+//      doesn't push the page wider than the card).
+//   2. overflow: auto on .p-datatable-wrapper (so both horizontal AND
+//      vertical scrolling engage when the table outgrows the card).
+// p-table is a block host. Its parent .table-wrapper is a flex column,
+// so we make p-table a flex item too — that's the only way PrimeNG's
+// inner .p-datatable.p-datatable-flex-scrollable can resolve its
+// height: 100% against a real number instead of "auto" (which would
+// let the body grow to fit all rows instead of scrolling).
+p-table {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+.modern-table.p-datatable {
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+// This is the rule that actually engages PrimeNG's scrolling.
+// Scoped to .modern-table so legacy tables (.basic-table, .admin-table
+// etc., which already set their own max-height) are unaffected.
+//
+// The wrapper scrolls in BOTH axes — but to keep the table header
+// visually pinned while the body rows scroll under it, we make the
+// thead rows sticky relative to this wrapper. The thead becomes the
+// fixed "header" and the tbody is the scrolling "body" the user asked
+// for.
+.modern-table.p-datatable.p-datatable-flex-scrollable > .p-datatable-wrapper {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+
+  // Thin, modern scrollbars — scoped to the table wrapper so the rest
+  // of the app (page scroll, dropdowns, overlays) keeps its native
+  // platform scrollbar. The wrapper gets a flat 8px track + slim
+  // rounded thumb that picks up a darker tone on hover, matching the
+  // muted-grey palette used elsewhere in the modern listing surface.
+  //
+  // Firefox uses scrollbar-color / scrollbar-width; Chromium + Safari
+  // use the legacy ::-webkit-scrollbar pseudo-elements.
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+
+  &::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--text-subtle);
+  }
+  // Hide the square in the bottom-right corner where the two
+  // scrollbars meet — default OS render is ugly grey.
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+// Sticky header rows. The first row is the column labels; the second
+// row is the inline filters/search/dropdowns. Both stay pinned while
+// the tbody scrolls under them.
+//
+// !important on background is intentional: per-module SCSS sets
+// `background: transparent` on header cells (so the table looks flat
+// without scroll), but for sticky-positioned cells to hide the rows
+// scrolling beneath them, they MUST be opaque. We respect the visual
+// design (no header fill at rest) by matching the card background —
+// which IS what's behind the header when nothing is scrolled.
+.modern-table.p-datatable.p-datatable-flex-scrollable {
+  .p-datatable-thead > tr:first-child > th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--card-background) !important;
+  }
+
+  .p-datatable-thead > tr:nth-child(2) > th {
+    position: sticky;
+    // Pin the filter row directly below the label row. 40px matches
+    // the label-row height set in the module-level scss.
+    top: 40px;
+    z-index: 2;
+    background: var(--card-background) !important;
+  }
+
+  // Frozen-column cells in the header need a higher z-index so they
+  // sit above the rest of the sticky header (which itself is above
+  // body rows) — AND above body frozen cells (which PrimeNG gives
+  // z-index: 1 by default).
+  .p-datatable-thead > tr > th.p-frozen-column {
+    z-index: 3;
+  }
+}
+
+// Status pill — single source of truth across all .modern-table
+// listing modules. Background tint + 1px tinted border + colored
+// dot + label. Three states: active (green), inactive (grey),
+// locked (warning amber). Per-module SCSS overrides that flatten
+// the pill into a plain dot + text are intentionally beaten here
+// (specificity bumped via class chaining).
+.modern-table .status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold);
+  line-height: 1.2;
+  white-space: nowrap;
+  border: 1px solid transparent;
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    box-shadow: none;
+  }
+
+  .label {
+    letter-spacing: 0.01em;
+    color: inherit;
+  }
+
+  &.active {
+    color: var(--success-color);
+    background: var(--success-bg, rgba(34, 197, 94, 0.08));
+    border-color: var(--success-color);
+  }
+
+  &.inactive {
+    color: var(--secondary-color);
+    background: var(--hover-background);
+    border-color: var(--border-color);
+  }
+
+  &.locked {
+    color: var(--warning-color);
+    background: var(--warning-bg, rgba(255, 152, 0, 0.08));
+    border-color: var(--warning-color);
+  }
+}
+
+// Card toolbar holding inline form controls (dropdowns, search
+// inputs) with floatingLabel=true. The floating label sticks up
+// above the input's top edge, but our .content-card has overflow:
+// hidden (required for table-scroll isolation), so without top
+// padding the label gets clipped. 12px gives the label clear room
+// to sit visibly above the dropdown border.
+.content-card .card-toolbar {
+  padding-top: var(--space-5) !important;
+}
+
+// Column alignment — left-align everything in modern listing tables.
+// Modules historically right-aligned the Actions column (header label
+// AND row buttons), but the user wants a single consistent left-edge
+// alignment so all columns line up the same way. These rules beat the
+// per-module `.actions-th { justify-content: flex-end }` and the body
+// `.row-actions { justify-content: flex-end }` rules.
+.modern-table.p-datatable {
+  // Header label cells — left-align all
+  .p-datatable-thead > tr > th {
+    text-align: left;
+
+    .th-content {
+      justify-content: flex-start;
+
+      // Even when the per-module rule still targets .actions-th, force
+      // left-alignment so the "Actions" label sits at the start of its
+      // 7rem column instead of the end.
+      &.actions-th {
+        justify-content: flex-start !important;
+      }
+    }
+  }
+
+  // Body cells — left-align
+  .p-datatable-tbody > tr > td {
+    text-align: left;
+  }
+
+  // Row-actions cell content (the edit/delete icon group) — left-align
+  // the icon group inside its 7rem cell so it lines up with the
+  // Actions header label.
+  .p-datatable-tbody > tr > td .row-actions {
+    justify-content: flex-start !important;
+  }
+}
+
+// Checkbox column — header AND body cells. PrimeNG doesn't propagate
+// the <th> width to <td> in scrollable mode, so the body cell sizes
+// itself to content + padding (which can leave the checkbox visually
+// offset from the header checkbox above). Force matching width on
+// both, and turn the cell into a flex centre so the inner
+// <p-tablecheckbox> (a non-inline Angular host element that
+// `text-align: center` can't move) sits at the exact middle.
+.modern-table.p-datatable {
+  .p-datatable-thead > tr > th:first-child,
+  .p-datatable-tbody > tr > td:first-child {
+    width: 2.75rem !important;
+    min-width: 2.75rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+  }
+
+  // Center the actual checkbox host element regardless of its
+  // default `display` value.
+  .p-datatable-tbody > tr > td:first-child {
+    p-tablecheckbox {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+  }
+  .p-datatable-thead > tr > th:first-child {
+    p-tableheadercheckbox {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+  }
+}
+
+// PrimeNG default removes the bottom border from the last data row's
+// cells, which leaves the last row hanging without a closing divider
+// when empty space sits beneath it (flex-scrollable mode + few rows).
+// Restore the divider for our modern listing tables so the table
+// always reads as bounded.
+.modern-table.p-datatable .p-datatable-tbody > tr:last-child > td {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+// Empty-state row — replaces the previous icon + title + subtitle
+// stacked block with a single quiet inline message. Sits centered
+// inside the empty body, takes minimal vertical space, reads as
+// "table is empty" without dominating the page.
+.modern-table.p-datatable .empty-row > .empty-message-cell {
+  padding: var(--space-8) var(--space-6);
+  background: transparent;
+}
+.modern-table.p-datatable .empty-state-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  // Bumped from --text-muted to --text-color for clear readability;
+  // a single-row inline empty state needs to read as primary content,
+  // not as a quiet hint.
+  color: var(--text-color);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+
+  .empty-state-icon {
+    font-size: 18px;
+    color: var(--text-muted);
+  }
+
+  .empty-state-text {
+    line-height: 1.4;
+  }
+}
+
+// Group ALL paginator content (page-report, page buttons, refresh,
+// rows-per-page) on the right side of the card as one cohesive
+// cluster, with readable spacing between sub-groups.
+//
+// PrimeNG defaults to:
+//   .p-paginator { justify-content: center }
+//   .p-paginator-right-content { margin-left: auto }
+// The margin-left:auto on right-content pushes it to the far right,
+// breaking the cluster. We override both: flex-end alignment AND
+// strip the auto margin so the refresh button packs with the rest.
+//
+// Spacing rhythm (matches JIRA/Linear paginator density):
+//   - page-report → page-buttons   : 12px
+//   - page-buttons internal        : 2px between buttons
+//   - page-buttons → rows-per-page : 12px
+//   - rows-per-page → refresh      : 12px
+//   - right edge padding           : 16px
+.modern-table.p-datatable .p-paginator {
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-5); // 12px between top-level groups
+  padding: var(--space-5) var(--space-6); // 12px top/bot, 16px sides
+
+  // Right-content wrapper holds the refresh button. PrimeNG default
+  // margin-left: auto pushed it to the far right (broke the cluster);
+  // we strip that and add an explicit margin-left so the icon button
+  // has the same visual gap from the page-size dropdown as other
+  // sub-groups have from each other. The extra space compensates for
+  // the dropdown's right border vs. the borderless icon button.
+  .p-paginator-right-content {
+    margin-left: var(--space-4); // 8px — added on top of the parent's 12px gap
+    margin-right: 0;
+  }
+  .p-paginator-left-content {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  // Quiet the current-page report so it reads as supporting text
+  // next to the active controls.
+  .p-paginator-current {
+    color: var(--text-muted);
+    font-size: var(--fs-body);
+    margin: 0;
+  }
+}
+
+// JIRA-style refresh button rendered via <ng-template pTemplate="paginatorright">.
+// Sits inside the paginator, packed with the rest of the controls on
+// the right side of the card.
+.modern-table.p-datatable .p-paginator .paginator-refresh-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color-secondary);
+  transition: color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+
+  i {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  &:hover {
+    color: var(--primary-color);
+    background: var(--hover-background);
+    border-color: var(--border-color);
+  }
+
+  &:active i {
+    // Quick rotational cue that the refresh fired.
+    transform: rotate(180deg);
+    transition: transform 0.25s ease;
+  }
+}
+
 .basic-table {
   .p-datatable-wrapper {
     max-height: calc(100vh - 394px);
@@ -952,15 +1321,9 @@ textarea,
   margin-left: 5px;
 }
 
-.p-checkbox .p-checkbox-box.p-highlight {
-  background-color: $main-color;
-  border-color: $main-color;
-  background: $main-color;
-}
-.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-  background-color: $main-color;
-  border-color: $main-color;
-}
+// Checkbox highlight + highlight-hover are covered by the consolidated
+// .p-checkbox rule near the bottom of this file (uses --primary-color
+// tokens instead of the old $main-color sass var).
 .p-datatable .p-datatable-thead > tr > th {
   background-color: $theme-color-3;
   border-color: var(--table-border-color);
@@ -1759,14 +2122,50 @@ aw-wizard-navigation-bar.horizontal ul.steps-indicator li {
 .p-tabmenu .p-tabmenu-nav .p-tabmenu-ink-bar {
   background-color: var(--main-color);
 }
-.p-checkbox .p-checkbox-box {
-  border-color: var(--checkbox-color);
-  border-radius: 50%;
+// Checkbox baseline — small rounded square (modern SaaS norm, replaces
+// the previous circle look). Border uses the theme border-color so it
+// reads as a quiet control at rest and gets the brand colour when
+// checked.
+.p-checkbox {
+  width: 18px;
+  height: 18px;
+
+  .p-checkbox-box {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    background: var(--card-background);
+    transition:
+      border-color var(--motion-fast) ease,
+      background-color var(--motion-fast) ease;
+
+    &:not(.p-disabled):hover {
+      border-color: var(--primary-color);
+    }
+
+    &.p-highlight {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+
+      &:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+      }
+    }
+
+    .p-checkbox-icon {
+      font-size: 11px;
+      color: var(--primary-text);
+    }
+  }
 }
+
+// Datatable header/body checkbox column — let component-level rules
+// decide the width via inline th style (we removed the global 2rem
+// !important override that was clamping the column).
 .p-datatable .p-datatable-thead > tr > th:has(> p-tableHeaderCheckbox),
 .p-datatable .p-datatable-tbody > tr > td:has(> p-tableCheckbox) {
-  width: 2rem;
-  padding: 0.25rem 0.5rem !important;
   text-align: center;
 }
 .p-inputtext {
@@ -2452,19 +2851,9 @@ body {
   min-width: 200px;
 }
 
-// Circular table checkboxes + tight column width
-.modern-table {
-  .p-checkbox .p-checkbox-box {
-    border-radius: 50% !important;
-  }
-
-  .p-datatable-thead > tr > th:first-child,
-  .p-datatable-tbody > tr > td:first-child {
-    width: 2.5rem !important;
-    max-width: 2.5rem !important;
-    min-width: 2.5rem !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0 !important;
-    text-align: center;
-  }
-}
+// Old `.modern-table` overrides (forced circle checkbox + asymmetric
+// first-column padding + 2.5rem !important width) were removed. Those
+// rules predate the Phase-1 redesign and conflict with the consolidated
+// .p-checkbox rule + per-module first-column sizing. Checkbox styling
+// now comes from the global .p-checkbox block higher in this file,
+// and first-column width / centring is handled per-module SCSS.

@@ -255,7 +255,7 @@ export class ListOrganisationComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadOrganisations(this.lastTableLazyLoadEvent);
     }

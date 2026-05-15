@@ -6,6 +6,25 @@
         <h2>{{ 'ANNOUNCEMENT.TITLE' | translate }}</h2>
         <p class="subtitle">{{ 'ANNOUNCEMENT.SUBTITLE' | translate }}</p>
       </div>
+
+      <div class="header-actions">
+          <button
+            pButton
+            [label]="'COMMON.CLEAR' | translate"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+
+          <button
+            pButton
+            [label]="'COMMON.ADD' | translate"
+            icon="pi pi-plus"
+            (click)="onAdd()"
+            class="p-button-raised p-button-primary modern-button"
+          ></button>
+              </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -31,25 +50,6 @@
             </app-custom-dropdown>
           </div>
         </div>
-
-        <div class="toolbar-right">
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button mr-2"
-          ></button>
-
-          <button
-            pButton
-            [label]="'COMMON.ADD' | translate"
-            icon="pi pi-plus"
-            (click)="onAdd()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
-        </div>
       </div>
 
       <div class="table-wrapper">
@@ -69,33 +69,33 @@
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
           scrollHeight="calc(100vh - 440px)"
-          [tableStyle]="{ 'min-width': '70rem' }"
+          [tableStyle]="{ 'min-width': '93rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 4rem" pFrozenColumn>
+              <th style="width: 5rem; min-width: 5rem" pFrozenColumn>
                 <div class="th-content">{{ 'ANNOUNCEMENT.PREVIEW' | translate }}</div>
               </th>
-              <th style="width: 14rem" pFrozenColumn>
+              <th style="width: 14rem; min-width: 14rem" pFrozenColumn>
                 <div class="th-content">{{ 'ANNOUNCEMENT.ANNOUNCEMENT_TITLE' | translate }}</div>
               </th>
-              <th style="width: 18rem">
+              <th style="min-width: 20rem">
                 <div class="th-content">{{ 'COMMON.DESCRIPTION' | translate }}</div>
               </th>
-              <th style="width: 10rem">
+              <th style="width: 12rem; min-width: 12rem">
                 <div class="th-content">{{ 'ANNOUNCEMENT.GROUP' | translate }}</div>
               </th>
-              <th style="width: 7rem">
+              <th  style="width: 9rem; min-width: 9rem">
                 <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
-              <th style="width: 12rem">
+              <th style="width: 14rem; min-width: 14rem">
                 <div class="th-content">{{ 'ANNOUNCEMENT.ACTIVE_WINDOW' | translate }}</div>
               </th>
-              <th style="width: 10rem">
+              <th  style="width: 12rem; min-width: 12rem">
                 <div class="th-content">{{ 'COMMON.CREATED_ON' | translate }}</div>
               </th>
-              <th style="width: 6rem">
-                <div class="th-content">{{ 'COMMON.ACTIONS' | translate }}</div>
+              <th style="width: 7rem; min-width: 7rem">
+                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -194,7 +194,7 @@
               </td>
               <td>
                 <span
-                  class="status-indicator"
+                  class="status-pill"
                   [ngClass]="{
                     active: isActive(a),
                     inactive: !isActive(a),
@@ -249,11 +249,27 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="8" class="empty-message-cell text-center">
-                {{ 'COMMON.NO_RECORD_FOUND' | translate }}
+            <tr class="empty-row">
+              <td colspan="8" class="empty-message-cell">
+                <div class="empty-state-inline">
+                  <i class="pi pi-inbox empty-state-icon"></i>
+                  <span class="empty-state-text">
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                  </span>
+                </div>
               </td>
             </tr>
+          </ng-template>
+        
+          <ng-template pTemplate="paginatorright">
+            <button
+              type="button"
+              class="paginator-refresh-btn"
+              (click)="refreshList()"
+              [attr.aria-label]="'COMMON.REFRESH' | translate"
+            >
+              <i class="pi pi-refresh"></i>
+            </button>
           </ng-template>
         </p-table>
       </div>

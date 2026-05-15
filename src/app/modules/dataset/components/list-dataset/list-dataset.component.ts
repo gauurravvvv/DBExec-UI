@@ -725,7 +725,7 @@ export class ListDatasetComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadDatasets(this.lastTableLazyLoadEvent);
     } else {

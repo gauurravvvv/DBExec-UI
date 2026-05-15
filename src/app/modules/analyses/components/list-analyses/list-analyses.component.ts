@@ -31,6 +31,12 @@ type AnalysesSortField = 'name' | 'status' | 'createdOn';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListAnalysesComponent implements OnInit {
+  refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadAnalyses();
+    }
+  }
+
   @ViewChild('dt') dt!: Table;
 
   limit = 10;

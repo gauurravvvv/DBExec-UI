@@ -8,6 +8,37 @@
           {{ 'TAB.SUBTITLE' | translate }}
         </p>
       </div>
+
+      <div class="header-actions">
+          <!-- Bulk Delete Button -->
+          <button
+            *ngIf="selectedCount > 0"
+            pButton
+            [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
+            icon="pi pi-trash"
+            (click)="confirmBulkDelete()"
+            class="p-button-raised p-button-danger modern-button"
+          ></button>
+
+          <!-- Clear Filters Button -->
+          <button
+            pButton
+            [label]="'COMMON.CLEAR' | translate"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+
+          <!-- Add Button -->
+          <button
+            pButton
+            [label]="'COMMON.ADD' | translate"
+            icon="pi pi-plus"
+            (click)="onAddNewTab()"
+            class="p-button-raised p-button-primary modern-button"
+          ></button>
+              </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -54,37 +85,6 @@
             </app-custom-dropdown>
           </div>
         </div>
-
-        <div class="toolbar-right">
-          <!-- Bulk Delete Button -->
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button mr-2"
-          ></button>
-
-          <!-- Clear Filters Button -->
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button mr-2"
-          ></button>
-
-          <!-- Add Button -->
-          <button
-            pButton
-            [label]="'COMMON.ADD' | translate"
-            icon="pi pi-plus"
-            (click)="onAddNewTab()"
-            class="p-button-raised p-button-primary modern-button"
-          ></button>
-        </div>
       </div>
 
       <!-- Table -->
@@ -108,30 +108,30 @@
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
           scrollHeight="calc(100vh - 440px)"
-          [tableStyle]="{ 'min-width': '61rem' }"
+          [tableStyle]="{ 'min-width': '73rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 3rem" pFrozenColumn>
+              <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
                 <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
               </th>
-              <th style="width: 12rem" pFrozenColumn>
+              <th style="width: 14rem; min-width: 14rem" pFrozenColumn>
                 <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
               </th>
-              <th style="width: 16rem">
+              <th style="min-width: 20rem">
                 <div class="th-content">{{ 'COMMON.DESCRIPTION' | translate }}</div>
               </th>
-              <th style="width: 7rem">
+              <th style="width: 8rem; min-width: 8rem">
                 <div class="th-content">{{ 'COMMON.SECTIONS' | translate }}</div>
               </th>
-              <th style="width: 7rem">
+              <th  style="width: 9rem; min-width: 9rem">
                 <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
-              <th style="width: 10rem">
+              <th  style="width: 12rem; min-width: 12rem">
                 <div class="th-content">{{ 'COMMON.CREATED_ON' | translate }}</div>
               </th>
-              <th style="width: 6rem">
-                <div class="th-content">{{ 'COMMON.ACTIONS' | translate }}</div>
+              <th style="width: 7rem; min-width: 7rem">
+                <div class="th-content actions-th">{{ 'COMMON.ACTIONS' | translate }}</div>
               </th>
             </tr>
             <!-- Filter Row -->
@@ -208,7 +208,7 @@
               </td>
               <td>
                 <span
-                  class="status-indicator"
+                  class="status-pill"
                   [ngClass]="{
                     active: tab.status === 1,
                     inactive: tab.status !== 1,
@@ -246,11 +246,27 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="7" class="empty-message-cell text-center">
-                {{ 'COMMON.NO_RECORD_FOUND' | translate }}
+            <tr class="empty-row">
+              <td colspan="7" class="empty-message-cell">
+                <div class="empty-state-inline">
+                  <i class="pi pi-inbox empty-state-icon"></i>
+                  <span class="empty-state-text">
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                  </span>
+                </div>
               </td>
             </tr>
+          </ng-template>
+        
+          <ng-template pTemplate="paginatorright">
+            <button
+              type="button"
+              class="paginator-refresh-btn"
+              (click)="refreshList()"
+              [attr.aria-label]="'COMMON.REFRESH' | translate"
+            >
+              <i class="pi pi-refresh"></i>
+            </button>
           </ng-template>
         </p-table>
       </div>

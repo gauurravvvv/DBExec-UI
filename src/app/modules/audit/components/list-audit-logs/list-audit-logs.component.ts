@@ -27,6 +27,12 @@ type AuditLogSortField = 'action' | 'createdOn';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListAuditLogsComponent implements OnInit {
+  refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadLogs(this.lastTableLazyLoadEvent);
+    }
+  }
+
   private destroyRef = inject(DestroyRef);
   private searchSubject = new Subject<void>();
 

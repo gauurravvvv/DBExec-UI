@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  HostBinding,
   inject,
   OnInit,
 } from '@angular/core';
@@ -29,9 +30,33 @@ interface MenuItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent implements OnInit {
+  /**
+   * The sidebar is open when EITHER the user has pinned it open (clicked
+   * the toggle) OR the mouse is currently peeking. The template still
+   * reads `isExpanded` everywhere; we recompute it whenever either input
+   * changes so all the existing bindings keep working unchanged.
+   */
   isExpanded = false;
-  isMobile = false;
+  /**
+   * User-controlled pin state (click toggle to flip). Bound to the host
+   * via .pinned-open class so the host width can change in lockstep —
+   * pinned means we PUSH content; peek floats OVER content.
+   */
+  @HostBinding('class.pinned-open') isPinnedOpen = false;
+  /** Hover-driven temporary expansion. */
+  isHoverPeeking = false;
+  /** True while floating over content (peeking, not pinned). Drives the
+   *  overlay layout in CSS. */
+  isPeekOverlay = false;
+  @HostBinding('class.is-mobile') isMobile = false;
   menuItems: MenuItem[] = [];
+
+  /** Small enter/leave delays so a mouse twitch across the rail doesn't
+   *  open and close the sidebar repeatedly. */
+  private static readonly PEEK_ENTER_DELAY = 120;
+  private static readonly PEEK_LEAVE_DELAY = 200;
+  private peekEnterTimer: ReturnType<typeof setTimeout> | null = null;
+  private peekLeaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
@@ -54,9 +79,71 @@ export class SidebarComponent implements OnInit {
       .subscribe(() => this.cdr.markForCheck());
     const resizeHandler = () => this.checkScreenSize();
     window.addEventListener('resize', resizeHandler);
-    this.destroyRef.onDestroy(() =>
-      window.removeEventListener('resize', resizeHandler),
-    );
+    this.destroyRef.onDestroy(() => {
+      window.removeEventListener('resize', resizeHandler);
+      this.clearPeekTimers();
+    });
+  }
+
+  /**
+   * Mouse enters the sidebar. If the user hasn't pinned it open, schedule
+   * a temporary expansion after PEEK_ENTER_DELAY so brief mouse-overs
+   * don't snap the rail open.
+   */
+  onSidebarMouseEnter(): void {
+    if (this.isPinnedOpen || this.isMobile) return;
+    this.cancelPeekLeave();
+    if (this.peekEnterTimer) return; // already scheduled
+    this.peekEnterTimer = setTimeout(() => {
+      this.peekEnterTimer = null;
+      this.isHoverPeeking = true;
+      this.isPeekOverlay = true;
+      this.expandMenuForCurrentRoute();
+      this.recomputeExpanded();
+    }, SidebarComponent.PEEK_ENTER_DELAY);
+  }
+
+  /**
+   * Mouse leaves the sidebar. Schedule the collapse after a slightly
+   * longer delay so users moving toward submenu items have time to
+   * cross the gap without the peek snapping closed.
+   */
+  onSidebarMouseLeave(): void {
+    if (this.isPinnedOpen || this.isMobile) return;
+    this.cancelPeekEnter();
+    if (!this.isHoverPeeking) return;
+    if (this.peekLeaveTimer) return;
+    this.peekLeaveTimer = setTimeout(() => {
+      this.peekLeaveTimer = null;
+      this.isHoverPeeking = false;
+      this.isPeekOverlay = false;
+      this.collapseAllMenus();
+      this.recomputeExpanded();
+    }, SidebarComponent.PEEK_LEAVE_DELAY);
+  }
+
+  private cancelPeekEnter(): void {
+    if (this.peekEnterTimer) {
+      clearTimeout(this.peekEnterTimer);
+      this.peekEnterTimer = null;
+    }
+  }
+
+  private cancelPeekLeave(): void {
+    if (this.peekLeaveTimer) {
+      clearTimeout(this.peekLeaveTimer);
+      this.peekLeaveTimer = null;
+    }
+  }
+
+  private clearPeekTimers(): void {
+    this.cancelPeekEnter();
+    this.cancelPeekLeave();
+  }
+
+  private recomputeExpanded(): void {
+    this.isExpanded = this.isPinnedOpen || this.isHoverPeeking;
+    this.cdr.markForCheck();
   }
 
   processMenuItems(items: MenuItem[], level: number = 0): MenuItem[] {
@@ -108,14 +195,22 @@ export class SidebarComponent implements OnInit {
     expandParents(this.menuItems);
   }
 
+  /**
+   * Click the toggle handle: flip the pinned-open state. Pinned wins over
+   * hover-peek (clicking to pin always takes priority; clicking to unpin
+   * also cancels any in-progress peek timer).
+   */
   toggleSidebar() {
-    this.isExpanded = !this.isExpanded;
-    if (this.isExpanded) {
+    this.clearPeekTimers();
+    this.isHoverPeeking = false;
+    this.isPeekOverlay = false;
+    this.isPinnedOpen = !this.isPinnedOpen;
+    if (this.isPinnedOpen) {
       this.expandMenuForCurrentRoute();
     } else {
       this.collapseAllMenus();
     }
-    this.cdr.markForCheck();
+    this.recomputeExpanded();
   }
 
   toggleSidebarAndCollapseAll() {
@@ -140,12 +235,12 @@ export class SidebarComponent implements OnInit {
 
   toggleSubmenuAndExpand(item: MenuItem) {
     if (!this.isExpanded) {
-      // Coming from collapsed → open the rail first, then expand this branch
-      // on the next tick so the width transition kicks in cleanly. OnPush
-      // change-detection means we must explicitly mark for check after the
-      // setTimeout, otherwise the flag flips but the view doesn't refresh.
-      this.isExpanded = true;
-      this.cdr.markForCheck();
+      // Coming from collapsed → click on a parent icon should pin the
+      // sidebar open (the user made a deliberate choice) and then open
+      // this branch on the next tick once the width transition kicks in.
+      this.clearPeekTimers();
+      this.isPinnedOpen = true;
+      this.recomputeExpanded();
       setTimeout(() => {
         item.isExpanded = true;
         this.cdr.markForCheck();
@@ -220,11 +315,15 @@ export class SidebarComponent implements OnInit {
         }
       });
 
-      // Then collapse the sidebar
-      this.isExpanded = false;
+      // Then collapse the sidebar (force off in mobile — hover peek is
+      // disabled at this breakpoint).
+      this.isPinnedOpen = false;
+      this.isHoverPeeking = false;
+      this.isPeekOverlay = false;
+      this.clearPeekTimers();
     }
 
-    this.cdr.markForCheck();
+    this.recomputeExpanded();
   }
 
   trackByIndex(index: number): number {

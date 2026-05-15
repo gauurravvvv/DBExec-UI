@@ -487,7 +487,7 @@ export class ListSectionComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadSections(this.lastTableLazyLoadEvent);
     } else {

@@ -517,7 +517,7 @@ export class ListPromptComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadPrompts(this.lastTableLazyLoadEvent);
     } else {

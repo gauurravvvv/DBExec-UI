@@ -28,15 +28,13 @@
       </div>
 
       <!-- Fullscreen -->
-      <button
-        class="icon-btn"
-        (click)="toggleFullscreen()"
-        [pTooltip]="(isFullscreen ? 'HEADER.EXIT_FULLSCREEN' : 'HEADER.FULLSCREEN') | translate"
-        tooltipPosition="bottom"
-      >
+      <button class="icon-btn" (click)="toggleFullscreen()">
+        <!-- PrimeIcons in this version ships pi-expand but not
+             pi-compress. Use the window-minimize glyph for the
+             "exit fullscreen" state. -->
         <i
           class="pi"
-          [ngClass]="isFullscreen ? 'pi-window-minimize' : 'pi-window-maximize'"
+          [ngClass]="isFullscreen ? 'pi-window-minimize' : 'pi-expand'"
         ></i>
       </button>
 
@@ -57,8 +55,6 @@
       <button
         class="icon-btn notification-btn"
         (click)="toggleNotificationMenu($event)"
-        [pTooltip]="'HEADER.NOTIFICATIONS' | translate"
-        tooltipPosition="bottom"
       >
         <i class="pi pi-bell"></i>
         <span class="badge" *ngIf="unreadNotifications > 0">{{
@@ -69,18 +65,11 @@
       <!-- Divider -->
       <div class="header-divider"></div>
 
-      <!-- User Profile -->
+      <!-- User Profile — avatar-only trigger; full identity sits in the
+           open menu so the header chrome stays compact. -->
       <div class="user-profile" (click)="toggleProfileMenu($event)">
         <div class="profile-trigger">
           <div class="avatar">{{ userInitials }}</div>
-          <div class="user-meta">
-            <span class="username">{{ userName }}</span>
-            <span class="user-role">{{ userRole }}</span>
-          </div>
-          <i
-            class="pi pi-chevron-down chevron"
-            [class.open]="showProfileMenu"
-          ></i>
         </div>
 
         <div class="profile-menu" *ngIf="showProfileMenu">

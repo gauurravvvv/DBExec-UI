@@ -2,6 +2,14 @@
 :host {
   display: block;
   height: 100%;
+  // Host is a flex child of <main class="main-content"> (when the
+  // listing is rendered via router-outlet inside a flex layout). Without
+  // min-width: 0, the host expands to the table's intrinsic width and
+  // pushes the page horizontally. With it, the host stays bounded and
+  // PrimeNG's internal scroll engages.
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   background-color: var(--background-color);
   border-radius: var(--radius-lg);
 }
@@ -12,6 +20,12 @@
   height: 100%;
   width: 100%;
   padding: var(--space-0);
+  // Flex children need min-width: 0 (horizontal) AND min-height: 0
+  // (vertical) so they can shrink below their content's intrinsic size.
+  // Without min-height: 0, PrimeNG's flex-scrollable body can't scroll
+  // because the parent grows to fit all rows.
+  min-width: 0;
+  min-height: 0;
 
   .dataset-content-container {
     flex: 1;
@@ -21,17 +35,26 @@
     max-width: 100%;
     margin: 0 auto;
     width: 100%;
+    min-width: 0;
+    min-height: 0;
     gap: var(--space-8);
   }
 }
 
-// 1. Header Section
+// 1. Header Section — title (left) + page actions (right) in a single
+// row. This pattern collapses the previously empty band between the
+// page title and the table-toolbar onto one line, saving ~80px of
+// vertical real estate.
 .page-header-section {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-6);
 
   .header-content {
+    min-width: 0;
+
     h2 {
       font-size: var(--fs-h1);
       font-weight: var(--fw-semibold);
@@ -47,36 +70,50 @@
       font-weight: var(--fw-regular);
     }
   }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-shrink: 0;
+  }
 }
 
-// 2. Content Card & Toolbar
+// 2. Content surface
+// No outer card border, no inner box-shadow, no toolbar bottom-divider —
+// the data is the surface. The single subtle line that survives is the
+// table-header bottom border.
 .content-card {
-  background: var(--card-background);
-  border-radius: var(--radius-lg);
-  box-shadow:
-    0 4px 6px -1px var(--shadow-color),
-    0 2px 4px -1px var(--shadow-color);
-  border: 1px solid var(--border-color);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   flex: 1;
+  // Both axes bounded for the flex layout to actually scroll inside:
+  //   min-width: 0  — stops horizontal expansion past parent
+  //   min-height: 0 — lets the body shrink below content height so
+  //                   PrimeNG's flex-scrollable body can scroll
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
 
   .card-toolbar {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+    padding: 0 0 var(--space-5);
+    border-bottom: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-6);
-    background: var(--card-background);
+    background: transparent;
 
     .toolbar-left,
     .toolbar-right {
       display: flex;
       align-items: center;
-      gap: var(--space-6);
+      gap: var(--space-4);
     }
 
     // Search Input
@@ -153,10 +190,18 @@
   // 3. Table Wrapper
   .table-wrapper {
     flex: 1;
-    overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
+    // Bound horizontally (min-width: 0) so the page doesn't overflow,
+    // but leave overflow alone — PrimeNG's flex-scrollable mode needs
+    // an unbounded overflow on the wrapper so it can manage both
+    // horizontal AND vertical scrolling internally on
+    // .p-datatable-wrapper. Clamping overflow here kills vertical
+    // scroll inside the table body.
+    min-width: 0;
+    width: 100%;
+    min-height: 0;
 
     ::ng-deep .modern-table {
       .p-datatable-wrapper {
@@ -168,35 +213,45 @@
         display: none;
       } // We used custom toolbar
 
+      // Header row — quiet, no fill. Single 1px hairline below it
+      // separates header from body. Sentence-case label (not uppercase),
+      // muted colour, default weight at 600 so it still reads as a header
+      // without dominating.
       .p-datatable-thead > tr:first-child > th {
-        background: var(--hover-background);
-        color: var(--text-color);
+        background: transparent;
+        color: var(--text-muted);
         opacity: 1;
         font-size: var(--fs-label);
         font-weight: var(--fw-semibold);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        padding: 0.85rem 1rem;
-        height: 48px;
+        text-transform: none;
+        letter-spacing: 0;
+        padding: var(--space-5) var(--space-6);
+        height: 40px;
         border-bottom: 1px solid var(--border-color);
         white-space: nowrap;
 
         .th-content {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: var(--space-3);
+          gap: var(--space-2);
           line-height: 1;
 
           &.actions-th {
             justify-content: flex-end;
+            width: 100%;
           }
         }
 
+        // Checkbox column — symmetric padding so the checkbox sits at
+        // the visual centre of the 2.75rem (44px) cell. Asymmetric
+        // padding would shift the centred content off-axis.
         &:first-child {
-          padding-left: 2rem;
+          padding-left: 0;
+          padding-right: 0;
+          text-align: center;
         }
         &:last-child {
-          padding-right: 2rem;
+          padding-right: var(--space-8);
         }
 
         &:focus {
@@ -206,17 +261,24 @@
         &.sortable-th {
           cursor: pointer;
           user-select: none;
-          transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
+          transition: color var(--motion-fast) ease;
 
+          // Hover: the column header tints to text colour and the sort
+          // indicator pops in. No background fill — keep the chrome calm.
           &:hover {
-            background: var(--border-color);
-            .sort-indicator .pi { color: var(--primary-color); }
+            color: var(--text-color);
+            .sort-indicator { opacity: 1; }
           }
 
+          // Active sort: column header itself becomes the primary colour;
+          // the sort arrow shows full-strength.
           &.is-sorted {
             color: var(--primary-color);
-            background: var(--primary-color-transparent);
-            .sort-indicator .pi { color: var(--primary-color); }
+            background: transparent;
+            .sort-indicator {
+              opacity: 1;
+              .pi { color: var(--primary-color); }
+            }
           }
 
           &:focus-visible {
@@ -224,15 +286,23 @@
             outline-offset: -2px;
           }
 
+          // Sort indicator: hidden by default, fades in on column hover
+          // or stays visible when the column is the active sort key.
           .sort-indicator {
             display: inline-flex;
             align-items: center;
             gap: var(--space-2);
-            margin-left: 0.35rem;
+            margin-left: var(--space-2);
+            opacity: 0;
+            transition: opacity var(--motion-fast) ease;
+
+            &.is-sorted {
+              opacity: 1;
+            }
 
             .pi {
-              font-size: var(--fs-label);
-              color: var(--secondary-color);
+              font-size: 11px;
+              color: var(--text-muted);
               transition: color var(--motion-fast) ease;
             }
 
@@ -240,32 +310,35 @@
               display: inline-flex;
               align-items: center;
               justify-content: center;
-              min-width: 1rem;
-              height: 1rem;
-              padding: 0 0.25rem;
+              min-width: 14px;
+              height: 14px;
+              padding: 0 4px;
               border-radius: var(--radius-pill);
               background: var(--primary-color);
               color: var(--primary-text);
-              font-size: var(--fs-micro);
-              font-weight: var(--fw-semibold);
+              font-size: 9px;
+              font-weight: var(--fw-bold);
               line-height: 1;
             }
           }
         }
       }
 
-      // Filter row
+      // Filter row — quieter than before. No background, no bottom border;
+      // it lives directly under the header hairline and reads as a
+      // continuation of the header zone.
       .p-datatable-thead > tr:last-child > th {
-        padding: 0.6rem 0.75rem;
-        height: 56px;
-        background: var(--card-background);
+        padding: var(--space-4) var(--space-5);
+        height: 52px;
+        background: transparent;
         border-bottom: 1px solid var(--border-color);
 
         &:first-child {
-          padding-left: 1rem;
+          padding-left: 0;
+          padding-right: 0;
         }
         &:last-child {
-          padding-right: 1rem;
+          padding-right: var(--space-8);
         }
 
         app-custom-dropdown,
@@ -286,26 +359,44 @@
         }
       }
 
-      // Body Rows
+      // Body Rows — single horizontal divider between rows; no card
+      // wrap, no zebra stripe. Hover tints the row and inserts a 2px
+      // primary-coloured left accent so the eye knows which row it's on.
       .p-datatable-tbody > tr {
-        background: var(--card-background);
-        transition: background-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
-        border-bottom: 1px solid var(--border-color);
+        background: transparent;
+        transition: background-color var(--motion-fast) ease;
         position: relative;
 
         td {
-          padding: 0.875rem 1rem;
-          height: 56px;
+          padding: var(--space-4) var(--space-6);
+          height: 52px;
           vertical-align: middle;
           color: var(--text-color);
           font-size: var(--fs-body);
           line-height: 1.45;
+          // Row divider lives on the cell (border-collapse: separate
+          // ignores <tr> borders). 1px hairline below every cell.
+          border-bottom: 1px solid var(--border-color);
+          // Long content (long emails, descriptions) gets truncated with
+          // ellipsis instead of pushing the row taller or sneaking past
+          // the cell boundary. The :title attribute on the inner span
+          // (already set in template) shows the full value on hover.
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
 
+          // First column holds the row-select checkbox — zero horizontal
+          // padding + text-align: center so the checkbox sits at the
+          // exact visual centre of the 44px cell. Width matching and
+          // wrapper centering live in the global styles.scss rule so
+          // every modern-table listing module gets the same behavior.
           &:first-child {
-            padding-left: 2rem;
+            padding-left: 0;
+            padding-right: 0;
+            text-align: center;
           }
           &:last-child {
-            padding-right: 2rem;
+            padding-right: var(--space-8);
           }
         }
 
@@ -313,29 +404,51 @@
           background-color: var(--hover-background) !important;
 
           td:first-child {
-            box-shadow: inset 3px 0 0 0 var(--primary-color);
+            box-shadow: inset 2px 0 0 0 var(--primary-color);
           }
+        }
 
-          .row-actions {
-            opacity: 1;
-          }
+        // Override PrimeNG's default rule that strips the bottom
+        // border from the last row's cells — we want the last data row
+        // to have a closing divider so the table reads as bounded
+        // even when empty space sits beneath it.
+        &.modern-row:last-of-type > td {
+          border-bottom: 1px solid var(--border-color) !important;
         }
       }
 
+      // Frozen columns must have an OPAQUE background or the scrolled
+      // body cells will show through underneath them. `inherit` from a
+      // transparent parent is what was leaking. Force card-bg for thead
+      // and body; the table's hover-row rule then re-tints the body
+      // frozen cell to match on hover.
       .p-frozen-column {
-        background: inherit;
-
-        &.p-frozen-column-end,
-        &:has(+ :not(.p-frozen-column)) {
-          box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.08);
-        }
+        background: var(--card-background) !important;
       }
 
-      // Link Style
+      // Add a soft right-edge shadow on the LAST left-frozen column so
+      // the freeze boundary reads as a visual seam when the user scrolls
+      // horizontally.
+      .p-datatable-thead > tr > th.p-frozen-column-end,
+      .p-datatable-tbody > tr > td.p-frozen-column-end,
+      .p-datatable-thead > tr > th.p-frozen-column:has(+ :not(.p-frozen-column)),
+      .p-datatable-tbody > tr > td.p-frozen-column:has(+ :not(.p-frozen-column)) {
+        box-shadow: 4px 0 6px -4px rgba(0, 0, 0, 0.08);
+      }
+
+      // Hover tint must propagate to frozen cells, or only the
+      // non-frozen part of the row appears hovered.
+      .p-datatable-tbody > tr:hover .p-frozen-column {
+        background: var(--hover-background) !important;
+      }
+
+      // Primary link — slightly heavier than body, brand colour on hover.
+      // Body weight stays at semibold (we want the username scannable)
+      // but at fs-body, not fs-h3, so it doesn't tower over the row.
       .dataset-name-link {
         color: var(--text-color);
         font-weight: var(--fw-semibold);
-        font-size: var(--fs-h3);
+        font-size: var(--fs-body);
         text-decoration: none;
         display: block;
         white-space: nowrap;
@@ -344,6 +457,7 @@
         max-width: 100%;
         border-radius: var(--radius-xs);
         padding: 2px 0;
+        transition: color var(--motion-fast) ease;
 
         &:hover {
           color: var(--primary-color);
@@ -355,9 +469,10 @@
         }
       }
 
-      // Description
+      // Body text in supporting columns — slightly muted so the primary
+      // identifier (username link, status) carries more visual weight.
       .description-text {
-        color: var(--secondary-color);
+        color: var(--text-color);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -370,7 +485,8 @@
       }
 
       .date-text {
-        color: var(--secondary-color);
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -391,49 +507,8 @@
         white-space: nowrap;
       }
 
-      // Status Pill — three-state (locked / active / inactive)
-      .status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-3);
-        padding: 0.25rem 0.65rem;
-        border-radius: var(--radius-pill);
-        font-size: var(--fs-control);
-        font-weight: var(--fw-semibold);
-        line-height: 1.2;
-        white-space: nowrap;
-        border: 1px solid transparent;
-
-        .dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: currentColor;
-          flex-shrink: 0;
-        }
-
-        .label {
-          letter-spacing: 0.01em;
-        }
-
-        &.active {
-          color: var(--success-color);
-          background: var(--success-bg, rgba(34, 197, 94, 0.08));
-          border-color: var(--success-color);
-        }
-
-        &.inactive {
-          color: var(--secondary-color);
-          background: var(--hover-background);
-          border-color: var(--border-color);
-        }
-
-        &.locked {
-          color: var(--warning-color);
-          background: var(--warning-bg, rgba(234, 179, 8, 0.1));
-          border-color: var(--warning-color);
-        }
-      }
+      // Status — minimal dot + label. No pill, no outline, no fill.
+      // Three signals collapsed to two (dot colour + text).
 
       // Mappings Info
       .mappings-info {
@@ -448,49 +523,58 @@
         }
       }
 
-      // Row Actions
+      // Row actions — always visible. The icons are quiet at rest
+      // (muted colour, no background) and tint to their semantic colour
+      // on hover so they don't compete with the row data.
       .row-actions {
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: var(--space-4);
-        transition: opacity var(--motion-base);
+        gap: var(--space-2);
+        opacity: 1;
 
         .icon-btn {
-          width: 32px;
-          height: 32px;
+          width: 28px;
+          height: 28px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid transparent;
+          border: none;
           background: transparent;
           border-radius: var(--radius-sm);
-          color: var(--secondary-color);
+          color: var(--text-muted);
           cursor: pointer;
-          transition: all var(--motion-base);
+          transition:
+            background-color var(--motion-fast) ease,
+            color var(--motion-fast) ease;
+
+          i { font-size: var(--fs-body); }
 
           &:hover {
-            background: var(--hover-background);
-            color: var(--primary-color);
+            background: var(--card-background);
+            color: var(--text-color);
           }
 
           &.edit-btn:hover {
-            background: var(--primary-color-transparent);
-            color: var(--primary-hover);
+            color: var(--primary-color);
           }
 
           &.delete-btn:hover {
-            background: var(--error-bg);
             color: var(--error-color);
           }
 
           &.unlock-btn {
             color: var(--warning-color);
+            opacity: 1; // unlock affordance is important — always visible
 
             &:hover {
-              background: var(--warning-bg);
-              color: var(--warning-color);
+              color: var(--warning-hover);
             }
+          }
+
+          &:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
           }
 
           &:focus-visible {
@@ -500,19 +584,21 @@
         }
       }
 
-      // Paginator
+      // Paginator — no top border, no fill, sits flush with the bottom
+      // of the last row. Slim 28px buttons.
       .p-paginator {
-        background: var(--card-background);
-        border-top: 1px solid var(--border-color);
+        background: transparent;
+        border-top: none;
         justify-content: flex-end;
-        padding: 0.85rem 1.5rem;
+        padding: var(--space-4) var(--space-8);
         gap: var(--space-2);
 
         .p-paginator-current {
-          color: var(--secondary-color);
+          color: var(--text-muted);
           font-size: var(--fs-control);
           font-weight: var(--fw-medium);
-          margin-right: 0.75rem;
+          margin-right: var(--space-5);
+          font-variant-numeric: tabular-nums;
         }
 
         .p-paginator-page,
@@ -521,12 +607,15 @@
         .p-paginator-first,
         .p-paginator-last {
           border-radius: var(--radius-sm);
-          color: var(--secondary-color);
-          min-width: 2.25rem;
-          height: 2.25rem;
-          margin: 0 0.125rem;
+          color: var(--text-muted);
+          min-width: 28px;
+          height: 28px;
+          margin: 0;
           font-weight: var(--fw-medium);
-          transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
+          font-size: var(--fs-control);
+          transition:
+            background-color var(--motion-fast) ease,
+            color var(--motion-fast) ease;
 
           &:hover {
             background: var(--hover-background);
@@ -539,13 +628,19 @@
           }
 
           &.p-highlight {
-            background: var(--primary-color);
-            color: var(--primary-text);
+            background: var(--primary-color-transparent);
+            color: var(--primary-color);
+
+            &:hover {
+              background: var(--primary-color-transparent);
+              color: var(--primary-color);
+            }
           }
         }
 
         .p-dropdown {
-          height: 2.25rem;
+          height: 28px;
+          min-height: 28px;
           border-radius: var(--radius-sm);
         }
       }

@@ -348,7 +348,7 @@ export class ListDatasourceComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadDatasources(this.lastTableLazyLoadEvent);
     }

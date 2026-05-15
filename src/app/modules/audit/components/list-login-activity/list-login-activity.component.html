@@ -8,6 +8,34 @@
           {{ 'LOGIN_ACTIVITY.SUBTITLE' | translate }}
         </p>
       </div>
+
+      <div class="header-actions">
+          <button
+            pButton
+            icon="pi pi-file-pdf"
+            [pTooltip]="'COMMON.EXPORT_PDF' | translate"
+            tooltipPosition="top"
+            (click)="exportActivity('pdf')"
+            [disabled]="totalItems() === 0"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-refresh"
+            [pTooltip]="'COMMON.REFRESH' | translate"
+            tooltipPosition="top"
+            (click)="refreshActivities()"
+            class="p-button-outlined modern-button"
+          ></button>
+          <button
+            pButton
+            [label]="'COMMON.CLEAR' | translate"
+            icon="pi pi-filter-slash"
+            (click)="clearFilters()"
+            [disabled]="!isFilterActive"
+            class="p-button-outlined p-button-danger modern-button"
+          ></button>
+              </div>
     </div>
 
     <!-- Unified Toolbar & Content Card -->
@@ -34,34 +62,6 @@
               (onChangeEvent)="onOrganisationChange()"
             ></app-custom-dropdown>
           </div>
-        </div>
-
-        <div class="toolbar-right">
-          <button
-            pButton
-            icon="pi pi-file-pdf"
-            [pTooltip]="'COMMON.EXPORT_PDF' | translate"
-            tooltipPosition="top"
-            (click)="exportActivity('pdf')"
-            [disabled]="totalItems() === 0"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
-          <button
-            pButton
-            icon="pi pi-refresh"
-            [pTooltip]="'COMMON.REFRESH' | translate"
-            tooltipPosition="top"
-            (click)="refreshActivities()"
-            class="p-button-outlined modern-button"
-          ></button>
-          <button
-            pButton
-            [label]="'COMMON.CLEAR' | translate"
-            icon="pi pi-filter-slash"
-            (click)="clearFilters()"
-            [disabled]="!isFilterActive"
-            class="p-button-outlined p-button-danger modern-button"
-          ></button>
         </div>
       </div>
 
@@ -209,11 +209,27 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="7" class="empty-message-cell text-center">
-                {{ 'LOGIN_ACTIVITY.NO_ACTIVITY_FOUND' | translate }}
+            <tr class="empty-row">
+              <td colspan="7" class="empty-message-cell">
+                <div class="empty-state-inline">
+                  <i class="pi pi-inbox empty-state-icon"></i>
+                  <span class="empty-state-text">
+                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
+                  </span>
+                </div>
               </td>
             </tr>
+          </ng-template>
+        
+          <ng-template pTemplate="paginatorright">
+            <button
+              type="button"
+              class="paginator-refresh-btn"
+              (click)="refreshList()"
+              [attr.aria-label]="'COMMON.REFRESH' | translate"
+            >
+              <i class="pi pi-refresh"></i>
+            </button>
           </ng-template>
         </p-table>
       </div>

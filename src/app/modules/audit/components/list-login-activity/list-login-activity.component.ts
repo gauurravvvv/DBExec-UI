@@ -24,6 +24,12 @@ import { AuditService } from '../../services/audit.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListLoginActivityComponent implements OnInit {
+  refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadActivities(this.lastTableLazyLoadEvent);
+    }
+  }
+
   private destroyRef = inject(DestroyRef);
   private searchSubject = new Subject<void>();
 

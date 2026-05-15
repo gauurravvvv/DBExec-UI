@@ -297,7 +297,7 @@ export class ListRoleComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadRoles(this.lastTableLazyLoadEvent);
     } else {

@@ -28,6 +28,12 @@ import { RlsRulesService } from '../../services/rls-rules.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListRlsRuleComponent implements OnInit {
+  refreshList() {
+    if (this.lastTableLazyLoadEvent) {
+      this.loadRules(this.lastTableLazyLoadEvent);
+    }
+  }
+
   @ViewChild('dt') dt!: Table;
 
   private destroyRef = inject(DestroyRef);

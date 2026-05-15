@@ -3,12 +3,40 @@
 // Single source of truth. No duplicate blocks below.
 // ===================================================================
 
+// Host element holds the in-flow width. When the sidebar is peeking the
+// inner <aside> floats over content (position: absolute), so the host
+// must keep its 64px slot allocated; otherwise main content reflows
+// every time the mouse enters the rail.
+:host {
+  display: block;
+  width: 64px;
+  height: 100%; // bound to .content-wrapper, not viewport
+  flex-shrink: 0;
+  position: relative; // anchors the absolute-positioned peek overlay
+  transition: width var(--motion-base) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:host(.pinned-open) {
+  width: 240px;
+}
+
+// Mobile: the sidebar drawer floats over content entirely; the host
+// shouldn't reserve any layout width.
+:host(.is-mobile) {
+  width: 0;
+}
+
 .sidebar {
   width: 240px;
-  height: 100vh;
+  height: 100%;
   background: var(--card-background);
   border-right: 1px solid var(--border-color);
-  transition: width var(--motion-base) cubic-bezier(0.4, 0, 0.2, 1);
+  // Animate width AND box-shadow together so the panel grows and the
+  // overlay drop-shadow fade in lockstep — no shadow snap when peeking
+  // begins or ends.
+  transition:
+    width var(--motion-base) var(--ease-in-out),
+    box-shadow var(--motion-base) var(--ease-in-out);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -22,51 +50,81 @@
     position: fixed;
     z-index: var(--z-overlay);
   }
+
+  // Peek mode: the sidebar floats over the main content area. Bounded
+  // by .content-wrapper (height: 100%) so the overlay never spills over
+  // the top header band.
+  &.peek-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100%;
+    z-index: var(--z-overlay);
+    box-shadow: var(--shadow-lg);
+  }
 }
 
-// ── Header slot: holds the collapse toggle only ─────────────────────
+// ── Header slot ─────────────────────────────────────────────────────
+// The toggle is absolutely positioned onto the sidebar's right divider
+// in both modes (circular "click here to collapse" handle), so the
+// header slot itself has zero height — nav content starts flush with
+// the top of the sidebar.
 .sidebar-header {
-  height: 44px;
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
+  height: 0;
+  padding: 0;
+  overflow: visible; // let the absolutely-positioned toggle escape
   flex-shrink: 0;
 }
 
+// Semi-circle handle pinned to the right divider — flat side flush
+// against the sidebar edge, curved side bulging into the content area.
+// Classic "tab" affordance. Same treatment in both expanded and
+// collapsed modes.
 .toggle-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
+  width: 14px;
+  height: 44px;
+  border: 1px solid var(--border-color);
+  // Hide the left side of the border so the flat edge sits cleanly
+  // against the sidebar's right divider.
+  border-left: none;
+  background: var(--card-background);
   color: var(--secondary-color);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin: 0 auto; // collapsed mode: centered in the rail
-  transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
+  // Round only the right edge — left side stays square against the
+  // sidebar divider, right side curves out.
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+  box-shadow: var(--shadow-sm);
+  position: absolute;
+  top: 12px;
+  right: 0;
+  // Push the handle entirely outside the sidebar so its flat left edge
+  // aligns with the sidebar's right border.
+  transform: translateX(100%);
+  z-index: var(--z-elevated);
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
 
   &:hover {
     background: var(--hover-background);
     color: var(--text-color);
   }
 
-  // Expanded mode: dock at the right edge of the header slot, in-flow so
-  // nothing overlaps the nav below.
-  &.outside {
-    margin: 0 0 0 auto;
+  i {
+    font-size: var(--fs-control);
   }
-
-  i { font-size: var(--fs-control); }
 }
 
 // ── Scrollable content area ──────────────────────────────────────────
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0 12px;
+  padding: 4px 0 12px;
 
   // Modern scrollbar — invisible until you actually scroll, then thin.
   scrollbar-width: thin;
@@ -113,16 +171,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0.85rem;
-  margin: 1px 8px;
+  padding: 0.625rem 0.9rem; // bumped from 0.5/0.85 — more breathing room
+  margin: 0px 8px; // bumped vertical margin slightly too
   border-radius: var(--radius-sm);
-  font-size: var(--fs-control);
-  font-weight: var(--fw-medium);
+  font-size: var(
+    --fs-body
+  ); // 14px instead of 13 — sidebar text now matches body
+  font-weight: var(
+    --fw-semibold
+  ); // 600 — a touch bolder so labels carry presence
   color: var(--text-color);
   text-decoration: none;
   cursor: pointer;
   position: relative;
-  transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
 
   &:hover {
     background: var(--hover-background);
@@ -136,10 +200,10 @@
     min-width: 0;
 
     i {
-      min-width: 20px;
+      min-width: 24px; // bumped from 20 to keep parity with new icon size
       display: flex;
       justify-content: center;
-      font-size: var(--fs-body);
+      font-size: var(--fs-h3); // 15px icon glyph — slightly larger than text
       color: var(--secondary-color);
       transition: color var(--motion-fast) ease;
     }
@@ -149,6 +213,10 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      // Fade the label in/out as the sidebar transitions between modes.
+      // Always rendered (no *ngIf) so layout doesn't reflow.
+      opacity: 1;
+      transition: opacity var(--motion-fast) ease;
     }
   }
 
@@ -160,7 +228,10 @@
     font-size: var(--fs-label);
     color: var(--secondary-color);
     margin-left: 6px;
-    transition: transform var(--motion-base) ease;
+    opacity: 1;
+    transition:
+      transform var(--motion-base) ease,
+      opacity var(--motion-fast) ease;
 
     &.expanded {
       transform: rotate(-180deg);
@@ -303,8 +374,32 @@
 
 // ── Collapsed mode: hide labels, hide arrows, hide submenus ────────
 .sidebar.collapsed {
-  .nav-text,
-  .submenu-arrow,
+  // Hide labels and chevrons via `display: none` in the collapsed state —
+  // we tried opacity-only for animation smoothness, but the labels kept
+  // leaking past the 64px rail and overflowing into the content area.
+  // The expand animation still feels clean because the label nodes
+  // mount fresh when the panel opens.
+  .nav-link .link-content .nav-text,
+  .submenu-link .link-content .nav-text {
+    display: none;
+  }
+
+  .nav-link .submenu-arrow,
+  .submenu-link .submenu-arrow {
+    display: none;
+  }
+
+  // Guard against any leak: rows must never spill past their pill, and
+  // their content cluster must not stretch.
+  .nav-link,
+  .submenu-link,
+  .submenu-item > a,
+  .submenu-item > .submenu-link,
+  .nested-submenu-item > a,
+  .nested-submenu-item > .submenu-link {
+    overflow: hidden;
+  }
+
   .section-label > * {
     display: none;
   }
@@ -326,15 +421,15 @@
     margin: 1px 8px;
 
     .link-content {
-      flex: 0 0 auto;          // do not stretch — keep content compact
+      flex: 0 0 auto; // do not stretch — keep content compact
       justify-content: center;
       gap: var(--space-0);
-      width: 100%;             // pill is 48px wide; let content fill it
-                               // so justify-content centers the lone icon
+      width: 100%; // pill is 48px wide; let content fill it
+      // so justify-content centers the lone icon
 
       i {
         min-width: 0;
-        margin: 0 auto;        // belt + braces: explicit horizontal centring
+        margin: 0 auto; // belt + braces: explicit horizontal centring
       }
     }
   }

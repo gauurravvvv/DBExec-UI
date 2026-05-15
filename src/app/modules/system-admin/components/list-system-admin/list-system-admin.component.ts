@@ -212,7 +212,7 @@ export class ListSystemAdminComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadSuperAdmins(this.lastTableLazyLoadEvent);
     }

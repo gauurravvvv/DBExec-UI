@@ -154,6 +154,18 @@ $icon-url: '../icons/';
     &.ci-clipboard-list {
       content: url($icon-url + 'clipboard-list.svg');
     }
+    // Database-to-database connection (two cylinders linked)
+    &.ci-connection {
+      content: url($icon-url + 'connection.svg');
+    }
+    // App-settings gear
+    &.ci-cog {
+      content: url($icon-url + 'cog.svg');
+    }
+    // Announcements bell
+    &.ci-bell {
+      content: url($icon-url + 'bell.svg');
+    }
   }
 }
 
@@ -191,8 +203,10 @@ $icon-url: '../icons/';
   .nav-link {
     .link-content {
       i.ci {
-        width: 1.4em;
-        height: 1.4em;
+        // Slightly oversized relative to text so the glyph anchors the row.
+        // Bumped from 1.4em to 1.55em (≈ 22px against a 14px text base).
+        width: 1.55em;
+        height: 1.55em;
         margin-right: 1rem;
 
         // Active state in light mode

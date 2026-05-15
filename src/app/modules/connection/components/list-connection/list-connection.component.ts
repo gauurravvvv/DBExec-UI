@@ -426,7 +426,7 @@ export class ListConnectionComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadConnections(this.lastTableLazyLoadEvent);
     }

@@ -476,7 +476,7 @@ export class ListUserComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadUsers(this.lastTableLazyLoadEvent);
     } else {

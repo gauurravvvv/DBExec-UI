@@ -497,7 +497,7 @@ export class ListTabComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadTabs(this.lastTableLazyLoadEvent);
     } else {

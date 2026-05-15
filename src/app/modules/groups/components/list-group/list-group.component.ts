@@ -412,7 +412,7 @@ export class ListGroupComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadGroups(this.lastTableLazyLoadEvent);
     } else {

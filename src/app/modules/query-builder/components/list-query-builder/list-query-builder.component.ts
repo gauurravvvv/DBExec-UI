@@ -499,7 +499,7 @@ export class ListQueryBuilderComponent implements OnInit {
     this.deleteJustification = '';
   }
 
-  private refreshList() {
+  refreshList() {
     if (this.lastTableLazyLoadEvent) {
       this.loadQueryBuilders(this.lastTableLazyLoadEvent);
     } else {
