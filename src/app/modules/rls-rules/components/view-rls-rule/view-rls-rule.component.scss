@@ -14,8 +14,8 @@ $radius-sm: 8px;
     gap: 12px;
     padding: 10px 16px;
     background: var(--hover-background);
-    font-size: 0.78rem;
-    font-weight: 600;
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
     color: var(--text-color);
     opacity: 0.65;
     border-bottom: 1px solid var(--border-color);
@@ -53,8 +53,8 @@ $radius-sm: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.72rem;
-      font-weight: 600;
+      font-size: var(--fs-micro);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       opacity: 0.6;
       flex-shrink: 0;
@@ -64,13 +64,13 @@ $radius-sm: 8px;
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.9rem;
+      font-size: var(--fs-body);
       color: var(--text-color);
-      font-weight: 500;
+      font-weight: var(--fw-medium);
 
       i {
         color: var(--primary-color);
-        font-size: 0.75rem;
+        font-size: var(--fs-label);
         opacity: 0.7;
       }
     }
@@ -83,8 +83,8 @@ $radius-sm: 8px;
       background: var(--primary-color-transparent);
       color: var(--primary-color);
       border-radius: 12px;
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
       letter-spacing: 0.03em;
       width: fit-content;
     }
@@ -99,7 +99,7 @@ $radius-sm: 8px;
         background: var(--hover-background);
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
         color: var(--text-color);
       }
     }
@@ -108,7 +108,7 @@ $radius-sm: 8px;
 
 .and-note {
   margin-top: 10px;
-  font-size: 0.78rem;
+  font-size: var(--fs-control);
   color: var(--text-color);
   opacity: 0.5;
   display: flex;
@@ -164,7 +164,7 @@ $radius-sm: 8px;
             }
 
             i {
-              font-size: 1.1rem;
+              font-size: var(--fs-h2);
               color: var(--text-color) !important;
             }
           }
@@ -172,8 +172,8 @@ $radius-sm: 8px;
 
         h2 {
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
         }
       }
@@ -188,8 +188,8 @@ $radius-sm: 8px;
           gap: 8px;
           padding: 0.6rem 1.25rem;
           border-radius: 6px;
-          font-weight: 600;
-          font-size: 0.9rem;
+          font-weight: var(--fw-semibold);
+          font-size: var(--fs-body);
           cursor: pointer;
           transition: all 0.2s ease;
           border: none;
@@ -272,8 +272,8 @@ $radius-sm: 8px;
 
           h3 {
             margin: 0 0 16px;
-            font-size: 18px;
-            font-weight: 500;
+            font-size: var(--fs-h2);
+            font-weight: var(--fw-medium);
             color: var(--text-color);
             display: flex;
             align-items: center;
@@ -288,7 +288,7 @@ $radius-sm: 8px;
               background: var(--hover-background);
               padding: 2px 8px;
               border-radius: 12px;
-              font-size: 12px;
+              font-size: var(--fs-label);
               color: var(--text-color);
               opacity: 0.7;
             }
@@ -302,7 +302,7 @@ $radius-sm: 8px;
             .info-item {
               label {
                 display: block;
-                font-size: 14px;
+                font-size: var(--fs-body);
                 color: var(--text-color);
                 opacity: 0.7;
                 margin-bottom: 8px;
@@ -310,7 +310,7 @@ $radius-sm: 8px;
 
               p {
                 margin: 0;
-                font-size: 15px;
+                font-size: var(--fs-h3);
                 color: var(--text-color);
               }
 
@@ -339,7 +339,7 @@ $radius-sm: 8px;
             padding: 8px 12px;
             background: var(--hover-background);
             border-radius: 6px;
-            font-size: 14px;
+            font-size: var(--fs-body);
             color: var(--text-color);
             transition: all 0.2s ease;
 
@@ -370,8 +370,8 @@ $radius-sm: 8px;
 .status-badge {
   padding: 4px 8px;
   border-radius: 12px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
   display: inline-block;
 
   &.active {
@@ -417,7 +417,7 @@ h3 {
     background: var(--hover-background);
     padding: 2px 8px;
     border-radius: 12px;
-    font-size: 12px;
+    font-size: var(--fs-label);
     color: var(--secondary-color);
   }
 }
@@ -479,23 +479,23 @@ h3 {
 
   i {
     color: var(--primary-color);
-    font-size: 1rem;
+    font-size: var(--fs-h3);
   }
 
   .assignment-name {
     flex: 1;
-    font-size: 0.9rem;
+    font-size: var(--fs-body);
     color: var(--text-color);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
   }
 
   .assignment-type-badge {
-    font-size: 0.75rem;
+    font-size: var(--fs-label);
     padding: 2px 8px;
     border-radius: 10px;
     background: var(--primary-color-transparent);
     color: var(--primary-color);
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     text-transform: capitalize;
   }
 }
@@ -565,13 +565,13 @@ h3 {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: var(--fs-h1);
       }
 
       h3 {
         margin: 0;
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
     }
@@ -589,18 +589,18 @@ h3 {
         border: 1px solid var(--border-color);
         padding: 8px 14px;
         border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         margin-bottom: 1rem;
 
         i {
-          font-size: 0.8rem;
+          font-size: var(--fs-control);
         }
       }
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -619,7 +619,7 @@ h3 {
           gap: 10px;
           padding: 0.5rem 0;
           color: var(--secondary-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           border-bottom: 1px dashed var(--border-color);
 
           &:last-child {
@@ -627,7 +627,7 @@ h3 {
           }
           i {
             color: var(--primary-color);
-            font-size: 0.75rem;
+            font-size: var(--fs-label);
             flex-shrink: 0;
           }
         }
@@ -640,8 +640,8 @@ h3 {
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -657,7 +657,7 @@ h3 {
           border-radius: $radius-sm;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -678,7 +678,7 @@ h3 {
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -698,13 +698,13 @@ h3 {
         padding: 0.75rem 1.5rem;
         border-radius: $radius-md;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {

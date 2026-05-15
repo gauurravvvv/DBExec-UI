@@ -47,15 +47,15 @@
           }
 
           i {
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
           }
         }
 
         h2 {
           color: var(--text-color);
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
         }
       }
 
@@ -69,7 +69,7 @@
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
           &:hover:not(:disabled) {
@@ -90,7 +90,7 @@
           border: none !important;
           padding: 0.65rem 1.25rem;
           border-radius: 6px !important;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
           transition: all 0.2s ease;
 
@@ -108,7 +108,7 @@
           }
 
           i {
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
         }
       }
@@ -156,7 +156,7 @@
         width: 100%;
 
         label {
-          font-weight: 500;
+          font-weight: var(--fw-medium);
           color: var(--text-color);
 
           .required {
@@ -197,12 +197,12 @@
 
         .error-message {
           color: var(--error-color);
-          font-size: 12px;
+          font-size: var(--fs-label);
         }
 
         .field-hint {
           color: var(--secondary-color);
-          font-size: 0.8rem;
+          font-size: var(--fs-control);
         }
       }
     }
@@ -232,7 +232,7 @@
       }
       .step-label {
         color: var(--primary-color);
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
       }
     }
 
@@ -242,12 +242,12 @@
         color: var(--primary-text);
 
         i {
-          font-size: 0.65rem;
+          font-size: var(--fs-micro);
         }
       }
       .step-label {
         color: var(--success-color);
-        font-weight: 500;
+        font-weight: var(--fw-medium);
       }
     }
 
@@ -260,14 +260,14 @@
       align-items: center;
       justify-content: center;
       color: var(--text-color);
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       margin-bottom: 6px;
       transition: all 0.3s ease;
-      font-size: 12px;
+      font-size: var(--fs-label);
     }
 
     .step-label {
-      font-size: 12px;
+      font-size: var(--fs-label);
       color: var(--text-color);
       transition: all 0.3s ease;
     }
@@ -354,8 +354,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
     color: var(--text-color);
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border-color);
@@ -363,7 +363,7 @@
 
     i {
       color: var(--primary-color);
-      font-size: 1rem;
+      font-size: var(--fs-h3);
     }
   }
 
@@ -407,8 +407,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
     color: var(--text-color);
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border-color);
@@ -416,7 +416,7 @@
 
     i {
       color: var(--primary-color);
-      font-size: 1rem;
+      font-size: var(--fs-h3);
     }
   }
 
@@ -455,8 +455,8 @@
     align-items: center;
     gap: 0.4rem;
     color: var(--primary-color);
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
     cursor: pointer;
     transition: opacity 0.2s ease;
 
@@ -472,7 +472,7 @@
     }
 
     i {
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
     }
   }
 
@@ -480,8 +480,8 @@
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium);
 
     &.success {
       color: var(--success-color);
@@ -492,7 +492,7 @@
     }
 
     i {
-      font-size: 0.9rem;
+      font-size: var(--fs-body);
     }
   }
 }
@@ -503,11 +503,11 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.875rem;
+    font-size: var(--fs-body);
     color: var(--text-color);
     opacity: 0.7;
     margin-bottom: 1rem;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
 
     i {
       color: var(--primary-color);
@@ -552,16 +552,16 @@
       }
 
       .info-label {
-        font-size: 0.8125rem;
+        font-size: var(--fs-control);
         color: var(--text-color);
         opacity: 0.6;
-        font-weight: 500;
+        font-weight: var(--fw-medium);
       }
 
       .info-value {
-        font-size: 0.8125rem;
+        font-size: var(--fs-control);
         color: var(--text-color);
-        font-weight: 500;
+        font-weight: var(--fw-medium);
 
         &.masked {
           letter-spacing: 2px;
@@ -576,11 +576,11 @@
       gap: 0.5rem;
       color: var(--text-color);
       opacity: 0.5;
-      font-size: 0.75rem;
+      font-size: var(--fs-label);
       margin: 0.75rem 0 0;
 
       i {
-        font-size: 0.75rem;
+        font-size: var(--fs-label);
       }
     }
 
@@ -590,7 +590,7 @@
       gap: 0.5rem;
       color: var(--text-color);
       opacity: 0.7;
-      font-size: 0.8125rem;
+      font-size: var(--fs-control);
       line-height: 1.5;
       margin: 0 0 0.6rem;
 
@@ -626,7 +626,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-control);
 
     &:hover {
       border-color: var(--primary-color);
@@ -678,7 +678,7 @@
   border-radius: 6px;
   border: 1px solid var(--border-color);
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--fs-control);
 }
 
 .confirmation-popup {
@@ -741,7 +741,7 @@
         background: var(--primary-color-transparent);
 
         i {
-          font-size: 1.5rem;
+          font-size: var(--fs-h1);
           color: var(--primary-color);
         }
       }
@@ -749,8 +749,8 @@
       h3 {
         margin: 0;
         color: var(--text-color);
-        font-size: 1.35rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
       }
     }
 
@@ -760,7 +760,7 @@
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -772,8 +772,8 @@
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -789,7 +789,7 @@
           border-radius: 6px;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -810,7 +810,7 @@
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -830,13 +830,13 @@
         padding: 0.75rem 1.5rem;
         border-radius: 8px;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {
@@ -990,4 +990,10 @@
   .p-steps {
     display: none;
   }
+}
+
+// Variant of .readonly-info-title that opens a second section underneath
+// the master-datasource warning block.
+.readonly-info-title.readonly-info-title--spaced {
+  margin-top: 1.25rem;
 }

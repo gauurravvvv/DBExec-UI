@@ -5,8 +5,8 @@ app-custom-daterange {
     gap: 8px;
 
     .normal-label {
-      font-size: 13px;
-      font-weight: 500;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
       color: var(--text-color);
 
       .required {
@@ -17,7 +17,7 @@ app-custom-daterange {
 
     .error-message {
       color: var(--error-color);
-      font-size: 12px;
+      font-size: var(--fs-label);
     }
   }
 
@@ -30,7 +30,7 @@ app-custom-daterange {
       border: 1px solid var(--border-color) !important;
       color: var(--text-color) !important;
       border-radius: 6px !important;
-      font-size: 0.875rem;
+      font-size: var(--fs-body);
       padding: 0.625rem 0.75rem;
 
       &::placeholder {
@@ -94,7 +94,7 @@ app-custom-daterange {
   border: 1px solid var(--border-color) !important;
   box-shadow: var(--shadow-md) !important;
   padding: 0.5rem;
-  font-size: 0.85rem;
+  font-size: var(--fs-control);
 
   .p-datepicker-header {
     background: var(--card-background) !important;
@@ -105,7 +105,7 @@ app-custom-daterange {
       .p-datepicker-month,
       .p-datepicker-year {
         color: var(--text-color) !important;
-        font-size: 0.85rem;
+        font-size: var(--fs-control);
         padding: 0.25rem 0.5rem;
 
         &:hover {
@@ -125,19 +125,19 @@ app-custom-daterange {
       }
 
       .pi {
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
       }
     }
   }
 
   table {
-    font-size: 0.8rem;
+    font-size: var(--fs-control);
     margin: 0;
 
     th {
       padding: 0.25rem;
       color: var(--secondary-color) !important;
-      font-size: 0.75rem;
+      font-size: var(--fs-label);
 
       span {
         width: 1.85rem;
@@ -151,7 +151,7 @@ app-custom-daterange {
       span {
         width: 1.85rem;
         height: 1.85rem;
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
         color: var(--text-color) !important;
         border-radius: 6px;
 
@@ -184,7 +184,7 @@ app-custom-daterange {
     padding: 0.35rem 0;
 
     span {
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
       color: var(--text-color) !important;
     }
 
@@ -198,7 +198,7 @@ app-custom-daterange {
       }
 
       .pi {
-        font-size: 0.7rem;
+        font-size: var(--fs-micro);
       }
     }
 
@@ -217,7 +217,7 @@ app-custom-daterange {
     .p-monthpicker-month,
     .p-yearpicker-year {
       padding: 0.3rem;
-      font-size: 0.8rem;
+      font-size: var(--fs-control);
       color: var(--text-color) !important;
 
       &:hover {
@@ -240,7 +240,7 @@ app-custom-daterange {
       background: transparent !important;
       border: none !important;
       color: var(--primary-color) !important;
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
 
       &:hover {
         background: var(--hover-background) !important;

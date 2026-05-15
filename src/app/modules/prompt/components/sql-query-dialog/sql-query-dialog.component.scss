@@ -20,7 +20,7 @@
       border: 1px solid var(--border-color) !important;
       color: var(--text-color) !important;
       box-shadow: var(--shadow-sm);
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       transition: all 0.2s ease;
 
       &:hover:not(:disabled) {
@@ -34,7 +34,7 @@
       color: white !important;
       border: none !important;
       box-shadow: 0 4px 10px var(--primary-color-transparent);
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       transition: all 0.2s ease;
 
       &:hover:not(:disabled) {
@@ -68,12 +68,12 @@
     background: var(--primary-color-transparent);
     border-left: 3px solid var(--primary-color);
     border-radius: 4px;
-    font-size: 13px;
+    font-size: var(--fs-control);
     line-height: 1.5;
 
     i {
       color: var(--primary-color);
-      font-size: 16px;
+      font-size: var(--fs-h3);
       margin-top: 2px;
       flex-shrink: 0;
     }
@@ -89,9 +89,9 @@
     gap: 0.5rem;
 
     label {
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
-      font-size: 14px;
+      font-size: var(--fs-body);
 
       .required {
         color: var(--danger-color, var(--error-color));
@@ -124,15 +124,15 @@
       color: var(--text-color-secondary);
 
       i {
-        font-size: 20px;
+        font-size: var(--fs-h1);
       }
     }
 
     .editor-fallback {
       .fallback-textarea {
         width: 100%;
-        font-family: 'Courier New', Consolas, monospace;
-        font-size: 13px;
+        font-family: var(--font-mono);
+        font-size: var(--fs-control);
         line-height: 1.6;
         padding: 12px;
         border: 1px solid var(--border-color);
@@ -159,12 +159,12 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 12px;
+      font-size: var(--fs-label);
       color: var(--text-color-secondary);
       margin-top: 0.25rem;
 
       i {
-        font-size: 14px;
+        font-size: var(--fs-body);
         color: var(--primary-color);
       }
     }
@@ -179,11 +179,11 @@
     border-left: 3px solid var(--danger-color, var(--error-color));
     border-radius: 4px;
     color: var(--danger-color, var(--error-color));
-    font-size: 13px;
+    font-size: var(--fs-control);
 
     i {
       flex-shrink: 0;
-      font-size: 16px;
+      font-size: var(--fs-h3);
     }
   }
 }

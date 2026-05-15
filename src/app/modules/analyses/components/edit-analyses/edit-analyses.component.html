@@ -293,13 +293,8 @@
                 </div>
               </ng-container>
               <div
+                class="empty-fields-note"
                 *ngIf="analysisFields.length === 0"
-                style="
-                  padding: 8px 12px;
-                  font-size: 0.75rem;
-                  color: var(--text-color-secondary);
-                  text-align: center;
-                "
               >
                 {{ 'ANALYSES.NO_ANALYSIS_FIELDS_YET' | translate }}
               </div>

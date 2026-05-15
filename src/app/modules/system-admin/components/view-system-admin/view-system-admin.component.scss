@@ -42,18 +42,18 @@ $radius-sm: 8px;
 
   .header-content {
     h2 {
-      font-size: 1.875rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       letter-spacing: -0.025em;
       margin: 0 0 0.5rem 0;
     }
 
     .subtitle {
-      font-size: 0.95rem;
+      font-size: var(--fs-h3);
       color: var(--text-color-secondary);
       margin: 0;
-      font-weight: 400;
+      font-weight: var(--fw-regular);
       padding-left: 2px;
     }
   }
@@ -68,8 +68,8 @@ $radius-sm: 8px;
       gap: 8px;
       padding: 0.6rem 1.25rem;
       border-radius: $radius-sm;
-      font-weight: 600;
-      font-size: 0.9rem;
+      font-weight: var(--fw-semibold);
+      font-size: var(--fs-body);
       border: none;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -93,11 +93,11 @@ $radius-sm: 8px;
         }
 
         i {
-          font-size: 1.1rem;
+          font-size: var(--fs-h2);
         }
       }
       i {
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
       }
 
       &.btn-secondary {
@@ -209,7 +209,7 @@ $radius-sm: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3rem;
+      font-size: var(--fs-h1);
       color: var(--primary-text);
       margin-bottom: 20px;
       box-shadow: 0 8px 24px var(--shadow-color);
@@ -219,8 +219,8 @@ $radius-sm: 8px;
 
     .admin-name {
       margin: 0 0 6px;
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       text-align: center;
       letter-spacing: -0.01em;
@@ -229,7 +229,7 @@ $radius-sm: 8px;
     .admin-username {
       margin: 0 0 16px;
       color: var(--secondary-color);
-      font-size: 0.95rem;
+      font-size: var(--fs-h3);
       text-align: center;
     }
 
@@ -238,8 +238,8 @@ $radius-sm: 8px;
       align-items: center;
       padding: 6px 16px;
       border-radius: 99px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
       background-color: var(--hover-background);
       color: var(--secondary-color);
       border: 1px solid var(--border-color);
@@ -273,8 +273,8 @@ $radius-sm: 8px;
       border: 1px solid var(--warning-bg);
       background: var(--warning-bg);
       color: var(--warning-color);
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
       cursor: pointer;
       transition: all 0.2s;
 
@@ -284,7 +284,7 @@ $radius-sm: 8px;
       }
 
       i {
-        font-size: 0.75rem;
+        font-size: var(--fs-label);
       }
     }
   }
@@ -305,15 +305,15 @@ $radius-sm: 8px;
       border: 1px solid transparent;
 
       .label {
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
         color: var(--secondary-color);
-        font-weight: 500;
+        font-weight: var(--fw-medium);
       }
 
       .value {
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         color: var(--text-color);
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
       }
     }
   }
@@ -331,8 +331,8 @@ $radius-sm: 8px;
 
     h3 {
       margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
     }
   }
@@ -351,11 +351,11 @@ $radius-sm: 8px;
     .info-group {
       h4 {
         color: var(--primary-color);
-        font-size: 0.85rem;
+        font-size: var(--fs-control);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         margin: 0 0 20px;
-        font-weight: 700;
+        font-weight: var(--fw-semibold);
         opacity: 0.9;
       }
 
@@ -369,7 +369,7 @@ $radius-sm: 8px;
         }
 
         .label {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           color: var(--secondary-color);
           margin-bottom: 6px;
           display: flex;
@@ -377,14 +377,14 @@ $radius-sm: 8px;
           gap: 8px;
 
           i {
-            font-size: 1rem;
+            font-size: var(--fs-h3);
             opacity: 0.7;
           }
         }
 
         .value {
-          font-size: 1.05rem;
-          font-weight: 500;
+          font-size: var(--fs-h2);
+          font-weight: var(--fw-medium);
           color: var(--text-color);
           padding-left: 24px; // Align with label text
         }
@@ -454,7 +454,7 @@ $radius-sm: 8px;
         background: var(--error-bg);
 
         i {
-          font-size: 1.5rem;
+          font-size: var(--fs-h1);
           color: var(--error-color);
         }
       }
@@ -462,8 +462,8 @@ $radius-sm: 8px;
       h3 {
         margin: 0;
         color: var(--text-color);
-        font-size: 1.35rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
       }
     }
 
@@ -480,18 +480,18 @@ $radius-sm: 8px;
         border: 1px solid var(--border-color);
         padding: 8px 14px;
         border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         margin-bottom: 1rem;
 
         i {
-          font-size: 0.8rem;
+          font-size: var(--fs-control);
         }
       }
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -510,7 +510,7 @@ $radius-sm: 8px;
           gap: 10px;
           padding: 0.5rem 0;
           color: var(--secondary-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           border-bottom: 1px dashed var(--border-color);
 
           &:last-child {
@@ -518,7 +518,7 @@ $radius-sm: 8px;
           }
           i {
             color: var(--primary-color);
-            font-size: 0.75rem;
+            font-size: var(--fs-label);
             flex-shrink: 0;
           }
         }
@@ -531,8 +531,8 @@ $radius-sm: 8px;
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -548,7 +548,7 @@ $radius-sm: 8px;
           border-radius: $radius-sm;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -569,7 +569,7 @@ $radius-sm: 8px;
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -589,13 +589,13 @@ $radius-sm: 8px;
         padding: 0.75rem 1.5rem;
         border-radius: $radius-md;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {

@@ -471,15 +471,8 @@
           </div>
           <div class="form-row" *ngIf="showAddPromptValues">
             <div class="form-field">
-              <div
-                class="label-with-clear"
-                style="
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                "
-              >
-                <label for="promptValues" style="margin-bottom: 0">
+              <div class="label-with-clear">
+                <label for="promptValues" class="label-with-clear__label">
                   {{ 'PROMPT_MODULE.PROMPT_VALUES' | translate }}<span class="required">*</span>
                   <i
                     class="pi pi-info-circle info-icon"
@@ -487,14 +480,7 @@
                     tooltipPosition="right"
                   ></i>
                 </label>
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin-left: auto;
-                  "
-                >
+                <div class="label-with-clear__actions">
                   <button
                     type="button"
                     pButton
@@ -526,7 +512,7 @@
                     type="file"
                     #fileInput
                     accept=".csv,.txt"
-                    style="display: none"
+                    hidden
                     (change)="onPromptFileUpload($event)"
                   />
                   <button

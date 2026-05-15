@@ -26,8 +26,8 @@
 
         h2 {
           margin: 0;
-          font-size: 1.5rem;
-          font-weight: 500;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-medium);
           color: var(--text-color);
         }
 
@@ -86,7 +86,7 @@
           margin-bottom: 0;
 
           label {
-            font-weight: 500;
+            font-weight: var(--fw-medium);
             color: var(--text-color);
 
             .required {
@@ -97,7 +97,7 @@
 
           .error-message {
             color: var(--error-color);
-            font-size: 0.8rem;
+            font-size: var(--fs-control);
           }
 
           .p-input-icon-left {
@@ -172,8 +172,8 @@
     gap: 0.5rem;
     color: var(--primary-color);
     cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-medium);
     text-decoration: none;
     transition: opacity 0.2s ease;
 
@@ -187,7 +187,7 @@
     }
 
     i {
-      font-size: 0.875rem;
+      font-size: var(--fs-body);
 
       &.pi-check-circle {
         color: var(--success-color);
@@ -202,7 +202,7 @@
   .connection-hint {
     color: var(--text-color);
     opacity: 0.6;
-    font-size: 0.75rem;
+    font-size: var(--fs-label);
   }
 }
 
@@ -211,11 +211,11 @@
   width: 50%;
 
   .acknowledgments-title {
-    font-size: 0.875rem;
+    font-size: var(--fs-body);
     color: var(--text-color);
     opacity: 0.7;
     margin-bottom: 1rem;
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     display: flex;
     align-items: center;
   }
@@ -238,16 +238,16 @@
 
         .acknowledgment-label {
           display: block;
-          font-weight: 500;
+          font-weight: var(--fw-medium);
           color: var(--text-color);
           margin-bottom: 0.25rem;
-          font-size: 0.875rem;
+          font-size: var(--fs-body);
         }
 
         .acknowledgment-text {
           color: var(--text-color);
           opacity: 0.7;
-          font-size: 0.8125rem;
+          font-size: var(--fs-control);
           line-height: 1.5;
           margin: 0;
         }
@@ -256,7 +256,7 @@
 
     .error-message {
       color: var(--error-color);
-      font-size: 0.75rem;
+      font-size: var(--fs-label);
       margin-top: 0.375rem;
       margin-left: 2.25rem;
       display: block;
@@ -284,7 +284,7 @@
       }
 
       .p-checkbox-icon {
-        font-size: 10px;
+        font-size: var(--fs-micro);
         color: var(--primary-text);
       }
     }
@@ -300,7 +300,7 @@
         padding: 0.5rem 0.75rem;
         box-shadow: 0 2px 4px var(--shadow-color);
         border-radius: 4px;
-        font-size: 0.875rem;
+        font-size: var(--fs-body);
         max-width: 200px;
       }
 
@@ -412,7 +412,7 @@
         background: var(--primary-color-transparent);
 
         i {
-          font-size: 1.5rem;
+          font-size: var(--fs-h1);
           color: var(--primary-color);
         }
       }
@@ -420,8 +420,8 @@
       h3 {
         margin: 0;
         color: var(--text-color);
-        font-size: 1.35rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
       }
     }
 
@@ -431,7 +431,7 @@
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -443,8 +443,8 @@
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -460,7 +460,7 @@
           border-radius: 6px;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -481,7 +481,7 @@
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -501,13 +501,13 @@
         padding: 0.75rem 1.5rem;
         border-radius: 8px;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {
@@ -575,7 +575,7 @@
       gap: 1rem;
 
       i {
-        font-size: 1.2rem;
+        font-size: var(--fs-h2);
         color: var(--warning-color);
 
         &.pi-exclamation-triangle {
@@ -584,14 +584,14 @@
 
         &:last-child {
           margin-left: auto;
-          font-size: 1rem;
+          font-size: var(--fs-h3);
           animation: none;
         }
       }
 
       .warning-title {
-        font-weight: 600;
-        font-size: 1rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-h3);
       }
     }
 
@@ -601,7 +601,7 @@
 
       .warning-text {
         margin: 0;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
         line-height: 1.5;
 
         p {
@@ -634,7 +634,7 @@
 
   .status-label {
     color: var(--secondary-color);
-    font-size: 0.9rem;
+    font-size: var(--fs-body);
   }
 }
 

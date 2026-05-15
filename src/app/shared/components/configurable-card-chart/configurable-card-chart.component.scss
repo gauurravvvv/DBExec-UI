@@ -69,14 +69,14 @@
 }
 
 .card-value {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-semibold);
   line-height: 1.2;
   text-align: center;
 }
 
 .card-label {
-  font-size: 0.75rem;
+  font-size: var(--fs-label);
   margin-top: 6px;
   opacity: 0.85;
   text-align: center;
@@ -91,7 +91,7 @@
   text-align: center;
   padding: 40px;
   color: var(--secondary-color);
-  font-size: 0.875rem;
+  font-size: var(--fs-body);
 }
 
 @keyframes cardFadeIn {

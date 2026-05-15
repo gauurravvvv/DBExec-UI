@@ -117,15 +117,15 @@ $radius-sm: 8px;
       margin: 0 auto 1rem;
 
       i {
-        font-size: 1.5rem;
+        font-size: var(--fs-h1);
       }
     }
 
     h3 {
       margin: 0;
       color: var(--text-color);
-      font-size: 1.35rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
     }
   }
 
@@ -135,7 +135,7 @@ $radius-sm: 8px;
 
     .popup-message {
       color: var(--secondary-color);
-      font-size: 0.95rem;
+      font-size: var(--fs-h3);
       line-height: 1.6;
       margin-bottom: 1rem;
       text-align: center;
@@ -154,7 +154,7 @@ $radius-sm: 8px;
         gap: 10px;
         padding: 0.5rem 0;
         color: var(--secondary-color);
-        font-size: 0.85rem;
+        font-size: var(--fs-control);
         border-bottom: 1px dashed var(--border-color);
 
         &:last-child {
@@ -162,7 +162,7 @@ $radius-sm: 8px;
         }
 
         i {
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           flex-shrink: 0;
         }
       }
@@ -182,13 +182,13 @@ $radius-sm: 8px;
       padding: 0.75rem 1.5rem;
       border-radius: $radius-md;
       border: none;
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       cursor: pointer;
       transition: all 0.2s ease;
-      font-size: 0.9rem;
+      font-size: var(--fs-body);
 
       i {
-        font-size: 0.85rem;
+        font-size: var(--fs-control);
       }
     }
 
@@ -258,8 +258,8 @@ $radius-sm: 8px;
       padding: 0.75rem 0;
 
       .countdown-number {
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
         color: var(--error-color);
         line-height: 1;
         font-variant-numeric: tabular-nums;
@@ -267,7 +267,7 @@ $radius-sm: 8px;
 
       .countdown-label {
         display: block;
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
         color: var(--secondary-color);
         margin-top: 4px;
       }

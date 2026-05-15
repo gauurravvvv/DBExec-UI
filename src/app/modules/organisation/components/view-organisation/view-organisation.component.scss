@@ -49,8 +49,8 @@ $radius-sm: 8px;
           gap: 8px;
           padding: 0.6rem 1.25rem;
           border-radius: $radius-sm;
-          font-weight: 600;
-          font-size: 0.9rem;
+          font-weight: var(--fw-semibold);
+          font-size: var(--fs-body);
           border: none;
           cursor: pointer;
           transition: all 0.2s ease;
@@ -74,12 +74,12 @@ $radius-sm: 8px;
             }
 
             i {
-              font-size: 1.1rem;
+              font-size: var(--fs-h2);
             }
           }
 
           i {
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
 
           &.btn-secondary {
@@ -186,14 +186,14 @@ $radius-sm: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.5rem;
+      font-size: var(--fs-h1);
       color: var(--primary-text);
       margin-bottom: 16px;
     }
 
     .organisation-name {
       margin: 10px 0 5px;
-      font-size: 1.5rem;
+      font-size: var(--fs-h1);
       text-align: center;
       color: var(--text-color);
     }
@@ -227,14 +227,14 @@ $radius-sm: 8px;
         margin-bottom: 5px;
 
         i {
-          font-size: 1rem;
+          font-size: var(--fs-h3);
           color: var(--text-color);
         }
       }
 
       .value {
         display: block;
-        font-size: 1.1rem;
+        font-size: var(--fs-h2);
         color: var(--text-color);
         padding: 4px 0;
       }
@@ -255,7 +255,7 @@ $radius-sm: 8px;
       gap: 8px;
 
       i {
-        font-size: 1rem;
+        font-size: var(--fs-h3);
         color: var(--primary-color);
       }
     }
@@ -266,8 +266,8 @@ $radius-sm: 8px;
       gap: 6px;
       padding: 0.45rem 1rem;
       border-radius: $radius-sm;
-      font-weight: 600;
-      font-size: 0.8rem;
+      font-weight: var(--fw-semibold);
+      font-size: var(--fs-control);
       border: 1px solid var(--primary-color);
       background: transparent;
       color: var(--primary-color);
@@ -275,7 +275,7 @@ $radius-sm: 8px;
       transition: all 0.2s ease;
 
       i {
-        font-size: 0.85rem;
+        font-size: var(--fs-control);
       }
 
       &:hover:not(:disabled) {
@@ -307,12 +307,12 @@ $radius-sm: 8px;
     gap: 12px;
     padding: 14px 20px;
     border-radius: $radius-sm;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-medium);
     line-height: 1.5;
 
     i {
-      font-size: 1.2rem;
+      font-size: var(--fs-h2);
       flex-shrink: 0;
     }
 
@@ -348,22 +348,22 @@ $radius-sm: 8px;
         padding: 8px 12px;
 
         i {
-          font-size: 1.2rem;
+          font-size: var(--fs-h2);
           color: var(--secondary-color);
           margin-bottom: 4px;
         }
 
         .stat-value {
-          font-size: 1.6rem;
-          font-weight: 700;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
           line-height: 1;
         }
 
         .stat-label {
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
-          font-weight: 500;
+          font-weight: var(--fw-medium);
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -382,8 +382,8 @@ $radius-sm: 8px;
     display: inline-block;
     padding: 0.3rem 0.6rem;
     border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-medium);
     background-color: var(--error-color);
     color: var(--primary-text);
 
@@ -398,8 +398,8 @@ $radius-sm: 8px;
   display: inline-block;
   padding: 0.25rem 0.6rem;
   border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold);
   letter-spacing: 0.3px;
 
   &.smtp {
@@ -518,7 +518,7 @@ $radius-sm: 8px;
         background: var(--error-bg);
 
         i {
-          font-size: 1.5rem;
+          font-size: var(--fs-h1);
           color: var(--error-color);
         }
       }
@@ -526,8 +526,8 @@ $radius-sm: 8px;
       h3 {
         margin: 0;
         color: var(--text-color);
-        font-size: 1.35rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
       }
     }
 
@@ -544,18 +544,18 @@ $radius-sm: 8px;
         border: 1px solid var(--border-color);
         padding: 8px 14px;
         border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         margin-bottom: 1rem;
 
         i {
-          font-size: 0.8rem;
+          font-size: var(--fs-control);
         }
       }
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -574,7 +574,7 @@ $radius-sm: 8px;
           gap: 10px;
           padding: 0.5rem 0;
           color: var(--secondary-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           border-bottom: 1px dashed var(--border-color);
 
           &:last-child {
@@ -582,7 +582,7 @@ $radius-sm: 8px;
           }
           i {
             color: var(--primary-color);
-            font-size: 0.75rem;
+            font-size: var(--fs-label);
             flex-shrink: 0;
           }
         }
@@ -595,8 +595,8 @@ $radius-sm: 8px;
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -612,7 +612,7 @@ $radius-sm: 8px;
           border-radius: $radius-sm;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -633,7 +633,7 @@ $radius-sm: 8px;
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -653,13 +653,13 @@ $radius-sm: 8px;
         padding: 0.75rem 1.5rem;
         border-radius: $radius-md;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {

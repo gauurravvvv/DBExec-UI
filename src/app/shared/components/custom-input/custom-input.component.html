@@ -53,9 +53,8 @@
         />
         <i
           *ngIf="showPasswordToggle"
-          class="pi"
+          class="pi password-toggle-icon"
           [ngClass]="passwordVisible ? 'pi-eye-slash' : 'pi-eye'"
-          style="cursor: pointer"
           (click)="togglePasswordVisibility($event)"
         ></i>
       </span>

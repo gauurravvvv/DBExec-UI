@@ -47,8 +47,8 @@ $radius-sm: 8px;
 
         h2 {
           margin: 0;
-          font-size: 24px;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
         }
       }
@@ -80,8 +80,8 @@ $radius-sm: 8px;
           gap: 8px;
           padding: 8px 18px;
           border-radius: $radius-sm;
-          font-weight: 600;
-          font-size: 14px;
+          font-weight: var(--fw-semibold);
+          font-size: var(--fs-body);
           cursor: pointer;
           transition: all 0.2s ease;
           border: none;
@@ -178,8 +178,8 @@ $radius-sm: 8px;
               gap: 6px;
               padding: 6px 14px;
               border-radius: 6px;
-              font-weight: 600;
-              font-size: 13px;
+              font-weight: var(--fw-semibold);
+              font-size: var(--fs-control);
               cursor: pointer;
               transition: all 0.2s ease;
               border: none;
@@ -196,8 +196,8 @@ $radius-sm: 8px;
 
           h3 {
             margin: 0 0 16px;
-            font-size: 18px;
-            font-weight: 500;
+            font-size: var(--fs-h2);
+            font-weight: var(--fw-medium);
             color: var(--text-color);
             display: flex;
             align-items: center;
@@ -212,7 +212,7 @@ $radius-sm: 8px;
               background: var(--hover-background);
               padding: 2px 8px;
               border-radius: 12px;
-              font-size: 12px;
+              font-size: var(--fs-label);
               color: var(--text-color);
               opacity: 0.7;
             }
@@ -226,7 +226,7 @@ $radius-sm: 8px;
             .info-item {
               label {
                 display: block;
-                font-size: 14px;
+                font-size: var(--fs-body);
                 color: var(--text-color);
                 opacity: 0.7;
                 margin-bottom: 8px;
@@ -234,7 +234,7 @@ $radius-sm: 8px;
 
               p {
                 margin: 0;
-                font-size: 15px;
+                font-size: var(--fs-h3);
                 color: var(--text-color);
               }
 
@@ -284,7 +284,7 @@ $radius-sm: 8px;
               padding: 8px 12px;
               background: var(--hover-background);
               border-radius: 6px;
-              font-size: 13px;
+              font-size: var(--fs-control);
               transition: all 0.2s ease;
 
               &:hover {
@@ -300,8 +300,8 @@ $radius-sm: 8px;
                 background: var(--primary-color);
                 color: var(--primary-text);
                 border-radius: 50%;
-                font-weight: 600;
-                font-size: 12px;
+                font-weight: var(--fw-semibold);
+                font-size: var(--fs-label);
                 flex-shrink: 0;
               }
 
@@ -313,7 +313,7 @@ $radius-sm: 8px;
                 overflow: hidden;
 
                 .column-view {
-                  font-weight: 500;
+                  font-weight: var(--fw-medium);
                   color: var(--text-color);
                   overflow: hidden;
                   text-overflow: ellipsis;
@@ -321,10 +321,10 @@ $radius-sm: 8px;
                 }
 
                 .column-use {
-                  font-size: 11px;
+                  font-size: var(--fs-micro);
                   color: var(--text-color);
                   opacity: 0.6;
-                  font-family: monospace;
+                  font-family: var(--font-mono);
                   overflow: hidden;
                   text-overflow: ellipsis;
                   white-space: nowrap;
@@ -345,7 +345,7 @@ $radius-sm: 8px;
                 flex-shrink: 0;
 
                 i {
-                  font-size: 12px;
+                  font-size: var(--fs-label);
                 }
               }
 
@@ -366,13 +366,13 @@ $radius-sm: 8px;
             gap: 12px;
 
             i {
-              font-size: 48px;
+              font-size: var(--fs-h1);
               color: var(--primary-color);
               opacity: 0.5;
             }
 
             span {
-              font-size: 14px;
+              font-size: var(--fs-body);
             }
           }
         }
@@ -389,7 +389,7 @@ $radius-sm: 8px;
             padding: 8px 12px;
             background: var(--hover-background);
             border-radius: 6px;
-            font-size: 14px;
+            font-size: var(--fs-body);
             color: var(--text-color);
             transition: all 0.2s ease;
 
@@ -423,8 +423,8 @@ $radius-sm: 8px;
   gap: 6px;
   padding: 4px 12px;
   border-radius: 12px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
   background: var(--error-color-transparent);
   color: var(--error-color);
 
@@ -434,7 +434,7 @@ $radius-sm: 8px;
   }
 
   i {
-    font-size: 14px;
+    font-size: var(--fs-body);
   }
 }
 
@@ -470,8 +470,8 @@ $radius-sm: 8px;
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -488,7 +488,7 @@ $radius-sm: 8px;
           border-radius: $radius-sm;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           transition: border-color 0.2s;
 
@@ -516,8 +516,8 @@ $radius-sm: 8px;
 
         h4 {
           margin: 0 0 0.75rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
           opacity: 0.8;
         }
@@ -527,12 +527,12 @@ $radius-sm: 8px;
           align-items: center;
           gap: 0.75rem;
           padding: 0.4rem 0;
-          font-size: 0.9rem;
+          font-size: var(--fs-body);
           color: var(--text-color);
 
           i {
             color: var(--secondary-color);
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
             width: 16px;
             text-align: center;
           }
@@ -590,13 +590,13 @@ $radius-sm: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: var(--fs-h1);
       }
 
       h3 {
         margin: 0;
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
     }
@@ -608,7 +608,7 @@ $radius-sm: 8px;
         color: var(--secondary-color);
         text-align: center;
         margin-bottom: 1.5rem;
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.5;
       }
 
@@ -627,12 +627,12 @@ $radius-sm: 8px;
           align-items: center;
           gap: 0.75rem;
           color: var(--text-color);
-          font-size: 0.9rem;
-          font-weight: 500;
+          font-size: var(--fs-body);
+          font-weight: var(--fw-medium);
 
           i {
             color: var(--secondary-color);
-            font-size: 1rem;
+            font-size: var(--fs-h3);
           }
 
           span {
@@ -648,8 +648,8 @@ $radius-sm: 8px;
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -665,7 +665,7 @@ $radius-sm: 8px;
           border-radius: $radius-sm;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -686,7 +686,7 @@ $radius-sm: 8px;
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -707,8 +707,8 @@ $radius-sm: 8px;
         gap: 0.5rem;
         padding: 0.65rem 1.25rem;
         border-radius: $radius-sm;
-        font-weight: 600;
-        font-size: 0.9rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-body);
         cursor: pointer;
         transition: all 0.2s;
         border: 1px solid transparent;

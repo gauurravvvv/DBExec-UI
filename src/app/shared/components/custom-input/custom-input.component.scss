@@ -6,7 +6,7 @@
   margin-bottom: 0;
 
   label {
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--text-color);
 
     .required {
@@ -16,7 +16,7 @@
 
     .label-tooltip {
       margin-left: 6px;
-      font-size: 0.8rem;
+      font-size: var(--fs-control);
       color: var(--text-color);
       opacity: 0.4;
       cursor: help;
@@ -56,7 +56,7 @@
       color: var(--text-color);
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      font-size: 0.875rem;
+      font-size: var(--fs-body);
 
       &::placeholder {
         color: var(--text-color);
@@ -75,7 +75,7 @@
     color: var(--text-color);
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    font-size: 0.875rem;
+    font-size: var(--fs-body);
     padding: 0.625rem 0.75rem;
 
     &::placeholder {
@@ -89,7 +89,7 @@
     color: var(--text-color);
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    font-size: 0.875rem;
+    font-size: var(--fs-body);
     padding: 0.625rem 0.75rem;
 
     &::placeholder {
@@ -101,12 +101,12 @@
   .hint-message {
     color: var(--text-color);
     opacity: 0.5;
-    font-size: 12px;
+    font-size: var(--fs-label);
   }
 
   .error-message {
     color: var(--error-color);
-    font-size: 12px;
+    font-size: var(--fs-label);
   }
 }
 
@@ -119,4 +119,9 @@
   .p-inputtext:enabled:hover {
     border-color: var(--primary-color) !important;
   }
+}
+
+// Eye toggle on password inputs — clickable, so the cursor should hint.
+.password-toggle-icon {
+  cursor: pointer;
 }

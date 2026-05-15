@@ -1,27 +1,8 @@
-@font-face {
-  font-family: 'Montserrat-Regular';
-  src: url('./assets/fonts/Montserrat/Montserrat-Regular.ttf');
-}
-
-@font-face {
-  font-family: 'Montserrat-SemiBold';
-  src: url('./assets/fonts/Montserrat/Montserrat-SemiBold.ttf');
-}
-
-@font-face {
-  font-family: 'Montserrat-Medium';
-  src: url('./assets/fonts/Montserrat/Montserrat-Medium.ttf');
-}
-
-@font-face {
-  font-family: 'Montserrat-Bold';
-  src: url('./assets/fonts/Montserrat/Montserrat-Bold.ttf');
-}
-
-$font-regular: 'Montserrat-Regular';
-$font-medium: 'Montserrat-Medium';
-$font-semi-bold: 'Montserrat-SemiBold';
-$font-bold: 'Montserrat-Bold';
+// Montserrat @font-face declarations and the Sass $font-* aliases were
+// removed — the app uses Inter via Google Fonts (loaded in index.html) and
+// the var(--font-ui) / var(--font-mono) tokens defined in _theme-variables.
+// Removing this saves ~80KB of unused .ttf font payload on first load and
+// eliminates a stale family that didn't match the rest of the type system.
 
 $main-color: #0078d3;
 $hover-color: #1c96f2;

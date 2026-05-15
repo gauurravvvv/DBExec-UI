@@ -35,18 +35,18 @@ $radius-sm: 8px;
 
   .header-content {
     h2 {
-      font-size: 1.875rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       letter-spacing: -0.025em;
       margin: 0 0 0.5rem 0;
     }
 
     .subtitle {
-      font-size: 0.95rem;
+      font-size: var(--fs-h3);
       color: var(--text-color-secondary);
       margin: 0;
-      font-weight: 400;
+      font-weight: var(--fw-regular);
     }
   }
 }
@@ -86,7 +86,7 @@ $radius-sm: 8px;
 
     .modern-button {
       border-radius: $radius-sm !important;
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       padding: 0.65rem 1.25rem;
 
       &.p-button-outlined.p-button-danger {
@@ -117,8 +117,8 @@ $radius-sm: 8px;
         background: var(--hover-background);
         color: var(--text-color);
         opacity: 1;
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: var(--fs-label);
+        font-weight: var(--fw-semibold);
         text-transform: uppercase;
         letter-spacing: 0.04em;
         padding: 0.75rem 1rem;
@@ -182,7 +182,7 @@ $radius-sm: 8px;
           padding: 0.75rem 1rem;
           vertical-align: middle;
           color: var(--text-color);
-          font-size: 0.9rem;
+          font-size: var(--fs-body);
 
           &:first-child {
             padding-left: 2rem;
@@ -200,8 +200,8 @@ $radius-sm: 8px;
       // Name link
       .dataset-name-link {
         color: var(--text-color);
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-h3);
         text-decoration: none;
         cursor: default;
         display: block;
@@ -237,8 +237,8 @@ $radius-sm: 8px;
         display: inline-block;
         padding: 3px 10px;
         border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: var(--fs-label);
+        font-weight: var(--fw-semibold);
         text-transform: uppercase;
         letter-spacing: 0.03em;
         white-space: nowrap;
@@ -286,7 +286,7 @@ $radius-sm: 8px;
           min-width: 2rem;
           height: 2rem;
           margin: 0 0.125rem;
-          font-weight: 500;
+          font-weight: var(--fw-medium);
           &:hover {
             background: var(--hover-background);
             color: var(--text-color);
@@ -308,5 +308,5 @@ td.empty-message-cell {
   text-align: center;
   padding: 2rem !important;
   color: var(--secondary-color);
-  font-size: 0.95rem;
+  font-size: var(--fs-h3);
 }

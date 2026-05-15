@@ -10,7 +10,7 @@
     width: 100%;
 
     label {
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       color: var(--text-color);
       opacity: 0.6;
       background: var(--card-background);
@@ -26,7 +26,7 @@
   }
 
   .normal-label {
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     color: var(--text-color);
     display: block;
 
@@ -38,7 +38,7 @@
 
   .error-message {
     color: var(--error-color);
-    font-size: 12px;
+    font-size: var(--fs-label);
   }
 }
 
@@ -51,7 +51,7 @@
     border: 1px solid var(--border-color) !important;
     color: var(--text-color) !important;
     border-radius: 6px !important;
-    font-size: 0.9375rem;
+    font-size: var(--fs-h3);
     padding: 0.75rem 1rem;
 
     &::placeholder {
@@ -77,7 +77,7 @@
     }
 
     .pi {
-      font-size: 0.875rem;
+      font-size: var(--fs-body);
     }
   }
 
@@ -99,7 +99,7 @@
   border: 1px solid var(--border-color) !important;
   box-shadow: var(--shadow-md) !important;
   padding: 0.5rem;
-  font-size: 0.85rem;
+  font-size: var(--fs-control);
 
   .p-datepicker-header {
     background: var(--card-background) !important;
@@ -110,7 +110,7 @@
       .p-datepicker-month,
       .p-datepicker-year {
         color: var(--text-color) !important;
-        font-size: 0.85rem;
+        font-size: var(--fs-control);
         padding: 0.25rem 0.5rem;
 
         &:hover {
@@ -130,19 +130,19 @@
       }
 
       .pi {
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
       }
     }
   }
 
   table {
-    font-size: 0.8rem;
+    font-size: var(--fs-control);
     margin: 0;
 
     th {
       padding: 0.25rem;
       color: var(--secondary-color) !important;
-      font-size: 0.75rem;
+      font-size: var(--fs-label);
 
       span {
         width: 1.85rem;
@@ -156,7 +156,7 @@
       span {
         width: 1.85rem;
         height: 1.85rem;
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
         color: var(--text-color) !important;
         border-radius: 6px;
 
@@ -189,7 +189,7 @@
     padding: 0.35rem 0;
 
     span {
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
       color: var(--text-color) !important;
     }
 
@@ -203,7 +203,7 @@
       }
 
       .pi {
-        font-size: 0.7rem;
+        font-size: var(--fs-micro);
       }
     }
 
@@ -222,7 +222,7 @@
     .p-monthpicker-month,
     .p-yearpicker-year {
       padding: 0.3rem;
-      font-size: 0.8rem;
+      font-size: var(--fs-control);
       color: var(--text-color) !important;
 
       &:hover {
@@ -245,7 +245,7 @@
       background: transparent !important;
       border: none !important;
       color: var(--primary-color) !important;
-      font-size: 0.85rem;
+      font-size: var(--fs-control);
 
       &:hover {
         background: var(--hover-background) !important;

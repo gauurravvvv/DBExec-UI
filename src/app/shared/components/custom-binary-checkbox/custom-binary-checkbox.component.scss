@@ -16,8 +16,8 @@
   }
 
   .checkbox-label {
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-medium);
     color: var(--text-color);
     cursor: pointer;
 
@@ -29,14 +29,14 @@
 
   .checkbox-description {
     margin: 0;
-    font-size: 0.78rem;
+    font-size: var(--fs-control);
     line-height: 1.5;
     color: var(--secondary-color);
   }
 
   .error-message {
     color: var(--error-color);
-    font-size: 12px;
+    font-size: var(--fs-label);
   }
 }
 

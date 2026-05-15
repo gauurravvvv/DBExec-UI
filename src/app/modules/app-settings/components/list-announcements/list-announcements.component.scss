@@ -36,18 +36,18 @@ $radius-sm: 8px;
 
   .header-content {
     h2 {
-      font-size: 1.875rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       letter-spacing: -0.025em;
       margin: 0 0 0.5rem 0;
     }
 
     .subtitle {
-      font-size: 0.95rem;
+      font-size: var(--fs-h3);
       color: var(--text-color-secondary);
       margin: 0;
-      font-weight: 400;
+      font-weight: var(--fw-regular);
     }
   }
 }
@@ -83,7 +83,7 @@ $radius-sm: 8px;
 
     .modern-button {
       border-radius: 6px !important;
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       padding: 0.65rem 1.25rem;
 
       &.p-button-primary {
@@ -136,8 +136,8 @@ $radius-sm: 8px;
         background: var(--hover-background);
         color: var(--text-color);
         opacity: 1;
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: var(--fs-label);
+        font-weight: var(--fw-semibold);
         text-transform: uppercase;
         letter-spacing: 0.04em;
         padding: 0.75rem 1rem;
@@ -208,7 +208,7 @@ $radius-sm: 8px;
           padding: 0.75rem 1rem;
           vertical-align: middle;
           color: var(--text-color);
-          font-size: 0.9rem;
+          font-size: var(--fs-body);
 
           &:first-child {
             padding-left: 2rem;
@@ -229,8 +229,8 @@ $radius-sm: 8px;
 
       .dataset-name-link {
         color: var(--text-color);
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-h3);
         text-decoration: none;
         display: block;
         white-space: nowrap;
@@ -265,8 +265,8 @@ $radius-sm: 8px;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-medium);
         white-space: nowrap;
 
         .dot {
@@ -352,7 +352,7 @@ $radius-sm: 8px;
           min-width: 2rem;
           height: 2rem;
           margin: 0 0.125rem;
-          font-weight: 500;
+          font-weight: var(--fw-medium);
 
           &:hover {
             background: var(--hover-background);
@@ -385,7 +385,7 @@ td.empty-message-cell {
   text-align: center;
   padding: 2rem !important;
   color: var(--secondary-color);
-  font-size: 0.95rem;
+  font-size: var(--fs-h3);
 }
 
 .confirmation-popup {
@@ -451,13 +451,13 @@ td.empty-message-cell {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: var(--fs-h1);
       }
 
       h3 {
         margin: 0;
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
     }
@@ -468,7 +468,7 @@ td.empty-message-cell {
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -487,7 +487,7 @@ td.empty-message-cell {
           gap: 10px;
           padding: 0.5rem 0;
           color: var(--secondary-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           border-bottom: 1px dashed var(--border-color);
 
           &:last-child {
@@ -495,7 +495,7 @@ td.empty-message-cell {
           }
           i {
             color: var(--primary-color);
-            font-size: 0.75rem;
+            font-size: var(--fs-label);
             flex-shrink: 0;
           }
         }
@@ -515,13 +515,13 @@ td.empty-message-cell {
         padding: 0.75rem 1.5rem;
         border-radius: $radius-md;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {

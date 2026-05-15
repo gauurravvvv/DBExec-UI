@@ -35,8 +35,8 @@
   .brand {
     display: flex;
     align-items: center;
-    font-size: 2.25rem;
-    font-weight: 600;
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-semibold);
     margin-bottom: 1.5rem;
 
     i.ci-app-icon {
@@ -48,20 +48,20 @@
   }
 
   .headline {
-    font-size: 3rem;
-    font-weight: 600;
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-semibold);
     line-height: 1.2;
     margin: 2rem 0 1rem;
     text-align: center;
     max-width: 700px;
-    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    background: var(--auth-heading-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
   .subtitle {
-    font-size: 1.4rem;
+    font-size: var(--fs-h1);
     opacity: 0.8;
     margin-bottom: 1rem;
     text-align: center;
@@ -89,7 +89,7 @@
 .floating-icon {
   position: absolute;
   opacity: 0.08;
-  font-size: 2rem;
+  font-size: var(--fs-h1);
   animation: randomFloat 15s infinite;
   filter: brightness(0) invert(1);
 }
@@ -99,84 +99,84 @@
   top: 15%;
   left: 15%;
   animation: randomFloat 18s infinite;
-  font-size: 3rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(2) {
   top: 25%;
   left: 60%;
   animation: randomFloat 20s infinite -5s;
-  font-size: 2.2rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(3) {
   top: 60%;
   left: 25%;
   animation: randomFloat 16s infinite -3s;
-  font-size: 2.8rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(4) {
   top: 75%;
   left: 70%;
   animation: randomFloat 22s infinite -7s;
-  font-size: 2rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(5) {
   top: 45%;
   left: 45%;
   animation: randomFloat 19s infinite -10s;
-  font-size: 2.5rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(6) {
   top: 85%;
   left: 35%;
   animation: randomFloat 17s infinite -8s;
-  font-size: 2.4rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(7) {
   top: 30%;
   left: 80%;
   animation: randomFloat 21s infinite -12s;
-  font-size: 2.3rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(8) {
   top: 70%;
   left: 85%;
   animation: randomFloat 19s infinite -9s;
-  font-size: 2.6rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(9) {
   top: 40%;
   left: 10%;
   animation: randomFloat 23s infinite -15s;
-  font-size: 2.1rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(10) {
   top: 90%;
   left: 50%;
   animation: randomFloat 17s infinite -7s;
-  font-size: 2.4rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(11) {
   top: 20%;
   left: 40%;
   animation: randomFloat 20s infinite -11s;
-  font-size: 2.7rem;
+  font-size: var(--fs-h1);
 }
 
 .floating-icon:nth-child(12) {
   top: 55%;
   left: 75%;
   animation: randomFloat 18s infinite -6s;
-  font-size: 2.2rem;
+  font-size: var(--fs-h1);
 }
 
 @keyframes randomFloat {
@@ -264,7 +264,7 @@
       flex-shrink: 0;
 
       i {
-        font-size: 1.3rem;
+        font-size: var(--fs-h1);
         color: var(--primary-text);
       }
     }
@@ -273,14 +273,14 @@
       flex: 1;
 
       h3 {
-        font-size: 1.25rem;
-        font-weight: 500;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-medium);
         margin: 0 0 0.5rem;
         color: var(--primary-text);
       }
 
       p {
-        font-size: 1rem;
+        font-size: var(--fs-h3);
         line-height: 1.5;
         margin: 0;
         color: rgba(255, 255, 255, 0.7);
@@ -305,13 +305,13 @@
   border: none;
   padding: 0.75rem 1.25rem;
   border-radius: 100px;
-  font-size: 0.95rem;
+  font-size: var(--fs-h3);
   color: rgba(255, 255, 255, 0.8);
   white-space: nowrap;
 
   i {
     color: var(--primary-text);
-    font-size: 1.1rem;
+    font-size: var(--fs-h2);
     margin-right: 0.5rem;
   }
 }
@@ -336,8 +336,8 @@
   padding: 2rem;
 
   h2 {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-semibold);
     color: var(--auth-heading-color);
     margin-bottom: 0.5rem;
     background: none;
@@ -345,7 +345,7 @@
   }
 
   p.text-500 {
-    font-size: 1.2rem;
+    font-size: var(--fs-h2);
     color: var(--auth-subtext-color);
     margin-bottom: 2rem !important;
     line-height: 1.5;
@@ -362,7 +362,7 @@
     border: 1px solid var(--auth-input-border);
     border-radius: 8px;
     padding: 1rem 1rem 1rem 3rem;
-    font-size: 1rem;
+    font-size: var(--fs-h3);
     width: 100%;
     min-width: 440px;
     transition: all 0.2s ease;
@@ -382,7 +382,7 @@
 
     &::placeholder {
       color: var(--auth-placeholder-color);
-      font-weight: normal;
+      font-weight: var(--fw-regular);
     }
   }
 
@@ -395,7 +395,7 @@
 
     i.pi-lock {
       left: 12px;
-      font-size: 1.1rem;
+      font-size: var(--fs-h2);
     }
   }
 
@@ -442,8 +442,8 @@
     border: none;
     padding: 1rem;
     border-radius: 8px;
-    font-weight: 500;
-    font-size: 1rem;
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-h3);
     text-transform: none;
     letter-spacing: normal;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -502,17 +502,17 @@
     gap: 0.5rem;
 
     label {
-      font-size: 1rem;
+      font-size: var(--fs-h3);
       color: var(--auth-hint-color);
-      font-weight: 500;
+      font-weight: var(--fw-medium);
     }
   }
 }
 
 .forgot-password {
   color: var(--auth-heading-color);
-  font-weight: 500;
-  font-size: 1rem;
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-h3);
   text-decoration: none;
   position: relative;
   cursor: pointer;
@@ -589,7 +589,7 @@
     padding: 1.5rem;
 
     h2 {
-      font-size: 2rem;
+      font-size: var(--fs-h1);
     }
   }
 }
@@ -598,7 +598,7 @@
 @media screen and (max-width: 1200px) {
   .marketing-section {
     .brand {
-      font-size: 2rem;
+      font-size: var(--fs-h1);
 
       i.ci-app-icon {
         width: 2.5rem;
@@ -607,7 +607,7 @@
     }
 
     .headline {
-      font-size: 2.5rem;
+      font-size: var(--fs-h1);
     }
   }
 }
@@ -619,11 +619,11 @@
   gap: 0.5rem;
   margin-top: 1rem;
   color: var(--auth-error-color);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
 
   i {
-    font-size: 0.95rem;
+    font-size: var(--fs-h3);
   }
 }
 

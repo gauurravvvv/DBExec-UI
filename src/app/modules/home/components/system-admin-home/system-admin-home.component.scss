@@ -45,7 +45,7 @@
           border-radius: 6px;
           background: transparent;
           color: var(--secondary-color);
-          font-weight: 500;
+          font-weight: var(--fw-medium);
           cursor: pointer;
           transition: all 0.2s ease;
 
@@ -55,13 +55,13 @@
           }
 
           i {
-            font-size: 0.875rem;
+            font-size: var(--fs-body);
           }
         }
 
         h2 {
-          font-size: 1.5rem;
-          font-weight: 600;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
           margin: 0;
         }
@@ -76,19 +76,19 @@
           padding: 0.5rem 1rem;
           border: none;
           border-radius: 6px;
-          font-weight: 500;
+          font-weight: var(--fw-medium);
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
           transition: all 0.2s ease;
-          font-size: 0.875rem;
+          font-size: var(--fs-body);
           height: 36px;
           min-width: 100px;
 
           i {
-            font-size: 0.875rem;
+            font-size: var(--fs-body);
           }
 
           &.btn-submit {
@@ -182,16 +182,16 @@
           }
 
           label {
-            font-weight: 500;
+            font-weight: var(--fw-medium);
             color: var(--text-color);
-            font-size: 0.875rem;
+            font-size: var(--fs-body);
           }
 
           input {
             padding: 0.5rem 0.75rem;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-size: 0.875rem;
+            font-size: var(--fs-body);
             color: var(--text-color);
             transition: all 0.2s ease;
             background: var(--card-background);
@@ -220,7 +220,7 @@
 
           .invalid-feedback {
             color: var(--error-color);
-            font-size: 0.75rem;
+            font-size: var(--fs-label);
             margin-top: 0.125rem;
           }
 
@@ -252,7 +252,7 @@
               }
 
               i {
-                font-size: 1rem;
+                font-size: var(--fs-h3);
               }
             }
           }
@@ -274,18 +274,18 @@
             padding: 0.5rem 1rem;
             border: none;
             border-radius: 6px;
-            font-weight: 500;
+            font-weight: var(--fw-medium);
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.5rem;
             transition: all 0.2s ease;
-            font-size: 0.875rem;
+            font-size: var(--fs-body);
             height: 36px;
             min-width: 100px;
 
             i {
-              font-size: 0.875rem;
+              font-size: var(--fs-body);
             }
 
             &.btn-submit {
@@ -336,7 +336,7 @@
         }
 
         h2 {
-          font-size: 1.25rem;
+          font-size: var(--fs-h1);
         }
       }
     }
@@ -371,9 +371,9 @@
     .header-left {
       h2 {
         margin: 0;
-        font-size: 1.75rem;
+        font-size: var(--fs-h1);
         color: var(--text-color);
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
       }
 
       .subtitle {
@@ -404,7 +404,7 @@
           border-radius: 8px;
           background: var(--card-background);
           min-width: 200px;
-          font-size: 0.95rem;
+          font-size: var(--fs-h3);
           cursor: pointer;
 
           &:focus {
@@ -487,7 +487,7 @@
           align-items: center;
           justify-content: center;
           color: var(--primary-text);
-          font-size: 1.25rem;
+          font-size: var(--fs-h1);
           margin-bottom: 1rem;
 
           &.bg-1 {
@@ -508,12 +508,12 @@
           h4 {
             margin: 0;
             color: var(--text-color);
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
           }
 
           .value {
-            font-size: 1.75rem;
-            font-weight: 600;
+            font-size: var(--fs-h1);
+            font-weight: var(--fw-semibold);
             color: var(--text-color);
             margin: 0.5rem 0;
           }
@@ -551,7 +551,7 @@
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          font-weight: 500;
+          font-weight: var(--fw-medium);
           cursor: pointer;
           transition: all 0.3s ease;
           box-shadow: var(--shadow-sm);
@@ -596,14 +596,14 @@
 
             i {
               color: var(--primary-color);
-              font-size: 1.5rem;
+              font-size: var(--fs-h1);
             }
           }
 
           h3 {
             margin: 0;
             color: var(--text-color);
-            font-size: 1.25rem;
+            font-size: var(--fs-h1);
           }
         }
 
@@ -619,14 +619,14 @@
             .stat-value {
               h4 {
                 margin: 0;
-                font-size: 2rem;
+                font-size: var(--fs-h1);
                 color: var(--text-color);
               }
 
               p {
                 margin: 0;
                 color: var(--secondary-color);
-                font-size: 0.9rem;
+                font-size: var(--fs-body);
               }
             }
 
@@ -636,7 +636,7 @@
               gap: 0.5rem;
               padding: 0.5rem 1rem;
               border-radius: 20px;
-              font-size: 0.9rem;
+              font-size: var(--fs-body);
 
               &.up {
                 background: var(--success-bg);
@@ -660,12 +660,12 @@
                 display: flex;
                 justify-content: space-between;
                 margin-bottom: 0.5rem;
-                font-size: 0.9rem;
+                font-size: var(--fs-body);
                 color: var(--secondary-color);
 
                 .value {
                   color: var(--text-color);
-                  font-weight: 500;
+                  font-weight: var(--fw-medium);
                 }
               }
 

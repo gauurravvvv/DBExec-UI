@@ -115,6 +115,7 @@ export class SidebarComponent implements OnInit {
     } else {
       this.collapseAllMenus();
     }
+    this.cdr.markForCheck();
   }
 
   toggleSidebarAndCollapseAll() {
@@ -139,12 +140,32 @@ export class SidebarComponent implements OnInit {
 
   toggleSubmenuAndExpand(item: MenuItem) {
     if (!this.isExpanded) {
+      // Coming from collapsed → open the rail first, then expand this branch
+      // on the next tick so the width transition kicks in cleanly. OnPush
+      // change-detection means we must explicitly mark for check after the
+      // setTimeout, otherwise the flag flips but the view doesn't refresh.
       this.isExpanded = true;
+      this.cdr.markForCheck();
       setTimeout(() => {
-        item.isExpanded = !item.isExpanded;
+        item.isExpanded = true;
+        this.cdr.markForCheck();
       }, 100);
     } else {
-      item.isExpanded = !item.isExpanded;
+      const opening = !item.isExpanded;
+      item.isExpanded = opening;
+      // Closing a parent must also close everything under it, otherwise
+      // descendants keep their isExpanded=true state and pop back open the
+      // next time the parent is re-opened.
+      if (!opening) this.collapseDescendants(item);
+      this.cdr.markForCheck();
+    }
+  }
+
+  private collapseDescendants(item: MenuItem) {
+    if (!item.subPermissions) return;
+    for (const child of item.subPermissions) {
+      child.isExpanded = false;
+      this.collapseDescendants(child);
     }
   }
 

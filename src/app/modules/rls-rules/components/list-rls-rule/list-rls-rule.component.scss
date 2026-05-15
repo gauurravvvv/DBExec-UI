@@ -37,18 +37,18 @@ $radius-sm: 8px;
 
   .header-content {
     h2 {
-      font-size: 1.875rem;
-      font-weight: 700;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       letter-spacing: -0.025em;
       margin: 0 0 0.5rem 0;
     }
 
     .subtitle {
-      font-size: 0.95rem;
+      font-size: var(--fs-h3);
       color: var(--text-color-secondary);
       margin: 0;
-      font-weight: 400;
+      font-weight: var(--fw-regular);
     }
   }
 }
@@ -95,7 +95,7 @@ $radius-sm: 8px;
         border: 1px solid var(--border-color);
         padding: 0.65rem 1rem 0.65rem 2.5rem;
         width: 280px;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
         background: var(--hover-background);
         transition: all 0.2s;
         color: var(--text-color);
@@ -115,7 +115,7 @@ $radius-sm: 8px;
     // Modern Button
     .modern-button {
       border-radius: 6px !important;
-      font-weight: 600;
+      font-weight: var(--fw-semibold);
       padding: 0.65rem 1.25rem;
 
       &.p-button-primary {
@@ -170,8 +170,8 @@ $radius-sm: 8px;
         background: var(--hover-background);
         color: var(--text-color);
         opacity: 1;
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: var(--fs-label);
+        font-weight: var(--fw-semibold);
         text-transform: uppercase;
         letter-spacing: 0.04em;
         padding: 0.75rem 1rem;
@@ -244,7 +244,7 @@ $radius-sm: 8px;
           padding: 0.75rem 1rem;
           vertical-align: middle;
           color: var(--text-color);
-          font-size: 0.9rem;
+          font-size: var(--fs-body);
 
           &:first-child {
             padding-left: 2rem;
@@ -268,8 +268,8 @@ $radius-sm: 8px;
       // Link Style
       .dataset-name-link {
         color: var(--text-color);
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-h3);
         text-decoration: none;
         display: block;
         white-space: nowrap;
@@ -306,7 +306,7 @@ $radius-sm: 8px;
         color: var(--secondary-color);
         padding: 2px 8px;
         border-radius: 99px;
-        font-size: 0.8rem;
+        font-size: var(--fs-control);
         display: inline-block;
         max-width: 100%;
         overflow: hidden;
@@ -326,8 +326,8 @@ $radius-sm: 8px;
           color: var(--primary-color);
           padding: 2px 8px;
           border-radius: 99px;
-          font-size: 0.78rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           white-space: nowrap;
         }
 
@@ -335,24 +335,24 @@ $radius-sm: 8px;
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          font-size: 0.78rem;
+          font-size: var(--fs-control);
           color: var(--text-color);
           opacity: 0.75;
 
           .cond-col {
-            font-weight: 500;
+            font-weight: var(--fw-medium);
           }
 
           .cond-op {
             color: var(--primary-color);
-            font-size: 0.72rem;
-            font-weight: 600;
+            font-size: var(--fs-micro);
+            font-weight: var(--fw-semibold);
             opacity: 0.8;
           }
         }
 
         .more-conds {
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--text-color);
           opacity: 0.5;
         }
@@ -363,8 +363,8 @@ $radius-sm: 8px;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-medium);
         white-space: nowrap;
 
         .dot {
@@ -453,7 +453,7 @@ $radius-sm: 8px;
           min-width: 2rem;
           height: 2rem;
           margin: 0 0.125rem;
-          font-weight: 500;
+          font-weight: var(--fw-medium);
 
           &:hover {
             background: var(--hover-background);
@@ -479,7 +479,7 @@ td.empty-message-cell {
   text-align: center;
   padding: 2rem !important;
   color: var(--secondary-color);
-  font-size: 0.95rem;
+  font-size: var(--fs-h3);
 }
 
 // 5. Popups & Modals - Enhanced Premium Design
@@ -547,13 +547,13 @@ td.empty-message-cell {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: var(--fs-h1);
       }
 
       h3 {
         margin: 0;
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
     }
@@ -571,18 +571,18 @@ td.empty-message-cell {
         border: 1px solid var(--border-color);
         padding: 8px 14px;
         border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         margin-bottom: 1rem;
 
         i {
-          font-size: 0.8rem;
+          font-size: var(--fs-control);
         }
       }
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -601,7 +601,7 @@ td.empty-message-cell {
           gap: 10px;
           padding: 0.5rem 0;
           color: var(--secondary-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           border-bottom: 1px dashed var(--border-color);
 
           &:last-child {
@@ -609,7 +609,7 @@ td.empty-message-cell {
           }
           i {
             color: var(--primary-color);
-            font-size: 0.75rem;
+            font-size: var(--fs-label);
             flex-shrink: 0;
           }
         }
@@ -622,8 +622,8 @@ td.empty-message-cell {
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -639,7 +639,7 @@ td.empty-message-cell {
           border-radius: $radius-sm;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -660,7 +660,7 @@ td.empty-message-cell {
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -680,13 +680,13 @@ td.empty-message-cell {
         padding: 0.75rem 1.5rem;
         border-radius: $radius-md;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {

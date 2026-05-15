@@ -5,41 +5,36 @@
 .header {
   position: relative;
   z-index: 1000;
-  height: 54px;
-  padding: 0 1.25rem;
+  height: 56px;
+  padding: 0 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: var(--card-background);
-  box-shadow:
-    0 1px 0 var(--border-color),
-    var(--shadow-overlay);
-
-  // Gradient bottom border
-  .header-border {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      var(--primary-color) 30%,
-      var(--primary-color-transparent) 70%,
-      transparent 100%
-    );
-    opacity: 0.6;
-  }
+  border-bottom: 1px solid var(--border-color);
 }
 
-// ── Logo ──────────────────────────────────────────────────────────
+// ── Header Left (product wordmark) ────────────────────────────────
+.header-left {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
 .logo-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 6px 10px;
+  text-decoration: none;
   user-select: none;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--hover-background);
+  }
 
   .logo-icon {
     width: 24px;
@@ -49,10 +44,13 @@
   }
 
   .logo-text {
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    font-family: 'Poppins', sans-serif;
+    // Brand wordmark deliberately sits one notch above page H1. Poppins +
+    // 700 weight + gradient on "Exec" are the only spots in the app where
+    // we bend the type system rules — this is the only branding moment.
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-bold);
+    letter-spacing: -0.4px;
+    font-family: var(--font-brand);
     color: var(--text-color);
 
     .highlight {
@@ -64,23 +62,26 @@
   }
 }
 
-// ── Center ────────────────────────────────────────────────────────
+// ── Header Centre (organisation name) ─────────────────────────────
+// Absolutely centred so the org sits in the visual midpoint of the bar
+// regardless of how wide the left/right clusters get. pointer-events off
+// so it never blocks clicks underneath.
 .header-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  text-align: center;
   pointer-events: none;
+  max-width: 40vw;
 
-  .org-info {
-    .org-name {
-      margin: 0;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-color);
-      letter-spacing: 0.1px;
-      line-height: 1.2;
-    }
+  .org-name {
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
   }
 }
 
@@ -99,49 +100,49 @@
   opacity: 0.6;
 }
 
-// ── Search Trigger ────────────────────────────────────────────────
+// ── Search Trigger (Linear/Stripe-style command launcher) ─────────
 .search-trigger {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
+  padding: 0 10px 0 12px;
   height: 32px;
-  min-width: 190px;
+  min-width: 220px;
   background: var(--hover-background);
   border: 1px solid var(--border-color);
-  border-radius: 20px;
+  border-radius: 8px;
   cursor: pointer;
   margin-right: 8px;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 
   &:hover {
-    background: var(--card-background);
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+    background: var(--card-background);
   }
 
-  i {
-    font-size: 13px;
+  > i {
+    font-size: var(--fs-label);
     color: var(--secondary-color);
     flex-shrink: 0;
   }
 
   .placeholder {
-    font-size: 12px;
+    font-size: var(--fs-control);
     color: var(--secondary-color);
     flex: 1;
   }
 
   kbd.shortcut {
-    font-size: 10px;
-    background: var(--scrollbar-track);
+    font-size: var(--fs-micro);
+    background: var(--card-background);
     padding: 2px 6px;
-    border-radius: 5px;
+    border-radius: 4px;
     color: var(--secondary-color);
-    font-family: monospace;
+    font-family: var(--font-mono);
     border: 1px solid var(--border-color);
-    line-height: 1.6;
+    line-height: 1.4;
     white-space: nowrap;
+    font-weight: var(--fw-medium);
   }
 }
 
@@ -161,7 +162,7 @@
   transition: all 0.2s ease;
 
   i {
-    font-size: 0.95rem;
+    font-size: var(--fs-h3);
     transition: color 0.2s ease;
     pointer-events: none;
   }
@@ -185,8 +186,8 @@
       border-radius: 50%;
       min-width: 16px;
       height: 16px;
-      font-size: 9px;
-      font-weight: 700;
+      font-size: var(--fs-micro);
+      font-weight: var(--fw-semibold);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -225,8 +226,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 600;
+      font-size: var(--fs-micro);
+      font-weight: var(--fw-semibold);
       flex-shrink: 0;
       box-shadow: 0 2px 8px var(--primary-color-transparent);
     }
@@ -237,20 +238,20 @@
       line-height: 1.2;
 
       .username {
-        font-size: 0.8125rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
 
       .user-role {
-        font-size: 0.65rem;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
         text-transform: capitalize;
       }
     }
 
     .chevron {
-      font-size: 0.65rem;
+      font-size: var(--fs-micro);
       color: var(--secondary-color);
       transition: transform 0.2s ease;
 
@@ -288,22 +289,22 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         flex-shrink: 0;
       }
 
       .menu-name {
-        font-size: 0.875rem;
-        font-weight: 600;
+        font-size: var(--fs-body);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
 
       .menu-role-tag {
         display: inline-block;
         margin-top: 2px;
-        font-size: 0.7rem;
-        font-weight: 600;
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
         padding: 1px 7px;
         border-radius: 20px;
         background: rgba(var(--primary-color-rgb), 0.12);
@@ -333,12 +334,12 @@
         border-radius: 8px;
         color: var(--text-color);
         text-decoration: none;
-        font-size: 0.875rem;
+        font-size: var(--fs-body);
         transition: background 0.15s ease;
         cursor: pointer;
 
         i {
-          font-size: 0.9rem;
+          font-size: var(--fs-body);
           color: var(--secondary-color);
           width: 16px;
           text-align: center;
@@ -398,8 +399,8 @@
 
     h3 {
       margin: 0;
-      font-size: 0.9375rem;
-      font-weight: 600;
+      font-size: var(--fs-h3);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
     }
 
@@ -407,8 +408,8 @@
       background: transparent !important;
       border: none !important;
       color: var(--primary-color) !important;
-      font-size: 0.75rem;
-      font-weight: 500;
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
       padding: 4px 8px !important;
       border-radius: 6px !important;
       cursor: pointer;
@@ -458,7 +459,7 @@
         padding-left: 13px;
 
         .notification-content .message {
-          font-weight: 500;
+          font-weight: var(--fw-medium);
         }
 
         .notification-icon i {
@@ -483,7 +484,7 @@
 
         i {
           color: var(--secondary-color);
-          font-size: 14px;
+          font-size: var(--fs-body);
           opacity: 0.8;
         }
       }
@@ -495,7 +496,7 @@
 
         .message {
           margin: 0;
-          font-size: 0.8125rem;
+          font-size: var(--fs-control);
           line-height: 1.5;
           color: var(--text-color);
           display: -webkit-box;
@@ -506,7 +507,7 @@
 
         .time {
           display: block;
-          font-size: 0.7rem;
+          font-size: var(--fs-micro);
           color: var(--secondary-color);
           margin-top: 3px;
         }
@@ -532,7 +533,7 @@
         color: var(--secondary-color);
 
         i {
-          font-size: 11px;
+          font-size: var(--fs-micro);
         }
 
         &:hover {
@@ -556,7 +557,7 @@
     color: var(--secondary-color);
 
     i {
-      font-size: 28px;
+      font-size: var(--fs-h1);
       margin-bottom: 10px;
       display: block;
       opacity: 0.5;
@@ -564,13 +565,13 @@
 
     p {
       margin: 0;
-      font-size: 0.875rem;
+      font-size: var(--fs-body);
     }
   }
 
   .notification-footer {
     padding: 10px 16px;
-    font-size: 0.7rem;
+    font-size: var(--fs-micro);
     color: var(--secondary-color);
     border-top: 1px solid var(--border-color);
     background: var(--hover-background);
@@ -585,7 +586,7 @@
   align-items: center;
   justify-content: center;
   padding: 10px 48px;
-  font-size: 13px;
+  font-size: var(--fs-control);
   position: relative;
   z-index: 999;
   overflow: hidden;
@@ -646,8 +647,8 @@
       gap: 10px;
 
       .banner-label {
-        font-size: 10px;
-        font-weight: 700;
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
         letter-spacing: 1.5px;
         background: rgba(255, 255, 255, 0.18);
         padding: 3px 8px;
@@ -662,7 +663,7 @@
 
         .banner-count {
           margin-left: 4px;
-          font-weight: 600;
+          font-weight: var(--fw-semibold);
           opacity: 0.85;
         }
       }
@@ -677,7 +678,7 @@
         cursor: pointer;
 
         .typewriter-cursor {
-          font-weight: 300;
+          font-weight: var(--fw-regular);
           animation: blink 0.7s step-end infinite;
           margin-left: 1px;
         }
@@ -707,7 +708,7 @@
         }
 
         i {
-          font-size: 10px;
+          font-size: var(--fs-micro);
         }
       }
     }
@@ -750,8 +751,8 @@
       margin-bottom: 14px;
 
       .popup-tag {
-        font-size: 11px;
-        font-weight: 700;
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
         letter-spacing: 0.5px;
         color: var(--primary-color);
         text-transform: uppercase;
@@ -760,15 +761,15 @@
 
     .popup-title {
       margin: 0 0 10px;
-      font-size: 1.05rem;
-      font-weight: 600;
+      font-size: var(--fs-h2);
+      font-weight: var(--fw-semibold);
       color: var(--text-color);
       line-height: 1.4;
     }
 
     .popup-description {
       margin: 0 0 20px;
-      font-size: 0.875rem;
+      font-size: var(--fs-body);
       line-height: 1.7;
       color: var(--secondary-color);
       white-space: pre-line;
@@ -789,7 +790,7 @@
         margin: 0;
 
         span {
-          font-size: 0.8rem;
+          font-size: var(--fs-control);
           color: var(--secondary-color);
           user-select: none;
         }
@@ -801,8 +802,8 @@
         border: 1px solid var(--border-color);
         padding: 7px 20px;
         border-radius: 8px;
-        font-weight: 500;
-        font-size: 0.8rem;
+        font-weight: var(--fw-medium);
+        font-size: var(--fs-control);
         cursor: pointer;
         transition: all 0.15s ease;
 

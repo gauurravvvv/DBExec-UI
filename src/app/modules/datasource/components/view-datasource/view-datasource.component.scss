@@ -36,9 +36,9 @@ $radius-sm: 8px;
   z-index: 1;
 
   .header {
-    font-weight: 600;
+    font-weight: var(--fw-semibold);
     color: var(--text-color);
-    font-size: 0.9rem;
+    font-size: var(--fs-body);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -154,14 +154,14 @@ $radius-sm: 8px;
           gap: 8px;
           padding: 0.6rem 1.25rem;
           border-radius: 8px;
-          font-weight: 600;
-          font-size: 0.9rem;
+          font-weight: var(--fw-semibold);
+          font-size: var(--fs-body);
           border: none;
           cursor: pointer;
           transition: all 0.2s ease;
 
           i {
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
 
           &.btn-secondary {
@@ -247,7 +247,7 @@ $radius-sm: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: var(--fs-h1);
             background: var(--primary-color-transparent);
             color: var(--primary-color);
 
@@ -275,9 +275,9 @@ $radius-sm: 8px;
           .db-details {
             h3 {
               margin: 0;
-              font-size: 1.5rem;
+              font-size: var(--fs-h1);
               color: var(--text-color);
-              font-weight: 600;
+              font-weight: var(--fw-semibold);
             }
 
             .db-metadata {
@@ -291,21 +291,21 @@ $radius-sm: 8px;
                 color: var(--primary-color);
                 padding: 0.3rem 0.75rem;
                 border-radius: 4px;
-                font-size: 0.8rem;
-                font-weight: 500;
+                font-size: var(--fs-control);
+                font-weight: var(--fw-medium);
               }
 
               .db-connection {
                 color: var(--text-color);
                 opacity: 0.7;
-                font-size: 0.9rem;
+                font-size: var(--fs-body);
               }
 
               .db-status {
                 padding: 0.3rem 0.75rem;
                 border-radius: 4px;
-                font-size: 0.8rem;
-                font-weight: 500;
+                font-size: var(--fs-control);
+                font-weight: var(--fw-medium);
 
                 &.active {
                   background: var(--success-color-transparent);
@@ -382,7 +382,7 @@ $radius-sm: 8px;
 
             i {
               color: var(--primary-color);
-              font-size: 1.5rem;
+              font-size: var(--fs-h1);
             }
           }
 
@@ -391,14 +391,14 @@ $radius-sm: 8px;
             flex-direction: column;
 
             .stat-value {
-              font-size: 1.5rem;
-              font-weight: 600;
+              font-size: var(--fs-h1);
+              font-weight: var(--fw-semibold);
               color: var(--text-color);
               line-height: 1.2;
             }
 
             .stat-label {
-              font-size: 0.85rem;
+              font-size: var(--fs-control);
               color: var(--text-color);
               opacity: 0.7;
             }
@@ -458,8 +458,8 @@ $radius-sm: 8px;
 
         h4 {
           margin: 0;
-          font-size: 1rem;
-          font-weight: 500;
+          font-size: var(--fs-h3);
+          font-weight: var(--fw-medium);
         }
 
         .chart-actions {
@@ -484,9 +484,9 @@ $radius-sm: 8px;
 
           h4 {
             margin: 0 0 1rem;
-            font-size: 1.1rem;
+            font-size: var(--fs-h2);
             color: var(--text-color);
-            font-weight: 500;
+            font-weight: var(--fw-medium);
             text-align: center;
             flex-shrink: 0;
           }
@@ -539,8 +539,8 @@ $radius-sm: 8px;
 
         h4 {
           margin: 0 0 1rem;
-          font-size: 1rem;
-          font-weight: 500;
+          font-size: var(--fs-h3);
+          font-weight: var(--fw-medium);
           display: flex;
           align-items: center;
 
@@ -558,7 +558,7 @@ $radius-sm: 8px;
           .config-item {
             label {
               display: block;
-              font-size: 0.85rem;
+              font-size: var(--fs-control);
               color: var(--text-color);
               opacity: 0.7;
               margin-bottom: 0.5rem;
@@ -566,9 +566,9 @@ $radius-sm: 8px;
 
             p {
               margin: 0;
-              font-size: 1rem;
+              font-size: var(--fs-h3);
               color: var(--text-color);
-              font-weight: 500;
+              font-weight: var(--fw-medium);
             }
 
             p.with-badge {
@@ -579,8 +579,8 @@ $radius-sm: 8px;
             .config-badge {
               padding: 0.25rem 0.5rem;
               border-radius: 4px;
-              font-size: 0.8rem;
-              font-weight: 500;
+              font-size: var(--fs-control);
+              font-weight: var(--fw-medium);
               background-color: var(--hover-background);
               color: var(--primary-color);
               display: inline-block;
@@ -613,7 +613,7 @@ $radius-sm: 8px;
                 color: var(--text-color) !important;
                 padding: 0.75rem 1rem 0.75rem 2.5rem;
                 border-radius: 6px;
-                font-size: 0.875rem;
+                font-size: var(--fs-body);
                 transition: all 0.2s ease;
 
                 &::placeholder {
@@ -666,19 +666,19 @@ $radius-sm: 8px;
               margin-bottom: 1rem;
 
               i {
-                font-size: 1rem;
+                font-size: var(--fs-h3);
                 color: var(--primary-color);
                 margin-right: 0.75rem;
               }
 
               .schema-name {
-                font-weight: 500;
+                font-weight: var(--fw-medium);
                 color: var(--text-color);
                 flex: 1;
               }
 
               .schema-size {
-                font-size: 0.9rem;
+                font-size: var(--fs-body);
                 color: var(--text-color);
                 opacity: 0.7;
               }
@@ -709,13 +709,13 @@ $radius-sm: 8px;
 
                 .value {
                   display: block;
-                  font-size: 1.25rem;
-                  font-weight: 600;
+                  font-size: var(--fs-h1);
+                  font-weight: var(--fw-semibold);
                   color: var(--text-color);
                 }
 
                 .label {
-                  font-size: 0.8rem;
+                  font-size: var(--fs-control);
                   color: var(--text-color);
                   opacity: 0.7;
                 }
@@ -755,7 +755,7 @@ $radius-sm: 8px;
                 color: var(--text-color) !important;
                 padding: 0.75rem 1rem 0.75rem 2.5rem;
                 border-radius: 6px;
-                font-size: 0.875rem;
+                font-size: var(--fs-body);
                 transition: all 0.2s ease;
 
                 &::placeholder {
@@ -793,7 +793,7 @@ $radius-sm: 8px;
                 background: var(--hover-background);
                 color: var(--text-color);
                 border-color: var(--border-color);
-                font-weight: 600;
+                font-weight: var(--fw-semibold);
               }
 
               .p-datatable-tbody tr {
@@ -812,14 +812,14 @@ $radius-sm: 8px;
 
               .table-name {
                 color: var(--primary-color);
-                font-weight: 500;
+                font-weight: var(--fw-medium);
               }
 
               .schema-badge {
                 background: var(--hover-background);
                 padding: 0.25rem 0.5rem;
                 border-radius: 4px;
-                font-size: 0.8rem;
+                font-size: var(--fs-control);
               }
 
               .table-actions {
@@ -848,8 +848,8 @@ $radius-sm: 8px;
 
             h4 {
               margin: 0;
-              font-size: 1rem;
-              font-weight: 500;
+              font-size: var(--fs-h3);
+              font-weight: var(--fw-medium);
             }
 
             .editor-actions {
@@ -861,7 +861,7 @@ $radius-sm: 8px;
           .code-editor {
             textarea {
               width: 100%;
-              font-family: monospace;
+              font-family: var(--font-mono);
               background: var(--hover-background);
               color: var(--text-color);
               border-color: var(--border-color);
@@ -885,8 +885,8 @@ $radius-sm: 8px;
 
           h4 {
             margin: 0 0 1rem;
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: var(--fs-h3);
+            font-weight: var(--fw-medium);
           }
 
           .query-history {
@@ -903,7 +903,7 @@ $radius-sm: 8px;
 
               th {
                 background: var(--hover-background);
-                font-weight: 500;
+                font-weight: var(--fw-medium);
                 color: var(--text-color);
               }
 
@@ -918,7 +918,7 @@ $radius-sm: 8px;
               .query-status {
                 padding: 0.25rem 0.5rem;
                 border-radius: 4px;
-                font-size: 0.8rem;
+                font-size: var(--fs-control);
 
                 &.success {
                   background: var(--success-color-transparent);
@@ -1031,12 +1031,12 @@ $radius-sm: 8px;
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                font-size: 1.1rem;
-                font-weight: 500;
+                font-size: var(--fs-h2);
+                font-weight: var(--fw-medium);
 
                 i {
                   color: var(--primary-color);
-                  font-size: 1.2rem;
+                  font-size: var(--fs-h2);
                 }
               }
             }
@@ -1056,12 +1056,12 @@ $radius-sm: 8px;
                     gap: 8px;
                     color: var(--secondary-color);
                     margin-bottom: 5px;
-                    font-size: 0.9rem;
+                    font-size: var(--fs-body);
                   }
 
                   p {
                     display: block;
-                    font-size: 1.1rem;
+                    font-size: var(--fs-h2);
                     color: var(--text-color);
                     margin: 0;
 
@@ -1074,8 +1074,8 @@ $radius-sm: 8px;
                         display: inline-block;
                         padding: 0.3rem 0.6rem;
                         border-radius: 4px;
-                        font-size: 0.9rem;
-                        font-weight: 500;
+                        font-size: var(--fs-body);
+                        font-weight: var(--fw-medium);
                         background: var(--primary-color-transparent);
                         color: var(--primary-color);
                       }
@@ -1085,8 +1085,8 @@ $radius-sm: 8px;
                       display: inline-block;
                       padding: 0.3rem 0.6rem;
                       border-radius: 4px;
-                      font-size: 0.9rem;
-                      font-weight: 500;
+                      font-size: var(--fs-body);
+                      font-weight: var(--fw-medium);
 
                       &.active {
                         background: rgba(var(--success-rgb), 0.15);
@@ -1114,7 +1114,7 @@ $radius-sm: 8px;
 
             h3 {
               margin: 0;
-              font-size: 1.2rem;
+              font-size: var(--fs-h2);
               color: var(--text-color);
               display: flex;
               align-items: center;
@@ -1147,7 +1147,7 @@ $radius-sm: 8px;
                   color: var(--text-color) !important;
                   padding: 0.75rem 1rem 0.75rem 2.5rem;
                   border-radius: 6px;
-                  font-size: 0.875rem;
+                  font-size: var(--fs-body);
                   transition: all 0.2s ease;
 
                   &::placeholder {
@@ -1191,16 +1191,16 @@ $radius-sm: 8px;
                 label {
                   display: block;
                   margin-bottom: 0.5rem;
-                  font-size: 0.875rem;
+                  font-size: var(--fs-body);
                   color: var(--text-color);
                   opacity: 0.8;
                 }
 
                 p {
                   margin: 0;
-                  font-size: 1rem;
+                  font-size: var(--fs-h3);
                   color: var(--text-color);
-                  font-weight: 500;
+                  font-weight: var(--fw-medium);
                 }
               }
             }
@@ -1214,9 +1214,9 @@ $radius-sm: 8px;
               .chart-container {
                 h4 {
                   margin: 0 0 1rem;
-                  font-size: 1rem;
+                  font-size: var(--fs-h3);
                   color: var(--text-color);
-                  font-weight: 500;
+                  font-weight: var(--fw-medium);
                 }
 
                 .chart-wrapper {
@@ -1284,21 +1284,21 @@ $radius-sm: 8px;
                   }
 
                   .schema-name {
-                    font-weight: 500;
+                    font-weight: var(--fw-medium);
                     color: var(--text-color);
                     flex: 1;
                     min-width: 0;
                     word-break: break-word;
 
                     @media (max-width: 640px) {
-                      font-size: 0.95rem;
+                      font-size: var(--fs-h3);
                     }
                   }
 
                   .schema-size {
                     color: var(--primary-color);
-                    font-weight: 500;
-                    font-size: 0.9rem;
+                    font-weight: var(--fw-medium);
+                    font-size: var(--fs-body);
                   }
                 }
 
@@ -1332,14 +1332,14 @@ $radius-sm: 8px;
                     align-items: center;
 
                     .label {
-                      font-size: 0.75rem;
+                      font-size: var(--fs-label);
                       color: var(--text-color);
                       opacity: 0.7;
                     }
 
                     .value {
-                      font-size: 1rem;
-                      font-weight: 600;
+                      font-size: var(--fs-h3);
+                      font-weight: var(--fw-semibold);
                       color: var(--text-color);
                     }
                   }
@@ -1360,7 +1360,7 @@ $radius-sm: 8px;
                   .tables-list {
                     h5 {
                       margin: 0.5rem 0;
-                      font-size: 0.9rem;
+                      font-size: var(--fs-body);
                       color: var(--text-color);
                       opacity: 0.8;
                     }
@@ -1407,7 +1407,7 @@ $radius-sm: 8px;
 
                         i {
                           color: var(--primary-color);
-                          font-size: 0.8rem;
+                          font-size: var(--fs-control);
                           flex-shrink: 0;
                           transition: transform 0.2s ease;
                         }
@@ -1423,7 +1423,7 @@ $radius-sm: 8px;
                         display: grid;
                         grid-template-columns: repeat(3, 1fr);
                         gap: 0.5rem;
-                        font-size: 0.8rem;
+                        font-size: var(--fs-control);
                         min-width: 320px;
 
                         @media (max-width: 1200px) {
@@ -1433,7 +1433,7 @@ $radius-sm: 8px;
                         @media (max-width: 768px) {
                           min-width: 100%;
                           grid-template-columns: repeat(3, 1fr);
-                          font-size: 0.75rem;
+                          font-size: var(--fs-label);
                         }
 
                         @media (max-width: 480px) {
@@ -1454,7 +1454,7 @@ $radius-sm: 8px;
 
                           &.size {
                             color: var(--primary-color);
-                            font-weight: 500;
+                            font-weight: var(--fw-medium);
                           }
 
                           &.rows {
@@ -1509,7 +1509,7 @@ $radius-sm: 8px;
 
                   .table-name {
                     color: var(--text-color);
-                    font-weight: 500;
+                    font-weight: var(--fw-medium);
                     min-width: 0;
                     flex: 1;
                     padding-right: 1rem;
@@ -1522,7 +1522,7 @@ $radius-sm: 8px;
                     }
 
                     @media (max-width: 640px) {
-                      font-size: 0.9rem;
+                      font-size: var(--fs-body);
                       white-space: normal;
                       word-break: break-word;
                     }
@@ -1536,14 +1536,14 @@ $radius-sm: 8px;
 
                     .table-size {
                       color: var(--primary-color);
-                      font-weight: 500;
+                      font-weight: var(--fw-medium);
                       white-space: nowrap;
                     }
 
                     .table-percentage {
                       color: var(--text-color);
                       opacity: 0.7;
-                      font-size: 0.85rem;
+                      font-size: var(--fs-control);
                       white-space: nowrap;
                     }
                   }
@@ -1637,7 +1637,7 @@ $radius-sm: 8px;
         background: var(--error-bg);
 
         i {
-          font-size: 1.5rem;
+          font-size: var(--fs-h1);
           color: var(--error-color);
         }
 
@@ -1668,8 +1668,8 @@ $radius-sm: 8px;
       h3 {
         margin: 0;
         color: var(--text-color);
-        font-size: 1.35rem;
-        font-weight: 700;
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
       }
     }
 
@@ -1686,18 +1686,18 @@ $radius-sm: 8px;
         border: 1px solid var(--border-color);
         padding: 8px 14px;
         border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         margin-bottom: 1rem;
 
         i {
-          font-size: 0.8rem;
+          font-size: var(--fs-control);
         }
       }
 
       .delete-intro {
         color: var(--secondary-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         line-height: 1.6;
         margin-bottom: 1rem;
         text-align: center;
@@ -1717,7 +1717,7 @@ $radius-sm: 8px;
           gap: 10px;
           padding: 0.5rem 0;
           color: var(--secondary-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           border-bottom: 1px dashed var(--border-color);
 
           &:last-child {
@@ -1726,7 +1726,7 @@ $radius-sm: 8px;
 
           i {
             color: var(--primary-color);
-            font-size: 0.75rem;
+            font-size: var(--fs-label);
             flex-shrink: 0;
           }
         }
@@ -1739,8 +1739,8 @@ $radius-sm: 8px;
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
 
           .required {
@@ -1756,7 +1756,7 @@ $radius-sm: 8px;
           border-radius: $radius-sm;
           background: var(--card-background);
           color: var(--text-color);
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
           transition: border-color 0.2s;
@@ -1777,7 +1777,7 @@ $radius-sm: 8px;
           display: block;
           text-align: right;
           margin-top: 0.25rem;
-          font-size: 0.75rem;
+          font-size: var(--fs-label);
           color: var(--secondary-color);
           opacity: 0.6;
         }
@@ -1798,13 +1798,13 @@ $radius-sm: 8px;
         padding: 0.75rem 1.5rem;
         border-radius: $radius-md;
         border: none;
-        font-weight: 600;
+        font-weight: var(--fw-semibold);
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &.btn-cancel {
@@ -1913,9 +1913,9 @@ $radius-sm: 8px;
 
     h4 {
       margin: 0 0 1rem;
-      font-size: 1.1rem;
+      font-size: var(--fs-h2);
       color: var(--text-color);
-      font-weight: 500;
+      font-weight: var(--fw-medium);
       text-align: center;
       flex-shrink: 0;
     }
@@ -2040,7 +2040,7 @@ $radius-sm: 8px;
       color: var(--text-color);
       cursor: pointer;
       padding: 0.25rem;
-      font-size: 1.2rem;
+      font-size: var(--fs-h2);
       opacity: 0.6;
       transition: opacity 0.2s;
 
@@ -2062,8 +2062,8 @@ $radius-sm: 8px;
       h4 {
         color: var(--text-color);
         margin: 0 0 1rem;
-        font-size: 1rem;
-        font-weight: 500;
+        font-size: var(--fs-h3);
+        font-weight: var(--fw-medium);
         border-bottom: 1px solid var(--border-color);
         padding-bottom: 0.5rem;
       }
@@ -2073,7 +2073,7 @@ $radius-sm: 8px;
 
         label {
           color: var(--secondary-color);
-          font-size: 0.875rem;
+          font-size: var(--fs-body);
           margin-bottom: 0.25rem;
           display: block;
         }
@@ -2081,7 +2081,7 @@ $radius-sm: 8px;
         p {
           color: var(--text-color);
           margin: 0;
-          font-size: 1rem;
+          font-size: var(--fs-h3);
         }
       }
 
@@ -2105,18 +2105,18 @@ $radius-sm: 8px;
             align-items: center;
             gap: 0.5rem;
             color: var(--secondary-color);
-            font-size: 0.85rem;
+            font-size: var(--fs-control);
             margin-bottom: 0.5rem;
 
             i {
-              font-size: 0.9rem;
+              font-size: var(--fs-body);
             }
           }
 
           p {
             color: var(--text-color);
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: var(--fs-h2);
+            font-weight: var(--fw-medium);
             margin: 0;
           }
         }
@@ -2140,13 +2140,13 @@ $radius-sm: 8px;
 
           .size-label {
             color: var(--secondary-color);
-            font-size: 0.9rem;
+            font-size: var(--fs-body);
           }
 
           .size-value {
             color: var(--primary-color);
-            font-weight: 500;
-            font-size: 0.95rem;
+            font-weight: var(--fw-medium);
+            font-size: var(--fs-h3);
           }
         }
       }
@@ -2182,7 +2182,7 @@ $radius-sm: 8px;
 
           .column-name {
             color: var(--text-color);
-            font-weight: 500;
+            font-weight: var(--fw-medium);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -2191,7 +2191,7 @@ $radius-sm: 8px;
 
             i {
               color: var(--primary-color);
-              font-size: 0.8rem;
+              font-size: var(--fs-control);
               flex-shrink: 0;
             }
 
@@ -2204,8 +2204,8 @@ $radius-sm: 8px;
 
           .column-type {
             color: var(--secondary-color);
-            font-size: 0.85rem;
-            font-family: 'Courier New', monospace;
+            font-size: var(--fs-control);
+            font-family: var(--font-mono);
             background: var(--card-background);
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
@@ -2217,7 +2217,7 @@ $radius-sm: 8px;
           }
 
           .column-nullable {
-            font-size: 0.8rem;
+            font-size: var(--fs-control);
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
             background: var(--error-background);
@@ -2244,7 +2244,7 @@ $radius-sm: 8px;
       gap: 0.5rem;
 
       i {
-        font-size: 0.9rem;
+        font-size: var(--fs-body);
       }
     }
   }

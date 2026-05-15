@@ -67,14 +67,14 @@ $radius-sm: 8px;
       gap: 12px;
 
       i {
-        font-size: 20px;
+        font-size: var(--fs-h1);
         color: var(--primary-color);
       }
 
       h2 {
         margin: 0;
-        font-size: 1.2rem;
-        font-weight: 600;
+        font-size: var(--fs-h2);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
     }
@@ -115,8 +115,8 @@ $radius-sm: 8px;
 
       h4 {
         margin: 0;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
         display: flex;
         align-items: center;
@@ -128,7 +128,7 @@ $radius-sm: 8px;
 
       .function-count,
       .field-count {
-        font-size: 10px;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
         background: var(--hover-background);
         padding: 3px 8px;
@@ -151,7 +151,7 @@ $radius-sm: 8px;
 
         input {
           width: 100%;
-          font-size: 12px;
+          font-size: var(--fs-label);
           padding: 8px 8px 8px 32px;
           background: var(--hover-background);
           border: 1px solid var(--border-color);
@@ -182,16 +182,16 @@ $radius-sm: 8px;
         margin-bottom: 6px;
 
         .selected-fn-name {
-          font-size: 13px;
-          font-weight: 600;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
           color: var(--primary-color);
         }
       }
 
       .selected-fn-usage {
         display: block;
-        font-size: 10px;
-        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: var(--fs-micro);
+        font-family: var(--font-mono);
         background: var(--hover-background);
         padding: 6px 8px;
         border-radius: $radius-sm;
@@ -201,7 +201,7 @@ $radius-sm: 8px;
       }
 
       .selected-fn-desc {
-        font-size: 11px;
+        font-size: var(--fs-micro);
         color: var(--text-color);
         margin: 0;
         line-height: 1.4;
@@ -214,7 +214,7 @@ $radius-sm: 8px;
 
         p {
           margin: 0;
-          font-size: 11px;
+          font-size: var(--fs-micro);
           color: var(--secondary-color);
           font-style: italic;
         }
@@ -227,7 +227,7 @@ $radius-sm: 8px;
       color: var(--secondary-color);
 
       i {
-        font-size: 28px;
+        font-size: var(--fs-h1);
         opacity: 0.3;
         margin-bottom: 8px;
         display: block;
@@ -235,7 +235,7 @@ $radius-sm: 8px;
 
       p {
         margin: 0;
-        font-size: 11px;
+        font-size: var(--fs-micro);
       }
     }
   }
@@ -283,14 +283,14 @@ $radius-sm: 8px;
       }
 
       .field-name {
-        font-size: 12px;
-        font-weight: 600;
+        font-size: var(--fs-label);
+        font-weight: var(--fw-semibold);
         color: var(--text-color);
       }
 
       .field-column {
-        font-size: 10px;
-        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: var(--fs-micro);
+        font-family: var(--font-mono);
         color: var(--secondary-color);
         white-space: nowrap;
         overflow: hidden;
@@ -317,8 +317,8 @@ $radius-sm: 8px;
 
       label {
         color: var(--text-color);
-        font-weight: 500;
-        font-size: 13px;
+        font-weight: var(--fw-medium);
+        font-size: var(--fs-control);
 
         .required {
           color: var(--error-color);
@@ -330,7 +330,7 @@ $radius-sm: 8px;
         background: var(--hover-background);
         border: 1px solid var(--border-color);
         color: var(--text-color);
-        font-size: 0.95rem;
+        font-size: var(--fs-h3);
         padding: 0.75rem 1rem;
         border-radius: $radius-sm;
         transition: all 0.2s;
@@ -353,11 +353,11 @@ $radius-sm: 8px;
         align-items: center;
         gap: 6px;
         color: var(--error-color);
-        font-size: 11px;
+        font-size: var(--fs-micro);
         margin-top: 4px;
 
         i {
-          font-size: 12px;
+          font-size: var(--fs-label);
         }
       }
 
@@ -396,11 +396,11 @@ $radius-sm: 8px;
           border: 1px solid var(--border-color);
           border-radius: $radius-sm;
           color: var(--secondary-color);
-          font-size: 13px;
+          font-size: var(--fs-control);
           min-height: 180px;
 
           i {
-            font-size: 18px;
+            font-size: var(--fs-h2);
           }
         }
 
@@ -414,11 +414,11 @@ $radius-sm: 8px;
             background: var(--card-background);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            font-size: 13px;
+            font-size: var(--fs-control);
             padding: 12px;
             border-radius: $radius-sm;
             resize: none;
-            font-family: 'Consolas', 'Monaco', monospace;
+            font-family: var(--font-mono);
             line-height: 1.5;
             min-height: 180px;
 
@@ -441,11 +441,11 @@ $radius-sm: 8px;
           align-items: center;
           gap: 6px;
           color: var(--secondary-color);
-          font-size: 11px;
+          font-size: var(--fs-micro);
           margin-top: 6px;
 
           i {
-            font-size: 12px;
+            font-size: var(--fs-label);
             color: var(--primary-color);
           }
         }
@@ -456,11 +456,11 @@ $radius-sm: 8px;
           gap: 8px;
           padding: 10px 12px;
           border-radius: $radius-sm;
-          font-size: 12px;
+          font-size: var(--fs-label);
           margin-top: 8px;
 
           i {
-            font-size: 14px;
+            font-size: var(--fs-body);
             margin-top: 1px;
           }
 
@@ -501,13 +501,13 @@ $radius-sm: 8px;
         gap: 6px;
         padding: 0.75rem 1.5rem !important;
         border-radius: $radius-md !important;
-        font-weight: 600;
-        font-size: 0.9rem;
+        font-weight: var(--fw-semibold);
+        font-size: var(--fs-body);
         cursor: pointer;
         transition: all 0.2s ease;
 
         i {
-          font-size: 0.85rem;
+          font-size: var(--fs-control);
         }
 
         &:disabled {
@@ -598,28 +598,28 @@ $radius-sm: 8px;
         gap: 8px;
 
         i {
-          font-size: 13px;
+          font-size: var(--fs-control);
           color: var(--primary-color);
           width: 16px;
         }
 
         .category-name {
-          font-size: 11px;
-          font-weight: 600;
+          font-size: var(--fs-micro);
+          font-weight: var(--fw-semibold);
           color: var(--text-color);
         }
 
         .count-badge {
           background: var(--hover-background);
           color: var(--secondary-color);
-          font-size: 9px;
+          font-size: var(--fs-micro);
           padding: 2px 5px;
           border-radius: 8px;
         }
       }
 
       > i {
-        font-size: 10px;
+        font-size: var(--fs-micro);
         color: var(--secondary-color);
       }
     }
@@ -653,14 +653,14 @@ $radius-sm: 8px;
       }
 
       .function-name {
-        font-size: 11px;
-        font-weight: 600;
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
         color: var(--primary-color);
       }
 
       .function-usage {
-        font-size: 9px;
-        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: var(--fs-micro);
+        font-family: var(--font-mono);
         color: var(--secondary-color);
         white-space: nowrap;
         overflow: hidden;
