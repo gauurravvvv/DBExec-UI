@@ -46,8 +46,13 @@ export const MONACO_EDITOR_OPTIONS = {
   cursorSmoothCaretAnimation: 'on' as const,
   smoothScrolling: true,
   mouseWheelZoom: true,
+  // Match the rest of the app: JetBrains Mono with ui-monospace fallback so
+  // the editor reads with the same family as inline code chips and version
+  // chips. Monaco reads fontFamily as a literal CSS list and does not
+  // resolve var(...), so the stack is duplicated here from --font-mono.
   fontSize: 14,
-  fontFamily: "'Fira Code', 'Courier New', monospace",
+  fontFamily:
+    "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
   fontLigatures: true,
 
   // Bracket Features

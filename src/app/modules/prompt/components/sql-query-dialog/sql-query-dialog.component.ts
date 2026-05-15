@@ -62,8 +62,11 @@ const MONACO_EDITOR_OPTIONS = {
   cursorSmoothCaretAnimation: 'on' as const,
   smoothScrolling: true,
   mouseWheelZoom: true,
+  // Match the rest of the app: JetBrains Mono. Monaco doesn't resolve
+  // var(--font-mono), so the stack is duplicated.
   fontSize: 14,
-  fontFamily: "'Fira Code', 'Courier New', monospace",
+  fontFamily:
+    "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
   fontLigatures: true,
 
   // Bracket Features

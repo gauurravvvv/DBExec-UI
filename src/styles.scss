@@ -90,17 +90,19 @@ textarea {
 }
 
 // PrimeNG component baseline — overrides the theme's hard-coded
-// "font-family: Roboto, …" on .p-component so every PrimeNG widget
-// (dropdown, datatable, button) inherits Inter.
+// "font-family: Roboto, …" AND "font-size: 1rem (=16px)" on .p-component
+// so every PrimeNG widget (dropdown, datatable, button) inherits Inter
+// at the app's 14px body size instead of PrimeNG's stock 16px.
 .p-component {
   font-family: var(--font-ui) !important;
+  font-size: var(--fs-body) !important;
 }
 
 // Native form controls and PrimeNG inputs. PrimeNG's theme also sets
-// font-family directly on .p-inputtext and on bare input/select/textarea,
-// neither of which always carries .p-component. We force them all to the
-// UI family so SQL editors, search boxes, and text areas don't render in
-// Roboto.
+// font-family + font-size directly on .p-inputtext and on bare
+// input/select/textarea, none of which always carry .p-component. Force
+// them to the UI family + body size so SQL editors, search boxes, and
+// text areas render consistently.
 input,
 select,
 textarea,
@@ -111,6 +113,144 @@ textarea,
 .p-calendar,
 .p-autocomplete {
   font-family: var(--font-ui) !important;
+  font-size: var(--fs-body) !important;
+}
+
+// PrimeNG default button text + icon size is 1rem (16px) — too large
+// against the rest of the UI at 14px. Snap the default variant down.
+//
+// .p-button-sm (0.875rem) and .p-button-lg (1.25rem) are NOT overridden
+// on purpose:
+//   • -sm is used for compact rounded icon buttons (close-X, trash, refresh
+//     inside dialogs). Forcing them to 14px would balloon the icon.
+//   • -lg is used on auth pages (login, set/reset/forgot password) where
+//     the marketing-style large inputs and buttons are the design intent.
+// Both variants represent a deliberate design call — leave them alone.
+.p-button:not(.p-button-sm):not(.p-button-lg) {
+  font-size: var(--fs-body) !important;
+
+  .p-button-icon {
+    font-size: var(--fs-body) !important;
+  }
+}
+
+// PrimeNG link button — same treatment.
+.p-link {
+  font-size: var(--fs-body) !important;
+}
+
+// Datepicker overlay — calendar cells, weekday headers, year picker
+// all default to 1rem. Drop to body so the overlay matches form inputs.
+.p-datepicker table,
+.p-datepicker .p-datepicker-header,
+.p-datepicker .p-yearpicker,
+.p-datepicker .p-monthpicker {
+  font-size: var(--fs-body) !important;
+}
+
+// PrimeIcons inside controls — 1rem by default. Match the surrounding
+// 14px context so an inline icon doesn't out-size its label.
+.p-component .pi,
+.p-button .pi,
+.p-inputtext + .pi {
+  font-size: var(--fs-body);
+}
+
+// Back-arrow icon used in every page header's left section. One token,
+// every page. Replaces the old `text-xl` (PrimeFlex utility) usage.
+.back-icon {
+  font-size: var(--icon-lg);
+}
+
+// Belt-and-braces: every PrimeNG overlay/menu/dialog widget gets an
+// explicit body-size rule. The .p-component baseline above usually wins,
+// but the PrimeNG theme uses very deep selector chains for these widgets
+// (e.g. `.p-menu .p-menuitem-link .p-menuitem-text`) which can occasionally
+// out-specificity a single-class rule even with !important. Naming the
+// widgets here removes any doubt.
+.p-overlaypanel,
+.p-overlaypanel .p-overlaypanel-content,
+.p-dialog,
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer,
+.p-confirm-dialog,
+.p-confirm-popup,
+.p-confirm-popup .p-confirm-popup-content,
+.p-toast,
+.p-toast .p-toast-message,
+.p-menu,
+.p-menu .p-menuitem-link,
+.p-menu .p-menuitem-text,
+.p-contextmenu,
+.p-contextmenu .p-menuitem-link,
+.p-contextmenu .p-menuitem-text,
+.p-tieredmenu,
+.p-tieredmenu .p-menuitem-link,
+.p-tieredmenu .p-menuitem-text,
+.p-menubar,
+.p-menubar .p-menuitem-link,
+.p-menubar .p-menuitem-text,
+.p-megamenu,
+.p-megamenu .p-menuitem-link,
+.p-megamenu .p-menuitem-text,
+.p-tabmenu,
+.p-tabmenu .p-tabmenuitem .p-menuitem-link,
+.p-paginator,
+.p-paginator .p-paginator-element,
+.p-paginator .p-paginator-current,
+.p-dropdown-panel,
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+.p-dropdown-panel .p-dropdown-header,
+.p-multiselect-panel,
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item,
+.p-multiselect-panel .p-multiselect-header,
+.p-autocomplete-panel,
+.p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item,
+.p-cascadeselect-panel,
+.p-cascadeselect-items .p-cascadeselect-item,
+.p-treeselect-panel,
+.p-tree,
+.p-tree .p-tree-container .p-treenode,
+.p-listbox,
+.p-listbox .p-listbox-list .p-listbox-item,
+.p-tooltip,
+.p-tooltip .p-tooltip-text {
+  font-size: var(--fs-body) !important;
+}
+
+// Within-overlay form controls — PrimeNG theme can re-state font-size on
+// these even when .p-inputtext is already covered globally. Belt + braces.
+.p-overlaypanel .p-inputtext,
+.p-dialog .p-inputtext,
+.p-confirm-dialog .p-inputtext,
+.p-dropdown-panel .p-dropdown-filter,
+.p-multiselect-panel .p-multiselect-filter,
+.p-autocomplete-panel .p-inputtext {
+  font-size: var(--fs-body) !important;
+}
+
+// PrimeNG popup / toast icons — theme defaults are 1.5–2rem font glyphs.
+// Pin them to the icon-scale tokens so the alert/info/error icon visually
+// anchors the popup without dwarfing its body copy.
+.p-confirm-popup .p-confirm-popup-icon {
+  font-size: var(--icon-lg) !important;   // 24px — compact popup
+}
+.p-confirm-dialog .p-confirm-dialog-icon,
+.p-dialog.p-confirm-dialog .p-confirm-dialog-icon {
+  font-size: var(--icon-xl) !important;   // 36px — modal-scale dialog
+}
+.p-toast .p-toast-message .p-toast-message-content .p-toast-message-icon {
+  font-size: var(--icon-xl) !important;   // 36px — top-right toast
+}
+// Toast message body text + summary
+.p-toast .p-toast-message .p-toast-summary {
+  font-size: var(--fs-body) !important;
+  font-weight: var(--fw-semibold);
+}
+.p-toast .p-toast-message .p-toast-detail {
+  font-size: var(--fs-control) !important;
+  font-weight: var(--fw-regular);
 }
 
 ::-webkit-scrollbar {

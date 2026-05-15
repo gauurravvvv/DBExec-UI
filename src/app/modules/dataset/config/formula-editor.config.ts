@@ -44,8 +44,12 @@ export const FORMULA_EDITOR_OPTIONS = {
   cursorSmoothCaretAnimation: 'on' as const,
   smoothScrolling: true,
   mouseWheelZoom: false,
+  // Match the rest of the app: JetBrains Mono with ui-monospace fallback.
+  // Monaco reads fontFamily as a literal CSS list and cannot resolve
+  // var(--font-mono), so the stack is duplicated here.
   fontSize: 14,
-  fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+  fontFamily:
+    "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
   fontLigatures: false,
   lineHeight: 22,
   padding: { top: 8, bottom: 8 },

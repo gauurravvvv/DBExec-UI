@@ -1,6 +1,43 @@
 import * as echarts from 'echarts';
 import { COLOR_PALETTES } from './chart-config.helper';
 
+// ========= Chart Typography =========
+// ECharts is canvas-rendered and does not resolve CSS variables. To stay in
+// sync with the rest of the app, the design-token values are duplicated as
+// numeric literals here. Source of truth: _theme-variables.scss.
+//
+// Mapping:
+//   axisLabel   → 11px / 400 / muted   (matches --fs-micro)
+//   axisName    → 12px / 500 / muted   (matches --fs-label)
+//   legend      → 12px / 400 / muted   (matches --fs-label)
+//   tooltip     → 12px / 500           (matches --fs-label)
+//   dataLabel   → 11px / 500           (matches --fs-micro)
+//   chartTitle  → 13px / 600 / strong  (matches --fs-control)
+const CHART_FONT_FAMILY =
+  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+const CHART_COLOR_MUTED = '#6b7280';   // matches --text-muted
+const CHART_COLOR_STRONG = '#374151';  // matches --table-header-text
+const CHART_COLOR_GRID = '#f0f0f0';    // soft grid line
+const CHART_COLOR_AXIS = '#d1d5db';    // axis line / tick
+
+export const CHART_TYPOGRAPHY = {
+  fontFamily: CHART_FONT_FAMILY,
+  axisLabel: { fontSize: 11, fontWeight: 400, color: CHART_COLOR_MUTED },
+  axisName: { fontSize: 12, fontWeight: 500, color: CHART_COLOR_MUTED },
+  legend: { fontSize: 12, fontWeight: 400, color: CHART_COLOR_MUTED },
+  tooltip: { fontSize: 12, fontWeight: 500, color: CHART_COLOR_STRONG },
+  dataLabel: { fontSize: 11, fontWeight: 500, color: CHART_COLOR_STRONG },
+  chartTitle: { fontSize: 13, fontWeight: 600, color: CHART_COLOR_STRONG },
+  // Line / tick colours kept here so a future palette pivot only touches
+  // this file.
+  colors: {
+    muted: CHART_COLOR_MUTED,
+    strong: CHART_COLOR_STRONG,
+    grid: CHART_COLOR_GRID,
+    axis: CHART_COLOR_AXIS,
+  },
+};
+
 // ========= Helper Functions =========
 
 function getColors(colorScheme: string): string[] {
@@ -52,8 +89,8 @@ function buildLegend(config: any): any {
     show: true,
     type: config.legendType || 'scroll',
     textStyle: {
-      fontSize: 12,
-      color: '#666',
+      ...CHART_TYPOGRAPHY.legend,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
     },
     itemWidth: 14,
     itemHeight: 10,
@@ -136,16 +173,16 @@ function buildTooltip(config: any, defaultTrigger: string = 'item'): any {
     borderRadius: 8,
     padding: [8, 12],
     textStyle: {
-      color: '#374151',
-      fontSize: 13,
+      ...CHART_TYPOGRAPHY.tooltip,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
     },
     extraCssText: 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);',
   };
   if (config.axisPointerType && config.axisPointerType !== 'none') {
     tooltip.axisPointer = {
       type: config.axisPointerType,
-      lineStyle: { color: '#9ca3af', type: 'dashed' },
-      crossStyle: { color: '#9ca3af' },
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.muted, type: 'dashed' },
+      crossStyle: { color: CHART_TYPOGRAPHY.colors.muted },
       shadowStyle: { color: 'rgba(150, 150, 150, 0.08)' },
     };
   }
@@ -180,9 +217,10 @@ function buildDataLabel(config: any, defaultPosition?: string): any {
   return {
     show: true,
     position: config.labelPosition || defaultPosition || 'top',
-    fontSize: config.labelFontSize || 12,
-    color: '#555',
-    fontWeight: 500,
+    fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    fontSize: config.labelFontSize || CHART_TYPOGRAPHY.dataLabel.fontSize,
+    color: CHART_TYPOGRAPHY.dataLabel.color,
+    fontWeight: CHART_TYPOGRAPHY.dataLabel.fontWeight,
   };
 }
 
@@ -215,10 +253,16 @@ function buildCategoryAxis(
     name: showLabel ? label : '',
     nameLocation: 'middle',
     nameGap,
-    nameTextStyle: { color: '#666', fontSize: 12, fontWeight: 500 },
+    nameTextStyle: {
+      ...CHART_TYPOGRAPHY.axisName,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    },
     boundaryGap: config.boundaryGap !== false,
-    axisTick: { alignWithLabel: true, lineStyle: { color: '#d1d5db' } },
-    axisLine: { lineStyle: { color: '#d1d5db' } },
+    axisTick: {
+      alignWithLabel: true,
+      lineStyle: { color: CHART_TYPOGRAPHY.colors.axis },
+    },
+    axisLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
     axisLabel: {
       rotate: isX ? config.xAxisLabelRotate || 0 : 0,
       overflow: (isX ? config.trimXAxisTicks : config.trimYAxisTicks)
@@ -227,12 +271,15 @@ function buildCategoryAxis(
       width:
         ((isX ? config.maxXAxisTickLength : config.maxYAxisTickLength) || 16) *
         7,
-      color: '#666',
-      fontSize: 11,
+      ...CHART_TYPOGRAPHY.axisLabel,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
     },
     splitLine: {
       show: config.showGridLines !== false,
-      lineStyle: { type: config.gridLineStyle || 'dashed', color: '#f0f0f0' },
+      lineStyle: {
+        type: config.gridLineStyle || 'dashed',
+        color: CHART_TYPOGRAPHY.colors.grid,
+      },
     },
   };
   // Bar gap properties — set on category axis for reliable effect
@@ -255,13 +302,22 @@ function buildValueAxis(config: any, axis: 'x' | 'y'): any {
     name: showLabel ? label : '',
     nameLocation: 'middle',
     nameGap: isX ? 35 : 55,
-    nameTextStyle: { color: '#666', fontSize: 12, fontWeight: 500 },
-    axisTick: { lineStyle: { color: '#d1d5db' } },
-    axisLine: { lineStyle: { color: '#d1d5db' } },
-    axisLabel: { color: '#666', fontSize: 11 },
+    nameTextStyle: {
+      ...CHART_TYPOGRAPHY.axisName,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    },
+    axisTick: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
+    axisLine: { lineStyle: { color: CHART_TYPOGRAPHY.colors.axis } },
+    axisLabel: {
+      ...CHART_TYPOGRAPHY.axisLabel,
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
+    },
     splitLine: {
       show: config.showGridLines !== false,
-      lineStyle: { type: config.gridLineStyle || 'dashed', color: '#f0f0f0' },
+      lineStyle: {
+        type: config.gridLineStyle || 'dashed',
+        color: CHART_TYPOGRAPHY.colors.grid,
+      },
     },
     scale: config.autoScale || false,
     min: config.yScaleMin,
@@ -364,7 +420,10 @@ function buildDataZoom(config: any, axis: 'x' | 'y' = 'x'): any[] {
       backgroundColor: '#fafafa',
       fillerColor: 'rgba(99, 102, 241, 0.12)',
       handleStyle: { color: '#6366f1', borderColor: '#6366f1' },
-      textStyle: { color: '#666', fontSize: 11 },
+      textStyle: {
+        ...CHART_TYPOGRAPHY.axisLabel,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      },
     },
     { type: 'inside', ...index },
   ];
@@ -876,7 +935,12 @@ export function buildPieChartOption(
   // Nested pie: inner + outer ring
   if (isNestedPie) {
     option.series[0].radius = ['0%', '30%'];
-    option.series[0].label = { position: 'inner', fontSize: 10 };
+    option.series[0].label = {
+      position: 'inner',
+      fontFamily: CHART_TYPOGRAPHY.fontFamily,
+      fontSize: CHART_TYPOGRAPHY.dataLabel.fontSize,
+      color: CHART_TYPOGRAPHY.dataLabel.color,
+    };
     option.series[0].selectedMode = 'single';
     option.series.push({
       type: 'pie',
@@ -998,7 +1062,9 @@ export function buildGaugeChartOption(data: any[], config: any): any {
         axisLabel: {
           show: config.gaugeShowScale !== false,
           distance: 25,
-          fontSize: 11,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.axisLabel.fontSize,
+          color: CHART_TYPOGRAPHY.axisLabel.color,
         },
         splitLine: {
           show: config.gaugeShowScale !== false,
@@ -1016,12 +1082,24 @@ export function buildGaugeChartOption(data: any[], config: any): any {
           roundCap: config.gaugeProgressRoundCap || false,
         },
         detail: {
+          // Gauge centre value IS the chart's visual hierarchy — keep this
+          // intentionally larger than chartTitle so the reading dominates.
           show: config.gaugeShowValue !== false,
           formatter: config.units ? `{value} ${config.units}` : '{value}',
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
           fontSize: 20,
+          fontWeight: CHART_TYPOGRAPHY.chartTitle.fontWeight,
+          color: CHART_TYPOGRAPHY.chartTitle.color,
           offsetCenter: [0, '70%'],
         },
-        title: { show: true, offsetCenter: [0, '90%'], fontSize: 14 },
+        title: {
+          show: true,
+          offsetCenter: [0, '90%'],
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.chartTitle.fontSize,
+          fontWeight: CHART_TYPOGRAPHY.chartTitle.fontWeight,
+          color: CHART_TYPOGRAPHY.chartTitle.color,
+        },
         data: gaugeData.length > 0 ? [gaugeData[0]] : [{ value: 0, name: '' }],
       },
     ],
@@ -1354,7 +1432,14 @@ export function buildFunnelChartOption(data: any[], config: any): any {
           borderWidth: 1,
         },
         emphasis: {
-          label: { fontSize: 14, fontWeight: 'bold' },
+          // Hover-emphasized label — one notch above dataLabel so the
+          // hovered segment reads as primary.
+          label: {
+            fontFamily: CHART_TYPOGRAPHY.fontFamily,
+            fontSize: CHART_TYPOGRAPHY.tooltip.fontSize,
+            fontWeight: CHART_TYPOGRAPHY.chartTitle.fontWeight,
+            color: CHART_TYPOGRAPHY.chartTitle.color,
+          },
         },
         data: funnelData,
       },
@@ -1456,7 +1541,9 @@ export function buildSankeyChartOption(
         },
         edgeLabel: {
           show: config.sankeyEdgeLabel || false,
-          fontSize: 10,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.dataLabel.fontSize,
+          color: CHART_TYPOGRAPHY.dataLabel.color,
         },
       },
     ],
@@ -1698,7 +1785,9 @@ export function buildGraphChartOption(
         },
         edgeLabel: {
           show: config.graphEdgeLabel || false,
-          fontSize: 10,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.dataLabel.fontSize,
+          color: CHART_TYPOGRAPHY.dataLabel.color,
         },
         lineStyle: {
           color: 'source',
@@ -1849,7 +1938,11 @@ export function buildPolarBarChartOption(data: any[], config: any): any {
     angleAxis: {
       type: 'category',
       data: categories,
-      axisLabel: { fontSize: 10 },
+      axisLabel: {
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+        fontSize: CHART_TYPOGRAPHY.axisLabel.fontSize,
+        color: CHART_TYPOGRAPHY.axisLabel.color,
+      },
     },
     radiusAxis: {
       show: config.yAxis !== false,
@@ -1988,7 +2081,10 @@ export function buildParallelChartOption(data: any[], config: any): any {
         type: 'value',
         nameLocation: 'end',
         nameGap: 20,
-        nameTextStyle: { fontSize: 12 },
+        nameTextStyle: {
+          ...CHART_TYPOGRAPHY.axisName,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+        },
       },
     },
     series: [
@@ -2048,7 +2144,12 @@ export function buildBar3DChartOption(data: any[], config: any): any {
         type: 'bar3D',
         data: seriesData.map(d => ({ value: d })),
         shading: config.shading || 'lambert',
-        label: { show: config.showDataLabel || false, fontSize: 10 },
+        label: {
+          show: config.showDataLabel || false,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.dataLabel.fontSize,
+          color: CHART_TYPOGRAPHY.dataLabel.color,
+        },
         itemStyle: { opacity: config.itemOpacity ?? 0.8 },
       },
     ],
@@ -2221,7 +2322,9 @@ export function buildGlobeChartOption(data: any[], config: any): any {
         label: {
           show: config.showDataLabel || false,
           formatter: (params: any) => tooltipNames[params.dataIndex] || '',
-          fontSize: 10,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.dataLabel.fontSize,
+          color: CHART_TYPOGRAPHY.dataLabel.color,
         },
         itemStyle: {
           opacity: 0.9,
@@ -2410,7 +2513,12 @@ export function buildMap3DChartOption(data: any[], config: any): any {
     xAxis3D: {
       type: 'category',
       data: categories,
-      axisLabel: { rotate: 30, fontSize: 10 },
+      axisLabel: {
+        rotate: 30,
+        fontFamily: CHART_TYPOGRAPHY.fontFamily,
+        fontSize: CHART_TYPOGRAPHY.axisLabel.fontSize,
+        color: CHART_TYPOGRAPHY.axisLabel.color,
+      },
     },
     yAxis3D: { type: 'category', data: [''] },
     zAxis3D: { type: 'value', name: 'Value' },
@@ -2432,7 +2540,12 @@ export function buildMap3DChartOption(data: any[], config: any): any {
         type: 'bar3D',
         data: values.map((v, i) => ({ value: v, name: categories[i] })),
         shading: 'lambert',
-        label: { show: config.showDataLabel || false, fontSize: 10 },
+        label: {
+          show: config.showDataLabel || false,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.dataLabel.fontSize,
+          color: CHART_TYPOGRAPHY.dataLabel.color,
+        },
         itemStyle: { opacity: 0.85 },
       },
     ],
@@ -2484,7 +2597,9 @@ export function buildWorldMapChartOption(data: any[], config: any): any {
         roam: config.worldMapRoam !== false,
         label: {
           show: config.worldMapShowLabels || false,
-          fontSize: 10,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.dataLabel.fontSize,
+          color: CHART_TYPOGRAPHY.dataLabel.color,
         },
         emphasis: {
           label: { show: true },
@@ -2627,7 +2742,8 @@ export function buildFlowLinesChartOption(
           show: true,
           formatter: (params: any) => String(params.name),
           position: 'right',
-          fontSize: 11,
+          fontFamily: CHART_TYPOGRAPHY.fontFamily,
+          fontSize: CHART_TYPOGRAPHY.axisLabel.fontSize,
           color: 'inherit',
         },
         emphasis: { scale: 1.4 },
@@ -2686,7 +2802,7 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
       show: true,
       splitLine: {
         show: true,
-        lineStyle: { type: 'dashed', color: '#e8e8e8' },
+        lineStyle: { type: 'dashed', color: CHART_TYPOGRAPHY.colors.grid },
       },
     },
     yAxis: {
@@ -2694,7 +2810,7 @@ export function buildFlowGLChartOption(data: any[], config: any): any {
       show: true,
       splitLine: {
         show: true,
-        lineStyle: { type: 'dashed', color: '#e8e8e8' },
+        lineStyle: { type: 'dashed', color: CHART_TYPOGRAPHY.colors.grid },
       },
     },
     visualMap: {
