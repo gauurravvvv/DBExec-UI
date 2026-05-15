@@ -98,17 +98,18 @@
           styleClass="p-datatable-sm modern-table"
           [scrollable]="true"
           scrollHeight="flex"
+          [tableStyle]="{ 'min-width': '90rem' }"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 180px; min-width: 180px" pFrozenColumn>
+              <th style="width: 14rem; min-width: 14rem" pFrozenColumn>
                 <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
               </th>
-              <th style="width: 160px; min-width: 160px">
+              <th style="width: 12rem; min-width: 12rem">
                 <div class="th-content">{{ 'AUDIT.PERFORMED_BY' | translate }}</div>
               </th>
               <th
-                style="width: 140px; min-width: 140px"
+                style="width: 9rem; min-width: 9rem"
                 class="sortable-th"
                 [class.is-sorted]="!!sortHelper.direction('action')"
                 (click)="toggleSort('action')"
@@ -125,14 +126,14 @@
                   </span>
                 </div>
               </th>
-              <th style="width: 80px; min-width: 80px">
+              <th style="width: 6rem; min-width: 6rem">
                 <div class="th-content">{{ 'AUDIT.VERSION' | translate }}</div>
               </th>
-              <th  style="width: 8rem; min-width: 8rem">
+              <th style="width: 9rem; min-width: 9rem">
                 <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
               </th>
               <th
-                style="width: 220px; min-width: 220px"
+                style="width: 14rem; min-width: 14rem"
                 class="sortable-th"
                 [class.is-sorted]="!!sortHelper.direction('createdOn')"
                 (click)="toggleSort('createdOn')"
@@ -149,10 +150,10 @@
                   </span>
                 </div>
               </th>
-              <th style="width: 160px; min-width: 160px">
+              <th style="width: 10rem; min-width: 10rem">
                 <div class="th-content">{{ 'AUDIT.IP_ADDRESS' | translate }}</div>
               </th>
-              <th style="width: 240px; min-width: 240px">
+              <th style="min-width: 16rem">
                 <div class="th-content">{{ 'AUDIT.JUSTIFICATION' | translate }}</div>
               </th>
             </tr>
@@ -289,7 +290,7 @@
             <tr class="empty-row">
               <td colspan="8" class="empty-message-cell">
                 <div class="empty-state-inline">
-                  <i class="pi pi-inbox empty-state-icon"></i>
+                  <i class="pi pi-search empty-state-icon"></i>
                   <span class="empty-state-text">
                     {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash; {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
                   </span>

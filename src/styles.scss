@@ -548,6 +548,20 @@ p-table {
   padding-top: var(--space-5) !important;
 }
 
+// Header typography — sentence-case everywhere. Three legacy modules
+// (audit-logs, login-activity, announcements) set uppercase + wider
+// letter-spacing on the header row via deeply nested per-module SCSS
+// (high specificity). Override globally so every listing reads the
+// same way — "Username" not "USERNAME", "Event" not "EVENT".
+.modern-table.p-datatable .p-datatable-thead > tr > th {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  font-size: var(--fs-label) !important;
+  font-weight: var(--fw-semibold) !important;
+}
+
 // Column alignment — left-align everything in modern listing tables.
 // Modules historically right-aligned the Actions column (header label
 // AND row buttons), but the user wants a single consistent left-edge
@@ -591,28 +605,54 @@ p-table {
 // both, and turn the cell into a flex centre so the inner
 // <p-tablecheckbox> (a non-inline Angular host element that
 // `text-align: center` can't move) sits at the exact middle.
+//
+// IMPORTANT: only apply to header cells that ACTUALLY contain a
+// header checkbox. Three listing modules (audit-logs, login-activity,
+// announcements) have no checkbox column — their first column is a
+// data column (Name / Username / Preview). Without the :has()
+// guard, the data column would get squeezed to 2.75rem and the
+// content would be visibly clipped.
 .modern-table.p-datatable {
-  .p-datatable-thead > tr > th:first-child,
-  .p-datatable-tbody > tr > td:first-child {
+  // Header row's first th — the one with the row-select checkbox.
+  .p-datatable-thead > tr > th:first-child:has(p-tableheadercheckbox) {
     width: 2.75rem !important;
     min-width: 2.75rem !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
     text-align: center !important;
-  }
 
-  // Center the actual checkbox host element regardless of its
-  // default `display` value.
-  .p-datatable-tbody > tr > td:first-child {
-    p-tablecheckbox {
+    p-tableheadercheckbox {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       width: 100%;
     }
   }
-  .p-datatable-thead > tr > th:first-child {
-    p-tableheadercheckbox {
+
+  // Filter row's first th — sits directly under the header checkbox
+  // cell. Has no filter control. Match the width so it lines up.
+  // We can't simply target ":first-child" because the parent table
+  // might NOT have a checkbox column at all — in that case the filter
+  // row's first cell is a search input on the data column, which
+  // needs full width. Use :has() on the thead to scope.
+  .p-datatable-thead:has(p-tableheadercheckbox) > tr:nth-child(2) > th:first-child {
+    width: 2.75rem !important;
+    min-width: 2.75rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  // Body cells: match the same shape on rows where the first cell
+  // holds a row-select checkbox. PrimeNG renders <p-tablecheckbox>
+  // in those cells.
+  .p-datatable-tbody > tr > td:first-child:has(p-tablecheckbox) {
+    width: 2.75rem !important;
+    min-width: 2.75rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+
+    p-tablecheckbox {
       display: inline-flex;
       align-items: center;
       justify-content: center;
