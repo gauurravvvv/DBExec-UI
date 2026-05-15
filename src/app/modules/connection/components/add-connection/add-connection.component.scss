@@ -3,11 +3,11 @@
 
   .add-admin-container {
     background: var(--card-background);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    padding: var(--space-8);
 
     .page-header {
       display: flex;
@@ -19,10 +19,10 @@
       .left-section {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: var(--space-6);
 
         .back-button {
-          padding: 0 !important;
+          padding: var(--space-0) !important;
           width: 36px;
           height: 36px;
           border-radius: 50% !important;
@@ -33,7 +33,7 @@
           color: var(--text-color) !important;
           min-width: 0;
           border: none !important;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover {
             background: var(--hover-background) !important;
@@ -46,7 +46,7 @@
 
         h2 {
           color: var(--text-color);
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h1);
           font-weight: var(--fw-semibold);
         }
@@ -54,14 +54,14 @@
 
       .action-buttons {
         display: flex;
-        gap: 12px;
+        gap: var(--space-5);
 
         .btn-cancel {
           background: var(--card-background) !important;
           border: 1px solid var(--border-color) !important;
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
-          border-radius: 6px !important;
+          border-radius: var(--radius-sm) !important;
           font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
@@ -82,10 +82,10 @@
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
-          border-radius: 6px !important;
+          border-radius: var(--radius-sm) !important;
           font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover:not(:disabled) {
             opacity: 1;
@@ -112,7 +112,7 @@
         .duplicate-warning {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: var(--space-4);
           color: var(--warning-color);
 
           i {
@@ -137,12 +137,12 @@
 
       &::-webkit-scrollbar-track {
         background: transparent;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -156,7 +156,7 @@
       .form-grid {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: var(--space-7);
         width: 100%;
         align-content: flex-start;
 
@@ -175,7 +175,7 @@
         .form-field {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: var(--space-4);
           width: 50%;
           margin-bottom: 1rem;
           position: relative;
@@ -252,7 +252,7 @@
           .status-wrapper {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: var(--space-5);
             padding-top: 0.25rem;
 
             .status-text {
@@ -264,8 +264,8 @@
 
         .fields-container {
           width: 100%;
-          margin: 0;
-          padding: 0;
+          margin: var(--space-0);
+          padding: var(--space-0);
 
           .fields-header {
             display: flex;
@@ -287,7 +287,7 @@
               }
 
               .add-btn {
-                z-index: 1;
+                z-index: var(--z-base);
                 color: var(--primary-color) !important;
               }
             }
@@ -307,7 +307,7 @@
             .credential-set {
               display: flex;
               align-items: flex-end;
-              gap: 20px;
+              gap: var(--space-7);
               margin-bottom: 16px;
               padding-bottom: 16px;
               border-bottom: 1px solid var(--border-color);
@@ -321,7 +321,7 @@
                 flex: 1;
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 20px;
+                gap: var(--space-7);
                 align-items: end;
 
                 @media (max-width: 1200px) {
@@ -336,7 +336,7 @@
                   .field-input {
                     display: flex;
                     flex-direction: column;
-                    gap: 8px;
+                    gap: var(--space-4);
                     position: relative;
 
                     &::after {
@@ -402,7 +402,7 @@
               .remove-btn {
                 width: 40px;
                 height: 40px;
-                padding: 0;
+                padding: var(--space-0);
                 margin-bottom: 8px;
                 cursor: pointer;
 
@@ -426,15 +426,15 @@
 
 @media (max-width: 576px) {
   .add-admin-wrapper {
-    padding: 10px;
+    padding: var(--space-5);
 
     .add-admin-container {
-      padding: 15px;
+      padding: var(--space-6);
 
       .page-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: var(--space-6);
 
         .action-buttons {
           width: 100%;
@@ -452,7 +452,7 @@
       background: transparent !important;
       border: none !important;
       color: var(--text-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       &:hover {
         background: var(--hover-background) !important;
@@ -541,7 +541,7 @@
     .p-dropdown-header {
       background: var(--hover-background) !important;
       border-bottom: 1px solid var(--border-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       .p-dropdown-filter {
         background: var(--card-background) !important;
@@ -594,12 +594,12 @@
 
       &::-webkit-scrollbar-track {
         background: transparent;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -628,7 +628,7 @@
 
     .p-multiselect-label {
       color: var(--text-color);
-      padding: 0.5rem;
+      padding: var(--space-4);
 
       &.p-placeholder {
         color: var(--text-color);
@@ -645,18 +645,18 @@
       background: var(--primary-color);
       color: var(--text-color);
       padding: 0.25rem 0.5rem;
-      margin: 0.125rem;
-      border-radius: 4px;
+      margin: var(--space-1);
+      border-radius: var(--radius-xs);
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--space-4);
 
       .p-multiselect-token-icon {
         color: var(--text-color);
         font-size: var(--fs-label);
         cursor: pointer;
         border-radius: 50%;
-        transition: all 0.2s;
+        transition: all var(--motion-base);
 
         &:hover {
           background: rgba(255, 255, 255, 0.2);
@@ -672,7 +672,7 @@
     .p-multiselect-header {
       background: var(--hover-background) !important;
       border-bottom: 1px solid var(--border-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       .p-multiselect-filter-container {
         .p-inputtext {
@@ -696,10 +696,10 @@
         .p-checkbox-box {
           width: 18px;
           height: 18px;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
           background: var(--card-background);
           border: 1px solid var(--border-color);
-          transition: all 0.2s;
+          transition: all var(--motion-base);
 
           &:not(.p-disabled):hover {
             border-color: var(--primary-color);
@@ -724,9 +724,9 @@
         background: var(--card-background);
         border-radius: 50%;
         transition:
-          background-color 0.2s,
-          color 0.2s,
-          box-shadow 0.2s;
+          background-color var(--motion-base),
+          color var(--motion-base),
+          box-shadow var(--motion-base);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -776,10 +776,10 @@
           .p-checkbox-box {
             width: 18px;
             height: 18px;
-            border-radius: 4px;
+            border-radius: var(--radius-xs);
             background: var(--card-background);
             border: 1px solid var(--border-color);
-            transition: all 0.2s;
+            transition: all var(--motion-base);
 
             &:not(.p-disabled):hover {
               border-color: var(--primary-color);
@@ -811,12 +811,12 @@
 
       &::-webkit-scrollbar-track {
         background: transparent;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -870,12 +870,12 @@
 .mapping-row {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--space-6);
   margin-bottom: 1rem;
   position: relative;
-  padding: 1rem;
+  padding: var(--space-6);
   background: var(--surface-ground);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 
   .index-number {
     min-width: 24px;
@@ -893,7 +893,7 @@
   .mapping-inputs {
     flex: 1;
     display: flex;
-    gap: 2rem;
+    gap: var(--space-9);
     position: relative;
 
     @media (max-width: 768px) {
@@ -932,7 +932,7 @@
     margin-bottom: 2.5rem;
 
     .mapping-inputs {
-      gap: 1.5rem;
+      gap: var(--space-8);
 
       .dropdown-container,
       .input-container {
@@ -984,14 +984,14 @@
 .schema-group {
   margin-bottom: 2rem;
   background: var(--surface-card);
-  border-radius: 8px;
-  padding: 1rem;
-  transition: opacity 0.3s ease;
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  transition: opacity var(--motion-slow) ease;
 
   .schema-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: var(--space-6);
     margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--surface-border);
@@ -1022,16 +1022,16 @@
   .mappings-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--space-6);
 
     .mapping-row {
       display: flex;
       align-items: flex-start;
-      gap: 1rem;
-      padding: 1rem;
+      gap: var(--space-6);
+      padding: var(--space-6);
       background: var(--surface-ground);
-      border-radius: 8px;
-      margin: 0;
+      border-radius: var(--radius-md);
+      margin: var(--space-0);
 
       .index-number {
         min-width: 24px;
@@ -1049,7 +1049,7 @@
       .mapping-inputs {
         flex: 1;
         display: flex;
-        gap: 1rem;
+        gap: var(--space-6);
         position: relative;
         flex-wrap: wrap;
 
@@ -1069,7 +1069,7 @@
 
         @media (max-width: 768px) {
           flex-direction: column;
-          gap: 1rem;
+          gap: var(--space-6);
 
           .dropdown-container,
           .input-container {

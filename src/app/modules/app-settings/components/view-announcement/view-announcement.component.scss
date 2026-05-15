@@ -1,19 +1,15 @@
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 .view-category-wrapper {
   height: 100%;
 
   .view-category-container {
     background: var(--card-background);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     height: 100%;
     display: flex;
     flex-direction: column;
 
     .page-header {
-      padding: 20px;
+      padding: var(--space-7);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
@@ -22,18 +18,18 @@ $radius-sm: 8px;
       border-radius: 8px 8px 0 0;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: var(--z-elevated);
 
       .left-section {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: var(--space-5);
 
         button {
           min-width: 0;
 
           &.back-button {
-            padding: 0 !important;
+            padding: var(--space-0) !important;
             width: 36px;
             height: 36px;
             border-radius: 50% !important;
@@ -43,7 +39,7 @@ $radius-sm: 8px;
             background: transparent !important;
             color: var(--text-color) !important;
             border: none !important;
-            transition: all 0.2s ease;
+            transition: all var(--motion-base) ease;
 
             &:hover {
               background: var(--hover-background) !important;
@@ -57,7 +53,7 @@ $radius-sm: 8px;
         }
 
         h2 {
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h1);
           font-weight: var(--fw-semibold);
           color: var(--text-color);
@@ -66,18 +62,18 @@ $radius-sm: 8px;
 
       .header-actions {
         display: flex;
-        gap: 12px;
+        gap: var(--space-5);
 
         button {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: var(--space-4);
           padding: 0.6rem 1.25rem;
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           font-weight: var(--fw-semibold);
           font-size: var(--fs-body);
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
           border: none;
         }
 
@@ -108,7 +104,7 @@ $radius-sm: 8px;
     .content-section {
       flex: 1;
       overflow-y: auto;
-      padding: 30px;
+      padding: var(--space-9);
 
       &::-webkit-scrollbar {
         width: 8px;
@@ -117,12 +113,12 @@ $radius-sm: 8px;
 
       &::-webkit-scrollbar-track {
         background: transparent;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -132,14 +128,14 @@ $radius-sm: 8px;
       .details-grid {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: var(--space-8);
 
         .info-section {
           background: var(--card-background);
           border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 20px;
-          transition: all 0.2s ease;
+          border-radius: var(--radius-md);
+          padding: var(--space-7);
+          transition: all var(--motion-base) ease;
 
           &:hover {
             box-shadow: 0 2px 8px var(--shadow-color);
@@ -162,7 +158,7 @@ $radius-sm: 8px;
           .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            gap: var(--space-7);
 
             .info-item {
               label {
@@ -174,7 +170,7 @@ $radius-sm: 8px;
               }
 
               p {
-                margin: 0;
+                margin: var(--space-0);
                 font-size: var(--fs-h3);
                 color: var(--text-color);
                 word-break: break-word;
@@ -183,7 +179,7 @@ $radius-sm: 8px;
               .with-icon {
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: var(--space-4);
 
                 i {
                   color: var(--text-color);
@@ -195,7 +191,7 @@ $radius-sm: 8px;
                 display: inline-block;
                 width: 22px;
                 height: 22px;
-                border-radius: 4px;
+                border-radius: var(--radius-xs);
                 border: 1px solid var(--border-color);
                 flex-shrink: 0;
               }
@@ -214,9 +210,9 @@ $radius-sm: 8px;
           .banner-preview {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--space-5);
             padding: 14px 18px;
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             font-size: var(--fs-body);
 
             .preview-label {
@@ -224,7 +220,7 @@ $radius-sm: 8px;
               letter-spacing: 1.2px;
               background: rgba(255, 255, 255, 0.18);
               padding: 3px 8px;
-              border-radius: 3px;
+              border-radius: var(--radius-xs);
               font-size: var(--fs-micro);
             }
 
@@ -245,12 +241,12 @@ $radius-sm: 8px;
 
 .status-badge {
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   font-size: var(--fs-control);
   font-weight: var(--fw-medium);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-2);
 
   &.active {
     background: rgba(var(--success-rgb), 0.15);
@@ -278,7 +274,7 @@ $radius-sm: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
@@ -292,8 +288,8 @@ $radius-sm: 8px;
 
   .popup-content {
     background: var(--card-background);
-    padding: 2rem;
-    border-radius: $radius-lg;
+    padding: var(--space-9);
+    border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-xl),
       0 0 0 1px var(--border-color);
@@ -319,7 +315,7 @@ $radius-sm: 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       .popup-icon {
         width: 48px;
@@ -334,7 +330,7 @@ $radius-sm: 8px;
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
@@ -356,14 +352,14 @@ $radius-sm: 8px;
       .delete-info-list {
         list-style: none;
         padding: 0.75rem 1rem;
-        margin: 0;
+        margin: var(--space-0);
         background: var(--hover-background);
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
 
         li {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: var(--space-5);
           padding: 0.5rem 0;
           color: var(--secondary-color);
           font-size: var(--fs-control);
@@ -384,20 +380,20 @@ $radius-sm: 8px;
 
     .popup-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: center;
 
       button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: var(--space-3);
         padding: 0.75rem 1.5rem;
-        border-radius: $radius-md;
+        border-radius: var(--radius-md);
         border: none;
         font-weight: var(--fw-semibold);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
         font-size: var(--fs-body);
 
         i {

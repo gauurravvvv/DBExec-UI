@@ -1,15 +1,15 @@
 .add-admin-wrapper {
   background-color: var(--card-background);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px var(--shadow-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   height: 100%;
   display: flex;
   flex-direction: column;
 
   .add-admin-container {
-    padding: 1.5rem;
+    padding: var(--space-8);
     max-width: 100%;
-    margin: 0;
+    margin: var(--space-0);
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -25,10 +25,10 @@
       .left-section {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: var(--space-6);
 
         .back-button {
-          padding: 0 !important;
+          padding: var(--space-0) !important;
           width: 36px;
           height: 36px;
           border-radius: 50% !important;
@@ -39,7 +39,7 @@
           color: var(--text-color) !important;
           min-width: 0;
           border: none !important;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover {
             background: var(--hover-background) !important;
@@ -52,7 +52,7 @@
 
         h2 {
           color: var(--text-color);
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h1);
           font-weight: var(--fw-semibold);
           margin-left: 0.2rem;
@@ -61,14 +61,14 @@
 
       .action-buttons {
         display: flex;
-        gap: 12px;
+        gap: var(--space-5);
 
         .btn-cancel {
           background: var(--card-background) !important;
           border: 1px solid var(--border-color) !important;
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
-          border-radius: 6px !important; // Match $radius-sm
+          border-radius: var(--radius-sm) !important; // Match $radius-sm
           font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
@@ -89,10 +89,10 @@
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
-          border-radius: 6px !important; // Match $radius-sm
+          border-radius: var(--radius-sm) !important; // Match $radius-sm
           font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover:not(:disabled) {
             opacity: 1;
@@ -125,12 +125,12 @@
 
       &::-webkit-scrollbar-track {
         background: var(--card-background);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -140,7 +140,7 @@
       .form-grid {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: var(--space-8);
         width: 50%;
         margin-bottom: 0;
         padding-bottom: 24px;
@@ -230,7 +230,7 @@
       background: transparent !important;
       border: none !important;
       color: var(--text-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       &:hover {
         background: var(--hover-background) !important;

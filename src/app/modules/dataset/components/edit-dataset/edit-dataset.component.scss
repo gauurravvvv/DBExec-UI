@@ -8,7 +8,7 @@
   width: 100%;
   background-color: var(--background-color);
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
 
@@ -28,7 +28,7 @@
   .toolbar-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-6);
 
     .toggle-sidebar {
       padding: 6px 8px;
@@ -41,7 +41,7 @@
       max-width: 300px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: var(--space-4);
 
       label {
         font-weight: var(--fw-medium);
@@ -131,13 +131,13 @@
     }
 
     .toolbar-title {
-      margin: 0;
+      margin: var(--space-0);
       font-size: var(--fs-h3);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-4);
 
       i {
         color: var(--primary-color);
@@ -149,13 +149,13 @@
       color: var(--secondary-color);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3);
 
       kbd {
         background-color: var(--hover-background);
         color: var(--text-color);
         padding: 2px 6px;
-        border-radius: 3px;
+        border-radius: var(--radius-xs);
         font-size: var(--fs-micro);
         font-family: var(--font-mono);
         border: 1px solid var(--border-color);
@@ -165,12 +165,12 @@
 
   .toolbar-right {
     display: flex;
-    gap: 8px !important;
+    gap: var(--space-4) !important;
 
     .p-button,
     button {
-      padding: 0.5rem !important;
-      margin: 0 !important;
+      padding: var(--space-4) !important;
+      margin: var(--space-0) !important;
       min-width: auto !important;
     }
 
@@ -292,7 +292,7 @@
   border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all var(--motion-slow) ease;
   overflow: hidden;
   height: 100%;
 
@@ -302,7 +302,7 @@
 
     .sidebar-content {
       position: relative;
-      padding: 0;
+      padding: var(--space-0);
       height: 100%;
 
       .sidebar-header,
@@ -340,13 +340,13 @@
     flex-shrink: 0;
 
     h4 {
-      margin: 0;
+      margin: var(--space-0);
       font-size: var(--fs-body);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-4);
 
       i {
         color: var(--primary-color);
@@ -354,8 +354,8 @@
     }
 
     .p-button {
-      padding: 0.5rem !important;
-      margin: 0 !important;
+      padding: var(--space-4) !important;
+      margin: var(--space-0) !important;
       min-width: auto !important;
       background: transparent !important;
       border: none !important;
@@ -379,12 +379,12 @@
 
     &::-webkit-scrollbar-track {
       background: transparent;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
     }
 
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
 
       &:hover {
         background: var(--secondary-color);
@@ -396,7 +396,7 @@
   }
 
   .schema-search {
-    padding: 12px;
+    padding: var(--space-5);
     border-bottom: 1px solid var(--border-color);
 
     .search-input {
@@ -404,7 +404,7 @@
       padding: 8px 12px;
       background-color: var(--input-background);
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       color: var(--text-color);
       font-size: var(--fs-control);
 
@@ -428,10 +428,10 @@
     .datasource-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-4);
       padding: 10px 12px;
       cursor: pointer;
-      transition: background-color 0.15s ease;
+      transition: background-color var(--motion-fast) ease;
       font-weight: var(--fw-semibold);
       background-color: var(--hover-background);
       border-bottom: 1px solid var(--border-color);
@@ -474,10 +474,10 @@
     .schema-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-4);
       padding: 8px 12px 8px 24px;
       cursor: pointer;
-      transition: background-color 0.15s ease;
+      transition: background-color var(--motion-fast) ease;
 
       &:hover {
         background-color: var(--hover-background);
@@ -517,10 +517,10 @@
     .table-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-4);
       padding: 8px 12px 8px 24px;
       cursor: pointer;
-      transition: background-color 0.15s ease;
+      transition: background-color var(--motion-fast) ease;
 
       &:hover {
         background-color: var(--hover-background);
@@ -564,10 +564,10 @@
   .column-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     padding: 6px 16px;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--motion-fast) ease;
 
     &:hover {
       background-color: var(--hover-background);
@@ -651,7 +651,7 @@
     align-items: center;
     justify-content: center;
     color: var(--text-color);
-    transition: color 0.2s ease;
+    transition: color var(--motion-base) ease;
     padding: 8px 4px;
     height: 40px;
 
@@ -682,14 +682,14 @@
 .btn {
   padding: 8px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-size: var(--fs-body);
   font-weight: var(--fw-medium);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
+  gap: var(--space-3);
+  transition: all var(--motion-base) ease;
 
   i {
     font-size: var(--fs-body);
@@ -729,7 +729,7 @@
 }
 
 .btn-icon {
-  padding: 8px;
+  padding: var(--space-4);
   background-color: transparent;
   color: var(--text-color);
 
@@ -795,7 +795,7 @@
   right: 0;
   bottom: 0;
   background-color: var(--background-color);
-  z-index: 10;
+  z-index: var(--z-elevated);
 
   i {
     font-size: var(--fs-h1);
@@ -805,7 +805,7 @@
 
   p {
     font-size: var(--fs-h3);
-    margin: 0;
+    margin: var(--space-0);
   }
 
   .loading-hint {
@@ -829,8 +829,8 @@
   right: 0;
   bottom: 0;
   background-color: var(--background-color);
-  z-index: 10;
-  padding: 32px;
+  z-index: var(--z-elevated);
+  padding: var(--space-9);
   text-align: center;
 
   i {
@@ -855,7 +855,7 @@
   ul {
     text-align: left;
     margin: 0 0 24px 0;
-    padding: 0;
+    padding: var(--space-0);
     list-style: none;
     max-width: 400px;
 
@@ -905,7 +905,7 @@
 
   p {
     font-size: var(--fs-body);
-    margin: 0;
+    margin: var(--space-0);
     color: var(--secondary-color);
     max-width: 400px;
     line-height: 1.6;
@@ -928,7 +928,7 @@
   .status-bar-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-5);
 
     .status-icon {
       display: flex;
@@ -957,19 +957,19 @@
   .status-bar-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
 
     .status-bar-btn {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3);
       padding: 5px 12px;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       font-size: var(--fs-label);
       font-weight: var(--fw-semibold);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all var(--motion-base) ease;
 
       i {
         font-size: var(--fs-label);
@@ -1002,10 +1002,6 @@
 // ===================================================================
 // Results Popup Overlay
 // ===================================================================
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 .results-popup-overlay {
   position: fixed;
   top: 0;
@@ -1017,7 +1013,7 @@ $radius-sm: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: popupFadeIn 0.2s ease-out;
 
   @keyframes popupFadeIn {
@@ -1032,7 +1028,7 @@ $radius-sm: 8px;
 
 .results-popup-container {
   background: var(--card-background);
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   box-shadow:
     var(--shadow-xl),
     0 0 0 1px var(--border-color);
@@ -1074,7 +1070,7 @@ $radius-sm: 8px;
   .popup-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-5);
 
     > i {
       font-size: var(--fs-h2);
@@ -1093,7 +1089,7 @@ $radius-sm: 8px;
       padding: 4px 10px;
       background-color: var(--card-background);
       border: 1px solid var(--border-color);
-      border-radius: 99px;
+      border-radius: var(--radius-pill);
       font-weight: var(--fw-medium);
     }
   }
@@ -1101,18 +1097,18 @@ $radius-sm: 8px;
   .popup-header-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
 
     .export-csv-btn {
       font-size: var(--fs-control);
       padding: 0.4rem 0.8rem;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
     }
 
     .clear-filters-btn {
       font-size: var(--fs-control);
       padding: 0.4rem 0.8rem;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
     }
 
     .p-button {
@@ -1170,7 +1166,7 @@ $radius-sm: 8px;
       background: var(--hover-background);
       border: 1px solid var(--border-color);
       border-left: 4px solid var(--error-color);
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       padding: 16px 20px;
       margin-bottom: 16px;
       text-align: left;
@@ -1188,7 +1184,7 @@ $radius-sm: 8px;
     .error-meta {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3);
       color: var(--secondary-color);
       font-size: var(--fs-control);
 
@@ -1241,7 +1237,7 @@ $radius-sm: 8px;
     .success-meta {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3);
       color: var(--secondary-color);
       font-size: var(--fs-control);
 
@@ -1279,7 +1275,7 @@ $radius-sm: 8px;
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          gap: 2px;
+          gap: var(--space-1);
 
           .column-datatype {
             font-size: var(--fs-micro);
@@ -1289,7 +1285,7 @@ $radius-sm: 8px;
             font-family: var(--font-mono);
             padding: 1px 6px;
             background: var(--primary-color-transparent);
-            border-radius: 3px;
+            border-radius: var(--radius-xs);
             cursor: default;
             white-space: nowrap;
             overflow: hidden;
@@ -1322,7 +1318,7 @@ $radius-sm: 8px;
 
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: all 0.15s ease;
+        transition: all var(--motion-fast) ease;
         border-bottom: 1px solid var(--border-color);
 
         td {
@@ -1368,7 +1364,7 @@ $radius-sm: 8px;
       .p-column-filter {
         font-size: var(--fs-control);
         padding: 0.4rem 0.6rem;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
         border: 1px solid var(--border-color);
         background: var(--card-background);
         color: var(--text-color);
@@ -1396,7 +1392,7 @@ $radius-sm: 8px;
         .p-paginator-prev,
         .p-paginator-first,
         .p-paginator-last {
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           color: var(--secondary-color);
           min-width: 2rem;
           height: 2rem;
@@ -1424,7 +1420,7 @@ td.text-center {
 
 td.empty-message-cell {
   text-align: center;
-  padding: 2rem !important;
+  padding: var(--space-9) !important;
   color: var(--secondary-color);
   font-size: var(--fs-h3);
 }
@@ -1435,7 +1431,7 @@ td.empty-message-cell {
 @media (max-width: 768px) {
   .query-toolbar {
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-5);
     align-items: flex-start;
 
     .toolbar-left {
@@ -1443,7 +1439,7 @@ td.empty-message-cell {
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-4);
     }
 
     .toolbar-right {
@@ -1458,7 +1454,7 @@ td.empty-message-cell {
 
   .datasource-sidebar {
     position: absolute;
-    z-index: 100;
+    z-index: var(--z-dropdown);
     height: 100%;
 
     &.collapsed {
@@ -1495,7 +1491,7 @@ td.empty-message-cell {
 
 ::-webkit-scrollbar-thumb {
   background: var(--code-editor-scrollbar);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
 
   &:hover {
     background: var(--code-editor-scrollbar-hover);
@@ -1567,7 +1563,7 @@ td.empty-message-cell {
 
   .tabs-container {
     display: flex;
-    gap: 4px;
+    gap: var(--space-2);
     flex: 1;
     overflow-x: auto;
     overflow-y: hidden;
@@ -1580,13 +1576,13 @@ td.empty-message-cell {
   .tab-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     padding: 8px 12px;
     background-color: transparent;
     border: none;
     border-bottom: 2px solid transparent;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
     white-space: nowrap;
     color: var(--text-secondary-color);
     font-size: var(--fs-control);
@@ -1614,7 +1610,7 @@ td.empty-message-cell {
       font-weight: var(--fw-medium);
       max-width: 150px;
       border: 1px solid var(--primary-color);
-      border-radius: 3px;
+      border-radius: var(--radius-xs);
       padding: 2px 6px;
       background-color: var(--background-color);
       color: var(--text-color);
@@ -1652,13 +1648,13 @@ td.empty-message-cell {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2px;
+      padding: var(--space-1);
       background: transparent;
       border: none;
-      border-radius: 3px;
+      border-radius: var(--radius-xs);
       cursor: pointer;
       opacity: 0;
-      transition: all 0.2s ease;
+      transition: all var(--motion-base) ease;
       color: var(--text-secondary-color);
 
       i {
@@ -1693,7 +1689,7 @@ td.empty-message-cell {
 
   .btn-new-tab {
     margin-left: 8px;
-    padding: 6px;
+    padding: var(--space-3);
     min-width: 32px;
     height: 32px;
     flex-shrink: 0;
@@ -1711,9 +1707,9 @@ td.empty-message-cell {
   position: fixed;
   background-color: var(--card-background);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 2px 8px var(--shadow-color);
-  z-index: 10000;
+  z-index: var(--z-modal);
   min-width: 160px;
   padding: 4px 0;
   animation: contextMenuFadeIn 0.15s ease;
@@ -1721,10 +1717,10 @@ td.empty-message-cell {
   .context-menu-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     padding: 6px 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
     color: var(--text-color);
     font-size: var(--fs-control);
 
@@ -1762,19 +1758,19 @@ td.empty-message-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
 
   .popup-content {
     background: var(--card-background);
-    padding: 24px;
-    border-radius: 8px;
+    padding: var(--space-8);
+    border-radius: var(--radius-md);
     width: 500px;
     box-shadow: 0 4px 6px var(--shadow-color);
 
     .popup-header {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: var(--space-5);
       margin-bottom: 20px;
 
       .warning-icon {
@@ -1783,7 +1779,7 @@ td.empty-message-cell {
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h2);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
@@ -1794,7 +1790,7 @@ td.empty-message-cell {
       margin-bottom: 24px;
 
       p {
-        margin: 0;
+        margin: var(--space-0);
         line-height: 1.6;
         color: var(--text-color);
       }
@@ -1803,7 +1799,7 @@ td.empty-message-cell {
     .popup-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 12px;
+      gap: var(--space-5);
 
       button {
         &.p-button-outlined {
@@ -1854,7 +1850,7 @@ td.empty-message-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: confirmFadeIn 0.2s ease-out;
 
   @keyframes confirmFadeIn {
@@ -1868,8 +1864,8 @@ td.empty-message-cell {
 
   .popup-content {
     background: var(--card-background);
-    padding: 2rem;
-    border-radius: $radius-lg;
+    padding: var(--space-9);
+    border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-xl),
       0 0 0 1px var(--border-color);
@@ -1909,7 +1905,7 @@ td.empty-message-cell {
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         color: var(--text-color);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
@@ -1948,13 +1944,13 @@ td.empty-message-cell {
           width: 100%;
           padding: 0.65rem 0.75rem;
           border: 1px solid var(--border-color);
-          border-radius: $radius-sm;
+          border-radius: var(--radius-sm);
           background: var(--card-background);
           color: var(--text-color);
           font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
-          transition: border-color 0.2s;
+          transition: border-color var(--motion-base);
 
           &::placeholder {
             color: var(--secondary-color);
@@ -1981,20 +1977,20 @@ td.empty-message-cell {
 
     .popup-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: center;
 
       button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: var(--space-3);
         padding: 0.75rem 1.5rem;
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
         border: none;
         font-weight: var(--fw-semibold);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
         font-size: var(--fs-body);
 
         i {

@@ -1,7 +1,7 @@
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-3);
 
   .normal-label {
     font-size: var(--fs-control);
@@ -23,7 +23,7 @@
 .checkbox-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: var(--space-6);
   padding: 4px 0;
 
   &--vertical {
@@ -49,7 +49,7 @@
   .p-checkbox-box {
     border-color: var(--border-color) !important;
     background: var(--hover-background) !important;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     &:hover {
       border-color: var(--primary-color) !important;

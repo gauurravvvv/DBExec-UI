@@ -1,10 +1,6 @@
 // View Query Builder reuses the same styles as Execute Query Builder
 @import '../execute-query-builder/execute-query-builder.component.scss';
 
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 // Header action buttons (matching view-prompt pattern)
 .action-buttons {
   .btn-primary {
@@ -53,14 +49,14 @@ $radius-sm: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   .popup-content {
     background: var(--card-background);
     width: 90%;
     max-width: 420px;
-    border-radius: $radius-lg;
+    border-radius: var(--radius-lg);
     box-shadow:
       0 20px 25px -5px var(--shadow-color),
       0 8px 10px -6px var(--shadow-color);
@@ -76,7 +72,7 @@ $radius-sm: 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       .popup-icon {
         width: 48px;
@@ -91,7 +87,7 @@ $radius-sm: 8px;
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
@@ -111,18 +107,18 @@ $radius-sm: 8px;
 
       .delete-info-list {
         background: var(--hover-background);
-        border-radius: $radius-md;
-        padding: 1rem;
+        border-radius: var(--radius-md);
+        padding: var(--space-6);
         list-style: none;
-        margin: 0;
+        margin: var(--space-0);
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: var(--space-5);
 
         li {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: var(--space-5);
           color: var(--text-color);
           font-size: var(--fs-body);
           font-weight: var(--fw-medium);
@@ -159,13 +155,13 @@ $radius-sm: 8px;
           width: 100%;
           padding: 0.65rem 0.75rem;
           border: 1px solid var(--border-color);
-          border-radius: $radius-sm;
+          border-radius: var(--radius-sm);
           background: var(--card-background);
           color: var(--text-color);
           font-size: var(--fs-control);
           font-family: inherit;
           resize: vertical;
-          transition: border-color 0.2s;
+          transition: border-color var(--motion-base);
 
           &::placeholder {
             color: var(--secondary-color);
@@ -195,19 +191,19 @@ $radius-sm: 8px;
       background: var(--hover-background);
       border-top: 1px solid var(--border-color);
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: flex-end;
 
       button {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: var(--space-4);
         padding: 0.65rem 1.25rem;
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
         font-weight: var(--fw-semibold);
         font-size: var(--fs-body);
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all var(--motion-base);
         border: 1px solid transparent;
 
         &.btn-cancel {

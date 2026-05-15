@@ -8,7 +8,7 @@
   height: 100vh;
   background: var(--card-background);
   border-right: 1px solid var(--border-color);
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width var(--motion-base) cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
 
   &.mobile {
     position: fixed;
-    z-index: 1000;
+    z-index: var(--z-overlay);
   }
 }
 
@@ -36,7 +36,7 @@
 .toggle-btn {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: none;
   background: transparent;
   color: var(--secondary-color);
@@ -46,7 +46,7 @@
   justify-content: center;
   flex-shrink: 0;
   margin: 0 auto; // collapsed mode: centered in the rail
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
 
   &:hover {
     background: var(--hover-background);
@@ -84,8 +84,8 @@
   }
   &::-webkit-scrollbar-thumb {
     background: transparent;
-    border-radius: 3px;
-    transition: background 0.2s ease;
+    border-radius: var(--radius-xs);
+    transition: background var(--motion-base) ease;
   }
   &:hover::-webkit-scrollbar-thumb {
     background: var(--border-color);
@@ -99,8 +99,8 @@
 .submenu,
 .nested-submenu {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: var(--space-0);
+  margin: var(--space-0);
 }
 
 // ── Nav item — the row that holds an icon + label ──────────────────
@@ -115,14 +115,14 @@
   justify-content: space-between;
   padding: 0.5rem 0.85rem;
   margin: 1px 8px;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   font-size: var(--fs-control);
   font-weight: var(--fw-medium);
   color: var(--text-color);
   text-decoration: none;
   cursor: pointer;
   position: relative;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease;
 
   &:hover {
     background: var(--hover-background);
@@ -131,7 +131,7 @@
   .link-content {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: var(--space-5);
     flex: 1;
     min-width: 0;
 
@@ -141,7 +141,7 @@
       justify-content: center;
       font-size: var(--fs-body);
       color: var(--secondary-color);
-      transition: color 0.15s ease;
+      transition: color var(--motion-fast) ease;
     }
 
     .nav-text {
@@ -160,7 +160,7 @@
     font-size: var(--fs-label);
     color: var(--secondary-color);
     margin-left: 6px;
-    transition: transform 0.2s ease;
+    transition: transform var(--motion-base) ease;
 
     &.expanded {
       transform: rotate(-180deg);
@@ -172,9 +172,14 @@
 // Expanded mode: 3px left-accent + brand-tinted background. Font weight
 // stays at 500 so the row width does not change on selection — a small
 // industry standard from Linear/Stripe/Vercel.
+//
+// Angular's routerLinkActive puts `.active` directly on the <a>/<div>
+// element, not on its <li> parent. So the active selectors target the
+// link element itself at every depth.
 .nav-link.active,
-.active > .submenu-link,
-.active > a {
+.submenu-link.active,
+.submenu-item > a.active,
+.nested-submenu-item > a.active {
   background: var(--primary-color-transparent);
   color: var(--primary-color);
   box-shadow: inset 3px 0 0 0 var(--primary-color);
@@ -188,10 +193,39 @@
 // brand-tinted background pill so the icon still reads "you are here".
 .sidebar.collapsed {
   .nav-link.active,
-  .active > .submenu-link,
-  .active > a {
+  .submenu-link.active,
+  .submenu-item > a.active,
+  .nested-submenu-item > a.active {
     box-shadow: none;
     margin: 1px 8px;
+  }
+
+  // Parent reflection in collapsed mode — when the submenu isn't visible,
+  // the rail must still indicate which section is active. We use the
+  // brand-tinted pill on the parent (same family as the active state)
+  // because nothing else is on screen to compete with it.
+  .nav-link.has-active-child,
+  .submenu-link.has-active-child {
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+
+    .link-content i {
+      color: var(--primary-color);
+    }
+  }
+}
+
+// Expanded mode: parent of an active child gets a neutral hover-grey
+// background (Linear / Stripe convention) plus a brand-coloured icon —
+// strong enough to anchor the open branch, soft enough that the active
+// CHILD remains the dominant visual cue. The brand tint stays reserved
+// for the actual active row.
+.nav-link.has-active-child:not(.active),
+.submenu-link.has-active-child:not(.active) {
+  background: var(--hover-background);
+
+  .link-content i {
+    color: var(--primary-color);
   }
 }
 
@@ -231,8 +265,8 @@
 .submenu,
 .nested-submenu {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: var(--space-0);
+  margin: var(--space-0);
 }
 
 .submenu > .submenu-item,
@@ -242,9 +276,9 @@
   overflow: hidden;
   transform: translateY(-2px);
   transition:
-    max-height 0.2s ease,
-    opacity 0.15s ease,
-    transform 0.15s ease;
+    max-height var(--motion-base) ease,
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
 }
 
 .submenu.expanded > .submenu-item,
@@ -275,18 +309,33 @@
     display: none;
   }
 
+  // Top-level nav rows in collapsed mode. The earlier nested selector also
+  // matched .submenu-item > a, which carries an inherited padding-left of
+  // 2.4rem from the indent rule — that pushed the icon off-center inside
+  // its pill. Here we reset the padding back to symmetrical and stop the
+  // .link-content from stretching, so the icon sits in the middle of the
+  // 48px-wide pill instead of hugging its left edge.
   .nav-link,
   .submenu-link,
-  .submenu-item > a {
+  .submenu-item > a,
+  .submenu-item > .submenu-link,
+  .nested-submenu-item > a,
+  .nested-submenu-item > .submenu-link {
     justify-content: center;
-    padding: 0.5rem 0;
+    padding: 0.5rem 0 !important;
     margin: 1px 8px;
 
     .link-content {
+      flex: 0 0 auto;          // do not stretch — keep content compact
       justify-content: center;
-      gap: 0;
+      gap: var(--space-0);
+      width: 100%;             // pill is 48px wide; let content fill it
+                               // so justify-content centers the lone icon
 
-      i { min-width: 0; }
+      i {
+        min-width: 0;
+        margin: 0 auto;        // belt + braces: explicit horizontal centring
+      }
     }
   }
 

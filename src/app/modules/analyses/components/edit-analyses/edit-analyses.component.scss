@@ -8,7 +8,7 @@
   width: 100%;
   background-color: var(--background-color);
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
 
@@ -29,23 +29,23 @@
   .toolbar-left {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
 
     .left-section {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       button {
         min-width: 0;
         background: transparent !important;
         border: none !important;
         color: var(--text-color) !important;
-        padding: 0.5rem !important;
+        padding: var(--space-4) !important;
 
         &:hover {
           background: var(--hover-background) !important;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
         }
 
         i {
@@ -61,8 +61,8 @@
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 0 !important;
-        transition: all 0.2s ease !important;
+        padding: var(--space-0) !important;
+        transition: all var(--motion-base) ease !important;
 
         &:hover {
           background: var(--hover-background) !important;
@@ -71,7 +71,7 @@
       }
 
       .toolbar-label {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h3);
         font-weight: var(--fw-medium);
         color: var(--text-color-secondary);
@@ -85,7 +85,7 @@
     transform: translateX(-50%);
 
     .toolbar-title {
-      margin: 0;
+      margin: var(--space-0);
       font-size: var(--fs-h1);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
@@ -99,12 +99,12 @@
   .toolbar-right {
     display: flex;
     align-items: center;
-    gap: 8px !important;
+    gap: var(--space-4) !important;
 
     .p-button,
     button {
-      padding: 0.5rem !important;
-      margin: 0 !important;
+      padding: var(--space-4) !important;
+      margin: var(--space-0) !important;
       min-width: auto !important;
     }
 
@@ -135,18 +135,18 @@
 .sub-header {
   display: flex;
   align-items: center;
-  padding: 8px;
+  padding: var(--space-4);
   background-color: var(--card-background);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
-  gap: 4px !important;
+  gap: var(--space-2) !important;
 
   .p-button {
-    margin: 0 !important;
-    padding: 0.5rem !important;
+    margin: var(--space-0) !important;
+    padding: var(--space-4) !important;
     min-width: auto !important;
     border-radius: 0 !important;
-    transition: all 0.3s ease;
+    transition: all var(--motion-slow) ease;
 
     &.active {
       background-color: rgba(var(--primary-color-rgb), 0.1) !important;
@@ -163,7 +163,7 @@
   .dataset-status-indicator {
     margin-left: 8px;
     padding: 6px 12px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     font-size: var(--fs-label);
     font-weight: var(--fw-medium);
     display: flex;
@@ -174,7 +174,7 @@
     .status-error {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--space-3);
 
       i {
         font-size: var(--fs-body);
@@ -185,7 +185,7 @@
       color: var(--primary-color);
       background-color: rgba(var(--primary-color-rgb), 0.1);
       padding: 6px 12px;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
 
       i {
         animation: spin 1s linear infinite;
@@ -196,22 +196,22 @@
       color: var(--success-color);
       background-color: var(--success-bg);
       padding: 6px 12px;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
     }
 
     .status-error {
       color: var(--error-color);
       background-color: var(--error-bg);
       padding: 6px 12px;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
     }
 
     .refresh-btn {
       margin-left: 8px;
-      padding: 6px !important;
+      padding: var(--space-3) !important;
       min-width: auto !important;
       color: var(--secondary-color);
-      transition: all 0.2s ease;
+      transition: all var(--motion-base) ease;
 
       &:hover:not(:disabled) {
         color: var(--primary-color);
@@ -266,7 +266,7 @@
   border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all var(--motion-slow) ease;
 
   &.collapsed {
     width: 0;
@@ -286,7 +286,7 @@
   border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all var(--motion-slow) ease;
 
   &.collapsed {
     width: 0;
@@ -306,7 +306,7 @@
   border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all var(--motion-slow) ease;
 
   &.collapsed {
     width: 0;
@@ -326,7 +326,7 @@
   border-right: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all var(--motion-slow) ease;
 
   &.collapsed {
     width: 0;
@@ -367,7 +367,7 @@
       font-weight: var(--fw-semibold);
       color: var(--secondary-color);
       letter-spacing: 0.5px;
-      margin: 0;
+      margin: var(--space-0);
     }
 
     .visual-count-badge {
@@ -376,7 +376,7 @@
       font-size: var(--fs-micro);
       font-weight: var(--fw-semibold);
       padding: 2px 8px;
-      border-radius: 12px;
+      border-radius: var(--radius-lg);
       min-width: 20px;
       text-align: center;
     }
@@ -388,7 +388,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      margin: 0;
+      margin: var(--space-0);
     }
   }
 
@@ -404,7 +404,7 @@
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    padding: 0;
+    padding: var(--space-0);
 
     .search-wrapper {
       padding: 12px 12px 0 12px;
@@ -421,12 +421,12 @@
 
     &::-webkit-scrollbar-track {
       background: transparent;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
     }
 
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
 
       &:hover {
         background: var(--secondary-color);
@@ -469,12 +469,12 @@
 
     &::-webkit-scrollbar-track {
       background: transparent;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
     }
 
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
 
       &:hover {
         background: var(--secondary-color);
@@ -501,7 +501,7 @@
 
   // Dataset Name Section with Dividers
   .dataset-name-section {
-    padding: 16px;
+    padding: var(--space-6);
     border-bottom: 1px solid var(--border-color);
   }
 
@@ -542,22 +542,22 @@
 
   // Fields List
   .fields-list {
-    padding: 12px;
+    padding: var(--space-5);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-4);
   }
 
   .field-card {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-5);
     padding: 0 8px;
     background-color: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     &:hover {
       background-color: var(--hover-background);
@@ -615,15 +615,15 @@
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-3);
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--motion-fast) ease;
 
     .field-action-icon {
       font-size: var(--fs-micro);
       cursor: pointer;
       color: var(--text-color-secondary);
-      transition: color 0.15s ease;
+      transition: color var(--motion-fast) ease;
     }
 
     .edit-icon:hover {
@@ -647,7 +647,7 @@
     flex-shrink: 0;
     color: var(--primary-color);
     font-size: var(--fs-body);
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
   }
 
   // Selection mode styles for fields - simple highlight
@@ -671,13 +671,13 @@
   .axis-slot {
     display: flex;
     flex-direction: column;
-    padding: 12px;
+    padding: var(--space-5);
     margin-bottom: 8px;
     background-color: var(--card-background);
     border: 2px dashed var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     &:hover {
       border-color: var(--primary-color);
@@ -737,7 +737,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: var(--space-4);
 
     span {
       font-size: var(--fs-control);
@@ -752,9 +752,9 @@
       color: var(--secondary-color);
       font-size: var(--fs-label);
       cursor: pointer;
-      padding: 4px;
+      padding: var(--space-2);
       border-radius: 50%;
-      transition: all 0.2s ease;
+      transition: all var(--motion-base) ease;
 
       &:hover {
         color: var(--error-color);
@@ -766,7 +766,7 @@
   .axis-placeholder {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     color: var(--secondary-color);
 
     i {
@@ -782,7 +782,7 @@
   .axis-hint {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-5);
     padding: 10px 14px;
     margin-bottom: 12px;
     background: linear-gradient(
@@ -791,7 +791,7 @@
       rgba(var(--primary-color-rgb), 0.08)
     );
     border: 1px solid rgba(var(--primary-color-rgb), 0.25);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: var(--fs-label);
     font-weight: var(--fw-medium);
     color: var(--primary-color);
@@ -809,10 +809,10 @@
 
   // Add Visual Section
   .add-visual-section {
-    padding: 12px;
+    padding: var(--space-5);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-5);
   }
 
   .add-visual-button {
@@ -823,10 +823,10 @@
 
   // Add Filter Section
   .add-filter-section {
-    padding: 12px;
+    padding: var(--space-5);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-5);
   }
 
   .add-filter-button {
@@ -853,27 +853,27 @@
     p {
       font-size: var(--fs-control);
       font-weight: var(--fw-semibold);
-      margin: 0;
+      margin: var(--space-0);
       color: var(--text-color);
     }
   }
 
   // Filter Cards in sidebar
   .filter-cards {
-    padding: 8px;
+    padding: var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--space-3);
     overflow-y: auto;
   }
 
   .filter-card {
     background: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     padding: 8px 10px;
     cursor: default;
-    transition: border-color 0.2s ease;
+    transition: border-color var(--motion-base) ease;
 
     &:hover {
       border-color: var(--primary-color);
@@ -892,7 +892,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 4px;
+    gap: var(--space-2);
   }
 
   .filter-card-name {
@@ -907,15 +907,15 @@
 
   .filter-card-actions {
     display: flex;
-    gap: 6px;
+    gap: var(--space-3);
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--motion-base) ease;
 
     i {
       font-size: var(--fs-micro);
       cursor: pointer;
       color: var(--secondary-color);
-      padding: 2px;
+      padding: var(--space-1);
 
       &:hover {
         color: var(--primary-color);
@@ -930,7 +930,7 @@
   .filter-card-meta {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--space-1);
     margin-top: 4px;
   }
 
@@ -965,13 +965,13 @@
 
   .filter-card-badges {
     display: flex;
-    gap: 4px;
+    gap: var(--space-2);
     margin-top: 4px;
 
     .badge {
       font-size: var(--fs-micro);
       padding: 1px 5px;
-      border-radius: 3px;
+      border-radius: var(--radius-xs);
       font-weight: var(--fw-semibold);
     }
 
@@ -1007,7 +1007,7 @@
     p {
       font-size: var(--fs-control);
       font-weight: var(--fw-semibold);
-      margin: 0;
+      margin: var(--space-0);
       color: var(--text-color);
     }
   }
@@ -1015,22 +1015,22 @@
   .visual-list-items {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-2);
     padding: 6px 8px;
   }
 
   .visual-list-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     padding: 6px 8px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     border: 1px solid var(--border-color);
     background: var(--card-background);
     transition:
-      background 0.15s ease,
-      border-color 0.15s ease;
+      background var(--motion-fast) ease,
+      border-color var(--motion-fast) ease;
 
     &:hover {
       background: var(--hover-background);
@@ -1062,12 +1062,12 @@
     justify-content: center;
     width: 26px;
     height: 26px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     flex-shrink: 0;
     background: rgba(var(--primary-color-rgb), 0.08);
     color: var(--primary-color);
     font-size: var(--fs-micro);
-    transition: background 0.15s ease;
+    transition: background var(--motion-fast) ease;
   }
 
   .visual-info {
@@ -1086,7 +1086,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     line-height: 1.3;
-    transition: color 0.15s ease;
+    transition: color var(--motion-fast) ease;
   }
 
   .visual-type-label {
@@ -1127,14 +1127,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px;
+    padding: var(--space-5);
     background-color: rgba(var(--primary-color-rgb), 0.08);
     border-bottom: 1px solid var(--border-color);
 
     .selected-chart-info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: var(--space-5);
       font-size: var(--fs-control);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
@@ -1157,7 +1157,7 @@
   .chart-type-hint {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     padding: 10px 12px;
     background-color: rgba(var(--primary-color-rgb), 0.08);
     border-bottom: 1px solid var(--border-color);
@@ -1181,10 +1181,10 @@
         width: 100%;
         padding-left: 2.5rem;
         font-size: var(--fs-control);
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         border: 1px solid var(--border-color);
         background-color: var(--hover-background);
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
 
         &:focus {
           border-color: var(--primary-color);
@@ -1209,7 +1209,7 @@
   .chart-categories {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-2);
   }
 
   .chart-category-section {
@@ -1234,7 +1234,7 @@
       2,
       minmax(0, 1fr)
     ); // minmax(0, 1fr) ensures equal width
-    gap: 6px;
+    gap: var(--space-3);
     padding: 8px 10px;
   }
 
@@ -1246,10 +1246,10 @@
     padding: 8px 4px;
     background-color: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all 0.2s ease;
-    gap: 4px;
+    transition: all var(--motion-base) ease;
+    gap: var(--space-2);
     min-height: 50px;
     position: relative;
     box-sizing: border-box;
@@ -1333,7 +1333,7 @@
     justify-content: center;
     font-size: var(--fs-h2);
     color: var(--secondary-color);
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     &.rotate {
       transform: rotate(90deg);
@@ -1352,14 +1352,14 @@
     max-width: 100%;
     opacity: 0.7;
     max-height: 16px;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
   }
 
   // Visual Count
   .visual-count {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-2);
     text-align: center;
     color: var(--secondary-color);
     font-size: var(--fs-micro);
@@ -1387,7 +1387,7 @@
   flex-direction: column;
   animation: slideInRight 0.3s ease-out;
   overflow: hidden;
-  z-index: 100;
+  z-index: var(--z-dropdown);
   box-shadow: -4px 0 16px var(--shadow-color);
 
   .sidebar-content {
@@ -1412,11 +1412,11 @@
       font-weight: var(--fw-semibold);
       color: var(--secondary-color);
       letter-spacing: 0.5px;
-      margin: 0;
+      margin: var(--space-0);
     }
 
     .close-btn {
-      padding: 0.25rem;
+      padding: var(--space-2);
       width: 24px;
       height: 24px;
     }
@@ -1432,7 +1432,7 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0;
+    padding: var(--space-0);
 
     &::-webkit-scrollbar {
       width: 8px;
@@ -1444,7 +1444,7 @@
 
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
 
       &:hover {
         background: var(--secondary-color);
@@ -1453,7 +1453,7 @@
   }
 
   .config-form {
-    padding: 16px;
+    padding: var(--space-6);
   }
 
   .config-section {
@@ -1540,13 +1540,13 @@
 
 .canvas-area {
   flex: 1;
-  padding: 16px;
+  padding: var(--space-6);
   overflow-y: auto;
   overflow-x: hidden;
   display: grid;
   grid-template-columns: repeat(24, 1fr);
   grid-auto-rows: var(--dynamic-row-height, 50px);
-  gap: 16px;
+  gap: var(--space-6);
   align-content: flex-start;
   background: var(--background-color);
 }
@@ -1555,15 +1555,15 @@
   position: relative;
   background: var(--card-background);
   border: 1.5px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   box-shadow: 0 1px 4px var(--shadow-color);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.15s ease;
+    border-color var(--motion-base) ease,
+    box-shadow var(--motion-base) ease,
+    transform var(--motion-fast) ease;
   cursor: default;
 
   &:hover {
@@ -1579,7 +1579,7 @@
     box-shadow:
       0 0 0 2px rgba(var(--primary-color-rgb), 0.15),
       0 4px 20px rgba(var(--primary-color-rgb), 0.12);
-    z-index: 10;
+    z-index: var(--z-elevated);
     .visual-inline-title {
       background: rgba(var(--primary-color-rgb), 0.03);
     }
@@ -1617,8 +1617,8 @@
     border-color: rgba(var(--primary-color-rgb), 0.4);
     background: rgba(var(--primary-color-rgb), 0.02);
     transition:
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
+      border-color var(--motion-base) ease,
+      box-shadow var(--motion-base) ease;
     &:hover {
       border-color: var(--primary-color);
       background: rgba(var(--primary-color-rgb), 0.05);
@@ -1683,7 +1683,7 @@
   bottom: 0;
   height: 8px;
   cursor: ns-resize;
-  z-index: 10;
+  z-index: var(--z-elevated);
   background: transparent;
 }
 .resize-handle-right {
@@ -1693,7 +1693,7 @@
   right: 0;
   width: 8px;
   cursor: ew-resize;
-  z-index: 10;
+  z-index: var(--z-elevated);
   background: transparent;
 }
 .resize-handle-corner-br {
@@ -1705,7 +1705,7 @@
   cursor: nwse-resize;
   opacity: 0;
   z-index: 11;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--motion-base) ease;
   &::after {
     content: '';
     position: absolute;
@@ -1739,14 +1739,14 @@
 .visual-inline-title {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-3);
   padding: 0 10px;
   height: 36px;
   flex-shrink: 0;
   cursor: grab;
   border-bottom: 1px solid var(--border-color);
   background: var(--card-background);
-  transition: background 0.15s ease;
+  transition: background var(--motion-fast) ease;
 
   &:active {
     cursor: grabbing;
@@ -1769,13 +1769,13 @@
     color: var(--text-color);
     cursor: pointer;
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
     line-height: 1.4;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--motion-fast) ease;
 
     &:hover {
       background: rgba(var(--primary-color-rgb), 0.06);
@@ -1788,7 +1788,7 @@
     background: var(--card-background);
     color: var(--text-color);
     padding: 3px 8px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     font-size: var(--fs-label);
     font-weight: var(--fw-semibold);
     outline: none;
@@ -1803,7 +1803,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-2);
   }
 
   .char-counter {
@@ -1815,7 +1815,7 @@
   .visual-action-buttons {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: var(--space-1);
     flex-shrink: 0;
 
     .action-icon {
@@ -1824,15 +1824,15 @@
       justify-content: center;
       width: 24px;
       height: 24px;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       font-size: var(--fs-micro);
       cursor: pointer;
       color: var(--secondary-color);
       opacity: 0.4;
       transition:
-        opacity 0.15s ease,
-        color 0.15s ease,
-        background 0.15s ease;
+        opacity var(--motion-fast) ease,
+        color var(--motion-fast) ease,
+        background var(--motion-fast) ease;
 
       &:hover {
         opacity: 1;
@@ -1858,7 +1858,7 @@
   background-color: var(--card-background);
   color: var(--text-color);
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-size: var(--fs-control);
   font-weight: var(--fw-semibold);
   outline: none;
@@ -1871,13 +1871,13 @@
 
 .visual-actions {
   display: flex;
-  gap: 4px;
+  gap: var(--space-2);
 
   button {
-    padding: 0.25rem;
+    padding: var(--space-2);
     width: 28px;
     height: 28px;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     &:hover {
       transform: scale(1.1);
@@ -1897,7 +1897,7 @@
 
 .visual-body {
   flex: 1;
-  padding: 0;
+  padding: var(--space-0);
   display: flex;
   align-items: stretch;
   justify-content: stretch;
@@ -1979,10 +1979,10 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 10px;
+  gap: var(--space-5);
   width: 100%;
   height: 100%;
-  padding: 16px;
+  padding: var(--space-6);
 
   .placeholder-icon-wrap {
     display: flex;
@@ -1990,7 +1990,7 @@
     justify-content: center;
     width: 44px;
     height: 44px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     background: rgba(var(--primary-color-rgb), 0.08);
     border: 1px solid rgba(var(--primary-color-rgb), 0.15);
     flex-shrink: 0;
@@ -2003,7 +2003,7 @@
   }
 
   p {
-    margin: 0;
+    margin: var(--space-0);
     font-size: var(--fs-label);
     font-weight: var(--fw-medium);
     color: var(--text-color);
@@ -2031,7 +2031,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-5);
 
     .loading-spinner {
       font-size: var(--fs-h1);
@@ -2059,7 +2059,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
 
     .error-icon {
       font-size: var(--fs-h1);
@@ -2110,17 +2110,17 @@
 .empty-state-tips {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-5);
   align-items: flex-start;
   background-color: var(--hover-background);
   padding: 20px 24px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
 
   .tip-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-5);
     font-size: var(--fs-control);
 
     i {
@@ -2150,7 +2150,7 @@
     padding: 8px 12px;
 
     .toolbar-left {
-      gap: 8px;
+      gap: var(--space-4);
 
       .toolbar-title {
         font-size: var(--fs-body);
@@ -2173,7 +2173,7 @@
   right: 0;
   bottom: 0;
   background: var(--overlay-background);
-  z-index: 9999;
+  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2191,7 +2191,7 @@
 
 .maximized-visual-container {
   background: var(--card-background);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   box-shadow: 0 20px 40px -10px var(--overlay-background);
   max-width: 92vw;
   max-height: 88vh;
@@ -2240,7 +2240,7 @@
 
 .maximized-visual-body {
   flex: 1;
-  padding: 20px;
+  padding: var(--space-7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2252,7 +2252,7 @@
 :host ::ng-deep {
   .filter-config-dialog {
     .p-dialog {
-      border-radius: 12px;
+      border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: 0 20px 60px var(--overlay-background);
     }
@@ -2279,7 +2279,7 @@
     }
 
     .p-dialog-content {
-      padding: 1.5rem;
+      padding: var(--space-8);
       background: var(--card-background);
       overflow: visible;
     }
@@ -2317,13 +2317,13 @@
 .filter-dialog-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--space-7);
 }
 
 .filter-dialog-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-3);
 
   label {
     font-size: var(--fs-body);
@@ -2331,7 +2331,7 @@
     color: var(--text-color);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-3);
 
     i {
       font-size: var(--fs-control);
@@ -2349,7 +2349,7 @@
     color: var(--secondary-color);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-2);
     opacity: 0.8;
 
     i {
@@ -2361,35 +2361,35 @@
 .filter-dialog-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: var(--space-6);
 }
 
 .filter-dialog-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: var(--space-6);
   padding: 14px 16px;
   background: var(--hover-background);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
 }
 
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: var(--space-5);
 
   button {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-4);
     padding: 0.6rem 1.25rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-weight: var(--fw-semibold);
     font-size: var(--fs-body);
     border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--motion-base) ease;
 
     i {
       font-size: var(--fs-body);
@@ -2445,14 +2445,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   .popup-content {
     background: var(--card-background);
     width: 90%;
     max-width: 420px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     box-shadow:
       0 20px 25px -5px var(--shadow-color),
       0 8px 10px -6px var(--shadow-color);
@@ -2468,7 +2468,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       .popup-icon {
         width: 48px;
@@ -2483,7 +2483,7 @@
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
@@ -2503,18 +2503,18 @@
 
       .delete-info-list {
         background: var(--hover-background);
-        border-radius: 8px;
-        padding: 1rem;
+        border-radius: var(--radius-md);
+        padding: var(--space-6);
         list-style: none;
-        margin: 0;
+        margin: var(--space-0);
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: var(--space-5);
 
         li {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: var(--space-5);
           color: var(--text-color);
           font-size: var(--fs-body);
           font-weight: var(--fw-medium);
@@ -2536,19 +2536,19 @@
       background: var(--hover-background);
       border-top: 1px solid var(--border-color);
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: flex-end;
 
       button {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: var(--space-4);
         padding: 0.65rem 1.25rem;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         font-weight: var(--fw-semibold);
         font-size: var(--fs-body);
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all var(--motion-base);
         border: 1px solid transparent;
 
         &.btn-cancel {

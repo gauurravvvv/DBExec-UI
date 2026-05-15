@@ -2,7 +2,7 @@ app-custom-daterange {
   .form-field {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-4);
 
     .normal-label {
       font-size: var(--fs-control);
@@ -29,7 +29,7 @@ app-custom-daterange {
       background: var(--card-background) !important;
       border: 1px solid var(--border-color) !important;
       color: var(--text-color) !important;
-      border-radius: 6px !important;
+      border-radius: var(--radius-sm) !important;
       font-size: var(--fs-body);
       padding: 0.625rem 0.75rem;
 
@@ -58,7 +58,7 @@ app-custom-daterange {
     // When input + button are side-by-side, let the wrapper own the single border
     &.p-calendar-w-btn {
       border: 1px solid var(--border-color);
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       background: var(--card-background);
 
       .p-inputtext {
@@ -93,7 +93,7 @@ app-custom-daterange {
   background: var(--card-background) !important;
   border: 1px solid var(--border-color) !important;
   box-shadow: var(--shadow-md) !important;
-  padding: 0.5rem;
+  padding: var(--space-4);
   font-size: var(--fs-control);
 
   .p-datepicker-header {
@@ -132,10 +132,10 @@ app-custom-daterange {
 
   table {
     font-size: var(--fs-control);
-    margin: 0;
+    margin: var(--space-0);
 
     th {
-      padding: 0.25rem;
+      padding: var(--space-2);
       color: var(--secondary-color) !important;
       font-size: var(--fs-label);
 
@@ -153,7 +153,7 @@ app-custom-daterange {
         height: 1.85rem;
         font-size: var(--fs-control);
         color: var(--text-color) !important;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
 
         &:hover {
           background: var(--hover-background) !important;

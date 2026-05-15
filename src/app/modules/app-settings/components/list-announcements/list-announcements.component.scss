@@ -1,13 +1,9 @@
 // Premium Design Variables - Using Global Theme
-$radius-lg: 16px;
-$radius-md: 12px;
-$radius-sm: 8px;
-
 :host {
   display: block;
   height: 100%;
   background-color: var(--background-color);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 
 .dataset-page-wrapper {
@@ -15,7 +11,7 @@ $radius-sm: 8px;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  padding: 0;
+  padding: var(--space-0);
 
   .dataset-content-container {
     flex: 1;
@@ -25,7 +21,7 @@ $radius-sm: 8px;
     max-width: 100%;
     margin: 0 auto;
     width: 100%;
-    gap: 1.5rem;
+    gap: var(--space-8);
   }
 }
 
@@ -46,7 +42,7 @@ $radius-sm: 8px;
     .subtitle {
       font-size: var(--fs-h3);
       color: var(--text-color-secondary);
-      margin: 0;
+      margin: var(--space-0);
       font-weight: var(--fw-regular);
     }
   }
@@ -54,7 +50,7 @@ $radius-sm: 8px;
 
 .content-card {
   background: var(--card-background);
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   box-shadow:
     0 4px 6px -1px var(--shadow-color),
     0 2px 4px -1px var(--shadow-color);
@@ -71,18 +67,18 @@ $radius-sm: 8px;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-6);
     background: var(--card-background);
 
     .toolbar-left,
     .toolbar-right {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
     }
 
     .modern-button {
-      border-radius: 6px !important;
+      border-radius: var(--radius-sm) !important;
       font-weight: var(--fw-semibold);
       padding: 0.65rem 1.25rem;
 
@@ -91,7 +87,7 @@ $radius-sm: 8px;
         border: none !important;
         color: white !important;
         box-shadow: 0 4px 10px var(--primary-color-transparent);
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
 
         &:hover {
           transform: translateY(-1px);
@@ -146,7 +142,7 @@ $radius-sm: 8px;
         .th-content {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: var(--space-4);
         }
 
         &:first-child {
@@ -188,7 +184,7 @@ $radius-sm: 8px;
           width: 100%;
 
           .form-field {
-            gap: 0;
+            gap: var(--space-0);
           }
 
           .p-dropdown,
@@ -201,7 +197,7 @@ $radius-sm: 8px;
 
       .p-datatable-tbody > tr {
         background: var(--card-background);
-        transition: all 0.15s ease;
+        transition: all var(--motion-fast) ease;
         border-bottom: 1px solid var(--border-color);
 
         td {
@@ -264,7 +260,7 @@ $radius-sm: 8px;
       .status-indicator {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: var(--space-4);
         font-size: var(--fs-control);
         font-weight: var(--fw-medium);
         white-space: nowrap;
@@ -289,8 +285,8 @@ $radius-sm: 8px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 0.5rem;
-        transition: opacity 0.2s;
+        gap: var(--space-4);
+        transition: opacity var(--motion-base);
 
         .icon-btn {
           width: 32px;
@@ -300,10 +296,10 @@ $radius-sm: 8px;
           justify-content: center;
           border: 1px solid transparent;
           background: transparent;
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           color: var(--secondary-color);
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all var(--motion-base);
 
           &:hover {
             background: var(--hover-background);
@@ -347,7 +343,7 @@ $radius-sm: 8px;
         .p-paginator-prev,
         .p-paginator-first,
         .p-paginator-last {
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           color: var(--secondary-color);
           min-width: 2rem;
           height: 2rem;
@@ -373,7 +369,7 @@ $radius-sm: 8px;
   display: inline-block;
   width: 22px;
   height: 22px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
 }
 
@@ -383,7 +379,7 @@ td.text-center {
 
 td.empty-message-cell {
   text-align: center;
-  padding: 2rem !important;
+  padding: var(--space-9) !important;
   color: var(--secondary-color);
   font-size: var(--fs-h3);
 }
@@ -399,7 +395,7 @@ td.empty-message-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-overlay);
   animation: fadeIn 0.2s ease-out;
 
   @keyframes fadeIn {
@@ -413,8 +409,8 @@ td.empty-message-cell {
 
   .popup-content {
     background: var(--card-background);
-    padding: 2rem;
-    border-radius: $radius-lg;
+    padding: var(--space-9);
+    border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-xl),
       0 0 0 1px var(--border-color);
@@ -440,7 +436,7 @@ td.empty-message-cell {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: var(--space-6);
 
       .popup-icon {
         width: 48px;
@@ -455,7 +451,7 @@ td.empty-message-cell {
       }
 
       h3 {
-        margin: 0;
+        margin: var(--space-0);
         font-size: var(--fs-h1);
         font-weight: var(--fw-semibold);
         color: var(--text-color);
@@ -477,14 +473,14 @@ td.empty-message-cell {
       .delete-info-list {
         list-style: none;
         padding: 0.75rem 1rem;
-        margin: 0;
+        margin: var(--space-0);
         background: var(--hover-background);
-        border-radius: $radius-sm;
+        border-radius: var(--radius-sm);
 
         li {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: var(--space-5);
           padding: 0.5rem 0;
           color: var(--secondary-color);
           font-size: var(--fs-control);
@@ -504,20 +500,20 @@ td.empty-message-cell {
 
     .popup-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: var(--space-5);
       justify-content: center;
 
       button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: var(--space-3);
         padding: 0.75rem 1.5rem;
-        border-radius: $radius-md;
+        border-radius: var(--radius-md);
         border: none;
         font-weight: var(--fw-semibold);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--motion-base) ease;
         font-size: var(--fs-body);
 
         i {

@@ -1,7 +1,7 @@
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-4);
   width: 100%;
   margin-bottom: 0;
 
@@ -33,7 +33,7 @@
     font-weight: var(--fw-medium);
     color: color-mix(in srgb, var(--text-color) 60%, transparent);
     background: var(--card-background);
-    z-index: 1;
+    z-index: var(--z-base);
 
     .required {
       color: var(--error-color);
@@ -58,7 +58,7 @@
   .p-dropdown {
     background: var(--card-background);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
 
     &.ng-invalid.ng-touched,
     &.ng-invalid.ng-dirty {
@@ -103,14 +103,14 @@
   .p-dropdown-panel {
     background: var(--card-background) !important;
     border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
+    border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-md) !important;
     margin-top: 2px !important;
 
     .p-dropdown-header {
       background: var(--card-background) !important;
       border-bottom: 1px solid var(--border-color) !important;
-      padding: 0.6rem !important;
+      padding: var(--space-4) !important;
 
       .p-dropdown-filter {
         background: var(--card-background) !important;
@@ -118,7 +118,7 @@
         color: var(--text-color) !important;
         font-size: var(--fs-body) !important;
         padding: 0.55rem 0.75rem !important;
-        border-radius: 4px !important;
+        border-radius: var(--radius-xs) !important;
 
         &::placeholder {
           color: var(--text-color) !important;
@@ -142,7 +142,7 @@
         padding: 0.65rem 0.9rem !important;
         font-size: var(--fs-body) !important;
         margin: 1px 0.25rem !important;
-        border-radius: 4px !important;
+        border-radius: var(--radius-xs) !important;
 
         &:hover {
           background: var(--hover-background) !important;
@@ -171,12 +171,12 @@
 
       &::-webkit-scrollbar-track {
         background: transparent;
-        border-radius: 3px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 3px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);

@@ -4,8 +4,8 @@
 
   .add-admin-container {
     background: var(--card-background);
-    border-radius: 8px;
-    padding: 20px;
+    border-radius: var(--radius-md);
+    padding: var(--space-7);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -20,10 +20,10 @@
       .left-section {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: var(--space-6);
 
         .back-button {
-          padding: 0 !important;
+          padding: var(--space-0) !important;
           width: 36px;
           height: 36px;
           border-radius: 50% !important;
@@ -34,7 +34,7 @@
           color: var(--text-color) !important;
           min-width: 0;
           border: none !important;
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover {
             background: var(--hover-background) !important;
@@ -47,7 +47,7 @@
 
         h2 {
           color: var(--text-color);
-          margin: 0;
+          margin: var(--space-0);
           font-size: var(--fs-h1);
           font-weight: var(--fw-semibold);
         }
@@ -55,14 +55,14 @@
 
       .action-buttons {
         display: flex;
-        gap: 12px;
+        gap: var(--space-5);
 
         .btn-cancel {
           background: var(--card-background) !important;
           border: 1px solid var(--border-color) !important;
           color: var(--text-color) !important;
           padding: 0.65rem 1.25rem;
-          border-radius: 6px !important;
+          border-radius: var(--radius-sm) !important;
           font-weight: var(--fw-semibold);
           box-shadow: var(--shadow-sm);
 
@@ -83,10 +83,10 @@
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
-          border-radius: 6px !important;
+          border-radius: var(--radius-sm) !important;
           font-weight: var(--fw-semibold);
           box-shadow: 0 4px 10px var(--primary-color-transparent);
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover:not(:disabled) {
             opacity: 1;
@@ -110,7 +110,7 @@
 
     .admin-form {
       display: flex;
-      gap: 2rem;
+      gap: var(--space-9);
       flex: 1;
       overflow-y: auto;
       padding-right: 4px;
@@ -123,12 +123,12 @@
 
       &::-webkit-scrollbar-track {
         background: transparent;
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
       }
 
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
 
         &:hover {
           background: var(--secondary-color);
@@ -150,13 +150,13 @@
           max-width: 100%;
           display: grid;
           grid-template-columns: 1fr;
-          gap: 20px;
+          gap: var(--space-7);
           margin-bottom: 1rem;
 
           .form-field {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: var(--space-4);
             width: 100%;
 
             label {
@@ -231,9 +231,9 @@
           }
 
           .acknowledgment-card {
-            padding: 1rem;
+            padding: var(--space-6);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             margin-bottom: 1rem;
             background: var(--hover-background);
 
@@ -244,7 +244,7 @@
             .p-field-checkbox {
               display: flex;
               align-items: flex-start;
-              gap: 1rem;
+              gap: var(--space-6);
 
               .acknowledgment-content {
                 flex: 1;
@@ -262,7 +262,7 @@
                   opacity: 0.7;
                   font-size: var(--fs-control);
                   line-height: 1.6;
-                  margin: 0;
+                  margin: var(--space-0);
                 }
               }
             }
@@ -284,7 +284,7 @@
         margin-top: 0;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: var(--space-7);
 
         .section-title {
           font-size: var(--fs-h2);
@@ -300,10 +300,10 @@
           opacity: 0.6;
           font-size: var(--fs-control);
           line-height: 1.5;
-          margin: 0;
+          margin: var(--space-0);
           padding: 0.75rem 1rem;
           background: var(--hover-background);
-          border-radius: 6px;
+          border-radius: var(--radius-sm);
           border-left: 3px solid var(--primary-color);
         }
 
@@ -311,7 +311,7 @@
           width: 100%;
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: var(--space-4);
 
           label {
             font-weight: var(--fw-medium);
@@ -381,18 +381,18 @@
 .connection-test-section {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: var(--space-3);
 
   .test-connection-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-4);
     color: var(--primary-color);
     cursor: pointer;
     font-size: var(--fs-body);
     font-weight: var(--fw-medium);
     text-decoration: none;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--motion-base) ease;
 
     &:hover:not(.disabled) {
       opacity: 0.8;
@@ -430,7 +430,7 @@
       border-color: var(--border-color);
       width: 18px;
       height: 18px;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
 
       &.p-highlight {
         border-color: var(--primary-color);
@@ -459,7 +459,7 @@
 
     .p-inputswitch-slider {
       background: var(--border-color) !important;
-      border-radius: 30px !important;
+      border-radius: var(--radius-pill) !important;
 
       &:before {
         background: var(--card-background) !important;
@@ -468,7 +468,7 @@
         left: 0.25rem !important;
         margin-top: -0.5rem !important;
         border-radius: 50% !important;
-        transition: all 0.2s ease !important;
+        transition: all var(--motion-base) ease !important;
       }
     }
 
@@ -570,12 +570,12 @@
 
     &::-webkit-scrollbar-track {
       background: transparent;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
     }
 
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
 
       &:hover {
         background: var(--secondary-color);
@@ -592,7 +592,7 @@
     .p-dropdown-header {
       background: var(--hover-background) !important;
       border-bottom: 1px solid var(--border-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       .p-dropdown-filter {
         background: var(--card-background) !important;
@@ -657,7 +657,7 @@
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
-      margin: 0;
+      margin: var(--space-0);
     }
   }
 }
@@ -675,7 +675,7 @@
       background: transparent !important;
       border: none !important;
       color: var(--text-color) !important;
-      padding: 0.5rem !important;
+      padding: var(--space-4) !important;
 
       &:hover {
         background: var(--hover-background) !important;

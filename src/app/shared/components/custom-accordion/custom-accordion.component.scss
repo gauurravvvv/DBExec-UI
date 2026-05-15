@@ -6,7 +6,7 @@
   .p-accordion {
     .p-accordion-tab {
       border: 1px solid var(--border-color);
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       overflow: hidden;
       margin-bottom: 0;
 
@@ -19,7 +19,7 @@
           color: var(--text-color);
           font-weight: var(--fw-medium);
           font-size: var(--fs-body);
-          transition: all 0.2s ease;
+          transition: all var(--motion-base) ease;
 
           &:hover {
             background: var(--hover-background);
@@ -51,7 +51,7 @@
       }
 
       .p-accordion-content {
-        padding: 0;
+        padding: var(--space-0);
         background: var(--card-background);
         border: none;
         color: var(--text-color);
@@ -63,7 +63,7 @@
 .accordion-header-content {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-4);
 
   i {
     font-size: var(--fs-body);
