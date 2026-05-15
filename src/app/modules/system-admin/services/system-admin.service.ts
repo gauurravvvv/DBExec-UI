@@ -27,7 +27,7 @@ export class SystemAdminService {
         this.http.apiGet(SYSTEM_ADMIN.LIST, { params }),
       );
       if (res?.status) {
-        this._admins.set(res.data.superAdmins ?? []);
+        this._admins.set(res.data.systemAdmins ?? []);
         this._total.set(res.data.count ?? 0);
       }
     } finally {
@@ -87,7 +87,9 @@ export class SystemAdminService {
 
   async delete(id: string, justification?: string): Promise<any> {
     return lastValueFrom(
-      this.http.apiDelete(SYSTEM_ADMIN.DELETE + id, { body: { justification } }),
+      this.http.apiDelete(SYSTEM_ADMIN.DELETE + id, {
+        body: { justification },
+      }),
     );
   }
 

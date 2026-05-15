@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   forwardRef,
@@ -36,6 +37,8 @@ export class CustomToggleComponent implements ControlValueAccessor {
   private _onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   get isChecked(): boolean {
     return this.value === this.trueValue;
   }
@@ -46,6 +49,7 @@ export class CustomToggleComponent implements ControlValueAccessor {
 
   writeValue(value: any): void {
     this.value = value;
+    this.cdr.markForCheck();
   }
 
   registerOnChange(fn: (value: any) => void): void {
@@ -58,6 +62,7 @@ export class CustomToggleComponent implements ControlValueAccessor {
 
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
+    this.cdr.markForCheck();
   }
 
   onToggleChange(checked: boolean): void {

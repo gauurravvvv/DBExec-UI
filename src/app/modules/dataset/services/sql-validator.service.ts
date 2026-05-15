@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MonacoIntelliSenseService } from './monaco-intellisense.service';
 
 declare const monaco: any;
 
@@ -26,7 +27,7 @@ export class SqlValidatorService {
   private readonly DEBOUNCE_MS = 300;
   private readonly MARKER_OWNER = 'sql-validator';
 
-  constructor() {}
+  constructor(private intellisense: MonacoIntelliSenseService) {}
 
   /**
    * Validate SQL and set Monaco markers
@@ -83,8 +84,10 @@ export class SqlValidatorService {
     const errors: SqlError[] = [];
     const lines = sql.split('\n');
 
-    // Strip strings and comments for structural checks (preserves line/column positions)
-    const stripped = this.stripStringsAndComments(sql);
+    // Strip strings and comments for structural checks (preserves line/column
+    // positions). Cached on the IntelliSense service so this work is shared
+    // with the completion provider — same input → same output.
+    const stripped = this.intellisense.stripCached(sql);
     const strippedLines = stripped.split('\n');
 
     // Check for unclosed parentheses (use stripped to ignore parens in strings/comments)
@@ -115,71 +118,46 @@ export class SqlValidatorService {
     const semicolonError = this.checkMissingSemicolon(sql, lines);
     if (semicolonError) errors.push(semicolonError);
 
+    // Schema-aware diagnostics — unknown tables, unknown qualifiers,
+    // unknown columns on resolved tables. Only fires when schema is loaded.
+    const schemaDiagnostics = this.intellisense.findSchemaDiagnostics(sql);
+    for (const d of schemaDiagnostics) {
+      const start = this.offsetToPosition(sql, d.start);
+      const end = this.offsetToPosition(sql, d.end);
+      errors.push({
+        line: start.line,
+        column: start.column,
+        endLine: end.line,
+        endColumn: end.column,
+        message: d.message,
+        // Warning rather than Error: we may be wrong (e.g. schema not yet
+        // refreshed after a new table was created). Yellow squiggle is a hint.
+        severity: 'warning',
+      });
+    }
+
     return errors;
   }
 
   /**
-   * Replace string literals and comments with spaces (preserving line/column positions).
-   * This prevents false positives from keywords/parentheses inside strings or comments.
+   * Translate a 0-based character offset in the full SQL into a 1-based
+   * (line, column) pair for Monaco markers.
    */
-  private stripStringsAndComments(sql: string): string {
-    const result: string[] = [];
-    let i = 0;
-
-    while (i < sql.length) {
-      // Single-line comment: -- ...
-      if (sql[i] === '-' && sql[i + 1] === '-') {
-        while (i < sql.length && sql[i] !== '\n') {
-          result.push(' ');
-          i++;
-        }
-      }
-      // Block comment: /* ... */
-      else if (sql[i] === '/' && sql[i + 1] === '*') {
-        result.push(' ');
-        i++; // /
-        result.push(' ');
-        i++; // *
-        while (i < sql.length) {
-          if (sql[i] === '*' && sql[i + 1] === '/') {
-            result.push(' ');
-            i++; // *
-            result.push(' ');
-            i++; // /
-            break;
-          }
-          result.push(sql[i] === '\n' ? '\n' : ' ');
-          i++;
-        }
-      }
-      // String literal: '...' (with '' escape)
-      else if (sql[i] === "'") {
-        result.push(' ');
-        i++; // opening quote
-        while (i < sql.length) {
-          if (sql[i] === "'" && sql[i + 1] === "'") {
-            result.push(' ');
-            i++; // escaped quote
-            result.push(' ');
-            i++;
-          } else if (sql[i] === "'") {
-            result.push(' ');
-            i++; // closing quote
-            break;
-          } else {
-            result.push(sql[i] === '\n' ? '\n' : ' ');
-            i++;
-          }
-        }
-      }
-      // Normal character
-      else {
-        result.push(sql[i]);
-        i++;
+  private offsetToPosition(
+    sql: string,
+    offset: number,
+  ): { line: number; column: number } {
+    let line = 1;
+    let column = 1;
+    for (let i = 0; i < offset && i < sql.length; i++) {
+      if (sql[i] === '\n') {
+        line++;
+        column = 1;
+      } else {
+        column++;
       }
     }
-
-    return result.join('');
+    return { line, column };
   }
 
   /**

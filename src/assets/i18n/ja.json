@@ -326,6 +326,7 @@
     "TESTING_CONNECTION": "接続テスト中...",
     "CONNECTED": "接続済み",
     "CONNECTION_FAILED": "接続失敗",
+    "DB_PASSWORD_REQUIRED": "データベースのパスワードが必要です",
     "ORG_ADMIN": "組織管理者",
     "ADMIN_EMAIL": "管理者メールアドレス",
     "ADMIN_EMAIL_PLACEHOLDER": "admin@example.com",
@@ -410,7 +411,9 @@
     "MAX_ENVIRONMENTS": "最大環境数",
     "MAX_CATEGORIES": "最大カテゴリ数",
     "ADMIN_LANGUAGE": "管理者の言語",
-    "ADMIN_LANGUAGE_PLACEHOLDER": "ウェルカムメールの言語を選択"
+    "ADMIN_LANGUAGE_PLACEHOLDER": "ウェルカムメールの言語を選択",
+    "ADMIN_LOCALE": "管理者の言語",
+    "ADMIN_LOCALE_PLACEHOLDER": "ウェルカムメールの言語を選択"
   },
   "ROLE": {
     "TITLE": "役割",

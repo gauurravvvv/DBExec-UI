@@ -310,7 +310,9 @@
               <span
                 class="test-connection-link"
                 [class.disabled]="
-                  !isDbConnectionFieldsValid() || connectionTestLoading()
+                  !isDbConnectionFieldsValid() ||
+                  connectionTestLoading() ||
+                  connectionTested()
                 "
                 (click)="testConnection()"
               >
@@ -337,7 +339,8 @@
                 class="connection-status failed"
                 *ngIf="connectionTestResult() === 'failed'"
               >
-                <i class="pi pi-times-circle"></i> {{ 'ORG.CONNECTION_FAILED' | translate }}
+                <i class="pi pi-times-circle"></i>
+                {{ connectionTestError() || ('ORG.CONNECTION_FAILED' | translate) }}
               </span>
             </div>
           </div>
@@ -367,13 +370,13 @@
             </app-custom-input>
 
             <div class="form-field">
-              <label>{{ 'ORG.ADMIN_LANGUAGE' | translate }}</label>
+              <label>{{ 'ORG.ADMIN_LOCALE' | translate }}</label>
               <app-custom-dropdown
                 formControlName="adminLocale"
                 [options]="locales"
                 optionLabel="label"
                 optionValue="code"
-                [placeholder]="'ORG.ADMIN_LANGUAGE_PLACEHOLDER' | translate"
+                [placeholder]="'ORG.ADMIN_LOCALE_PLACEHOLDER' | translate"
                 [filter]="false"
                 appendTo="body"
               ></app-custom-dropdown>

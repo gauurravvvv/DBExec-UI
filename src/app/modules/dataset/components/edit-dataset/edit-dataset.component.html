@@ -38,8 +38,9 @@
           !hasQueryChanged
         "
         [title]="'DATASET.UPDATE_DATASET' | translate"
+        [attr.aria-label]="'DATASET.UPDATE_DATASET' | translate"
       >
-        <i class="pi pi-save"></i>
+        <i class="pi pi-save" aria-hidden="true"></i>
       </button>
       <button
         pButton
@@ -52,8 +53,9 @@
           !hasQueryChanged
         "
         [title]="'DATASET.RESET_TO_ORIGINAL' | translate"
+        [attr.aria-label]="'DATASET.RESET_TO_ORIGINAL' | translate"
       >
-        <i class="pi pi-undo"></i>
+        <i class="pi pi-undo" aria-hidden="true"></i>
       </button>
       <button
         pButton
@@ -61,8 +63,9 @@
         (click)="triggerFileInput()"
         [disabled]="isLoadingEditor || !selectedDatasourceObj || !editor"
         [title]="'DATASET.IMPORT_SQL_FILE' | translate"
+        [attr.aria-label]="'DATASET.IMPORT_SQL_FILE' | translate"
       >
-        <i class="pi pi-upload"></i>
+        <i class="pi pi-upload" aria-hidden="true"></i>
       </button>
       <button
         pButton
@@ -72,8 +75,9 @@
           isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
         "
         [title]="'DATASET.EXPORT_SCRIPT' | translate"
+        [attr.aria-label]="'DATASET.EXPORT_SCRIPT' | translate"
       >
-        <i class="pi pi-download"></i>
+        <i class="pi pi-download" aria-hidden="true"></i>
       </button>
       <button
         pButton
@@ -83,12 +87,13 @@
           isLoadingEditor || !selectedDatasourceObj || !editor || isQueryEmpty
         "
         [title]="'DATASET.CLEAR_EDITOR' | translate"
+        [attr.aria-label]="'DATASET.CLEAR_EDITOR' | translate"
       >
-        <i class="pi pi-trash"></i>
+        <i class="pi pi-trash" aria-hidden="true"></i>
       </button>
       <button
         pButton
-        class="p-button-text btn-primary"
+        class="btn-run"
         (click)="executeQuery()"
         [disabled]="
           isLoadingEditor ||
@@ -98,11 +103,14 @@
           isQueryEmpty
         "
         [title]="'DATASET.EXECUTE_QUERY' | translate"
+        [attr.aria-label]="'DATASET.EXECUTE_QUERY' | translate"
       >
         <i
           class="pi"
           [ngClass]="isExecutingQuery ? 'pi-spin pi-spinner' : 'pi-play'"
+          aria-hidden="true"
         ></i>
+        <span class="btn-run-label">{{ 'DATASET.RUN' | translate }}</span>
       </button>
     </div>
   </div>
@@ -193,9 +201,7 @@
                 <i
                   class="pi"
                   [ngClass]="
-                    expandedSchemas[
-                      selectedDatasourceObj.id + '.' + schema.name
-                    ]
+                    isExpanded(schemaPath(selectedDatasourceObj.id, schema.name))
                       ? 'pi-chevron-down'
                       : 'pi-chevron-right'
                   "
@@ -211,8 +217,9 @@
               <div
                 class="tables-list"
                 *ngIf="
-                  expandedSchemas[selectedDatasourceObj.id + '.' + schema.name]
+                  isExpanded(schemaPath(selectedDatasourceObj.id, schema.name))
                 "
+                @expand
               >
                 <div
                   *ngFor="
@@ -268,6 +275,7 @@
                         table.name
                       )
                     "
+                    @expand
                   >
                     <div
                       *ngFor="let column of table.columns; trackBy: trackByName"
@@ -285,21 +293,17 @@
                       "
                     >
                       <i
-                        class="pi"
+                        class="pi column-icon"
                         [ngClass]="{
                           'pi-key': column.isPrimaryKey,
                           'pi-link':
                             column.isForeignKey && !column.isPrimaryKey,
                           'pi-circle':
                             !column.isPrimaryKey && !column.isForeignKey,
+                          'is-pk': column.isPrimaryKey,
+                          'is-fk':
+                            column.isForeignKey && !column.isPrimaryKey,
                         }"
-                        [style.color]="
-                          column.isPrimaryKey
-                            ? '#ffc107'
-                            : column.isForeignKey
-                              ? '#2196f3'
-                              : ''
-                        "
                       ></i>
                       <span class="column-name">{{ column.name }}</span>
                       <span class="column-type">({{ column.type }})</span>
@@ -471,15 +475,17 @@
 >
 </app-save-dataset-dialog>
 
-<!-- Results Popup Overlay -->
+<!--
+  Results Popup Overlay — close affordances are the X button and Esc only.
+  Click-outside-to-close was removed because users mid-scroll through long
+  results frequently misclicked the overlay edge and lost their position.
+-->
 <div
   class="results-popup-overlay"
   *ngIf="showResultsPopup && queryResult"
-  (click)="showResultsPopup = false"
 >
   <div
     class="results-popup-container"
-    (click)="$event.stopPropagation()"
     [class.compact]="
       queryResult.error ||
       (queryResult.rows.length === 0 &&
@@ -591,11 +597,13 @@
               >
                 <div class="th-content">
                   {{ col }}
-                  <span
-                    class="column-datatype"
-                    *ngIf="queryResult.columnTypes?.[col]"
-                  >
-                    {{ queryResult.columnTypes![col] }}
+                  <!--
+                    Always render the type chip so column header heights stay
+                    consistent across rows. Falls back to "—" when the BE
+                    doesn't tell us the type (computed columns, etc.).
+                  -->
+                  <span class="column-datatype">
+                    {{ queryResult.columnTypes?.[col] || '—' }}
                   </span>
                 </div>
               </th>

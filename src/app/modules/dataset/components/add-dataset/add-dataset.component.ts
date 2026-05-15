@@ -5,6 +5,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
   inject,
   Input,
   OnChanges,
@@ -17,8 +18,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { MessageService } from 'primeng/api';
-import { Observable, Subject } from 'rxjs';
-import { debounceTime, first } from 'rxjs/operators';
+import { Observable, Subject, TimeoutError } from 'rxjs';
+import { debounceTime, first, timeout } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/constants';
 import { DATASET } from 'src/app/constants/routes';
 import { ROLES } from 'src/app/constants/user.constant';
@@ -27,8 +28,17 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { OrganisationService } from 'src/app/modules/organisation/services/organisation.service';
-import { MONACO_EDITOR_OPTIONS } from '../../config/sql-editor.config';
-import { DatasourceSchema, QueryResult } from '../../helpers/dummy-data.helper';
+import {
+  MONACO_EDITOR_OPTIONS,
+  QUERY_EXECUTION_TIMEOUT_MS,
+  SQL_EDITOR_PLACEHOLDER,
+} from '../../config/sql-editor.config';
+import { IAPIResponse } from 'src/app/core/interfaces/global.interface';
+import {
+  DatasourceSchema,
+  QueryExecuteData,
+  QueryResult,
+} from '../../helpers/dummy-data.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
@@ -52,11 +62,14 @@ import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.comp
 declare const monaco: any;
 declare const window: any;
 
+import { expandAnimation } from '../../animations/expand.animation';
+
 @Component({
   selector: 'app-add-dataset',
   templateUrl: './add-dataset.component.html',
   styleUrls: ['./add-dataset.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [expandAnimation],
 })
 export class AddDatasetComponent
   implements OnInit, OnDestroy, AfterViewInit, OnChanges, HasUnsavedChanges
@@ -89,9 +102,15 @@ export class AddDatasetComponent
 
   // Database sidebar
   showDatasourceSidebar = true;
-  expandedDatasources: { [key: string]: boolean } = {};
-  expandedSchemas: { [key: string]: boolean } = {};
-  expandedTables: { [key: string]: boolean } = {};
+  /**
+   * Single set of expanded tree paths, keyed by composite strings:
+   *   `${dbId}` for datasource rows
+   *   `${dbId}.${schemaName}` for schema rows
+   *   `${dbId}.${schemaName}.${tableName}` for table rows
+   * Replaces the previous three separate dictionaries — one source of truth
+   * means collapse cascades and refreshes don't fall out of sync.
+   */
+  expandedPaths = new Set<string>();
   schemaSearchText = '';
   selectedDatasource: string = '';
   selectedSchema: string = '';
@@ -145,6 +164,10 @@ export class AddDatasetComponent
   datasourceSchemas: { [dbId: string]: DatasourceSchema } = {};
   loadingDatasources: { [dbId: string]: boolean } = {};
   isLoadingDatasources: boolean = false;
+  // Sequence counter incremented on every datasource/org switch. Async schema
+  // load callbacks compare against this to discard responses for selections
+  // the user has already moved away from.
+  private schemaSelectionToken = 0;
 
   // NgRx Store Observables for schema caching
   private schemaDataObservables: Map<string, Observable<any | null>> =
@@ -166,7 +189,7 @@ export class AddDatasetComponent
 
   get isQueryEmpty(): boolean {
     const query = this.currentQuery.trim();
-    const defaultQuery = '-- Write your SQL query here';
+    const defaultQuery = SQL_EDITOR_PLACEHOLDER;
     return !query || query === defaultQuery;
   }
 
@@ -291,8 +314,7 @@ export class AddDatasetComponent
     const params: any = { page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
-      const res: any =
-        await this.organisationService.listOrganisation(params);
+      const res: any = await this.organisationService.listOrganisation(params);
       if (this.globalService.handleSuccessService(res, false)) {
         return { items: res?.data?.orgs ?? [], total: res?.data?.count ?? 0 };
       }
@@ -336,7 +358,7 @@ export class AddDatasetComponent
     // Check if editor has unsaved content
     const editorValue = this.editor ? this.editor.getValue().trim() : '';
     const hasContent = editorValue.length > 0;
-    const defaultContent = '-- Write your SQL query here';
+    const defaultContent = SQL_EDITOR_PLACEHOLDER;
     const isDefaultContent = editorValue === defaultContent.trim();
 
     // Only show confirmation if there's actual user content (not empty and not default)
@@ -355,14 +377,21 @@ export class AddDatasetComponent
   }
 
   private proceedWithDatasourceChange(selectedDb: any): void {
+    // Bump the selection token so any in-flight schema responses for the
+    // previously-selected datasource will be discarded when they return.
+    const token = ++this.schemaSelectionToken;
+
     // Reset editor and results
     this.resetEditor();
 
     // Expand the database in the tree
-    this.expandedDatasources[selectedDb.id] = true;
+    this.expandedPaths.add(selectedDb.id);
 
     // Always load schema from API (don't use cached data)
     this.loadDatasourceSchema(selectedDb.id).then(() => {
+      // If the user switched away while we were loading, don't initialize
+      // the editor based on stale state.
+      if (token !== this.schemaSelectionToken) return;
       // Initialize editor if not already done
       if (!this.editor) {
         setTimeout(() => this.loadMonacoEditor(), 100);
@@ -388,7 +417,8 @@ export class AddDatasetComponent
         if (this.globalService.handleSuccessService(response, false)) {
           const items = response?.data?.datasources ?? [];
           this.preloadedDatasources = items;
-          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
+          this.preloadedDatasourcesTotal =
+            response?.data?.count ?? items.length;
           this.availableDatasources = items;
 
           // Auto-select the first database and load its schema
@@ -436,10 +466,8 @@ export class AddDatasetComponent
   };
 
   refreshDatasources(): void {
-    // Collapse all expanded datasources
-    this.expandedDatasources = {};
-    this.expandedSchemas = {};
-    this.expandedTables = {};
+    // Collapse all expanded nodes
+    this.expandedPaths.clear();
 
     // Clear all cached schema data
     this.datasourceSchemas = {};
@@ -468,20 +496,9 @@ export class AddDatasetComponent
       }),
     );
 
-    // Collapse this database's tree (schemas and tables)
-    Object.keys(this.expandedSchemas).forEach(key => {
-      if (key.startsWith(`${dbId}.`)) {
-        delete this.expandedSchemas[key];
-      }
-    });
-    Object.keys(this.expandedTables).forEach(key => {
-      if (key.startsWith(`${dbId}.`)) {
-        delete this.expandedTables[key];
-      }
-    });
-
-    // Collapse the database itself
-    delete this.expandedDatasources[dbId];
+    // Collapse this database's tree (datasource itself + schemas + tables).
+    // One pass over the path set handles all three levels.
+    this.collapseSubtree(dbId);
 
     // Clear local cache
     delete this.datasourceSchemas[dbId];
@@ -507,7 +524,7 @@ export class AddDatasetComponent
     // Check if editor has unsaved content
     const editorValue = this.editor ? this.editor.getValue().trim() : '';
     const hasContent = editorValue.length > 0;
-    const defaultContent = '-- Write your SQL query here';
+    const defaultContent = SQL_EDITOR_PLACEHOLDER;
     const isDefaultContent = editorValue === defaultContent.trim();
 
     // Only show confirmation if there's actual user content (not empty and not default)
@@ -526,6 +543,9 @@ export class AddDatasetComponent
   }
 
   private proceedWithOrgChange(newOrg: any): void {
+    // Discard any in-flight schema responses tied to the previous org.
+    this.schemaSelectionToken++;
+
     this.selectedOrg = newOrg;
     this.orgId = this.selectedOrg.id;
 
@@ -538,7 +558,7 @@ export class AddDatasetComponent
     this.preloadedDatasourcesTotal = null;
     this.selectedDatasourceObj = null;
     this.datasourceSchemas = {};
-    this.expandedDatasources = {};
+    this.expandedPaths.clear();
 
     // Reload datasources for the new organisation
     this.loadDatasources();
@@ -661,6 +681,7 @@ export class AddDatasetComponent
   private initMonaco(): void {
     if (!this.selectedDatasourceObj) {
       this.isLoadingEditor = false;
+      this.cdr.markForCheck();
       return;
     }
 
@@ -669,6 +690,7 @@ export class AddDatasetComponent
       const container = this.sqlEditorContainer?.nativeElement;
       if (!container) {
         this.isLoadingEditor = false;
+        this.cdr.markForCheck();
         return;
       }
 
@@ -678,12 +700,15 @@ export class AddDatasetComponent
           this.editor.dispose();
         }
 
+        const initialValue = this.initialQuery || SQL_EDITOR_PLACEHOLDER;
+
         // Create Monaco Editor instance
         this.editor = monaco.editor.create(container, {
           ...MONACO_EDITOR_OPTIONS,
-          value: this.initialQuery || '-- Write your SQL query here',
+          value: initialValue,
           theme: this.currentTheme,
         });
+        this.currentQuery = initialValue;
 
         // Focus the editor
         this.editor.focus();
@@ -695,11 +720,14 @@ export class AddDatasetComponent
         this.sqlFormatterService.registerFormattingProvider();
         this.sqlFormatterService.registerContextMenuActions(this.editor);
 
-        // Setup SQL Validator with real-time validation
+        // Setup SQL Validator with real-time validation. Monaco events fire
+        // outside Angular's zone, so OnPush won't notice the currentQuery
+        // change without an explicit markForCheck — the Run button stays
+        // greyed out as the user types otherwise.
         this.editor.onDidChangeModelContent(() => {
           this.currentQuery = this.editor.getValue();
-          // Validate SQL with debouncing
           this.sqlValidatorService.validateDebounced(this.editor.getModel());
+          this.cdr.markForCheck();
         });
 
         // Initial validation
@@ -740,8 +768,10 @@ export class AddDatasetComponent
         });
 
         this.isLoadingEditor = false;
+        this.cdr.markForCheck();
       } catch (error) {
         this.isLoadingEditor = false;
+        this.cdr.markForCheck();
       }
     }, 100);
   }
@@ -819,13 +849,14 @@ export class AddDatasetComponent
     // Store schema data by database ID
     this.datasourceSchemas[dbId] = schemaData;
 
-    // Update datasources array for IntelliSense
+    // Push fresh schema into the IntelliSense cache. The completion/hover
+    // providers read this lazily on each invocation, so no re-registration
+    // is needed — they pick up the new schema on the next keystroke.
     this.datasources = Object.values(this.datasourceSchemas);
-
-    // Re-register completions with new schema
-    this.registerIntelliSenseProviders();
+    this.monacoIntelliSenseService.setDatasources(this.datasources);
 
     this.loadingDatasources[dbId] = false;
+    this.cdr.markForCheck();
   }
 
   /**
@@ -836,6 +867,8 @@ export class AddDatasetComponent
 
     const orgId = this.selectedOrg.id.toString();
     const dbIdStr = dbId.toString();
+    // Capture the selection token so we can detect a stale response on return.
+    const token = this.schemaSelectionToken;
 
     this.loadingDatasources[dbId] = true;
 
@@ -856,7 +889,8 @@ export class AddDatasetComponent
               const schemaData =
                 SchemaTransformerHelper.transformSchemaResponse(response);
 
-              // Dispatch success action with schema data
+              // Dispatch success action with schema data — even if the user
+              // moved on, the cache is still valid for this dbId so we keep it.
               if (schemaData.length > 0) {
                 this.store.dispatch(
                   AddDatasetActions.loadSchemaDataSuccess({
@@ -865,18 +899,19 @@ export class AddDatasetComponent
                     data: schemaData[0],
                   }),
                 );
-
-                // Store schema data by database ID
                 this.datasourceSchemas[dbId] = schemaData[0];
               }
 
-              // Update datasources array for IntelliSense
-              this.datasources = Object.values(this.datasourceSchemas);
-
-              // Re-register completions with new schema
-              this.registerIntelliSenseProviders();
+              // Only push the schema into the IntelliSense cache if the user
+              // is still viewing this datasource — otherwise we'd swap in
+              // schema data for a DB they've already navigated away from.
+              if (token === this.schemaSelectionToken) {
+                this.datasources = Object.values(this.datasourceSchemas);
+                this.monacoIntelliSenseService.setDatasources(this.datasources);
+              }
 
               this.loadingDatasources[dbId] = false;
+              this.cdr.markForCheck();
               resolve();
             },
             error: (error: any) => {
@@ -885,11 +920,14 @@ export class AddDatasetComponent
                 AddDatasetActions.loadSchemaDataFailure({
                   orgId,
                   dbId: dbIdStr,
-                  error: error.message || this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+                  error:
+                    error.message ||
+                    this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
                 }),
               );
 
               this.loadingDatasources[dbId] = false;
+              this.cdr.markForCheck();
               reject(error);
             },
           });
@@ -899,11 +937,14 @@ export class AddDatasetComponent
           AddDatasetActions.loadSchemaDataFailure({
             orgId,
             dbId: dbIdStr,
-            error: error.message || this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
+            error:
+              error.message ||
+              this.translate.instant('DATASET.FAILED_TO_LOAD_SCHEMA'),
           }),
         );
 
         this.loadingDatasources[dbId] = false;
+        this.cdr.markForCheck();
         reject(error);
       }
     });
@@ -916,6 +957,10 @@ export class AddDatasetComponent
    */
   executeQuery(): void {
     if (!this.editor) return;
+    // Block keyboard re-entry while the results popup is open or a query is
+    // already in flight — Monaco keeps focus when the popup overlays it, so
+    // Ctrl+Enter would otherwise fire repeatedly.
+    if (this.showResultsPopup || this.isExecutingQuery) return;
 
     const selection = this.editor.getSelection();
     const hasSelection = selection && !selection.isEmpty();
@@ -937,6 +982,7 @@ export class AddDatasetComponent
    * Execute complete SQL query from editor
    */
   executeCompleteQuery(): void {
+    if (this.showResultsPopup || this.isExecutingQuery) return;
     const query = this.editor?.getValue() || this.currentQuery;
     this.resultPage = 1;
     this.resultFilterValues = {};
@@ -949,6 +995,7 @@ export class AddDatasetComponent
    * @param selectedText The selected SQL text to execute
    */
   executeSelectedQuery(selectedText: string): void {
+    if (this.showResultsPopup || this.isExecutingQuery) return;
     this.resultPage = 1;
     this.resultFilterValues = {};
     this.queryResult = null;
@@ -1010,7 +1057,9 @@ export class AddDatasetComponent
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('DATASET.FILE_TOO_LARGE'),
-        detail: this.translate.instant('DATASET.FILE_SIZE_LIMIT', { size: maxSizeInMB }),
+        detail: this.translate.instant('DATASET.FILE_SIZE_LIMIT', {
+          size: maxSizeInMB,
+        }),
         key: 'topRight',
         life: 3000,
         styleClass: 'custom-toast',
@@ -1088,7 +1137,7 @@ export class AddDatasetComponent
 
     // Reset editor content if it exists
     if (this.editor) {
-      this.editor.setValue('-- Write your SQL query here');
+      this.editor.setValue(SQL_EDITOR_PLACEHOLDER);
     }
 
     // Reset current query
@@ -1150,9 +1199,11 @@ export class AddDatasetComponent
         link.click();
         window.URL.revokeObjectURL(url);
         this.isExportingResults = false;
+        this.cdr.markForCheck();
       },
       error: (error: any) => {
         this.isExportingResults = false;
+        this.cdr.markForCheck();
         this.messageService.add({
           severity: 'error',
           summary: this.translate.instant('DATASET.EXPORT_FAILED'),
@@ -1225,105 +1276,94 @@ export class AddDatasetComponent
       payload.filter = JSON.stringify(filter);
     }
 
-    this.queryService.executeQuery(payload).subscribe({
-      next: (response: any) => {
-        // Check if response indicates an error (status: false)
-        if (response.status === false) {
+    this.queryService
+      .executeQuery(payload)
+      .pipe(timeout(QUERY_EXECUTION_TIMEOUT_MS))
+      .subscribe({
+        next: (response: IAPIResponse<QueryExecuteData>) => {
+          if (!response.status) {
+            this.queryResult = {
+              columns: [],
+              rows: [],
+              rowCount: 0,
+              executionTime: `${Date.now() - startTime}ms`,
+              error:
+                response.message ||
+                this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
+            };
+            this.isExecutingQuery = false;
+            this.cdr.markForCheck();
+            return;
+          }
+
+          const data = response.data;
+          if (!data) {
+            this.queryResult = {
+              columns: [],
+              rows: [],
+              rowCount: 0,
+              executionTime: `${Date.now() - startTime}ms`,
+              message: response.message,
+            };
+            this.isExecutingQuery = false;
+            this.cdr.markForCheck();
+            return;
+          }
+
+          const executionTime =
+            typeof data.executionTime === 'number'
+              ? `${data.executionTime}ms`
+              : data.executionTime || `${Date.now() - startTime}ms`;
+
+          this.queryResult = {
+            columns: data.columns ?? [],
+            columnTypes: data.columnTypes ?? {},
+            rows: Array.isArray(data.data) ? data.data : [],
+            rowCount: data.rowCount ?? 0,
+            executionTime,
+            query: data.query,
+          };
+
+          // Auto-open results popup if the query produced a result set
+          if (this.queryResult.columns.length > 0) {
+            this.showResultsPopup = true;
+          }
+
+          this.isExecutingQuery = false;
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
           const executionTime = `${Date.now() - startTime}ms`;
+
+          // Extract error message — check for RxJS TimeoutError first so we can
+          // surface a helpful message instead of an opaque "timeout" string.
+          let errorMessage: string;
+          if (error instanceof TimeoutError) {
+            errorMessage = this.translate.instant('DATASET.QUERY_TIMEOUT');
+          } else if (error?.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error?.message) {
+            errorMessage = error.message;
+          } else if (typeof error?.error === 'string') {
+            errorMessage = error.error;
+          } else {
+            errorMessage = this.translate.instant(
+              'DATASET.QUERY_EXECUTION_FAILED',
+            );
+          }
+
           this.queryResult = {
             columns: [],
             rows: [],
             rowCount: 0,
             executionTime: executionTime,
-            error: response.message || this.translate.instant('DATASET.QUERY_EXECUTION_FAILED'),
+            error: errorMessage,
           };
+
           this.isExecutingQuery = false;
-          return;
-        }
-
-        // Handle string-based response
-        if (typeof response === 'string') {
-          this.queryResult = {
-            columns: [],
-            rows: [],
-            rowCount: 0,
-            executionTime: `${Date.now() - startTime}ms`,
-            message: response,
-          };
-          this.isExecutingQuery = false;
-          return;
-        }
-
-        // Extract the actual data object from response
-        const dataObj = response.data || response;
-
-        // Extract execution time
-        let executionTime = dataObj.executionTime || response.executionTime;
-
-        if (executionTime && typeof executionTime === 'string') {
-          executionTime = executionTime;
-        } else if (executionTime && typeof executionTime === 'number') {
-          executionTime = `${executionTime}ms`;
-        } else {
-          const calculatedTime = Date.now() - startTime;
-          executionTime = `${calculatedTime}ms`;
-        }
-
-        // Extract columns and rows from API response
-        const data = dataObj.data || dataObj.rows || [];
-        const columns =
-          dataObj.columns ||
-          (Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []);
-        const rowCount =
-          dataObj.rowCount !== undefined
-            ? dataObj.rowCount
-            : Array.isArray(data)
-              ? data.length
-              : 0;
-
-        // Extract column types
-        const columnTypes = dataObj.columnTypes || response.columnTypes || {};
-
-        this.queryResult = {
-          columns: columns,
-          columnTypes: columnTypes,
-          rows: Array.isArray(data) ? data : [],
-          rowCount: rowCount,
-          executionTime: executionTime,
-          query: dataObj.query || response.query,
-        };
-
-        // Auto-open results popup if there are columns (even with 0 rows)
-        if (this.queryResult.columns.length > 0) {
-          this.showResultsPopup = true;
-        }
-
-        this.isExecutingQuery = false;
-      },
-      error: (error: any) => {
-        const executionTime = `${Date.now() - startTime}ms`;
-
-        // Extract error message
-        let errorMessage = this.translate.instant('DATASET.QUERY_EXECUTION_FAILED');
-        if (error.error?.message) {
-          errorMessage = error.error.message;
-        } else if (error.message) {
-          errorMessage = error.message;
-        } else if (typeof error.error === 'string') {
-          errorMessage = error.error;
-        }
-
-        this.queryResult = {
-          columns: [],
-          rows: [],
-          rowCount: 0,
-          executionTime: executionTime,
-          error: errorMessage,
-        };
-
-        this.isExecutingQuery = false;
-      },
-    });
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   onDatasetDialogClose(formData: DatasetFormData | null): void {
@@ -1379,30 +1419,51 @@ export class AddDatasetComponent
     }, 300);
   }
 
+  // ─── Tree expansion API ──────────────────────────────────
+  // Path scheme:
+  //   `${dbId}`                              datasource node
+  //   `${dbId}.${schemaName}`                schema node
+  //   `${dbId}.${schemaName}.${tableName}`   table node
+
+  schemaPath(dbId: string, schemaName: string): string {
+    return `${dbId}.${schemaName}`;
+  }
+
+  tablePath(dbId: string, schemaName: string, tableName: string): string {
+    return `${dbId}.${schemaName}.${tableName}`;
+  }
+
+  isExpanded(path: string): boolean {
+    return this.expandedPaths.has(path);
+  }
+
+  /** Remove `dbId` and every descendant path under it from the expansion set. */
+  private collapseSubtree(dbId: string): void {
+    const prefix = `${dbId}.`;
+    for (const path of Array.from(this.expandedPaths)) {
+      if (path === dbId || path.startsWith(prefix)) {
+        this.expandedPaths.delete(path);
+      }
+    }
+  }
+
+  /** Remove `${dbId}.${schemaName}` and every table path under it. */
+  private collapseSchemaSubtree(dbId: string, schemaName: string): void {
+    const schemaKey = this.schemaPath(dbId, schemaName);
+    const tablePrefix = `${schemaKey}.`;
+    for (const path of Array.from(this.expandedPaths)) {
+      if (path === schemaKey || path.startsWith(tablePrefix)) {
+        this.expandedPaths.delete(path);
+      }
+    }
+  }
+
   toggleDatasource(db: any): void {
-    const isExpanded = this.expandedDatasources[db.id];
-
-    if (isExpanded) {
-      // Collapse - also collapse all child schemas and tables
-      this.expandedDatasources[db.id] = false;
-
-      // Collapse all schemas under this database
-      Object.keys(this.expandedSchemas).forEach(key => {
-        if (key.startsWith(`${db.id}.`)) {
-          delete this.expandedSchemas[key];
-        }
-      });
-
-      // Collapse all tables under this database
-      Object.keys(this.expandedTables).forEach(key => {
-        if (key.startsWith(`${db.id}.`)) {
-          delete this.expandedTables[key];
-        }
-      });
+    if (this.expandedPaths.has(db.id)) {
+      // Collapse cascades to all schemas/tables under this DB.
+      this.collapseSubtree(db.id);
     } else {
-      // Expand - fetch schema if not already loaded
-      this.expandedDatasources[db.id] = true;
-
+      this.expandedPaths.add(db.id);
       if (!this.datasourceSchemas[db.id]) {
         this.loadDatasourceSchema(db.id);
       }
@@ -1410,28 +1471,21 @@ export class AddDatasetComponent
   }
 
   toggleSchema(dbId: string, schemaName: string): void {
-    const key = `${dbId}.${schemaName}`;
-    const isExpanded = this.expandedSchemas[key];
-
-    if (isExpanded) {
-      // Collapse - also collapse all child tables
-      delete this.expandedSchemas[key];
-
-      // Collapse all tables under this schema
-      Object.keys(this.expandedTables).forEach(tableKey => {
-        if (tableKey.startsWith(`${dbId}.${schemaName}.`)) {
-          delete this.expandedTables[tableKey];
-        }
-      });
+    const key = this.schemaPath(dbId, schemaName);
+    if (this.expandedPaths.has(key)) {
+      this.collapseSchemaSubtree(dbId, schemaName);
     } else {
-      // Expand
-      this.expandedSchemas[key] = true;
+      this.expandedPaths.add(key);
     }
   }
 
   toggleTable(dbId: string, schemaName: string, tableName: string): void {
-    const key = `${dbId}.${schemaName}.${tableName}`;
-    this.expandedTables[key] = !this.expandedTables[key];
+    const key = this.tablePath(dbId, schemaName, tableName);
+    if (this.expandedPaths.has(key)) {
+      this.expandedPaths.delete(key);
+    } else {
+      this.expandedPaths.add(key);
+    }
   }
 
   isTableExpanded(
@@ -1439,8 +1493,7 @@ export class AddDatasetComponent
     schemaName: string,
     tableName: string,
   ): boolean {
-    const key = `${dbId}.${schemaName}.${tableName}`;
-    return this.expandedTables[key] || false;
+    return this.expandedPaths.has(this.tablePath(dbId, schemaName, tableName));
   }
 
   insertColumnName(
@@ -1498,5 +1551,23 @@ export class AddDatasetComponent
     this.refreshSingleDatasource(this.contextMenuDatasource.id);
 
     this.closeContextMenu();
+  }
+
+  /**
+   * Esc closes the open results popup or context menu without affecting Monaco's
+   * own Esc handling (Monaco gets the key first when the editor has focus, so it
+   * can dismiss its own widgets like the suggestion list before this fires).
+   */
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showResultsPopup) {
+      this.showResultsPopup = false;
+      this.cdr.markForCheck();
+      return;
+    }
+    if (this.showContextMenu) {
+      this.closeContextMenu();
+      this.cdr.markForCheck();
+    }
   }
 }

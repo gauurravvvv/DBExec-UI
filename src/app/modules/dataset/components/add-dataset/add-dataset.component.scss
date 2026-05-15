@@ -116,6 +116,13 @@
       padding: var(--space-4) !important;
       margin: var(--space-0) !important;
       min-width: auto !important;
+
+      // Softer disabled state during Monaco load — the entire toolbar
+      // greying out at 0.5 opacity reads as "broken page". 0.65 keeps
+      // structure visible without inviting clicks.
+      &:disabled {
+        opacity: 0.65 !important;
+      }
     }
 
     // Custom button colors - icon only
@@ -211,6 +218,53 @@
         color: var(--primary-color);
         opacity: 0.5;
         cursor: not-allowed;
+      }
+    }
+
+    // Filled primary action — Run is the most-clicked button in the editor
+    // and deserves visual weight. Matches the .modern-button.p-button-primary
+    // pattern used across other modules (list-dataset, etc.) for consistency:
+    // gradient fill, raised shadow, slight lift on hover.
+    .btn-run {
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-hover)
+      );
+      border: none;
+      border-radius: 6px;
+      color: var(--primary-text);
+      padding: 0.55rem 1rem !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 600;
+      box-shadow: 0 4px 10px var(--primary-color-transparent);
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        opacity: 1;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+        color: var(--primary-text);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px var(--primary-color-transparent);
+      }
+
+      &:disabled {
+        // Soften but keep the gradient — flat grey would look broken next to
+        // the rest of the toolbar.
+        opacity: 0.55 !important;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .btn-run-label {
+        font-size: 0.875rem;
+        line-height: 1;
       }
     }
   }
@@ -525,6 +579,15 @@
       font-size: var(--fs-label);
       width: 14px;
       flex-shrink: 0;
+    }
+
+    // PK/FK column markers — colors live in the theme so dark-mode and any
+    // brand tweaks stay in one place.
+    .column-icon.is-pk {
+      color: var(--pk-color);
+    }
+    .column-icon.is-fk {
+      color: var(--fk-color);
     }
 
     .column-name {

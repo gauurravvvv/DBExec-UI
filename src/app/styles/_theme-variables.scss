@@ -107,6 +107,10 @@
   --success-dark: #388e3c;
   --error-hover: #e53935;
 
+  // ── Schema explorer (PK / FK column markers) ──────────────────
+  --pk-color: #ffc107; // amber — keys
+  --fk-color: #2196f3; // blue — links
+
   // ── Code editor (Monaco scrollbar — intentionally dark) ───────
   --code-editor-bg: #1e1e1e;
   --code-editor-scrollbar: #424242;

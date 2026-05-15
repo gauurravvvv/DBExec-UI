@@ -9,6 +9,7 @@ import {
   TableColumn,
   TableSchema,
 } from '../helpers/dummy-data.helper';
+import { CursorScope, findScopeAt } from './sql-scope-tracker';
 
 declare const monaco: any;
 
@@ -99,54 +100,155 @@ const RESERVED_WORDS = new Set([
  * Service to handle Monaco Editor IntelliSense registration
  * Provides SQL completions, hover providers, and keyboard shortcuts
  */
+/** Pre-built lookup maps over the active datasources. */
+interface SchemaLookups {
+  allTables: TableSchema[];
+  /**
+   * Indexed by both `tablename` and `schema.tablename` (lowercase).
+   * Used by the parser to resolve qualified and unqualified references.
+   */
+  tableByName: Map<string, TableSchema>;
+  schemaMap: Map<string, TableSchema[]>;
+  tableToSchema: Map<string, string>;
+  schemaNames: string[];
+}
+
+const EMPTY_LOOKUPS: SchemaLookups = {
+  allTables: [],
+  tableByName: new Map(),
+  schemaMap: new Map(),
+  tableToSchema: new Map(),
+  schemaNames: [],
+};
+
 @Injectable({
   providedIn: 'root',
 })
 export class MonacoIntelliSenseService {
+  /**
+   * Most recent datasources passed to a provider. Held here so the
+   * provideCompletionItems / provideHover callbacks can read fresh schema
+   * data on each invocation without forcing the component to re-register
+   * providers (which is slow and resets Monaco's internal cache).
+   */
+  private currentDatasources: DatasourceSchema[] = [];
+
+  /**
+   * Bumped on every setDatasources() call. Used to invalidate the lookup
+   * cache below — providers stay registered, but rebuild their maps lazily
+   * the first time they're called after a schema update.
+   */
+  private datasourcesVersion = 0;
+
+  /** Cached lookups + the version they were built from. */
+  private lookupsCache: SchemaLookups = EMPTY_LOOKUPS;
+  private lookupsCacheVersion = -1;
+
+  /** Cached parsed table references, keyed by the stripped statement text. */
+  private tableRefsCache: { key: string; refs: TableRef[] } | null = null;
+  private cteRefsCache: { key: string; refs: TableRef[] } | null = null;
+
+  /**
+   * Tiny LRU for stripped SQL — most editor activity targets the same 2-3
+   * texts repeatedly (full document, current statement, text-up-to-cursor),
+   * so a 4-entry cache covers >99% of repeated keystrokes. Map preserves
+   * insertion order so eviction is just `delete(firstKey)`.
+   */
+  private stripCache = new Map<string, string>();
+  private static readonly STRIP_CACHE_CAPACITY = 4;
+
   constructor() {}
 
   /**
-   * Register SQL completions for tables, columns, keywords, functions, and snippets
-   * @returns Disposable to unregister the provider
+   * Update the schema data the providers read from. Safe to call as often as
+   * the schema changes — no provider re-registration required. Bumping the
+   * version invalidates downstream lookup and parse caches.
    */
-  registerSQLCompletions(datasources: DatasourceSchema[], editor: any): any {
-    // Build flat table list + lookup maps
+  setDatasources(datasources: DatasourceSchema[]): void {
+    this.currentDatasources = datasources || [];
+    this.datasourcesVersion++;
+    // Pre-built lookups become stale; parse caches are tied to the lookups
+    // that resolved the table names so they go stale too.
+    this.lookupsCacheVersion = -1;
+    this.tableRefsCache = null;
+    this.cteRefsCache = null;
+  }
+
+  /**
+   * Build (or return cached) flat lookups over the current datasources.
+   * Called on every keystroke from inside provideCompletionItems, so it
+   * needs to be O(1) on cache hit.
+   */
+  private getLookups(): SchemaLookups {
+    if (this.lookupsCacheVersion === this.datasourcesVersion) {
+      return this.lookupsCache;
+    }
+
     const allTables: TableSchema[] = [];
     const tableByName: Map<string, TableSchema> = new Map();
     const schemaMap: Map<string, TableSchema[]> = new Map();
-    const tableToSchema: Map<string, string> = new Map(); // table name → schema name
+    const tableToSchema: Map<string, string> = new Map();
 
-    if (datasources && datasources.length > 0) {
-      for (const db of datasources) {
-        if (!db.schemas) continue;
-        for (const schema of db.schemas) {
-          if (!schema.tables) continue;
-          if (!schemaMap.has(schema.name.toLowerCase())) {
-            schemaMap.set(schema.name.toLowerCase(), []);
-          }
-          for (const table of schema.tables) {
-            allTables.push(table);
-            tableByName.set(table.name.toLowerCase(), table);
-            // Also store as schema.table
-            tableByName.set(
-              `${schema.name.toLowerCase()}.${table.name.toLowerCase()}`,
-              table,
-            );
-            schemaMap.get(schema.name.toLowerCase())!.push(table);
-            tableToSchema.set(table.name.toLowerCase(), schema.name);
-          }
+    for (const db of this.currentDatasources) {
+      if (!db.schemas) continue;
+      for (const schema of db.schemas) {
+        if (!schema.tables) continue;
+        const schemaKey = schema.name.toLowerCase();
+        if (!schemaMap.has(schemaKey)) {
+          schemaMap.set(schemaKey, []);
+        }
+        for (const table of schema.tables) {
+          allTables.push(table);
+          tableByName.set(table.name.toLowerCase(), table);
+          tableByName.set(`${schemaKey}.${table.name.toLowerCase()}`, table);
+          schemaMap.get(schemaKey)!.push(table);
+          tableToSchema.set(table.name.toLowerCase(), schema.name);
         }
       }
     }
 
-    if (allTables.length === 0) {
-      return null;
+    this.lookupsCache = {
+      allTables,
+      tableByName,
+      schemaMap,
+      tableToSchema,
+      schemaNames: Array.from(schemaMap.keys()),
+    };
+    this.lookupsCacheVersion = this.datasourcesVersion;
+    return this.lookupsCache;
+  }
+
+  /**
+   * Register SQL completions for tables, columns, keywords, functions, and
+   * snippets. Reads schema data from the live cache (`setDatasources()`), so
+   * the registration itself never needs to be redone when the schema reloads.
+   *
+   * `datasources` is kept as a parameter for backwards compatibility with
+   * existing callers — the first argument is just forwarded to setDatasources()
+   * so the cache is primed.
+   */
+  registerSQLCompletions(datasources: DatasourceSchema[], editor: any): any {
+    if (datasources && datasources.length > 0) {
+      this.setDatasources(datasources);
     }
 
     return monaco.languages.registerCompletionItemProvider('sql', {
       triggerCharacters: ['.', ',', '('],
       provideCompletionItems: (model: any, position: any) => {
         try {
+          // Read fresh lookups every invocation; cache hit is O(1).
+          const {
+            allTables,
+            tableByName,
+            schemaMap,
+            tableToSchema,
+            schemaNames,
+          } = this.getLookups();
+
+          // Nothing schema-aware to suggest if the schema hasn't loaded yet —
+          // but we still want keywords/functions/snippets, so don't bail.
+          const haveSchema = allTables.length > 0;
+
           const fullText = model.getValue();
           const textUntilPosition = model.getValueInRange({
             startLineNumber: 1,
@@ -174,27 +276,55 @@ export class MonacoIntelliSenseService {
             this.getCurrentStatement(fullText, cursorOffset);
           const textInStatement = fullText.substring(startOffset, cursorOffset);
 
-          // Strip strings/comments for safe structural parsing
-          const strippedStatement =
-            this.stripStringsAndComments(currentStatement);
-          const strippedTextInStatement =
-            this.stripStringsAndComments(textInStatement);
+          // Strip strings/comments for safe structural parsing.
+          // The cached form deduplicates work across keystrokes that don't
+          // structurally change the SQL.
+          const strippedStatement = this.stripCached(currentStatement);
+          const strippedTextInStatement = this.stripCached(textInStatement);
 
-          // ─── PARSE REFERENCES (scoped to current statement) ─
-          const tableRefs = this.parseTableReferences(
+          // ─── PARSE REFERENCES (scoped to current statement, memoized) ─
+          const baseTableRefs = this.getCachedTableRefs(
             strippedStatement,
             tableByName,
           );
-          const cteRefs = this.parseCTEReferences(
+          const baseCteRefs = this.getCachedCTERefs(
             strippedStatement,
             tableByName,
           );
+
+          // ─── SCOPE TRACKER OVERRIDE ─────────────────────────
+          // The token-based scope tracker handles nesting (subqueries, CTE
+          // bodies, scalar subqueries in SET/WHERE) that the regex parsers
+          // can't see. When it confidently identifies a scope, we use ITS
+          // table refs — they're filtered to the cursor's actual visibility.
+          // Falls through to the regex-parsed refs when the tracker bails.
+          const cursorOffsetInStatement = strippedTextInStatement.length;
+          const scope: CursorScope | null = findScopeAt(
+            strippedStatement,
+            cursorOffsetInStatement,
+          );
+          const scopeTrackerActive = !!scope;
+          const tableRefs = scopeTrackerActive
+            ? this.resolveScopeRefs(scope!.tableRefs, tableByName)
+            : baseTableRefs;
+          const cteRefs = scopeTrackerActive
+            ? scope!.cteNames.map(name => ({
+                schemaName: null,
+                tableName: name,
+                alias: null,
+                tableSchema: null,
+              }))
+            : baseCteRefs;
           const allRefs = [...cteRefs, ...tableRefs];
           const aliasMap = this.buildAliasMap(allRefs);
 
           // ─── DOT COMPLETION ──────────────────────────────────
-          const dotMatch = textUntilPosition.match(/(?:(\w+)\.)?(\w+)\.$/);
-          if (dotMatch) {
+          // Allow whitespace around the dot — Postgres-style `schema . table`
+          // and accidental whitespace from formatters both still complete.
+          const dotMatch = textUntilPosition.match(
+            /(?:(\w+)\s*\.\s*)?(\w+)\s*\.\s*$/,
+          );
+          if (dotMatch && haveSchema) {
             const afterDotRange = {
               startLineNumber: position.lineNumber,
               endLineNumber: position.lineNumber,
@@ -204,7 +334,7 @@ export class MonacoIntelliSenseService {
             return {
               suggestions: this.getDotCompletions(
                 dotMatch,
-                datasources,
+                this.currentDatasources,
                 allTables,
                 aliasMap,
                 schemaMap,
@@ -241,8 +371,24 @@ export class MonacoIntelliSenseService {
             };
           }
 
-          // ─── CONTEXT ANALYSIS (uses stripped text) ──────────
-          const ctx = this.getContext(strippedTextInStatement);
+          // ─── CONTEXT ANALYSIS ────────────────────────────────
+          // Prefer the scope tracker's clause when available. It correctly
+          // handles subqueries, CTE bodies, INSERT-from-SELECT, scalar
+          // subqueries — every case the regex pattern misses. The 'groupby'
+          // clause from the tracker maps to 'orderby' for the regex-side
+          // call sites because the suggestion behavior is identical.
+          let ctx: string;
+          if (scopeTrackerActive) {
+            ctx = scope!.clause === 'groupby' ? 'orderby' : scope!.clause;
+            // If the tracker reports 'generic', fall back to the regex
+            // detection — it has finer-grained heuristics for partial input
+            // (e.g. mid-typing a clause keyword).
+            if (ctx === 'generic') {
+              ctx = this.getContext(strippedTextInStatement);
+            }
+          } else {
+            ctx = this.getContext(strippedTextInStatement);
+          }
           const suggestions: any[] = [];
           const seenLabels = new Set<string>();
 
@@ -289,14 +435,15 @@ export class MonacoIntelliSenseService {
               // 2. Schema-qualified tables (select in one step: schema.table)
               for (const [schemaName, schemaTables] of schemaMap.entries()) {
                 for (const table of schemaTables) {
-                  const qualifiedName = `${schemaName}.${table.name}`;
+                  const qualifiedLabel = `${schemaName}.${table.name}`;
+                  const qualifiedInsert = `${this.quoteIdentifier(schemaName)}.${this.quoteIdentifier(table.name)}`;
                   addSuggestion({
-                    label: qualifiedName,
+                    label: qualifiedLabel,
                     kind: monaco.languages.CompletionItemKind.Class,
                     detail: `Table (${table.columns.length} columns)`,
                     documentation: this.getTableDocumentation(table),
-                    insertText: qualifiedName + ' ',
-                    filterText: `${qualifiedName} ${table.name}`,
+                    insertText: qualifiedInsert + ' ',
+                    filterText: `${qualifiedLabel} ${table.name}`,
                     sortText: '2_' + schemaName + '_' + table.name,
                     range: defaultRange,
                   });
@@ -312,7 +459,7 @@ export class MonacoIntelliSenseService {
                   kind: monaco.languages.CompletionItemKind.Class,
                   detail: `Table · ${schemaName} (${table.columns.length} cols)`,
                   documentation: this.getTableDocumentation(table),
-                  insertText: table.name + ' ',
+                  insertText: this.quoteIdentifier(table.name) + ' ',
                   sortText: '3_' + table.name,
                   range: defaultRange,
                 });
@@ -401,6 +548,21 @@ export class MonacoIntelliSenseService {
                   });
                 }
               }
+            }
+            // DISTINCT / ALL are the canonical first tokens right after
+            // SELECT — surface them above generic keywords so they appear
+            // when the user types `dist` / `all` immediately.
+            for (const kw of ['DISTINCT', 'ALL']) {
+              if (seenLabels.has(kw)) continue;
+              seenLabels.add(kw);
+              suggestions.push({
+                label: kw,
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                detail: 'SQL keyword',
+                insertText: kw + ' ',
+                sortText: '0__' + kw, // tied with `*` / `prefix.*` shortcuts
+                range: defaultRange,
+              });
             }
             // Add aggregate functions at high priority in SELECT
             this.addFunctions(suggestions, seenLabels, defaultRange, '1_');
@@ -557,13 +719,24 @@ export class MonacoIntelliSenseService {
 
           // ─── DEFAULT / GENERIC context → Keywords + Functions + Snippets + Tables ─
 
-          // Smart alias suggestion: if text ends with FROM/JOIN table_name, suggest alias
+          // Smart alias suggestion: if text ends with FROM/JOIN table_name, suggest alias.
+          // Prefer the BE-supplied `table_alias` (server-derived, deterministic
+          // per-(schema,table)) over the client heuristic so two users editing
+          // the same schema converge on the same alias.
           const aliasContextMatch = strippedTextInStatement.match(
-            /\b(?:from|join)\s+(?:\w+\.)?(\w+)\s+$/i,
+            /\b(?:from|join)\s+(?:(\w+)\.)?(\w+)\s+$/i,
           );
           if (aliasContextMatch) {
-            const tblName = aliasContextMatch[1];
-            const suggestedAlias = this.generateAlias(tblName);
+            const schemaPart = aliasContextMatch[1];
+            const tblName = aliasContextMatch[2];
+            const lookupKey = schemaPart
+              ? `${schemaPart.toLowerCase()}.${tblName.toLowerCase()}`
+              : tblName.toLowerCase();
+            const resolvedTable =
+              tableByName.get(lookupKey) ||
+              tableByName.get(tblName.toLowerCase());
+            const suggestedAlias =
+              resolvedTable?.alias || this.generateAlias(tblName);
             addSuggestion({
               label: suggestedAlias,
               kind: monaco.languages.CompletionItemKind.Variable,
@@ -637,26 +810,30 @@ export class MonacoIntelliSenseService {
    * Returns: 'table' | 'select' | 'column' | 'having' | 'orderby' | 'join_on' | 'generic'
    */
   private getContext(text: string): string {
-    const t = text.replace(/\s+$/, '');
+    // NOTE: Don't trim trailing whitespace here — the gap between a keyword
+    // and the cursor (e.g. `SELECT |`) is the strongest signal that we're in
+    // that clause's context. Each regex below allows an optional trailing
+    // `\s*` so it works with or without a partial word being typed.
+    const t = text;
 
     // After FROM, JOIN, INTO, UPDATE → expecting table name
-    if (/\b(?:from|join|into|update|table)\s+\w*$/i.test(t)) {
+    if (/\b(?:from|join|into|update|table)\s+\w*\s*$/i.test(t)) {
       return 'table';
     }
 
     // After ON (in JOIN context) → expecting join condition columns
-    if (/\bJOIN\s+\S+(?:\s+(?:AS\s+)?\w+)?\s+ON\s+\w*$/i.test(t)) {
+    if (/\bJOIN\s+\S+(?:\s+(?:AS\s+)?\w+)?\s+ON\s+\w*\s*$/i.test(t)) {
       return 'join_on';
     }
 
     // After ORDER BY or GROUP BY → expecting columns
-    if (/\b(?:order\s+by|group\s+by)\s+(?:[\w\.,\s]*,\s*)?\w*$/i.test(t)) {
+    if (/\b(?:order\s+by|group\s+by)\s+(?:[\w\.,\s]*,\s*)?\w*\s*$/i.test(t)) {
       return 'orderby';
     }
 
     // In SELECT clause (after SELECT or after comma in SELECT, before FROM)
     if (
-      /\bselect\s+(?:distinct\s+)?(?:[\w\.\*,\s\(\)]*,\s*)?\w*$/i.test(t) &&
+      /\bselect\s+(?:distinct\s+)?(?:[\w\.\*,\s\(\)]*,\s*)?\w*\s*$/i.test(t) &&
       !/\bfrom\b/i.test(t)
     ) {
       return 'select';
@@ -686,6 +863,37 @@ export class MonacoIntelliSenseService {
   }
 
   // ─── TABLE REFERENCE PARSING ───────────────────────────────
+
+  /**
+   * Memoized wrapper around parseTableReferences. Most keystrokes happen inside
+   * a single statement that hasn't structurally changed, so we cache by the
+   * stripped statement text. Cache is invalidated automatically when the
+   * datasources change (setDatasources clears it).
+   */
+  private getCachedTableRefs(
+    sql: string,
+    tableByName: Map<string, TableSchema>,
+  ): TableRef[] {
+    if (this.tableRefsCache && this.tableRefsCache.key === sql) {
+      return this.tableRefsCache.refs;
+    }
+    const refs = this.parseTableReferences(sql, tableByName);
+    this.tableRefsCache = { key: sql, refs };
+    return refs;
+  }
+
+  /** Memoized wrapper around parseCTEReferences — same caching strategy. */
+  private getCachedCTERefs(
+    sql: string,
+    tableByName: Map<string, TableSchema>,
+  ): TableRef[] {
+    if (this.cteRefsCache && this.cteRefsCache.key === sql) {
+      return this.cteRefsCache.refs;
+    }
+    const refs = this.parseCTEReferences(sql, tableByName);
+    this.cteRefsCache = { key: sql, refs };
+    return refs;
+  }
 
   /**
    * Parse all FROM and JOIN table references in the query.
@@ -749,11 +957,69 @@ export class MonacoIntelliSenseService {
     return map;
   }
 
+  /**
+   * Resolve scope-tracker refs (which carry only schema/table/alias names)
+   * into TableRef objects with their TableSchema attached, using the same
+   * lookup map the regex parser uses. Drops refs that don't resolve — the
+   * scope tracker may capture FROM-clause names that aren't in our schema
+   * (a typo, a temp table, a view we can't see). Letting unresolved refs
+   * through would cause downstream code to dereference null tableSchema.
+   */
+  private resolveScopeRefs(
+    scopeRefs: { schemaName: string | null; tableName: string; alias: string | null }[],
+    tableByName: Map<string, TableSchema>,
+  ): TableRef[] {
+    const out: TableRef[] = [];
+    for (const r of scopeRefs) {
+      const lookupKey = r.schemaName
+        ? `${r.schemaName.toLowerCase()}.${r.tableName.toLowerCase()}`
+        : r.tableName.toLowerCase();
+      const tableSchema =
+        tableByName.get(lookupKey) ||
+        tableByName.get(r.tableName.toLowerCase()) ||
+        null;
+      out.push({
+        schemaName: r.schemaName,
+        tableName: r.tableName,
+        alias: r.alias,
+        tableSchema,
+      });
+    }
+    return out;
+  }
+
   // ─── STRING/COMMENT AWARENESS ────────────────────────────────
+
+  /**
+   * Cached strip-strings-and-comments. Same input → cached output, with a
+   * tiny LRU so the validator and IntelliSense don't both pay the O(n) cost
+   * on every keystroke.
+   */
+  stripCached(sql: string): string {
+    const cached = this.stripCache.get(sql);
+    if (cached !== undefined) {
+      // Refresh recency: re-insert moves to end of Map order.
+      this.stripCache.delete(sql);
+      this.stripCache.set(sql, cached);
+      return cached;
+    }
+    const result = this.stripStringsAndComments(sql);
+    if (this.stripCache.size >= MonacoIntelliSenseService.STRIP_CACHE_CAPACITY) {
+      // Evict oldest (least recently used) entry.
+      const oldestKey = this.stripCache.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.stripCache.delete(oldestKey);
+      }
+    }
+    this.stripCache.set(sql, result);
+    return result;
+  }
 
   /**
    * Replace string literals and comments with spaces (preserving line/column positions).
    * Prevents false matches from keywords/identifiers inside strings or comments.
+   *
+   * Most call sites should prefer `stripCached()` to avoid repeated work.
    */
   private stripStringsAndComments(sql: string): string {
     const result: string[] = [];
@@ -880,7 +1146,7 @@ export class MonacoIntelliSenseService {
     fullText: string,
     cursorOffset: number,
   ): { statement: string; startOffset: number } {
-    const stripped = this.stripStringsAndComments(fullText);
+    const stripped = this.stripCached(fullText);
     let start = 0;
     let end = fullText.length;
 
@@ -990,6 +1256,21 @@ export class MonacoIntelliSenseService {
         .toLowerCase();
     }
     return tableName[0].toLowerCase();
+  }
+
+  /**
+   * Wrap an identifier in double quotes when it contains characters that
+   * would break unquoted SQL — anything that isn't [A-Za-z0-9_], or a leading
+   * digit, or a name that happens to be a reserved word. Existing inner
+   * double quotes are escaped per SQL standard (doubled).
+   */
+  private quoteIdentifier(name: string): string {
+    if (!name) return name;
+    const needsQuoting =
+      !/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) ||
+      RESERVED_WORDS.has(name.toLowerCase());
+    if (!needsQuoting) return name;
+    return `"${name.replace(/"/g, '""')}"`;
   }
 
   // ─── INSERT / UPDATE COLUMN HELPERS ─────────────────────────
@@ -1127,7 +1408,7 @@ export class MonacoIntelliSenseService {
         kind: monaco.languages.CompletionItemKind.Class,
         detail: `Table (${tbl.columns.length} columns)`,
         documentation: this.getTableDocumentation(tbl),
-        insertText: tbl.name,
+        insertText: this.quoteIdentifier(tbl.name),
         sortText: String(idx).padStart(4, '0'),
         range: range,
       }));
@@ -1142,7 +1423,7 @@ export class MonacoIntelliSenseService {
       kind: monaco.languages.CompletionItemKind.Field,
       detail: `${col.type}${col.nullable ? ' (nullable)' : ''}${col.isPrimaryKey ? ' PK' : ''}${col.isForeignKey ? ' FK' : ''}`,
       documentation: this.getColumnDocumentation(col),
-      insertText: col.name,
+      insertText: this.quoteIdentifier(col.name),
       sortText: String(idx).padStart(4, '0'), // preserve column order from schema
       range: range,
     }));
@@ -1371,6 +1652,136 @@ export class MonacoIntelliSenseService {
     }
   }
 
+  // ─── SCHEMA-AWARE DIAGNOSTICS ──────────────────────────────
+
+  /**
+   * Find identifier-resolution problems in SQL — unknown tables in FROM/JOIN
+   * positions and unknown qualifiers in `qualifier.column` references.
+   *
+   * Returns plain offset ranges so the caller (validator) can convert to
+   * Monaco markers. Returns an empty array when no schema is loaded — never
+   * emits diagnostics speculatively.
+   *
+   * Conservative by design: only flags things we're confident about. False
+   * negatives are acceptable; false positives are not.
+   */
+  findSchemaDiagnostics(
+    sql: string,
+  ): { start: number; end: number; message: string }[] {
+    const diagnostics: { start: number; end: number; message: string }[] = [];
+    const { tableByName, schemaMap, allTables } = this.getLookups();
+    if (allTables.length === 0) return diagnostics;
+
+    const stripped = this.stripCached(sql);
+
+    // ─── 1. UNKNOWN TABLE in FROM/JOIN position ────────────────
+    // We re-run the FROM/JOIN regex against the stripped SQL but track
+    // capture group offsets so we can mark the table token specifically.
+    const tableRegex =
+      /\b(?:from|join)\s+(?![\(\s]*select)(?:(\w+)\s*\.\s*)?(\w+)/gi;
+    let m: RegExpExecArray | null;
+    while ((m = tableRegex.exec(stripped)) !== null) {
+      const schemaName = m[1] || null;
+      const tableName = m[2];
+      const tableTokenStart =
+        m.index + m[0].length - tableName.length;
+      const tableTokenEnd = tableTokenStart + tableName.length;
+
+      // CTEs are valid table references — skip if this name is a CTE.
+      const cteRefs = this.getCachedCTERefs(stripped, tableByName);
+      if (
+        cteRefs.some(c => c.tableName.toLowerCase() === tableName.toLowerCase())
+      ) {
+        continue;
+      }
+
+      const lookupKey = schemaName
+        ? `${schemaName.toLowerCase()}.${tableName.toLowerCase()}`
+        : tableName.toLowerCase();
+      const resolved =
+        tableByName.get(lookupKey) || tableByName.get(tableName.toLowerCase());
+
+      if (!resolved) {
+        diagnostics.push({
+          start: tableTokenStart,
+          end: tableTokenEnd,
+          message: schemaName
+            ? `Table "${schemaName}.${tableName}" not found in schema`
+            : `Table "${tableName}" not found in schema`,
+        });
+      }
+    }
+
+    // ─── 2. UNKNOWN QUALIFIER in `qualifier.column` ────────────
+    // Once we know which tables/aliases are in scope, any `name.something`
+    // where `name` is neither (a) a known alias, (b) a known table, nor
+    // (c) a known schema is almost certainly a typo.
+    const refs = this.getCachedTableRefs(stripped, tableByName);
+    const cteRefs = this.getCachedCTERefs(stripped, tableByName);
+    const allRefs = [...cteRefs, ...refs];
+    const aliasMap = this.buildAliasMap(allRefs);
+
+    // qualifier.column where the column is a word (not `*`)
+    const qualifierRegex = /(?<![\w."'])(\w+)\s*\.\s*(\w+)/g;
+    let q: RegExpExecArray | null;
+    while ((q = qualifierRegex.exec(stripped)) !== null) {
+      const qualifier = q[1];
+      const column = q[2];
+      const qualifierStart = q.index;
+      const qualifierEnd = qualifierStart + qualifier.length;
+      const columnStart = qualifierEnd + (q[0].length - qualifier.length - column.length);
+      const columnEnd = columnStart + column.length;
+
+      // Skip if this is in a FROM/JOIN/UPDATE/INTO position — that's
+      // schema.table syntax, handled by the table-resolution loop above.
+      // Look backward through whitespace for the preceding keyword.
+      const before = stripped.substring(0, qualifierStart);
+      if (/\b(?:from|join|update|into|table)\s+$/i.test(before)) {
+        continue;
+      }
+
+      const qualifierLower = qualifier.toLowerCase();
+
+      // Resolve to a TableSchema via alias map, direct table, or schema lookup
+      const aliasRef = aliasMap.get(qualifierLower);
+      if (aliasRef?.tableSchema) {
+        // Qualifier resolved → check the column.
+        // Skip if the "column" is `*` — handled by the regex's \w+ but defensive.
+        const colExists = aliasRef.tableSchema.columns.some(
+          c => c.name.toLowerCase() === column.toLowerCase(),
+        );
+        if (!colExists) {
+          diagnostics.push({
+            start: columnStart,
+            end: columnEnd,
+            message: `Column "${column}" not found on ${aliasRef.tableName}`,
+          });
+        }
+        continue;
+      }
+
+      // Qualifier might be a schema name (legitimate `schema.table`)
+      if (schemaMap.has(qualifierLower)) {
+        // It's a schema — `schema.table` resolution happens in the FROM/JOIN
+        // pass above, so don't double-report here.
+        continue;
+      }
+
+      // Unknown qualifier — only report if it's not a SQL keyword or a
+      // function name (e.g. `pg_catalog.set_config(...)` or the start of a
+      // path-like identifier). Cheap reserved-words check covers most cases.
+      if (RESERVED_WORDS.has(qualifierLower)) continue;
+
+      diagnostics.push({
+        start: qualifierStart,
+        end: qualifierEnd,
+        message: `Unknown table or alias "${qualifier}"`,
+      });
+    }
+
+    return diagnostics;
+  }
+
   // ─── HOVER PROVIDER ────────────────────────────────────────
 
   /**
@@ -1378,28 +1789,24 @@ export class MonacoIntelliSenseService {
    * @returns Disposable to unregister the provider
    */
   registerHoverProvider(datasources: any[]): any {
-    const tables: TableSchema[] = [];
-
     if (datasources && datasources.length > 0) {
-      for (const db of datasources) {
-        if (!db.schemas) continue;
-        for (const schema of db.schemas) {
-          if (!schema.tables) continue;
-          for (const table of schema.tables) {
-            tables.push(table);
-          }
-        }
-      }
+      this.setDatasources(datasources);
     }
-
-    if (tables.length === 0) return null;
 
     return monaco.languages.registerHoverProvider('sql', {
       provideHover: (model: any, position: any) => {
+        const { allTables: tables, tableByName } = this.getLookups();
+
         const word = model.getWordAtPosition(position);
         if (!word) return null;
 
         const wordLower = word.word.toLowerCase();
+        const haveSchema = tables.length > 0;
+        // If no schema is loaded, schema-aware hover paths are skipped but
+        // keyword/function hovers still work — fall through to the fallback.
+        if (!haveSchema) {
+          return this.buildKeywordOrFunctionHover(word.word) ?? null;
+        }
 
         // Check if previous character is a dot → this is qualified (table.column or alias.column)
         const lineContent = model.getLineContent(position.lineNumber);
@@ -1428,10 +1835,8 @@ export class MonacoIntelliSenseService {
             }
             // Qualifier might be an alias — resolve from current text
             const fullText = model.getValue();
-            const strippedText = this.stripStringsAndComments(fullText);
-            const tableByName = new Map<string, TableSchema>();
-            tables.forEach(t => tableByName.set(t.name.toLowerCase(), t));
-            const refs = this.parseTableReferences(strippedText, tableByName);
+            const strippedText = this.stripCached(fullText);
+            const refs = this.getCachedTableRefs(strippedText, tableByName);
             const ref = refs.find(
               r =>
                 (r.alias && r.alias.toLowerCase() === qualifier) ||
@@ -1505,10 +1910,8 @@ export class MonacoIntelliSenseService {
 
         // Check if it's an alias — resolve and show the real table
         const fullText = model.getValue();
-        const strippedFull = this.stripStringsAndComments(fullText);
-        const tableByName = new Map<string, TableSchema>();
-        tables.forEach(t => tableByName.set(t.name.toLowerCase(), t));
-        const refs = this.parseTableReferences(strippedFull, tableByName);
+        const strippedFull = this.stripCached(fullText);
+        const refs = this.getCachedTableRefs(strippedFull, tableByName);
         const aliasRef = refs.find(
           r => r.alias && r.alias.toLowerCase() === wordLower,
         );
@@ -1571,9 +1974,44 @@ export class MonacoIntelliSenseService {
           return { contents };
         }
 
-        return null;
+        // Last resort: SQL keyword or built-in function tooltip.
+        return this.buildKeywordOrFunctionHover(word.word) ?? null;
       },
     });
+  }
+
+  /**
+   * Look up `word` in the static SQL_KEYWORDS / SQL_FUNCTIONS lists and
+   * return a hover-content payload, or null if there's no match. Case
+   * insensitive.
+   */
+  private buildKeywordOrFunctionHover(
+    word: string,
+  ): { contents: { value: string }[] } | null {
+    const upper = word.toUpperCase();
+
+    // Built-in functions carry richer info (params + description).
+    const fn = SQL_FUNCTIONS.find(f => f.name.toUpperCase() === upper);
+    if (fn) {
+      return {
+        contents: [
+          { value: `**${fn.name}**(${fn.params})` },
+          { value: fn.description },
+        ],
+      };
+    }
+
+    // Keywords are a flat list — only show a tooltip for the canonical match.
+    if (SQL_KEYWORDS.includes(upper)) {
+      return {
+        contents: [
+          { value: `**${upper}**` },
+          { value: '_SQL keyword_' },
+        ],
+      };
+    }
+
+    return null;
   }
 
   private buildColumnHoverContents(
@@ -1587,10 +2025,14 @@ export class MonacoIntelliSenseService {
       },
     ];
     if (col.isPrimaryKey) contents.push({ value: '🔑 **Primary Key**' });
-    if (col.isForeignKey) {
-      contents.push({
-        value: `🔗 **Foreign Key** → ${col.foreignKeyTable}.${col.foreignKeyColumn}`,
-      });
+    if (col.isForeignKey && col.foreignKeyTable) {
+      const ref = col.foreignKeySchema
+        ? `${col.foreignKeySchema}.${col.foreignKeyTable}.${col.foreignKeyColumn}`
+        : `${col.foreignKeyTable}.${col.foreignKeyColumn}`;
+      contents.push({ value: `🔗 **Foreign Key** → ${ref}` });
+    }
+    if (col.defaultValue) {
+      contents.push({ value: `**Default:** \`${col.defaultValue}\`` });
     }
     return contents;
   }
@@ -1734,7 +2176,13 @@ export class MonacoIntelliSenseService {
     doc += `**Nullable:** ${col.nullable ? 'Yes' : 'No'}\n`;
     if (col.isPrimaryKey) doc += `**Primary Key:** Yes\n`;
     if (col.isForeignKey && col.foreignKeyTable) {
-      doc += `**Foreign Key:** References ${col.foreignKeyTable}.${col.foreignKeyColumn}\n`;
+      const ref = col.foreignKeySchema
+        ? `${col.foreignKeySchema}.${col.foreignKeyTable}.${col.foreignKeyColumn}`
+        : `${col.foreignKeyTable}.${col.foreignKeyColumn}`;
+      doc += `**Foreign Key:** References ${ref}\n`;
+    }
+    if (col.defaultValue) {
+      doc += `**Default:** \`${col.defaultValue}\`\n`;
     }
     return doc;
   }

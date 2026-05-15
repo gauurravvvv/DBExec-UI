@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .form-field {
   display: flex;
   flex-direction: column;
@@ -59,6 +64,19 @@
     background: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
+    outline: none !important;
+
+    &,
+    &:focus,
+    &:focus-visible,
+    &:focus-within,
+    &.p-focus,
+    *,
+    *:focus,
+    *:focus-visible {
+      outline: none !important;
+      outline-offset: 0 !important;
+    }
 
     &.ng-invalid.ng-touched,
     &.ng-invalid.ng-dirty {
@@ -82,6 +100,8 @@
       color: var(--text-color);
       font-size: var(--fs-body);
       padding: 0.625rem 0.75rem;
+      border: none !important;
+      box-shadow: none !important;
 
       &.p-placeholder {
         color: var(--text-color);
@@ -97,6 +117,18 @@
     .p-dropdown-trigger {
       color: var(--text-color);
       opacity: 0.7;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    // PrimeNG renders a hidden focusable input inside .p-hidden-accessible —
+    // suppress any browser default outline that may bleed through
+    .p-hidden-accessible,
+    .p-hidden-accessible input,
+    input {
+      outline: none !important;
+      box-shadow: none !important;
+      border: none !important;
     }
   }
 

@@ -73,8 +73,17 @@ export class EditAnalysesComponent
     return this._isDirty;
   }
 
+  /**
+   * Monotonic counter passed down to chart-renderer as `configVersion`. Bumped
+   * on every mutation that should re-render the chart — config sidebar field
+   * tweaks, axis remaps, etc. — so OnPush sees a real Input change and CD
+   * reaches the inner EchartVisual whose ngDoCheck does the deep diff.
+   */
+  chartConfigVersion = 0;
+
   markDirty(): void {
     this._isDirty = true;
+    this.chartConfigVersion++;
   }
   datasetId: string = '';
   analysisDetails: any = null;
@@ -174,6 +183,41 @@ export class EditAnalysesComponent
     if (type.includes('enum') || type.includes('user-defined'))
       return 'pi-sliders-h';
     return 'pi-bars';
+  }
+
+  /** Coarse type bucket, used to color the field-icon chip per type. */
+  getDataTypeCategory(dataType: string): string {
+    if (!dataType) return 'other';
+    const type = dataType.toLowerCase();
+    if (
+      type.includes('int') ||
+      type.includes('numeric') ||
+      type.includes('decimal') ||
+      type.includes('float') ||
+      type.includes('double') ||
+      type.includes('real') ||
+      type.includes('serial') ||
+      type.includes('money')
+    )
+      return 'numeric';
+    if (
+      type.includes('char') ||
+      type.includes('text') ||
+      type.includes('string') ||
+      type.includes('citext') ||
+      type.includes('name')
+    )
+      return 'text';
+    if (type.includes('bool')) return 'bool';
+    if (
+      type.includes('timestamp') ||
+      type.includes('date') ||
+      type.includes('time') ||
+      type.includes('interval')
+    )
+      return 'date';
+    if (type.includes('uuid') || type.includes('json')) return 'special';
+    return 'other';
   }
 
   // Combined fields: dataset-level + analysis-level (cached)

@@ -86,7 +86,11 @@
         }
 
         .btn-save {
-          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
@@ -162,8 +166,6 @@
 
       // Hide number input spinners
       input[type='number'] {
-        -moz-appearance: textfield;
-
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
           -webkit-appearance: none;
@@ -176,6 +178,11 @@
         flex-direction: column;
         gap: var(--space-4);
         width: 50%;
+
+        app-custom-dropdown {
+          width: 100% !important
+          ;
+        }
 
         label {
           font-weight: var(--fw-medium);
@@ -815,6 +822,14 @@
   app-custom-input {
     width: 100%;
   }
+
+  .form-field {
+    width: 100%;
+
+    app-custom-dropdown {
+      width: 100%;
+    }
+  }
 }
 
 .admin-setup-group {
@@ -847,6 +862,7 @@
       color: var(--secondary-color);
       cursor: not-allowed;
       opacity: 0.5;
+      pointer-events: none;
     }
 
     i {
@@ -860,6 +876,11 @@
     gap: 0.35rem;
     font-size: var(--fs-control);
     font-weight: var(--fw-medium);
+    // Long BE error messages ("Connection refused at host..." etc.) shouldn't
+    // overflow the row or break mid-word into a single column.
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 
     &.success {
       color: var(--success-color);
@@ -871,6 +892,7 @@
 
     i {
       font-size: var(--fs-body);
+      flex-shrink: 0;
     }
   }
 }

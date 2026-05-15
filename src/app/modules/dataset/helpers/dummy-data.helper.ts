@@ -7,8 +7,12 @@ export interface TableColumn {
   name: string;
   type: string;
   nullable: boolean;
+  /** Server-supplied default expression (e.g. `nextval(...)`, `CURRENT_DATE`). */
+  defaultValue?: string | null;
   isPrimaryKey?: boolean;
   isForeignKey?: boolean;
+  /** Schema of the referenced table, when known. */
+  foreignKeySchema?: string;
   foreignKeyTable?: string;
   foreignKeyColumn?: string;
 }
@@ -16,6 +20,12 @@ export interface TableColumn {
 export interface TableSchema {
   name: string;
   columns: TableColumn[];
+  /**
+   * Stable per-(schema, table) alias pre-computed by the BE
+   * (e.g. `emp_24b`). Used as the default alias suggestion in the editor so
+   * the FE doesn't need to derive one from the table name.
+   */
+  alias?: string;
 }
 
 export interface SchemaGroup {
@@ -36,6 +46,18 @@ export interface QueryResult {
   executionTime?: string | number;
   error?: string;
   message?: string;
+  query?: string;
+}
+
+/**
+ * Shape of the `data` field on a successful query/execute response from the BE.
+ */
+export interface QueryExecuteData {
+  columns: string[];
+  columnTypes?: Record<string, string>;
+  data: any[];
+  rowCount: number;
+  executionTime?: string | number;
   query?: string;
 }
 

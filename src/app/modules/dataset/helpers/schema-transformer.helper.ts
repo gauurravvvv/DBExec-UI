@@ -1,3 +1,4 @@
+import { IAPIResponse } from 'src/app/core/interfaces/global.interface';
 import {
   DatasourceSchema,
   SchemaGroup,
@@ -6,88 +7,87 @@ import {
 } from './dummy-data.helper';
 
 /**
- * Helper class for transforming API responses into DatasourceSchema format
+ * Shape of a single column entry as returned by /query/getStructure on the BE.
+ * See DbExec-API/src/controllers/query/getDatasourceStructure.ts.
  */
+interface ApiColumn {
+  name: string;
+  type: string;
+  nullable: boolean;
+  default_value?: string | null;
+  is_primary_key?: boolean;
+  is_foreign_key?: boolean;
+  foreign_key_schema?: string | null;
+  foreign_key_table?: string | null;
+  foreign_key_column?: string | null;
+}
+
+/** Shape of a single table entry in the BE schema response. */
+interface ApiTable {
+  table_name: string;
+  table_alias?: string;
+  columns: ApiColumn[];
+}
+
+/** Shape of a single schema entry in the BE schema response. */
+interface ApiSchemaGroup {
+  schema_name: string;
+  tables: ApiTable[];
+}
+
+/** Helper class for transforming the BE schema response into DatasourceSchema. */
 export class SchemaTransformerHelper {
   /**
-   * Transform API response to DatasourceSchema interface
-   * @param response - API response from backend
-   * @returns DatasourceSchema array
+   * Convert the BE `/query/getStructure` response into a DatasourceSchema
+   * array. The BE always returns the same shape (validated in
+   * DbExec-API/src/controllers/query/getDatasourceStructure.ts), so this is a
+   * straight mapping. If the response shape ever drifts, the type system and
+   * Logger.error in the controller will surface the mismatch — no defensive
+   * fallbacks needed here.
+   *
+   * Returns a single-element array (one logical datasource per response) to
+   * match the existing call-site contract.
    */
-  static transformSchemaResponse(response: any): DatasourceSchema[] {
-    // Transform the API response to match our DatasourceSchema interface
-    const schemas: SchemaGroup[] = [];
+  static transformSchemaResponse(
+    response: IAPIResponse<ApiSchemaGroup[]> | ApiSchemaGroup[],
+  ): DatasourceSchema[] {
+    // Accept either the wrapped envelope or a bare array (some legacy
+    // callers may have already unwrapped).
+    const schemasData: ApiSchemaGroup[] = Array.isArray(response)
+      ? response
+      : (response?.data ?? []);
 
-    // Handle different API response formats:
-    // 1. { data: { schemas: [...] } } - wrapped response
-    // 2. { schemas: [...] } - direct response
-    // 3. { data: [...] } - legacy format
-    let schemasData =
-      response?.data?.schemas || response?.schemas || response?.data;
+    const schemas: SchemaGroup[] = schemasData.map(
+      (schemaData): SchemaGroup => ({
+        name: schemaData.schema_name || 'public',
+        tables: (schemaData.tables ?? []).map(
+          (tableData): TableSchema => ({
+            name: tableData.table_name,
+            alias: tableData.table_alias,
+            columns: (tableData.columns ?? []).map(
+              (col): TableColumn => ({
+                name: col.name,
+                type: col.type,
+                nullable: col.nullable === true,
+                defaultValue: col.default_value ?? null,
+                isPrimaryKey: col.is_primary_key === true,
+                isForeignKey: col.is_foreign_key === true,
+                foreignKeySchema: col.foreign_key_schema ?? undefined,
+                foreignKeyTable: col.foreign_key_table ?? undefined,
+                foreignKeyColumn: col.foreign_key_column ?? undefined,
+              }),
+            ),
+          }),
+        ),
+      }),
+    );
 
-    // If schemasData is an object with schemas property (nested), unwrap it
-    if (schemasData && !Array.isArray(schemasData) && schemasData.schemas) {
-      schemasData = schemasData.schemas;
-    }
-
-    if (schemasData && Array.isArray(schemasData)) {
-      for (const schemaData of schemasData) {
-        const tables: TableSchema[] = [];
-
-        // Handle tables array
-        const tablesData = schemaData.tables || [];
-        if (Array.isArray(tablesData)) {
-          for (const tableData of tablesData) {
-            const columns: TableColumn[] = [];
-
-            // Handle columns array
-            const columnsData = tableData.columns || [];
-
-            if (Array.isArray(columnsData)) {
-              for (const col of columnsData) {
-                columns.push({
-                  name: col.name || col.column_name,
-                  type: col.type || col.data_type,
-                  nullable: col.nullable === true || col.is_nullable === 'YES',
-                  isPrimaryKey: col.isPrimaryKey || col.is_primary_key || false,
-                  isForeignKey: col.isForeignKey || col.is_foreign_key || false,
-                  foreignKeyTable: col.foreignKeyTable || col.foreign_key_table,
-                  foreignKeyColumn:
-                    col.foreignKeyColumn || col.foreign_key_column,
-                });
-              }
-            }
-
-            tables.push({
-              name: tableData.table || tableData.table_name || tableData.name,
-              columns: columns,
-            });
-          }
-        }
-
-        const schemaName =
-          schemaData.schema ||
-          schemaData.schema_name ||
-          schemaData.name ||
-          'public';
-        schemas.push({
-          name: schemaName,
-          tables: tables,
-        });
-      }
-    }
-
-    const result = [
+    return [
       {
-        name:
-          response.datasource_name ||
-          response?.data?.datasource_name ||
-          response.name ||
-          'datasource',
-        schemas: schemas,
+        name: 'datasource',
+        schemas,
       },
     ];
-    return result;
   }
 
   /**

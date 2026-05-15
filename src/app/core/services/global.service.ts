@@ -7,14 +7,8 @@ import { MessageService } from 'primeng/api';
 import { BehaviorSubject } from 'rxjs';
 import { StorageType } from '../../constants/storageType';
 import { ROLES } from '../../constants/user.constant';
+import { IAPIResponse } from '../interfaces/global.interface';
 import { StorageService } from './storage.service';
-
-interface IAPIResponse {
-  code: number;
-  message: string;
-  data?: any;
-  status: boolean;
-}
 
 @Injectable({
   providedIn: 'root',

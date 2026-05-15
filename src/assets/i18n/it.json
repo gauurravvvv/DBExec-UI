@@ -326,6 +326,7 @@
     "TESTING_CONNECTION": "Test connessione in corso...",
     "CONNECTED": "Connesso",
     "CONNECTION_FAILED": "Connessione fallita",
+    "DB_PASSWORD_REQUIRED": "La password del database è obbligatoria",
     "ORG_ADMIN": "Amministratore organizzazione",
     "ADMIN_EMAIL": "E-mail amministratore",
     "ADMIN_EMAIL_PLACEHOLDER": "admin@example.com",
@@ -410,7 +411,9 @@
     "MAX_ENVIRONMENTS": "Ambienti massimi",
     "MAX_CATEGORIES": "Categorie massime",
     "ADMIN_LANGUAGE": "Lingua dell'amministratore",
-    "ADMIN_LANGUAGE_PLACEHOLDER": "Seleziona la lingua per l'email di benvenuto"
+    "ADMIN_LANGUAGE_PLACEHOLDER": "Seleziona la lingua per l'email di benvenuto",
+    "ADMIN_LOCALE": "Lingua dell'amministratore",
+    "ADMIN_LOCALE_PLACEHOLDER": "Seleziona la lingua per l'email di benvenuto"
   },
   "ROLE": {
     "TITLE": "Ruoli",

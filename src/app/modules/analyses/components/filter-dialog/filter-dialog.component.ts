@@ -73,6 +73,8 @@ export const DATE_FORMAT_OPTIONS = [
 @Component({
   selector: 'app-filter-dialog',
   templateUrl: './filter-dialog.component.html',
+  // No styleUrls — see visuals-chart-sidebar for context. The filter
+  // dialog form selectors live in the parent edit-analyses stylesheet.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterDialogComponent implements OnChanges {

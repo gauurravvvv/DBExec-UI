@@ -79,7 +79,11 @@
         }
 
         .btn-save {
-          background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
           color: white !important;
           border: none !important;
           padding: 0.65rem 1.25rem;
@@ -393,6 +397,9 @@
     font-weight: var(--fw-medium);
     text-decoration: none;
     transition: opacity var(--motion-base) ease;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
 
     &:hover:not(.disabled) {
       opacity: 0.8;
@@ -401,10 +408,12 @@
     &.disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      pointer-events: none;
     }
 
     i {
       font-size: var(--fs-body);
+      flex-shrink: 0;
 
       &.pi-check-circle {
         color: var(--success-color);
@@ -652,8 +661,6 @@
 
 .p-input-icon-left {
   input[type='number'] {
-    -moz-appearance: textfield; /* Firefox */
-
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
